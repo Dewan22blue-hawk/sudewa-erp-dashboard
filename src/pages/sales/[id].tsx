@@ -14,6 +14,11 @@ import { InvoiceItemTable } from "@/components/features/sales/detail/InvoiceItem
  */
 export default function SalesDetailPage() {
     const router = useRouter()
+    const { id } = router.query
+
+    const handleEdit = () => {
+        router.push(`/sales/edit/${id}`)
+    }
 
     return (
         <DashboardLayout>
@@ -49,7 +54,7 @@ export default function SalesDetailPage() {
                             <Printer className="mr-2 h-4 w-4" />
                             Print
                         </Button>
-                        <Button size="sm">
+                        <Button size="sm" onClick={handleEdit}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                         </Button>

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { useRouter } from "next/router"
 import {
     TableRow,
     TableCell,
@@ -27,9 +28,26 @@ function formatNumber(value: number): string {
 }
 
 /**
- * Sales Table Row - EXACT sesuai Figma dengan checkbox state
+ * Sales Table Row - EXACT sesuai Figma dengan checkbox state dan navigasi
  */
 export function SalesTableRow({ item, isSelected, onToggle }: Props) {
+    const router = useRouter()
+
+    const handleEdit = () => {
+        router.push(`/sales/edit/${item.id}`)
+    }
+
+    const handleDetail = () => {
+        router.push(`/sales/${item.id}`)
+    }
+
+    const handleDelete = () => {
+        if (confirm(`Hapus ${item.kodeJual}?`)) {
+            console.log('Delete item:', item.id)
+            alert('Item deleted!')
+        }
+    }
+
     return (
         <TableRow className="hover:bg-muted/30">
             {/* Checkbox */}
@@ -90,10 +108,14 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Detail</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleEdit}>
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDetail}>
+                            Detail
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Print</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                             Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>
