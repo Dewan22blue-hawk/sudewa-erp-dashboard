@@ -49,9 +49,9 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
     }
 
     return (
-        <TableRow className="hover:bg-muted/30">
+        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 hover:bg-accent/50">
             {/* Checkbox */}
-            <TableCell className="w-12">
+            <TableCell className="w-12 transition-all duration-200 group-hover:translate-x-0.5">
                 <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onToggle(item.id)}
@@ -59,51 +59,51 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
             </TableCell>
 
             {/* Kode Jual - Link biru */}
-            <TableCell>
+            <TableCell className="transition-all duration-200">
                 <Link
                     href={`/sales/${item.id}`}
-                    className="font-medium text-blue-600 hover:underline"
+                    className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
                 >
                     {item.kodeJual}
                 </Link>
             </TableCell>
 
             {/* Tanggal */}
-            <TableCell>{item.tanggal}</TableCell>
+            <TableCell className="transition-all duration-200">{item.tanggal}</TableCell>
 
             {/* Customer */}
-            <TableCell>{item.customer}</TableCell>
+            <TableCell className="transition-all duration-200">{item.customer}</TableCell>
 
             {/* Total Biaya */}
-            <TableCell className="text-left">
+            <TableCell className="text-left transition-all duration-200">
                 {item.totalBiaya}
             </TableCell>
 
             {/* Total DPP */}
-            <TableCell className="text-right">
+            <TableCell className="text-right transition-all duration-200">
                 {formatNumber(item.totalDpp)}
             </TableCell>
 
             {/* Total PPN */}
-            <TableCell className="text-right">
+            <TableCell className="text-right transition-all duration-200">
                 {formatNumber(item.totalPpn)}
             </TableCell>
 
             {/* Total Jual */}
-            <TableCell className="text-right">
+            <TableCell className="text-right transition-all duration-200">
                 {formatNumber(item.totalJual)}
             </TableCell>
 
             {/* Kurang Bayar - MERAH */}
-            <TableCell className="text-right font-semibold text-red-600">
+            <TableCell className="text-right font-semibold text-red-600 transition-all duration-200">
                 {formatNumber(item.kurangBayar)}
             </TableCell>
 
             {/* Action Dropdown */}
-            <TableCell className="text-right">
+            <TableCell className="text-right transition-all duration-200">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="rounded-md p-1 hover:bg-muted">
+                        <button className="rounded-md p-1 hover:bg-muted transition-colors duration-200 hover:scale-110 active:scale-95 transform">
                             <MoreVertical className="h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>

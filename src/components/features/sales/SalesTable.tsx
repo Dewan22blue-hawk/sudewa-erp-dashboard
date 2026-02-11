@@ -63,10 +63,10 @@ export function SalesTable() {
 
     return (
         <div className="space-y-4">
-            <div className="rounded-sm border bg-card shadow-sm">
+            <div className="rounded-sm border bg-card shadow-md hover:shadow-lg transition-shadow duration-300">
                 <Table>
                     <TableHeader>
-                        <TableRow style={{ backgroundColor: '#F9FAFB' }}>
+                        <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
                             <TableHead className="w-12">
                                 <Checkbox
                                     checked={allCurrentPageSelected && currentPageIds.length > 0}
@@ -88,7 +88,7 @@ export function SalesTable() {
                     </TableHeader>
 
                     <TableBody>
-                        {currentData.map((item) => (
+                        {currentData.map((item, index) => (
                             <SalesTableRow
                                 key={item.id}
                                 item={item}

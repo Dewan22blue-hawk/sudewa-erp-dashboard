@@ -110,7 +110,7 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
             <CardContent className="p-0">
                 <Table>
                     <TableHeader>
-                        <TableRow style={{ backgroundColor: '#F9FAFB' }}>
+                        <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
                             {/* Bulk Select Checkbox */}
                             <TableHead className="w-12">
                                 <Checkbox
@@ -135,32 +135,32 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
 
                     <TableBody>
                         {currentData.map((item, i) => (
-                            <TableRow key={item.id} className="hover:bg-muted/30">
+                            <TableRow key={item.id} className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 hover:bg-accent/50">
                                 {/* Checkbox */}
-                                <TableCell className="w-12">
+                                <TableCell className="w-12 transition-all duration-200 group-hover:translate-x-0.5">
                                     <Checkbox
                                         checked={selectedIds.has(item.id)}
                                         onCheckedChange={() => handleToggle(item.id)}
                                     />
                                 </TableCell>
 
-                                <TableCell className="font-medium">{startIndex + i + 1}</TableCell>
-                                <TableCell className="font-medium">{item.unitType}</TableCell>
-                                <TableCell className="text-center">{item.qty}</TableCell>
-                                <TableCell className="text-right">{formatNumber(item.hargaJual)}</TableCell>
-                                <TableCell className="text-right">{item.biayaBbn}</TableCell>
-                                <TableCell className="text-right">{item.biayaEkspedisi}</TableCell>
-                                <TableCell className="text-right">{item.biayaLain}</TableCell>
-                                <TableCell className="text-right">{formatNumber(item.hpp)}</TableCell>
-                                <TableCell className="text-right">{formatNumber(item.dpp)}</TableCell>
-                                <TableCell className="text-right">{formatNumber(item.ppn)}</TableCell>
-                                <TableCell className="text-right font-semibold">{formatNumber(item.jumlah)}</TableCell>
+                                <TableCell className="font-medium transition-all duration-200">{startIndex + i + 1}</TableCell>
+                                <TableCell className="font-medium transition-all duration-200">{item.unitType}</TableCell>
+                                <TableCell className="text-center transition-all duration-200">{item.qty}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.hargaJual)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{item.biayaBbn}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{item.biayaEkspedisi}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{item.biayaLain}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.hpp)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.dpp)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.ppn)}</TableCell>
+                                <TableCell className="text-right font-semibold transition-all duration-200">{formatNumber(item.jumlah)}</TableCell>
 
                                 {/* Action Dropdown */}
-                                <TableCell className="text-center">
+                                <TableCell className="text-center transition-all duration-200">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="rounded-md p-1 hover:bg-muted">
+                                            <button className="rounded-md p-1 hover:bg-muted transition-colors duration-200 hover:scale-110 active:scale-95 transform">
                                                 <MoreVertical className="h-4 w-4 text-muted-foreground" />
                                             </button>
                                         </DropdownMenuTrigger>
