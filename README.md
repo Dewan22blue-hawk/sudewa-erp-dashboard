@@ -10,7 +10,7 @@
 
 ---
 
-## 📋 Daftar Isi
+## Daftar Isi
 
 - [Tentang Project](#-tentang-project)
 - [Fitur Utama](#-fitur-utama)
@@ -25,48 +25,48 @@
 
 ---
 
-## 🎯 Tentang Project
+## Tentang Project
 
 **Wajira Dashboard** adalah aplikasi web-based ERP (Enterprise Resource Planning) yang dirancang khusus untuk mengelola operasional multi-perusahaan di grup Wajira. Dashboard ini menyediakan antarmuka yang modern, responsif, dan user-friendly untuk memantau data penjualan, inventory, keuangan, dan laporan bisnis secara real-time.
 
 ### Kenapa Dashboard Ini Dibuat?
 
 Dashboard ini ngatasi beberapa pain points:
-- 🔄 **Multi-Company Management**: Satu user bisa akses dan switch antar beberapa perusahaan
-- 📊 **Real-time Monitoring**: Data finansial dan operasional ter-update otomatis
-- 🎨 **Modern UI/UX**: Interface yang apik lan gampang digunakne
-- 🔐 **Role-based Access**: Sistem permission sing terstruktur kanggo keamanan data
+-  **Multi-Company Management**: Satu user bisa akses dan switch antar beberapa perusahaan
+-  **Real-time Monitoring**: Data finansial dan operasional ter-update otomatis
+-  **Modern UI/UX**: Interface yang apik lan gampang digunakne
+-  **Role-based Access**: Sistem permission sing terstruktur kanggo keamanan data
 
 ---
 
-## ✨ Fitur Utama
+##  Fitur Utama
 
-### 🔐 Authentication & Authorization
+###  Authentication & Authorization
 - [x] Login page dengan split-screen modern design
 - [x] Token-based authentication
 - [x] Route guards untuk proteksi halaman
 - [x] Auto-redirect berdasarkan auth state
 
-### 🏢 Multi-Company System
+### Multi-Company System
 - [x] Company selection page setelah login
 - [x] Dynamic company selector di sidebar
 - [x] Seamless switch antar perusahaan
 - [x] Company-specific data isolation
 
-### 📊 Dashboard & Analytics
+### Dashboard & Analytics
 - [x] Overview keuangan (BCA, RCA, Cash, Net Worth)
 - [x] Grafik tren keuangan bulanan
 - [x] Chart Pemasukan dengan visualization
 - [x] Responsive cards dengan animasi
 
-### 💰 Sales Management
+###  Sales Management
 - [x] Daftar penjualan dengan pagination
 - [x] Detail penjualan unit
 - [x] Edit penjualan (form lengkap)
 - [x] Dynamic table dengan animasi hover
 - [x] Bulk selection & actions
 
-### 🎨 UI/UX Excellence
+###  UI/UX Excellence
 - [x] Smooth animations (fade-in, slide, hover effects)
 - [x] Modern table styling à la shadcn/ui
 - [x] Responsive design (mobile-first)
@@ -175,22 +175,22 @@ wajira-dashboard/
 
 ### Penjelasan Struktur
 
-#### 📦 `components/ui/`
+####  `components/ui/`
 Komponen UI dasar sing reusable, kebanyakan dari shadcn/ui. **Jangan dimodifikasi langsung** kecuali untuk styling spesifik.
 
-#### 🧩 `components/features/`
+####  `components/features/`
 Komponen sing spesifik kanggo fitur tertentu (dashboard, sales, navigation). Organized by feature domain.
 
-#### 🎨 `components/layout/`
+####  `components/layout/`
 Komponen layout utama (Sidebar, Topbar, DashboardLayout) sing digunakan di semua halaman dashboard.
 
-#### 📄 `pages/`
+####  `pages/`
 Halaman-halaman aplikasi (Next.js Pages Router). File structure = route structure.
 
-#### 🌐 `contexts/`
+####  `contexts/`
 Global state management menggunakan React Context API.
 
-#### 🔌 `services/`
+####  `services/`
 API service layer, **backend-ready** dengan dummy data. Gampang diganti ke real API call.
 
 ---
@@ -208,8 +208,8 @@ Pastikan sudah install:
 
 ```bash
 # Clone repository
-git clone <repository-url>
-cd wajira-dashboard
+git clone <repository-url-ikiyoo>
+cd jenenge-repo-nyo
 
 # Install dependencies
 npm install
@@ -232,7 +232,7 @@ npm start
 
 ---
 
-## 🔐 Sistem Autentikasi
+##  Sistem Autentikasi
 
 Dashboard menggunakan **token-based authentication** dengan route guards.
 
