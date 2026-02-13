@@ -6,6 +6,7 @@ export interface Supplier {
     npwp: string
     pic: string
     phone: string
+    companyId: string
     createdAt: string
     updatedAt: string
 }
@@ -16,6 +17,7 @@ export interface CreateSupplierRequest {
     npwp: string
     pic: string
     phone: string
+    companyId: string
 }
 
 export interface UpdateSupplierRequest {

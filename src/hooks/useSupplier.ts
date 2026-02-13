@@ -10,10 +10,11 @@ import type {
     UpdateSupplierRequest,
 } from "@/@types/supplier.types"
 
-export function useSuppliers() {
+export function useSuppliers(companyId: string | null) {
     return useQuery({
-        queryKey: ["suppliers"],
-        queryFn: getSuppliers,
+        queryKey: ["suppliers", companyId],
+        queryFn: () => getSuppliers(companyId!),
+        enabled: !!companyId,
     })
 }
 

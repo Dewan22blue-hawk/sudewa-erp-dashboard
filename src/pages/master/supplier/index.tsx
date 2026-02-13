@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
+import { useCompany } from "@/contexts/CompanyContext"
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from "@/hooks/useSupplier"
 import { createSupplierSchema, type CreateSupplierFormValues } from "@/scheme/supplier.schema"
 import { SupplierTable } from "@/components/features/supplier/SupplierTable"
@@ -14,7 +15,8 @@ import { DeleteSupplierDialog } from "@/components/features/supplier/DeleteSuppl
 import type { Supplier } from "@/@types/supplier.types"
 
 export default function SupplierPage() {
-    const { data, isLoading, isError } = useSuppliers()
+    const { companyId } = useCompany()
+    const { data, isLoading, isError } = useSuppliers(companyId)
     const createSupplier = useCreateSupplier()
     const updateSupplier = useUpdateSupplier()
     const deleteSupplier = useDeleteSupplier()
@@ -75,12 +77,21 @@ export default function SupplierPage() {
     }
 
     const onSubmitCreate = async (values: CreateSupplierFormValues) => {
+        if (!companyId) {
+            toast.error("Company ID tidak ditemukan")
+            return
+        }
+
         try {
-            await createSupplier.mutateAsync(values)
+            await createSupplier.mutateAsync({
+                ...values,
+                companyId,
+            })
             handleCloseCreateModal()
             toast.success("Data berhasil ditambahkan")
         } catch (error) {
             console.error("Failed to create supplier:", error)
+            toast.error("Gagal menambahkan data supplier")
         }
     }
 
@@ -96,6 +107,7 @@ export default function SupplierPage() {
             toast.success("Data berhasil diperbarui")
         } catch (error) {
             console.error("Failed to update supplier:", error)
+            toast.error("Gagal memperbarui data supplier")
         }
     }
 
@@ -119,6 +131,7 @@ export default function SupplierPage() {
             toast.success("Data berhasil dihapus")
         } catch (error) {
             console.error("Failed to delete supplier:", error)
+            toast.error("Gagal menghapus data supplier")
         }
     }
 

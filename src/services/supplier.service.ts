@@ -14,6 +14,7 @@ let suppliers: Supplier[] = [
         npwp: "123456789012345",
         pic: "Emilia Clarke",
         phone: "08xx xxxx xxxx",
+        companyId: "1",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     },
@@ -21,13 +22,15 @@ let suppliers: Supplier[] = [
 
 let nextId = 2
 
-export async function getSuppliers(): Promise<SupplierListResponse> {
+export async function getSuppliers(companyId: string): Promise<SupplierListResponse> {
     await new Promise((resolve) => setTimeout(resolve, 300))
 
+    const filteredSuppliers = suppliers.filter(s => s.companyId === companyId)
+
     return {
-        data: suppliers,
+        data: filteredSuppliers,
         meta: {
-            total: suppliers.length,
+            total: filteredSuppliers.length,
             page: 1,
             perPage: 10,
         },
@@ -43,6 +46,7 @@ export async function createSupplier(
         id: String(nextId++),
         code: `SPL-${String(nextId - 1).padStart(3, "0")}`,
         ...payload,
+        companyId: payload.companyId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     }

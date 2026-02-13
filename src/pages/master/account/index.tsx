@@ -35,6 +35,7 @@ import { Account, AccountType } from "@/@types/account.types"
 import { cn } from "@/lib/utils"
 import { z } from "zod"
 import { AccountFormModal } from "@/components/features/account/AccountFormModal"
+import { DeleteAccountDialog } from "@/components/features/account/DeleteAccountDialog"
 import { toast } from "sonner"
 
 type FilterTab = "ALL" | AccountType
@@ -136,11 +137,14 @@ export default function AccountPage() {
             toast.success("Data berhasil ditambahkan")
         } catch (error: any) {
             console.error("Failed to create account:", error)
+
             if (error.message === "Kode akun sudah digunakan") {
                 form.setError("code", {
                     type: "manual",
                     message: "Kode akun sudah digunakan",
                 })
+            } else {
+                toast.error("Gagal menambahkan data akun")
             }
         }
     }
@@ -163,11 +167,14 @@ export default function AccountPage() {
             toast.success("Data berhasil diperbarui")
         } catch (error: any) {
             console.error("Failed to update account:", error)
+
             if (error.message === "Kode akun sudah digunakan") {
                 editForm.setError("code", {
                     type: "manual",
                     message: "Kode akun sudah digunakan",
                 })
+            } else {
+                toast.error("Gagal memperbarui data akun")
             }
         }
     }
@@ -192,6 +199,7 @@ export default function AccountPage() {
             toast.success("Data berhasil dihapus")
         } catch (error) {
             console.error("Failed to delete account:", error)
+            toast.error("Gagal menghapus data akun")
         }
     }
 
@@ -449,31 +457,12 @@ export default function AccountPage() {
             </div>
 
             {/* DELETE CONFIRMATION DIALOG */}
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent className="sm:max-w-[400px]">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl">Hapus Data Ini?</DialogTitle>
-                        <DialogDescription>
-                            Apa anda yakin ingin menghapus data ini?
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="gap-2 sm:gap-0">
-                        <Button
-                            variant="outline"
-                            onClick={() => setDeleteDialogOpen(false)}
-                        >
-                            Batal
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleConfirmDelete}
-                            disabled={deleteAccount.isPending}
-                        >
-                            {deleteAccount.isPending ? "Menghapus..." : "Hapus"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <DeleteAccountDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleConfirmDelete}
+                isDeleting={deleteAccount.isPending}
+            />
 
             {/* CREATE ACCOUNT MODAL */}
             <AccountFormModal
