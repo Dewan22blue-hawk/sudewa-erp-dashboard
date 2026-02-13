@@ -38,6 +38,10 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Akun",
                 href: "/master/account",
             },
+            {
+                label: "Supplier",
+                href: "/master/supplier",
+            },
         ],
     },
     {
