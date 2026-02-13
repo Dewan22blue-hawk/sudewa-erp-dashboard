@@ -42,6 +42,14 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Supplier",
                 href: "/master/supplier",
             },
+            {
+                label: "Customer",
+                href: "/master/customer",
+            },
+            {
+                label: "Tipe Unit",
+                href: "/master/type-unit",
+            },
         ],
     },
     {
