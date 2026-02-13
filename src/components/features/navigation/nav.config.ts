@@ -33,7 +33,12 @@ export const NAV_ITEMS: NavItemConfig[] = [
     {
         label: "Master Data",
         icon: Database,
-        children: [], // Expandable tapi kosong untuk sekarang
+        children: [
+            {
+                label: "Akun",
+                href: "/master/account",
+            },
+        ],
     },
     {
         label: "Transaksi",
