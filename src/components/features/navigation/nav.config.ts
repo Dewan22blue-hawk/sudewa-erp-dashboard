@@ -54,6 +54,10 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Sparepart",
                 href: "/master/sparepart",
             },
+            {
+                label: "Kas",
+                href: "/master/kas",
+            },
         ],
     },
     {
