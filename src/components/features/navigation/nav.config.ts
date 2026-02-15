@@ -58,6 +58,10 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Kas",
                 href: "/master/kas",
             },
+            {
+                label: "User",
+                href: "/master/user",
+            },
         ],
     },
     {
