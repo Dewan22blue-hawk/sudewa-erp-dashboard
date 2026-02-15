@@ -1,0 +1,230 @@
+"use client"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { transactionSchema, TransactionFormValues } from "@/scheme/transaction.schema"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { CalendarIcon, Save } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { DatePicker } from "@/components/ui/date-picker"
+
+// Assuming standard layout components exist where possible, or using raw HTML/Tailwind for precision
+interface Props {
+    defaultValues: any
+    onSubmit: (data: any) => Promise<void>
+    onCancel: () => void
+    isBusy?: boolean
+}
+
+export default function TransactionForm({ defaultValues, onSubmit, onCancel, isBusy }: Props) {
+    const form = useForm<TransactionFormValues>({
+        resolver: zodResolver(transactionSchema) as any,
+        defaultValues,
+    })
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+                {/* SECTION 1: HEADER */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                                <FormLabel>Pilih Tanggal</FormLabel>
+                                <FormControl>
+                                    <DatePicker
+                                        value={field.value ? new Date(field.value) : undefined}
+                                        onChange={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                                        disabled={isBusy}
+                                        placeholder="Pick a date"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                {/* SECTION 2: TRANSACTION INFO */}
+                <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Transaksi</h3>
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Nama Transaksi</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Masukkan nama transaksi" {...field} disabled={isBusy} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                {/* SECTION 3: BANK (Grid Layout) */}
+                <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">BANK</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* USD ROW */}
+                        <FormField
+                            control={form.control}
+                            name="debitUSD"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Debet USD</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
+                                            <Input type="number" className="pl-7" placeholder="0" {...field} disabled={isBusy} />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="creditUSD"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Kredit USD</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
+                                            <Input type="number" className="pl-7" placeholder="0" {...field} disabled={isBusy} />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* IDR ROW */}
+                        <FormField
+                            control={form.control}
+                            name="debitIDR"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Debet IDR</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                            <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="creditIDR"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Kredit IDR</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                            <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                {/* SECTION 4: CASH */}
+                <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">CASH</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                            control={form.control}
+                            name="debitCash"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Debet</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                            <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="creditCash"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Kredit</FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                            <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                {/* SECTION 5: FOOTER */}
+                <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Lainnya</h3>
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Keterangan</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Masukkan Keterangan"
+                                        className="resize-none h-24"
+                                        {...field}
+                                        disabled={isBusy}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={isBusy}>
+                        Batal
+                    </Button>
+                    <Button type="submit" className="bg-black text-white hover:bg-black/90" disabled={isBusy}>
+                        {isBusy ? (
+                            <>Menyimpan...</>
+                        ) : (
+                            <>
+                                <Save className="mr-2 h-4 w-4" />
+                                Simpan
+                            </>
+                        )}
+                    </Button>
+                </div>
+            </form>
+        </Form>
+    )
+}

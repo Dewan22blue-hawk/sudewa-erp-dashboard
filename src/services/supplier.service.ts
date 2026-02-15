@@ -5,7 +5,7 @@ import type {
     SupplierListResponse,
 } from "@/@types/supplier.types"
 
-let suppliers: Supplier[] = [
+const suppliers: Supplier[] = [
     {
         id: "1",
         code: "SPL-001",

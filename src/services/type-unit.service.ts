@@ -5,7 +5,7 @@ import type {
     TypeUnitListResponse,
 } from "@/@types/type-unit.types"
 
-let typeUnits: TypeUnit[] = [
+const typeUnits: TypeUnit[] = [
     {
         id: "1",
         code: "HND-0011",

@@ -69,6 +69,10 @@ export const NAV_ITEMS: NavItemConfig[] = [
         icon: FileText,
         children: [
             {
+                label: "Arus Transaksi",
+                href: "/transaksi/arus-transaksi",
+            },
+            {
                 label: "Penjualan Unit",
                 href: "/sales",
             },

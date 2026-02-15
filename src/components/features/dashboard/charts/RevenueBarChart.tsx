@@ -17,7 +17,7 @@ import { useDashboardData } from "@/hooks/useDashboardData"
  * Padding: 8px horizontal, 6px vertical
  * Border radius: 8px
  */
-function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
+function CustomTooltip({ active, payload, label }: any) {
     if (!active || !payload || !payload.length) return null
 
     return (
@@ -34,7 +34,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
             >
                 <p className="mb-1">{label}</p>
                 <div className="space-y-0.5">
-                    {payload.map((entry, index) => (
+                    {payload.map((entry: any, index: number) => (
                         <div key={index} className="flex items-center gap-2">
                             <div
                                 className="h-2 w-2 rounded-sm"

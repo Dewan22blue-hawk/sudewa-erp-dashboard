@@ -10,6 +10,7 @@ import { ImportSparepartDialog } from "@/components/features/sparepart/ImportSpa
 import { Plus, Upload } from "lucide-react"
 import { useCompany } from "@/contexts/CompanyContext"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Sparepart } from "@/@types/sparepart.types"
 
 export default function SparepartPage() {
     const { companyId } = useCompany()
@@ -18,7 +19,7 @@ export default function SparepartPage() {
 
     const { data, isLoading, isError } = useSpareparts(safeCompanyId)
 
-    const [selected, setSelected] = useState<any>(null)
+    const [selected, setSelected] = useState<Sparepart | null>(null)
     const [openForm, setOpenForm] = useState(false)
     const [openDelete, setOpenDelete] = useState(false)
     const [openImport, setOpenImport] = useState(false)

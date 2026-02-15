@@ -5,7 +5,7 @@ import type {
     CustomerListResponse,
 } from "@/@types/customer.types"
 
-let customers: Customer[] = [
+const customers: Customer[] = [
     {
         id: "1",
         code: "SPL-001",

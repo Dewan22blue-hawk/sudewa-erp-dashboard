@@ -21,7 +21,7 @@ const COLORS = ["#ECB45B", "#B0160D", "#1C3A58"]
 /**
  * Custom Tooltip
  */
-function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
+function CustomTooltip({ active, payload }: any) {
     if (!active || !payload || !payload.length) return null
 
     return (
