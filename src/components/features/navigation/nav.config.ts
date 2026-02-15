@@ -50,6 +50,10 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Tipe Unit",
                 href: "/master/type-unit",
             },
+            {
+                label: "Sparepart",
+                href: "/master/sparepart",
+            },
         ],
     },
     {
