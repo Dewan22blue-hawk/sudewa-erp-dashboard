@@ -114,7 +114,9 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
                         <DropdownMenuItem onClick={handleDetail}>
                             Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/sales/${item.id}?print=true`, '_blank')}>
+                            Print
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                             Hapus
                         </DropdownMenuItem>

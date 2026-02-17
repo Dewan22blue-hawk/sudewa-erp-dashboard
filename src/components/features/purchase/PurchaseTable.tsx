@@ -7,23 +7,30 @@ import {
     TableHead,
     TableRow,
     TableBody,
+    TableCell,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { SALES_DATA } from "./sales.data"
-import { SalesTableRow } from "./SalesTableRow"
-import { Plus } from "lucide-react"
+import { Purchase } from "@/types/purchase.types"
+import { MoreVertical, Plus } from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { format } from "date-fns"
+import { useRouter } from "next/router"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Props {
-    // Add props if needed, simpler for SalesTable as it uses static data
+    data: Purchase[]
+    onDelete: (id: string) => void
     onAdd?: () => void
 }
 
-/**
- * Sales Table Component dengan Pagination dan Bulk Select
- */
-export function SalesTable({ onAdd }: Props) {
+export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
+    const router = useRouter()
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -31,10 +38,10 @@ export function SalesTable({ onAdd }: Props) {
     // Filter data based on search
     const [searchTerm, setSearchTerm] = useState("")
 
-    const filteredData = SALES_DATA.filter(item =>
-        item.kodeJual.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tanggal.includes(searchTerm)
+    const filteredData = data.filter(item =>
+        item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.supplierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.date.includes(searchTerm)
     )
 
     // Pagination logic
@@ -44,6 +51,9 @@ export function SalesTable({ onAdd }: Props) {
     const currentData = filteredData.slice(startIndex, endIndex)
 
     // Reset page when search changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // useEffect(() => setCurrentPage(1), [searchTerm]) // implicit by state setter in onChange if needed, or effect.
+    // Let's use simple logic: if search changes, set page to 1.
     const handleSearch = (term: string) => {
         setSearchTerm(term)
         setCurrentPage(1)
@@ -142,32 +152,88 @@ export function SalesTable({ onAdd }: Props) {
                         <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
                             <TableHead className="w-12">
                                 <Checkbox
-                                    checked={allCurrentPageSelected && currentPageIds.length > 0}
+                                    checked={allCurrentPageSelected}
                                     onCheckedChange={handleBulkSelect}
                                 />
                             </TableHead>
-                            <TableHead className="font-semibold text-foreground">KODE JUAL</TableHead>
+                            <TableHead className="font-semibold text-foreground">KODE BELI</TableHead>
                             <TableHead className="font-semibold text-foreground">TANGGAL</TableHead>
-                            <TableHead className="font-semibold text-foreground">CUSTOMER</TableHead>
-                            <TableHead className="font-semibold text-right text-foreground">TOTAL BIAYA</TableHead>
-                            <TableHead className="font-semibold text-right text-foreground">TOTAL DPP</TableHead>
-                            <TableHead className="font-semibold text-right text-foreground">TOTAL PPN</TableHead>
-                            <TableHead className="font-semibold text-right text-foreground">TOTAL JUAL</TableHead>
-                            <TableHead className="font-semibold text-right text-foreground">KURANG BAYAR</TableHead>
+                            <TableHead className="font-semibold text-foreground">SUPPLIER</TableHead>
+                            <TableHead className="font-semibold text-foreground">TOTAL BIAYA</TableHead>
+                            <TableHead className="font-semibold text-foreground">TOTAL DPP</TableHead>
+                            <TableHead className="font-semibold text-foreground">TOTAL PPN</TableHead>
+                            <TableHead className="font-semibold text-foreground">TOTAL BELI</TableHead>
+                            <TableHead className="font-semibold text-foreground">KURANG BAYAR</TableHead>
                             <TableHead className="font-semibold text-right text-foreground">
                                 ACTION
                             </TableHead>
                         </TableRow>
                     </TableHeader>
-
                     <TableBody>
-                        {currentData.map((item, index) => (
-                            <SalesTableRow
+                        {currentData.map((item) => (
+                            <TableRow
                                 key={item.id}
-                                item={item}
-                                isSelected={selectedIds.has(item.id)}
-                                onToggle={handleToggle}
-                            />
+                                className="border-t hover:bg-muted/40 transition-colors"
+                                data-state={selectedIds.has(item.id) && "selected"}
+                            >
+                                <TableCell className="w-12">
+                                    <Checkbox
+                                        checked={selectedIds.has(item.id)}
+                                        onCheckedChange={() => handleToggle(item.id)}
+                                    />
+                                </TableCell>
+                                <TableCell className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => router.push(`/transaksi/pembelian-unit/${item.id}/detail`)}>
+                                    {item.code}
+                                </TableCell>
+                                <TableCell>
+                                    {format(new Date(item.date), "dd/MM/yyyy")}
+                                </TableCell>
+                                <TableCell>{item.supplierName}</TableCell>
+                                <TableCell>{Number(item.totalCost).toLocaleString("id-ID")}</TableCell>
+                                <TableCell>{Number(item.totalDpp).toLocaleString("id-ID")}</TableCell>
+                                <TableCell>{Number(item.totalPpn).toLocaleString("id-ID")}</TableCell>
+                                <TableCell className="font-semibold">{Number(item.totalPurchase).toLocaleString("id-ID")}</TableCell>
+                                <TableCell className="text-red-500 font-semibold">
+                                    {Number(item.remainingPayment).toLocaleString("id-ID")}
+                                </TableCell>
+
+                                <TableCell className="text-right">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    router.push(`/transaksi/pembelian-unit/${item.id}/detail`)
+                                                }
+                                            >
+                                                Detail
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    router.push(`/transaksi/pembelian-unit/${item.id}/edit`)
+                                                }
+                                            >
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => window.open(`/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}
+                                            >
+                                                Print
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => onDelete(item.id)}
+                                                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                            >
+                                                Hapus
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
+                            </TableRow>
                         ))}
                     </TableBody>
                 </Table>

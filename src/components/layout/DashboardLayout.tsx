@@ -11,10 +11,12 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
     const router = useRouter()
-    const { companyId } = useCompany()
+    const { companyId, isLoading } = useCompany()
 
     // ===== ROUTE GUARD =====
     useEffect(() => {
+        if (isLoading) return // Wait for company check
+
         const token = getToken()
 
         // Jika TIDAK ADA token → redirect ke /login
@@ -28,9 +30,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             router.replace("/select-company")
             return
         }
-    }, [router, companyId])
+    }, [router, companyId, isLoading])
 
-    // Jangan render jika belum ada token atau company_id
+    // Jangan render jika belum ada token atau company_id (tapi tunggu loading)
+    if (isLoading) {
+        return null // Or a loading spinner
+    }
+
     const token = getToken()
     if (!token || !companyId) {
         return null
@@ -38,11 +44,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     return (
         <div className="flex min-h-screen">
-            <Sidebar />
+            <div className="print:hidden">
+                <Sidebar />
+            </div>
             <div className="flex flex-1 flex-col">
-                <Topbar />
-                <main className="flex-1 bg-muted/40 p-6">
-                    <div className="mx-auto max-w-7xl space-y-6">
+                <div className="print:hidden">
+                    <Topbar />
+                </div>
+                <main className="flex-1 bg-muted/40 p-6 print:bg-white print:p-0">
+                    <div className="mx-auto max-w-7xl space-y-6 print:max-w-none print:space-y-4">
                         {children}
                     </div>
                 </main>

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 
 interface CompanyContextValue {
     companyId: string | null
+    isLoading: boolean
     setCompanyId: (id: string) => void
 }
 
@@ -9,10 +10,14 @@ const CompanyContext = createContext<CompanyContextValue | undefined>(undefined)
 
 export function CompanyProvider({ children }: { children: React.ReactNode }) {
     const [companyId, setCompanyIdState] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         const stored = localStorage.getItem("company_id")
-        if (stored) setCompanyIdState(stored)
+        if (stored) {
+            setCompanyIdState(stored)
+        }
+        setIsLoading(false)
     }, [])
 
     function setCompanyId(id: string) {
@@ -21,7 +26,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <CompanyContext.Provider value={{ companyId, setCompanyId }}>
+        <CompanyContext.Provider value={{ companyId, isLoading, setCompanyId }}>
             {children}
         </CompanyContext.Provider>
     )

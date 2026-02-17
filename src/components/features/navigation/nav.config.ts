@@ -76,6 +76,10 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Penjualan Unit",
                 href: "/sales",
             },
+            {
+                label: "Pembelian Unit",
+                href: "/transaksi/pembelian-unit",
+            },
         ],
     },
     {

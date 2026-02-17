@@ -24,20 +24,11 @@ export default function SalesPage() {
                     />
 
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                        </Button>
-
-                        <Button size="sm" onClick={() => router.push("/sales/create")}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Tambah
-                        </Button>
                     </div>
                 </div>
 
                 {/* Sales Table */}
-                <SalesTable />
+                <SalesTable onAdd={() => router.push("/sales/create")} />
             </div>
         </DashboardLayout>
     )

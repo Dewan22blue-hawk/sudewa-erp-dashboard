@@ -1,3 +1,12 @@
+"use client"
+import React, { useState } from "react"
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getPaginationRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
 import {
     Table,
     TableBody,
@@ -6,54 +15,133 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { UnitItem } from "../sales.data"
 import { Button } from "@/components/ui/button"
-import { MoreVertical, Trash2, Pencil, ChevronLeft, ChevronRight, Eye } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/router"
 import {
-    ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    getPaginationRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import React from "react"
+import { ChevronLeft, ChevronRight, Eye, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { PurchaseUnit } from "@/@types/purchase.types"
+import { useRouter } from "next/router"
+import { toast } from "sonner"
+import { useDeletePurchaseUnit } from "@/hooks/usePurchase"
 
 interface Props {
-    units: UnitItem[]
-    salesId: string
+    units: PurchaseUnit[]
+    purchaseId: string
 }
 
-export function SalesUnitTable({ units, salesId }: Props) {
+export default function PurchaseUnitTable({ units, purchaseId }: Props) {
     const router = useRouter()
+    const deleteMutation = useDeletePurchaseUnit()
+    const [unitToDelete, setUnitToDelete] = useState<string | null>(null)
 
-    const columns: ColumnDef<UnitItem>[] = [
+    // DELETE HANDLER
+    const handleDeleteConfirm = async () => {
+        if (!unitToDelete) return
+        try {
+            await deleteMutation.mutateAsync({ purchaseId, unitId: unitToDelete })
+            toast.success("Unit deleted successfully")
+            setUnitToDelete(null)
+        } catch (error) {
+            console.error("Failed to delete unit:", error)
+            toast.error("Failed to delete unit")
+        }
+    }
+
+    // ACTIONS
+    const handleDetail = (unitId: string) => {
+        // Implement router push to detail if exists, or show modal
+        console.log("Detail unit:", unitId)
+    }
+
+    const handleEdit = (unitId: string) => {
+        // Implement router push to edit if exists
+        console.log("Edit unit:", unitId)
+    }
+
+    const columns: ColumnDef<PurchaseUnit>[] = [
         {
             id: "no",
             header: "No",
             cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
         },
         {
-            accessorKey: "color",
-            header: "WARNA",
-            cell: ({ row }) => <div className="font-medium">{row.getValue("color")}</div>,
+            accessorKey: "typeUnitName",
+            header: "TIPE UNIT",
+            cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("typeUnitName")}</div>,
         },
         {
-            accessorKey: "engineNumber",
-            header: "NOMOR MESIN",
-            cell: ({ row }) => <div>{row.getValue("engineNumber")}</div>,
+            accessorKey: "qty",
+            header: "QTY",
+            cell: ({ row }) => <div className="text-foreground pl-4">{row.getValue("qty")}</div>,
         },
         {
-            accessorKey: "chassisNumber",
-            header: "NOMOR RANGKA",
-            cell: ({ row }) => <div>{row.getValue("chassisNumber")}</div>,
+            accessorKey: "price",
+            header: "HARGA BELI",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("price"))
+                const formatted = new Intl.NumberFormat("id-ID").format(amount)
+                return <div className="text-foreground">{formatted}</div>
+            },
+        },
+        {
+            accessorKey: "biayaBBN",
+            header: "BIAYA BBN",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("biayaBBN") || "0")
+                const formatted = new Intl.NumberFormat("id-ID").format(amount)
+                return <div className="text-foreground">{formatted}</div>
+            },
+        },
+        {
+            accessorKey: "biayaEkspedisi",
+            header: "BIAYA EKSPEDISI",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("biayaEkspedisi") || "0")
+                const formatted = new Intl.NumberFormat("id-ID").format(amount)
+                return <div className="text-foreground">{formatted}</div>
+            },
+        },
+        {
+            accessorKey: "biayaLain",
+            header: "BIAYA LAIN",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("biayaLain") || "0")
+                const formatted = new Intl.NumberFormat("id-ID").format(amount)
+                return <div className="text-foreground">{formatted}</div>
+            },
+        },
+        {
+            accessorKey: "hpp",
+            header: "HPP",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("hpp"))
+                const formatted = new Intl.NumberFormat("id-ID").format(amount)
+                return <div className="text-foreground">{formatted}</div>
+            },
+        },
+        {
+            accessorKey: "dpp",
+            header: "DPP",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("dpp"))
+                const formatted = new Intl.NumberFormat("id-ID").format(amount)
+                return <div className="text-foreground">{formatted}</div>
+            },
         },
         {
             id: "actions",
@@ -69,15 +157,16 @@ export function SalesUnitTable({ units, salesId }: Props) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => router.push(`/sales/${salesId}/unit/${unit.id}`)}>
+                                <DropdownMenuItem onClick={() => router.push(`/transaksi/pembelian-unit/${purchaseId}/unit/${unit.id}`)}>
+                                    <Eye className="mr-2 h-4 w-4" />
                                     Detail
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => router.push(`/sales/${salesId}/unit/${unit.id}/edit`)}>
+                                <DropdownMenuItem onClick={() => router.push(`/transaksi/pembelian-unit/${purchaseId}/unit/${unit.id}/edit`)}>
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => console.log("Delete", unit.id)}
+                                    onClick={() => setUnitToDelete(unit.id)}
                                     className="text-red-600 focus:text-red-600 focus:bg-red-50"
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -106,8 +195,8 @@ export function SalesUnitTable({ units, salesId }: Props) {
     return (
         <div className="space-y-4">
             <div>
-                <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
-                <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>
+                <h2 className="text-xl font-semibold">Detail Pembelian Unit</h2>
+                <p className="text-muted-foreground">Rincian lengkap unit yang dibeli</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -132,7 +221,7 @@ export function SalesUnitTable({ units, salesId }: Props) {
                 <span className="text-sm">Page</span>
             </div>
 
-            <div className="rounded-md border bg-white shadow-sm">
+            <div className="rounded-md border bg-card shadow-sm">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -176,7 +265,7 @@ export function SalesUnitTable({ units, salesId }: Props) {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                                    Belum ada unit yang ditambahkan.
+                                    No units found.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -243,6 +332,27 @@ export function SalesUnitTable({ units, salesId }: Props) {
                     </Button>
                 </div>
             </div>
+
+            <AlertDialog open={!!unitToDelete} onOpenChange={() => setUnitToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the unit
+                            from the purchase order.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteConfirm}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                        >
+                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
