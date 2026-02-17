@@ -4,11 +4,15 @@ import { SalesTable } from "@/components/features/sales/SalesTable"
 import { Button } from "@/components/ui/button"
 import { Download, Plus } from "lucide-react"
 
+import { useRouter } from "next/router"
+
 /**
  * Sales Page - Penjualan Unit
  * Halaman untuk mengelola dan melacak semua penjualan unit
  */
 export default function SalesPage() {
+    const router = useRouter()
+
     return (
         <DashboardLayout>
             <div className="space-y-6">
@@ -25,7 +29,7 @@ export default function SalesPage() {
                             Download
                         </Button>
 
-                        <Button size="sm">
+                        <Button size="sm" onClick={() => router.push("/sales/create")}>
                             <Plus className="mr-2 h-4 w-4" />
                             Tambah
                         </Button>
