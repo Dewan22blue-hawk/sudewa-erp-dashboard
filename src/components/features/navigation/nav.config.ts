@@ -90,7 +90,12 @@ export const NAV_ITEMS: NavItemConfig[] = [
     {
         label: "Finance",
         icon: DollarSign,
-        children: [], // Siap untuk di-expand dengan sub-items
+        children: [
+            {
+                label: "Transaksi Kas Harian",
+                href: "/finance/transaksi-kas-harian",
+            },
+        ], // Siap untuk di-expand dengan sub-items
     },
     {
         label: "Laporan",
