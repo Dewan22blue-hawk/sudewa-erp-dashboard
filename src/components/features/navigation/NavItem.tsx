@@ -13,7 +13,7 @@ interface NavItemProps {
  * Helper to check if a path is active
  * Handles dynamic slugs by comparing the start of the path
  */
-const isPathActive = (currentPath: string, targetPath: string | undefined) => {
+const isPathActive = (currentPath: string, targetPath: string | undefined, exact = false) => {
     if (!targetPath) return false
 
     // Clean paths from query params if any
@@ -22,6 +22,9 @@ const isPathActive = (currentPath: string, targetPath: string | undefined) => {
 
     // Exact match
     if (cleanCurrent === cleanTarget) return true
+
+    // If exact match is required, stop here
+    if (exact) return false
 
     // Parent path match (e.g. /dashboard/slug/transaksi/pembelian-unit matches /dashboard/slug/transaksi/pembelian-unit/create)
     // But be careful not to match partial segments e.g. /dashboard/slug/transaksi shouldn't match /dashboard/slug/transaksi-kas-harian if not intended
@@ -40,8 +43,8 @@ export function NavItem({ item }: NavItemProps) {
     const currentPath = router.asPath
 
     // Check if this item or any of its children is active
-    const isActive = isPathActive(currentPath, item.href) ||
-        (item.children?.some((child) => isPathActive(currentPath, child.href)) || false)
+    const isActive = isPathActive(currentPath, item.href, item.exact) ||
+        (item.children?.some((child) => isPathActive(currentPath, child.href, child.exact)) || false)
 
     const [isExpanded, setIsExpanded] = useState(isActive)
 
