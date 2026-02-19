@@ -95,6 +95,14 @@ export const NAV_ITEMS: NavItemConfig[] = [
                 label: "Transaksi Kas Harian",
                 href: "/finance/transaksi-kas-harian",
             },
+            {
+                label: "Data PPN Penjualan",
+                href: "/finance/data-ppn-penjualan",
+            },
+            {
+                label: "Data PPN Pembelian",
+                href: "/finance/data-ppn-pembelian",
+            },
         ], // Siap untuk di-expand dengan sub-items
     },
     {

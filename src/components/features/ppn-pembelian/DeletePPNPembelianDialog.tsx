@@ -36,17 +36,17 @@ export default function DeletePPNPembelianDialog({
                     Apakah anda yakin ingin menghapus data ini?
                 </p>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex justify-end gap-3 pt-4">
                     <Button
                         variant="outline"
                         onClick={onClose}
-                        className="w-full"
+                        className="w-24"
                     >
                         Batal
                     </Button>
                     <Button
                         onClick={handleDelete}
-                        className="w-full bg-red-600 text-white"
+                        className="w-24 bg-red-600 text-white"
                     >
                         Hapus
                     </Button>

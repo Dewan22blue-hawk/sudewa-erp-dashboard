@@ -43,15 +43,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     }
 
     return (
-        <div className="flex min-h-screen">
-            <div className="print:hidden">
+        <div className="flex h-screen overflow-hidden">
+            <div className="print:hidden shrink-0">
                 <Sidebar />
             </div>
-            <div className="flex flex-1 flex-col">
-                <div className="print:hidden">
+            <div className="flex flex-1 flex-col h-full overflow-hidden">
+                <div className="print:hidden shrink-0">
                     <Topbar />
                 </div>
-                <main className="flex-1 bg-muted/40 p-6 print:bg-white print:p-0">
+                <main className="flex-1 overflow-y-auto bg-muted/40 p-6 print:bg-white print:p-0">
                     <div className="mx-auto max-w-7xl space-y-6 print:max-w-none print:space-y-4">
                         {children}
                     </div>

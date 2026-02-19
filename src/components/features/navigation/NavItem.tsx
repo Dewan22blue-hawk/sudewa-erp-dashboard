@@ -3,7 +3,7 @@ import { useRouter } from "next/router"
 import { cn } from "@/lib/utils"
 import { NavItemConfig } from "./nav.config"
 import { ChevronRight, ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface NavItemProps {
     item: NavItemConfig
@@ -16,14 +16,20 @@ interface NavItemProps {
 export function NavItem({ item }: NavItemProps) {
     const router = useRouter()
 
-    // Expand hanya Dashboard dan Master Data by default sesuai Figma
-    const shouldExpandByDefault = item.label === "Dashboard" || item.label === "Master Data"
-    const [isExpanded, setIsExpanded] = useState(shouldExpandByDefault)
-
     // Check if this item or any of its children is active
     const isActive = item.href
         ? router.pathname === item.href
-        : item.children?.some((child) => child.href === router.pathname)
+        : item.children?.some((child) => child.href === router.pathname) || false
+
+    const [isExpanded, setIsExpanded] = useState(isActive)
+
+    // Sync expansion with active route
+    // Only auto-expand when active, don't auto-collapse to allow exploring
+    useEffect(() => {
+        if (isActive) {
+            setIsExpanded(true)
+        }
+    }, [isActive])
 
     const hasChildren = item.children && item.children.length > 0
 
