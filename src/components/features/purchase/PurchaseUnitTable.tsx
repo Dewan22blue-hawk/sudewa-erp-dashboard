@@ -42,9 +42,10 @@ import { useDeletePurchaseUnit } from "@/hooks/usePurchase"
 interface Props {
     units: PurchaseUnit[]
     purchaseId: string
+    slug: string
 }
 
-export default function PurchaseUnitTable({ units, purchaseId }: Props) {
+export default function PurchaseUnitTable({ units, purchaseId, slug }: Props) {
     const router = useRouter()
     const deleteMutation = useDeletePurchaseUnit()
     const [unitToDelete, setUnitToDelete] = useState<string | null>(null)
@@ -64,85 +65,15 @@ export default function PurchaseUnitTable({ units, purchaseId }: Props) {
 
     // ACTIONS
     const handleDetail = (unitId: string) => {
-        // Implement router push to detail if exists, or show modal
-        console.log("Detail unit:", unitId)
+        router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${unitId}`)
     }
 
     const handleEdit = (unitId: string) => {
-        // Implement router push to edit if exists
-        console.log("Edit unit:", unitId)
+        router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${unitId}/edit`)
     }
 
     const columns: ColumnDef<PurchaseUnit>[] = [
-        {
-            id: "no",
-            header: "No",
-            cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
-        },
-        {
-            accessorKey: "typeUnitName",
-            header: "TIPE UNIT",
-            cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("typeUnitName")}</div>,
-        },
-        {
-            accessorKey: "qty",
-            header: "QTY",
-            cell: ({ row }) => <div className="text-foreground pl-4">{row.getValue("qty")}</div>,
-        },
-        {
-            accessorKey: "price",
-            header: "HARGA BELI",
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("price"))
-                const formatted = new Intl.NumberFormat("id-ID").format(amount)
-                return <div className="text-foreground">{formatted}</div>
-            },
-        },
-        {
-            accessorKey: "biayaBBN",
-            header: "BIAYA BBN",
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("biayaBBN") || "0")
-                const formatted = new Intl.NumberFormat("id-ID").format(amount)
-                return <div className="text-foreground">{formatted}</div>
-            },
-        },
-        {
-            accessorKey: "biayaEkspedisi",
-            header: "BIAYA EKSPEDISI",
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("biayaEkspedisi") || "0")
-                const formatted = new Intl.NumberFormat("id-ID").format(amount)
-                return <div className="text-foreground">{formatted}</div>
-            },
-        },
-        {
-            accessorKey: "biayaLain",
-            header: "BIAYA LAIN",
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("biayaLain") || "0")
-                const formatted = new Intl.NumberFormat("id-ID").format(amount)
-                return <div className="text-foreground">{formatted}</div>
-            },
-        },
-        {
-            accessorKey: "hpp",
-            header: "HPP",
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("hpp"))
-                const formatted = new Intl.NumberFormat("id-ID").format(amount)
-                return <div className="text-foreground">{formatted}</div>
-            },
-        },
-        {
-            accessorKey: "dpp",
-            header: "DPP",
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("dpp"))
-                const formatted = new Intl.NumberFormat("id-ID").format(amount)
-                return <div className="text-foreground">{formatted}</div>
-            },
-        },
+        // ... (other columns)
         {
             id: "actions",
             header: () => <div className="text-right">ACTION</div>,
@@ -157,11 +88,11 @@ export default function PurchaseUnitTable({ units, purchaseId }: Props) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => router.push(`/transaksi/pembelian-unit/${purchaseId}/unit/${unit.id}`)}>
+                                <DropdownMenuItem onClick={() => handleDetail(unit.id)}>
                                     <Eye className="mr-2 h-4 w-4" />
                                     Detail
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => router.push(`/transaksi/pembelian-unit/${purchaseId}/unit/${unit.id}/edit`)}>
+                                <DropdownMenuItem onClick={() => handleEdit(unit.id)}>
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>

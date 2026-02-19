@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { Purchase } from "@/types/purchase.types"
+import { Purchase } from "@/@types/purchase.types"
 import { MoreVertical, Plus } from "lucide-react"
 import {
     DropdownMenu,
@@ -27,9 +27,10 @@ interface Props {
     data: Purchase[]
     onDelete: (id: string) => void
     onAdd?: () => void
+    slug: string
 }
 
-export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
+export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
     const router = useRouter()
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [currentPage, setCurrentPage] = useState(1)
@@ -50,10 +51,6 @@ export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
     const endIndex = startIndex + itemsPerPage
     const currentData = filteredData.slice(startIndex, endIndex)
 
-    // Reset page when search changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // useEffect(() => setCurrentPage(1), [searchTerm]) // implicit by state setter in onChange if needed, or effect.
-    // Let's use simple logic: if search changes, set page to 1.
     const handleSearch = (term: string) => {
         setSearchTerm(term)
         setCurrentPage(1)
@@ -100,40 +97,11 @@ export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
 
     return (
         <div className="space-y-4">
-            {/* Controls */}
+            {/* ... (Controls) */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                {/* ... (Search and items per page) */}
                 <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <div className="relative w-full sm:w-72">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-                        </span>
-                        <input
-                            type="text"
-                            placeholder="Search here"
-                            value={searchTerm}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-white"
-                        />
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                        <span>Show</span>
-                        <Select
-                            value={String(itemsPerPage)}
-                            onValueChange={(val) => handleItemsPerPageChange(val)}
-                        >
-                            <SelectTrigger className="h-9 w-[70px] bg-white">
-                                <SelectValue placeholder="10" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="20">20</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                                <SelectItem value="100">100</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <span>Page</span>
-                    </div>
+                    {/* ... */}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -149,25 +117,7 @@ export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
             <div className="rounded-sm border bg-card shadow-md hover:shadow-lg transition-shadow duration-300">
                 <Table>
                     <TableHeader>
-                        <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
-                            <TableHead className="w-12">
-                                <Checkbox
-                                    checked={allCurrentPageSelected}
-                                    onCheckedChange={handleBulkSelect}
-                                />
-                            </TableHead>
-                            <TableHead className="font-semibold text-foreground">KODE BELI</TableHead>
-                            <TableHead className="font-semibold text-foreground">TANGGAL</TableHead>
-                            <TableHead className="font-semibold text-foreground">SUPPLIER</TableHead>
-                            <TableHead className="font-semibold text-foreground">TOTAL BIAYA</TableHead>
-                            <TableHead className="font-semibold text-foreground">TOTAL DPP</TableHead>
-                            <TableHead className="font-semibold text-foreground">TOTAL PPN</TableHead>
-                            <TableHead className="font-semibold text-foreground">TOTAL BELI</TableHead>
-                            <TableHead className="font-semibold text-foreground">KURANG BAYAR</TableHead>
-                            <TableHead className="font-semibold text-right text-foreground">
-                                ACTION
-                            </TableHead>
-                        </TableRow>
+                        {/* ... */}
                     </TableHeader>
                     <TableBody>
                         {currentData.map((item) => (
@@ -182,14 +132,14 @@ export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
                                         onCheckedChange={() => handleToggle(item.id)}
                                     />
                                 </TableCell>
-                                <TableCell className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => router.push(`/transaksi/pembelian-unit/${item.id}/detail`)}>
+                                <TableCell className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
                                     {item.code}
                                 </TableCell>
                                 <TableCell>
                                     {format(new Date(item.date), "dd/MM/yyyy")}
                                 </TableCell>
                                 <TableCell>{item.supplierName}</TableCell>
-                                <TableCell>{Number(item.totalCost).toLocaleString("id-ID")}</TableCell>
+                                <TableCell>{Number(item.totalBiaya).toLocaleString("id-ID")}</TableCell>
                                 <TableCell>{Number(item.totalDpp).toLocaleString("id-ID")}</TableCell>
                                 <TableCell>{Number(item.totalPpn).toLocaleString("id-ID")}</TableCell>
                                 <TableCell className="font-semibold">{Number(item.totalPurchase).toLocaleString("id-ID")}</TableCell>
@@ -207,20 +157,20 @@ export default function PurchaseTable({ data, onDelete, onAdd }: Props) {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem
                                                 onClick={() =>
-                                                    router.push(`/transaksi/pembelian-unit/${item.id}/detail`)
+                                                    router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)
                                                 }
                                             >
                                                 Detail
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() =>
-                                                    router.push(`/transaksi/pembelian-unit/${item.id}/edit`)
+                                                    router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)
                                                 }
                                             >
                                                 Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
-                                                onClick={() => window.open(`/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}
+                                                onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}
                                             >
                                                 Print
                                             </DropdownMenuItem>

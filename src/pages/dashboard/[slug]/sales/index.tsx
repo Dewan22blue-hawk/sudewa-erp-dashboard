@@ -28,7 +28,11 @@ export default function SalesPage() {
                 </div>
 
                 {/* Sales Table */}
-                <SalesTable onAdd={() => router.push("/sales/create")} />
+                <SalesTable onAdd={() => {
+                    const slugQuery = router.query.slug
+                    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+                    router.push(slug ? `/dashboard/${slug}/sales/create` : "/sales/create")
+                }} />
             </div>
         </DashboardLayout>
     )

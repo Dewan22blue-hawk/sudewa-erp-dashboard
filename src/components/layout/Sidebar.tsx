@@ -1,5 +1,5 @@
 import { ChevronDown, Check } from "lucide-react"
-import { NAV_ITEMS } from "@/components/features/navigation/nav.config"
+import { getNavItems } from "@/components/features/navigation/nav.config" // Import dynamic config
 import { NavItem } from "@/components/features/navigation/NavItem"
 import { useEffect, useState } from "react"
 import { useCompany } from "@/contexts/CompanyContext"
@@ -10,11 +10,20 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/router"
 
 export function Sidebar() {
+    const router = useRouter()
+    // Extract slug from router query. It can be a string or array, take the first one if array.
+    const slugQuery = router.query.slug
+    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+
     const { companyId, setCompanyId } = useCompany()
     const [companies, setCompanies] = useState<Company[]>([])
     const [isOpen, setIsOpen] = useState(false)
+
+    // Generate nav items based on current slug
+    const navItems = getNavItems(slug)
 
     // Fetch companies list
     useEffect(() => {
@@ -23,6 +32,19 @@ export function Sidebar() {
         })
     }, [])
 
+    // Sync context with URL slug if present and valid
+    // This ensures that if user lands on /dashboard/[slug], the context is updated
+    useEffect(() => {
+        if (slug && companies.length > 0) {
+            // Find company by slug OR id (fallback)
+            const matchedCompany = companies.find(c => c.slug === slug || c.id === slug)
+
+            if (matchedCompany && matchedCompany.id !== companyId) {
+                setCompanyId(matchedCompany.id)
+            }
+        }
+    }, [slug, companies, companyId, setCompanyId])
+
     // Get current selected company
     const selectedCompany = companies.find((c) => c.id === companyId)
 
@@ -30,25 +52,26 @@ export function Sidebar() {
     const handleSelectCompany = (company: Company) => {
         setCompanyId(company.id)
         setIsOpen(false)
-        // Optional: Reload page to refresh dashboard data
-        window.location.reload()
+        // Navigate to the dashboard of the selected company
+        // Use slug if available, otherwise ID
+        const targetSlug = company.slug || company.id;
+        router.push(`/dashboard/${targetSlug}`)
     }
 
     return (
         <aside className="flex h-screen w-64 flex-col border-r bg-sidebar">
-            {/* Company Selector */}
-            <div className="border-b px-4 py-4">
+            <div className="h-14 flex items-center px-4 border-b">
                 <Popover open={isOpen} onOpenChange={setIsOpen}>
                     <PopoverTrigger asChild>
-                        <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted">
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[11px] text-muted-foreground">Company</span>
-                                <span className="font-medium text-foreground">
+                        <button className="flex w-full h-10 items-center justify-between rounded-lg border border-border bg-background px-3 text-left text-sm transition-colors hover:bg-muted">
+                            <div className="flex flex-col gap-0.5 overflow-hidden">
+                                <span className="text-[10px] uppercase font-bold text-muted-foreground truncate">Company</span>
+                                <span className="font-medium text-foreground truncate leading-none pb-0.5">
                                     {selectedCompany ? selectedCompany.name : "Select Company..."}
                                 </span>
                             </div>
                             <ChevronDown className={cn(
-                                "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                                "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
                                 isOpen && "rotate-180"
                             )} />
                         </button>
@@ -80,7 +103,7 @@ export function Sidebar() {
 
             {/* Navigation */}
             <nav className="flex-1 space-y-1 px-3 py-4">
-                {NAV_ITEMS.map((item, index) => (
+                {navItems.map((item, index) => (
                     <NavItem key={index} item={item} />
                 ))}
             </nav>

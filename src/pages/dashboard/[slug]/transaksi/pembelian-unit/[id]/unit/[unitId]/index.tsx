@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react"
 
 export default function UnitPurchaseDetailPage() {
     const router = useRouter()
-    const { id, unitId } = router.query
+    const { slug, id, unitId } = router.query
 
     // Using existing hook logic - typically we'd fetch specific unit or parent.
     // For parity with Sales mock, we fetch parent Purchase.
@@ -20,9 +20,9 @@ export default function UnitPurchaseDetailPage() {
     useEffect(() => {
         if (!isLoading && !purchase) {
             toast.error("Data pembelian tidak ditemukan")
-            router.push("/transaksi/pembelian-unit")
+            router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)
         }
-    }, [isLoading, purchase, router])
+    }, [isLoading, purchase, router, slug])
 
     if (isLoading) {
         return (
@@ -39,7 +39,7 @@ export default function UnitPurchaseDetailPage() {
             <DashboardLayout>
                 <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
                     <p className="text-muted-foreground">Data tidak ditemukan</p>
-                    <Button onClick={() => router.push("/transaksi/pembelian-unit")}>
+                    <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
                         Kembali ke List
                     </Button>
                 </div>
@@ -71,7 +71,11 @@ export default function UnitPurchaseDetailPage() {
                 <PurchaseDetailCards data={purchase} />
 
                 {/* Detail Unit Table (Reusing Component) */}
-                <PurchaseUnitTable units={purchase.units} purchaseId={purchase.id} />
+                <PurchaseUnitTable
+                    units={purchase.units}
+                    purchaseId={purchase.id}
+                    slug={slug as string}
+                />
             </div>
         </DashboardLayout>
     )

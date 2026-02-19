@@ -32,15 +32,18 @@ function formatNumber(value: number): string {
  */
 export function SalesTableRow({ item, isSelected, onToggle }: Props) {
     const router = useRouter()
+    const slugQuery = router.query.slug
+    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
 
     const handleEdit = () => {
-        router.push(`/sales/edit/${item.id}`)
+        router.push(slug ? `/dashboard/${slug}/sales/edit/${item.id}` : `/sales/edit/${item.id}`)
     }
 
     const handleDetail = () => {
-        router.push(`/sales/${item.id}`)
+        router.push(slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`)
     }
 
+    // Handle delete
     const handleDelete = () => {
         if (confirm(`Hapus ${item.kodeJual}?`)) {
             console.log('Delete item:', item.id)
@@ -61,7 +64,7 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
             {/* Kode Jual - Link biru */}
             <TableCell className="transition-all duration-200">
                 <Link
-                    href={`/sales/${item.id}`}
+                    href={slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`}
                     className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
                 >
                     {item.kodeJual}
@@ -114,7 +117,7 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
                         <DropdownMenuItem onClick={handleDetail}>
                             Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/sales/${item.id}?print=true`, '_blank')}>
+                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/sales/${item.id}?print=true` : `/sales/${item.id}?print=true`, '_blank')}>
                             Print
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDelete} className="text-red-600">

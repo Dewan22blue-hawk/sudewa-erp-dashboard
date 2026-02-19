@@ -59,7 +59,9 @@ export default function EditUnitPage() {
             })
         } else {
             toast.error("Data penjualan tidak ditemukan")
-            router.push("/sales")
+            const slugQuery = router.query.slug
+            const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+            router.push(slug ? `/dashboard/${slug}/sales` : "/sales")
         }
         setIsLoading(false)
     }, [itemId, router])
@@ -81,7 +83,10 @@ export default function EditUnitPage() {
             toast.success("Data berhasil disimpan!")
 
             // Navigate back to detail page
-            router.push(`/sales`)
+            const slugQuery = router.query.slug
+            const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+            const basePath = slug ? `/dashboard/${slug}/sales` : "/sales"
+            router.push(`${basePath}`)
 
         } catch (error) {
             console.error("Error updating unit:", error)

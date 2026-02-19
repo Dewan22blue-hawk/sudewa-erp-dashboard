@@ -1,25 +1,30 @@
-import { useRouter } from "next/router"
-import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, Loader2 } from "lucide-react"
-import PurchaseUnitForm from "@/components/features/purchase/PurchaseUnitForm"
-import { usePurchaseById } from "@/hooks/usePurchase"
-import { toast } from "sonner"
-import { useEffect, useState } from "react"
+"use client"
 
-export default function EditNestedUnitPage() {
+import { useRouter } from "next/router"
+import { toast } from "sonner"
+import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import PurchaseUnitForm from "@/components/features/purchase/PurchaseUnitForm"
+import { useAddPurchaseUnit, usePurchaseById } from "@/hooks/usePurchase"
+import { ArrowLeft, Loader2 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+
+export default function CreatePurchaseUnitPage() {
     const router = useRouter()
-    const { id, unitId } = router.query
+    const { slug, id } = router.query
+
     const { data: purchase, isLoading } = usePurchaseById(id as string)
+    const addUnitMutation = useAddPurchaseUnit()
 
     const handleSubmit = async (data: any) => {
         try {
-            // Mock update
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            toast.success("Unit berhasil diperbarui")
-            router.push(`/transaksi/pembelian-unit/${id}`)
+            await addUnitMutation.mutateAsync({
+                purchaseId: id as string,
+                ...data
+            })
+            toast.success("Unit berhasil ditambahkan")
+            router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${id}`)
         } catch (error) {
-            toast.error("Gagal memperbarui unit")
+            toast.error("Gagal menambahkan unit")
         }
     }
 
@@ -32,14 +37,6 @@ export default function EditNestedUnitPage() {
             </DashboardLayout>
         )
     }
-
-    if (!purchase) return null
-
-    // Determine initial values or finding specific unit
-    const unit = purchase.units.find((u: any) => u.id === unitId)
-    // In real app we would pre-fill with 'unit' data. 
-    // PurchaseUnitForm might need adjustment to accept defaultValues matching Unit structure perfectly or mapped.
-    // For now we render the form.
 
     return (
         <DashboardLayout>
@@ -54,10 +51,10 @@ export default function EditNestedUnitPage() {
                     </button>
 
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">Edit Unit</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Tambah Unit</h1>
                         <div className="flex items-center gap-2 text-sm">
                             <span className="text-muted-foreground">Kode Pembelian</span>
-                            <span className="text-blue-600 font-medium">{purchase.code}</span>
+                            <span className="text-blue-600 font-medium">{purchase?.code}</span>
                         </div>
                     </div>
                 </div>
@@ -65,9 +62,10 @@ export default function EditNestedUnitPage() {
                 <Card className="rounded-xl">
                     <CardContent className="p-6">
                         <PurchaseUnitForm
-                            // initialValues={unit} // TODO: Implement if PurchaseUnitForm supports it
                             onSubmit={handleSubmit}
+                            // need to update PurchaseUnitForm to accept these
                             onCancel={() => router.back()}
+                            loading={addUnitMutation.isPending}
                         />
                     </CardContent>
                 </Card>

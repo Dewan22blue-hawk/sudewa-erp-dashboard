@@ -1,32 +1,34 @@
+"use client"
+
 import { useRouter } from "next/router"
-import { toast } from "sonner"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import PurchaseForm from "@/components/features/purchase/PurchaseForm"
-import {
-    usePurchaseById,
-    useUpdatePurchase
-} from "@/hooks/usePurchase"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Loader2 } from "lucide-react"
+import { PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
+import { usePurchaseById, useUpdatePayment } from "@/hooks/usePurchase"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 
-export default function EditPurchasePage() {
+export default function PurchasePaymentPage() {
     const router = useRouter()
-    const { itemId } = router.query // Changed from id to itemId to match folder structure
-
-    // Note: usePurchaseById usually expects 'id'. We need to ensure logic handles 'itemId'
-    const { data: purchase, isLoading } = usePurchaseById(itemId as string)
-    const updateMutation = useUpdatePurchase()
+    const { slug, id } = router.query
+    const { data: purchase, isLoading } = usePurchaseById(id as string)
+    const updatePayment = useUpdatePayment()
 
     const handleSubmit = async (data: any) => {
         try {
-            await updateMutation.mutateAsync({
-                id: itemId as string,
-                payload: data
+            await updatePayment.mutateAsync({
+                id: id as string,
+                payload: {
+                    bca: data.paymentBca,
+                    bcaUsd: data.paymentBcaUsd,
+                    cash: data.paymentCash,
+                },
             })
-            toast.success("Pembelian berhasil diperbarui")
-            router.push("/transaksi/pembelian-unit")
-        } catch (error) {
-            toast.error("Gagal memperbarui pembelian")
+            toast.success("Pembayaran berhasil disimpan")
+            router.back()
+        } catch {
+            toast.error("Gagal menyimpan pembayaran")
         }
     }
 
@@ -44,10 +46,10 @@ export default function EditPurchasePage() {
         return (
             <DashboardLayout>
                 <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
-                    <p className="text-muted-foreground">Data tidak ditemukan</p>
-                    <button onClick={() => router.back()} className="text-blue-600 hover:underline">
-                        Kembali
-                    </button>
+                    <p className="text-muted-foreground">Pembelian tidak ditemukan</p>
+                    <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
+                        Kembali ke List
+                    </Button>
                 </div>
             </DashboardLayout>
         )
@@ -66,7 +68,7 @@ export default function EditPurchasePage() {
                     </button>
 
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">Edit Pembelian</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Pembayaran Unit</h1>
                         <div className="flex items-center gap-2 text-sm">
                             <span className="text-muted-foreground">Kode Pembelian</span>
                             <span className="text-blue-600 font-medium">{purchase.code}</span>
@@ -76,11 +78,11 @@ export default function EditPurchasePage() {
 
                 <Card className="rounded-xl">
                     <CardContent className="p-6">
-                        <PurchaseForm
-                            defaultValues={purchase}
+                        <PurchasePaymentForm
+                            purchaseData={purchase}
                             onSubmit={handleSubmit}
                             onCancel={() => router.back()}
-                            loading={updateMutation.isPending}
+                            loading={updatePayment.isPending}
                         />
                     </CardContent>
                 </Card>

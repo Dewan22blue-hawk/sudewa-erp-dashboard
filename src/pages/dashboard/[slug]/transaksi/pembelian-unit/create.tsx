@@ -7,9 +7,12 @@ import { PageHeader } from "@/components/common/PageHeader"
 import PurchaseUnitForm from "@/components/features/purchase/PurchaseUnitForm"
 import { useCreatePurchase } from "@/hooks/usePurchase"
 import { ChevronRight } from "lucide-react"
+import { useCompany } from "@/contexts/CompanyContext"
 
 export default function CreatePurchasePage() {
     const router = useRouter()
+    const { slug } = router.query
+    const { companyId } = useCompany()
     const mutation = useCreatePurchase()
 
     const handleSubmit = async (data: any) => {
@@ -26,7 +29,7 @@ export default function CreatePurchasePage() {
             const payload = {
                 date: new Date().toISOString().split('T')[0], // Today
                 supplierName: "General Supplier", // Default
-                companyId: "1",
+                companyId: companyId || "",
                 ...data, // Contains properties like typeUnitId, qty, price, etc. 
                 // We need to ensure typeUnitName is present or handle it in service.
                 // data.typeUnitId is present.
@@ -41,7 +44,7 @@ export default function CreatePurchasePage() {
 
             toast.success("Pembelian berhasil dibuat")
             router.push(
-                `/transaksi/pembelian-unit/${newPurchase.id}/detail` // Corrected path
+                `/dashboard/${slug}/transaksi/pembelian-unit/${newPurchase.id}/detail` // Corrected path
             )
         } catch {
             toast.error("Gagal membuat pembelian")
@@ -55,7 +58,7 @@ export default function CreatePurchasePage() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span
                         className="hover:text-foreground cursor-pointer"
-                        onClick={() => router.push("/transaksi/pembelian-unit")}
+                        onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
                     >
                         Pembelian Unit
                     </span>
@@ -78,7 +81,7 @@ export default function CreatePurchasePage() {
                     <PurchaseUnitForm
                         onSubmit={handleSubmit}
                         loading={mutation.isPending}
-                        onCancel={() => router.push("/transaksi/pembelian-unit")}
+                        onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
                     />
                 </div>
             </div>

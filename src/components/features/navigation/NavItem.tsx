@@ -10,21 +10,42 @@ interface NavItemProps {
 }
 
 /**
+ * Helper to check if a path is active
+ * Handles dynamic slugs by comparing the start of the path
+ */
+const isPathActive = (currentPath: string, targetPath: string | undefined) => {
+    if (!targetPath) return false
+
+    // Clean paths from query params if any
+    const cleanCurrent = currentPath.split("?")[0]
+    const cleanTarget = targetPath.split("?")[0]
+
+    // Exact match
+    if (cleanCurrent === cleanTarget) return true
+
+    // Parent path match (e.g. /dashboard/slug/transaksi/pembelian-unit matches /dashboard/slug/transaksi/pembelian-unit/create)
+    // But be careful not to match partial segments e.g. /dashboard/slug/transaksi shouldn't match /dashboard/slug/transaksi-kas-harian if not intended
+    // So we append a slash checking
+    if (cleanCurrent.startsWith(`${cleanTarget}/`)) return true
+
+    return false
+}
+
+/**
  * Navigation Item Component
  * Supports both parent items (expandable) dan child items
  */
 export function NavItem({ item }: NavItemProps) {
     const router = useRouter()
+    const currentPath = router.asPath
 
     // Check if this item or any of its children is active
-    const isActive = item.href
-        ? router.pathname === item.href
-        : item.children?.some((child) => child.href === router.pathname) || false
+    const isActive = isPathActive(currentPath, item.href) ||
+        (item.children?.some((child) => isPathActive(currentPath, child.href)) || false)
 
     const [isExpanded, setIsExpanded] = useState(isActive)
 
     // Sync expansion with active route
-    // Only auto-expand when active, don't auto-collapse to allow exploring
     useEffect(() => {
         if (isActive) {
             setIsExpanded(true)
@@ -63,13 +84,13 @@ export function NavItem({ item }: NavItemProps) {
                 className={cn(
                     "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
                     isActive
-                        ? "text-foreground"
+                        ? "text-foreground" // Active parent
                         : "text-muted-foreground hover:text-foreground"
                 )}
             >
                 <div className="flex items-center gap-3">
                     {Icon && <Icon className="h-4 w-4" />}
-                    <span className="font-medium">{item.label}</span>
+                    <span className={cn("font-medium", isActive && "font-semibold")}>{item.label}</span>
                 </div>
                 {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
@@ -82,7 +103,7 @@ export function NavItem({ item }: NavItemProps) {
             {isExpanded && hasChildren && (
                 <div className="ml-7 mt-1 space-y-1">
                     {item.children?.map((child, index) => (
-                        <NavChildItem key={child.href || index} item={child} />
+                        <NavChildItem key={child.href || index} item={child} currentPath={currentPath} />
                     ))}
                 </div>
             )}
@@ -94,9 +115,8 @@ export function NavItem({ item }: NavItemProps) {
  * Child Navigation Item Component
  * For nested menu items under parent categories
  */
-function NavChildItem({ item }: { item: NavItemConfig }) {
-    const router = useRouter()
-    const isActive = router.pathname === item.href
+function NavChildItem({ item, currentPath }: { item: NavItemConfig, currentPath: string }) {
+    const isActive = isPathActive(currentPath, item.href, item.exact)
 
     if (!item.href) return null
 
@@ -106,7 +126,7 @@ function NavChildItem({ item }: { item: NavItemConfig }) {
             className={cn(
                 "flex items-center rounded-lg px-3 py-2 text-sm transition-colors",
                 isActive
-                    ? "bg-accent text-accent-foreground font-medium"
+                    ? "bg-accent text-accent-foreground font-medium border-l-2 border-primary pl-[10px]" // indent adjusted for border
                     : "text-muted-foreground hover:text-foreground"
             )}
         >

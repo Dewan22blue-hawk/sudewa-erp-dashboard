@@ -37,7 +37,9 @@ export default function UnitPurchaseDetailPage({ data }: InferGetServerSideProps
     useEffect(() => {
         if (!data) {
             toast.error("Data penjualan tidak ditemukan")
-            router.push("/sales")
+            const slugQuery = router.query.slug
+            const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+            router.push(slug ? `/dashboard/${slug}/sales` : "/sales")
         }
     }, [data, router])
 

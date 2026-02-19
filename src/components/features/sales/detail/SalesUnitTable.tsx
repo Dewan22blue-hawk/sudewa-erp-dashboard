@@ -69,10 +69,20 @@ export function SalesUnitTable({ units, salesId }: Props) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => router.push(`/sales/${salesId}/unit/${unit.id}`)}>
+                                <DropdownMenuItem onClick={() => {
+                                    const slugQuery = router.query.slug
+                                    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+                                    const basePath = slug ? `/dashboard/${slug}/sales` : "/sales"
+                                    router.push(`${basePath}/${salesId}/unit/${unit.id}`)
+                                }}>
                                     Detail
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => router.push(`/sales/${salesId}/unit/${unit.id}/edit`)}>
+                                <DropdownMenuItem onClick={() => {
+                                    const slugQuery = router.query.slug
+                                    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+                                    const basePath = slug ? `/dashboard/${slug}/sales` : "/sales"
+                                    router.push(`${basePath}/${salesId}/unit/${unit.id}/edit`)
+                                }}>
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>

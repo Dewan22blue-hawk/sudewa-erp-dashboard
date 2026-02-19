@@ -11,7 +11,7 @@ import { ArrowLeft, Plus, CreditCard, Loader2 } from "lucide-react"
 
 export default function PurchaseDetailPage() {
     const router = useRouter()
-    const { id } = router.query
+    const { slug, id } = router.query
     const { data: purchase, isLoading } = usePurchaseById(id as string)
 
     if (isLoading) {
@@ -29,7 +29,7 @@ export default function PurchaseDetailPage() {
             <DashboardLayout>
                 <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
                     <p className="text-muted-foreground">Pembelian tidak ditemukan</p>
-                    <Button onClick={() => router.push("/transaksi/pembelian-unit")}>
+                    <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
                         Kembali ke List
                     </Button>
                 </div>
@@ -48,7 +48,7 @@ export default function PurchaseDetailPage() {
                                 variant="ghost"
                                 size="icon"
                                 className="-ml-2 h-8 w-8"
-                                onClick={() => router.push("/transaksi/pembelian-unit")}
+                                onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
                             >
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
@@ -68,12 +68,12 @@ export default function PurchaseDetailPage() {
                     <div className="flex gap-2 ml-8 md:ml-0">
                         <Button
                             variant="outline"
-                            onClick={() => router.push(`/transaksi/pembelian-unit/${purchase.id}/payment`)}
+                            onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}
                         >
                             <CreditCard className="mr-2 h-4 w-4" />
                             Bayar
                         </Button>
-                        <Button onClick={() => router.push(`/transaksi/pembelian-unit/${purchase.id}/create-unit`)}>
+                        <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/create-unit`)}>
                             <Plus className="mr-2 h-4 w-4" />
                             Tambah Unit
                         </Button>
@@ -84,7 +84,11 @@ export default function PurchaseDetailPage() {
                 <PurchaseDetailCards data={purchase} />
 
                 {/* UNIT TABLE */}
-                <PurchaseUnitTable units={purchase.units} purchaseId={purchase.id} />
+                <PurchaseUnitTable
+                    units={purchase.units}
+                    purchaseId={purchase.id}
+                    slug={slug as string}
+                />
             </div>
         </DashboardLayout>
     )

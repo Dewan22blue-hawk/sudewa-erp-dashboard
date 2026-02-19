@@ -40,7 +40,10 @@ export default function PaymentPage() {
             await new Promise(resolve => setTimeout(resolve, 1500))
 
             toast.success("Pembayaran berhasil disimpan!")
-            router.push(`/sales/${id}`)
+            const slugQuery = router.query.slug
+            const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+            const basePath = slug ? `/dashboard/${slug}/sales` : "/sales"
+            router.push(`${basePath}/${id}`)
 
         } catch (error) {
             console.error("Error saving payment:", error)

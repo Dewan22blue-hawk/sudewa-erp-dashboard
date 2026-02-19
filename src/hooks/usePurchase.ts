@@ -4,16 +4,16 @@ import {
     CreatePurchaseRequest,
     UpdatePurchaseRequest,
     CreatePurchaseUnitRequest
-} from "@/types/purchase.types"
+} from "@/@types/purchase.types"
 
 /* =====================================
    GET LIST
 ===================================== */
 
-export const usePurchases = (companyId: string) => {
+export const usePurchases = (companyId?: string | null) => {
     return useQuery({
         queryKey: ["purchases", companyId],
-        queryFn: () => purchaseService.getPurchases(companyId),
+        queryFn: () => purchaseService.getPurchases(companyId!),
         staleTime: 1000 * 60 * 5, // 5 minutes
         enabled: !!companyId
     })

@@ -12,11 +12,13 @@ import {
     usePurchases,
     useDeletePurchase
 } from "@/hooks/usePurchase"
+import { useCompany } from "@/contexts/CompanyContext"
 import { useRouter } from "next/router"
 
 export default function PurchasePage() {
     const router = useRouter()
-    const companyId = "1" // nanti dari context
+    const { slug } = router.query
+    const { companyId } = useCompany()
     const { data = [], isLoading } = usePurchases(companyId)
     const deleteMutation = useDeletePurchase()
 
@@ -53,7 +55,8 @@ export default function PurchasePage() {
                     <PurchaseTable
                         data={data}
                         onDelete={(id) => setSelectedId(id)}
-                        onAdd={() => router.push("/transaksi/pembelian-unit/create")}
+                        onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
+                        slug={slug as string}
                     />
                 )}
 

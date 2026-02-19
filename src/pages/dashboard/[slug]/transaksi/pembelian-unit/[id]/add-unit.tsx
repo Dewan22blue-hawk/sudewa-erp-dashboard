@@ -8,7 +8,7 @@ import { useAddPurchaseUnit } from "@/hooks/usePurchase"
 
 export default function AddUnitPage() {
     const router = useRouter()
-    const { id } = router.query
+    const { slug, id } = router.query
     const mutation = useAddPurchaseUnit()
 
     const handleSubmit = async (formData: any) => {
@@ -19,7 +19,7 @@ export default function AddUnitPage() {
             })
 
             toast.success("Unit berhasil ditambahkan")
-            router.push(`/transaksi/pembelian-unit/${id}/detail`)
+            router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${id}`)
         } catch {
             toast.error("Gagal menambahkan unit")
         }

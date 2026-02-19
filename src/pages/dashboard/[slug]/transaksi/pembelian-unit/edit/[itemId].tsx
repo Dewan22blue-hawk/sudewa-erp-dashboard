@@ -1,30 +1,32 @@
-"use client"
-
 import { useRouter } from "next/router"
 import { toast } from "sonner"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import PurchaseUnitForm from "@/components/features/purchase/PurchaseUnitForm"
-import { useAddPurchaseUnit, usePurchaseById } from "@/hooks/usePurchase"
-import { ArrowLeft, Loader2 } from "lucide-react"
+import PurchaseForm from "@/components/features/purchase/PurchaseForm"
+import {
+    usePurchaseById,
+    useUpdatePurchase
+} from "@/hooks/usePurchase"
 import { Card, CardContent } from "@/components/ui/card"
+import { ArrowLeft, Loader2 } from "lucide-react"
 
-export default function CreatePurchaseUnitPage() {
+export default function EditPurchasePage() {
     const router = useRouter()
-    const { id } = router.query
+    const { slug, itemId } = router.query // Changed from id to itemId to match folder structure
 
-    const { data: purchase, isLoading } = usePurchaseById(id as string)
-    const addUnitMutation = useAddPurchaseUnit()
+    // Note: usePurchaseById usually expects 'id'. We need to ensure logic handles 'itemId'
+    const { data: purchase, isLoading } = usePurchaseById(itemId as string)
+    const updateMutation = useUpdatePurchase()
 
     const handleSubmit = async (data: any) => {
         try {
-            await addUnitMutation.mutateAsync({
-                purchaseId: id as string,
-                ...data
+            await updateMutation.mutateAsync({
+                id: itemId as string,
+                payload: data
             })
-            toast.success("Unit berhasil ditambahkan")
-            router.push(`/transaksi/pembelian-unit/${id}`)
+            toast.success("Pembelian berhasil diperbarui")
+            router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)
         } catch (error) {
-            toast.error("Gagal menambahkan unit")
+            toast.error("Gagal memperbarui pembelian")
         }
     }
 
@@ -33,6 +35,19 @@ export default function CreatePurchaseUnitPage() {
             <DashboardLayout>
                 <div className="flex h-[50vh] items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+            </DashboardLayout>
+        )
+    }
+
+    if (!purchase) {
+        return (
+            <DashboardLayout>
+                <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
+                    <p className="text-muted-foreground">Data tidak ditemukan</p>
+                    <button onClick={() => router.back()} className="text-blue-600 hover:underline">
+                        Kembali
+                    </button>
                 </div>
             </DashboardLayout>
         )
@@ -51,21 +66,21 @@ export default function CreatePurchaseUnitPage() {
                     </button>
 
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">Tambah Unit</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Edit Pembelian</h1>
                         <div className="flex items-center gap-2 text-sm">
                             <span className="text-muted-foreground">Kode Pembelian</span>
-                            <span className="text-blue-600 font-medium">{purchase?.code}</span>
+                            <span className="text-blue-600 font-medium">{purchase.code}</span>
                         </div>
                     </div>
                 </div>
 
                 <Card className="rounded-xl">
                     <CardContent className="p-6">
-                        <PurchaseUnitForm
+                        <PurchaseForm
+                            defaultValues={purchase}
                             onSubmit={handleSubmit}
-                            // need to update PurchaseUnitForm to accept these
                             onCancel={() => router.back()}
-                            loading={addUnitMutation.isPending}
+                            loading={updateMutation.isPending}
                         />
                     </CardContent>
                 </Card>

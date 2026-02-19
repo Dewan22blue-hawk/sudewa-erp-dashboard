@@ -9,13 +9,16 @@ import { toast } from "sonner"
 
 export default function CreateSalesPage() {
     const router = useRouter()
+    const slugQuery = router.query.slug
+    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
+    const salesPath = slug ? `/dashboard/${slug}/sales` : "/sales"
 
     const handleSubmit = (data: any) => {
         console.log("Submitting sales data:", data)
         // Simulation of API call
         setTimeout(() => {
             toast.success("Penjualan unit berhasil ditambahkan")
-            router.push("/sales")
+            router.push(salesPath)
         }, 1000)
     }
 
@@ -26,7 +29,7 @@ export default function CreateSalesPage() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span
                         className="hover:text-foreground cursor-pointer"
-                        onClick={() => router.push("/sales")}
+                        onClick={() => router.push(salesPath)}
                     >
                         Penjualan Unit
                     </span>
@@ -62,7 +65,7 @@ export default function CreateSalesPage() {
                             biayaLain: 0,
                         }}
                         onSubmit={handleSubmit}
-                        onCancel={() => router.push("/sales")}
+                        onCancel={() => router.push(salesPath)}
                     />
                 </div>
             </div>

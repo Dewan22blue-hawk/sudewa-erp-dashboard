@@ -32,7 +32,12 @@ export default function SelectCompanyPage() {
 
     function handleSelect(company: Company) {
         setCompanyId(company.id)
-        router.push("/dashboard")
+        if (company.slug) {
+            router.push(`/dashboard/${company.slug}`)
+        } else {
+            // Fallback
+            router.push(`/dashboard`)
+        }
     }
 
     if (loading) return null

@@ -11,7 +11,7 @@ import {
 
 export default function EditPurchasePage() {
     const router = useRouter()
-    const { id } = router.query
+    const { slug, id } = router.query
 
     const { data, isLoading } = usePurchaseById(id as string)
     const mutation = useUpdatePurchase()
@@ -25,7 +25,7 @@ export default function EditPurchasePage() {
 
             toast.success("Data berhasil diperbarui")
             router.push(
-                `/transaksi/pembelian-unit/${id}/detail`
+                `/dashboard/${slug}/transaksi/pembelian-unit/${id}/detail`
             )
         } catch {
             toast.error("Gagal update data")

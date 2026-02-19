@@ -18,6 +18,8 @@ export default function SalesDetailPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [salesData, setSalesData] = useState<SalesItem | null>(null)
 
+    const { slug } = router.query
+
     useEffect(() => {
         if (!id) return
 
@@ -26,10 +28,10 @@ export default function SalesDetailPage() {
             setSalesData(data)
         } else {
             toast.error("Data penjualan tidak ditemukan")
-            // router.push("/sales") // Comment out for dev/debug easier
+            // router.push(slug ? `/dashboard/${slug}/sales` : "/sales") 
         }
         setIsLoading(false)
-    }, [id])
+    }, [id, slug])
 
     useEffect(() => {
         if (router.query.print === 'true' && !isLoading && salesData) {
@@ -40,11 +42,13 @@ export default function SalesDetailPage() {
     }, [router.query.print, isLoading, salesData])
 
     const handleCreateUnit = () => {
-        router.push(`/sales/${id}/create-unit`)
+        const basePath = slug ? `/dashboard/${slug}/sales` : "/sales"
+        router.push(`${basePath}/${id}/create-unit`)
     }
 
     const handlePayment = () => {
-        router.push(`/sales/${id}/payment`)
+        const basePath = slug ? `/dashboard/${slug}/sales` : "/sales"
+        router.push(`${basePath}/${id}/payment`)
     }
 
     if (isLoading || !salesData) {
