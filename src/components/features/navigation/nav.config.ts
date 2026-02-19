@@ -114,6 +114,10 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
                     label: "Data Refund Pembelian",
                     href: p("/finance/refund-beli"),
                 },
+                {
+                    label: "Data Refund Penjualan",
+                    href: p("/finance/refund-jual"),
+                },
             ], // Siap untuk di-expand dengan sub-items
         },
         {

@@ -69,7 +69,7 @@ export default function RefundBeliPage() {
                 </div>
 
                 {/* FILTER */}
-                <div className="flex justify-start gap-2 items-center">
+                <div className="flex justify-start gap-4 items-center">
                     <div className="relative w-[250px]">
                         <Search
                             size={16}
