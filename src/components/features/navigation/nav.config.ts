@@ -123,8 +123,16 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
                     href: p("/finance/data-hutang"),
                 },
                 {
+                    label: "Data Pembayaran Hutang",
+                    href: p("/finance/data-pembayaran-hutang"),
+                },
+                {
                     label: "Data Piutang",
                     href: p("/finance/data-piutang"),
+                },
+                {
+                    label: "Data Pembayaran Piutang",
+                    href: p("/finance/data-pembayaran-piutang"),
                 },
             ], // Siap untuk di-expand dengan sub-items
         },
