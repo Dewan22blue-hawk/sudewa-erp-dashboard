@@ -1,0 +1,52 @@
+name: CI Development
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    name: Pull Latest Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull From Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            whoami
+            pwd
+            echo "========= Pull Latest Code ========="
+            cd /www/wwwroot/wajirabackend.hawk-dev.com/apps
+            git checkout development
+            git reset --hard
+            git pull origin development
+
+  deploy:
+    name: Build & Restart Next App
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Install & Build
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            whoami
+            pwd
+            echo "========= Install Dependencies ========="
+            cd /www/wwwroot/wajirabackend.hawk-dev.com/apps
+            npm ci
+
+            echo "========= Build NextJS =========" 
+            npm run build
+
+            echo "========= Restart App ========="
+            pm2 restart wajira-dashboard || pm2 start npm --name "wajira-dashboard" -- start
