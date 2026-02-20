@@ -27,13 +27,9 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
             icon: LayoutDashboard,
             children: [
                 {
-                    label: "Dashboard",
+                    label: "Overview",
                     href: slug ? `/dashboard/${slug}` : "/dashboard",
                     exact: true,
-                },
-                {
-                    label: "Overview",
-                    href: p("/overview"),
                 },
             ],
         },
