@@ -132,7 +132,7 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
                 },
                 {
                     label: "Data Pembayaran Piutang",
-                    href: p("/finance/data-pembayaran-piutang"),
+                    href: p("/finance/data-penerimaan-piutang"),
                 },
             ], // Siap untuk di-expand dengan sub-items
         },
