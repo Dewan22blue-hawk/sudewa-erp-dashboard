@@ -28,12 +28,12 @@ export default function HutangDetailPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => router.back()}
-                            className="h-8 w-8"
+                            className="h-10 w-10"
                         >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft size={24} className="text-gray-600" />
                         </Button>
                         <div>
-                            <h1 className="text-xl font-semibold text-gray-900">Data Hutang</h1>
+                            <h1 className="text-2xl font-semibold text-gray-900">Data Hutang</h1>
                             <div className="flex gap-1 text-sm text-gray-500">
                                 <span>No Pembelian</span>
                                 <span className="text-blue-600">{data.noPembelian}</span>

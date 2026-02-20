@@ -1,0 +1,89 @@
+import { PiutangPayment } from "@/types/piutang.types"
+import { ArrowUpDown } from "lucide-react"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
+interface Props {
+    data: PiutangPayment[]
+}
+
+export default function PiutangPaymentTable({ data }: Props) {
+    const total = data.reduce(
+        (acc, curr) => acc + curr.jumlahBayar,
+        0
+    )
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm">
+                <span>Show</span>
+                <Select defaultValue="25">
+                    <SelectTrigger className="h-9 w-[70px]">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                </Select>
+                <span>Page</span>
+            </div>
+
+            <div className="bg-[#f8fafc] rounded-xl border border-gray-200 overflow-hidden">
+                <table className="w-full text-sm">
+                    <thead className="bg-[#f1f5f9] text-xs uppercase font-semibold text-gray-600">
+                        <tr>
+                            <th className="px-6 py-4 text-left">No</th>
+                            <th className="px-6 py-4 text-left">KODE BAYAR</th>
+                            <th className="px-6 py-4 text-left">
+                                <div className="flex items-center gap-1">
+                                    TANGGAL
+                                    <ArrowUpDown size={14} className="text-gray-400" />
+                                </div>
+                            </th>
+                            <th className="px-6 py-4 text-left">KAS KELUAR</th>
+                            <th className="px-6 py-4 text-right">JUMLAH BAYAR</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                        {data.map((item, index) => (
+                            <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4">{index + 1}</td>
+                                <td className="px-6 py-4 font-medium text-gray-900">{item.kodeBayar}</td>
+                                <td className="px-6 py-4 text-gray-600">{item.tanggal}</td>
+                                <td className="px-6 py-4 text-gray-600">{item.kasMasuk}</td>
+                                <td className="px-6 py-4 text-right font-medium text-gray-900">
+                                    Rp {item.jumlahBayar.toLocaleString()}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+
+                    <tfoot className="bg-[#f8fafc] border-t border-gray-200">
+                        <tr>
+                            <td colSpan={4} className="px-6 py-4 text-right font-bold text-gray-700">
+                                Sub Total
+                            </td>
+                            <td className="px-6 py-4 text-right font-bold text-gray-900">
+                                Rp {total.toLocaleString()}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div className="flex justify-between items-center text-sm text-gray-500 pt-2">
+                <div>Showing 1-{data.length} of 100 data</div>
+                <div className="flex gap-2">
+                    {/* Pagination Controls placeholder */}
+                </div>
+            </div>
+        </div>
+    )
+}
