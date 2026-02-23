@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatMoney } from '@/lib/utils/format';
 import { Banknote, CreditCard } from 'lucide-react';
 
-interface KpiGridProps {
+interface FinanceOverviewProps {
   accounts: AccountOverview[];
   isLoading?: boolean;
 }
@@ -17,7 +17,7 @@ const palette: Record<PaletteKey, { bg: string; text: string }> = {
   IDR: { bg: 'bg-red-100', text: 'text-red-700' },
 };
 
-function InfoRow({ label, value, colorClass = 'text-gray-900', currency }: { label: string; value: number; colorClass?: string; currency: AccountOverview['currency'] }) {
+function InfoRow({ label, value, currency, colorClass = 'text-gray-900' }: { label: string; value: number; currency: AccountOverview['currency']; colorClass?: string }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</span>
@@ -61,7 +61,7 @@ function SkeletonCard() {
   return <Skeleton className="h-[210px] rounded-2xl" />;
 }
 
-export function KpiGrid({ accounts, isLoading }: KpiGridProps) {
+export function FinanceOverview({ accounts, isLoading }: FinanceOverviewProps) {
   if (isLoading) {
     return (
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
