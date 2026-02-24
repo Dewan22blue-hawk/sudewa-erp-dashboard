@@ -1,4 +1,4 @@
-import { PPNPembelian } from "@/types/ppn-pembelian.types"
+import { PPNPembelian } from "@/@types/ppn-pembelian.types"
 import { MoreVertical } from "lucide-react"
 
 interface Props {

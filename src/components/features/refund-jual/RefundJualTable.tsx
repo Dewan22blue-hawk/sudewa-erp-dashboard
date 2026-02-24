@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { RefundJual } from "@/types/refund-jual.types"
+import { RefundJual } from "@/@types/refund-jual.types"
 import { ArrowUpDown, Search } from "lucide-react"
 import {
     Select,

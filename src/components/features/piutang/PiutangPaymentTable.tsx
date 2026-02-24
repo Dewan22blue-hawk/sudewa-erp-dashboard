@@ -1,4 +1,4 @@
-import { PiutangPayment } from "@/types/piutang.types"
+import { PiutangPayment } from "@/@types/piutang.types"
 import { ArrowUpDown } from "lucide-react"
 import {
     Select,

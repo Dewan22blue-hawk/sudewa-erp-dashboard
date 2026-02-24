@@ -1,4 +1,4 @@
-import { RefundJual } from '@/types/refund-jual.types';
+import { RefundJual } from '@/@types/refund-jual.types';
 
 const refundJualDB: RefundJual[] = Array.from({ length: 100 }).map((_, i) => ({
   id: `refund-jual-${i + 1}`,

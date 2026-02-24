@@ -1,4 +1,4 @@
-import { PPNPembelian } from "@/types/ppn-pembelian.types"
+import { PPNPembelian } from "@/@types/ppn-pembelian.types"
 
 // Generate 100 dummy records
 let ppnDB: PPNPembelian[] = Array.from({ length: 100 }).map((_, index) => {

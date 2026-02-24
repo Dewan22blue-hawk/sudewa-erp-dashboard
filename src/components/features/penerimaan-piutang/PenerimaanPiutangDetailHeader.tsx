@@ -1,4 +1,4 @@
-import { PenerimaanPiutangDetail } from "@/types/penerimaan-piutang.types"
+import { PenerimaanPiutangDetail } from "@/@types/penerimaan-piutang.types"
 import { CalendarDays, FileText, ListChecks, User, ChevronLeft } from "lucide-react"
 import { useRouter } from "next/router"
 import { Button } from "@/components/ui/button"

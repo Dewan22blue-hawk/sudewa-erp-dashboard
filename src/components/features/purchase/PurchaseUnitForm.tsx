@@ -21,9 +21,11 @@ import { PurchaseUnit } from '@/@types/purchase.types';
 // and then map it to the submission format if needed.
 // But for parity, let's try to match valid keys.
 
+import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
+
 interface Props {
-  onSubmit: (data: PurchaseUnit) => void;
-  defaultValues?: Partial<PurchaseUnit>;
+  onSubmit: (data: CreatePurchaseUnitFormValues) => void;
+  defaultValues?: Partial<CreatePurchaseUnitFormValues>;
   readOnly?: boolean;
   loading?: boolean;
   onCancel?: () => void;

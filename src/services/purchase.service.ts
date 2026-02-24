@@ -6,7 +6,7 @@ import {
     CreatePurchaseRequest,
     UpdatePurchaseRequest,
     CreatePurchaseUnitRequest
-} from "@/types/purchase.types"
+} from "@/@types/purchase.types"
 
 import { nanoid } from "nanoid"
 

@@ -1,4 +1,4 @@
-import { PenerimaanPiutang } from "@/types/penerimaan-piutang.types"
+import { PenerimaanPiutang } from "@/@types/penerimaan-piutang.types"
 import { MoreVertical, Search, ArrowUpDown } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"

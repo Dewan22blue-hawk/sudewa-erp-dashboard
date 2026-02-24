@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { PenerimaanPiutang, PenerimaanPiutangDetail } from "@/types/penerimaan-piutang.types"
+import { PenerimaanPiutang, PenerimaanPiutangDetail } from "@/@types/penerimaan-piutang.types"
 import { PenerimaanPiutangService } from "@/services/penerimaan-piutang.service"
 
 export const usePenerimaanPiutang = () => {

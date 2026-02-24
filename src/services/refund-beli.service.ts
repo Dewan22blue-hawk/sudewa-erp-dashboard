@@ -1,4 +1,4 @@
-import { RefundBeli } from '@/types/refund-beli.types';
+import { RefundBeli } from '@/@types/refund-beli.types';
 
 const refundBeliDB: RefundBeli[] = Array.from({ length: 100 }).map((_, i) => ({
   id: String(i + 1),

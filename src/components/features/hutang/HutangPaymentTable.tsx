@@ -1,4 +1,4 @@
-import { HutangPayment } from "@/types/hutang.types"
+import { HutangPayment } from "@/@types/hutang.types"
 import { ArrowUpDown } from "lucide-react"
 import {
     Select,

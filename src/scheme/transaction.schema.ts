@@ -3,12 +3,12 @@ import { z } from "zod"
 export const transactionSchema = z.object({
     date: z.string().min(1, "Tanggal wajib diisi"),
     name: z.string().min(3, "Nama transaksi minimal 3 karakter"),
-    debitUSD: z.preprocess((val) => Number(val) || 0, z.number().optional()),
-    creditUSD: z.preprocess((val) => Number(val) || 0, z.number().optional()),
-    debitIDR: z.preprocess((val) => Number(val) || 0, z.number().optional()),
-    creditIDR: z.preprocess((val) => Number(val) || 0, z.number().optional()),
-    debitCash: z.preprocess((val) => Number(val) || 0, z.number().optional()),
-    creditCash: z.preprocess((val) => Number(val) || 0, z.number().optional()),
+    debitUSD: z.coerce.number().optional(),
+    creditUSD: z.coerce.number().optional(),
+    debitIDR: z.coerce.number().optional(),
+    creditIDR: z.coerce.number().optional(),
+    debitCash: z.coerce.number().optional(),
+    creditCash: z.coerce.number().optional(),
     description: z.string().optional(),
 }).refine(
     (data) => {

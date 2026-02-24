@@ -5,7 +5,7 @@
 
 import { DashboardApiResponse } from '@/@types/dashboard';
 import { ApiResponse } from '@/@types/api';
-import apiClient from './client';
+import { apiClient } from './client';
 import { MOCK_DASHBOARD_DATA } from './mock-data';
 import { dashboardResponseSchema } from '@/scheme/dashboard.schema';
 

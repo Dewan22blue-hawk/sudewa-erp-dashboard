@@ -1,4 +1,4 @@
-import { Hutang, HutangPayment } from "@/types/hutang.types"
+import { Hutang, HutangPayment } from "@/@types/hutang.types"
 
 const generateHutangData = (): Hutang[] => {
     const data: Hutang[] = []

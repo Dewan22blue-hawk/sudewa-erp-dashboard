@@ -1,4 +1,4 @@
-import { PenerimaanPiutang, PenerimaanPiutangDetail } from '@/types/penerimaan-piutang.types';
+import { PenerimaanPiutang, PenerimaanPiutangDetail } from '@/@types/penerimaan-piutang.types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper to generate dummy data

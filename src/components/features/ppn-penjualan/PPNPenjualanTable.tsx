@@ -1,4 +1,4 @@
-import { PPNPenjualan } from "@/types/ppn-penjualan.types"
+import { PPNPenjualan } from "@/@types/ppn-penjualan.types"
 import { MoreVertical } from "lucide-react"
 
 interface Props {

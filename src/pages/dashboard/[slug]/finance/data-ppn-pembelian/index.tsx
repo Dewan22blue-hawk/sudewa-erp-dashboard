@@ -7,7 +7,7 @@ import { usePPNPembelian } from "@/hooks/usePPNPembelian"
 import PPNPembelianTable from "@/components/features/ppn-pembelian/PPNPembelianTable"
 import PPNPembelianFormDialog from "@/components/features/ppn-pembelian/PPNPembelianFormDialog"
 import DeletePPNPembelianDialog from "@/components/features/ppn-pembelian/DeletePPNPembelianDialog"
-import { PPNPembelian } from "@/types/ppn-pembelian.types"
+import { PPNPembelian } from "@/@types/ppn-pembelian.types"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import {
     Select,

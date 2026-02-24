@@ -7,7 +7,7 @@ import { usePPNPenjualan } from "@/hooks/usePPNPenjualan"
 import PPNPenjualanTable from "@/components/features/ppn-penjualan/PPNPenjualanTable"
 import PPNPenjualanFormDialog from "@/components/features/ppn-penjualan/PPNPenjualanFormDialog"
 import DeletePPNPenjualanDialog from "@/components/features/ppn-penjualan/DeletePPNPenjualanDialog"
-import { PPNPenjualan } from "@/types/ppn-penjualan.types"
+import { PPNPenjualan } from "@/@types/ppn-penjualan.types"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import {
     Select,

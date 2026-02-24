@@ -3,7 +3,7 @@ import Head from "next/head"
 import { Plus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import Layout from "@/components/layout/Layout"
+import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { useKasHarian } from "@/hooks/useKasHarian"
 import KasHarianTable from "@/components/features/kas-harian/KasHarianTable"
 import KasHarianSummary from "@/components/features/kas-harian/KasHarianSummary"
@@ -45,7 +45,7 @@ export default function KasHarianPage() {
     ) || []
 
     return (
-        <Layout>
+        <DashboardLayout>
             <Head>
                 <title>Transaksi Kas Harian - Wajira Dashboard</title>
             </Head>
@@ -137,6 +137,6 @@ export default function KasHarianPage() {
                 onOpenChange={setIsDeleteOpen}
                 data={selectedItem}
             />
-        </Layout>
+        </DashboardLayout>
     )
 }

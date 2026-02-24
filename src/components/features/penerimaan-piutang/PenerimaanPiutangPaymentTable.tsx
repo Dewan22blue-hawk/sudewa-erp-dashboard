@@ -1,4 +1,4 @@
-import { PenerimaanPiutang } from "@/types/penerimaan-piutang.types"
+import { PenerimaanPiutang } from "@/@types/penerimaan-piutang.types"
 import { ArrowUpDown } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"

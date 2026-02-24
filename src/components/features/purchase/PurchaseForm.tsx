@@ -1,7 +1,7 @@
 "use client"
 
 import { useForm } from "react-hook-form"
-import { PurchaseFormValues } from "@/types/purchase.types"
+import { PurchaseFormValues } from "@/@types/purchase.types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/router"

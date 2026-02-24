@@ -1,8 +1,9 @@
 import { ArrowUpDown } from 'lucide-react';
-import { RefundBeli } from '@/types/refund-beli.types';
+import { RefundBeli } from '@/@types/refund-beli.types';
 
 interface Props {
   data: RefundBeli[];
+  sortOrder?: "asc" | "desc";
   onSort: () => void;
 }
 

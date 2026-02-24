@@ -8,7 +8,7 @@ export const ppnPenjualanSchema = z.object({
     nsfpkKeluaran: z.string().min(1, "NSFPK Keluaran wajib diisi"),
     biaya: z.coerce.number().min(0),
     // Other fields can be optional or have defaults
-    qty: z.coerce.number().min(1).default(1),
+    qty: z.coerce.number().min(1),
     tipeUnit: z.string().min(1, "Tipe Unit wajib diisi"),
     noMesin: z.string().min(1, "No Mesin wajib diisi"),
     noRangka: z.string().min(1, "No Rangka wajib diisi"),

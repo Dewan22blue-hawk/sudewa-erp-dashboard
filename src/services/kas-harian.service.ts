@@ -1,4 +1,4 @@
-import { KasHarian } from "@/types/kas-harian.types"
+import { KasHarian } from "@/@types/kas-harian.types"
 import { v4 as uuid } from "uuid"
 
 let kasHarianDB: KasHarian[] = [
