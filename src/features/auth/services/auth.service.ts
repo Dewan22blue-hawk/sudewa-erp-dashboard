@@ -14,7 +14,7 @@ export class AuthService {
     if (credentials.password) params.append('password', credentials.password);
 
     // Using POST with query params as per API requirements
-    const response = await apiClient.post<AuthResponse>(`/geni/auth/login?${params.toString()}`);
+    const response = await apiClient.post<AuthResponse>(`/wapi/auth/login?${params.toString()}`);
 
     // Check if business logic failed even with 200 OK HTTP status
     if (!response.data.status) {
