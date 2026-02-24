@@ -1,58 +1,70 @@
-import { useEffect, useState } from "react"
-import { Search, Bell, Clock } from "lucide-react"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+import { useEffect, useState } from 'react';
+import { Search, Bell, Clock } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 
-const RECENT_STORAGE_KEY = "global-search-recent"
+const RECENT_STORAGE_KEY = 'global-search-recent';
 
 export function Topbar() {
-    const [open, setOpen] = useState(false)
-    const [query, setQuery] = useState("")
-    const [recentItems, setRecentItems] = useState<string[]>([])
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [recentItems, setRecentItems] = useState<string[]>([]);
+  const { data: profile, isLoading: isProfileLoading } = useAuthMe();
 
-    /* ================= LOAD RECENT ================= */
-    useEffect(() => {
-        const stored = localStorage.getItem(RECENT_STORAGE_KEY)
-        if (stored) {
-            setRecentItems(JSON.parse(stored))
-        }
-    }, [])
+  const user = profile?.data;
 
-    /* ================= SAVE RECENT ================= */
-    const saveRecent = (value: string) => {
-        const trimmed = value.trim()
-        if (!trimmed) return
+  const displayName = user?.name || [user?.firstname, user?.lastname].filter(Boolean).join(' ') || '-';
+  const userId = user?.username || user?.email || String(user?.id ?? '-');
+  const role = user?.role || '-';
+  const subtitle = user ? `${userId}${role && role !== '-' ? ` • ${role}` : ''}` : 'User data unavailable';
+  const initials =
+    displayName
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || 'US';
 
-        let updated = [trimmed, ...recentItems.filter((item) => item.toLowerCase() !== trimmed.toLowerCase())]
-        updated = updated.slice(0, 6) // max 6 recent
-
-        setRecentItems(updated)
-        localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(updated))
+  /* ================= LOAD RECENT ================= */
+  useEffect(() => {
+    const stored = localStorage.getItem(RECENT_STORAGE_KEY);
+    if (stored) {
+      setRecentItems(JSON.parse(stored));
     }
+  }, []);
 
-    /* ================= HANDLE SEARCH ================= */
-    const handleSearchSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        saveRecent(query)
-        setOpen(false)
+  /* ================= SAVE RECENT ================= */
+  const saveRecent = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
 
-        // TODO: trigger real search API here
-        console.log("Searching:", query)
-    }
+    let updated = [trimmed, ...recentItems.filter((item) => item.toLowerCase() !== trimmed.toLowerCase())];
+    updated = updated.slice(0, 6); // max 6 recent
 
-    return (
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+    setRecentItems(updated);
+    localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(updated));
+  };
 
-            {/* ================= SEARCH ================= */}
-            <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <button className="relative w-[340px] text-left outline-none group">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                        <div
-                            className="
+  /* ================= HANDLE SEARCH ================= */
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveRecent(query);
+    setOpen(false);
+
+    // TODO: trigger real search API here
+    console.log('Searching:', query);
+  };
+
+  return (
+    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+      {/* ================= SEARCH ================= */}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button className="relative w-80 text-left outline-none group">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <div
+              className="
                                 flex items-center
                                 h-10
                                 w-full
@@ -69,25 +81,22 @@ export function Topbar() {
                                 group-focus:bg-white
                                 cursor-text
                             "
-                        >
-                            Search here...
-                        </div>
-                    </button>
-                </PopoverTrigger>
+            >
+              Search here...
+            </div>
+          </button>
+        </PopoverTrigger>
 
-                <PopoverContent
-                    align="start"
-                    className="w-[380px] p-0 rounded-xl shadow-xl border border-gray-200"
-                >
-                    {/* Search Input */}
-                    <form onSubmit={handleSearchSubmit} className="relative border-b border-gray-200 px-4 py-3">
-                        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                        <input
-                            autoFocus
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search here..."
-                            className="
+        <PopoverContent align="start" className="w-96 p-0 rounded-xl shadow-xl border border-gray-200">
+          {/* Search Input */}
+          <form onSubmit={handleSearchSubmit} className="relative border-b border-gray-200 px-4 py-3">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search here..."
+              className="
                 w-full
                 bg-transparent
                 pl-8
@@ -97,26 +106,24 @@ export function Topbar() {
                 outline-none
                 placeholder:text-gray-400
               "
-                        />
-                    </form>
+            />
+          </form>
 
-                    {/* Recent Section */}
-                    {recentItems.length > 0 && (
-                        <div className="px-4 py-3">
-                            <p className="text-sm font-semibold text-gray-500 mb-3">
-                                Recent
-                            </p>
+          {/* Recent Section */}
+          {recentItems.length > 0 && (
+            <div className="px-4 py-3">
+              <p className="text-sm font-semibold text-gray-500 mb-3">Recent</p>
 
-                            <div className="space-y-2">
-                                {recentItems.map((item, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => {
-                                            setQuery(item)
-                                            saveRecent(item)
-                                            setOpen(false)
-                                        }}
-                                        className="
+              <div className="space-y-2">
+                {recentItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setQuery(item);
+                      saveRecent(item);
+                      setOpen(false);
+                    }}
+                    className="
                       flex
                       w-full
                       items-center
@@ -130,38 +137,36 @@ export function Topbar() {
                       hover:bg-gray-100
                       transition
                     "
-                                    >
-                                        <Clock className="h-4 w-4 text-gray-400" />
-                                        <span>{item}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </PopoverContent>
-            </Popover>
-
-            {/* ================= RIGHT SIDE ================= */}
-            <div className="flex items-center gap-5">
-                <button className="text-gray-600 hover:text-black transition">
-                    <Bell className="h-5 w-5" />
-                </button>
-
-                <div className="flex items-center gap-3">
-                    <div className="flex flex-col text-right">
-                        <span className="text-sm font-medium text-gray-900">
-                            User ID
-                        </span>
-                        <span className="text-xs text-gray-500">
-                            Role
-                        </span>
-                    </div>
-
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
-                        CN
-                    </div>
-                </div>
+                  >
+                    <Clock className="h-4 w-4 text-gray-400" />
+                    <span>{item}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-        </header>
-    )
+          )}
+        </PopoverContent>
+      </Popover>
+
+      {/* ================= RIGHT SIDE ================= */}
+      <div className="flex items-center gap-5">
+        <button className="text-gray-600 hover:text-black transition">
+          <Bell className="h-5 w-5" />
+        </button>
+
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col text-right">
+            <span className="text-sm font-medium text-gray-900" title={displayName}>
+              {isProfileLoading ? 'Loading...' : displayName}
+            </span>
+            <span className="text-xs text-gray-500" title={`User ID: ${userId}`}>
+              {isProfileLoading ? '' : subtitle}
+            </span>
+          </div>
+
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">{initials}</div>
+        </div>
+      </div>
+    </header>
+  );
 }

@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api/client';
-import { AuthResponse, LoginRequest } from '../types/auth.types';
+import { AuthResponse, LoginRequest, ProfileResponse } from '../types/auth.types';
 
 export class AuthService {
   /**
@@ -19,6 +19,16 @@ export class AuthService {
     // Check if business logic failed even with 200 OK HTTP status
     if (!response.data.status) {
       throw new Error(response.data.message || 'Login failed');
+    }
+
+    return response.data;
+  }
+
+  static async me(): Promise<ProfileResponse> {
+    const response = await apiClient.get<ProfileResponse>('/wapi/auth/me');
+
+    if (!response.data.status) {
+      throw new Error(response.data.message || 'Failed to fetch profile');
     }
 
     return response.data;
