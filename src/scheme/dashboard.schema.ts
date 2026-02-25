@@ -72,7 +72,10 @@ export const financeSeriesSchema = z.object({
 /** Customer overview **/
 export const customerOverviewSchema = z.object({
   totalCustomers: z.number().nonnegative(),
-  totalRevenue: z.number().nonnegative(),
+  totalRevenue: z.object({
+    idr: z.number().nonnegative(),
+    usd: z.number().nonnegative(),
+  }),
   averageRevenue: z.number().nonnegative(),
   topCustomers: z.array(
     z.object({

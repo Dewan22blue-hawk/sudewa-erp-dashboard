@@ -132,8 +132,8 @@ export const MOCK_DASHBOARD_DATA: DashboardApiResponse = {
   ],
   customers: {
     totalCustomers: 23,
-    totalRevenue: 364_993_000,
-    averageRevenue: 99_222.98,
+    totalRevenue: { idr: 364_993_000, usd: 99_222.98 },
+    averageRevenue: 23,
     topCustomers: [
       { name: 'PT Mass Berg Ground', revenue: 234_000_000 },
       { name: 'PT Mass Berg Ground', revenue: 234_000_000 },

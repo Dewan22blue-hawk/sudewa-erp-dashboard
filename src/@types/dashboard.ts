@@ -77,7 +77,10 @@ export interface FinanceSeriesPoint {
  */
 export interface CustomerOverview {
   totalCustomers: number;
-  totalRevenue: number;
+  totalRevenue: {
+    idr: number;
+    usd: number;
+  };
   averageRevenue: number;
   topCustomers: Array<{ name: string; revenue: number }>;
 }

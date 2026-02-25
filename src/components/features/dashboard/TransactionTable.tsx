@@ -57,15 +57,15 @@ export function TransactionTable({ data, isLoading }: TransactionTableProps) {
 
       <div className="overflow-hidden rounded-xl border border-slate-200">
         <Table>
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableHead className="text-slate-700">Nota</TableHead>
-              <TableHead className="text-slate-700">Tanggal</TableHead>
-              <TableHead className="text-slate-700">Penjualan</TableHead>
-              <TableHead className="text-slate-700">Customer</TableHead>
-              <TableHead className="text-slate-700">Akun</TableHead>
-              <TableHead className="text-right text-slate-700">Total</TableHead>
-              <TableHead className="text-slate-700">Keterangan</TableHead>
+          <TableHeader className="bg-slate-100">
+            <TableRow className='font-bold'>
+              <TableHead className="text-slate-900 font-bold">Nota</TableHead>
+              <TableHead className="text-slate-900 font-bold">Tanggal</TableHead>
+              <TableHead className="text-slate-900 font-bold">Penjualan</TableHead>
+              <TableHead className="text-slate-900 font-bold">Customer</TableHead>
+              <TableHead className="text-slate-900 font-bold">Akun</TableHead>
+              <TableHead className="text-right text-slate-900 font-bold">Total</TableHead>
+              <TableHead className="text-slate-900 font-bold">Keterangan</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
