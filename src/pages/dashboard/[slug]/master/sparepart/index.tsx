@@ -1,15 +1,12 @@
 import { useState } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useSpareparts } from "@/hooks/useSparepart"
 import { SparepartTable } from "@/components/features/sparepart/SparepartTable"
 import { SparepartFormDialog } from "@/components/features/sparepart/SparepartFormDialog"
 import { DeleteSparepartDialog } from "@/components/features/sparepart/DeleteSparepartDialog"
 import { ImportSparepartDialog } from "@/components/features/sparepart/ImportSparepartDialog"
-import { Plus, Upload } from "lucide-react"
 import { useCompany } from "@/contexts/CompanyContext"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Sparepart } from "@/@types/sparepart.types"
 
 export default function SparepartPage() {
@@ -75,44 +72,10 @@ export default function SparepartPage() {
                             Kelola semua sparepart
                         </p>
                     </div>
-
-                    <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setOpenImport(true)}>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Import
-                        </Button>
-                        <Button
-                            className="bg-black text-white hover:bg-black/90"
-                            onClick={() => {
-                                setSelected(null)
-                                setOpenForm(true)
-                            }}
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Tambah
-                        </Button>
-                    </div>
-                </div>
-
-                {/* FILTERS & ENTRIES */}
-                <div className="flex items-center gap-2 text-sm">
-                    <span>Show</span>
-                    <Select defaultValue="10">
-                        <SelectTrigger className="h-8 w-[70px]">
-                            <SelectValue placeholder="10" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="25">25</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <span>Entries</span>
                 </div>
 
                 {/* TABLE CARD */}
-                <Card className="rounded-xl overflow-hidden border p-0">
+                <div className="">
                     <SparepartTable
                         data={data?.data ?? []}
                         onEdit={(item) => {
@@ -123,22 +86,12 @@ export default function SparepartPage() {
                             setSelected(item)
                             setOpenDelete(true)
                         }}
+                        onAdd={() => {
+                            setSelected(null)
+                            setOpenForm(true)
+                        }}
+                        onImport={() => setOpenImport(true)}
                     />
-                </Card>
-
-                {/* PAGINATION CONTROLS */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>
-                        Showing 1-{data?.data.length || 0} of {data?.meta?.total || 0} data
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="cursor-pointer hover:text-foreground">Previous</span>
-                        <div className="rounded-md border bg-muted px-3 py-1 text-foreground font-medium">
-                            1
-                        </div>
-                        <span className="cursor-pointer hover:text-foreground">Next</span>
-                    </div>
                 </div>
 
                 <SparepartFormDialog

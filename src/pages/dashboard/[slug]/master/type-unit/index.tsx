@@ -1,9 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/router"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import { useCompany } from "@/contexts/CompanyContext"
 import { useTypeUnits, useDeleteTypeUnit } from "@/hooks/useTypeUnit"
@@ -98,43 +96,16 @@ export default function TypeUnitPage() {
                             Kelola semua tipe unit
                         </p>
                     </div>
-                    <Button onClick={handleCreateClick} className="bg-black text-white hover:bg-black/90">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Tambah
-                    </Button>
-                </div>
-
-                {/* FILTERS & ENTRIES */}
-                <div className="flex items-center gap-2 text-sm">
-                    <span>Show</span>
-                    <div className="rounded-md border px-3 py-1 bg-background">
-                        10
-                    </div>
-                    <span>Entries</span>
                 </div>
 
                 {/* TABLE CARD */}
-                <Card className="rounded-xl overflow-hidden border p-0">
+                <div className="">
                     <TypeUnitTable
                         typeUnits={data?.data || []}
                         onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
+                        onAdd={handleCreateClick}
                     />
-                </Card>
-
-                {/* PAGINATION CONTROLS */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>
-                        Showing 1-{data?.data.length || 0} of {data?.meta.total} data
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="cursor-pointer hover:text-foreground">Previous</span>
-                        <div className="rounded-md border bg-muted px-3 py-1 text-foreground font-medium">
-                            1
-                        </div>
-                        <span className="cursor-pointer hover:text-foreground">Next</span>
-                    </div>
                 </div>
             </div>
 

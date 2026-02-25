@@ -1,14 +1,11 @@
 import { useState } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useUsers } from "@/hooks/useUser"
 import { UserTable } from "@/components/features/user/UserTable"
 import { UserFormDialog } from "@/components/features/user/UserFormDialog"
 import { DeleteUserDialog } from "@/components/features/user/DeleteUserDialog"
-import { Plus } from "lucide-react"
 import { useCompany } from "@/contexts/CompanyContext"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { User } from "@/@types/user.types"
 
 export default function UserPage() {
@@ -95,55 +92,16 @@ export default function UserPage() {
                         <h1 className="text-2xl font-semibold">User</h1>
                         <p className="text-sm text-muted-foreground">Kelola user role</p>
                     </div>
-
-                    <Button
-                        className="bg-black text-white hover:bg-black/90"
-                        onClick={handleCreate}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Tambah
-                    </Button>
-                </div>
-
-                {/* FILTERS & ENTRIES */}
-                <div className="flex items-center gap-2 text-sm">
-                    <span>Show</span>
-                    <Select defaultValue="10">
-                        <SelectTrigger className="h-8 w-[70px]">
-                            <SelectValue placeholder="10" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="25">25</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <span>Entries</span>
                 </div>
 
                 {/* TABLE CARD */}
-                <Card className="rounded-xl overflow-hidden border p-0 shadow-none">
+                <div className="">
                     <UserTable
                         data={users}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        onAdd={handleCreate}
                     />
-                </Card>
-
-                {/* PAGINATION CONTROLS */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>
-                        Showing 1-{users.length} of {users.length} data
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="cursor-pointer hover:text-foreground">Previous</span>
-                        <div className="rounded-md border bg-muted px-3 py-1 text-foreground font-medium">
-                            1
-                        </div>
-                        <span className="cursor-pointer hover:text-foreground">Next</span>
-                    </div>
                 </div>
 
                 <UserFormDialog

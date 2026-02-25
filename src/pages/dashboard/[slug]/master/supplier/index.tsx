@@ -2,9 +2,7 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import { useCompany } from "@/contexts/CompanyContext"
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from "@/hooks/useSupplier"
@@ -189,19 +187,16 @@ export default function SupplierPage() {
                             Kelola data supplier dengan mudah
                         </p>
                     </div>
-                    <Button onClick={handleCreateClick}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Tambah
-                    </Button>
                 </div>
 
-                <Card className="rounded-xl p-6">
+                <div className="">
                     <SupplierTable
                         suppliers={data?.data || []}
                         onEdit={handleEditSupplier}
                         onDelete={handleDeleteClick}
+                        onAdd={handleCreateClick}
                     />
-                </Card>
+                </div>
             </div>
 
             <SupplierFormDialog

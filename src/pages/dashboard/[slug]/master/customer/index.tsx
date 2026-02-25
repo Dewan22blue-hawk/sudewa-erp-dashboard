@@ -2,9 +2,7 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import { useCompany } from "@/contexts/CompanyContext"
 import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from "@/hooks/useCustomer"
@@ -190,48 +188,16 @@ export default function CustomerPage() {
                             Kelola data customer dengan mudah
                         </p>
                     </div>
-                    <Button onClick={handleCreateClick}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Tambah
-                    </Button>
-                </div>
-
-                {/* PAGINATION INFO - MATCHING DESIGN */}
-                <div className="flex items-center gap-2 text-sm">
-                    <span>Show</span>
-                    <div className="rounded-md border px-3 py-1">
-                        10
-                    </div>
-                    <span>Entries</span>
                 </div>
 
                 {/* TABLE CARD */}
-                <Card className="rounded-xl overflow-hidden border">
+                <div className="">
                     <CustomerTable
                         customers={data?.data || []}
                         onEdit={handleEditCustomer}
                         onDelete={handleDeleteClick}
+                        onAdd={handleCreateClick}
                     />
-                </Card>
-
-                {/* PAGINATION CONTROLS */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>
-                        Showing 1-{data?.data.length || 0} of{" "}
-                        {data?.meta.total} data
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="cursor-pointer hover:text-foreground">
-                            Previous
-                        </span>
-                        <div className="rounded-md border bg-muted px-3 py-1 text-foreground font-medium">
-                            1
-                        </div>
-                        <span className="cursor-pointer hover:text-foreground">
-                            Next
-                        </span>
-                    </div>
                 </div>
             </div>
 
