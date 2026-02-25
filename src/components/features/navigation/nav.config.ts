@@ -93,6 +93,10 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           label: 'Stok Unit',
           href: p('/warehouse/stock-unit'),
         },
+        {
+          label: 'Penerimaan Unit',
+          href: p('/warehouse/penerimaan-unit'),
+        },
       ], // Siap untuk di-expand dengan sub-items
     },
     {
