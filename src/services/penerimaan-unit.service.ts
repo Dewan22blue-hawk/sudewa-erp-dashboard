@@ -72,3 +72,12 @@ export const bulkTerimaDetail = async (ids: string[]) => {
 export const bulkDeleteDetail = async (ids: string[]) => {
   detailDB = detailDB.filter((d) => !ids.includes(d.id));
 };
+
+export const updatePenerimaanUnit = async (id: string, payload: Partial<PenerimaanUnit>) => {
+  const index = penerimaanDB.findIndex(p => p.id === id);
+  if (index === -1) throw new Error("Penerimaan Unit not found");
+
+  const updated = { ...penerimaanDB[index], ...payload };
+  penerimaanDB[index] = updated;
+  return updated;
+};

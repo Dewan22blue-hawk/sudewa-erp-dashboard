@@ -60,3 +60,16 @@ export const useBulkDeleteDetail = () => {
     },
   });
 };
+
+export const useUpdatePenerimaanUnit = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<import('@/@types/penerimaan-unit.types').PenerimaanUnit> }) =>
+      service.updatePenerimaanUnit(id, payload),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: ['penerimaan-unit'] });
+      qc.invalidateQueries({ queryKey: ['penerimaan-unit', id] });
+    },
+  });
+};

@@ -21,7 +21,7 @@ export function DatePicker({
     className,
     id
 }: {
-    value?: Date
+    value?: Date | string | null
     onChange?: (date?: Date) => void
     placeholder?: string
     disabled?: boolean
@@ -30,8 +30,13 @@ export function DatePicker({
 }) {
     const [open, setOpen] = React.useState(false)
 
-    // Ensure value is a Date object if string is passed
-    const dateValue = typeof value === 'string' ? new Date(value) : value;
+    // Ensure value is a valid Date object if string/null is passed
+    let dateValue = typeof value === 'string' ? new Date(value) : (value as Date | undefined | null);
+
+    // Fallback if date is invalid to prevent "Invalid time value" crashes
+    if (dateValue && (isNaN(dateValue.getTime()) || !(dateValue instanceof Date))) {
+        dateValue = undefined;
+    }
 
     return (
         <Popover open={open} onOpenChange={setOpen} modal={true}>
@@ -54,7 +59,7 @@ export function DatePicker({
             <PopoverContent className="w-auto p-0 z-[9999]" align="start">
                 <Calendar
                     mode="single"
-                    selected={dateValue}
+                    selected={dateValue || undefined}
                     onSelect={(date) => {
                         onChange?.(date)
                         setOpen(false)
