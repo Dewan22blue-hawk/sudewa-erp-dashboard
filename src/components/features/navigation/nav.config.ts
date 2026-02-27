@@ -148,7 +148,12 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
     {
       label: 'Laporan',
       icon: ScrollText,
-      children: [], // Siap untuk di-expand dengan sub-items
+      children: [
+        {
+          label: 'Laporan Akuntansi',
+          href: p('/laporan/laporan-akuntansi'),
+        }
+      ], // Siap untuk di-expand dengan sub-items
     },
   ];
 };

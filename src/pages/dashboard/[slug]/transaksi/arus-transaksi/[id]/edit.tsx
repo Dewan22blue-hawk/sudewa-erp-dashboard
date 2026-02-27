@@ -15,9 +15,10 @@ import { TransactionFormValues } from '@/scheme/transaction.schema';
 
 export default function EditTransactionPage() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, slug } = router.query;
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
+  const basePath = slug ? `/dashboard/${slug}/transaksi/arus-transaksi` : '/transaksi/arus-transaksi';
 
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [isFetching, setIsFetching] = useState(true);
@@ -35,7 +36,7 @@ export default function EditTransactionPage() {
         const data = await getTransactionById(id as string);
         if (!data) {
           toast.error('Transaksi tidak ditemukan');
-          router.push('/transaksi/arus-transaksi');
+          router.push(basePath);
           return;
         }
         setTransaction(data);
@@ -47,7 +48,7 @@ export default function EditTransactionPage() {
     };
 
     load();
-  }, [id, router]);
+  }, [id, router, basePath]);
 
   const handleSubmit = async (values: TransactionFormValues) => {
     if (!id) return;
@@ -61,7 +62,7 @@ export default function EditTransactionPage() {
         },
       });
       toast.success('Transaksi berhasil diperbarui');
-      router.push('/transaksi/arus-transaksi');
+      router.push(basePath);
     } catch {
       toast.error('Gagal memperbarui transaksi');
     }
@@ -84,7 +85,7 @@ export default function EditTransactionPage() {
       <div className="space-y-6">
         {/* BREADCRUMB HEADER */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push('/transaksi/arus-transaksi')}>
+          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(basePath)}>
             Arus Transaksi
           </span>
           <ChevronRight className="h-4 w-4" />
@@ -103,7 +104,7 @@ export default function EditTransactionPage() {
               // Ensure date format needs
             }}
             onSubmit={handleSubmit}
-            onCancel={() => router.push('/transaksi/arus-transaksi')}
+            onCancel={() => router.push(basePath)}
             isBusy={updateMutation.isPending}
           />
         </div>

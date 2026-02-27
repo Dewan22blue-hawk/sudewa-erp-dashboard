@@ -15,8 +15,10 @@ import { TransactionFormValues } from '@/scheme/transaction.schema';
 
 export default function CreateTransactionPage() {
   const router = useRouter();
+  const { slug } = router.query;
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
+  const basePath = slug ? `/dashboard/${slug}/transaksi/arus-transaksi` : '/transaksi/arus-transaksi';
 
   const createMutation = useCreateTransaction(safeCompanyId);
 
@@ -40,7 +42,7 @@ export default function CreateTransactionPage() {
       });
 
       toast.success('Transaksi berhasil ditambahkan');
-      router.push('/transaksi/arus-transaksi');
+      router.push(basePath);
     } catch {
       toast.error('Gagal menambahkan transaksi');
     }
@@ -51,7 +53,7 @@ export default function CreateTransactionPage() {
       <div className="space-y-6">
         {/* BREADCRUMB HEADER */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push('/transaksi/arus-transaksi')}>
+          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(basePath)}>
             Arus Transaksi
           </span>
           <ChevronRight className="h-4 w-4" />
@@ -77,7 +79,7 @@ export default function CreateTransactionPage() {
               description: '',
             }}
             onSubmit={handleSubmit}
-            onCancel={() => router.push('/transaksi/arus-transaksi')}
+            onCancel={() => router.push(basePath)}
             isBusy={createMutation.isPending}
           />
         </div>
