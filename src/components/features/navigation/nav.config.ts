@@ -150,6 +150,10 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       icon: ScrollText,
       children: [
         {
+          label: 'Laporan Transaksi Kas',
+          href: p('/laporan/laporan-transaksi-kas'),
+        },
+        {
           label: 'Laporan Akuntansi',
           href: p('/laporan/laporan-akuntansi'),
         },
@@ -158,8 +162,16 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           href: p('/laporan/laporan-pembelian'),
         },
         {
-          label: 'laporan Penjualan',
+          label: 'Laporan Penjualan',
           href: p('/laporan/laporan-penjualan')
+        },
+        {
+          label: 'Laporan Penerimaan',
+          href: p('/laporan/laporan-penerimaan')
+        },
+        {
+          label: 'Laporan Stock',
+          href: p('/laporan/laporan-stock')
         }
       ], // Siap untuk di-expand dengan sub-items
     },
