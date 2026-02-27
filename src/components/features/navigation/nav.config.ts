@@ -156,6 +156,10 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
         {
           label: 'Laporan Pembelian',
           href: p('/laporan/laporan-pembelian'),
+        },
+        {
+          label: 'laporan Penjualan',
+          href: p('/laporan/laporan-penjualan')
         }
       ], // Siap untuk di-expand dengan sub-items
     },
