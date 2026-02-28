@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Save } from 'lucide-react';
 import { createPurchaseUnitSchema } from '@/scheme/purchase.schema';
 import { PRODUCT_OPTIONS } from '@/components/features/sales/edit/edit-unit.data';
-import { PurchaseUnit } from '@/@types/purchase.types';
 
 // Extending the schema type for the form, or similar
 // For now we map to any for simplicity in this step, but ideal is strict typing.
@@ -74,7 +73,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
         {/* Section Header */}
         <div>
           <h2 className="text-lg font-semibold text-foreground">Informasi Pembelian</h2>
-          <div className="my-4 h-[1px] bg-border" />
+          <div className="my-4 h-px bg-border" />
         </div>
 
         {/* ROW 1: Tipe Unit, Qty, Harga */}
@@ -232,7 +231,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
             Batal
           </Button>
           {!readOnly && (
-            <Button type="submit" disabled={loading} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-[100px]">
+            <Button type="submit" disabled={loading} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
               {loading ? (
                 'Menyimpan...'
               ) : (

@@ -7,13 +7,7 @@ import { ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PenerimaanUnitHeaderCard from '@/components/features/penerimaan-unit/PenerimaanUnitHeaderCard';
 import PenerimaanUnitDetailTable from '@/components/features/penerimaan-unit/PenerimaanUnitDetailTable';
-import {
-  useBulkDeleteDetail,
-  useBulkTerimaDetail,
-  usePenerimaanDetail,
-  usePenerimaanUnitById,
-  useUpdatePenerimaanUnit
-} from '@/hooks/usePenerimaanUnit';
+import { useBulkDeleteDetail, useBulkTerimaDetail, usePenerimaanDetail, usePenerimaanUnitById, useUpdatePenerimaanUnit } from '@/hooks/usePenerimaanUnit';
 import { Button } from '@/components/ui/button';
 
 export default function EditPenerimaanUnitPage() {
@@ -32,19 +26,19 @@ export default function EditPenerimaanUnitPage() {
     supplier: string;
     keterangan: string;
   }>({
-    noPenerimaan: "",
+    noPenerimaan: '',
     tanggal: undefined,
-    supplier: "",
-    keterangan: "",
+    supplier: '',
+    keterangan: '',
   });
 
   useEffect(() => {
     if (header) {
       setForm({
-        noPenerimaan: header.noPenerimaan || "",
+        noPenerimaan: header.noPenerimaan || '',
         tanggal: header.tanggal || undefined,
-        supplier: header.supplier || "",
-        keterangan: header.keterangan || "",
+        supplier: header.supplier || '',
+        keterangan: header.keterangan || '',
       });
     }
   }, [header]);
@@ -57,17 +51,15 @@ export default function EditPenerimaanUnitPage() {
     if (!id) return;
 
     try {
-      const payloadValue = field === 'tanggal' && value instanceof Date
-        ? value.toISOString().split('T')[0]
-        : value;
+      const payloadValue = field === 'tanggal' && value instanceof Date ? value.toISOString().split('T')[0] : value;
 
       await updateMutation.mutateAsync({
         id,
-        payload: { [field]: payloadValue }
+        payload: { [field]: payloadValue },
       });
-      toast.success("Perubahan otomatis tersimpan");
-    } catch (error) {
-      toast.error("Gagal menyimpan otomatis");
+      toast.success('Perubahan otomatis tersimpan');
+    } catch {
+      toast.error('Gagal menyimpan otomatis');
     }
   };
 
@@ -93,15 +85,7 @@ export default function EditPenerimaanUnitPage() {
           </div>
         </div>
 
-        {isLoading || !header ? (
-          <div className="p-8 text-center text-gray-500">Loading...</div>
-        ) : (
-          <PenerimaanUnitHeaderCard
-            data={form}
-            onChange={handleFieldChange}
-            onBlur={handleSaveField}
-          />
-        )}
+        {isLoading || !header ? <div className="p-8 text-center text-gray-500">Loading...</div> : <PenerimaanUnitHeaderCard data={form} onChange={handleFieldChange} onBlur={handleSaveField} />}
 
         <div className="bg-white rounded-xl border p-4 sm:p-5 space-y-4">
           <h2 className="text-sm font-semibold">Detail Penerimaan</h2>
