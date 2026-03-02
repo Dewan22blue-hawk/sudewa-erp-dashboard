@@ -18,8 +18,9 @@ export interface NavItemConfig {
  * Updated to support dynamic slug routing
  */
 export const getNavItems = (slug: string): NavItemConfig[] => {
-  // Helper to format path
-  const p = (path: string) => (slug ? `/dashboard/${slug}${path}` : path);
+  // Helper to format path with/without slug
+  const base = (path: string) => (slug ? `/dashboard/${slug}${path}` : path);
+  const master = (sub: string) => (slug ? `/dashboard/${slug}/master${sub}` : `/master-data${sub}`);
 
   return [
     {
@@ -39,31 +40,31 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       children: [
         {
           label: 'Akun',
-          href: p('/master/account'),
+          href: master('/account'),
         },
         {
           label: 'Supplier',
-          href: p('/master/supplier'),
+          href: master('/supplier'),
         },
         {
           label: 'Customer',
-          href: p('/master/customer'),
+          href: master('/customer'),
         },
         {
           label: 'Tipe Unit',
-          href: p('/master/type-unit'),
+          href: master('/type-unit'),
         },
         {
           label: 'Sparepart',
-          href: p('/master/sparepart'),
+          href: master('/sparepart'),
         },
         {
           label: 'Kas',
-          href: p('/master/kas'),
+          href: master('/kas'),
         },
         {
           label: 'User',
-          href: p('/master/user'),
+          href: master('/user'),
         },
       ],
     },
@@ -73,15 +74,15 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       children: [
         {
           label: 'Arus Transaksi',
-          href: p('/transaksi/arus-transaksi'),
+          href: base('/transaksi/arus-transaksi'),
         },
         {
           label: 'Penjualan Unit',
-          href: p('/sales'),
+          href: base('/sales'),
         },
         {
           label: 'Pembelian Unit',
-          href: p('/transaksi/pembelian-unit'),
+          href: base('/transaksi/pembelian-unit'),
         },
       ],
     },
@@ -91,15 +92,15 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       children: [
         {
           label: 'Stok Unit',
-          href: p('/warehouse/stock-unit'),
+          href: base('/warehouse/stock-unit'),
         },
         {
           label: 'Penerimaan Unit',
-          href: p('/warehouse/penerimaan-unit'),
+          href: base('/warehouse/penerimaan-unit'),
         },
         {
           label: 'Pengeluaran Unit',
-          href: p('/warehouse/pengeluaran-unit'),
+          href: base('/warehouse/pengeluaran-unit'),
         },
       ], // Siap untuk di-expand dengan sub-items
     },
@@ -109,39 +110,39 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       children: [
         {
           label: 'Transaksi Kas Harian',
-          href: p('/finance/transaksi-kas-harian'),
+          href: base('/finance/transaksi-kas-harian'),
         },
         {
           label: 'Data PPN Penjualan',
-          href: p('/finance/data-ppn-penjualan'),
+          href: base('/finance/data-ppn-penjualan'),
         },
         {
           label: 'Data PPN Pembelian',
-          href: p('/finance/data-ppn-pembelian'),
+          href: base('/finance/data-ppn-pembelian'),
         },
         {
           label: 'Data Refund Pembelian',
-          href: p('/finance/refund-beli'),
+          href: base('/finance/refund-beli'),
         },
         {
           label: 'Data Refund Penjualan',
-          href: p('/finance/refund-jual'),
+          href: base('/finance/refund-jual'),
         },
         {
           label: 'Data Hutang',
-          href: p('/finance/data-hutang'),
+          href: base('/finance/data-hutang'),
         },
         {
           label: 'Data Pembayaran Hutang',
-          href: p('/finance/data-pembayaran-hutang'),
+          href: base('/finance/data-pembayaran-hutang'),
         },
         {
           label: 'Data Piutang',
-          href: p('/finance/data-piutang'),
+          href: base('/finance/data-piutang'),
         },
         {
           label: 'Data Pembayaran Piutang',
-          href: p('/finance/data-penerimaan-piutang'),
+          href: base('/finance/data-penerimaan-piutang'),
         },
       ], // Siap untuk di-expand dengan sub-items
     },
@@ -151,28 +152,28 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       children: [
         {
           label: 'Laporan Transaksi Kas',
-          href: p('/laporan/laporan-transaksi-kas'),
+          href: base('/laporan/laporan-transaksi-kas'),
         },
         {
           label: 'Laporan Akuntansi',
-          href: p('/laporan/laporan-akuntansi'),
+          href: base('/laporan/laporan-akuntansi'),
         },
         {
           label: 'Laporan Pembelian',
-          href: p('/laporan/laporan-pembelian'),
+          href: base('/laporan/laporan-pembelian'),
         },
         {
           label: 'Laporan Penjualan',
-          href: p('/laporan/laporan-penjualan')
+          href: base('/laporan/laporan-penjualan'),
         },
         {
           label: 'Laporan Penerimaan',
-          href: p('/laporan/laporan-penerimaan')
+          href: base('/laporan/laporan-penerimaan'),
         },
         {
           label: 'Laporan Stock',
-          href: p('/laporan/laporan-stock')
-        }
+          href: base('/laporan/laporan-stock'),
+        },
       ], // Siap untuk di-expand dengan sub-items
     },
   ];

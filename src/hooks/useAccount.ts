@@ -1,99 +1,66 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-    getAccounts,
-    getAccountById,
-    getAccountHierarchy,
-    createAccount,
-    updateAccount,
-    deleteAccount,
-} from "@/services/account.service"
-import {
-    CreateAccountRequest,
-    UpdateAccountRequest,
-    AccountType,
-} from "@/@types/account.types"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { AccountPayload } from '@/@types/account.types';
+import type { PaginationParams } from '@/@types/pagination.types';
+import { createAccount, deleteAccount, getAccountById, getAccountHierarchy, getAccounts, updateAccount } from '@/services/account.service';
 
-/**
- * Hook untuk fetch list accounts dengan optional filter
- */
-export function useAccounts(companyId: string | null, filter?: AccountType) {
-    return useQuery({
-        queryKey: ["accounts", companyId, filter],
-        queryFn: () => getAccounts(companyId!, filter),
-        enabled: !!companyId,
-    })
-}
+export const useAccounts = (params: PaginationParams & { search?: string; enabled?: boolean }) => {
+  const { enabled = true, ...rest } = params;
 
-/**
- * Hook untuk fetch single account by ID
- */
-export function useAccount(id: string | undefined) {
-    return useQuery({
-        queryKey: ["account", id],
-        queryFn: () => getAccountById(id!),
-        enabled: !!id,
-    })
-}
+  return useQuery({
+    queryKey: ['accounts', rest],
+    queryFn: () => getAccounts(rest),
+    placeholderData: (previous) => previous,
+    enabled,
+  });
+};
 
-/**
- * Hook untuk get account hierarchy (untuk dropdown parent)
- */
-export function useAccountHierarchy(companyId: string | null) {
-    return useQuery({
-        queryKey: ["account-hierarchy", companyId],
-        queryFn: () => getAccountHierarchy(companyId!),
-        enabled: !!companyId,
-    })
-}
+export const useAccount = (id: string | number | undefined) =>
+  useQuery({
+    queryKey: ['account', id],
+    queryFn: () => getAccountById(id!),
+    enabled: !!id,
+    retry: false,
+  });
 
-/**
- * Hook untuk create account
- */
-export function useCreateAccount() {
-    const queryClient = useQueryClient()
+export const useAccountHierarchy = () =>
+  useQuery({
+    queryKey: ['account-hierarchy'],
+    queryFn: () => getAccountHierarchy(),
+  });
 
-    return useMutation({
-        mutationFn: (payload: CreateAccountRequest) => createAccount(payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["accounts"] })
-            queryClient.invalidateQueries({ queryKey: ["account-hierarchy"] })
-        },
-    })
-}
+export const useCreateAccount = () => {
+  const queryClient = useQueryClient();
 
-/**
- * Hook untuk update account
- */
-export function useUpdateAccount() {
-    const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: AccountPayload) => createAccount(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account-hierarchy'] });
+    },
+  });
+};
 
-    return useMutation({
-        mutationFn: ({
-            id,
-            payload,
-        }: {
-            id: string
-            payload: UpdateAccountRequest
-        }) => updateAccount(id, payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["accounts"] })
-            queryClient.invalidateQueries({ queryKey: ["account"] })
-            queryClient.invalidateQueries({ queryKey: ["account-hierarchy"] })
-        },
-    })
-}
+export const useUpdateAccount = () => {
+  const queryClient = useQueryClient();
 
-/**
- * Hook untuk delete account (soft delete)
- */
-export function useDeleteAccount() {
-    const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string | number; payload: AccountPayload }) => updateAccount(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account'] });
+      queryClient.invalidateQueries({ queryKey: ['account-hierarchy'] });
+    },
+  });
+};
 
-    return useMutation({
-        mutationFn: (id: string) => deleteAccount(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["accounts"] })
-            queryClient.invalidateQueries({ queryKey: ["account-hierarchy"] })
-        },
-    })
-}
+export const useDeleteAccount = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string | number) => deleteAccount(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account-hierarchy'] });
+    },
+  });
+};

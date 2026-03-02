@@ -13,33 +13,45 @@ interface AccountTableProps {
   isLoading: boolean;
   onEdit: (account: Account) => void;
   onDelete: (account: Account) => void;
+  page?: number;
+  perPage?: number;
+  onPageChange?: (page: number) => void;
+  onPerPageChange?: (perPage: number) => void;
 }
 
-export function AccountTable({ data, total, isLoading, onEdit, onDelete }: AccountTableProps) {
+export function AccountTable({ data, total, isLoading, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange }: AccountTableProps) {
+  const isControlled = !!page && !!perPage;
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
   const handleItemsPerPageChange = (val: string) => {
-    setItemsPerPage(Number(val));
-    setCurrentPage(1);
+    const next = Number(val);
+    if (isControlled) {
+      onPerPageChange?.(next);
+      onPageChange?.(1);
+    } else {
+      setItemsPerPage(next);
+      setCurrentPage(1);
+    }
   };
 
   // Safe defaults
   const safeData = data || [];
+  const activePage = isControlled ? page! : currentPage;
+  const activePerPage = isControlled ? perPage! : itemsPerPage;
   const safeTotal = total ?? safeData.length;
 
-  // Local Pagination Logic (since backend pagination isn't passed as prop yet, we slice locally mimicking SalesTable)
-  const totalPages = Math.max(1, Math.ceil(safeData.length / itemsPerPage));
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = safeData.slice(startIndex, endIndex);
+  const totalPages = Math.max(1, Math.ceil(safeTotal / activePerPage));
+  const startIndex = (activePage - 1) * activePerPage;
+  const endIndex = startIndex + activePerPage;
+  const currentData = isControlled ? safeData : safeData.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-4">
       {/* SHOW ENTRIES */}
       <div className="flex items-center gap-2 text-sm">
         <span>Show</span>
-        <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
+        <Select value={String(activePerPage)} onValueChange={handleItemsPerPageChange}>
           <SelectTrigger className="h-9 w-20 bg-white">
             <SelectValue placeholder="10" />
           </SelectTrigger>
@@ -60,7 +72,7 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete }: Accou
               <TableHead className="font-semibold">KODE AKUN</TableHead>
               <TableHead className="font-semibold">GRUP AKUN</TableHead>
               <TableHead className="font-semibold">DESKRIPSI</TableHead>
-              <TableHead className="font-semibold">CASH FLOW</TableHead>
+              <TableHead className="font-semibold">KATEGORI</TableHead>
               <TableHead className="text-right font-semibold">ACTION</TableHead>
             </TableRow>
           </TableHeader>
@@ -96,9 +108,9 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete }: Accou
               currentData.map((account) => (
                 <TableRow key={account.id} className="hover:bg-muted/50">
                   <TableCell>{account.code}</TableCell>
-                  <TableCell>{account.group}</TableCell>
+                  <TableCell>{account.accountGroupName || account.name || '-'}</TableCell>
                   <TableCell>{account.description}</TableCell>
-                  <TableCell>{account.cashFlow}</TableCell>
+                  <TableCell className="capitalize">{account.type ?? '-'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -124,11 +136,11 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete }: Accou
       {/* PAGINATION */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>
-          Showing {safeData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, safeData.length)} of {safeTotal} entries
+          Showing {safeData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, safeTotal)} of {safeTotal} entries
         </span>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1}>
+          <Button variant="outline" size="sm" onClick={() => (isControlled ? onPageChange?.(Math.max(1, activePage - 1)) : setCurrentPage((prev) => Math.max(1, prev - 1)))} disabled={activePage === 1}>
             Previous
           </Button>
 
@@ -136,16 +148,24 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete }: Accou
             let pageNum: number;
             if (totalPages <= 5) {
               pageNum = i + 1;
-            } else if (currentPage <= 3) {
+            } else if (activePage <= 3) {
               pageNum = i + 1;
-            } else if (currentPage >= totalPages - 2) {
+            } else if (activePage >= totalPages - 2) {
               pageNum = totalPages - 4 + i;
             } else {
-              pageNum = currentPage - 2 + i;
+              pageNum = activePage - 2 + i;
             }
 
+            const changePage = () => {
+              if (isControlled) {
+                onPageChange?.(pageNum);
+              } else {
+                setCurrentPage(pageNum);
+              }
+            };
+
             return (
-              <Button key={pageNum} variant={currentPage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className="w-10">
+              <Button key={pageNum} variant={activePage === pageNum ? 'default' : 'outline'} size="sm" onClick={changePage} className="w-10">
                 {pageNum}
               </Button>
             );
@@ -160,7 +180,7 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete }: Accou
             </>
           )}
 
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
+          <Button variant="outline" size="sm" onClick={() => (isControlled ? onPageChange?.(Math.min(totalPages, activePage + 1)) : setCurrentPage((prev) => Math.min(totalPages, prev + 1)))} disabled={activePage === totalPages}>
             Next
           </Button>
         </div>

@@ -1,240 +1,141 @@
-import {
-    Account,
-    AccountListResponse,
-    CreateAccountRequest,
-    UpdateAccountRequest,
-    AccountType,
-} from "@/@types/account.types"
+import type { Account, AccountDetail, AccountListResponse, AccountPayload } from '@/@types/account.types';
+import type { PaginationParams } from '@/@types/pagination.types';
+import { apiClient } from '@/lib/api/client';
+import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
+import { ApiResponseError, ApiValidationError, LaravelApiResponse, ensureSuccess, toPaginatedResult } from '@/lib/api/response';
 
-// Dummy data storage untuk development
-let dummyAccounts: Account[] = [
+interface AccountApiModel {
+  id: number;
+  account_group_id: number;
+  account_group_name?: string;
+  account_group?: {
+    id: number;
+    name: string;
+  };
+  code: string;
+  name: string;
+  description?: string | null;
+  type?: 'credit' | 'debet' | 'debit';
+  is_active?: boolean | number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+const mapAccount = (payload: AccountApiModel): Account => ({
+  id: payload.id,
+  code: payload.code,
+  name: payload.name,
+  accountGroupId: payload.account_group_id,
+  accountGroupName: payload.account_group_name ?? payload.account_group?.name,
+  group: payload.account_group_name ?? payload.account_group?.name,
+  type: payload.type === 'debit' ? 'debet' : payload.type, // normalize to debet
+  cashFlow: undefined,
+  description: payload.description ?? null,
+  isActive: payload.is_active === undefined ? true : payload.is_active === true || payload.is_active === 1,
+  createdAt: payload.created_at,
+  updatedAt: payload.updated_at,
+});
+
+const basePath = '/wapi/master-data/account';
+
+type PaginatedAccountResponse = LaravelApiResponse<{
+  data: AccountApiModel[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}>;
+
+type AccountItemResponse = LaravelApiResponse<AccountApiModel>;
+
+type DeleteResponse = LaravelApiResponse<null>;
+
+export const getAccounts = async (params: PaginationParams & { search?: string }): Promise<AccountListResponse> => {
+  const response = await apiClient.get<PaginatedAccountResponse>(basePath, {
+    params: buildLaravelPaginationQuery(params),
+  });
+
+  const data = ensureSuccess(response.data);
+
+  return toPaginatedResult(
     {
-        id: "1",
-        code: "1000",
-        group: "1",
-        description: "AKTIVA",
-        category: "DEBET",
-        cashFlow: "DEBET",
-        accountType: "AKTIVA",
-        parentId: null,
-        isActive: true,
-        companyId: "1",
-        createdAt: new Date("2026-01-01").toISOString(),
-        updatedAt: new Date("2026-01-01").toISOString(),
+      data: data.data ?? [],
+      current_page: data.current_page,
+      per_page: data.per_page,
+      total: data.total,
+      last_page: data.last_page,
     },
-    {
-        id: "2",
-        code: "1100",
-        group: "1",
-        description: "Aktiva Lancar",
-        category: "DEBET",
-        cashFlow: "DEBET",
-        accountType: "AKTIVA",
-        parentId: "1",
-        isActive: true,
-        companyId: "1",
-        createdAt: new Date("2026-01-01").toISOString(),
-        updatedAt: new Date("2026-01-01").toISOString(),
-    },
-    {
-        id: "3",
-        code: "1110",
-        group: "1",
-        description: "Kas",
-        category: "DEBET",
-        cashFlow: "DEBET",
-        accountType: "AKTIVA",
-        parentId: "2",
-        isActive: true,
-        companyId: "1",
-        createdAt: new Date("2026-01-05").toISOString(),
-        updatedAt: new Date("2026-01-05").toISOString(),
-    },
-    {
-        id: "4",
-        code: "2000",
-        group: "2",
-        description: "PASIVA",
-        category: "KREDIT",
-        cashFlow: "KREDIT",
-        accountType: "PASIVA",
-        parentId: null,
-        isActive: true,
-        companyId: "1",
-        createdAt: new Date("2026-01-01").toISOString(),
-        updatedAt: new Date("2026-01-01").toISOString(),
-    },
-    {
-        id: "5",
-        code: "2100",
-        group: "2",
-        description: "Kewajiban Lancar",
-        category: "KREDIT",
-        cashFlow: "KREDIT",
-        accountType: "PASIVA",
-        parentId: "4",
-        isActive: true,
-        companyId: "1",
-        createdAt: new Date("2026-01-01").toISOString(),
-        updatedAt: new Date("2026-01-01").toISOString(),
-    },
-]
+    mapAccount,
+  );
+};
 
-/**
- * Get accounts dengan filter optional
- */
-export async function getAccounts(
-    companyId: string,
-    filter?: AccountType
-): Promise<AccountListResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300))
+export const getAccountById = async (id: number | string): Promise<AccountDetail> => {
+  const response = await apiClient.get<AccountItemResponse>(`${basePath}/${id}`);
+  const data = ensureSuccess(response.data);
+  return mapAccount(data);
+};
 
-    let filteredAccounts = dummyAccounts.filter(
-        (acc) => acc.companyId === companyId && acc.isActive
-    )
+export const createAccount = async (payload: AccountPayload): Promise<Account> => {
+  try {
+    const type = payload.type === 'debit' ? 'debet' : (payload.type ?? 'debet');
+    // Use x-www-form-urlencoded to match backend expectation
+    const body = new URLSearchParams();
+    body.append('account_group_id', String(payload.accountGroupId));
+    body.append('code', payload.code);
+    body.append('name', payload.name);
+    if (payload.description !== undefined && payload.description !== null) body.append('description', payload.description);
+    body.append('type', type);
 
-    // Apply type filter if provided
-    if (filter) {
-        filteredAccounts = filteredAccounts.filter(
-            (acc) => acc.accountType === filter
-        )
+    const response = await apiClient.post<AccountItemResponse>(basePath, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const data = ensureSuccess(response.data);
+    return mapAccount(data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
     }
+    throw error;
+  }
+};
 
-    return Promise.resolve({
-        data: filteredAccounts,
-        meta: {
-            page: 1,
-            perPage: 25,
-            total: filteredAccounts.length,
-        },
-    })
-}
+export const updateAccount = async (id: number | string, payload: AccountPayload): Promise<Account> => {
+  try {
+    const type = payload.type === 'debit' ? 'debet' : (payload.type ?? 'debet');
 
-/**
- * Get single account by ID
- */
-export async function getAccountById(id: string): Promise<Account | null> {
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    const body = new URLSearchParams();
+    body.append('account_group_id', String(payload.accountGroupId));
+    body.append('code', payload.code);
+    body.append('name', payload.name);
+    if (payload.description !== undefined && payload.description !== null) body.append('description', payload.description);
+    body.append('type', type);
 
-    const account = dummyAccounts.find((acc) => acc.id === id && acc.isActive)
-    return Promise.resolve(account || null)
-}
+    const response = await apiClient.put<AccountItemResponse>(`${basePath}/${id}`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
 
-/**
- * Get account hierarchy untuk dropdown parent
- */
-export async function getAccountHierarchy(
-    companyId: string
-): Promise<Account[]> {
-    await new Promise((resolve) => setTimeout(resolve, 200))
-
-    const accounts = dummyAccounts.filter(
-        (acc) => acc.companyId === companyId && acc.isActive
-    )
-
-    return Promise.resolve(accounts)
-}
-
-/**
- * Create new account
- */
-export async function createAccount(
-    payload: CreateAccountRequest
-): Promise<Account> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // Check code uniqueness per company
-    const codeExists = dummyAccounts.some(
-        (acc) =>
-            acc.code === payload.code &&
-            acc.companyId === payload.companyId &&
-            acc.isActive
-    )
-
-    if (codeExists) {
-        throw new Error("Kode akun sudah digunakan")
+    const data = ensureSuccess(response.data);
+    return mapAccount(data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
     }
+    throw error;
+  }
+};
 
-    const newAccount: Account = {
-        id: Date.now().toString(),
-        code: payload.code,
-        group: payload.group,
-        description: payload.description,
-        category: payload.category,
-        cashFlow: payload.category, // Cash flow sama dengan category
-        accountType: payload.accountType,
-        parentId: payload.parentId || null,
-        isActive: payload.isActive ?? true,
-        companyId: payload.companyId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
+export const deleteAccount = async (id: number | string): Promise<void> => {
+  const response = await apiClient.delete<DeleteResponse>(`${basePath}/${id}`);
+  const payload = response.data;
 
-    dummyAccounts = [newAccount, ...dummyAccounts]
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete account');
+  }
+};
 
-    return Promise.resolve(newAccount)
-}
-
-/**
- * Update existing account
- */
-export async function updateAccount(
-    id: string,
-    payload: UpdateAccountRequest
-): Promise<Account> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const currentAccount = dummyAccounts.find((acc) => acc.id === id)
-
-    if (!currentAccount) {
-        throw new Error("Akun tidak ditemukan")
-    }
-
-    // Check code uniqueness (exclude current account)
-    if (payload.code) {
-        const codeExists = dummyAccounts.some(
-            (acc) =>
-                acc.code === payload.code &&
-                acc.companyId === currentAccount.companyId &&
-                acc.id !== id &&
-                acc.isActive
-        )
-
-        if (codeExists) {
-            throw new Error("Kode akun sudah digunakan")
-        }
-    }
-
-    dummyAccounts = dummyAccounts.map((acc) =>
-        acc.id === id
-            ? {
-                ...acc,
-                ...payload,
-                cashFlow: payload.category ?? acc.cashFlow,
-                updatedAt: new Date().toISOString(),
-            }
-            : acc
-    )
-
-    const updatedAccount = dummyAccounts.find((acc) => acc.id === id)!
-    return Promise.resolve(updatedAccount)
-}
-
-/**
- * Soft delete account
- */
-export async function deleteAccount(id: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 300))
-
-    dummyAccounts = dummyAccounts.map((acc) =>
-        acc.id === id
-            ? {
-                ...acc,
-                isActive: false,
-                updatedAt: new Date().toISOString(),
-            }
-            : acc
-    )
-
-    return Promise.resolve()
-}
+// Legacy helper retained for compatibility with older dropdowns that require a flat list
+export const getAccountHierarchy = async (): Promise<Account[]> => {
+  const { data } = await getAccounts({ page: 1, perPage: 1000 });
+  return data;
+};

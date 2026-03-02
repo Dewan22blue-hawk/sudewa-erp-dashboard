@@ -7,6 +7,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { ApiError } from '@/@types/api';
 import { getAccessToken, removeAccessToken } from '@/lib/auth/token';
 
+// Default to hawk-dev backend to match master-data environment; override via NEXT_PUBLIC_API_URL when needed.
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://wajirabackend.hawk-dev.com';
 
 /**
@@ -27,6 +28,8 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
     }
+
+    // NOTE: Master-data endpoints must NOT be scoped by company_id, so we no longer auto-append company_id here.
     return config;
   },
   (error) => {
