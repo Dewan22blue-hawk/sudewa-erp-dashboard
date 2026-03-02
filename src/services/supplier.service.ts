@@ -1,87 +1,152 @@
-import type {
-    Supplier,
-    CreateSupplierRequest,
-    UpdateSupplierRequest,
-    SupplierListResponse,
-} from "@/@types/supplier.types"
+import type { Supplier, SupplierListResponse, SupplierPayload } from '@/@types/supplier.types';
+import type { PaginationParams } from '@/@types/pagination.types';
+import { apiClient } from '@/lib/api/client';
+import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
+import { ApiResponseError, ApiValidationError, LaravelApiResponse, ensureSuccess, toPaginatedResult } from '@/lib/api/response';
 
-const suppliers: Supplier[] = [
-    {
-        id: "1",
-        code: "SPL-001",
-        name: "ABC KALASAN - DRG.YOUNG SANI SANTANU",
-        address: "Jl. Raya Kalimalang No, Rt 000, Rw 000, Duren Sawit, Duren Sawit, Kota Adm. Jakarta Timur, DKI Jakarta 00000",
-        npwp: "123456789012345",
-        pic: "Emilia Clarke",
-        phone: "08xx xxxx xxxx",
-        companyId: "1",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+interface SupplierApiModel {
+  id: number;
+  uuid?: string;
+  code?: string;
+  type?: string;
+  name: string;
+  address?: string | null;
+  npwp?: string | null;
+  phone?: string | null;
+  pic?: string | null;
+  pic_name?: string | null;
+  user_id?: number | string;
+  company_id?: number | string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+const mapSupplier = (payload: SupplierApiModel): Supplier => ({
+  id: payload.id,
+  uuid: payload.uuid,
+  code: payload.code,
+  type: payload.type,
+  name: payload.name,
+  address: payload.address ?? null,
+  npwp: payload.npwp ?? null,
+  phone: payload.phone ?? null,
+  pic: payload.pic ?? payload.pic_name ?? null,
+  userId: payload.user_id,
+  companyId: payload.company_id,
+  createdAt: payload.created_at,
+  updatedAt: payload.updated_at,
+});
+
+const basePath = '/wapi/master-data/supplier';
+
+type PaginatedSupplierResponse = LaravelApiResponse<{
+  data: SupplierApiModel[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}>;
+
+type SupplierItemResponse = LaravelApiResponse<SupplierApiModel>;
+
+type DeleteResponse = LaravelApiResponse<null>;
+
+export const getSuppliers = async (
+  params: PaginationParams & {
+    search?: string;
+    user_id?: number | string;
+    company_id?: number | string;
+    code?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
+    case_sensitive?: 0 | 1 | boolean;
+  },
+): Promise<SupplierListResponse> => {
+  const response = await apiClient.get<PaginatedSupplierResponse>(basePath, {
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      search: params.search,
+      user_id: params.user_id,
+      company_id: params.company_id,
+      code: params.code,
+      sort_by: params.sort_by,
+      sort_order: params.sort_order,
+      case_sensitive: params.case_sensitive,
     },
-]
+  });
 
-let nextId = 2
+  const data = ensureSuccess(response.data);
 
-export async function getSuppliers(companyId: string): Promise<SupplierListResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300))
+  return toPaginatedResult(
+    {
+      data: data.data ?? [],
+      current_page: data.current_page,
+      per_page: data.per_page,
+      total: data.total,
+      last_page: data.last_page,
+    },
+    mapSupplier,
+  );
+};
 
-    const filteredSuppliers = suppliers.filter(s => s.companyId === companyId)
+export const getSupplierById = async (id: number | string): Promise<Supplier> => {
+  const response = await apiClient.get<SupplierItemResponse>(`${basePath}/${id}`);
+  const data = ensureSuccess(response.data);
+  return mapSupplier(data);
+};
 
-    return {
-        data: filteredSuppliers,
-        meta: {
-            total: filteredSuppliers.length,
-            page: 1,
-            perPage: 10,
-        },
+const buildPayload = (payload: SupplierPayload) => {
+  const body = new URLSearchParams();
+  if (payload.userId !== undefined) body.append('user_id', String(payload.userId));
+  body.append('name', payload.name);
+  //   if (payload.companyId !== undefined) body.append('company_id', String(payload.companyId));
+  // Per permintaan, jangan sertakan company_id untuk sekarang
+  if (payload.address) body.append('address', payload.address);
+  if (payload.phone) body.append('phone', payload.phone);
+  if (payload.npwp) body.append('npwp', payload.npwp);
+  if (payload.pic) {
+    body.append('pic', payload.pic);
+    body.append('pic_name', payload.pic);
+  }
+  return body;
+};
+
+export const createSupplier = async (payload: SupplierPayload): Promise<Supplier> => {
+  try {
+    const body = buildPayload(payload);
+    const response = await apiClient.post<SupplierItemResponse>(basePath, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    const data = ensureSuccess(response.data);
+    return mapSupplier(data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
     }
-}
+    throw error;
+  }
+};
 
-export async function createSupplier(
-    payload: CreateSupplierRequest
-): Promise<Supplier> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const newSupplier: Supplier = {
-        id: String(nextId++),
-        code: `SPL-${String(nextId - 1).padStart(3, "0")}`,
-        ...payload,
-        companyId: payload.companyId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+export const updateSupplier = async (id: number | string, payload: SupplierPayload): Promise<Supplier> => {
+  try {
+    const body = buildPayload(payload);
+    const response = await apiClient.put<SupplierItemResponse>(`${basePath}/${id}`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    const data = ensureSuccess(response.data);
+    return mapSupplier(data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
     }
+    throw error;
+  }
+};
 
-    suppliers.push(newSupplier)
-    return newSupplier
-}
-
-export async function updateSupplier(
-    id: string,
-    payload: UpdateSupplierRequest
-): Promise<Supplier> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const index = suppliers.findIndex((s) => s.id === id)
-    if (index === -1) {
-        throw new Error("Supplier tidak ditemukan")
-    }
-
-    suppliers[index] = {
-        ...suppliers[index],
-        ...payload,
-        updatedAt: new Date().toISOString(),
-    }
-
-    return suppliers[index]
-}
-
-export async function deleteSupplier(id: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const index = suppliers.findIndex((s) => s.id === id)
-    if (index === -1) {
-        throw new Error("Supplier tidak ditemukan")
-    }
-
-    suppliers.splice(index, 1)
-}
+export const deleteSupplier = async (id: number | string): Promise<void> => {
+  const response = await apiClient.delete<DeleteResponse>(`${basePath}/${id}`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete supplier');
+  }
+};

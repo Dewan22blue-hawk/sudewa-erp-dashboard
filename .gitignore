@@ -9,6 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+/API_INTEGRATION_GUIDE.md
 
 # testing
 /coverage
