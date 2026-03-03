@@ -33,7 +33,7 @@ export const AccountCreatePage = () => {
         code: values.code,
         name: values.name,
         description: values.description,
-        isActive: values.isActive,
+        // isActive: values.isActive,
       });
       toast.success('Akun berhasil dibuat');
       router.push('/master-data/account');

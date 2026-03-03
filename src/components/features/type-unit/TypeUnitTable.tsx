@@ -99,8 +99,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
                   <TableCell className="text-slate-700">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="font-medium text-slate-800">{item.name}</TableCell>
-                  <TableCell className="text-slate-700">{item.purchasePrice ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{item.salePrice ?? '-'}</TableCell>
+                  {/* <TableCell className="text-slate-700">{item.purchasePrice ?? '-'}</TableCell> */}
+                  {/* <TableCell className="text-slate-700">{item.salePrice ?? '-'}</TableCell> */}
                   {/* <TableCell className="text-slate-700">{item.unitType || '-'}</TableCell> */}
                   <TableCell className="text-slate-700">{item.unitModel || '-'}</TableCell>
                   <TableCell className="text-slate-700">{item.brutoWeight ?? '-'}</TableCell>
