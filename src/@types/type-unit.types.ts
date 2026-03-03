@@ -1,43 +1,41 @@
+import type { PaginatedResult } from './pagination.types';
+
+export interface UnitBrand {
+  id: number;
+  uuid?: string;
+  name: string;
+  image?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface TypeUnit {
-    id: string
-    code: string
-    merk: string
-    type: string
-    jenis?: string
-    model?: string
-    bruto?: number
-    netto?: number
-    companyId: string
-    createdAt: string
-    updatedAt: string
+  id: number;
+  uuid?: string;
+  brandId: number;
+  code: string;
+  name: string;
+  capacity?: number | null;
+  image?: string | null;
+  unitType?: string | null;
+  unitModel?: string | null;
+  nettoWeight?: number | null;
+  brutoWeight?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+  brand?: UnitBrand | null;
 }
 
-export interface CreateTypeUnitRequest {
-    code: string
-    merk: string
-    type: string
-    jenis?: string
-    model?: string
-    bruto?: number
-    netto?: number
-    companyId: string
+export interface TypeUnitPayload {
+  code: string;
+  brandId: number;
+  name: string;
+  capacity?: number | null;
+  unitType?: string | null;
+  unitModel?: string | null;
+  nettoWeight?: number | null;
+  brutoWeight?: number | null;
+  image?: File | null;
 }
 
-export interface UpdateTypeUnitRequest {
-    code?: string
-    merk?: string
-    type?: string
-    jenis?: string
-    model?: string
-    bruto?: number
-    netto?: number
-}
-
-export interface TypeUnitListResponse {
-    data: TypeUnit[]
-    meta: {
-        total: number
-        page: number
-        perPage: number
-    }
-}
+export interface TypeUnitListResponse extends PaginatedResult<TypeUnit> {}

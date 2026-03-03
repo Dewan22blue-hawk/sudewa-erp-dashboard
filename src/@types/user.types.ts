@@ -1,30 +1,49 @@
-export type UserRole =
-    | "Direksi"
-    | "Accounting"
-    | "Admin"
-    | "Warehouse"
+export type UserRole = 'admin' | 'employee' | string;
+
+export interface UserRoleItem {
+  id: number;
+  name: string;
+  guard_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
 export interface User {
-    id: string
-    userId: string
-    name: string
-    role: UserRole
-    companyId: string
-    createdAt: string
-    updatedAt: string
+  id: number | string;
+  uuid?: string;
+  name: string;
+  email: string;
+  username: string;
+  firstname?: string | null;
+  lastname?: string | null;
+  isActive?: boolean | number;
+  emailVerifiedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  roles?: UserRoleItem[];
+}
+
+export interface UserListParams {
+  role?: string;
 }
 
 export interface CreateUserRequest {
-    userId: string
-    name: string
-    password: string
-    role: UserRole
-    companyId: string
+  name: string;
+  email: string;
+  username: string;
+  firstname?: string;
+  lastname?: string;
+  password?: string;
+  password_confirmation?: string;
+  roles?: string;
 }
 
-export interface UpdateUserRequest {
-    id: string
-    name: string
-    password?: string
-    role: UserRole
+export interface UpdateUserRequest extends Partial<CreateUserRequest> {
+  id: number | string;
+}
+
+export interface UserStatusResponse {
+  total?: number;
+  active?: number;
+  inactive?: number;
 }

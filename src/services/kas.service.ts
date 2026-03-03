@@ -1,79 +1,110 @@
-import { Kas, KasListResponse, CreateKasRequest, UpdateKasRequest } from "@/@types/kas.types"
+import { Kas, KasListResponse, KasPayload, KasType } from '@/@types/kas.types';
+import type { LaravelPagination } from '@/@types/pagination.types';
+import { apiClient } from '@/lib/api/client';
+import { ApiResponseError, LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
 
-// Initial Mock Data
-let kasDB: Kas[] = [
-    {
-        id: "1",
-        code: "BCA",
-        description: "BCA IDR",
-        type: "Bank",
-        companyId: "1",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
-]
+interface KasApiModel {
+  id: number;
+  uuid?: string;
+  company_id?: number | string;
+  code: string;
+  description: string;
+  type: KasType;
+  created_at?: string;
+  updated_at?: string;
+}
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+type KasListApiResponse = LaravelApiResponse<LaravelPagination<KasApiModel> | KasApiModel[]>;
+type KasItemApiResponse = LaravelApiResponse<KasApiModel>;
+type DeleteResponse = LaravelApiResponse<null>;
 
-export async function getKas(companyId: string): Promise<KasListResponse> {
-    await delay(500) // Simulate network delay
+const basePath = '/wapi/master-data/cash';
 
-    // Filter by companyId (Multi-tenant safety)
-    const filtered = kasDB.filter(item => item.companyId === companyId)
+const mapKas = (payload: KasApiModel): Kas => ({
+  id: payload.id,
+  uuid: payload.uuid,
+  code: payload.code,
+  description: payload.description,
+  type: payload.type,
+  companyId: payload.company_id ?? null,
+  createdAt: payload.created_at,
+  updatedAt: payload.updated_at,
+});
 
-    // Return cloned data to prevent mutation
+const normalizeList = (data: LaravelPagination<KasApiModel> | KasApiModel[]): { list: KasApiModel[]; meta: { current_page: number; per_page: number; total: number; last_page: number } } => {
+  if (Array.isArray(data)) {
     return {
-        data: [...filtered],
-        meta: {
-            page: 1,
-            perPage: 10,
-            total: filtered.length,
-        }
-    }
-}
+      list: data,
+      meta: {
+        current_page: 1,
+        per_page: data.length || 1,
+        total: data.length,
+        last_page: 1,
+      },
+    };
+  }
 
-export async function createKas(payload: CreateKasRequest): Promise<Kas> {
-    await delay(500)
+  return {
+    list: data.data ?? [],
+    meta: {
+      current_page: data.current_page ?? 1,
+      per_page: data.per_page ?? (data.data?.length || 1),
+      total: data.total ?? data.data?.length ?? 0,
+      last_page: data.last_page ?? 1,
+    },
+  };
+};
 
-    const newKas: Kas = {
-        id: Date.now().toString(),
-        ...payload,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
+const buildPayload = (payload: KasPayload, opts?: { asUpdate?: boolean }) => {
+  const body = new FormData();
+  if (opts?.asUpdate) body.append('_method', 'PUT');
 
-    // Immutable update
-    kasDB = [newKas, ...kasDB]
-    return { ...newKas }
-}
+  body.append('code', payload.code);
+  body.append('description', payload.description);
+  body.append('type', payload.type);
+  if (payload.companyId !== undefined && payload.companyId !== null) {
+    body.append('company_id', String(payload.companyId));
+  }
 
-export async function updateKas(id: string, payload: UpdateKasRequest): Promise<Kas> {
-    await delay(500)
+  return body;
+};
 
-    const index = kasDB.findIndex(item => item.id === id)
-    if (index === -1) {
-        throw new Error("Data tidak ditemukan")
-    }
+export const getKas = async (companyId?: string | number): Promise<KasListResponse> => {
+  const response = await apiClient.get<KasListApiResponse>(basePath, {
+    params: companyId ? { company_id: companyId } : undefined,
+  });
+  const data = ensureSuccess(response.data);
+  const { list, meta } = normalizeList(data);
 
-    const updatedKas: Kas = {
-        ...kasDB[index],
-        ...payload,
-        updatedAt: new Date().toISOString()
-    }
+  return {
+    data: list.map(mapKas),
+    meta: {
+      currentPage: meta.current_page,
+      perPage: meta.per_page,
+      total: meta.total,
+      lastPage: meta.last_page,
+    },
+  };
+};
 
-    // Immutable update
-    kasDB = [...kasDB.slice(0, index), updatedKas, ...kasDB.slice(index + 1)]
-    return { ...updatedKas }
-}
+export const createKas = async (payload: KasPayload): Promise<Kas> => {
+  const body = buildPayload(payload);
+  const response = await apiClient.post<KasItemApiResponse>(basePath, body);
+  const data = ensureSuccess(response.data);
+  return mapKas(data);
+};
 
-export async function deleteKas(id: string): Promise<void> {
-    await delay(500)
+export const updateKas = async (id: number | string, payload: KasPayload): Promise<Kas> => {
+  const body = buildPayload(payload, { asUpdate: true });
+  const response = await apiClient.post<KasItemApiResponse>(`${basePath}/${id}`, body);
+  const data = ensureSuccess(response.data);
+  return mapKas(data);
+};
 
-    const exists = kasDB.find(item => item.id === id)
-    if (!exists) {
-        throw new Error("Data tidak ditemukan")
-    }
-
-    // Immutable update
-    kasDB = kasDB.filter(item => item.id !== id)
-}
+export const deleteKas = async (id: number | string): Promise<void> => {
+  const response = await apiClient.delete<DeleteResponse>(`${basePath}/${id}`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete kas');
+  }
+};

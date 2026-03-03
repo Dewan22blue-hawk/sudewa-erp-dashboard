@@ -1,57 +1,50 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-    getSpareparts,
-    createSparepart,
-    updateSparepart,
-    deleteSparepart,
-    importSparepart,
-} from "@/services/sparepart.service"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createSparepart, deleteSparepart, getSparepartCategories, getSpareparts, importSparepart, updateSparepart } from '@/services/sparepart.service';
+import type { SparepartPayload } from '@/@types/sparepart.types';
 
-export function useSpareparts(companyId: string) {
-    return useQuery({
-        queryKey: ["spareparts", companyId],
-        queryFn: () => getSpareparts(companyId),
-    })
+export function useSpareparts(companyId?: string | number) {
+  return useQuery({
+    queryKey: ['spareparts', companyId],
+    queryFn: () => getSpareparts(companyId),
+    enabled: Boolean(companyId),
+  });
 }
 
-export function useCreateSparepart(companyId: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: createSparepart,
-        onSuccess: () =>
-            qc.invalidateQueries({ queryKey: ["spareparts", companyId] }),
-    })
+export function useSparepartCategories() {
+  return useQuery({
+    queryKey: ['sparepart-categories'],
+    queryFn: getSparepartCategories,
+  });
 }
 
-export function useUpdateSparepart(companyId: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({
-            id,
-            payload,
-        }: {
-            id: string
-            payload: any
-        }) => updateSparepart(id, payload),
-        onSuccess: () =>
-            qc.invalidateQueries({ queryKey: ["spareparts", companyId] }),
-    })
+export function useCreateSparepart(companyId?: string | number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: SparepartPayload) => createSparepart(payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['spareparts', companyId] }),
+  });
 }
 
-export function useDeleteSparepart(companyId: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: deleteSparepart,
-        onSuccess: () =>
-            qc.invalidateQueries({ queryKey: ["spareparts", companyId] }),
-    })
+export function useUpdateSparepart(companyId?: string | number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number | string; payload: SparepartPayload }) => updateSparepart(id, payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['spareparts', companyId] }),
+  });
 }
 
-export function useImportSparepart(companyId: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: importSparepart,
-        onSuccess: () =>
-            qc.invalidateQueries({ queryKey: ["spareparts", companyId] }),
-    })
+export function useDeleteSparepart(companyId?: string | number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => deleteSparepart(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['spareparts', companyId] }),
+  });
+}
+
+export function useImportSparepart(companyId?: string | number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ file }: { file: File }) => importSparepart(file, companyId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['spareparts', companyId] }),
+  });
 }

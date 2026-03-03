@@ -95,12 +95,12 @@ export const getSupplierById = async (id: number | string): Promise<Supplier> =>
   return mapSupplier(data);
 };
 
-const buildPayload = (payload: SupplierPayload) => {
-  const body = new URLSearchParams();
+const buildPayload = (payload: SupplierPayload, opts?: { asUpdate?: boolean }) => {
+  const body = new FormData();
+  if (opts?.asUpdate) body.append('_method', 'PUT');
   if (payload.userId !== undefined) body.append('user_id', String(payload.userId));
+  // Jangan kirim company_id (permintaan sebelumnya)
   body.append('name', payload.name);
-  //   if (payload.companyId !== undefined) body.append('company_id', String(payload.companyId));
-  // Per permintaan, jangan sertakan company_id untuk sekarang
   if (payload.address) body.append('address', payload.address);
   if (payload.phone) body.append('phone', payload.phone);
   if (payload.npwp) body.append('npwp', payload.npwp);
@@ -114,31 +114,23 @@ const buildPayload = (payload: SupplierPayload) => {
 export const createSupplier = async (payload: SupplierPayload): Promise<Supplier> => {
   try {
     const body = buildPayload(payload);
-    const response = await apiClient.post<SupplierItemResponse>(basePath, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    const response = await apiClient.post<SupplierItemResponse>(basePath, body);
     const data = ensureSuccess(response.data);
     return mapSupplier(data);
   } catch (error) {
-    if (error instanceof ApiValidationError) {
-      throw error;
-    }
+    if (error instanceof ApiValidationError) throw error;
     throw error;
   }
 };
 
 export const updateSupplier = async (id: number | string, payload: SupplierPayload): Promise<Supplier> => {
   try {
-    const body = buildPayload(payload);
-    const response = await apiClient.put<SupplierItemResponse>(`${basePath}/${id}`, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    const body = buildPayload(payload, { asUpdate: true });
+    const response = await apiClient.post<SupplierItemResponse>(`${basePath}/${id}`, body);
     const data = ensureSuccess(response.data);
     return mapSupplier(data);
   } catch (error) {
-    if (error instanceof ApiValidationError) {
-      throw error;
-    }
+    if (error instanceof ApiValidationError) throw error;
     throw error;
   }
 };

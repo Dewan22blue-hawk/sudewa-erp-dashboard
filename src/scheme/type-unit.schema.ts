@@ -1,13 +1,17 @@
-import { z } from "zod"
+import { z } from 'zod';
 
 export const typeUnitSchema = z.object({
-    merk: z.string().min(1, "Merk wajib dipilih"),
-    code: z.string().min(1, "Kode wajib diisi"),
-    type: z.string().min(1, "Tipe wajib diisi"),
-    jenis: z.string().optional(),
-    model: z.string().optional(),
-    bruto: z.number().optional(),
-    netto: z.number().optional(),
-})
+  brandId: z.coerce.number().min(1, 'Brand ID wajib diisi'),
+  code: z.string().min(1, 'Kode wajib diisi'),
+  name: z.string().min(1, 'Nama wajib diisi'),
+  unitType: z.string().optional(),
+  unitModel: z.string().optional(),
+  brutoWeight: z.coerce.number().optional(),
+  nettoWeight: z.coerce.number().optional(),
+  capacity: z.coerce.number().optional(),
+  image: z.any().optional().nullable(),
+  sellPrice: z.coerce.number().optional(),
+  buyPrice: z.coerce.number().optional(),
+});
 
-export type TypeUnitFormValues = z.infer<typeof typeUnitSchema>
+export type TypeUnitFormValues = z.infer<typeof typeUnitSchema>;

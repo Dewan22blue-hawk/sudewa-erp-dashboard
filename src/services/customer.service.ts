@@ -1,87 +1,148 @@
-import type {
-    Customer,
-    CreateCustomerRequest,
-    UpdateCustomerRequest,
-    CustomerListResponse,
-} from "@/@types/customer.types"
+import type { Customer, CustomerListResponse, CustomerPayload } from '@/@types/customer.types';
+import type { PaginationParams } from '@/@types/pagination.types';
+import { apiClient } from '@/lib/api/client';
+import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
+import { ApiResponseError, ApiValidationError, LaravelApiResponse, ensureSuccess, toPaginatedResult } from '@/lib/api/response';
 
-const customers: Customer[] = [
-    {
-        id: "1",
-        code: "SPL-001",
-        name: "ELLA YOUNG WIDJAYANTO NUGRAHA",
-        address: "Jl. Raya Kalimalang No, Rt 000, Rw 000, Duren Sawit, Duren Sawit, Kota Adm. Jakarta Timur, DKI Jakarta 00000",
-        npwp: "123456789012345",
-        pic: "Emilia Clarke",
-        phone: "08xx xxxx xxxx",
-        companyId: "1", // Default company
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+interface CustomerApiModel {
+  id: number;
+  uuid?: string;
+  code?: string;
+  type?: string;
+  name: string;
+  address?: string | null;
+  npwp?: string | null;
+  phone?: string | null;
+  pic?: string | null;
+  pic_name?: string | null;
+  user_id?: number | string;
+  company_id?: number | string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+const mapCustomer = (payload: CustomerApiModel): Customer => ({
+  id: payload.id,
+  uuid: payload.uuid,
+  code: payload.code,
+  type: payload.type,
+  name: payload.name,
+  address: payload.address ?? null,
+  npwp: payload.npwp ?? null,
+  phone: payload.phone ?? null,
+  pic: payload.pic ?? payload.pic_name ?? null,
+  userId: payload.user_id,
+  companyId: payload.company_id,
+  createdAt: payload.created_at,
+  updatedAt: payload.updated_at,
+});
+
+const basePath = '/wapi/master-data/customer';
+
+type PaginatedCustomerResponse = LaravelApiResponse<{
+  data: CustomerApiModel[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}>;
+
+type CustomerItemResponse = LaravelApiResponse<CustomerApiModel>;
+
+type DeleteResponse = LaravelApiResponse<null>;
+
+export const getCustomers = async (
+  params: PaginationParams & {
+    search?: string;
+    user_id?: number | string;
+    company_id?: number | string;
+    code?: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
+    case_sensitive?: 0 | 1 | boolean;
+  },
+): Promise<CustomerListResponse> => {
+  const response = await apiClient.get<PaginatedCustomerResponse>(basePath, {
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      search: params.search,
+      user_id: params.user_id,
+      company_id: params.company_id,
+      code: params.code,
+      sort_by: params.sort_by,
+      sort_order: params.sort_order,
+      case_sensitive: params.case_sensitive,
     },
-]
+  });
 
-let nextId = 2
+  const data = ensureSuccess(response.data);
 
-export async function getCustomers(companyId: string): Promise<CustomerListResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 300))
+  return toPaginatedResult(
+    {
+      data: data.data ?? [],
+      current_page: data.current_page,
+      per_page: data.per_page,
+      total: data.total,
+      last_page: data.last_page,
+    },
+    mapCustomer,
+  );
+};
 
-    const filteredCustomers = customers.filter(c => c.companyId === companyId)
+export const getCustomerById = async (id: number | string): Promise<Customer> => {
+  const response = await apiClient.get<CustomerItemResponse>(`${basePath}/${id}`);
+  const data = ensureSuccess(response.data);
+  return mapCustomer(data);
+};
 
-    return {
-        data: filteredCustomers,
-        meta: {
-            total: filteredCustomers.length,
-            page: 1,
-            perPage: 10,
-        },
+const buildPayload = (payload: CustomerPayload, opts?: { asUpdate?: boolean }) => {
+  const body = new FormData();
+  if (opts?.asUpdate) body.append('_method', 'PUT'); // << method override for Laravel PUT
+  if (payload.userId !== undefined) body.append('user_id', String(payload.userId));
+  if (payload.companyId !== undefined) body.append('company_id', String(payload.companyId));
+  body.append('name', payload.name);
+  if (payload.address) body.append('address', payload.address);
+  if (payload.phone) body.append('phone', payload.phone);
+  if (payload.npwp) body.append('npwp', payload.npwp);
+  if (payload.pic) {
+    body.append('pic', payload.pic);
+    body.append('pic_name', payload.pic);
+  }
+  return body;
+};
+
+export const createCustomer = async (payload: CustomerPayload): Promise<Customer> => {
+  try {
+    const body = buildPayload(payload);
+    const response = await apiClient.post<CustomerItemResponse>(basePath, body);
+    const data = ensureSuccess(response.data);
+    return mapCustomer(data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
     }
-}
+    throw error;
+  }
+};
 
-export async function createCustomer(
-    payload: CreateCustomerRequest
-): Promise<Customer> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const newCustomer: Customer = {
-        id: String(nextId++),
-        code: `SPL-${String(nextId - 1).padStart(3, "0")}`,
-        ...payload,
-        companyId: payload.companyId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+export const updateCustomer = async (id: number | string, payload: CustomerPayload): Promise<Customer> => {
+  try {
+    const body = buildPayload(payload, { asUpdate: true });
+    const response = await apiClient.post<CustomerItemResponse>(`${basePath}/${id}`, body);
+    const data = ensureSuccess(response.data);
+    return mapCustomer(data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
     }
+    throw error;
+  }
+};
 
-    customers.push(newCustomer)
-    return newCustomer
-}
-
-export async function updateCustomer(
-    id: string,
-    payload: UpdateCustomerRequest
-): Promise<Customer> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const index = customers.findIndex((c) => c.id === id)
-    if (index === -1) {
-        throw new Error("Customer tidak ditemukan")
-    }
-
-    customers[index] = {
-        ...customers[index],
-        ...payload,
-        updatedAt: new Date().toISOString(),
-    }
-
-    return customers[index]
-}
-
-export async function deleteCustomer(id: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const index = customers.findIndex((c) => c.id === id)
-    if (index === -1) {
-        throw new Error("Customer tidak ditemukan")
-    }
-
-    customers.splice(index, 1)
-}
+export const deleteCustomer = async (id: number | string): Promise<void> => {
+  const response = await apiClient.delete<DeleteResponse>(`${basePath}/${id}`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete customer');
+  }
+};

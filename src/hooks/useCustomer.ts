@@ -1,56 +1,49 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-    getCustomers,
-    createCustomer,
-    updateCustomer,
-    deleteCustomer,
-} from "@/services/customer.service"
-import { CreateCustomerRequest, UpdateCustomerRequest } from "@/@types/customer.types"
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getCustomers, createCustomer, updateCustomer, deleteCustomer } from '@/services/customer.service';
+import { CustomerPayload } from '@/@types/customer.types';
 
 // Hooks
 export function useCustomers(companyId: string | null) {
-    return useQuery({
-        queryKey: ["customers", companyId],
-        queryFn: () => getCustomers(companyId!),
-        enabled: !!companyId,
-    })
+  return useQuery({
+    queryKey: ['customers', companyId],
+    queryFn: () =>
+      getCustomers({
+        company_id: companyId || undefined,
+        perPage: 100,
+      }),
+    enabled: !!companyId,
+  });
 }
 
 export function useCreateCustomer() {
-    const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (payload: CreateCustomerRequest) => createCustomer(payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["customers"] })
-        },
-    })
+  return useMutation({
+    mutationFn: (payload: CustomerPayload) => createCustomer(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    },
+  });
 }
 
 export function useUpdateCustomer() {
-    const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({
-            id,
-            payload,
-        }: {
-            id: string
-            payload: UpdateCustomerRequest
-        }) => updateCustomer(id, payload),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["customers"] })
-        },
-    })
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string | number; payload: CustomerPayload }) => updateCustomer(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    },
+  });
 }
 
 export function useDeleteCustomer() {
-    const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (id: string) => deleteCustomer(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["customers"] })
-        },
-    })
+  return useMutation({
+    mutationFn: (id: string | number) => deleteCustomer(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    },
+  });
 }

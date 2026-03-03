@@ -1,18 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUsers, createUser, updateUser, deleteUser, fetchUsersOptions, type UserOption } from '@/services/user.service';
-import { CreateUserRequest, UpdateUserRequest } from '@/@types/user.types';
+import { getUsers, createUser, updateUser, deleteUser, fetchUsersOptions, type UserOption, activateUser, deactivateUser, assignRole } from '@/services/user.service';
+import { CreateUserRequest, UpdateUserRequest, UserListParams } from '@/@types/user.types';
 
 // Strict Query Keys
 export const userKeys = {
   all: ['users'] as const,
-  list: (companyId: string) => [...userKeys.all, companyId] as const,
+  list: (filters?: UserListParams) => [...userKeys.all, filters?.role ?? 'all'] as const,
 };
 
-export function useUsers(companyId: string) {
+export function useUsers(filters?: UserListParams) {
   return useQuery({
-    queryKey: userKeys.list(companyId),
-    queryFn: () => getUsers(companyId),
-    enabled: !!companyId,
+    queryKey: userKeys.list(filters),
+    queryFn: () => getUsers(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: false,
@@ -26,35 +25,59 @@ export const useUserOptions = () =>
     staleTime: 1000 * 60 * 5,
   });
 
-export function useCreateUser(companyId: string) {
+export function useCreateUser() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: Omit<CreateUserRequest, 'companyId'>) => createUser({ ...payload, companyId }),
+    mutationFn: (payload: CreateUserRequest) => createUser(payload),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: userKeys.list(companyId) });
+      qc.invalidateQueries({ queryKey: userKeys.list() });
     },
   });
 }
 
-export function useUpdateUser(companyId: string) {
+export function useUpdateUser() {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: UpdateUserRequest) => updateUser(payload),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: userKeys.list(companyId) });
+      qc.invalidateQueries({ queryKey: userKeys.list() });
     },
   });
 }
 
-export function useDeleteUser(companyId: string) {
+export function useDeleteUser() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteUser(id),
+    mutationFn: (id: number | string) => deleteUser(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: userKeys.list(companyId) });
+      qc.invalidateQueries({ queryKey: userKeys.list() });
     },
+  });
+}
+
+export function useActivateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => activateUser(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.list() }),
+  });
+}
+
+export function useDeactivateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => deactivateUser(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.list() }),
+  });
+}
+
+export function useAssignRole() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, role }: { id: number | string; role: string }) => assignRole(id, role),
+    onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.list() }),
   });
 }

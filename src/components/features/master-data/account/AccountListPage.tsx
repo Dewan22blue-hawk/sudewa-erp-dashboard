@@ -12,18 +12,15 @@ import { toast } from 'sonner';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useCompany } from '@/contexts/CompanyContext';
 import { useForm } from 'react-hook-form';
 import { accountSchema, type AccountFormValues } from '@/scheme/account-master.schema';
 
 export const AccountListPage = () => {
-  const { isLoading: isCompanyLoading } = useCompany();
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
-  const queryEnabled = !isCompanyLoading;
 
-  const { data, isLoading, isError, isFetching } = useAccounts({ page, perPage, search, enabled: queryEnabled });
+  const { data, isLoading, isError, isFetching } = useAccounts({ page, perPage, search, enabled: true });
   // Fetch account groups for modal dropdown (no company scope)
-  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({ page: 1, perPage: 100, search: '', enabled: queryEnabled });
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({ page: 1, perPage: 100, search: '', enabled: true });
 
   const createMutation = useCreateAccount();
   const updateMutation = useUpdateAccount();
@@ -146,17 +143,7 @@ export const AccountListPage = () => {
           {isError ? (
             <div className="text-center text-red-600">Gagal memuat data akun</div>
           ) : (
-            <AccountTable
-              data={data?.data ?? []}
-              total={data?.meta.total}
-              isLoading={isLoading || isFetching || !queryEnabled}
-              onEdit={handleEdit}
-              onDelete={setSelected}
-              page={page}
-              perPage={perPage}
-              onPageChange={setPage}
-              onPerPageChange={setPerPage}
-            />
+            <AccountTable data={data?.data ?? []} total={data?.meta.total} isLoading={isLoading || isFetching} onEdit={handleEdit} onDelete={setSelected} page={page} perPage={perPage} onPageChange={setPage} onPerPageChange={setPerPage} />
           )}
         </div>
       </div>

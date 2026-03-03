@@ -1,38 +1,29 @@
+import type { PaginatedResult } from './pagination.types';
+
 export interface Customer {
-    id: string
-    code: string
-    name: string
-    address: string
-    npwp: string
-    pic: string
-    phone: string
-    companyId: string
-    createdAt: string
-    updatedAt: string
+  id: number | string;
+  uuid?: string;
+  code?: string;
+  type?: string;
+  name: string;
+  address?: string | null;
+  npwp?: string | null;
+  pic?: string | null;
+  phone?: string | null;
+  userId?: number | string;
+  companyId?: number | string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface CreateCustomerRequest {
-    name: string
-    address: string
-    npwp: string
-    pic: string
-    phone: string
-    companyId: string
+export interface CustomerPayload {
+  name: string;
+  address?: string;
+  npwp?: string;
+  pic?: string;
+  phone?: string;
+  userId?: number | string;
+  companyId?: number | string;
 }
 
-export interface UpdateCustomerRequest {
-    name?: string
-    address?: string
-    npwp?: string
-    pic?: string
-    phone?: string
-}
-
-export interface CustomerListResponse {
-    data: Customer[]
-    meta: {
-        total: number
-        page: number
-        perPage: number
-    }
-}
+export interface CustomerListResponse extends PaginatedResult<Customer> {}

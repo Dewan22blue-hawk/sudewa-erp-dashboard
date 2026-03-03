@@ -1,29 +1,23 @@
-export type KasType = "Cash" | "Bank"
+import type { PaginatedResult } from './pagination.types';
+
+export type KasType = 'cash' | 'bank';
 
 export interface Kas {
-    id: string
-    code: string
-    description: string
-    type: KasType
-    companyId: string
-    createdAt: string
-    updatedAt: string
+  id: number | string;
+  uuid?: string;
+  code: string;
+  description: string;
+  type: KasType;
+  companyId?: number | string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface CreateKasRequest {
-    code: string
-    description: string
-    type: KasType
-    companyId: string
+export interface KasPayload {
+  code: string;
+  description: string;
+  type: KasType;
+  companyId?: number | string;
 }
 
-export interface UpdateKasRequest extends Partial<CreateKasRequest> { }
-
-export interface KasListResponse {
-    data: Kas[]
-    meta: {
-        page: number
-        perPage: number
-        total: number
-    }
-}
+export type KasListResponse = PaginatedResult<Kas>;

@@ -1,16 +1,21 @@
+import { apiClient } from '@/lib/api/client';
+import { LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
+
 export interface Company {
-    id: string
-    name: string
-    slug: string
+  id: number;
+  uuid?: string;
+  name: string;
+  slug: string;
+  code?: string;
+  description?: string;
+  type?: string;
+  created_at?: string | null;
 }
 
+type CompanyListApiResponse = LaravelApiResponse<Company[]>;
+
 export async function fetchUserCompanies(): Promise<Company[]> {
-    // dummy, backend-ready
-    return Promise.resolve([
-        { id: "1", name: "PT Wajira Morindo", slug: "wajira-morindo" },
-        { id: "2", name: "PT Wajira International", slug: "wajira-international" },
-        { id: "3", name: "PT Wajira Transindo", slug: "wajira-transindo" },
-        { id: "4", name: "PT Wajira Yanotama", slug: "wajira-yanotama" },
-        { id: "5", name: "PT Adhiyas Agradasata", slug: "adhiyas-agradasata" },
-    ])
+  const response = await apiClient.get<CompanyListApiResponse>('/wapi/global/company');
+  const data = ensureSuccess(response.data);
+  return data;
 }

@@ -1,118 +1,156 @@
-import { User, CreateUserRequest, UpdateUserRequest } from '@/@types/user.types';
-import { nanoid } from 'nanoid';
+import { User, CreateUserRequest, UpdateUserRequest, UserListParams, UserStatusResponse } from '@/@types/user.types';
 import { apiClient } from '@/lib/api/client';
-import { ensureSuccess, type LaravelApiResponse } from '@/lib/api/response';
+import { ensureSuccess, type LaravelApiResponse, ApiResponseError } from '@/lib/api/response';
+
+type UserRolePivot = {
+  model_type?: string;
+  model_id?: number;
+  role_id?: number;
+};
+
+type UserRoleApiModel = {
+  id: number;
+  name: string;
+  guard_name?: string;
+  created_at?: string;
+  updated_at?: string;
+  pivot?: UserRolePivot;
+};
 
 type UserApiModel = {
   id: number;
+  uuid?: string;
+  avatar?: string | null;
+  is_active?: number | boolean;
   name: string;
+  email: string;
+  username: string;
+  firstname?: string | null;
+  lastname?: string | null;
+  email_verified_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  roles?: UserRoleApiModel[];
 };
 
-type UsersResponse = LaravelApiResponse<UserApiModel[]>;
+type UsersResponse = LaravelApiResponse<UserApiModel[] | UserApiModel>;
+type UserItemResponse = LaravelApiResponse<UserApiModel>;
+type UserStatusApiResponse = LaravelApiResponse<UserStatusResponse>;
+type DeleteResponse = LaravelApiResponse<null>;
 
-// Mock Data Storage
-let userDB: User[] = [
-  {
-    id: '1',
-    userId: 'ADMIN',
-    name: 'Administrator',
-    role: 'Direksi',
-    companyId: '1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    userId: 'ACCOUNTING',
-    name: 'Staff Accounting',
-    role: 'Accounting',
-    companyId: '1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    userId: 'WAREHOUSE',
-    name: 'Kepala Gudang',
-    role: 'Warehouse',
-    companyId: '1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    userId: 'OWNER',
-    name: 'Bapak Direktur',
-    role: 'Direksi',
-    companyId: '1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+const basePath = '/wapi/users';
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const mapUser = (payload: UserApiModel): User => ({
+  id: payload.id,
+  uuid: payload.uuid,
+  name: payload.name,
+  email: payload.email,
+  username: payload.username,
+  firstname: payload.firstname ?? undefined,
+  lastname: payload.lastname ?? undefined,
+  isActive: payload.is_active,
+  emailVerifiedAt: payload.email_verified_at ?? null,
+  createdAt: payload.created_at,
+  updatedAt: payload.updated_at,
+  roles: payload.roles?.map((role) => ({
+    id: role.id,
+    name: role.name,
+    guard_name: role.guard_name,
+    created_at: role.created_at,
+    updated_at: role.updated_at,
+  })),
+});
 
-export async function getUsers(companyId: string): Promise<User[]> {
-  await delay(500);
-  // Multi-company isolation
-  return userDB.filter((u) => u.companyId === companyId);
-}
+const buildPayload = (payload: CreateUserRequest | UpdateUserRequest, opts?: { asUpdate?: boolean }) => {
+  const body = new FormData();
+  if (opts?.asUpdate) body.append('_method', 'PUT');
 
-export async function createUser(payload: CreateUserRequest): Promise<User> {
-  await delay(500);
+  if (payload.name !== undefined) body.append('name', payload.name);
+  if (payload.email !== undefined) body.append('email', payload.email);
+  if (payload.username !== undefined) body.append('username', payload.username);
+  if (payload.firstname !== undefined) body.append('firstname', payload.firstname);
+  if (payload.lastname !== undefined) body.append('lastname', payload.lastname);
+  if (payload.roles !== undefined) body.append('roles', payload.roles);
+  if (payload.password) body.append('password', payload.password);
+  if ((payload as any).password_confirmation) body.append('password_confirmation', (payload as any).password_confirmation);
 
-  // Duplicate Check (Hardened)
-  const exists = userDB.some((u) => u.userId === payload.userId && u.companyId === payload.companyId);
-  if (exists) {
-    throw new Error(`User ID "${payload.userId}" sudah digunakan`);
+  return body;
+};
+
+export const getUsers = async (params?: UserListParams): Promise<User[]> => {
+  const response = await apiClient.get<UsersResponse>(basePath, {
+    params,
+  });
+  const data = ensureSuccess(response.data);
+  const list = Array.isArray(data) ? data : [data];
+  return list.map(mapUser);
+};
+
+export const getUserById = async (id: number | string): Promise<User> => {
+  const response = await apiClient.get<UserItemResponse>(`${basePath}/${id}`);
+  const data = ensureSuccess(response.data);
+  return mapUser(data);
+};
+
+export const createUser = async (payload: CreateUserRequest): Promise<User> => {
+  const body = buildPayload(payload);
+  const response = await apiClient.post<UserItemResponse>(basePath, body);
+  const data = ensureSuccess(response.data);
+  return mapUser(data);
+};
+
+export const updateUser = async (payload: UpdateUserRequest): Promise<User> => {
+  const body = buildPayload(payload, { asUpdate: true });
+  const response = await apiClient.post<UserItemResponse>(`${basePath}/${payload.id}`, body);
+  const data = ensureSuccess(response.data);
+  return mapUser(data);
+};
+
+export const deleteUser = async (id: number | string): Promise<void> => {
+  const response = await apiClient.delete<DeleteResponse>(`${basePath}/${id}`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete user');
   }
+};
 
-  const newUser: User = {
-    id: nanoid(),
-    userId: payload.userId,
-    name: payload.name,
-    role: payload.role,
-    companyId: payload.companyId,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  // Immutable Update
-  userDB = [...userDB, newUser];
-  return newUser;
-}
-
-export async function updateUser(payload: UpdateUserRequest): Promise<User> {
-  await delay(500);
-
-  const index = userDB.findIndex((u) => u.id === payload.id);
-  if (index === -1) throw new Error('User tidak ditemukan');
-
-  // Immutable Update
-  const updatedUser = {
-    ...userDB[index],
-    name: payload.name,
-    role: payload.role,
-    updatedAt: new Date().toISOString(),
-  };
-
-  // Only update password if provided
-  // Note: In a real app, this is where hashing would occur
-  if (payload.password) {
-    // Mocking password update logic
-    console.log(`Password for user ${updatedUser.userId} updated`);
+export const assignRole = async (id: number | string, role: string): Promise<void> => {
+  const body = new FormData();
+  body.append('roles', role);
+  const response = await apiClient.post<UserItemResponse>(`${basePath}/${id}/assign-role`, body);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to assign role');
   }
+};
 
-  userDB = [...userDB.slice(0, index), updatedUser, ...userDB.slice(index + 1)];
+export const activateUser = async (id: number | string): Promise<void> => {
+  const response = await apiClient.put<UserItemResponse>(`${basePath}/${id}/activate-user`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to activate user');
+  }
+};
 
-  return updatedUser;
-}
+export const deactivateUser = async (id: number | string): Promise<void> => {
+  const response = await apiClient.put<UserItemResponse>(`${basePath}/${id}/deactivate-user`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to deactivate user');
+  }
+};
 
-export async function deleteUser(id: string): Promise<void> {
-  await delay(500);
-  // Immutable Update
-  userDB = userDB.filter((u) => u.id !== id);
-}
+export const getUserPassword = async (id: number | string): Promise<string | null> => {
+  const response = await apiClient.get<LaravelApiResponse<string | null>>(`${basePath}/${id}/get-user-password`);
+  return ensureSuccess(response.data);
+};
+
+export const getUserStatus = async (status?: boolean): Promise<UserStatusResponse> => {
+  const response = await apiClient.get<UserStatusApiResponse>(`${basePath}/action/get-status`, {
+    params: status === undefined ? undefined : { status },
+  });
+  return ensureSuccess(response.data);
+};
 
 // === API: User list for selector ===
 export interface UserOption {
@@ -120,8 +158,11 @@ export interface UserOption {
   name: string;
 }
 
-export async function fetchUsersOptions(): Promise<UserOption[]> {
-  const response = await apiClient.get<UsersResponse>('/wapi/users');
+export async function fetchUsersOptions(role?: string): Promise<UserOption[]> {
+  const response = await apiClient.get<UsersResponse>(basePath, {
+    params: role ? { role } : undefined,
+  });
   const data = ensureSuccess(response.data);
-  return (data ?? []).map((u) => ({ id: u.id, name: u.name }));
+  const list = Array.isArray(data) ? data : [data];
+  return (list ?? []).map((u) => ({ id: u.id, name: u.name }));
 }
