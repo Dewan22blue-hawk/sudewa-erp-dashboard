@@ -13,6 +13,7 @@ export default function SelectCompanyPage() {
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // ===== TOKEN GUARD =====
   useEffect(() => {
@@ -24,10 +25,14 @@ export default function SelectCompanyPage() {
 
   // ===== FETCH COMPANIES =====
   useEffect(() => {
-    fetchUserCompanies().then((data) => {
-      setCompanies(data);
-      setLoading(false);
-    });
+    fetchUserCompanies()
+      .then((data) => {
+        setCompanies(data);
+      })
+      .catch((err) => {
+        setError(err?.message || 'Gagal memuat perusahaan');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   function handleSelect(company: Company) {
@@ -40,7 +45,36 @@ export default function SelectCompanyPage() {
     }
   }
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#F5F6F8] px-4 font-sans">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-200 border-t-orange-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#F5F6F8] px-4 font-sans">
+        <Card className="w-full max-w-[420px] bg-white p-8 text-center space-y-4">
+          <p className="text-sm text-red-600 font-medium">{error}</p>
+          <button
+            onClick={() => {
+              setError(null);
+              setLoading(true);
+              fetchUserCompanies()
+                .then((data) => setCompanies(data))
+                .catch((err) => setError(err?.message || 'Gagal memuat perusahaan'))
+                .finally(() => setLoading(false));
+            }}
+            className="text-sm font-medium text-orange-600 hover:text-orange-700"
+          >
+            Coba lagi
+          </button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#F5F6F8] px-4 font-sans">

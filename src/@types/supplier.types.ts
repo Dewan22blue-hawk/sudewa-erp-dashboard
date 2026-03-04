@@ -18,6 +18,8 @@ export interface Supplier {
 
 export interface SupplierPayload {
   name: string;
+  code?: string;
+  type?: string;
   address?: string;
   npwp?: string;
   phone?: string;

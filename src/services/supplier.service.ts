@@ -99,7 +99,9 @@ const buildPayload = (payload: SupplierPayload, opts?: { asUpdate?: boolean }) =
   const body = new FormData();
   if (opts?.asUpdate) body.append('_method', 'PUT');
   if (payload.userId !== undefined) body.append('user_id', String(payload.userId));
-  // Jangan kirim company_id (permintaan sebelumnya)
+  if (payload.companyId !== undefined) body.append('company_id', String(payload.companyId));
+  if (payload.code) body.append('code', payload.code);
+  if (payload.type) body.append('type', payload.type);
   body.append('name', payload.name);
   if (payload.address) body.append('address', payload.address);
   if (payload.phone) body.append('phone', payload.phone);
