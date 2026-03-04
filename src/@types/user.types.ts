@@ -6,6 +6,7 @@ export interface UserRoleItem {
   guard_name?: string;
   created_at?: string;
   updated_at?: string;
+  users_count?: number;
 }
 
 export interface User {

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText, Shield } from 'lucide-react';
 
 /**
  * Navigation Item Configuration
@@ -21,6 +21,7 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
   // Helper to format path with/without slug
   const base = (path: string) => (slug ? `/dashboard/${slug}${path}` : path);
   const master = (sub: string) => (slug ? `/dashboard/${slug}/master${sub}` : `/master-data${sub}`);
+  const settings = (sub: string) => (slug ? `/dashboard/${slug}/settings${sub}` : `/settings${sub}`);
 
   return [
     {
@@ -175,6 +176,20 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           href: base('/laporan/laporan-stock'),
         },
       ], // Siap untuk di-expand dengan sub-items
+    },
+    {
+      label: 'Settings',
+      icon: Shield,
+      children: [
+        {
+          label: 'Roles',
+          href: settings('/roles'),
+        },
+        {
+          label: 'Permissions',
+          href: settings('/permissions'),
+        },
+      ],
     },
   ];
 };
