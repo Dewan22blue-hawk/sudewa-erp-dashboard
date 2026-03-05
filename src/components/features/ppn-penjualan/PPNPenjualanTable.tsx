@@ -1,5 +1,7 @@
 import { PPNPenjualan } from "@/@types/ppn-penjualan.types"
 import { MoreVertical } from "lucide-react"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 
 interface Props {
     data: PPNPenjualan[]
@@ -12,32 +14,67 @@ export default function PPNPenjualanTable({
     onEdit,
     onDelete,
 }: Props) {
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data,
+    })
     return (
         <div className="bg-white rounded-xl border overflow-x-auto">
             <table className="min-w-[2000px] w-full text-sm">
                 <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900">
                     <tr className="text-center border-b border-gray-200">
-                        <th className="px-4 py-3 text-left">Kode Jual</th>
-                        <th className="px-4 py-3 text-left">Tanggal Jual</th>
-                        <th className="px-4 py-3 text-left">Customer</th>
-                        <th className="px-4 py-3 text-left">Tanggal FPK</th>
-                        <th className="px-4 py-3 text-left">Masa NSFPK</th>
-                        <th className="px-4 py-3 text-left">NSFPK Keluaran</th>
-                        <th className="px-4 py-3 text-right">QTY</th>
-                        <th className="px-4 py-3 text-left">Tipe Unit</th>
-                        <th className="px-4 py-3 text-left">No Mesin</th>
-                        <th className="px-4 py-3 text-left">No Rangka</th>
-                        <th className="px-4 py-3 text-right">Harga Jual</th>
-                        <th className="px-4 py-3 text-right">Biaya</th>
-                        <th className="px-4 py-3 text-right">Harga Unit</th>
-                        <th className="px-4 py-3 text-right">DPP Jual</th>
-                        <th className="px-4 py-3 text-right">PPN 11%</th>
-                        <th className="px-4 py-3 text-right">Payment Jual</th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="Kode Jual" sortKey="kodeJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="Tanggal Jual" sortKey="tanggalJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="Customer" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="Tanggal FPK" sortKey="tanggalFPK" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="Masa NSFPK" sortKey="masaNSFPK" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="NSFPK Keluaran" sortKey="nsfpkKeluaran" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="Tipe Unit" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="No Mesin" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-left">
+                            <SortableHeader title="No Rangka" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="Harga Jual" sortKey="hargaJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="Biaya" sortKey="biaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="Harga Unit" sortKey="hargaUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="DPP Jual" sortKey="dppJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="PPN 11%" sortKey="ppn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
+                        <th className="py-2 text-right">
+                            <SortableHeader title="Payment Jual" sortKey="paymentJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                        </th>
                         <th className="px-4 py-3 text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map(item => (
+                    {sortedData.map(item => (
                         <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
                             <td className="px-4 py-3 text-blue-600">{item.kodeJual}</td>
                             <td className="px-4 py-3">{item.tanggalJual}</td>

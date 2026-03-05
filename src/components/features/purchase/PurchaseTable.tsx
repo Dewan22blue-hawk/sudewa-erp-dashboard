@@ -9,6 +9,8 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: Purchase[];
@@ -31,11 +33,15 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
       item.date.includes(searchTerm)
   );
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filteredData,
+  });
+
   // Pagination logic
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentData = sortedData.slice(startIndex, endIndex);
 
   const handleToggle = (id: string) => {
     const newSelectedIds = new Set(selectedIds);
@@ -106,14 +112,30 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
           <TableHeader className="bg-slate-50">
             <TableRow>
               <TableHead className="w-12"></TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">INVOICE</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">TANGGAL TRANSAKSI</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">NAMA SUPPLIER</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">TOTAL BIAYA</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">TOTAL DPP</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">TOTAL PPN</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">TOTAL PEMBELIAN</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">SISA BAYAR</TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="INVOICE" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="TANGGAL TRANSAKSI" sortKey="date" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="NAMA SUPPLIER" sortKey="supplierName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="TOTAL BIAYA" sortKey="totalBiaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="TOTAL DPP" sortKey="totalDpp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="TOTAL PPN" sortKey="totalPpn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="TOTAL PEMBELIAN" sortKey="totalPurchase" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="SISA BAYAR" sortKey="remainingPayment" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
               <TableHead className="text-right font-semibold uppercase text-slate-700">ACTION</TableHead>
             </TableRow>
           </TableHeader>
@@ -166,10 +188,10 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
       </div>
 
       {/* Pagination */}
-      {filteredData.length > 0 && (
+      {sortedData.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <div className="text-sm text-slate-500">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
+            Showing {startIndex + 1} to {Math.min(endIndex, sortedData.length)} of {sortedData.length} entries
           </div>
           <div className="flex items-center gap-1">
             <Button

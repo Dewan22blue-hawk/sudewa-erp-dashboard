@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import React from 'react';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   units: UnitItem[];
@@ -16,30 +18,34 @@ interface Props {
 export function SalesUnitTable({ units, salesId }: Props) {
   const router = useRouter();
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: units,
+  });
+
   const columns: ColumnDef<UnitItem>[] = [
     {
       id: 'no',
-      header: 'No',
+      header: () => <div className="text-center font-semibold text-foreground px-4">No</div>,
       cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     },
     {
       accessorKey: 'color',
-      header: 'WARNA',
-      cell: ({ row }) => <div className="font-medium">{row.getValue('color')}</div>,
+      header: () => <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
+      cell: ({ row }) => <div className="font-medium px-4">{row.getValue('color')}</div>,
     },
     {
       accessorKey: 'engineNumber',
-      header: 'NOMOR MESIN',
-      cell: ({ row }) => <div>{row.getValue('engineNumber')}</div>,
+      header: () => <SortableHeader title="NOMOR MESIN" sortKey="engineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
+      cell: ({ row }) => <div className="px-4">{row.getValue('engineNumber')}</div>,
     },
     {
       accessorKey: 'chassisNumber',
-      header: 'NOMOR RANGKA',
-      cell: ({ row }) => <div>{row.getValue('chassisNumber')}</div>,
+      header: () => <SortableHeader title="NOMOR RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
+      cell: ({ row }) => <div className="px-4">{row.getValue('chassisNumber')}</div>,
     },
     {
       id: 'actions',
-      header: () => <div className="text-right">ACTION</div>,
+      header: () => <div className="text-right font-semibold text-foreground px-4">ACTION</div>,
       cell: ({ row }) => {
         const unit = row.original;
         return (
@@ -85,7 +91,7 @@ export function SalesUnitTable({ units, salesId }: Props) {
   ];
 
   const table = useReactTable({
-    data: units,
+    data: sortedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -132,7 +138,7 @@ export function SalesUnitTable({ units, salesId }: Props) {
               <TableRow key={headerGroup.id} className="bg-[#F9FAFB] hover:bg-[#F9FAFB]">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className={`font-semibold text-foreground bg-[#F9FAFB] ${header.id === 'actions' ? 'print:hidden' : ''}`}>
+                    <TableHead key={header.id} className={`p-0 bg-[#F9FAFB] ${header.id === 'actions' ? 'print:hidden' : ''}`}>
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
@@ -145,8 +151,8 @@ export function SalesUnitTable({ units, salesId }: Props) {
               table.getRowModel().rows.map((row, index) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="hover:bg-muted/50">
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={`py-4 ${cell.column.id === 'actions' ? 'print:hidden' : ''}`}>
-                      {cell.column.id === 'no' ? index + 1 : flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <TableCell key={cell.id} className={`py-4 p-0 ${cell.column.id === 'actions' ? 'print:hidden' : ''}`}>
+                      {cell.column.id === 'no' ? <div className="px-4 text-center">{index + 1}</div> : flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>

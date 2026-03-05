@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: PengeluaranUnit[];
@@ -27,12 +29,16 @@ export default function PengeluaranUnitTable({ data, onDelete }: Props) {
     return data.filter((item) => [item.noPengeluaran, item.tanggal, item.customer].some((val) => String(val).toLowerCase().includes(q)));
   }, [data, search]);
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filtered,
+  });
+
   const perPage = Number(itemsPerPage);
-  const totalItems = filtered.length;
+  const totalItems = sortedData.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
   const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * perPage;
   const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + perPage, totalItems);
-  const paginated = filtered.slice(startIndex, startIndex + perPage);
+  const paginated = sortedData.slice(startIndex, startIndex + perPage);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -88,10 +94,18 @@ export default function PengeluaranUnitTable({ data, onDelete }: Props) {
         <table className="w-full text-sm">
           <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700 uppercase">
             <tr>
-              <th className="px-4 py-3 text-left">NO PENGELUARAN</th>
-              <th className="px-4 py-3 text-left">TANGGAL</th>
-              <th className="px-4 py-3 text-left">CUSTOMER</th>
-              <th className="px-4 py-3 text-left">KETERANGAN</th>
+              <th className="py-2 text-left">
+                <SortableHeader title="NO PENGELUARAN" sortKey="noPengeluaran" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="CUSTOMER" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="KETERANGAN" sortKey="keterangan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+              </th>
               <th className="px-4 py-3 text-center w-15">ACTION</th>
             </tr>
           </thead>

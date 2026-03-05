@@ -5,6 +5,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MoreVertical, Plus } from 'lucide-react';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: User[];
@@ -17,10 +19,14 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const totalPages = Math.max(1, Math.ceil(data.length / itemsPerPage));
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data,
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = useMemo(() => data.slice(startIndex, endIndex), [data, startIndex, endIndex]);
+  const currentData = useMemo(() => sortedData.slice(startIndex, endIndex), [sortedData, startIndex, endIndex]);
 
   const handleItemsPerPageChange = (value: string) => {
     setItemsPerPage(Number(value));
@@ -61,8 +67,12 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         <Table>
           <TableHeader className="bg-[#f8fafc]">
             <TableRow className="border-slate-200">
-              <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">User ID</TableHead>
-              <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">Nama Pengguna</TableHead>
+              <TableHead className="py-3">
+                <SortableHeader title="User ID" sortKey="username" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs" />
+              </TableHead>
+              <TableHead className="py-3">
+                <SortableHeader title="Nama Pengguna" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs" />
+              </TableHead>
               <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">Role</TableHead>
               <TableHead className="py-3 pr-6 text-right text-sm font-semibold uppercase text-slate-700 tracking-wide">Action</TableHead>
             </TableRow>

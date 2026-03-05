@@ -78,12 +78,12 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           href: base('/transaksi/arus-transaksi'),
         },
         {
-          label: 'Penjualan Unit',
-          href: base('/sales'),
-        },
-        {
           label: 'Pembelian Unit',
           href: base('/transaksi/pembelian-unit'),
+        },
+        {
+          label: 'Penjualan Unit',
+          href: base('/sales'),
         },
       ],
     },

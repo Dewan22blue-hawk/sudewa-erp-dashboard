@@ -5,6 +5,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MoreVertical, Plus, Upload } from 'lucide-react';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: Sparepart[];
@@ -18,11 +20,17 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data,
+    defaultSortKey: 'code',
+    defaultSortOrder: 'asc'
+  });
+
   // Pagination logic
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = data.slice(startIndex, endIndex);
+  const currentData = sortedData.slice(startIndex, endIndex);
 
   const handleItemsPerPageChange = (value: string) => {
     setItemsPerPage(Number(value));
@@ -68,13 +76,25 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="font-semibold uppercase text-slate-700">KODE SPAREPART</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">NAMA SPAREPART</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">KATEGORI</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">SATUAN</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">HARGA BELI</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">HARGA JUAL</TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700">ACTION</TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="KODE SPAREPART" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="NAMA SPAREPART" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="KATEGORI" sortKey="category.name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="SATUAN" sortKey="unit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="HARGA BELI" sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="HARGA JUAL" sortKey="sellingPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              </TableHead>
+              <TableHead className="text-right font-semibold uppercase text-slate-700 pr-4">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

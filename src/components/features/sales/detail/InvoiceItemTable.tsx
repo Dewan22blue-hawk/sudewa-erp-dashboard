@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { InvoiceItem } from "./invoice.types"
 import { MoreVertical } from "lucide-react"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 
 /**
  * Format angka dengan titik separator
@@ -36,11 +38,17 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 10
 
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data: items,
+        defaultSortKey: 'unitType',
+        defaultSortOrder: 'asc'
+    })
+
     // Pagination logic
-    const totalPages = Math.ceil(items.length / itemsPerPage)
+    const totalPages = Math.ceil(sortedData.length / itemsPerPage)
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = startIndex + itemsPerPage
-    const currentData = items.slice(startIndex, endIndex)
+    const currentData = sortedData.slice(startIndex, endIndex)
 
     // Get IDs of current page items
     const currentPageIds = currentData.map(item => item.id)
@@ -118,17 +126,37 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
                                     onCheckedChange={handleBulkSelect}
                                 />
                             </TableHead>
-                            <TableHead className="font-semibold">No</TableHead>
-                            <TableHead className="font-semibold">TIPE UNIT</TableHead>
-                            <TableHead className="font-semibold text-center">QTY</TableHead>
-                            <TableHead className="font-semibold text-right">HARGA JUAL</TableHead>
-                            <TableHead className="font-semibold text-right">BIAYA BBN</TableHead>
-                            <TableHead className="font-semibold text-right">BIAYA EKSPEDISI</TableHead>
-                            <TableHead className="font-semibold text-right">BIAYA LAIN</TableHead>
-                            <TableHead className="font-semibold text-right">HPP</TableHead>
-                            <TableHead className="font-semibold text-right">DPP</TableHead>
-                            <TableHead className="font-semibold text-right">PPN</TableHead>
-                            <TableHead className="font-semibold text-right">JUMLAH</TableHead>
+                            <TableHead className="font-semibold text-center">No</TableHead>
+                            <TableHead className="p-0 font-semibold">
+                                <SortableHeader title="TIPE UNIT" sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-center">
+                                <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-center text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="HARGA JUAL" sortKey="hargaJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="BIAYA BBN" sortKey="biayaBbn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="BIAYA EKSPEDISI" sortKey="biayaEkspedisi" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="BIAYA LAIN" sortKey="biayaLain" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="HPP" sortKey="hpp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="DPP" sortKey="dpp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="PPN" sortKey="ppn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
+                            <TableHead className="p-0 font-semibold text-right">
+                                <SortableHeader title="JUMLAH" sortKey="jumlah" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+                            </TableHead>
                             <TableHead className="font-semibold text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -144,7 +172,7 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
                                     />
                                 </TableCell>
 
-                                <TableCell className="font-medium transition-all duration-200">{startIndex + i + 1}</TableCell>
+                                <TableCell className="font-medium text-center transition-all duration-200">{startIndex + i + 1}</TableCell>
                                 <TableCell className="font-medium transition-all duration-200">{item.unitType}</TableCell>
                                 <TableCell className="text-center transition-all duration-200">{item.qty}</TableCell>
                                 <TableCell className="text-right transition-all duration-200">{formatNumber(item.hargaJual)}</TableCell>

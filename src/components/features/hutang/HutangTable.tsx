@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: Hutang[];
@@ -22,12 +24,16 @@ export default function HutangTable({ data }: Props) {
   // FILTERING
   const filteredData = data.filter((item) => item.noPembelian.toLowerCase().includes(search.toLowerCase()) || item.namaSupplier.toLowerCase().includes(search.toLowerCase()));
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filteredData,
+  });
+
   // PAGINATION
-  const totalItems = filteredData.length;
+  const totalItems = sortedData.length;
   const totalPages = Math.ceil(totalItems / Number(itemsPerPage));
   const startIndex = (currentPage - 1) * Number(itemsPerPage);
   const endIndex = Math.min(startIndex + Number(itemsPerPage), totalItems);
-  const paginatedData = filteredData.slice(startIndex, startIndex + Number(itemsPerPage));
+  const paginatedData = sortedData.slice(startIndex, startIndex + Number(itemsPerPage));
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -96,17 +102,24 @@ export default function HutangTable({ data }: Props) {
           <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
             <tr className="border-b border-gray-200">
               <th className="px-4 py-3 text-left">NO</th>
-              <th className="px-4 py-3 text-left">NO PEMBELIAN</th>
-              <th className="px-4 py-3 text-left">
-                <div className="flex items-center gap-1">
-                  TANGGAL
-                  <ArrowUpDown size={14} className="text-gray-400" />
-                </div>
+              <th className="py-2 text-left">
+                <SortableHeader title="NO PEMBELIAN" sortKey="noPembelian" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900" />
               </th>
-              <th className="px-4 py-3 text-left">NAMA SUPPLIER</th>
-              <th className="px-4 py-3 text-right">TOTAL BELI</th>
-              <th className="px-4 py-3 text-right">TOTAL BAYAR</th>
-              <th className="px-4 py-3 text-right">AMOUNT HUTANG</th>
+              <th className="py-2 text-left">
+                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="NAMA SUPPLIER" sortKey="namaSupplier" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="TOTAL BELI" sortKey="totalBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="TOTAL BAYAR" sortKey="totalBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="AMOUNT HUTANG" sortKey="amountHutang" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
+              </th>
               <th className="px-4 py-3 text-center">ACTION</th>
             </tr>
           </thead>

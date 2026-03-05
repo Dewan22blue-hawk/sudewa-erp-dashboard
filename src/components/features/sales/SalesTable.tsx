@@ -8,6 +8,8 @@ import { SALES_DATA } from './sales.data';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -27,11 +29,15 @@ export function SalesTable({ onAdd }: Props) {
 
   const filteredData = SALES_DATA.filter((item) => item.kodeJual.toLowerCase().includes(searchTerm.toLowerCase()) || item.customer.toLowerCase().includes(searchTerm.toLowerCase()) || item.tanggal.includes(searchTerm));
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filteredData,
+  });
+
   // Pagination logic
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentData = sortedData.slice(startIndex, endIndex);
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
@@ -133,14 +139,30 @@ export function SalesTable({ onAdd }: Props) {
               <TableHead className="w-12">
                 <Checkbox checked={allCurrentPageSelected && currentPageIds.length > 0} onCheckedChange={handleBulkSelect} />
               </TableHead>
-              <TableHead className="font-semibold text-foreground">KODE JUAL</TableHead>
-              <TableHead className="font-semibold text-foreground">TANGGAL</TableHead>
-              <TableHead className="font-semibold text-foreground">CUSTOMER</TableHead>
-              <TableHead className="font-semibold text-right text-foreground">TOTAL BIAYA</TableHead>
-              <TableHead className="font-semibold text-right text-foreground">TOTAL DPP</TableHead>
-              <TableHead className="font-semibold text-right text-foreground">TOTAL PPN</TableHead>
-              <TableHead className="font-semibold text-right text-foreground">TOTAL JUAL</TableHead>
-              <TableHead className="font-semibold text-right text-foreground">KURANG BAYAR</TableHead>
+              <TableHead className="p-0 font-semibold text-foreground">
+                <SortableHeader title="KODE JUAL" sortKey="kodeJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-foreground">
+                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-foreground">
+                <SortableHeader title="CUSTOMER" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-right text-foreground">
+                <SortableHeader title="TOTAL BIAYA" sortKey="biaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-right text-foreground">
+                <SortableHeader title="TOTAL DPP" sortKey="totalDPP" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-right text-foreground">
+                <SortableHeader title="TOTAL PPN" sortKey="totalPPN" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-right text-foreground">
+                <SortableHeader title="TOTAL JUAL" sortKey="totalJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold text-right text-foreground">
+                <SortableHeader title="KURANG BAYAR" sortKey="kurangBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
+              </TableHead>
               <TableHead className="font-semibold text-right text-foreground">ACTION</TableHead>
             </TableRow>
           </TableHeader>
@@ -156,7 +178,7 @@ export function SalesTable({ onAdd }: Props) {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {filteredData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
+          Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, sortedData.length)} of {sortedData.length} entries
         </div>
 
         <div className="flex items-center gap-2">

@@ -57,8 +57,16 @@ export default function EditTransactionPage() {
       await updateMutation.mutateAsync({
         id: id as string,
         payload: {
-          ...values,
-          updatedAt: new Date().toISOString(),
+          companyId: safeCompanyId,
+          date: values.date,
+          name: values.name,
+          description: values.description ?? values.name,
+          debitUSD: values.debitUSD ?? 0,
+          creditUSD: values.creditUSD ?? 0,
+          debitIDR: values.debitIDR ?? 0,
+          creditIDR: values.creditIDR ?? 0,
+          debitCash: values.debitCash ?? 0,
+          creditCash: values.creditCash ?? 0,
         },
       });
       toast.success('Transaksi berhasil diperbarui');

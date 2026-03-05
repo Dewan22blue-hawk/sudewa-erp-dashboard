@@ -79,20 +79,9 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>PIC</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={isUserLoading}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={isUserLoading ? 'Memuat pengguna...' : 'Pilih PIC'} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {userOptions.map((user) => (
-                        <SelectItem key={user.id} value={user.name}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input placeholder="Tambahkan PIC" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -103,7 +92,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nomer Telepon</FormLabel>
+                  <FormLabel>Phone</FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nomer telepon" {...field} />
                   </FormControl>

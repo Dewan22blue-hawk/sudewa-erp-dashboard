@@ -9,12 +9,14 @@ export class AuthService {
    * which return 200 OK with `status: false` instead of standard HTTP error codes.
    */
   static async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const params = new URLSearchParams();
-    if (credentials.email) params.append('email', credentials.email);
-    if (credentials.password) params.append('password', credentials.password);
+    const body = new URLSearchParams();
+    const loginValue = credentials.login || credentials.email; // backend uses `login` (email/username)
+    if (loginValue) body.append('login', loginValue);
+    if (credentials.password) body.append('password', credentials.password);
 
-    // Using POST with query params as per API requirements
-    const response = await apiClient.post<AuthResponse>(`/wapi/auth/login?${params.toString()}`);
+    const response = await apiClient.post<AuthResponse>(`/wapi/auth/login`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
 
     // Check if business logic failed even with 200 OK HTTP status
     if (!response.data.status) {

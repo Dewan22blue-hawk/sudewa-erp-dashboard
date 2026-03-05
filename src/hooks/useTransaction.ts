@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as service from '@/services/transaction.service';
-import { Transaction } from '@/@types/transaction.types';
+import { Transaction, CreateTransactionRequest } from '@/@types/transaction.types';
 
 const KEYS = {
   all: ['transactions'] as const,
@@ -29,11 +29,10 @@ export const useTransactionSummary = (companyId: string) =>
 export const useCreateTransaction = (companyId: string) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Transaction) => service.createTransaction(data),
+    mutationFn: (data: CreateTransactionRequest) => service.createTransaction(data),
     onSuccess: () => {
-      // Invalidate related queries for this company
+      qc.invalidateQueries({ queryKey: KEYS.all });
       qc.invalidateQueries({ queryKey: KEYS.summary(companyId) });
-      qc.invalidateQueries({ queryKey: KEYS.list(companyId, 1, 10, '') });
     },
   });
 };
@@ -43,8 +42,8 @@ export const useUpdateTransaction = (companyId: string) => {
   return useMutation({
     mutationFn: (data: { id: string; payload: Partial<Transaction> }) => service.updateTransaction(data.id, data.payload),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEYS.all });
       qc.invalidateQueries({ queryKey: KEYS.summary(companyId) });
-      qc.invalidateQueries({ queryKey: KEYS.list(companyId, 1, 10, '') });
     },
   });
 };
@@ -54,8 +53,8 @@ export const useDeleteTransaction = (companyId: string) => {
   return useMutation({
     mutationFn: (id: string) => service.deleteTransaction(id),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEYS.all });
       qc.invalidateQueries({ queryKey: KEYS.summary(companyId) });
-      qc.invalidateQueries({ queryKey: KEYS.list(companyId, 1, 10, '') });
     },
   });
 };

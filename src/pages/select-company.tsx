@@ -134,7 +134,7 @@ export default function SelectCompanyPage() {
                   hover:shadow-sm
                 "
               >
-                <span className="text-[#111827] text-[15px] font-medium group-hover:text-black transition-colors">{company.name}</span>
+                <span className="text-[#111827] text-[15px] font-medium group-hover:text-black transition-colors uppercase">{company.name}</span>
 
                 {/* Arrow Icon */}
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#9CA3AF] group-hover:text-[#6B7280] transform group-hover:translate-x-1 transition-all duration-300">

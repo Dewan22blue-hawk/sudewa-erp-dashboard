@@ -4,8 +4,10 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreHorizontal, Plus, Search } from 'lucide-react';
+import { MoreVertical, Plus, Search } from 'lucide-react';
 import type { Supplier } from '@/@types/supplier.types';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface SupplierTableProps {
   suppliers: Supplier[];
@@ -31,11 +33,15 @@ export function SupplierTable({ suppliers, onEdit, onDelete, onAdd }: SupplierTa
     );
   }, [suppliers, searchTerm]);
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filteredData,
+  });
+
   // Pagination logic
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentData = sortedData.slice(startIndex, endIndex);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -86,12 +92,24 @@ export function SupplierTable({ suppliers, onEdit, onDelete, onAdd }: SupplierTa
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="font-semibold uppercase text-slate-700">Kode Supplier</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Nama Supplier</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Alamat</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">NPWP</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">PIC</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Phone</TableHead>
+              <TableHead>
+                <SortableHeader title="Kode Supplier" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="Nama Supplier" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="Alamat" sortKey="address" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="NPWP" sortKey="npwp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="PIC" sortKey="pic" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="Phone" sortKey="phone" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
               <TableHead className="text-right font-semibold uppercase text-slate-700">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -117,7 +135,7 @@ export function SupplierTable({ suppliers, onEdit, onDelete, onAdd }: SupplierTa
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">

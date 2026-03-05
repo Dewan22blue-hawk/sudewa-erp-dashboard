@@ -3,9 +3,11 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { Account } from '@/@types/account.types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface AccountTableProps {
   data: Account[] | undefined;
@@ -37,14 +39,19 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete, page, p
 
   // Safe defaults
   const safeData = data || [];
+
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: safeData,
+  });
+
   const activePage = isControlled ? page! : currentPage;
   const activePerPage = isControlled ? perPage! : itemsPerPage;
-  const safeTotal = total ?? safeData.length;
+  const safeTotal = total ?? sortedData.length;
 
   const totalPages = Math.max(1, Math.ceil(safeTotal / activePerPage));
   const startIndex = (activePage - 1) * activePerPage;
   const endIndex = startIndex + activePerPage;
-  const currentData = isControlled ? safeData : safeData.slice(startIndex, endIndex);
+  const currentData = isControlled ? sortedData : sortedData.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-4">
@@ -69,10 +76,18 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete, page, p
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="font-semibold">KODE AKUN</TableHead>
-              <TableHead className="font-semibold">GRUP AKUN</TableHead>
-              <TableHead className="font-semibold">DESKRIPSI</TableHead>
-              <TableHead className="font-semibold">KATEGORI</TableHead>
+              <TableHead>
+                <SortableHeader title="KODE AKUN" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="GRUP AKUN" sortKey="accountGroupName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="DESKRIPSI" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
+                <SortableHeader title="KATEGORI" sortKey="type" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
               <TableHead className="text-right font-semibold">ACTION</TableHead>
             </TableRow>
           </TableHeader>
@@ -115,7 +130,7 @@ export function AccountTable({ data, total, isLoading, onEdit, onDelete, page, p
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">

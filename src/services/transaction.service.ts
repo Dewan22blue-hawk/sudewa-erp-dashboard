@@ -1,194 +1,128 @@
-import { Transaction, TransactionAudit, TransactionSummary } from "@/@types/transaction.types"
-import { nanoid } from "nanoid"
+import { Transaction, TransactionSummary, CreateTransactionRequest } from '@/@types/transaction.types';
+import { apiClient } from '@/lib/api/client';
+import { ensureSuccess, type LaravelApiResponse, ApiResponseError } from '@/lib/api/response';
 
-// Mock Databases
-let db: Transaction[] = [
-    {
-        id: "1",
-        companyId: "1", // PT Wajira Morindo
-        date: "2024-10-01",
-        name: "Setoran Modal Awal",
-        debitUSD: 0,
-        creditUSD: 0,
-        debitIDR: 0,
-        creditIDR: 0,
-        debitCash: 100000000,
-        creditCash: 0,
-        description: "Setoran modal awal tunai",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+const basePath = '/wapi/transaction/transaction-flow';
+
+type TransactionFlowApiModel = {
+  id: number;
+  uuid: string;
+  company_id: number;
+  unit_transaction_id: number | null;
+  transaction_date: string;
+  description: string | null;
+  bank_usd_debit: string | number | null;
+  bank_usd_credit: string | number | null;
+  bank_idr_debit: string | number | null;
+  bank_idr_credit: string | number | null;
+  cash_idr_debit: string | number | null;
+  cash_idr_credit: string | number | null;
+  created_at?: string;
+  updated_at?: string;
+  unit_transaction?: unknown;
+};
+
+type PaginatedResponse = LaravelApiResponse<{
+  current_page: number;
+  data: TransactionFlowApiModel[];
+  per_page: number;
+  total: number;
+}>;
+
+type ItemResponse = LaravelApiResponse<TransactionFlowApiModel>;
+
+const mapTransaction = (item: TransactionFlowApiModel): Transaction => ({
+  id: String(item.id),
+  uuid: item.uuid,
+  companyId: String(item.company_id),
+  unitTransactionId: item.unit_transaction_id,
+  date: item.transaction_date,
+  name: item.description ?? '',
+  description: item.description ?? '',
+  debitUSD: Number(item.bank_usd_debit || 0),
+  creditUSD: Number(item.bank_usd_credit || 0),
+  debitIDR: Number(item.bank_idr_debit || 0),
+  creditIDR: Number(item.bank_idr_credit || 0),
+  debitCash: Number(item.cash_idr_debit || 0),
+  creditCash: Number(item.cash_idr_credit || 0),
+  createdAt: item.created_at,
+  updatedAt: item.updated_at,
+});
+
+export const getTransactions = async (companyId: string, page = 1, limit = 10, search = '') => {
+  const response = await apiClient.get<PaginatedResponse>(basePath, {
+    params: {
+      company_id: companyId,
+      page,
+      per_page: limit,
+      description: search || undefined,
     },
-    {
-        id: "2",
-        companyId: "1",
-        date: "2024-10-02",
-        name: "Beli Perlengkapan Kantor",
-        debitUSD: 0,
-        creditUSD: 0,
-        debitIDR: 0,
-        creditIDR: 0,
-        debitCash: 0,
-        creditCash: 2500000,
-        description: "Pembelian ATK dan kertas",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-    {
-        id: "3",
-        companyId: "1",
-        date: "2024-10-05",
-        name: "Penerimaan Pembayaran Invoice #INV-001",
-        debitUSD: 5000,
-        creditUSD: 0,
-        debitIDR: 0,
-        creditIDR: 0,
-        debitCash: 0,
-        creditCash: 0,
-        description: "Pembayaran dari Client A (USD)",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-    {
-        id: "4",
-        companyId: "1",
-        date: "2024-10-06",
-        name: "Tukar Valas (USD ke IDR)",
-        debitUSD: 0,
-        creditUSD: 1000,
-        debitIDR: 15500000,
-        creditIDR: 0,
-        debitCash: 0,
-        creditCash: 0,
-        description: "Konversi $1000 @ 15.500",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
-]
-const auditLog: TransactionAudit[] = []
+  });
 
-// Delay simulation
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+  const payload = ensureSuccess(response.data);
+  const list = payload.data ?? [];
 
-export const getTransactions = async (
-    companyId: string,
-    page = 1,
-    limit = 10,
-    search = ""
-) => {
-    await delay(500)
-    let filtered = db.filter((t) => t.companyId === companyId)
+  return {
+    data: list.map(mapTransaction),
+    total: Number(payload.total ?? list.length),
+    page: Number(payload.current_page ?? page),
+    limit: Number(payload.per_page ?? limit),
+  };
+};
 
-    if (search) {
-        const lowerSearch = search.toLowerCase()
-        filtered = filtered.filter(t =>
-            t.name.toLowerCase().includes(lowerSearch) ||
-            t.description?.toLowerCase().includes(lowerSearch)
-        )
-    }
+export const getTransactionById = async (id: string): Promise<Transaction> => {
+  const response = await apiClient.get<ItemResponse>(`${basePath}/${id}`);
+  const data = ensureSuccess(response.data);
+  return mapTransaction(data);
+};
 
-    const start = (page - 1) * limit
-    const end = start + limit
+const buildPayload = (payload: Partial<CreateTransactionRequest>) => {
+  const body: Record<string, any> = {};
+  if (payload.companyId !== undefined) body.company_id = payload.companyId;
+  if (payload.unitTransactionId !== undefined) body.unit_transaction_id = payload.unitTransactionId ?? null;
+  if (payload.date !== undefined) body.transaction_date = payload.date;
+  if (payload.description !== undefined || payload.name !== undefined) body.description = payload.description ?? payload.name ?? '';
+  if (payload.debitUSD !== undefined) body.bank_usd_debit = payload.debitUSD ?? 0;
+  if (payload.creditUSD !== undefined) body.bank_usd_credit = payload.creditUSD ?? 0;
+  if (payload.debitIDR !== undefined) body.bank_idr_debit = payload.debitIDR ?? 0;
+  if (payload.creditIDR !== undefined) body.bank_idr_credit = payload.creditIDR ?? 0;
+  if (payload.debitCash !== undefined) body.cash_idr_debit = payload.debitCash ?? 0;
+  if (payload.creditCash !== undefined) body.cash_idr_credit = payload.creditCash ?? 0;
+  return body;
+};
 
-    return {
-        data: filtered.slice(start, end),
-        total: filtered.length,
-        page,
-        limit,
-    }
-}
+export const createTransaction = async (payload: CreateTransactionRequest): Promise<Transaction> => {
+  const response = await apiClient.post<ItemResponse>(basePath, buildPayload(payload));
+  const data = ensureSuccess(response.data);
+  return mapTransaction(data);
+};
 
-export const getTransactionById = async (id: string): Promise<Transaction | undefined> => {
-    await delay(300)
-    return db.find((t) => t.id === id)
-}
+export const updateTransaction = async (id: string, payload: Partial<CreateTransactionRequest>): Promise<Transaction> => {
+  const response = await apiClient.put<ItemResponse>(`${basePath}/${id}`, buildPayload(payload));
+  const data = ensureSuccess(response.data);
+  return mapTransaction(data);
+};
+
+export const deleteTransaction = async (id: string): Promise<void> => {
+  const response = await apiClient.delete<LaravelApiResponse<null>>(`${basePath}/${id}`);
+  const payload = response.data;
+  if (payload.status === false) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete transaction');
+  }
+};
 
 export const getTransactionSummary = async (companyId: string): Promise<TransactionSummary> => {
-    await delay(300)
-    const companyData = db.filter(t => t.companyId === companyId)
+  // Fetch first page with a higher limit to approximate totals.
+  const result = await getTransactions(companyId, 1, 500, '');
+  const totals = result.data.reduce(
+    (acc, curr) => {
+      acc.totalBcaUsd += (curr.debitUSD || 0) - (curr.creditUSD || 0);
+      acc.totalBcaIdr += (curr.debitIDR || 0) - (curr.creditIDR || 0);
+      acc.totalCashIdr += (curr.debitCash || 0) - (curr.creditCash || 0);
+      return acc;
+    },
+    { totalBcaUsd: 0, totalBcaIdr: 0, totalCashIdr: 0 } as TransactionSummary,
+  );
 
-    // Simple calculation logic (Debit increases asset, Credit decreases asset for Asset accounts)
-    // Assuming BCA USD, BCA IDR, Cash IDR are asset accounts.
-    // Saldo = Initial + Debit - Credit. Assuming Initial is 0 for this mock.
-
-    const totalBcaUsd = companyData.reduce((acc, curr) => acc + (curr.debitUSD || 0) - (curr.creditUSD || 0), 0)
-    const totalBcaIdr = companyData.reduce((acc, curr) => acc + (curr.debitIDR || 0) - (curr.creditIDR || 0), 0)
-    const totalCashIdr = companyData.reduce((acc, curr) => acc + (curr.debitCash || 0) - (curr.creditCash || 0), 0)
-
-    return {
-        totalBcaUsd,
-        totalBcaIdr,
-        totalCashIdr
-    }
-}
-
-export const createTransaction = async (payload: Transaction, userId: string = "system") => {
-    await delay(600)
-
-    // Immutability
-    db = [...db, payload]
-
-    // Audit Logging
-    const audit: TransactionAudit = {
-        id: nanoid(),
-        transactionId: payload.id,
-        companyId: payload.companyId,
-        action: "CREATE",
-        timestamp: new Date().toISOString(),
-        userId,
-        details: `Created transaction "${payload.name}"`,
-        payload: payload
-    }
-    auditLog.push(audit)
-    console.log("AUDIT:", audit)
-
-    return payload
-}
-
-export const updateTransaction = async (id: string, payload: Partial<Transaction>, userId: string = "system") => {
-    await delay(600)
-
-    const oldData = db.find(t => t.id === id)
-    if (!oldData) throw new Error("Transaction not found")
-
-    // Immutability
-    db = db.map((t) => (t.id === id ? { ...t, ...payload } : t))
-
-    // Audit Logging
-    const audit: TransactionAudit = {
-        id: nanoid(),
-        transactionId: id,
-        companyId: oldData.companyId,
-        action: "UPDATE",
-        timestamp: new Date().toISOString(),
-        userId,
-        details: `Updated transaction "${oldData.name}"`,
-        payload: { before: oldData, after: payload }
-    }
-    auditLog.push(audit)
-    console.log("AUDIT:", audit)
-
-    return payload
-}
-
-export const deleteTransaction = async (id: string, userId: string = "system") => {
-    await delay(600)
-
-    const target = db.find(t => t.id === id)
-    if (!target) return // or throw
-
-    // Immutability
-    db = db.filter((t) => t.id !== id)
-
-    // Audit Logging
-    const audit: TransactionAudit = {
-        id: nanoid(),
-        transactionId: id,
-        companyId: target.companyId,
-        action: "DELETE",
-        timestamp: new Date().toISOString(),
-        userId,
-        details: `Deleted transaction "${target.name}"`
-    }
-    auditLog.push(audit)
-    console.log("AUDIT:", audit)
-}
+  return totals;
+};

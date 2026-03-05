@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MoreVertical, Plus, Search } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { TypeUnit } from '@/@types/type-unit.types';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface TypeUnitTableProps {
   typeUnits: TypeUnit[];
@@ -27,6 +29,11 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
   const hasData = (meta?.total ?? typeUnits.length) > 0;
   const startIndex = meta ? (page - 1) * perPage + 1 : 1;
   const endIndex = meta ? Math.min(page * perPage, meta.total) : typeUnits.length;
+
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: typeUnits,
+    defaultSortKey: 'code'
+  });
 
   return (
     <div className="space-y-4">
@@ -67,17 +74,34 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="font-semibold uppercase text-slate-700">KODE TIPE</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">MERK</TableHead>
-              {/* <TableHead className="font-semibold uppercase text-slate-700">NAMA</TableHead> */}
-              <TableHead className="font-semibold uppercase text-slate-700">TIPE UNIT</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">HARGA BELI</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">HARGA JUAL</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">UNIT MODEL</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">BRUTO (KG)</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">NETTO (KG)</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">CAPACITY</TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700">ACTION</TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="KODE TIPE" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="MERK" sortKey="brand.name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="TIPE UNIT" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="HARGA BELI" sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="HARGA JUAL" sortKey="salePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="UNIT MODEL" sortKey="unitModel" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="BRUTO (KG)" sortKey="brutoWeight" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="NETTO (KG)" sortKey="nettoWeight" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="p-0 font-semibold uppercase text-slate-700">
+                <SortableHeader title="CAPACITY" sortKey="capacity" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 font-semibold uppercase px-4" />
+              </TableHead>
+              <TableHead className="text-right font-semibold uppercase text-slate-700 px-4">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -94,13 +118,13 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 </TableCell>
               </TableRow>
             ) : (
-              typeUnits.map((item) => (
+              sortedData.map((item) => (
                 <TableRow key={item.id} className="hover:bg-slate-50/50">
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
                   <TableCell className="text-slate-700">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="font-medium text-slate-800">{item.name}</TableCell>
-                  <TableCell className="text-slate-700">{item.purchasePrice ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{item.salePrice ?? '-'}</TableCell>
+                  <TableCell className="text-slate-700">{(item as any).purchasePrice ?? '-'}</TableCell>
+                  <TableCell className="text-slate-700">{(item as any).salePrice ?? '-'}</TableCell>
                   {/* <TableCell className="text-slate-700">{item.unitType || '-'}</TableCell> */}
                   <TableCell className="text-slate-700">{item.unitModel || '-'}</TableCell>
                   <TableCell className="text-slate-700">{item.brutoWeight ?? '-'}</TableCell>

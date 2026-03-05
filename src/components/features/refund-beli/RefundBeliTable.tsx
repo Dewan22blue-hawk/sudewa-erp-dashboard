@@ -1,10 +1,11 @@
-import { ArrowUpDown } from 'lucide-react';
 import { RefundBeli } from '@/@types/refund-beli.types';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: RefundBeli[];
-  sortOrder?: "asc" | "desc";
-  onSort: () => void;
+  sortKey: string | undefined;
+  sortOrder: "asc" | "desc" | null;
+  onSort: (key: string) => void;
 }
 
 const formatCurrency = (value: number) =>
@@ -13,25 +14,34 @@ const formatCurrency = (value: number) =>
     currency: 'IDR',
   }).format(value);
 
-export default function RefundBeliTable({ data, onSort }: Props) {
+export default function RefundBeliTable({ data, sortKey, sortOrder, onSort }: Props) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-100 uppercase text-sm font-semibold text-gray-900 b">
             <tr className="border-b border-gray-200">
-              <th className="px-4 py-3 text-left">No Pembelian</th>
-              <th className="px-4 py-3 text-left cursor-pointer select-none group" onClick={onSort}>
-                <div className="flex items-center gap-1">
-                  Tanggal
-                  <ArrowUpDown size={14} className="text-gray-400 group-hover:text-gray-600" />
-                </div>
+              <th className="py-2 text-left">
+                <SortableHeader title="No Pembelian" sortKey="noPembelian" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-start w-full px-4" />
               </th>
-              <th className="px-4 py-3 text-left">Nama Supplier</th>
-              <th className="px-4 py-3 text-right">Total Pembelian</th>
-              <th className="px-4 py-3 text-right">Total Refund</th>
-              <th className="px-4 py-3 text-left">Kas Masuk</th>
-              <th className="px-4 py-3 text-left">Keterangan</th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Tanggal" sortKey="tanggal" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Nama Supplier" sortKey="namaSupplier" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="Total Pembelian" sortKey="totalPembelian" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="Total Refund" sortKey="totalRefund" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Kas Masuk" sortKey="kasMasuk" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Keterangan" sortKey="keterangan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="text-gray-900 justify-start w-full px-4" />
+              </th>
             </tr>
           </thead>
 

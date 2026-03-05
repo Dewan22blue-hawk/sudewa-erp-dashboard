@@ -1,7 +1,8 @@
 import { PembayaranHutang } from "@/types/pembayaran-hutang.types"
-import { ArrowUpDown } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 import {
     Select,
     SelectContent,
@@ -18,12 +19,16 @@ export default function PembayaranHutangListTable({ data }: Props) {
     const [itemsPerPage, setItemsPerPage] = useState("25")
     const [currentPage, setCurrentPage] = useState(1)
 
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data,
+    })
+
     // PAGINATION LOGIC
-    const totalItems = data.length
+    const totalItems = sortedData.length
     const totalPages = Math.ceil(totalItems / Number(itemsPerPage))
     const startIndex = (currentPage - 1) * Number(itemsPerPage)
     const endIndex = Math.min(startIndex + Number(itemsPerPage), totalItems)
-    const paginatedData = data.slice(startIndex, startIndex + Number(itemsPerPage))
+    const paginatedData = sortedData.slice(startIndex, startIndex + Number(itemsPerPage))
 
     const handlePageChange = (page: number) => {
         if (page >= 1 && page <= totalPages) {
@@ -81,15 +86,18 @@ export default function PembayaranHutangListTable({ data }: Props) {
                     <thead className="bg-gray-200/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
                         <tr className="border-b border-gray-200">
                             <th className="px-4 py-3 text-left">No</th>
-                            <th className="px-4 py-3 text-left">KODE BAYAR</th>
-                            <th className="px-4 py-3 text-left">
-                                <div className="flex items-center gap-1">
-                                    TANGGAL
-                                    <ArrowUpDown size={14} className="text-gray-400" />
-                                </div>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KODE BAYAR" sortKey="kodeBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
                             </th>
-                            <th className="px-4 py-3 text-left">KAS KELUAR</th>
-                            <th className="px-4 py-3 text-right">JUMLAH BAYAR</th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KAS KELUAR" sortKey="kasKeluar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
+                            </th>
+                            <th className="py-2 text-right">
+                                <SortableHeader title="JUMLAH BAYAR" sortKey="jumlahBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">

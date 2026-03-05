@@ -6,6 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Search } from 'lucide-react';
 import { useRefundBeli } from '@/hooks/useRefundBeli';
 import RefundBeliTable from '@/components/features/refund-beli/RefundBeliTable';
+import { useTableSort } from '@/hooks/useTableSort';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 // ... imports
@@ -16,29 +17,20 @@ export default function RefundBeliPage() {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const filteredData = useMemo(() => {
-    const result = data.filter((item) => item.namaSupplier.toLowerCase().includes(search.toLowerCase()));
+    return data.filter((item) => item.namaSupplier.toLowerCase().includes(search.toLowerCase()));
+  }, [data, search]);
 
-    result.sort((a, b) => {
-      // Parse DD/MM/YYYY to Date object
-      const parseDate = (dateStr: string) => {
-        const [day, month, year] = dateStr.split('/');
-        return new Date(Number(year), Number(month) - 1, Number(day)).getTime();
-      };
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filteredData,
+    defaultSortKey: 'tanggal',
+    defaultSortOrder: 'asc'
+  });
 
-      const dateA = parseDate(a.tanggal);
-      const dateB = parseDate(b.tanggal);
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-    });
+  const totalPages = Math.ceil(sortedData.length / pageSize);
 
-    return result;
-  }, [data, search, sortOrder]);
-
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-
-  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedData = sortedData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <DashboardLayout>
@@ -73,7 +65,7 @@ export default function RefundBeliPage() {
         </div>
 
         {/* TABLE */}
-        <RefundBeliTable data={paginatedData} sortOrder={sortOrder} onSort={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))} />
+        <RefundBeliTable data={paginatedData} sortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort as any} />
 
         {/* PAGINATION */}
         <div className="flex justify-between items-center text-sm text-gray-500">

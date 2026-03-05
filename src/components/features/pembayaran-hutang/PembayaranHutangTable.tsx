@@ -18,6 +18,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 
 interface Props {
     data: PembayaranHutang[]
@@ -40,39 +42,9 @@ export default function PembayaranHutangTable({ data }: Props) {
         item.namaSupplier.toLowerCase().includes(search.toLowerCase())
     )
 
-    // SORTING
-    const sortedData = [...filteredData].sort((a, b) => {
-        if (!sortConfig) return 0
-
-        let aValue: any = a[sortConfig.key]
-        let bValue: any = b[sortConfig.key]
-
-        // Handle Date Sorting specific format "DD/MM/YYYY"
-        if (sortConfig.key === 'tanggal') {
-            const parseDate = (dateStr: string) => {
-                const [day, month, year] = dateStr.split('/').map(Number)
-                return new Date(year, month - 1, day).getTime()
-            }
-            aValue = parseDate(a.tanggal)
-            bValue = parseDate(b.tanggal)
-        }
-
-        if (aValue < bValue) {
-            return sortConfig.direction === 'asc' ? -1 : 1
-        }
-        if (aValue > bValue) {
-            return sortConfig.direction === 'asc' ? 1 : -1
-        }
-        return 0
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data: filteredData,
     })
-
-    const handleSort = (key: keyof PembayaranHutang) => {
-        let direction: 'asc' | 'desc' = 'asc'
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc'
-        }
-        setSortConfig({ key, direction })
-    }
 
     // PAGINATION
     const totalItems = sortedData.length
@@ -151,19 +123,21 @@ export default function PembayaranHutangTable({ data }: Props) {
                     <thead className="bg-gray-200/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
                         <tr className="border-b border-gray-200">
                             <th className="px-4 py-3 text-left">NO</th>
-                            <th className="px-4 py-3 text-left">KODE BAYAR</th>
-                            <th className="px-4 py-3 text-left">KODE BELI</th>
-                            <th
-                                className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 transition-colors"
-                                onClick={() => handleSort('tanggal')}
-                            >
-                                <div className="flex items-center gap-1">
-                                    TANGGAL
-                                    <ArrowUpDown size={14} className="text-gray-400" />
-                                </div>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KODE BAYAR" sortKey="kodeBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
                             </th>
-                            <th className="px-4 py-3 text-left">KAS KELUAR</th>
-                            <th className="px-4 py-3 text-right">JUMLAH BAYAR</th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KODE BELI" sortKey="kodeBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KAS KELUAR" sortKey="kasKeluar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
+                            </th>
+                            <th className="py-2 text-right">
+                                <SortableHeader title="JUMLAH BAYAR" sortKey="jumlahBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
+                            </th>
                             <th className="px-4 py-3 text-center">ACTION</th>
                         </tr>
                     </thead>

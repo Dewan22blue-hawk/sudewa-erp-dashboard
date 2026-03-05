@@ -1,5 +1,6 @@
 import { PiutangPayment } from "@/@types/piutang.types"
-import { ArrowUpDown } from "lucide-react"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 import {
     Select,
     SelectContent,
@@ -13,7 +14,11 @@ interface Props {
 }
 
 export default function PiutangPaymentTable({ data }: Props) {
-    const total = data.reduce(
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data,
+    })
+
+    const total = sortedData.reduce(
         (acc, curr) => acc + curr.jumlahBayar,
         0
     )
@@ -40,19 +45,22 @@ export default function PiutangPaymentTable({ data }: Props) {
                     <thead className="bg-[#f1f5f9] text-xs uppercase font-semibold text-gray-600">
                         <tr>
                             <th className="px-6 py-4 text-left">No</th>
-                            <th className="px-6 py-4 text-left">KODE BAYAR</th>
-                            <th className="px-6 py-4 text-left">
-                                <div className="flex items-center gap-1">
-                                    TANGGAL
-                                    <ArrowUpDown size={14} className="text-gray-400" />
-                                </div>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KODE BAYAR" sortKey="kodeBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-600 justify-start w-full px-6" />
                             </th>
-                            <th className="px-6 py-4 text-left">KAS KELUAR</th>
-                            <th className="px-6 py-4 text-right">JUMLAH BAYAR</th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-600 justify-start w-full px-6" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KAS KELUAR" sortKey="kasMasuk" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-600 justify-start w-full px-6" />
+                            </th>
+                            <th className="py-2 text-right">
+                                <SortableHeader title="JUMLAH BAYAR" sortKey="jumlahBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-600 justify-end w-full px-6" />
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                        {data.map((item, index) => (
+                        {sortedData.map((item, index) => (
                             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-6 py-4">{index + 1}</td>
                                 <td className="px-6 py-4 font-medium text-gray-900">{item.kodeBayar}</td>

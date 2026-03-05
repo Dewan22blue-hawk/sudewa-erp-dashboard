@@ -92,6 +92,8 @@ export default function SupplierPage() {
     try {
       await createSupplier.mutateAsync({
         ...values,
+        pic: values.pic || undefined,
+        phone: values.phone || undefined,
         companyId: Number(companyId) || companyId,
         userId: Number(profile.data.id) || profile.data.id,
       });
@@ -112,6 +114,8 @@ export default function SupplierPage() {
     }
     const payload = {
       ...values,
+      pic: values.pic || undefined,
+      phone: values.phone || undefined,
       companyId: Number(supplierToEdit.companyId) || supplierToEdit.companyId,
       userId: Number(profile.data.id) || profile.data.id,
     };

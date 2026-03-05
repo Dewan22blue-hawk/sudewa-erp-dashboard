@@ -4,6 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMemo, useState } from 'react';
 import { formatDate } from '@/lib/utils/format';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface TransactionTableProps {
   data: TransactionEntry[];
@@ -33,6 +35,10 @@ export function TransactionTable({ data, isLoading }: TransactionTableProps) {
     return data.filter((item) => item.type === filter);
   }, [data, filter]);
 
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filtered,
+  });
+
   if (isLoading) return <LoadingTable />;
   if (!data?.length) return null;
 
@@ -59,17 +65,31 @@ export function TransactionTable({ data, isLoading }: TransactionTableProps) {
         <Table>
           <TableHeader className="bg-slate-100">
             <TableRow className='font-bold'>
-              <TableHead className="text-slate-900 font-bold">Nota</TableHead>
-              <TableHead className="text-slate-900 font-bold">Tanggal</TableHead>
-              <TableHead className="text-slate-900 font-bold">Penjualan</TableHead>
-              <TableHead className="text-slate-900 font-bold">Customer</TableHead>
-              <TableHead className="text-slate-900 font-bold">Akun</TableHead>
-              <TableHead className="text-right text-slate-900 font-bold">Total</TableHead>
-              <TableHead className="text-slate-900 font-bold">Keterangan</TableHead>
+              <TableHead className="p-0 text-slate-900 font-bold min-w-[120px]">
+                <SortableHeader title="Nota" sortKey="note" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-900 px-4" />
+              </TableHead>
+              <TableHead className="p-0 text-slate-900 font-bold min-w-[120px]">
+                <SortableHeader title="Tanggal" sortKey="date" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-900 px-4" />
+              </TableHead>
+              <TableHead className="p-0 text-slate-900 font-bold min-w-[150px]">
+                <SortableHeader title="Penjualan" sortKey="sale" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-900 px-4" />
+              </TableHead>
+              <TableHead className="p-0 text-slate-900 font-bold min-w-[150px]">
+                <SortableHeader title="Customer" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-900 px-4" />
+              </TableHead>
+              <TableHead className="p-0 text-slate-900 font-bold min-w-[150px]">
+                <SortableHeader title="Akun" sortKey="account" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-900 px-4" />
+              </TableHead>
+              <TableHead className="p-0 text-right text-slate-900 font-bold min-w-[150px]">
+                <SortableHeader title="Total" sortKey="total" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-slate-900 px-4" />
+              </TableHead>
+              <TableHead className="p-0 text-slate-900 font-bold min-w-[180px]">
+                <SortableHeader title="Keterangan" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-900 px-4" />
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((item, idx) => (
+            {sortedData.map((item, idx) => (
               <TableRow key={`${item.note}-${idx}`} className="hover:bg-slate-50/50">
                 <TableCell className="font-medium text-slate-800">{item.note}</TableCell>
                 <TableCell className="text-slate-700">{formatDate(item.date)}</TableCell>

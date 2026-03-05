@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Pencil, Plus, Trash } from 'lucide-react';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface AccountGroupTableProps {
   data: AccountGroup[];
@@ -26,26 +28,30 @@ interface AccountGroupTableProps {
 }
 
 export const AccountGroupTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onPageChange, onPerPageChange }: AccountGroupTableProps) => {
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data,
+  });
+
   const columns = useMemo<ColumnDef<AccountGroup>[]>(
     () => [
       {
         accessorKey: 'code',
-        header: 'Kode',
+        header: () => <SortableHeader title="Kode" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
         cell: ({ row }) => <span className="font-semibold text-sm text-foreground">{row.original.code}</span>,
       },
       {
         accessorKey: 'name',
-        header: 'Nama Grup',
+        header: () => <SortableHeader title="Nama Grup" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
         cell: ({ row }) => <span className="text-sm text-foreground">{row.original.name}</span>,
       },
       {
         accessorKey: 'description',
-        header: 'Deskripsi',
+        header: () => <SortableHeader title="Deskripsi" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
         cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.description || '-'}</span>,
       },
       {
         accessorKey: 'isActive',
-        header: 'Status',
+        header: () => <SortableHeader title="Status" sortKey="isActive" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
         cell: ({ row }) => (
           <Badge variant={row.original.isActive ? 'default' : 'secondary'} className={row.original.isActive ? '' : 'bg-gray-200 text-gray-700'}>
             {row.original.isActive ? 'Aktif' : 'Nonaktif'}
@@ -54,7 +60,7 @@ export const AccountGroupTable = ({ data, meta, search, page, perPage, isLoading
       },
       {
         id: 'actions',
-        header: () => <div className="text-right">Aksi</div>,
+        header: () => <div className="text-right uppercase font-semibold text-slate-700">Aksi</div>,
         cell: ({ row }) => (
           <div className="flex justify-end">
             <DropdownMenu>
@@ -78,11 +84,11 @@ export const AccountGroupTable = ({ data, meta, search, page, perPage, isLoading
         ),
       },
     ],
-    [onDelete, onEdit],
+    [onDelete, onEdit, sortKey, sortOrder, handleSort],
   );
 
   const table = useReactTable({
-    data,
+    data: sortedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     state: {

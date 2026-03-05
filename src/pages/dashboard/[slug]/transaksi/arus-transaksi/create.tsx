@@ -4,7 +4,6 @@
 import { useRouter } from 'next/router';
 
 import { toast } from 'sonner';
-import { nanoid } from 'nanoid';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import TransactionForm from '@/components/features/transaction/TransactionForm';
 import { useCreateTransaction } from '@/hooks/useTransaction';
@@ -25,20 +24,16 @@ export default function CreateTransactionPage() {
   const handleSubmit = async (data: TransactionFormValues) => {
     try {
       await createMutation.mutateAsync({
-        id: nanoid(),
         companyId: safeCompanyId,
         date: data.date,
         name: data.name,
-        // Ensure number defaults
+        description: data.description ?? data.name,
         debitUSD: data.debitUSD ?? 0,
         creditUSD: data.creditUSD ?? 0,
         debitIDR: data.debitIDR ?? 0,
         creditIDR: data.creditIDR ?? 0,
         debitCash: data.debitCash ?? 0,
         creditCash: data.creditCash ?? 0,
-        description: data.description ?? '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       });
 
       toast.success('Transaksi berhasil ditambahkan');

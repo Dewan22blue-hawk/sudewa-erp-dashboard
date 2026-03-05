@@ -35,6 +35,8 @@ export interface ProfileResponse {
 }
 
 export interface LoginRequest {
-  email?: string;
+  /** backend accepts `login` (email/username) */
+  login?: string;
+  email?: string; // kept for backward compatibility; mapped to `login` in service
   password?: string;
 }

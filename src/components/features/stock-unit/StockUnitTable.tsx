@@ -5,6 +5,8 @@ import StockUnitFilterTabs from './StockUnitFilterTabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 type StatusFilter = StockStatus | 'all';
 
@@ -40,10 +42,15 @@ export default function StockUnitTable({ data }: Props) {
 
   const perPage = Number(itemsPerPage);
   const totalItems = filteredData.length;
+
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: filteredData,
+  });
+
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
   const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * perPage;
   const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + perPage, totalItems);
-  const paginatedData = filteredData.slice(startIndex, startIndex + perPage);
+  const paginatedData = sortedData.slice(startIndex, startIndex + perPage);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -113,13 +120,27 @@ export default function StockUnitTable({ data }: Props) {
           <thead className="bg-gray-200/50 uppercase text-xs font-semibold text-gray-900">
             <tr className="border-b border-gray-200">
               <th className="px-4 py-3 text-left">No</th>
-              <th className="px-4 py-3 text-left">Tipe Unit</th>
-              <th className="px-4 py-3 text-left">Warna</th>
-              <th className="px-4 py-3 text-left">No Mesin</th>
-              <th className="px-4 py-3 text-left">No Rangka</th>
-              <th className="px-4 py-3 text-left">Supplier</th>
-              <th className="px-4 py-3 text-left">Customer</th>
-              <th className="px-4 py-3 text-left">Status</th>
+              <th className="p-0 text-left">
+                <SortableHeader title="Tipe Unit" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
+              <th className="p-0 text-left">
+                <SortableHeader title="Warna" sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
+              <th className="p-0 text-left">
+                <SortableHeader title="No Mesin" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
+              <th className="p-0 text-left">
+                <SortableHeader title="No Rangka" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
+              <th className="p-0 text-left">
+                <SortableHeader title="Supplier" sortKey="supplier" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
+              <th className="p-0 text-left">
+                <SortableHeader title="Customer" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
+              <th className="p-0 text-left">
+                <SortableHeader title="Status" sortKey="status" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">

@@ -37,6 +37,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MoreVertical, Trash2, Pencil, Eye, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { UnitItem } from "@/types/sales"
 import { toast } from "sonner"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 
 interface Props {
     units: UnitItem[]
@@ -49,6 +51,10 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,
+    })
+
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data: units,
     })
 
     const handleDetail = (unitId: string) => {
@@ -71,31 +77,31 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
     const columns: ColumnDef<UnitItem>[] = [
         {
             id: "no",
-            header: () => <div className="text-center w-[50px]">No</div>,
+            header: () => <div className="text-center font-semibold text-foreground px-4">No</div>,
             cell: ({ row }) => (
-                <div className="text-center">
+                <div className="text-center px-4">
                     {row.index + 1 + pagination.pageIndex * pagination.pageSize}
                 </div>
             ),
         },
         {
             accessorKey: "color",
-            header: "WARNA",
-            cell: ({ row }) => row.original.color,
+            header: () => <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
+            cell: ({ row }) => <div className="px-4">{row.original.color}</div>,
         },
         {
             accessorKey: "engineNumber",
-            header: "NOMOR MESIN",
-            cell: ({ row }) => row.original.engineNumber,
+            header: () => <SortableHeader title="NOMOR MESIN" sortKey="engineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
+            cell: ({ row }) => <div className="px-4">{row.original.engineNumber}</div>,
         },
         {
             accessorKey: "chassisNumber",
-            header: "NOMOR RANGKA",
-            cell: ({ row }) => row.original.chassisNumber,
+            header: () => <SortableHeader title="NOMOR RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
+            cell: ({ row }) => <div className="px-4">{row.original.chassisNumber}</div>,
         },
         {
             id: "actions",
-            header: () => <div className="text-right">ACTION</div>,
+            header: () => <div className="text-right font-semibold text-foreground px-4">ACTION</div>,
             cell: ({ row }) => {
                 const unit = row.original
                 return (
@@ -131,7 +137,7 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
     ]
 
     const table = useReactTable({
-        data: units,
+        data: sortedData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -178,7 +184,7 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className="p-0">
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -199,7 +205,7 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
                                     className="hover:bg-muted/50"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="py-4 p-0">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()

@@ -45,15 +45,15 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-gray-200 bg-[#F9FAFB]">
+    <aside className="flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB]">
       {/* Company Selector */}
-      <div className="px-4 py-4 border-b border-gray-200">
+      <div className="flex h-16 shrink-0 items-center px-4 border-b border-gray-200">
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-2 text-left shadow-sm hover:bg-gray-50 transition-colors">
+            <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
               <div className="flex flex-col overflow-hidden">
                 <span className="text-[10px] uppercase font-semibold text-gray-400">Company</span>
-                <span className="font-medium text-gray-900 truncate">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>
+                <span className="font-medium text-gray-900 truncate uppercase">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>
               </div>
               <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isOpen && 'rotate-180')} />
             </button>
@@ -67,7 +67,7 @@ export function Sidebar() {
                   onClick={() => handleSelectCompany(company)}
                   className={cn('flex w-full items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-gray-100', String(company.id) === companyId && 'bg-gray-100')}
                 >
-                  <span>{company.name}</span>
+                  <span className="uppercase">{company.name}</span>
                   {String(company.id) === companyId && <Check className="h-4 w-4 text-primary" />}
                 </button>
               ))}

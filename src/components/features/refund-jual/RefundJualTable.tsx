@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react"
 import { RefundJual } from "@/@types/refund-jual.types"
-import { ArrowUpDown, Search } from "lucide-react"
+import { Search } from "lucide-react"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 import {
     Select,
     SelectContent,
@@ -18,7 +20,6 @@ export default function RefundJualTable({ data }: Props) {
     const [search, setSearch] = useState("")
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(25)
-    const [sortAsc, setSortAsc] = useState(true)
 
     const filtered = useMemo(() => {
         return data.filter(item =>
@@ -27,22 +28,11 @@ export default function RefundJualTable({ data }: Props) {
         )
     }, [data, search])
 
-    const sorted = useMemo(() => {
-        return [...filtered].sort((a, b) => {
-            const parseDate = (dateStr: string) => {
-                const [day, month, year] = dateStr.split("/")
-                return new Date(Number(year), Number(month) - 1, Number(day)).getTime()
-            }
-
-            const dateA = parseDate(a.tanggal)
-            const dateB = parseDate(b.tanggal)
-
-            if (sortAsc) {
-                return dateA - dateB
-            }
-            return dateB - dateA
-        })
-    }, [filtered, sortAsc])
+    const { sortedData: sorted, sortKey, sortOrder, handleSort } = useTableSort({
+        data: filtered,
+        defaultSortKey: 'tanggal',
+        defaultSortOrder: 'asc'
+    })
 
     const paginated = useMemo(() => {
         const start = (page - 1) * limit
@@ -96,21 +86,27 @@ export default function RefundJualTable({ data }: Props) {
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
                         <tr className="border-b border-gray-200">
-                            <th className="px-4 py-3 text-left">NO PENJUALAN</th>
-                            <th
-                                className="px-4 py-3 text-left cursor-pointer select-none group"
-                                onClick={() => setSortAsc(!sortAsc)}
-                            >
-                                <div className="flex items-center gap-1">
-                                    TANGGAL
-                                    <ArrowUpDown size={14} className="text-gray-400 group-hover:text-gray-600" />
-                                </div>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="NO PENJUALAN" sortKey="noPenjualan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
                             </th>
-                            <th className="px-4 py-3 text-left">NAMA CUSTOMER</th>
-                            <th className="px-4 py-3 text-right">TOTAL PENJUALAN</th>
-                            <th className="px-4 py-3 text-right">TOTAL REFUND</th>
-                            <th className="px-4 py-3 text-left">KAS KELUAR</th>
-                            <th className="px-4 py-3 text-left">KETERANGAN</th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="NAMA CUSTOMER" sortKey="namaCustomer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-right">
+                                <SortableHeader title="TOTAL PENJUALAN" sortKey="totalPenjualan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                            </th>
+                            <th className="py-2 text-right">
+                                <SortableHeader title="TOTAL REFUND" sortKey="totalRefund" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KAS KELUAR" sortKey="kasKeluar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KETERANGAN" sortKey="keterangan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">

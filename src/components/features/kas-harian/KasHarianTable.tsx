@@ -7,6 +7,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { MoreVertical } from "lucide-react"
 import { KasHarian } from "@/@types/kas-harian.types"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 
 interface Props {
     data: KasHarian[]
@@ -19,6 +21,10 @@ export default function KasHarianTable({
     onEdit,
     onDelete,
 }: Props) {
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data,
+    })
+
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 
@@ -26,20 +32,20 @@ export default function KasHarianTable({
 
                 <thead className="bg-gray-100 text-xs uppercase tracking-wide font-medium">
                     <tr>
-                        <th className="px-4 py-3 text-left">
-                            Tanggal
+                        <th className="px-4 py-2 text-left">
+                            <SortableHeader title="Tanggal" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start px-0 w-full" />
                         </th>
-                        <th className="px-4 py-3 text-left">
-                            Nota Reff
+                        <th className="px-4 py-2 text-left">
+                            <SortableHeader title="Nota Reff" sortKey="notaRef" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start px-0 w-full" />
                         </th>
-                        <th className="px-4 py-3 text-left">
-                            Keterangan
+                        <th className="px-4 py-2 text-left">
+                            <SortableHeader title="Keterangan" sortKey="keterangan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start px-0 w-full" />
                         </th>
-                        <th className="px-4 py-3 text-right">
-                            Debet
+                        <th className="px-4 py-2 text-right">
+                            <SortableHeader title="Debet" sortKey="debit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end px-0 w-full" />
                         </th>
-                        <th className="px-4 py-3 text-right">
-                            Kredit
+                        <th className="px-4 py-2 text-right">
+                            <SortableHeader title="Kredit" sortKey="kredit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end px-0 w-full" />
                         </th>
                         <th className="px-4 py-3 text-center w-[60px]">
                             Action
@@ -48,14 +54,14 @@ export default function KasHarianTable({
                 </thead>
 
                 <tbody>
-                    {data.length === 0 ? (
+                    {sortedData.length === 0 ? (
                         <tr>
                             <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                                 Belum ada data transaksi
                             </td>
                         </tr>
                     ) : (
-                        data.map((item) => (
+                        sortedData.map((item) => (
                             <tr
                                 key={item.id}
                                 className="border-b last:border-none hover:bg-gray-50 h-[48px]"

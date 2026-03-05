@@ -2,6 +2,8 @@ import { Transaction } from "@/@types/transaction.types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTableSort } from "@/hooks/useTableSort"
+import { SortableHeader } from "@/components/ui/sortable-header"
 
 interface Props {
     data: Transaction[]
@@ -26,17 +28,27 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
         )
     }
 
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data,
+    })
+
     return (
         <div className="rounded-xl border bg-white overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead className="bg-muted uppercase text-xs">
                         <tr>
-                            <th className="p-2 text-left font-bold text-black min-w-[100px]" rowSpan={2}>Tanggal</th>
-                            <th className="p-2 text-left font-bold text-black min-w-[150px]" rowSpan={2}>Transaksi</th>
+                            <th className="p-0 text-left font-bold text-black min-w-[100px]" rowSpan={2}>
+                                <SortableHeader title="Tanggal" sortKey="date" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-black justify-start w-full px-2" />
+                            </th>
+                            <th className="p-0 text-left font-bold text-black min-w-[150px]" rowSpan={2}>
+                                <SortableHeader title="Transaksi" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-black justify-start w-full px-2" />
+                            </th>
                             <th className="p-2 text-center font-bold text-black border-l border-r" colSpan={4}>BANK</th>
                             <th className="p-2 text-center font-bold text-black border-r" colSpan={2}>CASH</th>
-                            <th className="p-2 text-left font-bold text-black min-w-[150px]" rowSpan={2}>Keterangan</th>
+                            <th className="p-0 text-left font-bold text-black min-w-[150px]" rowSpan={2}>
+                                <SortableHeader title="Keterangan" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-black justify-start w-full px-2" />
+                            </th>
                             <th className="p-2 text-center font-bold text-black" rowSpan={2}>Action</th>
                         </tr>
                         <tr className="border-t">
@@ -52,7 +64,7 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((trx) => (
+                        {sortedData.map((trx) => (
                             <tr key={trx.id} className="border-t hover:bg-muted/50 transition-colors">
                                 <td className="p-2 whitespace-nowrap">{trx.date}</td>
                                 <td className="p-2 font-medium">{trx.name}</td>

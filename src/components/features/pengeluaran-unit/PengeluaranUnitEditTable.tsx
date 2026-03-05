@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { PengeluaranUnitDetail } from '@/@types/pengeluaran-unit.types';
 import DeletePengeluaranUnitDialog from './DeletePengeluaranUnitDialog';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
     data: PengeluaranUnitDetail[];
@@ -36,12 +38,16 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
         );
     }, [data, search]);
 
+    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+        data: filtered,
+    });
+
     const perPage = Number(itemsPerPage);
-    const totalItems = filtered.length;
+    const totalItems = sortedData.length;
     const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
     const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * perPage;
     const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + perPage, totalItems);
-    const paginated = filtered.slice(startIndex, startIndex + perPage);
+    const paginated = sortedData.slice(startIndex, startIndex + perPage);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -130,12 +136,24 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                             <th className="px-4 py-3 text-center w-[48px]">
                                 <Checkbox checked={paginated.length > 0 && paginated.every((d) => selected.includes(d.id))} onCheckedChange={() => toggleAll()} />
                             </th>
-                            <th className="px-4 py-3 text-left">NO</th>
-                            <th className="px-4 py-3 text-left">KODE JUAL</th>
-                            <th className="px-4 py-3 text-left">TIPE UNIT</th>
-                            <th className="px-4 py-3 text-left">WARNA</th>
-                            <th className="px-4 py-3 text-left">NO MESIN</th>
-                            <th className="px-4 py-3 text-left">NO RANGKA</th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="NO" sortKey="id" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="KODE JUAL" sortKey="kodeJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="TIPE UNIT" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="WARNA" sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="NO MESIN" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                            </th>
+                            <th className="py-2 text-left">
+                                <SortableHeader title="NO RANGKA" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                            </th>
                         </tr>
                     </thead>
 
