@@ -22,13 +22,7 @@ import { InvoiceItem } from "./invoice.types"
 import { MoreVertical } from "lucide-react"
 import { useTableSort } from "@/hooks/useTableSort"
 import { SortableHeader } from "@/components/ui/sortable-header"
-
-/**
- * Format angka dengan titik separator
- */
-function formatNumber(value: number): string {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-}
+import { formatCurrency } from "@/lib/utils/currency"
 
 /**
  * Invoice Item Table dengan Bulk Select dan Action - EXACT sesuai Figma
@@ -175,14 +169,14 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
                                 <TableCell className="font-medium text-center transition-all duration-200">{startIndex + i + 1}</TableCell>
                                 <TableCell className="font-medium transition-all duration-200">{item.unitType}</TableCell>
                                 <TableCell className="text-center transition-all duration-200">{item.qty}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.hargaJual)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{item.biayaBbn}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{item.biayaEkspedisi}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{item.biayaLain}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.hpp)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.dpp)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatNumber(item.ppn)}</TableCell>
-                                <TableCell className="text-right font-semibold transition-all duration-200">{formatNumber(item.jumlah)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.hargaJual)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.biayaBbn)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.biayaEkspedisi)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.biayaLain)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.hpp)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.dpp)}</TableCell>
+                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.ppn)}</TableCell>
+                                <TableCell className="text-right font-semibold transition-all duration-200">{formatCurrency(item.jumlah)}</TableCell>
 
                                 {/* Action Dropdown */}
                                 <TableCell className="text-center transition-all duration-200">

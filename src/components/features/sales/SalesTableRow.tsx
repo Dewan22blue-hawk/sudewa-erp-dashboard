@@ -13,18 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreVertical } from "lucide-react"
 import { SalesItem } from "./sales.data"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     item: SalesItem
     isSelected: boolean
     onToggle: (id: string) => void
-}
-
-/**
- * Format angka dengan titik separator (Indonesian format)
- */
-function formatNumber(value: number): string {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
 /**
@@ -83,23 +77,23 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
             </TableCell>
 
             {/* Total DPP */}
-            <TableCell className="text-right transition-all duration-200">
-                {formatNumber(item.totalDpp)}
+            <TableCell className="text-right py-4 transition-all duration-200">
+                {formatCurrency(item.totalDpp)}
             </TableCell>
 
             {/* Total PPN */}
-            <TableCell className="text-right transition-all duration-200">
-                {formatNumber(item.totalPpn)}
+            <TableCell className="text-right py-4 transition-all duration-200">
+                {formatCurrency(item.totalPpn)}
             </TableCell>
 
             {/* Total Jual */}
-            <TableCell className="text-right transition-all duration-200">
-                {formatNumber(item.totalJual)}
+            <TableCell className="text-right font-semibold py-4 transition-all duration-200">
+                {formatCurrency(item.totalJual)}
             </TableCell>
 
             {/* Kurang Bayar - MERAH */}
-            <TableCell className="text-right font-semibold text-red-600 transition-all duration-200">
-                {formatNumber(item.kurangBayar)}
+            <TableCell className="text-right text-red-600 font-semibold py-4 transition-all duration-200">
+                {formatCurrency(item.kurangBayar)}
             </TableCell>
 
             {/* Action Dropdown */}

@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card"
+import { formatCurrency } from "@/lib/utils/currency"
 
 export default function PembayaranHutangInfoCards({
     detail,
@@ -23,9 +24,9 @@ export default function PembayaranHutangInfoCards({
                 </h3>
 
                 <div className="text-sm space-y-2">
-                    <p>Total Beli: Rp {detail.totalBeli.toLocaleString()}</p>
-                    <p>Total Bayar: Rp {detail.totalBayar.toLocaleString()}</p>
-                    <p>Total Hutang: Rp {detail.totalHutang.toLocaleString()}</p>
+                    <p>Total Beli: {formatCurrency(detail.totalBeli)}</p>
+                    <p>Total Bayar: {formatCurrency(detail.totalBayar)}</p>
+                    <p>Total Hutang: {formatCurrency(detail.totalHutang)}</p>
                 </div>
 
                 <div className="mt-4">

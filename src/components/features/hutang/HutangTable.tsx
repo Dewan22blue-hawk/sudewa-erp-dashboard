@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface Props {
   data: Hutang[];
@@ -131,9 +132,9 @@ export default function HutangTable({ data }: Props) {
                   <td className="px-4 py-3 font-medium">{item.noPembelian}</td>
                   <td className="px-4 py-3">{item.tanggal}</td>
                   <td className="px-4 py-3">{item.namaSupplier}</td>
-                  <td className="px-4 py-3 text-right">Rp {item.totalBeli.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right">Rp {item.totalBayar.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-red-600 font-medium">Rp {item.amountHutang.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-right">{formatCurrency(item.totalBeli)}</td>
+                  <td className="px-4 py-3 text-right">{formatCurrency(item.totalBayar)}</td>
+                  <td className="px-4 py-3 text-right text-red-600 font-medium">{formatCurrency(item.amountHutang)}</td>
                   <td className="px-4 py-3 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

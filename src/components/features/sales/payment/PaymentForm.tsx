@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { MoneyInput } from "@/components/ui/money-input"
 import { Label } from "@/components/ui/label"
 import { Save } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -131,11 +132,11 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
                                     <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
                                         <FormLabel className="col-span-1">BCA</FormLabel>
                                         <FormControl>
-                                            <Input
+                                            <MoneyInput
                                                 className="col-span-2"
-                                                type="number"
                                                 {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
+                                                value={field.value || 0}
+                                                onChangeValue={field.onChange}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -150,11 +151,11 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
                                     <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
                                         <FormLabel className="col-span-1">BCA (USD)</FormLabel>
                                         <FormControl>
-                                            <Input
+                                            <MoneyInput
                                                 className="col-span-2"
-                                                type="number"
                                                 {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
+                                                value={field.value || 0}
+                                                onChangeValue={field.onChange}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -169,11 +170,11 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
                                     <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
                                         <FormLabel className="col-span-1">Cash</FormLabel>
                                         <FormControl>
-                                            <Input
+                                            <MoneyInput
                                                 className="col-span-2"
-                                                type="number"
                                                 {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
+                                                value={field.value || 0}
+                                                onChangeValue={field.onChange}
                                             />
                                         </FormControl>
                                         <FormMessage />

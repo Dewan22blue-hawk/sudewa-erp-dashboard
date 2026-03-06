@@ -34,3 +34,20 @@ export const getBrands = async (): Promise<UnitBrand[]> => {
   const list = Array.isArray((data as any).data) ? (data as any).data : [];
   return list.map(mapBrand);
 };
+
+export interface CreateBrandPayload {
+  name: string;
+  image?: File | null;
+  description?: string | null;
+}
+
+export const createBrand = async (payload: CreateBrandPayload): Promise<UnitBrand> => {
+  const body = new FormData();
+  body.append('name', payload.name);
+  if (payload.image) body.append('image', payload.image);
+  if (payload.description) body.append('description', payload.description);
+
+  const response = await apiClient.post<LaravelApiResponse<BrandApiModel>>(basePath, body);
+  const data = ensureSuccess(response.data);
+  return mapBrand(data as BrandApiModel);
+};

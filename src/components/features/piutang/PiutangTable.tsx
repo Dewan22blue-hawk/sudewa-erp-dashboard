@@ -7,8 +7,9 @@ import { useRouter } from 'next/router';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { formatCurrency } from "@/lib/utils/currency"
+import { useTableSort } from "@/hooks/useTableSort"
 
 interface Props {
   data: Piutang[];
@@ -133,9 +134,9 @@ export default function PiutangTable({ data }: Props) {
                   <td className="px-4 py-3 font-medium">{item.noPenjualan}</td>
                   <td className="px-4 py-3">{item.tanggal}</td>
                   <td className="px-4 py-3">{item.namaCustomer}</td>
-                  <td className="px-4 py-3 text-right">Rp {item.totalJual.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right">Rp {item.totalBayar.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-red-600 font-medium">Rp {item.amountPiutang.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-right">{formatCurrency(item.totalJual)}</td>
+                  <td className="px-4 py-3 text-right">{formatCurrency(item.totalBayar)}</td>
+                  <td className="px-4 py-3 text-right text-red-600 font-medium">{formatCurrency(item.amountPiutang)}</td>
                   <td className="px-4 py-3 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

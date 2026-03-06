@@ -2,20 +2,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText, DollarSign, ListChecks, Calendar, User } from 'lucide-react';
 import { SalesItem } from '../sales.data';
 import { Progress } from '@/components/ui/progress';
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
   data: SalesItem;
-}
-
-function formatMoney(amount: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })
-    .format(amount)
-    .replace('Rp', 'Rp ');
 }
 
 export function SalesDetailCards({ data }: Props) {
@@ -72,20 +62,20 @@ export function SalesDetailCards({ data }: Props) {
           <div className="space-y-3 pt-2 flex-1">
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total DPP</span>
-              <span className="font-medium">{formatMoney(data.totalDpp)}</span>
+              <span className="font-medium">{formatCurrency(data.totalDpp)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total PPN</span>
-              <span className="font-medium">{formatMoney(data.totalPpn)}</span>
+              <span className="font-medium">{formatCurrency(data.totalPpn)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Biaya Lainnya</span>
-              <span className="font-medium">{formatMoney(data.totalBiaya)}</span>
+              <span className="font-medium">{formatCurrency(data.totalBiaya)}</span>
             </div>
 
             <div className="pt-4 mt-auto border-t flex justify-between items-center">
               <span className="font-medium">Total Penjualan</span>
-              <span className="font-bold text-lg">{formatMoney(data.totalJual)}</span>
+              <span className="font-bold text-lg">{formatCurrency(data.totalJual)}</span>
             </div>
           </div>
         </CardContent>
@@ -104,17 +94,17 @@ export function SalesDetailCards({ data }: Props) {
           <div className="space-y-3 pt-2 flex-1">
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total Harga</span>
-              <span className="font-medium">{formatMoney(data.totalJual)}</span>
+              <span className="font-medium">{formatCurrency(data.totalJual)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total Bayar</span>
-              <span className="font-medium">{formatMoney(totalPaid)}</span>
+              <span className="font-medium">{formatCurrency(totalPaid)}</span>
             </div>
 
             <div className="pt-4 mt-auto border-t space-y-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Kurang Bayar</span>
-                <span className="font-bold text-lg text-red-500">{formatMoney(data.kurangBayar)}</span>
+                <span className="font-bold text-lg text-red-500">{formatCurrency(data.kurangBayar)}</span>
               </div>
 
               <div className="space-y-2">

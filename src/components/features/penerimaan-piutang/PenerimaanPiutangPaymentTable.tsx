@@ -10,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { formatCurrency } from "@/lib/utils/currency"
 
 export default function PenerimaanPiutangPaymentTable({
     payments,
@@ -109,7 +110,7 @@ export default function PenerimaanPiutangPaymentTable({
                                 <td className="px-4 py-3">{item.tanggalTerima}</td>
                                 <td className="px-4 py-3">{item.kasMasuk}</td>
                                 <td className="px-4 py-3 text-right">
-                                    Rp {item.jumlahTerima.toLocaleString()}
+                                    {formatCurrency(item.jumlahTerima)}
                                 </td>
                             </tr>
                         ))}
@@ -122,7 +123,7 @@ export default function PenerimaanPiutangPaymentTable({
                                 Sub Total
                             </td>
                             <td className="px-4 py-3 text-right text-gray-900">
-                                Rp {total.toLocaleString()}
+                                {formatCurrency(total)}
                             </td>
                         </tr>
                     </tfoot>

@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Save } from 'lucide-react';
@@ -22,7 +23,7 @@ interface EditUnitFormProps {
  * Edit Unit Form - EXACT sesuai Figma
  * Layout: Tipe Unit + Qty | Harga | Satuan (2 cols) | Biaya
  */
-export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, readOnly = false }: EditUnitFormProps) {
+export function EditUnitForm({ defaultValues, onSubmit = () => { }, onCancel, readOnly = false }: EditUnitFormProps) {
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
     defaultValues,
@@ -97,7 +98,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Harga</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -114,7 +115,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Value" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -128,7 +129,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Value" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -142,7 +143,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Value" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -159,7 +160,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
                 <FormControl>
-                  <Input type="number" className="bg-muted/50" disabled {...field} />
+                  <MoneyInput className="bg-muted/50" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,7 +174,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
                 <FormControl>
-                  <Input type="number" className="bg-muted/50" disabled {...field} />
+                  <MoneyInput className="bg-muted/50" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -187,7 +188,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
                 <FormControl>
-                  <Input type="number" className="bg-muted/50" disabled {...field} />
+                  <MoneyInput className="bg-muted/50" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -204,7 +205,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Rp 0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Rp 0" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -218,7 +219,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Rp 0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                  <MoneyInput placeholder="Rp 0" {...field} value={field.value || 0} onChangeValue={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -232,7 +233,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Rp 0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Rp 0" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

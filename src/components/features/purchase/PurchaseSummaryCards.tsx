@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     label: string
@@ -16,10 +17,10 @@ export default function PurchaseSummaryCard({
             <CardContent className="p-5">
                 <p className="text-sm text-muted-foreground">{label}</p>
                 <p
-                    className={`text-lg font-semibold mt-1 ${highlight ? "text-red-500" : ""
-                        }`}
+                    className={`text - lg font - semibold mt - 1 ${highlight ? "text-red-500" : ""
+                        } `}
                 >
-                    {value.toLocaleString("id-ID")}
+                    {formatCurrency(value)}
                 </p>
             </CardContent>
         </Card>

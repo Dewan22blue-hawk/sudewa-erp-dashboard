@@ -1,13 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { DollarSign } from "lucide-react"
 import { InvoicePayment } from "./invoice.types"
-
-/**
- * Format Rupiah dengan titik separator
- */
-function formatRupiah(value: number): string {
-    return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-}
+import { formatCurrency } from "@/lib/utils/currency"
 
 /**
  * Invoice Payment Summary - EXACT sesuai Figma
@@ -35,19 +29,19 @@ export function InvoicePaymentSummary({ data }: { data: InvoicePayment }) {
                 {/* Total DPP */}
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Total DPP</span>
-                    <span className="text-sm font-medium">{formatRupiah(data.totalDpp)}</span>
+                    <span className="text-sm font-medium">{formatCurrency(data.totalDpp)}</span>
                 </div>
 
                 {/* Total PPN */}
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Total PPN</span>
-                    <span className="text-sm font-medium">{formatRupiah(data.totalPpn)}</span>
+                    <span className="text-sm font-medium">{formatCurrency(data.totalPpn)}</span>
                 </div>
 
                 {/* Total Penjualan - Bold & larger */}
                 <div className="flex items-center justify-between border-t pt-4">
                     <span className="text-sm font-medium">Total Penjualan</span>
-                    <span className="text-base font-bold">{formatRupiah(data.totalPenjualan)}</span>
+                    <span className="text-base font-bold">{formatCurrency(data.totalPenjualan)}</span>
                 </div>
             </CardContent>
         </Card>

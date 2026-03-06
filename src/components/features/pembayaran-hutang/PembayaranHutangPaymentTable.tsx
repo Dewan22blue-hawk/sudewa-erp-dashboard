@@ -1,6 +1,7 @@
 import { PembayaranHutang } from "@/types/pembayaran-hutang.types"
 import { useTableSort } from "@/hooks/useTableSort"
 import { SortableHeader } from "@/components/ui/sortable-header"
+import { formatCurrency } from "@/lib/utils/currency"
 
 export default function PembayaranHutangPaymentTable({
     payments,
@@ -40,7 +41,7 @@ export default function PembayaranHutangPaymentTable({
                             <td className="px-4 py-3">{item.tanggal}</td>
                             <td className="px-4 py-3">{item.kasKeluar}</td>
                             <td className="px-4 py-3 text-right">
-                                Rp {item.jumlahBayar.toLocaleString()}
+                                {formatCurrency(item.jumlahBayar)}
                             </td>
                         </tr>
                     ))}
@@ -50,7 +51,7 @@ export default function PembayaranHutangPaymentTable({
                             Sub Total
                         </td>
                         <td className="px-4 py-3 text-right">
-                            Rp {payments.reduce((acc, cur) => acc + cur.jumlahBayar, 0).toLocaleString()}
+                            {formatCurrency(payments.reduce((acc, cur) => acc + cur.jumlahBayar, 0))}
                         </td>
                     </tr>
                 </tbody>

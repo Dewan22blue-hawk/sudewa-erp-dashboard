@@ -9,6 +9,7 @@ import { MoreVertical } from "lucide-react"
 import { KasHarian } from "@/@types/kas-harian.types"
 import { useTableSort } from "@/hooks/useTableSort"
 import { SortableHeader } from "@/components/ui/sortable-header"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: KasHarian[]
@@ -81,11 +82,11 @@ export default function KasHarianTable({
                                 </td>
 
                                 <td className="px-4 py-3 text-right text-green-600 font-medium">
-                                    {item.debit > 0 ? item.debit.toLocaleString("id-ID") : "0"}
+                                    {formatCurrency(item.debit)}
                                 </td>
 
                                 <td className="px-4 py-3 text-right text-red-600 font-medium">
-                                    {item.kredit > 0 ? item.kredit.toLocaleString("id-ID") : "0"}
+                                    {formatCurrency(item.kredit)}
                                 </td>
 
                                 <td className="px-4 py-3 text-center">

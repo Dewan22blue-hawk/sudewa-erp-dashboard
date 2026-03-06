@@ -36,7 +36,8 @@ export default function EditTypeUnitPage() {
     if (typeUnit) {
       form.reset({
         code: typeUnit.code ?? '',
-        brandId: typeUnit.brandId,
+        // brandId can come from either brandId or nested brand
+        brandId: typeUnit.brandId ?? typeUnit.brand?.id,
         name: typeUnit.name ?? '',
         unitType: typeUnit.unitType ?? '',
         unitModel: typeUnit.unitModel ?? '',

@@ -3,6 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 // useEffect removed - not used
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Save } from 'lucide-react';
@@ -124,7 +126,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               <FormItem>
                 <FormLabel className="text-sm font-medium">Harga</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -141,7 +143,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Value" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -155,7 +157,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Value" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -169,7 +171,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Value" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -182,21 +184,21 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
           <FormItem>
             <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
             <FormControl>
-              <Input value={`Rp ${totalHpp.toLocaleString('id-ID')}`} className="bg-muted/50" disabled readOnly />
+              <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
             </FormControl>
           </FormItem>
 
           <FormItem>
             <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
             <FormControl>
-              <Input value={`Rp ${totalDpp.toLocaleString('id-ID')}`} className="bg-muted/50" disabled readOnly />
+              <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
             </FormControl>
           </FormItem>
 
           <FormItem>
             <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
             <FormControl>
-              <Input value={`Rp ${totalPpn.toLocaleString('id-ID')}`} className="bg-muted/50" disabled readOnly />
+              <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
             </FormControl>
           </FormItem>
         </div>
@@ -206,21 +208,21 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
           <FormItem>
             <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
             <FormControl>
-              <Input value={`Rp ${hppSatuan.toLocaleString('id-ID')}`} className="bg-muted/50" disabled readOnly />
+              <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
             </FormControl>
           </FormItem>
 
           <FormItem>
             <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
             <FormControl>
-              <Input value={`Rp ${dppSatuan.toLocaleString('id-ID')}`} className="bg-muted/50" disabled readOnly />
+              <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
             </FormControl>
           </FormItem>
 
           <FormItem>
             <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
             <FormControl>
-              <Input value={`Rp ${ppnSatuan.toLocaleString('id-ID')}`} className="bg-muted/50" disabled readOnly />
+              <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
             </FormControl>
           </FormItem>
         </div>

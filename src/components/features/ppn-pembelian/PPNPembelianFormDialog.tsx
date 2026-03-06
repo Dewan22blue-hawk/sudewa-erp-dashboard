@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { MoneyInput } from "@/components/ui/money-input"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ppnPembelianSchema, PPNPembelianFormValues } from "@/scheme/ppn-pembelian.schema"
@@ -218,11 +219,11 @@ export default function PPNPembelianFormDialog({
                                 <FormItem>
                                     <FormLabel>Biaya</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="number"
+                                        <MoneyInput
                                             placeholder="Tambahkan Biaya"
                                             {...field}
-                                            onChange={e => field.onChange(Number(e.target.value))}
+                                            value={field.value || 0}
+                                            onChangeValue={field.onChange}
                                         />
                                     </FormControl>
                                     <FormMessage />

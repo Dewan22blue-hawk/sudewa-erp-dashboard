@@ -9,13 +9,11 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: HutangPayment[]
 }
-
-const formatRupiah = (value: number) =>
-    "Rp " + value.toLocaleString("id-ID")
 
 export default function HutangPaymentTable({
     data,
@@ -85,10 +83,10 @@ export default function HutangPaymentTable({
                                     {item.tanggal}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    {formatRupiah(item.kasKeluar)}
+                                    {formatCurrency(item.kasKeluar)}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    {formatRupiah(item.jumlahBayar)}
+                                    {formatCurrency(item.jumlahBayar)}
                                 </td>
                             </tr>
                         ))}
@@ -102,7 +100,7 @@ export default function HutangPaymentTable({
                                 Sub Total
                             </td>
                             <td className="px-4 py-4 text-right text-gray-900 text-base">
-                                {formatRupiah(subtotal)}
+                                {formatCurrency(subtotal)}
                             </td>
                         </tr>
                     </tbody>

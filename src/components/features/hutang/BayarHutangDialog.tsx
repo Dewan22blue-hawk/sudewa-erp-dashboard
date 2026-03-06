@@ -13,6 +13,7 @@ import {
 import { useBayarHutang } from "@/hooks/useHutang"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
+import { MoneyInput } from "@/components/ui/money-input"
 import { Button } from "@/components/ui/button"
 import {
     Select,
@@ -159,11 +160,11 @@ export default function BayarHutangDialog({
                                 <FormItem>
                                     <FormLabel>Jumlah Bayar</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="number"
+                                        <MoneyInput
                                             placeholder="Tambahkan nominal"
                                             {...field}
-                                            onChange={e => field.onChange(Number(e.target.value))}
+                                            value={field.value || 0}
+                                            onChangeValue={field.onChange}
                                         />
                                     </FormControl>
                                     <FormMessage />

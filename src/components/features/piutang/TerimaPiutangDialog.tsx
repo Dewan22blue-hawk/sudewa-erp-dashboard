@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { terimaPiutangSchema, TerimaPiutangFormValues } from '@/scheme/piutang.schema';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -101,7 +102,7 @@ export default function TerimaPiutangDialog({ open, onClose, onSubmit }: Props) 
                 <FormItem>
                   <FormLabel>Jumlah Terima</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Tambahkan nominal" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                    <MoneyInput placeholder="Tambahkan nominal" {...field} value={field.value || 0} onChangeValue={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

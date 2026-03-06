@@ -1,13 +1,11 @@
 import { Card } from "@/components/ui/card"
 import { CalendarDays, FileText, ListChecks, User } from "lucide-react" // Changed icon
 import { Hutang } from "@/@types/hutang.types"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: Hutang
 }
-
-const formatRupiah = (value: number) =>
-    "Rp " + value.toLocaleString("id-ID")
 
 export default function HutangDetailHeader({ data }: Props) {
     const percentPaid =
@@ -91,7 +89,7 @@ export default function HutangDetailHeader({ data }: Props) {
                             Total Beli
                         </span>
                         <span className="font-medium text-gray-900">
-                            {formatRupiah(data.totalBeli)}
+                            {formatCurrency(data.totalBeli)}
                         </span>
                     </div>
 
@@ -100,7 +98,7 @@ export default function HutangDetailHeader({ data }: Props) {
                             Total Bayar
                         </span>
                         <span className="font-medium text-gray-900">
-                            {formatRupiah(data.totalBayar)}
+                            {formatCurrency(data.totalBayar)}
                         </span>
                     </div>
 
@@ -109,7 +107,7 @@ export default function HutangDetailHeader({ data }: Props) {
                             Total Hutang
                         </span>
                         <span className="font-medium text-gray-900">
-                            {formatRupiah(data.amountHutang)}
+                            {formatCurrency(data.amountHutang)}
                         </span>
                     </div>
                 </div>
@@ -118,7 +116,7 @@ export default function HutangDetailHeader({ data }: Props) {
                     <div className="flex justify-between mb-3 text-sm items-center">
                         <span className="font-medium text-gray-900">Kurang Bayar</span>
                         <span className="text-red-500 font-semibold text-lg">
-                            {formatRupiah(data.amountHutang)}
+                            {formatCurrency(data.amountHutang)}
                         </span>
                     </div>
 

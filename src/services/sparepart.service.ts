@@ -10,6 +10,9 @@ interface SparepartApiModel {
   code: string;
   name: string;
   unit?: string;
+  unit_type?: string;
+  price?: number | string;
+  capacity?: number | string;
   purchase_price?: number | string;
   selling_price?: number | string;
   company_id?: number | string;
@@ -23,6 +26,8 @@ interface SparepartCategoryApiModel {
   id: number;
   uuid?: string;
   name: string;
+  code?: string;
+  description?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -30,6 +35,7 @@ interface SparepartCategoryApiModel {
 type SparepartListApiResponse = LaravelApiResponse<SparepartApiModel[] | LaravelPagination<SparepartApiModel>>;
 type SparepartItemApiResponse = LaravelApiResponse<SparepartApiModel>;
 type SparepartCategoryListApiResponse = LaravelApiResponse<SparepartCategoryApiModel[]>;
+type SparepartCategoryItemApiResponse = LaravelApiResponse<SparepartCategoryApiModel>;
 type DeleteResponse = LaravelApiResponse<null>;
 
 const sparepartBasePath = '/wapi/master-data/sparepart';
@@ -48,8 +54,10 @@ const mapCategory = (payload?: SparepartCategoryApiModel | null): SparepartCateg
 
 const mapSparepart = (payload: SparepartApiModel): Sparepart => {
   const category = mapCategory(payload.sparepart_category);
-  const purchasePrice = payload.purchase_price === undefined || payload.purchase_price === null ? 0 : Number(payload.purchase_price);
-  const sellingPrice = payload.selling_price === undefined || payload.selling_price === null ? 0 : Number(payload.selling_price);
+  const rawPurchase = payload.purchase_price;
+  const rawSelling = payload.selling_price ?? payload.price;
+  const price = payload.price ?? rawSelling ?? rawPurchase;
+  const capacity = payload.capacity;
 
   return {
     id: payload.id,
@@ -57,9 +65,11 @@ const mapSparepart = (payload: SparepartApiModel): Sparepart => {
     code: payload.code,
     name: payload.name,
     categoryId: payload.sparepart_category_id ?? category?.id ?? null,
-    unit: payload.unit ?? '',
-    purchasePrice,
-    sellingPrice,
+    unitType: payload.unit_type ?? payload.unit ?? '',
+    price: price === undefined || price === null ? 0 : Number(price),
+    purchasePrice: rawPurchase === undefined || rawPurchase === null ? (price ? Number(price) : 0) : Number(rawPurchase),
+    sellingPrice: rawSelling === undefined || rawSelling === null ? (price ? Number(price) : 0) : Number(rawSelling),
+    capacity: capacity === undefined || capacity === null ? 0 : Number(capacity),
     companyId: payload.company_id ?? null,
     createdAt: payload.created_at,
     updatedAt: payload.updated_at,
@@ -91,13 +101,23 @@ const buildPayload = (payload: SparepartPayload, opts?: { asUpdate?: boolean }) 
   body.append('code', payload.code);
   body.append('name', payload.name);
   body.append('sparepart_category_id', String(payload.categoryId));
-  body.append('unit', payload.unit);
-  body.append('purchase_price', String(payload.purchasePrice));
-  body.append('selling_price', String(payload.sellingPrice));
+  body.append('unit_type', payload.unitType);
+  const priceValue = payload.price ?? payload.sellingPrice ?? payload.purchasePrice ?? 0;
+  const capacityValue = payload.capacity ?? 0;
+  body.append('price', String(priceValue));
+  body.append('capacity', String(capacityValue));
+  if (payload.purchasePrice !== undefined) body.append('purchase_price', String(payload.purchasePrice));
+  if (payload.sellingPrice !== undefined) body.append('selling_price', String(payload.sellingPrice));
   if (payload.companyId) body.append('company_id', String(payload.companyId));
 
   return body;
 };
+
+interface SparepartCategoryPayload {
+  code: string;
+  name: string;
+  description?: string;
+}
 
 export const getSpareparts = async (companyId?: string | number): Promise<SparepartListResponse> => {
   const response = await apiClient.get<SparepartListApiResponse>(sparepartBasePath, {
@@ -123,6 +143,17 @@ export const getSparepartCategories = async (): Promise<SparepartCategory[]> => 
   return data.map(mapCategory).filter(Boolean) as SparepartCategory[];
 };
 
+export const createSparepartCategory = async (payload: SparepartCategoryPayload): Promise<SparepartCategory> => {
+  const body = new FormData();
+  body.append('code', payload.code);
+  body.append('name', payload.name);
+  if (payload.description) body.append('description', payload.description);
+
+  const response = await apiClient.post<SparepartCategoryItemApiResponse>(categoryBasePath, body);
+  const data = ensureSuccess(response.data);
+  return mapCategory(data) as SparepartCategory;
+};
+
 export const createSparepart = async (payload: SparepartPayload): Promise<Sparepart> => {
   const body = buildPayload(payload);
   const response = await apiClient.post<SparepartItemApiResponse>(sparepartBasePath, body);
@@ -137,8 +168,10 @@ export const updateSparepart = async (id: number | string, payload: SparepartPay
   return mapSparepart(data);
 };
 
-export const deleteSparepart = async (id: number | string): Promise<void> => {
-  const response = await apiClient.delete<DeleteResponse>(`${sparepartBasePath}/${id}`);
+export const deleteSparepart = async (id: number | string, companyId?: string | number): Promise<void> => {
+  const response = await apiClient.delete<DeleteResponse>(`${sparepartBasePath}/${id}`, {
+    params: companyId ? { company_id: companyId } : undefined,
+  });
   const payload = response.data;
   if (!payload.status) {
     throw new ApiResponseError(payload.message ?? 'Failed to delete sparepart');

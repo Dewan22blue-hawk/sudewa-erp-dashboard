@@ -1,14 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { CreditCard } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { formatCurrency } from "@/lib/utils/currency"
 import { InvoiceStatus } from "./invoice.types"
-
-/**
- * Format Rupiah dengan titik separator
- */
-function formatRupiah(value: number): string {
-    return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-}
 
 /**
  * Invoice Status Card - EXACT sesuai Figma
@@ -36,21 +31,19 @@ export function InvoiceStatusCard({ data }: { data: InvoiceStatus }) {
                 {/* Total Harga */}
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Total Harga</span>
-                    <span className="text-sm font-medium">{formatRupiah(data.totalHarga)}</span>
+                    <span className="text-xl font-bold">{formatCurrency(data.totalHarga)}</span>
                 </div>
 
                 {/* Total Bayar */}
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Total Bayar</span>
-                    <span className="text-sm font-medium">{formatRupiah(data.totalBayar)}</span>
+                    <span className="text-sm font-medium">{formatCurrency(data.totalBayar)}</span>
                 </div>
 
                 {/* Kurang Bayar - RED & Bold */}
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Kurang Bayar</span>
-                    <span className="text-base font-bold text-red-600">
-                        {formatRupiah(data.kurangBayar)}
-                    </span>
+                    {formatCurrency(data.kurangBayar)}
                 </div>
 
                 {/* Progress Bar */}

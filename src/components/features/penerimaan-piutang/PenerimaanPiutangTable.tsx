@@ -17,9 +17,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { useTableSort } from "@/hooks/useTableSort"
 import { SortableHeader } from "@/components/ui/sortable-header"
+import { formatCurrency } from "@/lib/utils/currency"
+import { useTableSort } from "@/hooks/useTableSort"
+import { Button } from "@/components/ui/button"
 
 interface Props {
     data: PenerimaanPiutang[]
@@ -150,7 +151,7 @@ export default function PenerimaanPiutangTable({ data }: Props) {
                                     <td className="px-4 py-3">{item.tanggalTerima}</td>
                                     <td className="px-4 py-3">{item.kasMasuk}</td>
                                     <td className="px-4 py-3 text-right">
-                                        Rp {item.jumlahTerima.toLocaleString()}
+                                        {formatCurrency(item.jumlahTerima)}
                                     </td>
                                     <td className="px-4 py-3 text-center">
                                         <DropdownMenu>

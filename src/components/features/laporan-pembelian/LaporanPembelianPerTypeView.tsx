@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: {
@@ -49,7 +50,7 @@ export default function LaporanPembelianPerTypeView({ data }: Props) {
                             <td className="py-2.5 px-4 text-gray-600">{item.type}</td>
                             <td className="py-2.5 px-4 text-gray-600 text-right">{item.qty}</td>
                             <td className="py-2.5 px-4 text-gray-600 text-right">
-                                Rp {item.total.toLocaleString()}
+                                {formatCurrency(item.total)}
                             </td>
                         </tr>
                     ))}

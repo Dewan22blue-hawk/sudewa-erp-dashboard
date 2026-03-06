@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MoreVertical, Plus, Upload } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface Props {
   data: Sparepart[];
@@ -23,7 +24,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
     defaultSortKey: 'code',
-    defaultSortOrder: 'asc'
+    defaultSortOrder: 'asc',
   });
 
   // Pagination logic
@@ -76,25 +77,25 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="KODE SPAREPART" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              <TableHead className="font-semibold uppercase text-slate-700 h-12 pl-4 w-[180px]">
+                <SortableHeader title="KODE SPAREPART" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="NAMA SPAREPART" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[250px]">
+                <SortableHeader title="NAMA SPAREPART" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="KATEGORI" sortKey="category.name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
+                <SortableHeader title="GRUP SPAREPART" sortKey="category.name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="SATUAN" sortKey="unit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[120px]">
+                <SortableHeader title="SATUAN" sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="HARGA BELI" sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
+                <SortableHeader title="HARGA BELI" sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="HARGA JUAL" sortKey="sellingPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
+              <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
+                <SortableHeader title="HARGA JUAL" sortKey="sellingPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700 pr-4">ACTION</TableHead>
+              <TableHead className="text-right font-semibold uppercase text-slate-700 h-12 pr-4 w-[100px]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -107,13 +108,13 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
             ) : (
               currentData.map((item) => (
                 <TableRow key={item.id} className="hover:bg-slate-50/50">
-                  <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
-                  <TableCell className="text-slate-700">{item.name}</TableCell>
-                  <TableCell className="text-slate-700">{item.category?.name || item.group || '-'}</TableCell>
-                  <TableCell className="text-slate-700">{item.unit}</TableCell>
-                  <TableCell className="text-slate-700">RP {item.purchasePrice.toLocaleString('id-ID')}</TableCell>
-                  <TableCell className="text-slate-700">RP {item.sellingPrice.toLocaleString('id-ID')}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="font-medium text-slate-800 uppercase pl-4 py-4">{item.code}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.name}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.category?.name || item.group || '-'}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.unitType}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{formatCurrency(item.purchasePrice ?? item.price)}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{formatCurrency(item.sellingPrice ?? item.price)}</TableCell>
+                  <TableCell className="text-right pr-4 py-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost" className="h-8 w-8">

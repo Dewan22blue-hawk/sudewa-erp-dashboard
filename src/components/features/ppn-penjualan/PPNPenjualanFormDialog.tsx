@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { MoneyInput } from "@/components/ui/money-input"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ppnPenjualanSchema, PPNPenjualanFormValues } from "@/scheme/ppn-penjualan.schema"
@@ -276,7 +277,7 @@ export default function PPNPenjualanFormDialog({
                                     <FormItem>
                                         <FormLabel>Harga Jual</FormLabel>
                                         <FormControl>
-                                            <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                                            <MoneyInput {...field} value={field.value || 0} onChangeValue={field.onChange} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -289,7 +290,7 @@ export default function PPNPenjualanFormDialog({
                                     <FormItem>
                                         <FormLabel>Biaya</FormLabel>
                                         <FormControl>
-                                            <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                                            <MoneyInput {...field} value={field.value || 0} onChangeValue={field.onChange} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

@@ -2,6 +2,7 @@ import { PenerimaanPiutangDetail } from "@/@types/penerimaan-piutang.types"
 import { CalendarDays, FileText, ListChecks, User, ChevronLeft } from "lucide-react"
 import { useRouter } from "next/router"
 import { Button } from "@/components/ui/button"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: PenerimaanPiutangDetail
@@ -82,21 +83,21 @@ export default function PenerimaanPiutangDetailHeader({ data }: Props) {
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500">Total Beli</span>
-                            <span className="font-medium text-gray-900">Rp {data.totalJual.toLocaleString()}</span>
+                            <span className="font-medium text-gray-900">{formatCurrency(data.totalJual)}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500">Total Bayar</span>
-                            <span className="font-medium text-gray-900">Rp {data.totalTerima.toLocaleString()}</span>
+                            <span className="font-medium text-gray-900">{formatCurrency(data.totalTerima)}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500">Total Hutang</span>
-                            <span className="font-medium text-gray-900">Rp {data.totalPiutang.toLocaleString()}</span>
+                            <span className="font-medium text-gray-900">{formatCurrency(data.totalPiutang)}</span>
                         </div>
 
                         <div className="pt-4 mt-4 border-t border-gray-50">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="font-medium text-gray-900">Kurang Bayar</span>
-                                <span className="font-bold text-red-500">Rp {data.totalPiutang.toLocaleString()}</span>
+                                <span className="font-bold text-red-500">{formatCurrency(data.totalPiutang)}</span>
                             </div>
 
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">

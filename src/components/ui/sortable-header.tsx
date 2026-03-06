@@ -27,17 +27,17 @@ export function SortableHeader({
             variant="ghost"
             onClick={() => onSort(sortKey)}
             className={cn(
-                '-ml-4 h-8 data-[state=open]:bg-accent hover:bg-slate-200/50 uppercase font-semibold text-slate-700',
+                'px-0 hover:bg-transparent font-semibold uppercase text-slate-700 flex items-center gap-1',
                 className
             )}
         >
             <span>{title}</span>
             {isActive && sortOrder === 'asc' ? (
-                <ArrowUp className="ml-2 h-4 w-4 text-emerald-600" />
+                <ArrowUp className="h-4 w-4 text-emerald-600" />
             ) : isActive && sortOrder === 'desc' ? (
-                <ArrowDown className="ml-2 h-4 w-4 text-emerald-600" />
+                <ArrowDown className="h-4 w-4 text-emerald-600" />
             ) : (
-                <ArrowUpDown className="ml-2 h-4 w-4 opacity-50 text-slate-400" />
+                <ArrowUpDown className="h-4 w-4 opacity-50 text-slate-400" />
             )}
         </Button>
     );

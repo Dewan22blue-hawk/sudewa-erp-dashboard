@@ -2,6 +2,7 @@ import { PPNPembelian } from "@/@types/ppn-pembelian.types"
 import { MoreVertical } from "lucide-react"
 import { useTableSort } from "@/hooks/useTableSort"
 import { SortableHeader } from "@/components/ui/sortable-header"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: PPNPembelian[]
@@ -86,12 +87,12 @@ export default function PPNPembelianTable({
                             <td className="px-4 py-3">{item.tipeUnit}</td>
                             <td className="px-4 py-3">{item.noMesin}</td>
                             <td className="px-4 py-3">{item.noRangka}</td>
-                            <td className="px-4 py-3 text-right">Rp {item.hargaBeli}</td>
-                            <td className="px-4 py-3 text-right">Rp {item.biaya}</td>
-                            <td className="px-4 py-3 text-right">Rp {item.hargaUnit}</td>
-                            <td className="px-4 py-3 text-right">Rp {item.dppBeli}</td>
-                            <td className="px-4 py-3 text-right">Rp {item.ppn}</td>
-                            <td className="px-4 py-3 text-right">Rp {item.paymentBeli}</td>
+                            <td className="px-4 py-3 text-right">{formatCurrency(item.hargaBeli)}</td>
+                            <td className="px-4 py-3 text-right">{formatCurrency(item.biaya)}</td>
+                            <td className="px-4 py-3 text-right">{formatCurrency(item.hargaUnit)}</td>
+                            <td className="px-4 py-3 text-right">{formatCurrency(item.dppBeli)}</td>
+                            <td className="px-4 py-3 text-right">{formatCurrency(item.ppn)}</td>
+                            <td className="px-4 py-3 text-right">{formatCurrency(item.paymentBeli)}</td>
                             <td className="px-4 py-3 text-center">
                                 <div className="relative group">
                                     <MoreVertical size={18} className="cursor-pointer" />

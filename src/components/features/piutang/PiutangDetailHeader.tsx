@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Piutang } from '@/@types/piutang.types';
 import { CalendarDays, FileText, ListChecks, User, ChevronLeft } from 'lucide-react';
-// Link removed - not used
 import { useRouter } from 'next/router';
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
   data: Piutang;
@@ -86,11 +86,11 @@ export default function PiutangDetailHeader({ data, onTerima }: Props) {
           <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total Beli</span>
-              <span className="font-medium text-gray-900">Rp {data.totalJual.toLocaleString()}</span>
+              <span className="font-medium text-gray-900">{formatCurrency(data.totalJual)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total Bayar</span>
-              <span className="font-medium text-gray-900">Rp {data.totalBayar.toLocaleString()}</span>
+              <span className="font-medium text-gray-900">{formatCurrency(data.totalBayar)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total Hutang</span>
@@ -100,7 +100,7 @@ export default function PiutangDetailHeader({ data, onTerima }: Props) {
             <div className="pt-4 mt-4 border-t border-gray-50">
               <div className="flex justify-between items-center mb-2">
                 <span className="font-medium text-gray-900">Kurang Bayar</span>
-                <span className="font-bold text-red-500">Rp {data.amountPiutang.toLocaleString()}</span>
+                <span className="font-bold text-red-500">{formatCurrency(data.amountPiutang)}</span>
               </div>
 
               <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">

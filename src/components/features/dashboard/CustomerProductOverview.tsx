@@ -1,7 +1,7 @@
 import { CustomerOverview, ProductOverview } from '@/@types/dashboard';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatMoney } from '@/lib/utils/format';
+import { formatCurrency, formatCurrencyCompact } from '@/lib/utils/currency';
 import { ArrowUpDown } from 'lucide-react';
 import { useState } from 'react';
 
@@ -64,8 +64,8 @@ export function CustomerOverviewCard({ data, isLoading }: CustomerOverviewCardPr
         <StatItem label="Jumlah Customer" value={data.totalCustomers.toString()} />
         <StatItem
           label="Total Pendapatan"
-          value={formatMoney(data.totalRevenue.idr, 'IDR')}
-          value2={`$ ${data.totalRevenue.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          value={formatCurrencyCompact(data.totalRevenue.idr, 'IDR')}
+          value2={formatCurrencyCompact(data.totalRevenue.usd, 'USD')}
         />
         <StatItem label="Rata-rata pendapatan dari customer" value={data.averageRevenue.toString()} />
       </div>
@@ -90,7 +90,7 @@ export function CustomerOverviewCard({ data, isLoading }: CustomerOverviewCardPr
             {sortedCustomers.map((customer, idx) => (
               <TableRow key={`${customer.name}-${idx}`} className="border-b border-slate-50 last:border-none hover:bg-slate-50/50">
                 <TableCell className="py-[14px] text-[13px] font-medium text-slate-800">{customer.name}</TableCell>
-                <TableCell className="py-[14px] text-right text-[13px] text-slate-700">{formatMoney(customer.revenue, 'IDR')}</TableCell>
+                <TableCell className="py-[14px] text-right text-[13px] text-slate-700">{formatCurrency(customer.revenue, 'IDR')}</TableCell>
               </TableRow>
             ))}
           </TableBody>

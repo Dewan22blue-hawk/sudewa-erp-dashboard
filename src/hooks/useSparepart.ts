@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createSparepart, deleteSparepart, getSparepartCategories, getSpareparts, importSparepart, updateSparepart } from '@/services/sparepart.service';
+import { createSparepart, createSparepartCategory, deleteSparepart, getSparepartCategories, getSpareparts, importSparepart, updateSparepart } from '@/services/sparepart.service';
 import type { SparepartPayload } from '@/@types/sparepart.types';
 
 export function useSpareparts(companyId?: string | number) {
@@ -14,6 +14,14 @@ export function useSparepartCategories() {
   return useQuery({
     queryKey: ['sparepart-categories'],
     queryFn: getSparepartCategories,
+  });
+}
+
+export function useCreateSparepartCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createSparepartCategory,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['sparepart-categories'] }),
   });
 }
 
@@ -36,7 +44,7 @@ export function useUpdateSparepart(companyId?: string | number) {
 export function useDeleteSparepart(companyId?: string | number) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number | string) => deleteSparepart(id),
+    mutationFn: (id: number | string) => deleteSparepart(id, companyId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['spareparts', companyId] }),
   });
 }

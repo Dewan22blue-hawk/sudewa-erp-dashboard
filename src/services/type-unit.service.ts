@@ -57,7 +57,8 @@ const mapBrand = (brand?: TypeUnitApiModel['brand']): UnitBrand | null => {
 const mapTypeUnit = (payload: TypeUnitApiModel): TypeUnit => ({
   id: payload.id,
   uuid: payload.uuid,
-  brandId: payload.brand_id,
+  // Some endpoints only return the nested brand without brand_id; fallback to brand.id so the form can prefill correctly
+  brandId: payload.brand_id ?? payload.brand?.id ?? 0,
   code: payload.code,
   name: payload.name,
   capacity: payload.capacity ?? null,

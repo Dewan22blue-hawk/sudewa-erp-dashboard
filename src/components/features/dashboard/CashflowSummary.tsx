@@ -1,7 +1,7 @@
 import { CashflowSummary as CashflowSummaryType } from '@/@types/dashboard';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { formatMoney } from '@/lib/utils/format';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface CashflowSummaryProps {
   data?: CashflowSummaryType;
@@ -20,9 +20,7 @@ function SummaryTable({ title, rows }: { title: string; rows: CashflowSummaryTyp
           <TableBody>
             {rows.map((row, idx) => {
               // Menyesuaikan format sesuai yang di mock untuk USD (dengan decimal .00)
-              const formattedValue = row.currency === 'USD'
-                ? `$ ${(row.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                : formatMoney(row.amount, row.currency);
+              const formattedValue = formatCurrency(row.amount, row.currency as 'IDR' | 'USD');
 
               return (
                 <TableRow key={`${row.account}-${idx}`} className="border-b border-slate-50 hover:bg-slate-50/50 last:border-none">

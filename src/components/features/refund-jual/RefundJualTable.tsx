@@ -11,6 +11,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: RefundJual[]
@@ -116,10 +117,10 @@ export default function RefundJualTable({ data }: Props) {
                                 <td className="px-4 py-3">{item.tanggal}</td>
                                 <td className="px-4 py-3">{item.namaCustomer}</td>
                                 <td className="px-4 py-3 text-right">
-                                    Rp {item.totalPenjualan.toLocaleString()}
+                                    {formatCurrency(item.totalPenjualan)}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    Rp {item.totalRefund.toLocaleString()}
+                                    {formatCurrency(item.totalRefund)}
                                 </td>
                                 <td className="px-4 py-3">{item.kasKeluar}</td>
                                 <td className="px-4 py-3 text-gray-500">{item.keterangan}</td>

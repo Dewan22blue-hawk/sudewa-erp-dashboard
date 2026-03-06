@@ -14,9 +14,11 @@ export interface Sparepart {
   code: string;
   name: string;
   categoryId: number | null;
-  unit: string;
+  unitType: string;
+  price: number; // primary price field (maps to selling price when available)
   purchasePrice: number;
   sellingPrice: number;
+  capacity: number;
   companyId?: number | string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -29,9 +31,11 @@ export interface SparepartPayload {
   code: string;
   name: string;
   categoryId: number;
-  unit: string;
-  purchasePrice: number;
-  sellingPrice: number;
+  unitType: string;
+  price: number;
+  capacity: number;
+  purchasePrice?: number;
+  sellingPrice?: number;
   companyId?: string | number;
 }
 

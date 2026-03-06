@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { transactionSchema, TransactionFormValues } from '@/scheme/transaction.schema';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -77,7 +78,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
-                      <Input type="number" className="pl-7" placeholder="0" {...field} disabled={isBusy} />
+                      <MoneyInput className="pl-7" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -93,7 +94,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
-                      <Input type="number" className="pl-7" placeholder="0" {...field} disabled={isBusy} />
+                      <MoneyInput className="pl-7" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -111,7 +112,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -127,7 +128,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -150,7 +151,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -166,7 +167,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <Input type="number" className="pl-9" placeholder="0" {...field} disabled={isBusy} />
+                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />

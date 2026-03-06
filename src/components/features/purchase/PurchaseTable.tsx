@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
   data: Purchase[];
@@ -157,11 +158,11 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
                   </TableCell>
                   <TableCell className="text-slate-700">{format(new Date(item.date), 'dd/MM/yyyy')}</TableCell>
                   <TableCell className="text-slate-700">{item.supplierName}</TableCell>
-                  <TableCell className="text-slate-700">{Number(item.totalBiaya).toLocaleString('id-ID')}</TableCell>
-                  <TableCell className="text-slate-700">{Number(item.totalDpp).toLocaleString('id-ID')}</TableCell>
-                  <TableCell className="text-slate-700">{Number(item.totalPpn).toLocaleString('id-ID')}</TableCell>
-                  <TableCell className="font-semibold text-slate-800">{Number(item.totalPurchase).toLocaleString('id-ID')}</TableCell>
-                  <TableCell className="text-red-500 font-semibold">{Number(item.remainingPayment).toLocaleString('id-ID')}</TableCell>
+                  <TableCell className="text-slate-700">{formatCurrency(Number(item.totalBiaya))}</TableCell>
+                  <TableCell className="text-slate-700">{formatCurrency(Number(item.totalDpp))}</TableCell>
+                  <TableCell className="text-slate-700">{formatCurrency(Number(item.totalPpn))}</TableCell>
+                  <TableCell className="font-semibold text-slate-800">{formatCurrency(Number(item.totalPurchase))}</TableCell>
+                  <TableCell className="text-red-500 font-semibold">{formatCurrency(Number(item.remainingPayment))}</TableCell>
 
                   <TableCell className="text-right">
                     <DropdownMenu>

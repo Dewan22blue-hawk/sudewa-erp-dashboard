@@ -10,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { formatCurrency } from "@/lib/utils/currency"
 
 interface Props {
     data: PembayaranHutang[]
@@ -107,9 +108,7 @@ export default function PembayaranHutangListTable({ data }: Props) {
                                 <td className="px-4 py-3 font-medium">{item.kodeBayar}</td>
                                 <td className="px-4 py-3">{item.tanggal}</td>
                                 <td className="px-4 py-3">{item.kasKeluar}</td>
-                                <td className="px-4 py-3 text-right">
-                                    Rp {item.jumlahBayar.toLocaleString()}
-                                </td>
+                                {formatCurrency(item.jumlahBayar)}
                             </tr>
                         ))}
                     </tbody>
@@ -120,9 +119,7 @@ export default function PembayaranHutangListTable({ data }: Props) {
                             <td className="px-4 py-3 text-left text-gray-900">
                                 Sub Total
                             </td>
-                            <td className="px-4 py-3 text-right text-gray-900">
-                                Rp {total.toLocaleString()}
-                            </td>
+                            {formatCurrency(total)}
                         </tr>
                     </tfoot>
                 </table>

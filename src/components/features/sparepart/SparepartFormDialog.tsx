@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import { MoneyInput } from '@/components/ui/money-input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { sparepartSchema, SparepartFormValues } from '@/scheme/sparepart.schema';
 import { Sparepart } from '@/@types/sparepart.types';
 import { useCreateSparepart, useSparepartCategories, useUpdateSparepart } from '@/hooks/useSparepart';
 import { toast } from 'sonner';
+import { CreateSparepartCategoryDialog } from './CreateSparepartCategoryDialog';
 
 interface Props {
   open: boolean;
@@ -19,62 +21,88 @@ interface Props {
   companyId: string;
 }
 
+const defaultSparepartValues: SparepartFormValues = {
+  code: '',
+  name: '',
+  categoryId: 0,
+  unitType: '',
+  purchasePrice: 0,
+  sellingPrice: 0,
+  capacity: 0,
+};
+
 export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }: Props) {
   const isEdit = Boolean(sparepart);
 
   const createMutation = useCreateSparepart(companyId);
   const updateMutation = useUpdateSparepart(companyId);
   const { data: categories, isLoading: loadingCategories } = useSparepartCategories();
+  const [openCreateGroup, setOpenCreateGroup] = useState(false);
 
   const {
-    register,
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors, isSubmitting },
-    watch,
   } = useForm<SparepartFormValues>({
     resolver: zodResolver(sparepartSchema),
-    defaultValues: {
-      code: '',
-      name: '',
-      categoryId: 0,
-      unit: '',
-      purchasePrice: 0,
-      sellingPrice: 0,
-    },
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+    defaultValues: defaultSparepartValues,
   });
 
   useEffect(() => {
+    if (!open) {
+      reset(defaultSparepartValues);
+      return;
+    }
+
     if (sparepart) {
       reset({
-        code: sparepart.code,
-        name: sparepart.name,
+        code: sparepart.code || '',
+        name: sparepart.name || '',
         categoryId: sparepart.categoryId ?? sparepart.category?.id ?? 0,
-        unit: sparepart.unit,
-        purchasePrice: sparepart.purchasePrice,
-        sellingPrice: sparepart.sellingPrice,
+        unitType: sparepart.unitType ? sparepart.unitType.toLowerCase() : '',
+        purchasePrice: sparepart.purchasePrice ?? sparepart.price ?? 0,
+        sellingPrice: sparepart.sellingPrice ?? sparepart.price ?? 0,
+        capacity: sparepart.capacity ?? 0,
       });
     } else {
-      reset({
-        code: '',
-        name: '',
-        categoryId: 0,
-        unit: '',
-        purchasePrice: 0,
-        sellingPrice: 0,
-      });
+      reset(defaultSparepartValues);
     }
-  }, [sparepart, reset]);
+  }, [open, sparepart, reset]);
 
-  const selectedCategoryId = watch('categoryId');
-  const selectedUnit = watch('unit');
+  const handleClose = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      reset(
+        sparepart
+          ? {
+              code: sparepart.code || '',
+              name: sparepart.name || '',
+              categoryId: sparepart.categoryId ?? sparepart.category?.id ?? 0,
+              unitType: sparepart.unitType ? sparepart.unitType.toLowerCase() : '',
+              purchasePrice: sparepart.purchasePrice ?? sparepart.price ?? 0,
+              sellingPrice: sparepart.sellingPrice ?? sparepart.price ?? 0,
+              capacity: sparepart.capacity ?? 0,
+            }
+          : defaultSparepartValues,
+      );
+    }
+    onOpenChange(nextOpen);
+  };
 
   const onSubmit = async (values: SparepartFormValues) => {
     try {
       const payload = {
-        ...values,
+        code: values.code,
+        name: values.name,
         categoryId: Number(values.categoryId),
+        unitType: values.unitType,
+        price: values.sellingPrice || values.purchasePrice,
+        capacity: values.capacity ?? 0,
+        purchasePrice: values.purchasePrice,
+        sellingPrice: values.sellingPrice,
         companyId,
       };
 
@@ -91,86 +119,114 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
 
       onOpenChange(false);
       reset();
-    } catch {
-      toast.error('Terjadi kesalahan');
+    } catch (err: any) {
+      const message = err?.response?.data?.message || err?.message || 'Terjadi kesalahan';
+      toast.error(message);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Ubah Data SparePart' : 'Tambah Data SparePart'}</DialogTitle>
-          <DialogDescription>Masukkan detail sparepart baru</DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isEdit ? 'Ubah Data SparePart' : 'Tambah Data Sparepart'}</DialogTitle>
+            <DialogDescription>Masukkan detail sparepart baru</DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-bold mb-1">Kode Part</label>
-            <Input placeholder="Tambahkan kode" {...register('code')} />
-            {errors.code && <p className="text-xs text-destructive mt-1">{errors.code.message}</p>}
-          </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold mb-1">Kode Part</label>
+              <Controller control={control} name="code" render={({ field }) => <Input placeholder="Tambahkan kode" value={field.value ?? ''} onChange={field.onChange} />} />
+              {errors.code && <p className="text-xs text-destructive mt-1">{errors.code.message}</p>}
+            </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">Nama Part</label>
-            <Input placeholder="Tambahkan nama" {...register('name')} />
-            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
-          </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Nama Part</label>
+              <Controller control={control} name="name" render={({ field }) => <Input placeholder="Tambahkan nama" value={field.value ?? ''} onChange={field.onChange} />} />
+              {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
+            </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">Kategori</label>
-            <Select onValueChange={(value) => setValue('categoryId', Number(value))} value={selectedCategoryId ? String(selectedCategoryId) : ''} disabled={loadingCategories}>
-              <SelectTrigger>
-                <SelectValue placeholder={loadingCategories ? 'Memuat kategori...' : 'Pilih kategori'} />
-              </SelectTrigger>
-              <SelectContent>
-                {(categories ?? []).map((category) => (
-                  <SelectItem key={category.id} value={String(category.id)}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.categoryId && <p className="text-xs text-destructive mt-1">{errors.categoryId.message}</p>}
-          </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Grup</label>
+              <Controller
+                control={control}
+                name="categoryId"
+                render={({ field }) => (
+                  <div className="flex gap-2">
+                    <Select value={field.value ? String(field.value) : ''} onValueChange={(value) => field.onChange(Number(value))} disabled={loadingCategories}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder={loadingCategories ? 'Memuat grup...' : 'Pilih grup'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(categories ?? []).map((category) => (
+                          <SelectItem key={category.id} value={String(category.id)}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenCreateGroup(true)}>
+                      +
+                    </Button>
+                  </div>
+                )}
+              />
+              {errors.categoryId && <p className="text-xs text-destructive mt-1">{errors.categoryId.message}</p>}
+            </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">Satuan</label>
-            <Select onValueChange={(value) => setValue('unit', value)} value={selectedUnit || ''}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih Satuan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Pcs">Pcs</SelectItem>
-                <SelectItem value="Set">Set</SelectItem>
-                <SelectItem value="Box">Box</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.unit && <p className="text-xs text-destructive mt-1">{errors.unit.message}</p>}
-          </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Satuan</label>
+              <Controller
+                control={control}
+                name="unitType"
+                render={({ field }) => (
+                  <Select value={field.value || ''} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih Satuan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pcs">Pcs</SelectItem>
+                      <SelectItem value="set">Set</SelectItem>
+                      <SelectItem value="box">Box</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.unitType && <p className="text-xs text-destructive mt-1">{errors.unitType.message}</p>}
+            </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">Harga Beli</label>
-            <Input type="number" placeholder="Tambahkan harga beli" {...register('purchasePrice')} />
-            {errors.purchasePrice && <p className="text-xs text-destructive mt-1">{errors.purchasePrice.message}</p>}
-          </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Harga Beli</label>
+              <Controller control={control} name="purchasePrice" render={({ field: { onChange, value, ...rest } }) => <MoneyInput placeholder="Tambahkan harga beli" {...rest} value={value || 0} onChangeValue={onChange} />} />
+              {errors.purchasePrice && <p className="text-xs text-destructive mt-1">{errors.purchasePrice.message}</p>}
+            </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">Harga Jual</label>
-            <Input type="number" placeholder="Tambahkan harga" {...register('sellingPrice')} />
-            {errors.sellingPrice && <p className="text-xs text-destructive mt-1">{errors.sellingPrice.message}</p>}
-          </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Harga Jual</label>
+              <Controller control={control} name="sellingPrice" render={({ field: { onChange, value, ...rest } }) => <MoneyInput placeholder="Tambahkan harga jual" {...rest} value={value || 0} onChangeValue={onChange} />} />
+              {errors.sellingPrice && <p className="text-xs text-destructive mt-1">{errors.sellingPrice.message}</p>}
+            </div>
 
-          <div className="space-y-2 pt-2">
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              Simpan
-            </Button>
-            <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
-              Batal
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="space-y-2 pt-2">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                Simpan
+              </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
+                Batal
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <CreateSparepartCategoryDialog
+        open={openCreateGroup}
+        onOpenChange={setOpenCreateGroup}
+        onCreated={(id) => {
+          setValue('categoryId', id, { shouldValidate: true, shouldDirty: true });
+        }}
+      />
+    </>
   );
 }
