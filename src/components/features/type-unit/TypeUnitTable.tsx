@@ -8,6 +8,7 @@ import type { PaginationMeta } from '@/@types/pagination.types';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface TypeUnitTableProps {
   typeUnits: TypeUnit[];
@@ -123,8 +124,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
                   <TableCell className="text-slate-700">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="font-medium text-slate-800">{item.name}</TableCell>
-                  <TableCell className="text-slate-700">{(item as any).purchasePrice ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{(item as any).salePrice ?? '-'}</TableCell>
+                  <TableCell className="text-slate-700">{(item as any).purchasePrice ? formatCurrency(Number((item as any).purchasePrice)) : '-'}</TableCell>
+                  <TableCell className="text-slate-700">{(item as any).salePrice ? formatCurrency(Number((item as any).salePrice)) : '-'}</TableCell>
                   {/* <TableCell className="text-slate-700">{item.unitType || '-'}</TableCell> */}
                   <TableCell className="text-slate-700">{item.unitModel || '-'}</TableCell>
                   <TableCell className="text-slate-700">{item.brutoWeight ?? '-'}</TableCell>
