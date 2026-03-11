@@ -12,17 +12,17 @@ export const ppnPenjualanSchema = z.object({
   tanggalFPK: z.date({ required_error: 'Tanggal FPK wajib diisi' }),
   masaNSFPK: z.date({ required_error: 'Masa NSFPK wajib diisi' }),
   nsfpkKeluaran: z.string().min(1, 'NSFPK Keluaran wajib diisi'),
-  biaya: z.preprocess(toOptionalNumber, z.number().optional()),
+  biaya: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
   // Other fields can be optional or have defaults
-  qty: z.preprocess(toOptionalNumber, z.number().optional()),
+  qty: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
   tipeUnit: z.string().min(1, 'Tipe Unit wajib diisi'),
   noMesin: z.string().min(1, 'No Mesin wajib diisi'),
   noRangka: z.string().min(1, 'No Rangka wajib diisi'),
-  hargaJual: z.preprocess(toOptionalNumber, z.number().optional()),
-  hargaUnit: z.preprocess(toOptionalNumber, z.number().optional()),
-  dppJual: z.preprocess(toOptionalNumber, z.number().optional()),
-  ppn: z.preprocess(toOptionalNumber, z.number().optional()),
-  paymentJual: z.preprocess(toOptionalNumber, z.number().optional()),
+  hargaJual: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
+  hargaUnit: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
+  dppJual: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
+  ppn: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
+  paymentJual: z.preprocess((val) => toOptionalNumber(val) as any, z.number().optional()),
 });
 
 export type PPNPenjualanFormValues = z.infer<typeof ppnPenjualanSchema>;

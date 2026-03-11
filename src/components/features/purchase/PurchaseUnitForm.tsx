@@ -33,9 +33,10 @@ interface Props {
   readOnly?: boolean;
   loading?: boolean;
   onCancel?: () => void;
+  companyId?: string | null;
 }
 
-export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel }: Props) {
+export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel, companyId }: Props) {
   const queryClient = useQueryClient();
   const { data: typeUnitData, isFetching: typeUnitLoading } = useTypeUnits();
   const { data: brandsData } = useBrands();

@@ -28,21 +28,21 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
   const updateMutation = useUpdatePPNPenjualan();
 
   const form = useForm<PPNPenjualanFormValues>({
-    resolver: zodResolver(ppnPenjualanSchema),
+    resolver: zodResolver(ppnPenjualanSchema) as any,
     defaultValues: {
       kodeJual: 'Generated XX',
       customer: '',
       nsfpkKeluaran: '',
-      biaya: undefined,
-      qty: undefined,
+      biaya: 0,
+      qty: 0,
       tipeUnit: '',
       noMesin: '',
       noRangka: '',
-      hargaJual: undefined,
-      hargaUnit: undefined,
-      dppJual: undefined,
-      ppn: undefined,
-      paymentJual: undefined,
+      hargaJual: 0,
+      hargaUnit: 0,
+      dppJual: 0,
+      ppn: 0,
+      paymentJual: 0,
     },
   });
 
@@ -67,16 +67,16 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
         kodeJual: 'Generated XX',
         customer: '',
         nsfpkKeluaran: '',
-        biaya: undefined,
-        qty: undefined,
+        biaya: 0,
+        qty: 0,
         tipeUnit: '',
         noMesin: '',
         noRangka: '',
-        hargaJual: undefined,
-        hargaUnit: undefined,
-        dppJual: undefined,
-        ppn: undefined,
-        paymentJual: undefined,
+        hargaJual: 0,
+        hargaUnit: 0,
+        dppJual: 0,
+        ppn: 0,
+        paymentJual: 0,
         tanggalFPK: new Date(),
         masaNSFPK: new Date(),
       });
@@ -95,11 +95,25 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
         await updateMutation.mutateAsync({
           ...initialData,
           ...formattedData,
+          qty: formattedData.qty ?? 0,
+          biaya: formattedData.biaya ?? 0,
+          hargaJual: formattedData.hargaJual ?? 0,
+          hargaUnit: formattedData.hargaUnit ?? 0,
+          dppJual: formattedData.dppJual ?? 0,
+          ppn: formattedData.ppn ?? 0,
+          paymentJual: formattedData.paymentJual ?? 0,
         });
         toast.success('Data berhasil diperbarui');
       } else {
         await createMutation.mutateAsync({
           ...formattedData,
+          qty: formattedData.qty ?? 0,
+          biaya: formattedData.biaya ?? 0,
+          hargaJual: formattedData.hargaJual ?? 0,
+          hargaUnit: formattedData.hargaUnit ?? 0,
+          dppJual: formattedData.dppJual ?? 0,
+          ppn: formattedData.ppn ?? 0,
+          paymentJual: formattedData.paymentJual ?? 0,
           kodeJual: 'INV-WIN/' + Date.now(),
           tanggalJual: format(new Date(), 'dd/MM/yyyy'),
         });

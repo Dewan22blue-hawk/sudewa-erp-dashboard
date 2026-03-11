@@ -39,7 +39,7 @@ export default function PPNPembelianFormDialog({
     const updateMutation = useUpdatePPNPembelian()
 
     const form = useForm<PPNPembelianFormValues>({
-        resolver: zodResolver(ppnPembelianSchema),
+        resolver: zodResolver(ppnPembelianSchema) as any,
         defaultValues: {
             kodeBeli: "Generated XX",
             noMesin: "",
@@ -92,11 +92,13 @@ export default function PPNPembelianFormDialog({
                 await updateMutation.mutateAsync({
                     ...initialData,
                     ...formattedData,
+                    biaya: formattedData.biaya ?? 0,
                 })
                 toast.success("Data berhasil diperbarui")
             } else {
                 await createMutation.mutateAsync({
                     ...formattedData,
+                    biaya: formattedData.biaya ?? 0,
                     // Mock other fields
                     kodeBeli: "PBL-WIN/20260202-XXXX",
                     tanggalBeli: "28/01/2026",

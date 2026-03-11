@@ -12,7 +12,7 @@ export const ppnPembelianSchema = z.object({
   tanggalFPM: z.date({ required_error: 'Tanggal FPM wajib diisi' }),
   masaNSFPM: z.date({ required_error: 'Masa NSFPM wajib diisi' }),
   nsfpmMasukan: z.string().min(1, 'NSFPM Masukan wajib diisi'),
-  biaya: z.preprocess(toOptionalNumber, z.number().optional()),
+  biaya: z.preprocess((val) => toOptionalNumber(val), z.number().optional()),
 });
 
 export type PPNPembelianFormValues = z.infer<typeof ppnPembelianSchema>;
