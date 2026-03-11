@@ -1,6 +1,6 @@
 import type { TypeUnit, TypeUnitListResponse, TypeUnitPayload, UnitBrand } from '@/@types/type-unit.types';
 import { apiClient } from '@/lib/api/client';
-import { ApiResponseError, ApiValidationError, LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
+import { ApiResponseError, LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
 
 interface TypeUnitApiModel {
   id: number;

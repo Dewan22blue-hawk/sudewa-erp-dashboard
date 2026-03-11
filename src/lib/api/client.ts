@@ -59,7 +59,7 @@ apiClient.interceptors.response.use(
     const apiError: ApiError = {
       code: error.response?.data?.code || 'UNKNOWN_ERROR',
       message: error.response?.data?.message || error.message || 'An error occurred',
-      details: error.response?.data?.details,
+      details: (error.response?.data as any)?.errors || error.response?.data?.details,
       statusCode: error.response?.status,
     };
 

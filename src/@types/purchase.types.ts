@@ -1,45 +1,61 @@
 // src/@types/purchase.types.ts
 
-export type Currency = "IDR" | "USD"
+export type Currency = 'IDR' | 'USD';
 
 export interface PurchaseUnit {
-    id: string
-    purchaseId: string
-    typeUnitId: string
-    typeUnitName: string
+  id: string;
+  purchaseId: string;
+  typeUnitId: string;
+  typeUnitName: string;
 
-    qty: number
-    price: number
+  qty: number;
+  price: number;
 
-    biayaBBN: number
-    biayaEkspedisi: number
-    biayaLain: number
+  biayaBBN: number;
+  biayaEkspedisi: number;
+  biayaLain: number;
 
-    hpp: number
-    dpp: number
-    ppn: number
-    total: number
+  hpp: number;
+  dpp: number;
+  ppn: number;
+  total: number;
+}
+
+export interface PurchaseUnitItemDetail {
+  id: string;
+  uuid?: string;
+  purchaseId?: string; // from parent unit_transaction
+  unitTransactionItemId?: string;
+  color?: string;
+  machineNumber?: string;
+  chassisNumber?: string;
+  inStock?: boolean;
+  createdAt?: string;
 }
 
 export interface Purchase {
-    id: string
-    code: string
-    date: string
-    supplierName: string
-    companyId: string
+  id: string;
+  code: string;
+  date: string;
+  supplierName: string;
+  companyId: string;
+  stockState?: string;
+  maxCapacity?: number;
+  warehouseName?: string;
+  warehouseId?: string;
 
-    totalDpp: number
-    totalPpn: number
-    totalBiaya: number
-    totalPurchase: number
+  totalDpp: number;
+  totalPpn: number;
+  totalBiaya: number;
+  totalPurchase: number;
 
-    totalPaid: number
-    remainingPayment: number
+  totalPaid: number;
+  remainingPayment: number;
 
-    units: PurchaseUnit[]
+  units: PurchaseUnit[];
 
-    createdAt: string
-    updatedAt: string
+  createdAt: string;
+  updatedAt: string;
 }
 
 /* ============================
@@ -47,43 +63,91 @@ export interface Purchase {
 ============================ */
 
 export interface CreatePurchaseRequest {
-    date: string
-    supplierName: string
-    companyId: string
+  date: string;
+  supplierName: string;
+  companyId: string;
 
-    // Optional initial unit fields
-    typeUnitId?: string
-    typeUnitName?: string
-    qty?: number
-    price?: number
-    biayaBBN?: number
-    biayaEkspedisi?: number
-    biayaLain?: number
+  // New fields for backend payload
+  supplierId: number | string;
+  npwp?: string;
+  address?: string;
+  warehouseId?: number | string;
+  maxCapacity?: number | string;
+  stockState?: string;
+  type?: string;
+  code?: string;
+
+  // Optional initial unit fields
+  typeUnitId?: string;
+  typeUnitName?: string;
+  qty?: number;
+  price?: number;
+  biayaBBN?: number;
+  biayaEkspedisi?: number;
+  biayaLain?: number;
 }
 
 export interface UpdatePurchaseRequest {
-    date: string
-    supplierName: string
+  date: string;
+  supplierName: string;
 }
 
 export interface PurchaseFormValues {
-    supplierName: string
-    date: string
-    code: string
+  supplierName: string;
+  date: string;
+  code: string;
 }
 
 export interface CreatePurchaseUnitRequest {
-    purchaseId: string
-    typeUnitId: string
-    typeUnitName: string
-    qty: number
-    price: number
-    biayaBBN: number
-    biayaEkspedisi: number
-    biayaLain: number
+  purchaseId: string;
+  typeUnitId: string;
+  typeUnitName: string;
+  qty: number;
+  price: number;
+  biayaBBN: number;
+  biayaEkspedisi: number;
+  biayaLain: number;
 }
 
 export interface PurchaseListResponse {
-    data: Purchase[]
-    total: number
+  data: Purchase[];
+  total: number;
+}
+
+export interface PurchasePaginatedResponse {
+  data: Purchase[];
+  meta: {
+    currentPage: number;
+    perPage: number;
+    total: number;
+    lastPage: number;
+  };
+}
+
+export interface PurchaseUnitItemRow {
+  id: string;
+  unitTransactionId: string;
+  unitTransactionCode?: string;
+  unitTypeId?: string;
+  qtyTotal: number;
+  price: number;
+  bbnPrice: number;
+  otherFee: number;
+  hppPerUnit: number;
+  dppPerUnit: number;
+  ppnPerUnit: number;
+  totalDpp: number;
+  totalPpn: number;
+  totalPurchase: number;
+  createdAt?: string;
+}
+
+export interface PurchaseUnitItemPaginatedResponse {
+  data: PurchaseUnitItemRow[];
+  meta: {
+    currentPage: number;
+    perPage: number;
+    total: number;
+    lastPage: number;
+  };
 }

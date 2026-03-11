@@ -35,4 +35,25 @@ export class AuthService {
 
     return response.data;
   }
+
+  static async updateProfile(id: number, data: { name?: string; username?: string; firstname?: string; lastname?: string; email?: string }): Promise<ProfileResponse> {
+    const body = new URLSearchParams();
+    if (data.name) body.append('name', data.name);
+    if (data.username) body.append('username', data.username);
+    if (data.firstname) body.append('firstname', data.firstname);
+    if (data.lastname) body.append('lastname', data.lastname);
+    if (data.email) body.append('email', data.email);
+    body.append('_method', 'PUT'); // usually Laravel/PHP requires this for x-www-form-urlencoded PUTs if we use post, but we can just use apiClient.put. However, standard apiClient might support put perfectly. The prompt says Method: PUT, Content-Type: application/x-www-form-urlencoded. So let's use put.
+
+    const response = await apiClient.put<ProfileResponse>(`/wapi/users/${id}`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    if (!response.data.status) {
+      throw new Error(response.data.message || 'Failed to update profile');
+    }
+
+    return response.data;
+  }
 }
+

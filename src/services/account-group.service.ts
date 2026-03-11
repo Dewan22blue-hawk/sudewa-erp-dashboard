@@ -90,6 +90,24 @@ export const createAccountGroup = async (payload: AccountGroupPayload): Promise<
   }
 };
 
+/** Quick create used from modal (uses FormData + group_code/company_id as required by backend) */
+export interface QuickCreateAccountGroupPayload {
+  companyId: string | number;
+  groupCode: string;
+  description?: string | null;
+}
+
+export const quickCreateAccountGroup = async (payload: QuickCreateAccountGroupPayload): Promise<AccountGroup> => {
+  const body = new FormData();
+  body.append('company_id', String(payload.companyId));
+  body.append('group_code', payload.groupCode);
+  if (payload.description) body.append('description', payload.description);
+
+  const response = await apiClient.post<AccountGroupItemResponse>(basePath, body);
+  const data = ensureSuccess(response.data);
+  return mapAccountGroup(data);
+};
+
 export const updateAccountGroup = async (id: number | string, payload: AccountGroupPayload): Promise<AccountGroup> => {
   try {
     const response = await apiClient.put<AccountGroupItemResponse>(`${basePath}/${id}`, {

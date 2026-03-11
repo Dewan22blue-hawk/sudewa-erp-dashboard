@@ -21,6 +21,8 @@ export interface TypeUnit {
   unitModel?: string | null;
   nettoWeight?: number | null;
   brutoWeight?: number | null;
+  sellPrice?: number | null;
+  buyPrice?: number | null;
   createdAt?: string;
   updatedAt?: string;
   brand?: UnitBrand | null;
@@ -35,7 +37,9 @@ export interface TypeUnitPayload {
   unitModel?: string | null;
   nettoWeight?: number | null;
   brutoWeight?: number | null;
+  sellPrice?: number | null;
+  buyPrice?: number | null;
   image?: File | null;
 }
 
-export interface TypeUnitListResponse extends PaginatedResult<TypeUnit> {}
+export interface TypeUnitListResponse extends PaginatedResult<TypeUnit> { }

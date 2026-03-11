@@ -55,7 +55,7 @@ export default function TransactionListPage() {
         </div>
 
         {/* SUMMARY CARDS */}
-        <TransactionSummaryCards totalBcaUsd={summary?.totalBcaUsd || 0} totalBcaIdr={summary?.totalBcaIdr || 0} totalCashIdr={summary?.totalCashIdr || 0} isLoading={isSummaryLoading} />
+        {/* {/* <TransactionSummaryCards totalBcaUsd={summary?.totalBcaUsd || 0} totalBcaIdr={summary?.totalBcaIdr || 0} totalCashIdr={summary?.totalCashIdr || 0} isLoading={isSummaryLoading} /> */}
 
         {/* FILTERS & ACTIONS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -31,6 +31,13 @@ const mockData: PembayaranHutang[] = generateData();
 export const PembayaranHutangService = {
   getAll: () => mockData,
 
+  deleteById: (id: string): boolean => {
+    const idx = mockData.findIndex((d) => d.id === id);
+    if (idx === -1) return false;
+    mockData.splice(idx, 1);
+    return true;
+  },
+
   getById: (id: string): PembayaranHutangDetail | null => {
     const item = mockData.find((d) => d.id === id);
     if (!item) return null;

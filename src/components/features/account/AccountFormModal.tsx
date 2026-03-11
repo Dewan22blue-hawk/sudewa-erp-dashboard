@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormValues } from '@/scheme/account-master.schema';
 import type { AccountGroup } from '@/@types/account-group.types';
+import { CreateAccountGroupDialog } from './CreateAccountGroupDialog';
 
 interface AccountFormModalProps {
   open: boolean;
@@ -22,6 +24,8 @@ interface AccountFormModalProps {
 }
 
 export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, description, submitLabel = 'Simpan', isSubmitting = false, accountGroups, isLoadingGroups = false }: AccountFormModalProps) {
+  const [openCreateGroup, setOpenCreateGroup] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">
@@ -55,23 +59,28 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                 <FormItem>
                   <FormLabel>Grup Akun</FormLabel>
                   <FormControl>
-                    <Select value={field.value ? String(field.value) : ''} onValueChange={(val) => field.onChange(Number(val))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={isLoadingGroups ? 'Memuat...' : 'Masukkan grup akun'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {accountGroups.length === 0 && (
-                          <SelectItem value="" disabled>
-                            Tidak ada grup akun
-                          </SelectItem>
-                        )}
-                        {accountGroups.map((group) => (
-                          <SelectItem key={group.id} value={String(group.id)}>
-                            {group.code ? `${group.code}${group.description ? ` - ${group.description}` : ''}` : group.id}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Select value={field.value ? String(field.value) : ''} onValueChange={(val) => field.onChange(Number(val))}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder={isLoadingGroups ? 'Memuat...' : 'Masukkan grup akun'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {accountGroups.length === 0 && (
+                            <SelectItem value="" disabled>
+                              Tidak ada grup akun
+                            </SelectItem>
+                          )}
+                          {accountGroups.map((group) => (
+                            <SelectItem key={group.id} value={String(group.id)}>
+                              {group.code ? `${group.code}${group.description ? ` - ${group.description}` : ''}` : group.id}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenCreateGroup(true)}>
+                        +
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,6 +152,8 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
           </form>
         </Form>
       </DialogContent>
+
+      <CreateAccountGroupDialog open={openCreateGroup} onOpenChange={setOpenCreateGroup} onCreated={(id) => form.setValue('accountGroupId', Number(id), { shouldValidate: true, shouldDirty: true })} />
     </Dialog>
   );
 }

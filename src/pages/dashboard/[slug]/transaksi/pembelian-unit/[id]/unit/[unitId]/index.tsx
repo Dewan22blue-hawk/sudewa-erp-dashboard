@@ -66,7 +66,7 @@ export default function UnitPurchaseDetailPage() {
         <PurchaseDetailCards data={purchase} />
 
         {/* Detail Unit Table (Reusing Component) */}
-        <PurchaseUnitTable units={purchase.units} purchaseId={purchase.id} slug={slug as string} />
+        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} />
       </div>
     </DashboardLayout>
   );

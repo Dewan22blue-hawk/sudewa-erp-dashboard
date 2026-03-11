@@ -63,7 +63,7 @@ export default function CreateTransactionPage() {
         <div className="rounded-xl border bg-white p-6 md:p-8">
           <TransactionForm
             defaultValues={{
-              date: new Date().toISOString().split('T')[0], // Default today
+              date: new Date().toISOString().split('T')[0],
               name: '',
               debitUSD: undefined,
               creditUSD: undefined,

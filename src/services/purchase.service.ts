@@ -1,556 +1,556 @@
 // src/services/purchase.service.ts
 
+import { apiClient } from '@/lib/api/client';
+import { ensureSuccess, mapLaravelPaginationMeta, type LaravelApiResponse } from '@/lib/api/response';
+import { PaginationParams } from '@/@types/pagination.types';
+
 import {
-    Purchase,
-    PurchaseUnit,
-    CreatePurchaseRequest,
-    UpdatePurchaseRequest,
-    CreatePurchaseUnitRequest
-} from "@/@types/purchase.types"
+  Purchase,
+  PurchaseUnit,
+  PurchaseUnitItemDetail,
+  PurchaseUnitItemRow,
+  CreatePurchaseRequest,
+  UpdatePurchaseRequest,
+  CreatePurchaseUnitRequest,
+  PurchasePaginatedResponse,
+  PurchaseUnitItemPaginatedResponse,
+} from '@/@types/purchase.types';
 
-import { nanoid } from "nanoid"
+// Legacy in-memory store kept as a fallback for create/update flows that are not yet wired to the backend
+let purchases: Purchase[] = [];
+// cache for unit item details when API unavailable
+const purchaseUnitItemDetails: PurchaseUnitItemDetail[] = [];
 
-let purchases: Purchase[] = [
-    {
-        id: "pch-001",
-        code: "PBL-2024-0001",
-        date: "2024-02-01",
-        supplierName: "PT. Maju Jaya Motor",
-        companyId: "1",
-        totalDpp: 450000000,
-        totalPpn: 49500000,
-        totalBiaya: 502500000,
-        totalPurchase: 502500000,
-        totalPaid: 200000000,
-        remainingPayment: 302500000,
-        units: [
-            {
-                id: "unit-001-1",
-                purchaseId: "pch-001",
-                typeUnitId: "type-a",
-                typeUnitName: "Honda CR-V 2023",
-                qty: 1,
-                price: 450000000,
-                biayaBBN: 2000000,
-                biayaEkspedisi: 1000000,
-                biayaLain: 0,
-                hpp: 502500000,
-                dpp: 450000000,
-                ppn: 49500000,
-                total: 502500000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-002",
-        code: "PBL-2024-0002",
-        date: "2024-02-05",
-        supplierName: "CV. Berkah Abadi",
-        companyId: "1",
-        totalDpp: 300000000,
-        totalPpn: 33000000,
-        totalBiaya: 335000000,
-        totalPurchase: 335000000,
-        totalPaid: 335000000,
-        remainingPayment: 0,
-        units: [
-            {
-                id: "unit-002-1",
-                purchaseId: "pch-002",
-                typeUnitId: "type-b",
-                typeUnitName: "Toyota Raize GR",
-                qty: 1,
-                price: 300000000,
-                biayaBBN: 1500000,
-                biayaEkspedisi: 500000,
-                biayaLain: 0,
-                hpp: 335000000,
-                dpp: 300000000,
-                ppn: 33000000,
-                total: 335000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-003",
-        code: "PBL-2024-0003",
-        date: "2024-02-10",
-        supplierName: "Pak Budi Santoso",
-        companyId: "1",
-        totalDpp: 150000000,
-        totalPpn: 16500000,
-        totalBiaya: 168000000,
-        totalPurchase: 168000000,
-        totalPaid: 0,
-        remainingPayment: 168000000,
-        units: [
-            {
-                id: "unit-003-1",
-                purchaseId: "pch-003",
-                typeUnitId: "type-c",
-                typeUnitName: "Daihatsu Rocky",
-                qty: 1,
-                price: 150000000,
-                biayaBBN: 1000000,
-                biayaEkspedisi: 500000,
-                biayaLain: 0,
-                hpp: 168000000,
-                dpp: 150000000,
-                ppn: 16500000,
-                total: 168000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-004",
-        code: "PBL-2024-0004",
-        date: "2024-02-12",
-        supplierName: "PT. Auto 2000",
-        companyId: "1",
-        totalDpp: 800000000,
-        totalPpn: 88000000,
-        totalBiaya: 893000000,
-        totalPurchase: 893000000,
-        totalPaid: 400000000,
-        remainingPayment: 493000000,
-        units: [
-            {
-                id: "unit-004-1",
-                purchaseId: "pch-004",
-                typeUnitId: "type-d",
-                typeUnitName: "Toyota Fortuner VRZ",
-                qty: 1,
-                price: 550000000,
-                biayaBBN: 3000000,
-                biayaEkspedisi: 1000000,
-                biayaLain: 0,
-                hpp: 614500000,
-                dpp: 550000000,
-                ppn: 60500000,
-                total: 614500000
-            },
-            {
-                id: "unit-004-2",
-                purchaseId: "pch-004",
-                typeUnitId: "type-e",
-                typeUnitName: "Toyota Innova Zenix",
-                qty: 1,
-                price: 250000000,
-                biayaBBN: 500000,
-                biayaEkspedisi: 500000,
-                biayaLain: 0,
-                hpp: 278500000,
-                dpp: 250000000,
-                ppn: 27500000,
-                total: 278500000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-005",
-        code: "PBL-2024-0005",
-        date: "2024-02-15",
-        supplierName: "Ibu Siti Aminah",
-        companyId: "1",
-        totalDpp: 120000000,
-        totalPpn: 13200000,
-        totalBiaya: 134000000,
-        totalPurchase: 134000000,
-        totalPaid: 134000000,
-        remainingPayment: 0,
-        units: [
-            {
-                id: "unit-005-1",
-                purchaseId: "pch-005",
-                typeUnitId: "type-f",
-                typeUnitName: "Honda Brio Satya",
-                qty: 1,
-                price: 120000000,
-                biayaBBN: 500000,
-                biayaEkspedisi: 300000,
-                biayaLain: 0,
-                hpp: 134000000,
-                dpp: 120000000,
-                ppn: 13200000,
-                total: 134000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-006",
-        code: "PBL-2024-0006",
-        date: "2024-02-18",
-        supplierName: "CV. Abadi Jaya",
-        companyId: "1",
-        totalDpp: 650000000,
-        totalPpn: 71500000,
-        totalBiaya: 725000000,
-        totalPurchase: 725000000,
-        totalPaid: 725000000,
-        remainingPayment: 0,
-        units: [
-            {
-                id: "unit-006-1",
-                purchaseId: "pch-006",
-                typeUnitId: "type-g",
-                typeUnitName: "Mitsubishi Pajero Sport",
-                qty: 1,
-                price: 650000000,
-                biayaBBN: 3500000,
-                biayaEkspedisi: 0,
-                biayaLain: 0,
-                hpp: 725000000,
-                dpp: 650000000,
-                ppn: 71500000,
-                total: 725000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-007",
-        code: "PBL-2024-0007",
-        date: "2024-02-20",
-        supplierName: "PT. Sinar Mas",
-        companyId: "1",
-        totalDpp: 280000000,
-        totalPpn: 30800000,
-        totalBiaya: 312000000,
-        totalPurchase: 312000000,
-        totalPaid: 100000000,
-        remainingPayment: 212000000,
-        units: [
-            {
-                id: "unit-007-1",
-                purchaseId: "pch-007",
-                typeUnitId: "type-h",
-                typeUnitName: "Suzuki Jimny 5 Door",
-                qty: 1,
-                price: 280000000,
-                biayaBBN: 1200000,
-                biayaEkspedisi: 0,
-                biayaLain: 0,
-                hpp: 312000000,
-                dpp: 280000000,
-                ppn: 30800000,
-                total: 312000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-008",
-        code: "PBL-2024-0008",
-        date: "2024-02-22",
-        supplierName: "Bpk. Hartono",
-        companyId: "1",
-        totalDpp: 1100000000,
-        totalPpn: 121000000,
-        totalBiaya: 1225000000,
-        totalPurchase: 1225000000,
-        totalPaid: 1225000000,
-        remainingPayment: 0,
-        units: [
-            {
-                id: "unit-008-1",
-                purchaseId: "pch-008",
-                typeUnitId: "type-i",
-                typeUnitName: "Toyota Alphard HEV",
-                qty: 1,
-                price: 1100000000,
-                biayaBBN: 4000000,
-                biayaEkspedisi: 0,
-                biayaLain: 0,
-                hpp: 1225000000,
-                dpp: 1100000000,
-                ppn: 121000000,
-                total: 1225000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-009",
-        code: "PBL-2024-0009",
-        date: "2024-02-25",
-        supplierName: "Ibu Ratna Sari",
-        companyId: "1",
-        totalDpp: 90000000,
-        totalPpn: 9900000,
-        totalBiaya: 101000000,
-        totalPurchase: 101000000,
-        totalPaid: 50000000,
-        remainingPayment: 51000000,
-        units: [
-            {
-                id: "unit-009-1",
-                purchaseId: "pch-009",
-                typeUnitId: "type-j",
-                typeUnitName: "Daihatsu Ayla",
-                qty: 1,
-                price: 90000000,
-                biayaBBN: 1100000,
-                biayaEkspedisi: 0,
-                biayaLain: 0,
-                hpp: 101000000,
-                dpp: 90000000,
-                ppn: 9900000,
-                total: 101000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "pch-010",
-        code: "PBL-2024-0010",
-        date: "2024-02-28",
-        supplierName: "PT. Mega Mobil",
-        companyId: "1",
-        totalDpp: 400000000,
-        totalPpn: 44000000,
-        totalBiaya: 446000000,
-        totalPurchase: 446000000,
-        totalPaid: 0,
-        remainingPayment: 446000000,
-        units: [
-            {
-                id: "unit-010-1",
-                purchaseId: "pch-010",
-                typeUnitId: "type-k",
-                typeUnitName: "Honda HR-V SE",
-                qty: 1,
-                price: 400000000,
-                biayaBBN: 2000000,
-                biayaEkspedisi: 0,
-                biayaLain: 0,
-                hpp: 446000000,
-                dpp: 400000000,
-                ppn: 44000000,
-                total: 446000000
-            }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    }
-]
+const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
 
-/* =====================================
-   UTILITIES
-===================================== */
+type UnitTransactionListApiModel = {
+  id: number;
+  uuid?: string;
+  warehouse_id?: number;
+  person_id?: number;
+  code?: string;
+  type?: string;
+  max_capacity?: string;
+  stock_state?: string;
+  created_at?: string;
+  updated_at?: string;
+  warehouse?: {
+    id?: number;
+    uuid?: string;
+    name?: string;
+    capacity?: number;
+  };
+  person?: {
+    id?: number;
+    uuid?: string;
+    code?: string;
+    name?: string;
+    type?: string;
+  };
+  unit_transaction_billing?: {
+    total_dpp?: string | number;
+    total_ppn?: string | number;
+    total_billing?: string | number;
+    total_paid?: string | number;
+    remaining_payment?: string | number;
+  } | null;
+};
 
-function generatePurchaseCode(): string {
-    const now = new Date()
-    const year = now.getFullYear()
-    const random = Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, "0")
+type UnitTransactionDetailApiModel = UnitTransactionListApiModel & {
+  unit_transaction_items?: Array<{
+    id?: number;
+    uuid?: string;
+    unit_transaction_id?: number;
+    qty_total?: number;
+    price?: string | number;
+    unit_transaction_item_details?: Array<{
+      id?: number;
+      uuid?: string;
+      color?: string;
+      machine_number?: string;
+      chassis_number?: string;
+    }>;
+  }>;
+};
 
-    return `PBL-${year}-${random}`
-}
+const computeTotalsFromItems = (
+  items: UnitTransactionDetailApiModel['unit_transaction_items'],
+): {
+  totalDpp: number;
+  totalPpn: number;
+  totalBiaya: number;
+  totalPurchase: number;
+  totalPaid: number;
+  remainingPayment: number;
+} => {
+  const totalDpp = (items ?? []).reduce((acc, item) => {
+    const qty = Number(item?.qty_total ?? 0);
+    const price = Number(item?.price ?? 0);
+    return acc + qty * price;
+  }, 0);
 
-function calculateUnitTotals(unit: CreatePurchaseUnitRequest): PurchaseUnit {
-    const dpp = unit.price * unit.qty
-    const ppn = dpp * 0.11
-    const total =
-        dpp +
-        ppn +
-        unit.biayaBBN +
-        unit.biayaEkspedisi +
-        unit.biayaLain
+  const totalPpn = totalDpp * 0.11;
+  const totalPurchase = totalDpp + totalPpn;
+  const totalPaid = 0;
+  const remainingPayment = totalPurchase - totalPaid;
+
+  return {
+    totalDpp,
+    totalPpn,
+    totalBiaya: totalPurchase,
+    totalPurchase,
+    totalPaid,
+    remainingPayment,
+  };
+};
+
+const mapUnits = (detail: UnitTransactionDetailApiModel): PurchaseUnit[] => {
+  return (detail.unit_transaction_items ?? []).map((item, index) => {
+    const qty = Number(item?.qty_total ?? 0);
+    const price = Number(item?.price ?? 0);
+    const dpp = qty * price;
+    const ppn = dpp * 0.11;
+    const total = dpp + ppn;
 
     return {
-        id: nanoid(),
-        purchaseId: unit.purchaseId,
-        typeUnitId: unit.typeUnitId,
-        typeUnitName: unit.typeUnitName,
-        qty: unit.qty,
-        price: unit.price,
-        biayaBBN: unit.biayaBBN,
-        biayaEkspedisi: unit.biayaEkspedisi,
-        biayaLain: unit.biayaLain,
-        hpp: total,
-        dpp,
-        ppn,
-        total
-    }
-}
+      id: String(item?.id ?? index),
+      purchaseId: String(detail.id),
+      typeUnitId: item?.uuid ?? `unit-${index + 1}`,
+      typeUnitName: item?.unit_transaction_item_details?.[0]?.color ?? `Unit ${index + 1}`,
+      qty,
+      price,
+      biayaBBN: 0,
+      biayaEkspedisi: 0,
+      biayaLain: 0,
+      hpp: total,
+      dpp,
+      ppn,
+      total,
+    };
+  });
+};
 
-function recalculatePurchase(purchase: Purchase): Purchase {
-    const totalDpp = purchase.units.reduce((acc, u) => acc + u.dpp, 0)
-    const totalPpn = purchase.units.reduce((acc, u) => acc + u.ppn, 0)
-    const totalBiaya = purchase.units.reduce((acc, u) => acc + u.total, 0)
+const mapDetailToPurchase = (detail: UnitTransactionDetailApiModel): Purchase => {
+  const fromItems = computeTotalsFromItems(detail.unit_transaction_items);
 
-    const remainingPayment = totalBiaya - purchase.totalPaid
+  const billing = detail.unit_transaction_billing;
+  const billingTotals = billing
+    ? {
+        totalDpp: Number(billing.total_dpp ?? fromItems.totalDpp ?? 0),
+        totalPpn: Number(billing.total_ppn ?? fromItems.totalPpn ?? 0),
+        totalBiaya: Number(billing.total_billing ?? fromItems.totalBiaya ?? 0),
+        totalPurchase: Number(billing.total_billing ?? fromItems.totalPurchase ?? 0),
+        totalPaid: Number(billing.total_paid ?? 0),
+        remainingPayment: Number(billing.remaining_payment ?? fromItems.totalPurchase - Number(billing.total_paid ?? 0)),
+      }
+    : fromItems;
 
-    return {
-        ...purchase,
-        totalDpp,
-        totalPpn,
-        totalBiaya,
-        totalPurchase: totalBiaya,
-        remainingPayment
-    }
-}
+  return {
+    id: String(detail.id),
+    code: detail.code ?? '-',
+    date: detail.created_at ?? '',
+    supplierName: detail.person?.name ?? '-',
+    companyId: String(detail.person_id ?? ''),
+    stockState: detail.stock_state,
+    maxCapacity: detail.max_capacity !== undefined && detail.max_capacity !== null ? Number(detail.max_capacity) : undefined,
+    warehouseName: detail.warehouse?.name,
+    warehouseId: detail.warehouse?.id ? String(detail.warehouse.id) : undefined,
+    ...billingTotals,
+    units: mapUnits(detail),
+    totalPaid: billingTotals.totalPaid ?? 0,
+    createdAt: detail.created_at ?? '',
+    updatedAt: detail.updated_at ?? '',
+  };
+};
+
+const mapListItemToPurchase = (item: UnitTransactionListApiModel): Purchase => {
+  const billing = item.unit_transaction_billing;
+  const billingTotals = billing
+    ? {
+        totalDpp: Number(billing.total_dpp ?? 0),
+        totalPpn: Number(billing.total_ppn ?? 0),
+        totalBiaya: Number(billing.total_billing ?? 0),
+        totalPurchase: Number(billing.total_billing ?? 0),
+        totalPaid: Number(billing.total_paid ?? 0),
+        remainingPayment: Number(billing.remaining_payment ?? 0),
+      }
+    : {
+        totalDpp: 0,
+        totalPpn: 0,
+        totalBiaya: 0,
+        totalPurchase: 0,
+        totalPaid: 0,
+        remainingPayment: 0,
+      };
+
+  return {
+    id: String(item.id),
+    code: item.code ?? '-',
+    date: item.created_at ?? '',
+    supplierName: item.person?.name ?? '-',
+    companyId: String(item.person_id ?? ''),
+    stockState: item.stock_state,
+    maxCapacity: item.max_capacity !== undefined && item.max_capacity !== null ? Number(item.max_capacity) : undefined,
+    warehouseName: item.warehouse?.name,
+    warehouseId: item.warehouse?.id ? String(item.warehouse.id) : undefined,
+    ...billingTotals,
+    units: [],
+    createdAt: item.created_at ?? '',
+    updatedAt: item.updated_at ?? '',
+  };
+};
+
+type UnitTransactionItemDetailApiModel = {
+  id?: number;
+  uuid?: string;
+  unit_transaction_item_id?: number;
+  color?: string;
+  machine_number?: string;
+  chassis_number?: string;
+  in_stock?: boolean;
+  created_at?: string;
+  unit_transaction_item?: {
+    id?: number;
+    uuid?: string;
+    unit_transaction_id?: number;
+    unit_type_id?: number;
+  };
+};
+
+type UnitTransactionItemListApiModel = {
+  id?: number;
+  uuid?: string;
+  unit_transaction_id?: number;
+  unit_type_id?: number;
+  qty_total?: number;
+  price?: string | number;
+  bbn_price?: string | number;
+  hpp_per_unit_price?: string | number;
+  dpp_per_unit_price?: string | number;
+  ppn_per_unit_price?: string | number;
+  other_fee?: string | number;
+  created_at?: string;
+  unit_transaction?: {
+    id?: number;
+    uuid?: string;
+    code?: string;
+    warehouse_id?: number;
+  };
+};
+
+const mapItemDetail = (item: UnitTransactionItemDetailApiModel): PurchaseUnitItemDetail => ({
+  id: String(item.id ?? ''),
+  uuid: item.uuid,
+  purchaseId: item.unit_transaction_item?.unit_transaction_id ? String(item.unit_transaction_item.unit_transaction_id) : undefined,
+  unitTransactionItemId: item.unit_transaction_item?.id ? String(item.unit_transaction_item.id) : item.unit_transaction_item_id ? String(item.unit_transaction_item_id) : undefined,
+  color: item.color,
+  machineNumber: item.machine_number,
+  chassisNumber: item.chassis_number,
+  inStock: item.in_stock,
+  createdAt: item.created_at,
+});
+
+const mapUnitTransactionItemList = (item: UnitTransactionItemListApiModel): PurchaseUnitItemRow => {
+  const qty = Number(item.qty_total ?? 0);
+  const price = Number(item.price ?? 0);
+  const bbn = Number(item.bbn_price ?? 0);
+  const otherFee = Number(item.other_fee ?? 0);
+  const hppPerUnit = Number(item.hpp_per_unit_price ?? 0);
+  const dppPerUnit = Number(item.dpp_per_unit_price ?? 0);
+  const ppnPerUnit = Number(item.ppn_per_unit_price ?? 0);
+
+  const totalDpp = dppPerUnit * qty;
+  const totalPpn = ppnPerUnit * qty;
+  const totalPurchase = totalDpp + totalPpn;
+
+  return {
+    id: String(item.id ?? ''),
+    unitTransactionId: item.unit_transaction_id ? String(item.unit_transaction_id) : '',
+    unitTransactionCode: item.unit_transaction?.code,
+    unitTypeId: item.unit_type_id ? String(item.unit_type_id) : undefined,
+    qtyTotal: qty,
+    price,
+    bbnPrice: bbn,
+    otherFee,
+    hppPerUnit,
+    dppPerUnit,
+    ppnPerUnit,
+    totalDpp,
+    totalPpn,
+    totalPurchase,
+    createdAt: item.created_at,
+  };
+};
 
 /* =====================================
    SERVICE METHODS
 ===================================== */
 
 export const purchaseService = {
-    async getPurchases(companyId: string): Promise<Purchase[]> {
-        return purchases.filter(p => p.companyId === companyId)
-    },
+  async getPurchases(companyId: string, params: PaginationParams & { withTotals?: boolean } = {}): Promise<PurchasePaginatedResponse> {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
+        params: {
+          company_id: companyId,
+          page: params.page ?? 1,
+          per_page: params.perPage ?? 10,
+          sort_order: 'asc',
+          type: 'purchase',
+          search: params.search || undefined,
+        },
+      });
 
-    async getPurchaseById(id: string): Promise<Purchase | undefined> {
-        return purchases.find(p => p.id === id)
-    },
+      const payload = ensureSuccess(response.data);
+      const mapped = (payload.data ?? []).map((item: UnitTransactionListApiModel) => mapListItemToPurchase(item));
 
-    async createPurchase(payload: CreatePurchaseRequest): Promise<Purchase> {
-        const newPurchase: Purchase = {
-            id: nanoid(),
-            code: generatePurchaseCode(),
-            date: payload.date,
-            supplierName: payload.supplierName,
-            companyId: payload.companyId,
-            totalDpp: 0,
-            totalPpn: 0,
-            totalBiaya: 0,
-            totalPurchase: 0,
-            totalPaid: 0,
-            remainingPayment: 0,
-            units: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+      // Optionally enrich totals with detail fetch when billing is empty
+      let purchasesWithTotals = mapped;
+      if (params.withTotals !== false) {
+        const needsTotals = mapped.filter((item: Purchase) => item.totalDpp === 0 && item.totalPpn === 0 && item.totalPurchase === 0);
+
+        if (needsTotals.length > 0) {
+          const enriched = await Promise.all(
+            needsTotals.map(async (item: Purchase) => {
+              const detail = await this.getPurchaseById(item.id, true);
+              if (!detail) return item;
+              return {
+                ...item,
+                totalDpp: detail.totalDpp,
+                totalPpn: detail.totalPpn,
+                totalBiaya: detail.totalBiaya,
+                totalPurchase: detail.totalPurchase,
+                remainingPayment: detail.remainingPayment,
+                totalPaid: detail.totalPaid,
+                units: detail.units,
+              };
+            }),
+          );
+
+          purchasesWithTotals = mapped.map((item: Purchase) => enriched.find((enrichedItem) => enrichedItem.id === item.id) ?? item);
         }
+      }
 
-        // Handle initial unit creation if present
-        if (payload.typeUnitId && payload.qty) {
-            const calculatedUnit = calculateUnitTotals({
-                purchaseId: newPurchase.id,
-                typeUnitId: payload.typeUnitId,
-                typeUnitName: payload.typeUnitName || payload.typeUnitId, // Fallback
-                qty: payload.qty,
-                price: payload.price || 0,
-                biayaBBN: payload.biayaBBN || 0,
-                biayaEkspedisi: payload.biayaEkspedisi || 0,
-                biayaLain: payload.biayaLain || 0
-            })
-
-            newPurchase.units.push(calculatedUnit)
-
-            // Recalculate purchase totals
-            const totalDpp = newPurchase.units.reduce((acc: number, u: PurchaseUnit) => acc + u.dpp, 0)
-            const totalPpn = newPurchase.units.reduce((acc: number, u: PurchaseUnit) => acc + u.ppn, 0)
-            const totalBiaya = newPurchase.units.reduce((acc: number, u: PurchaseUnit) => acc + u.total, 0)
-
-            newPurchase.totalDpp = totalDpp
-            newPurchase.totalPpn = totalPpn
-            newPurchase.totalBiaya = totalBiaya
-            newPurchase.totalPurchase = totalBiaya
-            newPurchase.remainingPayment = totalBiaya // Assuming no payment yet
-        }
-
-        purchases = [...purchases, newPurchase]
-        return newPurchase
-    },
-
-    async updatePurchase(
-        id: string,
-        payload: UpdatePurchaseRequest
-    ): Promise<Purchase> {
-        purchases = purchases.map(p =>
-            p.id === id
-                ? {
-                    ...p,
-                    ...payload,
-                    updatedAt: new Date().toISOString()
-                }
-                : p
-        )
-
-        const updated = purchases.find(p => p.id === id)
-        if (!updated) throw new Error("Purchase not found")
-        return updated
-    },
-
-    async deletePurchase(id: string): Promise<void> {
-        purchases = purchases.filter(p => p.id !== id)
-    },
-
-    async addUnit(
-        payload: CreatePurchaseUnitRequest
-    ): Promise<Purchase> {
-        const purchase = purchases.find(p => p.id === payload.purchaseId)
-        if (!purchase) throw new Error("Purchase not found")
-
-        const calculatedUnit = calculateUnitTotals(payload)
-
-        const updatedPurchase = recalculatePurchase({
-            ...purchase,
-            units: [...purchase.units, calculatedUnit]
-        })
-
-        purchases = purchases.map(p =>
-            p.id === purchase.id ? updatedPurchase : p
-        )
-
-        return updatedPurchase
-    },
-
-    async updatePayment(
-        // Payment update logic
-        id: string,
-        payload: { bca: number; bcaUsd: number; cash: number }
-    ): Promise<Purchase> {
-        const purchase = purchases.find(p => p.id === id)
-        if (!purchase) throw new Error("Purchase not found")
-
-        const totalPaid =
-            (payload.bca || 0) +
-            (payload.bcaUsd || 0) +
-            (payload.cash || 0)
-
-        const updated = recalculatePurchase({
-            ...purchase,
-            totalPaid
-        })
-
-        purchases = purchases.map(p =>
-            p.id === id ? updated : p
-        )
-
-        return updated
-    },
-
-    async deleteUnit(purchaseId: string, unitId: string): Promise<Purchase> {
-        const purchase = purchases.find(p => p.id === purchaseId)
-        if (!purchase) throw new Error("Purchase not found")
-
-        const updatedUnits = purchase.units.filter((u: PurchaseUnit) => u.id !== unitId)
-
-        const updatedPurchase = recalculatePurchase({
-            ...purchase,
-            units: updatedUnits
-        })
-
-        purchases = purchases.map(p =>
-            p.id === purchaseId ? updatedPurchase : p
-        )
-
-        return updatedPurchase
+      return {
+        data: purchasesWithTotals,
+        meta: mapLaravelPaginationMeta(payload),
+      };
+    } catch {
+      // Fallback to legacy mocked data to avoid breaking UI if API is unreachable
+      const page = params.page ?? 1;
+      const perPage = params.perPage ?? 10;
+      const start = (page - 1) * perPage;
+      const end = start + perPage;
+      return {
+        data: purchases.slice(start, end),
+        meta: {
+          currentPage: page,
+          perPage,
+          total: purchases.length,
+          lastPage: Math.max(1, Math.ceil(purchases.length / perPage)),
+        },
+      };
     }
-}
+  },
+
+  async getPurchaseById(id: string, skipFallback = false): Promise<Purchase | undefined> {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<UnitTransactionDetailApiModel>>(`${basePath}/${id}`);
+      const payload = ensureSuccess(response.data);
+      const mapped = mapDetailToPurchase(payload);
+      // keep legacy store in sync so addUnit can work offline/in-memory
+      const existingIdx = purchases.findIndex((p) => p.id === mapped.id);
+      if (existingIdx >= 0) {
+        purchases[existingIdx] = mapped;
+      } else {
+        purchases = [...purchases, mapped];
+      }
+      return mapped;
+    } catch {
+      if (skipFallback) return undefined;
+      return purchases.find((p) => p.id === id);
+    }
+  },
+
+  /* =====================================
+     UNIT ITEM DETAIL CRUD
+  ===================================== */
+
+  async getUnitTransactionItems(params: PaginationParams = {}): Promise<PurchaseUnitItemPaginatedResponse> {
+    const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}-item`, {
+      params: {
+        page: params.page ?? 1,
+        per_page: params.perPage ?? 10,
+        search: params.search || undefined,
+      },
+    });
+    const payload = ensureSuccess(response.data);
+    return {
+      data: (payload.data?.data ?? []).map((item: UnitTransactionItemListApiModel) => mapUnitTransactionItemList(item)),
+      meta: mapLaravelPaginationMeta(payload),
+    };
+  },
+
+  async getUnitItemDetails(purchaseId?: string): Promise<PurchaseUnitItemDetail[]> {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}-item-detail`);
+      const payload = ensureSuccess(response.data);
+      const mapped: PurchaseUnitItemDetail[] = (payload.data?.data ?? []).map((item: UnitTransactionItemDetailApiModel) => mapItemDetail(item));
+      if (!purchaseId) return mapped;
+      return mapped.filter((item) => item.purchaseId === purchaseId);
+    } catch {
+      return purchaseUnitItemDetails.filter((item) => (purchaseId ? item.purchaseId === purchaseId : true));
+    }
+  },
+
+  async getUnitItemDetail(id: string): Promise<PurchaseUnitItemDetail | undefined> {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${basePath}-item-detail/${id}`);
+      const payload = ensureSuccess(response.data);
+      return mapItemDetail(payload);
+    } catch {
+      return purchaseUnitItemDetails.find((item) => item.id === id);
+    }
+  },
+
+  async createUnitItemDetail(formData: FormData): Promise<PurchaseUnitItemDetail> {
+    const response = await apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${basePath}-item-detail`, formData);
+    const payload = ensureSuccess(response.data);
+    const mapped = mapItemDetail(payload);
+    purchaseUnitItemDetails.push(mapped);
+    return mapped;
+  },
+
+  async updateUnitItemDetail(id: string, formData: FormData): Promise<PurchaseUnitItemDetail> {
+    const response = await apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${basePath}-item-detail/${id}?_method=PUT`, formData);
+    const payload = ensureSuccess(response.data);
+    const mapped = mapItemDetail(payload);
+    const idx = purchaseUnitItemDetails.findIndex((i) => i.id === id);
+    if (idx >= 0) purchaseUnitItemDetails[idx] = mapped;
+    return mapped;
+  },
+
+  async deleteUnitItemDetail(id: string): Promise<void> {
+    try {
+      await apiClient.delete<LaravelApiResponse<null>>(`${basePath}-item-detail/${id}`);
+    } finally {
+      const idx = purchaseUnitItemDetails.findIndex((i) => i.id === id);
+      if (idx >= 0) purchaseUnitItemDetails.splice(idx, 1);
+    }
+  },
+
+  async createPurchase(payload: CreatePurchaseRequest): Promise<Purchase> {
+    const form = new FormData();
+    form.append('warehouse_id', String(payload.warehouseId ?? 1));
+    form.append('person_id', String(payload.supplierId));
+    form.append('type', payload.type ?? 'purchase');
+    form.append('stock_state', payload.stockState ?? 'draft');
+    if (payload.code) form.append('code', payload.code);
+    if (payload.maxCapacity !== undefined) form.append('max_capacity', String(payload.maxCapacity));
+
+    if (process.env.NODE_ENV !== 'production') {
+      const preview = Array.from(form.entries()).reduce<Record<string, any>>((acc, [k, v]) => {
+        acc[k] = v;
+        return acc;
+      }, {});
+      console.log('[createPurchase] form payload', preview);
+    }
+
+    const response = await apiClient.post<LaravelApiResponse<UnitTransactionDetailApiModel>>(basePath, form);
+    const data = ensureSuccess(response.data);
+    const mapped = mapDetailToPurchase(data);
+
+    // keep legacy store in sync for offline cases
+    purchases = [...purchases, mapped];
+    return mapped;
+  },
+
+  async updatePurchase(id: string, payload: UpdatePurchaseRequest): Promise<Purchase> {
+    purchases = purchases.map((p) =>
+      p.id === id
+        ? {
+            ...p,
+            ...payload,
+            updatedAt: new Date().toISOString(),
+          }
+        : p,
+    );
+
+    const updated = purchases.find((p) => p.id === id);
+    if (!updated) throw new Error('Purchase not found');
+    return updated;
+  },
+
+  async deletePurchase(id: string): Promise<void> {
+    try {
+      await apiClient.delete<LaravelApiResponse<null>>(`${basePath}/${id}`);
+    } catch {
+      // swallow API errors here so UI can still proceed; local store will also delete
+    }
+    purchases = purchases.filter((p) => p.id !== id);
+  },
+
+  async addUnit(payload: CreatePurchaseUnitRequest): Promise<Purchase> {
+    const form = new FormData();
+    form.append('unit_transaction_id', payload.purchaseId);
+    form.append('unit_type_id', payload.typeUnitId);
+    form.append('qty_total', String(payload.qty));
+    form.append('price', String(payload.price));
+    form.append('bbn_price', String(payload.biayaBBN ?? 0));
+    form.append('expedition_fee', String(payload.biayaEkspedisi ?? 0));
+    form.append('other_fee', String(payload.biayaLain ?? 0));
+
+    await apiClient.post<LaravelApiResponse<any>>(`${basePath}-item`, form);
+
+    // Refresh detail to return the latest purchase with units
+    const refreshed = await this.getPurchaseById(payload.purchaseId, true);
+    if (refreshed) return refreshed;
+
+    // fallback to legacy store if API detail not available
+    const purchase = purchases.find((p) => p.id === payload.purchaseId);
+    if (purchase) return purchase;
+    throw new Error('Purchase not found');
+  },
+
+  async updatePayment(id: string, payload: { bca: number; bcaUsd: number; cash: number }): Promise<Purchase> {
+    const purchase = purchases.find((p) => p.id === id);
+    if (!purchase) throw new Error('Purchase not found');
+
+    const totalPaid = (payload.bca || 0) + (payload.bcaUsd || 0) + (payload.cash || 0);
+
+    const updated: Purchase = {
+      ...purchase,
+      totalPaid,
+      remainingPayment: purchase.totalPurchase - totalPaid,
+      updatedAt: new Date().toISOString(),
+    };
+
+    purchases = purchases.map((p) => (p.id === id ? updated : p));
+
+    return updated;
+  },
+
+  async deleteUnit(purchaseId: string, unitId: string): Promise<Purchase> {
+    const purchase = purchases.find((p) => p.id === purchaseId);
+    if (!purchase) throw new Error('Purchase not found');
+
+    const updatedUnits = purchase.units.filter((u: PurchaseUnit) => u.id !== unitId);
+
+    const totalDpp = updatedUnits.reduce((acc, u) => acc + u.dpp, 0);
+    const totalPpn = updatedUnits.reduce((acc, u) => acc + u.ppn, 0);
+    const totalBiaya = updatedUnits.reduce((acc, u) => acc + u.total, 0);
+
+    const updatedPurchase: Purchase = {
+      ...purchase,
+      units: updatedUnits,
+      totalDpp,
+      totalPpn,
+      totalBiaya,
+      totalPurchase: totalBiaya,
+      remainingPayment: totalBiaya - purchase.totalPaid,
+    };
+
+    purchases = purchases.map((p) => (p.id === purchaseId ? updatedPurchase : p));
+
+    return updatedPurchase;
+  },
+};

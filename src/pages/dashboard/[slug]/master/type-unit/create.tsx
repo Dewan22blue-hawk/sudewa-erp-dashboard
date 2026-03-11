@@ -17,7 +17,7 @@ export default function CreateTypeUnitPage() {
     resolver: zodResolver(typeUnitSchema),
     defaultValues: {
       code: '',
-      brandId: undefined,
+      brandId: 0,
       name: '',
       unitType: '',
       unitModel: '',
@@ -25,6 +25,8 @@ export default function CreateTypeUnitPage() {
       nettoWeight: undefined,
       capacity: undefined,
       image: null,
+      sellPrice: undefined,
+      buyPrice: undefined,
     },
   });
 

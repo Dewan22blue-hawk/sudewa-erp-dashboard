@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Search, Bell, Clock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { LogOut, ChevronDown } from 'lucide-react';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
+import { removeAccessToken } from '@/lib/auth/token';
 
 const RECENT_STORAGE_KEY = 'global-search-recent';
 
@@ -10,6 +21,9 @@ export function Topbar() {
   const [query, setQuery] = useState('');
   const [recentItems, setRecentItems] = useState<string[]>([]);
   const { data: profile, isLoading: isProfileLoading } = useAuthMe();
+  const router = useRouter();
+  const params = useParams();
+  const slug = params?.slug as string;
 
   const user = profile?.data;
 
@@ -54,6 +68,19 @@ export function Topbar() {
 
     // TODO: trigger real search API here
     console.log('Searching:', query);
+  };
+
+  const handleLogout = () => {
+    removeAccessToken();
+    router.replace('/login');
+  };
+
+  const handleProfileClick = () => {
+    if (slug) {
+      router.push(`/dashboard/${slug}/profile`);
+    } else {
+      router.push(`/dashboard/profile`);
+    }
   };
 
   return (
@@ -149,23 +176,39 @@ export function Topbar() {
       </Popover>
 
       {/* ================= RIGHT SIDE ================= */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-6">
         <button className="text-gray-600 hover:text-black transition">
           <Bell className="h-5 w-5" />
         </button>
 
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col text-right">
-            <span className="text-sm font-medium text-gray-900" title={displayName}>
-              {isProfileLoading ? 'Loading...' : displayName}
-            </span>
-            <span className="text-xs text-gray-500" title={`User ID: ${userId}`}>
-              {isProfileLoading ? '' : subtitle}
-            </span>
-          </div>
+        <div className="h-8 w-px bg-gray-200"></div>
 
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">{initials}</div>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-3 outline-none hover:opacity-80 transition-opacity">
+              <div className="flex flex-col text-right">
+                <span className="text-[13px] leading-tight font-semibold text-gray-900" title={displayName}>
+                  {isProfileLoading ? 'Loading...' : displayName}
+                </span>
+                <span className="text-[11px] leading-tight text-slate-500 font-medium mt-0.5" title={`User ID: ${userId}`}>
+                  {isProfileLoading ? '' : userId}
+                </span>
+              </div>
+
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-[13px] font-bold text-black border border-gray-100">{initials}</div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-xl">
+            <DropdownMenuItem onClick={handleProfileClick} className="cursor-pointer font-medium text-slate-900 text-[13px] py-2 px-3 rounded-lg hover:bg-slate-50 focus:bg-slate-50">
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-1" />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer font-medium text-red-600 text-[13px] py-2 px-3 rounded-lg hover:bg-red-50 focus:bg-red-50 focus:text-red-600">
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

@@ -28,6 +28,8 @@ export default function EditTypeUnitPage() {
       nettoWeight: undefined,
       capacity: undefined,
       image: null,
+      sellPrice: undefined,
+      buyPrice: undefined,
     },
   });
 
@@ -44,6 +46,8 @@ export default function EditTypeUnitPage() {
         brutoWeight: typeUnit.brutoWeight ?? undefined,
         nettoWeight: typeUnit.nettoWeight ?? undefined,
         capacity: typeUnit.capacity ?? undefined,
+        sellPrice: typeUnit.sellPrice ?? undefined,
+        buyPrice: typeUnit.buyPrice ?? undefined,
         image: null,
       });
     }

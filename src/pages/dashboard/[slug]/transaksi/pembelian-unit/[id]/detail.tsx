@@ -92,7 +92,7 @@ export default function PurchaseDetailPage() {
         <PurchaseDetailCards data={purchase} />
 
         {/* UNIT TABLE */}
-        <PurchaseUnitTable units={purchase.units} purchaseId={purchase.id} slug={slug as string} />
+        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} />
       </div>
     </DashboardLayout>
   );

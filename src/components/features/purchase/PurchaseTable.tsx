@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Purchase } from '@/@types/purchase.types';
 import { MoreVertical, Plus, Search } from 'lucide-react';
@@ -9,59 +8,66 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
-import { formatCurrency } from "@/lib/utils/currency"
+import { formatCurrency } from '@/lib/utils/currency';
+import { PaginationMeta } from '@/@types/pagination.types';
 
-interface Props {
+export interface PurchaseTableProps {
   data: Purchase[];
+  meta?: PaginationMeta;
   onDelete: (id: string) => void;
   onAdd?: () => void;
   slug: string;
+  onPageChange?: (page: number) => void;
+  onPerPageChange?: (perPage: number) => void;
+  onSearch?: (term: string) => void;
+  loading?: boolean;
 }
 
-export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
+export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, onSearch, loading }: PurchaseTableProps) {
   const router = useRouter();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = data.filter(
-    (item) =>
-      item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.supplierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.date.includes(searchTerm)
-  );
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      onPageChange?.(1);
+      onSearch?.(searchTerm);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchTerm, onSearch, onPageChange]);
 
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: filteredData,
-  });
-
-  // Pagination logic
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = sortedData.slice(startIndex, endIndex);
-
-  const handleToggle = (id: string) => {
-    const newSelectedIds = new Set(selectedIds);
-    if (newSelectedIds.has(id)) {
-      newSelectedIds.delete(id);
-    } else {
-      newSelectedIds.add(id);
-    }
-    setSelectedIds(newSelectedIds);
-  };
+  const currentPage = meta?.currentPage ?? 1;
+  const itemsPerPage = meta?.perPage ?? 10;
+  const totalPages = meta?.lastPage ?? 1;
+  const totalEntries = meta?.total ?? data.length;
+  const startIndex = totalEntries === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = startIndex === 0 ? 0 : startIndex + data.length - 1;
 
   const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value));
-    setCurrentPage(1); // Reset to page 1 on page size change
+    const parsed = Number(value);
+    onPerPageChange?.(parsed);
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to page 1 on search
+  const handlePageChange = (page: number) => {
+    onPageChange?.(page);
+  };
+
+  const renderPageButtons = () => {
+    const buttons = [] as number[];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) buttons.push(i);
+    } else if (currentPage <= 3) {
+      buttons.push(1, 2, 3, 4, 5);
+    } else if (currentPage >= totalPages - 2) {
+      for (let i = totalPages - 4; i <= totalPages; i++) buttons.push(i);
+    } else {
+      buttons.push(currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2);
+    }
+
+    return buttons.map((page) => (
+      <Button key={page} variant={currentPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-[#1f304f] hover:bg-[#1a2842] text-white' : ''}`}>
+        {page}
+      </Button>
+    ));
   };
 
   return (
@@ -71,13 +77,7 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <div className="relative w-full sm:w-[250px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input
-              type="text"
-              placeholder="Search here..."
-              className="pl-8 bg-white"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
+            <Input type="text" placeholder="Search here..." className="pl-8 bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
           <div className="flex items-center gap-2 whitespace-nowrap">
             <span className="text-sm font-medium">Show</span>
@@ -92,10 +92,8 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm font-medium">Entries</span>
+            <span className="text-sm font-medium">Page</span>
           </div>
-
-
         </div>
 
         <div className="flex w-full sm:w-auto items-center gap-2 justify-end">
@@ -108,72 +106,52 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader className="bg-[#f5f6f8]">
             <TableRow>
-              <TableHead className="w-12"></TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="INVOICE" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="TANGGAL TRANSAKSI" sortKey="date" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="NAMA SUPPLIER" sortKey="supplierName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="TOTAL BIAYA" sortKey="totalBiaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="TOTAL DPP" sortKey="totalDpp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="TOTAL PPN" sortKey="totalPpn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="TOTAL PEMBELIAN" sortKey="totalPurchase" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold uppercase text-slate-700">
-                <SortableHeader title="SISA BAYAR" sortKey="remainingPayment" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-slate-700 px-4" />
-              </TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700">ACTION</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">KODE BELI</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TANGGAL</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">SUPPLIER</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL BIAYA</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL DPP</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL PPN</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL BELI</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">KURANG BAYAR</TableHead>
+              <TableHead className="text-right text-xs font-semibold uppercase text-slate-600 px-4 py-3">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentData.length === 0 ? (
+            {data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                   Tidak ada data
                 </TableCell>
               </TableRow>
             ) : (
-              currentData.map((item) => (
-                <TableRow key={item.id} className="border-t hover:bg-slate-50/50 transition-colors" data-state={selectedIds.has(item.id) && 'selected'}>
-                  <TableCell className="w-12">
-                    <Checkbox checked={selectedIds.has(item.id)} onCheckedChange={() => handleToggle(item.id)} />
-                  </TableCell>
-                  <TableCell className="font-medium text-slate-800 cursor-pointer hover:underline" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
+              data.map((item) => (
+                <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
+                  <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
                     {item.code}
                   </TableCell>
-                  <TableCell className="text-slate-700">{format(new Date(item.date), 'dd/MM/yyyy')}</TableCell>
-                  <TableCell className="text-slate-700">{item.supplierName}</TableCell>
-                  <TableCell className="text-slate-700">{formatCurrency(Number(item.totalBiaya))}</TableCell>
-                  <TableCell className="text-slate-700">{formatCurrency(Number(item.totalDpp))}</TableCell>
-                  <TableCell className="text-slate-700">{formatCurrency(Number(item.totalPpn))}</TableCell>
-                  <TableCell className="font-semibold text-slate-800">{formatCurrency(Number(item.totalPurchase))}</TableCell>
-                  <TableCell className="text-red-500 font-semibold">{formatCurrency(Number(item.remainingPayment))}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.date ? format(new Date(item.date), 'dd/MM/yyyy') : '-'}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.supplierName}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(Number(item.totalBiaya))}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(Number(item.totalDpp))}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(Number(item.totalPpn))}</TableCell>
+                  <TableCell className="text-slate-800 font-semibold px-4">{formatCurrency(Number(item.totalPurchase))}</TableCell>
+                  <TableCell className="text-red-500 font-semibold px-4">{formatCurrency(Number(item.remainingPayment))}</TableCell>
 
-                  <TableCell className="text-right">
+                  <TableCell className="text-right px-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="w-32">
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}?action=refund`)}>Refund</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                           Hapus
@@ -186,66 +164,22 @@ export default function PurchaseTable({ data, onDelete, onAdd, slug }: Props) {
             )}
           </TableBody>
         </Table>
+        {loading && <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-sm text-muted-foreground">Memuat data...</div>}
       </div>
 
       {/* Pagination */}
-      {sortedData.length > 0 && (
+      {data.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <div className="text-sm text-slate-500">
-            Showing {startIndex + 1} to {Math.min(endIndex, sortedData.length)} of {sortedData.length} entries
+            Showing {startIndex} to {endIndex} of {totalEntries} data
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="h-8 px-3"
-            >
+            <Button variant="outline" size="sm" onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="h-8 px-3">
               Previous
             </Button>
+            {renderPageButtons()}
 
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum: number;
-              if (totalPages <= 5) pageNum = i + 1;
-              else if (currentPage <= 3) pageNum = i + 1;
-              else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
-              else pageNum = currentPage - 2 + i;
-
-              return (
-                <Button
-                  key={pageNum}
-                  variant={currentPage === pageNum ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`h-8 w-8 p-0 ${currentPage === pageNum ? 'bg-[#1f304f] hover:bg-[#1a2842]' : ''}`}
-                >
-                  {pageNum}
-                </Button>
-              );
-            })}
-
-            {totalPages > 5 && currentPage < totalPages - 2 && (
-              <>
-                <span className="px-2 text-slate-500">...</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(totalPages)}
-                  className="h-8 w-8 p-0"
-                >
-                  {totalPages}
-                </Button>
-              </>
-            )}
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="h-8 px-3"
-            >
+            <Button variant="outline" size="sm" onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="h-8 px-3">
               Next
             </Button>
           </div>

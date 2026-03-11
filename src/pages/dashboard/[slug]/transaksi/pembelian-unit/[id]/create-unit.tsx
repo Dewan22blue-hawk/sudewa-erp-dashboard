@@ -58,12 +58,7 @@ export default function CreatePurchaseUnitPage() {
 
         <Card className="rounded-xl">
           <CardContent className="p-6">
-            <PurchaseUnitForm
-              onSubmit={handleSubmit}
-              // need to update PurchaseUnitForm to accept these
-              onCancel={() => router.back()}
-              loading={addUnitMutation.isPending}
-            />
+            <PurchaseUnitForm onSubmit={handleSubmit} onCancel={() => router.back()} loading={addUnitMutation.isPending} />
           </CardContent>
         </Card>
       </div>

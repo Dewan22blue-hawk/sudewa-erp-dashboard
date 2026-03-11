@@ -14,7 +14,11 @@ export default function PurchasePage() {
   const router = useRouter();
   const { slug } = router.query;
   const { companyId } = useCompany();
-  const { data = [], isLoading } = usePurchases(companyId);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [search, setSearch] = useState('');
+
+  const { data, isLoading, isFetching } = usePurchases(companyId, { page, perPage, search });
   const deleteMutation = useDeletePurchase();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -25,6 +29,8 @@ export default function PurchasePage() {
       await deleteMutation.mutateAsync(selectedId);
       toast.success('Data berhasil dihapus');
       setSelectedId(null);
+      // Refresh list after deletion
+      setPage(1);
     } catch {
       toast.error('Gagal menghapus data');
     }
@@ -39,7 +45,24 @@ export default function PurchasePage() {
           <div className="flex gap-2"></div>
         </div>
 
-        {isLoading ? <div>Loading...</div> : <PurchaseTable data={data} onDelete={(id) => setSelectedId(id)} onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)} slug={slug as string} />}
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <PurchaseTable
+            data={data?.data ?? []}
+            meta={data?.meta}
+            onDelete={(id) => setSelectedId(id)}
+            onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
+            slug={slug as string}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+            onSearch={setSearch}
+            loading={isFetching}
+          />
+        )}
 
         <DeletePurchaseDialog open={!!selectedId} onClose={() => setSelectedId(null)} onConfirm={handleDelete} loading={deleteMutation.isPending} />
       </div>
