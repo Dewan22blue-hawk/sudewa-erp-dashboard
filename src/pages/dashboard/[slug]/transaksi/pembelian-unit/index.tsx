@@ -6,20 +6,18 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseTable from '@/components/features/purchase/PurchaseTable';
 import DeletePurchaseDialog from '@/components/features/purchase/DeletePurchaseDialog';
 import { PageHeader } from '@/components/common/PageHeader';
-import { usePurchases, useDeletePurchase } from '@/hooks/usePurchase';
-import { useCompany } from '@/contexts/CompanyContext';
+import { usePurchases, useDeletePurchaseUnitItem } from '@/hooks/usePurchase';
 import { useRouter } from 'next/router';
 
 export default function PurchasePage() {
   const router = useRouter();
   const { slug } = router.query;
-  const { companyId } = useCompany();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isFetching } = usePurchases(companyId, { page, perPage, search });
-  const deleteMutation = useDeletePurchase();
+  const { data, isLoading, isFetching } = usePurchases(undefined, { page, perPage, search });
+  const deleteMutation = useDeletePurchaseUnitItem();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
 

@@ -8,18 +8,39 @@ import {
   Purchase,
   PurchaseUnit,
   PurchaseUnitItemDetail,
-  PurchaseUnitItemRow,
   CreatePurchaseRequest,
   UpdatePurchaseRequest,
   CreatePurchaseUnitRequest,
   PurchasePaginatedResponse,
   PurchaseUnitItemPaginatedResponse,
+  PurchaseUnitItemRow,
 } from '@/@types/purchase.types';
 
 // Legacy in-memory store kept as a fallback for create/update flows that are not yet wired to the backend
 let purchases: Purchase[] = [];
 // cache for unit item details when API unavailable
 const purchaseUnitItemDetails: PurchaseUnitItemDetail[] = [];
+type UnitTransactionItemListApiModel = {
+  id?: number;
+  uuid?: string;
+  unit_transaction_id?: number;
+  unit_type_id?: number;
+  qty_total?: number;
+  price?: string | number;
+  bbn_price?: string | number;
+  expedition_fee?: string | number;
+  hpp_per_unit_price?: string | number;
+  dpp_per_unit_price?: string | number;
+  ppn_per_unit_price?: string | number;
+  other_fee?: string | number;
+  created_at?: string;
+  unit_transaction?: {
+    id?: number;
+    uuid?: string;
+    code?: string;
+    warehouse_id?: number;
+  };
+};
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
 
@@ -213,28 +234,6 @@ type UnitTransactionItemDetailApiModel = {
     id?: number;
     uuid?: string;
     unit_transaction_id?: number;
-    unit_type_id?: number;
-  };
-};
-
-type UnitTransactionItemListApiModel = {
-  id?: number;
-  uuid?: string;
-  unit_transaction_id?: number;
-  unit_type_id?: number;
-  qty_total?: number;
-  price?: string | number;
-  bbn_price?: string | number;
-  hpp_per_unit_price?: string | number;
-  dpp_per_unit_price?: string | number;
-  ppn_per_unit_price?: string | number;
-  other_fee?: string | number;
-  created_at?: string;
-  unit_transaction?: {
-    id?: number;
-    uuid?: string;
-    code?: string;
-    warehouse_id?: number;
   };
 };
 
@@ -254,14 +253,16 @@ const mapUnitTransactionItemList = (item: UnitTransactionItemListApiModel): Purc
   const qty = Number(item.qty_total ?? 0);
   const price = Number(item.price ?? 0);
   const bbn = Number(item.bbn_price ?? 0);
-  const otherFee = Number(item.other_fee ?? 0);
+  const expedition = Number(item.expedition_fee ?? 0);
+  const other = Number(item.other_fee ?? 0);
   const hppPerUnit = Number(item.hpp_per_unit_price ?? 0);
   const dppPerUnit = Number(item.dpp_per_unit_price ?? 0);
   const ppnPerUnit = Number(item.ppn_per_unit_price ?? 0);
 
-  const totalDpp = dppPerUnit * qty;
-  const totalPpn = ppnPerUnit * qty;
-  const totalPurchase = totalDpp + totalPpn;
+  const hppTotal = hppPerUnit * qty;
+  const dppTotal = dppPerUnit * qty;
+  const ppnTotal = ppnPerUnit * qty;
+  const totalPurchase = dppTotal + ppnTotal;
 
   return {
     id: String(item.id ?? ''),
@@ -271,12 +272,16 @@ const mapUnitTransactionItemList = (item: UnitTransactionItemListApiModel): Purc
     qtyTotal: qty,
     price,
     bbnPrice: bbn,
-    otherFee,
+    expeditionFee: expedition,
+    otherFee: other,
     hppPerUnit,
     dppPerUnit,
     ppnPerUnit,
-    totalDpp,
-    totalPpn,
+    hppTotal,
+    dppTotal,
+    ppnTotal,
+    totalDpp: dppTotal,
+    totalPpn: ppnTotal,
     totalPurchase,
     createdAt: item.created_at,
   };
@@ -385,7 +390,7 @@ export const purchaseService = {
     });
     const payload = ensureSuccess(response.data);
     return {
-      data: (payload.data?.data ?? []).map((item: UnitTransactionItemListApiModel) => mapUnitTransactionItemList(item)),
+      data: (payload.data ?? []).map((item: UnitTransactionItemListApiModel) => mapUnitTransactionItemList(item)),
       meta: mapLaravelPaginationMeta(payload),
     };
   },
@@ -436,6 +441,10 @@ export const purchaseService = {
       const idx = purchaseUnitItemDetails.findIndex((i) => i.id === id);
       if (idx >= 0) purchaseUnitItemDetails.splice(idx, 1);
     }
+  },
+
+  async deleteUnitTransactionItem(id: string): Promise<void> {
+    await apiClient.delete<LaravelApiResponse<null>>(`${basePath}-item/${id}`);
   },
 
   async createPurchase(payload: CreatePurchaseRequest): Promise<Purchase> {

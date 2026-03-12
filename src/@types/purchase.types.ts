@@ -132,13 +132,17 @@ export interface PurchaseUnitItemRow {
   qtyTotal: number;
   price: number;
   bbnPrice: number;
+  expeditionFee: number;
   otherFee: number;
   hppPerUnit: number;
   dppPerUnit: number;
   ppnPerUnit: number;
-  totalDpp: number;
-  totalPpn: number;
-  totalPurchase: number;
+  hppTotal: number;
+  dppTotal: number;
+  ppnTotal: number;
+  totalDpp?: number;
+  totalPpn?: number;
+  totalPurchase?: number;
   createdAt?: string;
 }
 
