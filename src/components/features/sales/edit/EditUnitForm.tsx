@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Save } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 import { editUnitSchema, EditUnitFormData } from './edit-unit.schema';
 import { PRODUCT_OPTIONS } from './edit-unit.data';
 
@@ -17,13 +17,15 @@ interface EditUnitFormProps {
   onSubmit?: (data: EditUnitFormData) => void; // Optional because readOnly won't submit
   onCancel: () => void;
   readOnly?: boolean;
+  showAddUnitButton?: boolean;
+  onAddUnitClick?: () => void;
 }
 
 /**
  * Edit Unit Form - EXACT sesuai Figma
  * Layout: Tipe Unit + Qty | Harga | Satuan (2 cols) | Biaya
  */
-export function EditUnitForm({ defaultValues, onSubmit = () => { }, onCancel, readOnly = false }: EditUnitFormProps) {
+export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, readOnly = false, showAddUnitButton = false, onAddUnitClick }: EditUnitFormProps) {
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
     defaultValues,
@@ -47,8 +49,22 @@ export function EditUnitForm({ defaultValues, onSubmit = () => { }, onCancel, re
         {/* Section Header */}
         <div>
           <h2 className="text-lg font-semibold text-foreground">Informasi Penjualan</h2>
-          <div className="my-4 h-[1px] bg-border" />
+          <div className="my-4 h-px bg-border" />
         </div>
+
+        <FormField
+          control={form.control}
+          name="customer"
+          render={({ field }) => (
+            <FormItem className="max-w-sm">
+              <FormLabel className="text-sm font-medium">Customer</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="PT XX" disabled={readOnly} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* ROW 1: Tipe Unit, Qty, Harga */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -58,20 +74,28 @@ export function EditUnitForm({ defaultValues, onSubmit = () => { }, onCancel, re
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium">Tipe Unit</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select an item" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {PRODUCT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-2">
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select an item" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {PRODUCT_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {showAddUnitButton && !readOnly && (
+                    <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0" onClick={onAddUnitClick}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -242,12 +266,12 @@ export function EditUnitForm({ defaultValues, onSubmit = () => { }, onCancel, re
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-3 pt-8">
+        <div className="flex justify-center gap-3 pt-8">
           <Button type="button" variant="ghost" onClick={onCancel} disabled={form.formState.isSubmitting} className="text-muted-foreground hover:text-foreground">
             Batal
           </Button>
           {!readOnly && (
-            <Button type="submit" disabled={form.formState.isSubmitting} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-[100px]">
+            <Button type="submit" disabled={form.formState.isSubmitting} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
               {form.formState.isSubmitting ? (
                 'Menyimpan...'
               ) : (

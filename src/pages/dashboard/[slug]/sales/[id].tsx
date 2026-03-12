@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, Plus, Wallet } from 'lucide-react';
 import { SALES_DATA } from '@/components/features/sales/sales.data';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
@@ -66,7 +66,7 @@ export default function SalesDetailPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
           <div className="flex items-start gap-4">
             <Button variant="ghost" size="icon" className="mt-1 h-8 w-8" onClick={() => router.back()}>
-              <ArrowLeft className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5" />
             </Button>
             <div className="space-y-1">
               <h1 className="text-2xl font-bold tracking-tight">Data Penjualan</h1>
@@ -78,11 +78,11 @@ export default function SalesDetailPage() {
           </div>
 
           <div className="flex gap-3 ml-12 md:ml-0">
-            <Button variant="outline" className="bg-white hover:bg-gray-50 text-black border-input" onClick={handlePayment}>
-              <span className="mr-2 font-semibold text-lg leading-none">$</span>
+            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handlePayment}>
+              <Wallet className="mr-2 h-4 w-4" />
               Bayar
             </Button>
-            <Button className="bg-gray-100 hover:bg-gray-200 text-black border-input border" onClick={handleCreateUnit}>
+            <Button variant="outline" className="bg-white hover:bg-gray-50" onClick={handleCreateUnit}>
               <Plus className="mr-2 h-4 w-4" />
               Tambah Unit
             </Button>
@@ -107,7 +107,7 @@ export default function SalesDetailPage() {
         <SalesDetailCards data={salesData} />
 
         {/* Detail Unit Table */}
-        <SalesUnitTable units={salesData.units} salesId={salesData.id} />
+        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} />
       </div>
     </DashboardLayout>
   );
