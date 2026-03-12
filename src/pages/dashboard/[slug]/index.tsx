@@ -19,10 +19,13 @@ export default function DashboardPage() {
         <FinanceOverview accounts={data?.accounts || []} isLoading={isLoading} />
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <FinanceChart data={data?.financeSeries || []} isLoading={isLoading} />
           </div>
-          <IncomeDonutChart />
+          {/* <div className="lg:col-span-2">
+            <FinanceChart data={data?.financeSeries || []} isLoading={isLoading} />
+          </div>
+          <IncomeDonutChart /> */}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">

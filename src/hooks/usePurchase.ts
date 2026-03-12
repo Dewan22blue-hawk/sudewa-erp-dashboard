@@ -6,12 +6,11 @@ import { CreatePurchaseRequest, UpdatePurchaseRequest, CreatePurchaseUnitRequest
    GET LIST
 ===================================== */
 
-export const usePurchases = (companyId?: string | null, options: { page?: number; perPage?: number; search?: string } = {}) => {
+export const usePurchases = (_companyId?: string | null, options: { page?: number; perPage?: number; search?: string } = {}) => {
   return useQuery({
-    queryKey: ['purchases', companyId, options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
-    queryFn: () => purchaseService.getPurchases(companyId!, { page: options.page, perPage: options.perPage, search: options.search }),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    enabled: !!companyId,
+    queryKey: ['purchase-items', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
+    queryFn: () => purchaseService.getUnitTransactionItems({ page: options.page, perPage: options.perPage, search: options.search }),
+    staleTime: 1000 * 60 * 5, // 5 minutes,
   });
 };
 
@@ -46,9 +45,7 @@ export const useCreatePurchase = () => {
   });
 };
 
-/* =====================================
-   UPDATE PURCHASE
-===================================== */
+
 
 export const useUpdatePurchase = () => {
   const queryClient = useQueryClient();
@@ -82,6 +79,18 @@ export const useDeletePurchase = () => {
       queryClient.invalidateQueries({
         queryKey: ['purchases'],
       });
+    },
+  });
+};
+
+export const useDeletePurchaseUnitItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => purchaseService.deleteUnitTransactionItem(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchase-items'] });
     },
   });
 };
