@@ -2,14 +2,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText, DollarSign, ListChecks, Calendar, User } from 'lucide-react';
 import { SalesItem } from '../sales.data';
 import { Progress } from '@/components/ui/progress';
-import { formatCurrency } from "@/lib/utils/currency"
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface Props {
   data: SalesItem;
 }
 
 export function SalesDetailCards({ data }: Props) {
-  const totalPaid = data.totalJual - data.kurangBayar;
+  const totalPaid = data.totalBayar ?? data.totalJual - data.kurangBayar;
   const percentagePaid = data.totalJual > 0 ? Math.round((totalPaid / data.totalJual) * 100) : 0;
 
   return (
@@ -68,13 +68,8 @@ export function SalesDetailCards({ data }: Props) {
               <span className="text-gray-500">Total PPN</span>
               <span className="font-medium">{formatCurrency(data.totalPpn)}</span>
             </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500">Biaya Lainnya</span>
-              <span className="font-medium">{formatCurrency(data.totalBiaya)}</span>
-            </div>
-
             <div className="pt-4 mt-auto border-t flex justify-between items-center">
-              <span className="font-medium">Total Penjualan</span>
+              <span className="font-medium">Total Pembelian</span>
               <span className="font-bold text-lg">{formatCurrency(data.totalJual)}</span>
             </div>
           </div>

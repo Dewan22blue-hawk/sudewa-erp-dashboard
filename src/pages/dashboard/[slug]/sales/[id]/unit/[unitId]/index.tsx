@@ -62,9 +62,9 @@ export default function UnitPurchaseDetailPage({ data }: InferGetServerSideProps
               <ArrowLeft className="h-4 w-4" />
               Kembali
             </button>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Detail Pembelian Unit</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Detail Penjualan Unit</h1>
             <p className="text-sm text-muted-foreground">
-              Invoice <span className="text-blue-600 font-medium cursor-pointer hover:underline">{data.kodeJual}</span>
+              Kode Jual <span className="text-blue-600 font-medium cursor-pointer hover:underline">{data.kodeJual}</span>
             </p>
           </div>
         </div>

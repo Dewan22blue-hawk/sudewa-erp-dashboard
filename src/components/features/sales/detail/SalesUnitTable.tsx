@@ -1,220 +1,161 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { UnitItem } from '../sales.data';
-import { Button } from '@/components/ui/button';
-import { MoreVertical, Trash2, Pencil } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import React from 'react';
-import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { MoreVertical } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils/currency';
+import { SalesLineItem } from '../sales.data';
 
 interface Props {
-  units: UnitItem[];
+  lineItems: SalesLineItem[];
   salesId: string;
 }
 
-export function SalesUnitTable({ units, salesId }: Props) {
+export function SalesUnitTable({ lineItems, salesId }: Props) {
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: units,
-  });
+  const slugQuery = router.query.slug;
+  const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
+  const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
 
-  const columns: ColumnDef<UnitItem>[] = [
-    {
-      id: 'no',
-      header: () => <div className="text-center font-semibold text-foreground px-4">No</div>,
-      cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
-    },
-    {
-      accessorKey: 'color',
-      header: () => <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
-      cell: ({ row }) => <div className="font-medium px-4">{row.getValue('color')}</div>,
-    },
-    {
-      accessorKey: 'engineNumber',
-      header: () => <SortableHeader title="NOMOR MESIN" sortKey="engineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
-      cell: ({ row }) => <div className="px-4">{row.getValue('engineNumber')}</div>,
-    },
-    {
-      accessorKey: 'chassisNumber',
-      header: () => <SortableHeader title="NOMOR RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
-      cell: ({ row }) => <div className="px-4">{row.getValue('chassisNumber')}</div>,
-    },
-    {
-      id: 'actions',
-      header: () => <div className="text-right font-semibold text-foreground px-4">ACTION</div>,
-      cell: ({ row }) => {
-        const unit = row.original;
-        return (
-          <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => {
-                    const slugQuery = router.query.slug;
-                    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-                    const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
-                    router.push(`${basePath}/${salesId}/unit/${unit.id}`);
-                  }}
-                >
-                  Detail
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    const slugQuery = router.query.slug;
-                    const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-                    const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
-                    router.push(`${basePath}/${salesId}/unit/${unit.id}/edit`);
-                  }}
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log('Delete', unit.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Hapus
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        );
-      },
-    },
-  ];
+  const totalPages = Math.max(1, Math.ceil(lineItems.length / perPage));
+  const pagedData = useMemo(() => {
+    const start = (currentPage - 1) * perPage;
+    return lineItems.slice(start, start + perPage);
+  }, [currentPage, perPage, lineItems]);
 
-  const table = useReactTable({
-    data: sortedData,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 5,
-      },
-    },
-  });
+  const handleDelete = () => {
+    setDeleteId(null);
+  };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
-        <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>
+    <div className="rounded-xl border bg-white">
+      <div className="border-b px-6 py-5">
+        <h3 className="text-xl font-semibold">Detail Pembelian Unit</h3>
+        <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dibeli</p>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 px-6 py-4">
         <span className="text-sm">Show</span>
         <Select
-          value={`${table.getState().pagination.pageSize}`}
+          value={String(perPage)}
           onValueChange={(value) => {
-            table.setPageSize(Number(value));
+            setPerPage(Number(value));
+            setCurrentPage(1);
           }}
         >
-          <SelectTrigger className="h-8 w-[70px]">
-            <SelectValue placeholder={table.getState().pagination.pageSize} />
+          <SelectTrigger className="h-9 w-18 bg-white">
+            <SelectValue placeholder="25" />
           </SelectTrigger>
-          <SelectContent side="top">
-            {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-              <SelectItem key={pageSize} value={`${pageSize}`}>
-                {pageSize}
-              </SelectItem>
-            ))}
+          <SelectContent>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="25">25</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+            <SelectItem value="100">100</SelectItem>
           </SelectContent>
         </Select>
         <span className="text-sm">Page</span>
       </div>
 
-      <div className="rounded-md border bg-white shadow-sm">
+      <div className="overflow-x-auto">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-[#F9FAFB] hover:bg-[#F9FAFB]">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className={`p-0 bg-[#F9FAFB] ${header.id === 'actions' ? 'print:hidden' : ''}`}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
+          <TableHeader className="bg-[#f5f6f8]">
+            <TableRow>
+              <TableHead className="px-4">No</TableHead>
+              <TableHead className="px-4">TIPE UNIT</TableHead>
+              <TableHead className="px-4">QTY</TableHead>
+              <TableHead className="px-4">HARGA JUAL</TableHead>
+              <TableHead className="px-4">BIAYA BBN</TableHead>
+              <TableHead className="px-4">BIAYA EXPEDISI</TableHead>
+              <TableHead className="px-4">BIAYA LAIN</TableHead>
+              <TableHead className="px-4">HPP</TableHead>
+              <TableHead className="px-4">DPP</TableHead>
+              <TableHead className="px-4">PPN</TableHead>
+              <TableHead className="px-4">JUMLAH</TableHead>
+              <TableHead className="px-4 text-right">ACTION</TableHead>
+            </TableRow>
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="hover:bg-muted/50">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={`py-4 p-0 ${cell.column.id === 'actions' ? 'print:hidden' : ''}`}>
-                      {cell.column.id === 'no' ? <div className="px-4 text-center">{index + 1}</div> : flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
+            {pagedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  Belum ada unit yang ditambahkan.
+                <TableCell colSpan={12} className="h-20 text-center text-muted-foreground">
+                  Tidak ada data
                 </TableCell>
               </TableRow>
+            ) : (
+              pagedData.map((item, idx) => (
+                <TableRow key={item.id}>
+                  <TableCell className="px-4">{(currentPage - 1) * perPage + idx + 1}</TableCell>
+                  <TableCell className="px-4">{item.tipeUnit}</TableCell>
+                  <TableCell className="px-4">{item.qty}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.hargaJual)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.biayaBbn)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.biayaEkspedisi)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.biayaLain)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.hpp)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.dpp)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.ppn)}</TableCell>
+                  <TableCell className="px-4">{formatCurrency(item.jumlah)}</TableCell>
+                  <TableCell className="px-4 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}>Detail</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)}>
+                          Hapus
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>
       </div>
 
-      {/* Pagination Controls */}
-      <div className="flex items-center justify-between px-2 print:hidden pb-4">
-        <div className="text-sm text-muted-foreground">
-          Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, table.getFilteredRowModel().rows.length)} of{' '}
-          {table.getFilteredRowModel().rows.length} data
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" className="h-8 px-2 text-muted-foreground hover:text-foreground" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+      <div className="flex items-center justify-between px-6 py-4 text-sm text-muted-foreground">
+        <span>
+          Showing {lineItems.length === 0 ? 0 : (currentPage - 1) * perPage + 1}-{Math.min(currentPage * perPage, lineItems.length)} of {lineItems.length} data
+        </span>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
             Previous
           </Button>
-
-          {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, i) => {
-            let pageNum: number;
-            const currentPage = table.getState().pagination.pageIndex + 1;
-            const totalPages = table.getPageCount();
-
-            if (totalPages <= 5) {
-              pageNum = i + 1;
-            } else if (currentPage <= 3) {
-              pageNum = i + 1;
-            } else if (currentPage >= totalPages - 2) {
-              pageNum = totalPages - 4 + i;
-            } else {
-              pageNum = currentPage - 2 + i;
-            }
-
-            return (
-              <Button
-                key={pageNum}
-                variant={currentPage === pageNum ? 'outline' : 'ghost'}
-                size="sm"
-                onClick={() => table.setPageIndex(pageNum - 1)}
-                className={`w-8 h-8 p-0 ${currentPage === pageNum ? 'border-input bg-white text-black font-medium shadow-sm' : 'text-muted-foreground'}`}
-              >
-                {pageNum}
-              </Button>
-            );
-          })}
-
-          {table.getPageCount() > 5 && <span className="text-muted-foreground">...</span>}
-
-          <Button variant="ghost" className="h-8 px-2 text-muted-foreground hover:text-foreground" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+            {currentPage}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
             Next
           </Button>
         </div>
       </div>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus data unit?</AlertDialogTitle>
+            <AlertDialogDescription>Tindakan ini tidak dapat dibatalkan.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDelete}>
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
