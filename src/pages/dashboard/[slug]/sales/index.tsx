@@ -1,8 +1,8 @@
+import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SalesTable } from '@/components/features/sales/SalesTable';
-// Header action buttons removed (unused imports)
-
+import { CreateSalesModal } from '@/components/features/sales/CreateSalesModal';
 import { useRouter } from 'next/router';
 
 /**
@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
  */
 export default function SalesPage() {
   const router = useRouter();
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   return (
     <DashboardLayout>
@@ -18,19 +19,19 @@ export default function SalesPage() {
         {/* Header Section */}
         <div className="flex items-start justify-between">
           <PageHeader title="Penjualan Unit" description="Kelola dan lacak semua penjualan unit" />
-
           <div className="flex gap-2"></div>
         </div>
 
         {/* Sales Table */}
         <SalesTable
-          onAdd={() => {
-            const slugQuery = router.query.slug;
-            const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-            router.push(slug ? `/dashboard/${slug}/sales/create` : '/sales/create');
-          }}
+          onAdd={() => setIsAddOpen(true)}
         />
       </div>
+
+      <CreateSalesModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+      />
     </DashboardLayout>
   );
 }

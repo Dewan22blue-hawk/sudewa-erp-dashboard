@@ -3,7 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MoneyInput } from "@/components/ui/money-input"
 import { Label } from "@/components/ui/label"
-import { Save } from "lucide-react"
+import { Wallet, CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { id as idLocale } from "date-fns/locale/id"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -85,71 +90,45 @@ export function PurchasePaymentForm({ purchaseData, onSubmit, onCancel, loading 
     }, [paymentBca, paymentBcaUsd, paymentCash, purchaseData.totalPurchase, setValue])
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="space-y-6">
+            <h2 className="text-xl font-semibold tracking-tight">Informasi Pembelian</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    {/* Left Column: Biaya & Invoice */}
-                    <div className="space-y-8">
-                        {/* Biaya Section */}
-                        <div className="space-y-4">
-                            <h3 className="text-sm font-medium text-muted-foreground">Biaya</h3>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Biaya Section */}
+                    <div className="rounded-xl border p-5 space-y-4 shadow-sm">
+                        <h3 className="text-sm text-muted-foreground">Biaya</h3>
 
-                            <div className="grid grid-cols-3 items-center gap-4">
-                                <Label className="col-span-1">Total DPP</Label>
-                                <Input className="col-span-2 bg-muted/50" readOnly value={formatMoney(purchaseData.totalDpp)} />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">Total Beli</Label>
+                                <Input className="bg-transparent rounded-lg" readOnly value={formatMoney(purchaseData.totalDpp)} />
                             </div>
-                            <div className="grid grid-cols-3 items-center gap-4">
-                                <Label className="col-span-1">Total PPN</Label>
-                                <Input className="col-span-2 bg-muted/50" readOnly value={formatMoney(purchaseData.totalPpn)} />
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">Total PPN</Label>
+                                <Input className="bg-transparent rounded-lg" readOnly value={formatMoney(purchaseData.totalPpn)} />
                             </div>
-                            <div className="grid grid-cols-3 items-center gap-4">
-                                <Label className="col-span-1">Total Biaya Lain</Label>
-                                <Input className="col-span-2 bg-muted/50" readOnly value={formatMoney(purchaseData.totalBiaya)} />
-                            </div>
-                        </div>
-
-                        {/* Invoice Section */}
-                        <div className="space-y-4">
-                            <h3 className="text-sm font-medium text-muted-foreground">Invoice</h3>
-
-                            <div className="grid grid-cols-3 items-center gap-4">
-                                <Label className="col-span-1">Tanggal</Label>
-                                <Input className="col-span-2 bg-muted/50" readOnly value={new Date(purchaseData.date).toLocaleDateString('id-ID')} />
-                            </div>
-                            <div className="grid grid-cols-3 items-center gap-4">
-                                <Label className="col-span-1">Total Bayar</Label>
-                                <Input
-                                    className="col-span-2 bg-muted/50"
-                                    readOnly
-                                    value={formatMoney(watch("totalBayar"))}
-                                />
-                            </div>
-                            <div className="grid grid-cols-3 items-center gap-4">
-                                <Label className="col-span-1">Kurang Bayar</Label>
-                                <Input
-                                    className="col-span-2 bg-muted/50 font-semibold text-red-600"
-                                    readOnly
-                                    value={formatMoney(watch("kurangBayar"))}
-                                />
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">Total Biaya</Label>
+                                <Input className="bg-transparent rounded-lg" readOnly value={formatMoney(purchaseData.totalPurchase)} />
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Pembayaran */}
-                    <div className="space-y-8">
-                        <div className="space-y-4">
-                            <h3 className="text-sm font-medium text-muted-foreground">Pembayaran</h3>
+                    {/* Pembayaran Section */}
+                    <div className="rounded-xl border p-5 space-y-4 shadow-sm">
+                        <h3 className="text-sm text-muted-foreground">Pembayaran</h3>
 
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <FormField
                                 control={form.control}
                                 name="paymentBca"
                                 render={({ field }) => (
-                                    <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
-                                        <FormLabel className="col-span-1">BCA</FormLabel>
+                                    <FormItem className="space-y-2">
+                                        <FormLabel className="text-sm font-medium">BCA IDR</FormLabel>
                                         <FormControl>
                                             <MoneyInput
-                                                className="col-span-2"
+                                                className="bg-transparent rounded-lg"
                                                 {...field}
                                                 value={field.value || 0}
                                                 onChangeValue={field.onChange}
@@ -164,11 +143,11 @@ export function PurchasePaymentForm({ purchaseData, onSubmit, onCancel, loading 
                                 control={form.control}
                                 name="paymentBcaUsd"
                                 render={({ field }) => (
-                                    <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
-                                        <FormLabel className="col-span-1">BCA (USD)</FormLabel>
+                                    <FormItem className="space-y-2">
+                                        <FormLabel className="text-sm font-medium">BCA USD</FormLabel>
                                         <FormControl>
                                             <MoneyInput
-                                                className="col-span-2"
+                                                className="bg-transparent rounded-lg"
                                                 {...field}
                                                 value={field.value || 0}
                                                 onChangeValue={field.onChange}
@@ -183,11 +162,11 @@ export function PurchasePaymentForm({ purchaseData, onSubmit, onCancel, loading 
                                 control={form.control}
                                 name="paymentCash"
                                 render={({ field }) => (
-                                    <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
-                                        <FormLabel className="col-span-1">Cash</FormLabel>
+                                    <FormItem className="space-y-2">
+                                        <FormLabel className="text-sm font-medium">Cash</FormLabel>
                                         <FormControl>
                                             <MoneyInput
-                                                className="col-span-2"
+                                                className="bg-transparent rounded-lg"
                                                 {...field}
                                                 value={field.value || 0}
                                                 onChangeValue={field.onChange}
@@ -199,35 +178,103 @@ export function PurchasePaymentForm({ purchaseData, onSubmit, onCancel, loading 
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Footer Buttons */}
-                <div className="flex justify-end gap-3 pt-8 border-t">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={onCancel}
-                        disabled={loading || form.formState.isSubmitting}
-                        className="text-muted-foreground hover:text-foreground"
-                    >
-                        Batal
-                    </Button>
-                    <Button
-                        type="submit"
-                        disabled={loading || form.formState.isSubmitting}
-                        className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-[100px]"
-                    >
-                        {loading || form.formState.isSubmitting ? (
-                            "Menyimpan..."
-                        ) : (
-                            <>
-                                <Save className="mr-2 h-4 w-4" />
-                                Simpan
-                            </>
-                        )}
-                    </Button>
-                </div>
-            </form>
-        </Form>
+                    {/* Invoice Section */}
+                    <div className="rounded-xl border p-5 space-y-4 shadow-sm">
+                        <h3 className="text-sm text-muted-foreground">Invoice</h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="space-y-2 flex flex-col justify-end">
+                                <Label className="text-sm font-medium">Tanggal</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal bg-transparent rounded-lg",
+                                                "text-muted-foreground"
+                                            )}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {purchaseData.date ? format(new Date(purchaseData.date), "PPP", { locale: idLocale }) : <span>Pilih Tanggal</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={new Date(purchaseData.date)}
+                                            onSelect={() => { }} // Read-only view
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+
+                            <FormField
+                                control={form.control}
+                                name="totalBayar"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-2">
+                                        <FormLabel className="text-sm font-medium">Total Bayar</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                className="bg-transparent rounded-lg"
+                                                readOnly
+                                                value={formatMoney(field.value)}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="kurangBayar"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-2">
+                                        <FormLabel className="text-sm font-medium">Kurang Bayar</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                className="bg-transparent rounded-lg"
+                                                readOnly
+                                                value={field.value === 0 ? "0" : formatMoney(field.value)}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center gap-4 pt-8">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={onCancel}
+                            disabled={loading || form.formState.isSubmitting}
+                            className="text-foreground hover:bg-muted font-medium px-8"
+                        >
+                            Batal
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={loading || form.formState.isSubmitting}
+                            className="bg-[#00d05a] hover:bg-[#00ba51] text-white min-w-[120px] font-medium px-8"
+                        >
+                            {loading || form.formState.isSubmitting ? (
+                                "Menyimpan..."
+                            ) : (
+                                <>
+                                    <Wallet className="mr-2 h-4 w-4" />
+                                    Bayar
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </div>
     )
 }

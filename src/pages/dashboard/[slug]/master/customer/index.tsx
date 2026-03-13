@@ -1,230 +1,165 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card } from '@/components/ui/card';
+import { CustomerTable, Customer } from '@/components/features/customer/CustomerTable';
+import { CustomerFormModal, CustomerFormData } from '@/components/features/customer/CustomerFormModal';
+import { DeleteCustomerModal } from '@/components/features/customer/DeleteCustomerModal';
 import { toast } from 'sonner';
-import { useCompany } from '@/contexts/CompanyContext';
-import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from '@/hooks/useCustomer';
-import { customerSchema, type CustomerFormValues } from '@/scheme/customer.schema';
-import { CustomerTable } from '@/components/features/customer/CustomerTable';
-import { CustomerFormDialog } from '@/components/features/customer/CustomerFormDialog';
-import { DeleteCustomerDialog } from '@/components/features/customer/DeleteCustomerDialog';
-import type { Customer } from '@/@types/customer.types';
-import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
+
+// DUMMY DATA INITIALIZATION
+const INITIAL_CUSTOMERS: Customer[] = [
+  {
+    id: 1,
+    namaDealer: "Yamaha Sejati Yogyakarta",
+    namaCustomer: "ELLA YOUNG WIDJAYANTO NUGRAHA",
+    pic: "Emilia Clarke",
+    alamat: "Jl. Raya Kalimalang No, Rt 000, Rw 000, Duren Sawit, Duren Sawit, Kota Adm. Jakarta Timur, DKI Jakarta 00000",
+    maps: "https://maps.app.goo.gl/example",
+    phone: "08xx xxxx xxxx"
+  },
+  {
+    id: 2,
+    namaDealer: "Yamaha Tugu Jogja",
+    namaCustomer: "BUDI SANTOSO",
+    pic: "John Doe",
+    alamat: "Jl. Pangeran Diponegoro No 10, Gowongan, Jetis, Kota Yogyakarta, DIY 55233",
+    maps: "https://maps.app.goo.gl/example",
+    phone: "0812 3456 7890"
+  },
+  {
+    id: 3,
+    namaDealer: "Honda Nusantara Abadi",
+    namaCustomer: "SITI RAHMAWATI",
+    pic: "Jane Smith",
+    alamat: "Jl. Magelang KM 5.5, Kutu Patran, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284",
+    maps: "https://maps.app.goo.gl/example",
+    phone: "0857 1122 3344"
+  },
+  {
+    id: 4,
+    namaDealer: "Suzuki Sumber Baru",
+    namaCustomer: "AHMAD FAUZI",
+    pic: "Tom Holland",
+    alamat: "Jl. Laksda Adisucipto No 15, Ambarukmo, Caturtunggal, Depok, Sleman, DIY 55281",
+    maps: "https://maps.app.goo.gl/example",
+    phone: "0878 9988 5544"
+  },
+  {
+    id: 5,
+    namaDealer: "Toyota Nasmoco Jogja",
+    namaCustomer: "DEWI KARTIKA",
+    pic: "Emma Watson",
+    alamat: "Jl. Ringroad Utara, Jombor Kidul, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284",
+    maps: "https://maps.app.goo.gl/example",
+    phone: "0819 6633 2211"
+  },
+];
 
 export default function CustomerPage() {
-  const { companyId } = useCompany();
-  const { data: profile } = useAuthMe();
-  const { data, isLoading, isError } = useCustomers(companyId);
-  const createCustomer = useCreateCustomer();
-  const updateCustomer = useUpdateCustomer();
-  const deleteCustomer = useDeleteCustomer();
+  // Data state
+  const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
 
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
-  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
+  // Table state
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
-  const createForm = useForm<CustomerFormValues>({
-    resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: '',
-      address: '',
-      npwp: '',
-      pic: '',
-      phone: '',
-    },
-  });
+  // Modals state
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-  const editForm = useForm<CustomerFormValues>({
-    resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: '',
-      address: '',
-      npwp: '',
-      pic: '',
-      phone: '',
-    },
-  });
+  // Filter & Pagination logic
+  const filteredCustomers = useMemo(() => {
+    return customers.filter(customer =>
+      customer.namaDealer.toLowerCase().includes(search.toLowerCase()) ||
+      customer.namaCustomer.toLowerCase().includes(search.toLowerCase()) ||
+      customer.pic.toLowerCase().includes(search.toLowerCase()) ||
+      customer.phone.includes(search)
+    );
+  }, [customers, search]);
 
-  useEffect(() => {
-    if (customerToEdit) {
-      editForm.reset({
-        name: customerToEdit.name,
-        address: customerToEdit.address ?? '',
-        npwp: customerToEdit.npwp ?? '',
-        pic: customerToEdit.pic ?? '',
-        phone: customerToEdit.phone ?? '',
-      });
-    }
-  }, [customerToEdit, editForm]);
+  const paginatedCustomers = useMemo(() => {
+    const startIndex = (page - 1) * perPage;
+    return filteredCustomers.slice(startIndex, startIndex + perPage);
+  }, [filteredCustomers, page, perPage]);
 
-  const handleCreateClick = () => {
-    setCreateModalOpen(true);
+  // Handlers
+  const handleAddClick = () => {
+    setSelectedCustomer(null);
+    setIsFormOpen(true);
   };
 
-  const handleCloseCreateModal = () => {
-    setCreateModalOpen(false);
-    createForm.reset();
-  };
-
-  const handleCloseEditModal = () => {
-    setEditModalOpen(false);
-    setCustomerToEdit(null);
-    editForm.reset();
-  };
-
-  const onSubmitCreate = async (values: CustomerFormValues) => {
-    if (!companyId) {
-      toast.error('Company ID tidak ditemukan');
-      return;
-    }
-
-    if (!profile?.data?.id) {
-      toast.error('User belum dimuat, silakan coba lagi');
-      return;
-    }
-
-    try {
-      await createCustomer.mutateAsync({
-        ...values,
-        companyId: Number(companyId) || companyId,
-        userId: profile.data.id,
-      });
-      handleCloseCreateModal();
-      toast.success('Data berhasil ditambahkan');
-    } catch (error) {
-      console.error('Failed to create customer:', error);
-      toast.error('Gagal menambahkan data customer');
-    }
-  };
-
-  const onSubmitEdit = async (values: CustomerFormValues) => {
-    if (!customerToEdit) return;
-
-    if (!profile?.data?.id) {
-      toast.error('User belum dimuat, silakan coba lagi');
-      return;
-    }
-
-    try {
-      await updateCustomer.mutateAsync({
-        id: customerToEdit.id,
-        payload: {
-          ...values,
-          companyId: Number(customerToEdit.companyId) || customerToEdit.companyId,
-          userId: profile.data.id,
-        },
-      });
-      handleCloseEditModal();
-      toast.success('Data berhasil diperbarui');
-    } catch (error) {
-      console.error('Failed to update customer:', error);
-      toast.error('Gagal memperbarui data customer');
-    }
-  };
-
-  const handleEditCustomer = (customer: Customer) => {
-    setCustomerToEdit(customer);
-    setEditModalOpen(true);
+  const handleEditClick = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsFormOpen(true);
   };
 
   const handleDeleteClick = (customer: Customer) => {
-    setCustomerToDelete(customer);
-    setDeleteDialogOpen(true);
+    setSelectedCustomer(customer);
+    setIsDeleteOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!customerToDelete) return;
+  const handleSaveForm = (data: CustomerFormData) => {
+    if (selectedCustomer) {
+      // Edit
+      setCustomers(customers.map(c => c.id === selectedCustomer.id ? { ...c, ...data } : c));
+      toast.success('Data customer berhasil diubah');
+    } else {
+      // Add
+      const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+      setCustomers([{ id: newId, ...data }, ...customers]);
+      toast.success('Data customer berhasil ditambahkan');
+    }
+    setIsFormOpen(false);
+  };
 
-    try {
-      await deleteCustomer.mutateAsync(customerToDelete.id);
-      setDeleteDialogOpen(false);
-      setCustomerToDelete(null);
-      toast.success('Data berhasil dihapus');
-    } catch (error) {
-      console.error('Failed to delete customer:', error);
-      toast.error('Gagal menghapus data customer');
+  const handleConfirmDelete = () => {
+    if (selectedCustomer) {
+      setCustomers(customers.filter(c => c.id !== selectedCustomer.id));
+      toast.success('Data customer berhasil dihapus');
+      setIsDeleteOpen(false);
+      setSelectedCustomer(null);
     }
   };
-
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Customer</h1>
-              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-            </div>
-          </div>
-          <Card className="rounded-xl p-6">
-            <div className="text-center text-muted-foreground">Loading...</div>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (isError) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Customer</h1>
-              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-            </div>
-          </div>
-          <Card className="rounded-xl p-6">
-            <div className="text-center text-destructive">Gagal memuat data</div>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Customer</h1>
-            <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-          </div>
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Customer</h1>
+          <p className="text-sm text-gray-500 mt-1">Kelola data customer dengan mudah</p>
         </div>
 
-        {/* TABLE CARD */}
-        <div className="">
-          <CustomerTable customers={data?.data || []} onEdit={handleEditCustomer} onDelete={handleDeleteClick} onAdd={handleCreateClick} />
-        </div>
+        {/* Content */}
+        <CustomerTable
+          customers={paginatedCustomers}
+          search={search}
+          onSearchChange={(v) => { setSearch(v); setPage(1); }}
+          page={page}
+          perPage={perPage}
+          totalData={filteredCustomers.length}
+          onPageChange={setPage}
+          onPerPageChange={(v) => { setPerPage(v); setPage(1); }}
+          onAdd={handleAddClick}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+        />
       </div>
 
-      <CustomerFormDialog
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        form={createForm}
-        onSubmit={onSubmitCreate}
-        title="Tambah Data Customer"
-        description="Masukkan detail customer baru"
-        isSubmitting={createCustomer.isPending}
+      {/* Modals */}
+      <CustomerFormModal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSave={handleSaveForm}
+        initialData={selectedCustomer}
       />
 
-      <CustomerFormDialog
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        form={editForm}
-        onSubmit={onSubmitEdit}
-        title="Edit Data Customer"
-        description="Perbarui detail customer"
-        submitLabel="Perbarui"
-        isSubmitting={updateCustomer.isPending}
+      <DeleteCustomerModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
       />
-
-      <DeleteCustomerDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={handleConfirmDelete} isDeleting={deleteCustomer.isPending} />
     </DashboardLayout>
   );
 }
