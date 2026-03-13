@@ -1,5 +1,4 @@
 import { ChevronDown, Check } from 'lucide-react';
-import { getNavItems, type NavItemConfig } from '@/components/features/navigation/nav.config';
 import { useEffect, useState } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies, Company } from '@/services/company.service';
@@ -7,6 +6,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useCompanyMenu } from '@/hooks/use-company-menu';
+import { MenuItem } from '@/types/menu.types';
 
 export function Sidebar() {
   const router = useRouter();
@@ -17,13 +18,13 @@ export function Sidebar() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const navItems = getNavItems(slug);
-
   useEffect(() => {
     fetchUserCompanies().then((data) => {
       setCompanies(data);
     });
   }, []);
+
+  const { menus } = useCompanyMenu(companies);
 
   useEffect(() => {
     if (slug && companies.length > 0) {
@@ -82,7 +83,7 @@ export function Sidebar() {
         <div className="mb-4 text-sm font-semibold text-gray-500">Main Menu</div>
 
         <nav className="space-y-1">
-          {navItems.map((item, index) => (
+          {menus.map((item, index) => (
             <SidebarNavItem key={index} item={item} />
           ))}
         </nav>
@@ -95,7 +96,7 @@ export function Sidebar() {
    CUSTOM NAV ITEM (FOR PERFECT CONTROL)
 ========================================= */
 
-function SidebarNavItem({ item }: { item: NavItemConfig }) {
+function SidebarNavItem({ item }: { item: MenuItem }) {
   const router = useRouter();
 
   // Modular function for exact route awareness

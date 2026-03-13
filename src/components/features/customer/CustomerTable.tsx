@@ -1,69 +1,65 @@
-import { useState, useMemo } from 'react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import React from 'react';
+import { Search, Plus, MoreVertical } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus, Search } from 'lucide-react';
-import type { Customer } from '@/@types/customer.types';
-import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { CustomerFormData } from './CustomerFormModal';
+
+export interface Customer extends CustomerFormData {
+  id: number;
+}
 
 interface CustomerTableProps {
   customers: Customer[];
+  search: string;
+  onSearchChange: (value: string) => void;
+  page: number;
+  perPage: number;
+  totalData: number;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
+  onAdd: () => void;
   onEdit: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
-  onAdd?: () => void;
 }
 
-export function CustomerTable({ customers, onEdit, onDelete, onAdd }: CustomerTableProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
-
-  const filteredData = useMemo(() => {
-    const lowercasedTerm = searchTerm.toLowerCase();
-    return customers.filter(
-      (item) =>
-        (item.name ?? '').toLowerCase().includes(lowercasedTerm) ||
-        (item.code ?? '').toLowerCase().includes(lowercasedTerm) ||
-        (item.address ?? '').toLowerCase().includes(lowercasedTerm) ||
-        (item.pic ?? '').toLowerCase().includes(lowercasedTerm) ||
-        (item.phone ?? '').toLowerCase().includes(lowercasedTerm),
-    );
-  }, [customers, searchTerm]);
-
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: filteredData,
-  });
-
-  // Pagination logic
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = sortedData.slice(startIndex, endIndex);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to page 1 on search
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value));
-    setCurrentPage(1); // Reset to page 1 on page size change
-  };
+export function CustomerTable({
+  customers,
+  search,
+  onSearchChange,
+  page,
+  perPage,
+  totalData,
+  onPageChange,
+  onPerPageChange,
+  onAdd,
+  onEdit,
+  onDelete
+}: CustomerTableProps) {
+  const totalPages = Math.ceil(totalData / perPage);
+  const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
+  const endData = Math.min(page * perPage, totalData);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search here" value={searchTerm} onChange={handleSearchChange} className="pl-9 bg-white" />
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search here"
+              className="pl-9 bg-white"
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-sm font-medium">Show</span>
-            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Show</span>
+            <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
               <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue placeholder="25" />
               </SelectTrigger>
@@ -74,123 +70,125 @@ export function CustomerTable({ customers, onEdit, onDelete, onAdd }: CustomerTa
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm font-medium">Page</span>
+            <span className="text-sm text-gray-500">Page</span>
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto justify-end">
-          {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Plus className="mr-2 h-4 w-4" /> Tambah
+        </Button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <Table>
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableHead>
-                <SortableHeader title="Kode Customer" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="Nama Customer" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="Alamat" sortKey="address" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="NPWP" sortKey="npwp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="PIC" sortKey="pic" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="Handphone" sortKey="phone" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentData.length === 0 ? (
+      <Card className="rounded-xl overflow-hidden border border-gray-200">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[1000px]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                  Tidak ada data
-                </TableCell>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">NAMA DEALER</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">NAMA CUSTOMER</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">PIC</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">ALAMAT</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">MAPS</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">HANDPHONE</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">ACTION</TableHead>
               </TableRow>
-            ) : (
-              currentData.map((customer) => (
-                <TableRow key={customer.id} className="hover:bg-slate-50/50">
-                  <TableCell className="font-medium text-slate-800">{customer.code ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{customer.name}</TableCell>
-                  <TableCell className="max-w-[300px] truncate text-slate-700" title={customer.address ?? undefined}>
-                    {customer.address ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-slate-700">{customer.npwp ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{customer.pic ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{customer.phone ?? '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(customer)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(customer)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+            </TableHeader>
+            <TableBody>
+              {customers.length > 0 ? (
+                customers.map((customer) => (
+                  <TableRow key={customer.id} className="hover:bg-gray-50/50">
+                    <TableCell className="px-4 py-4 text-sm text-gray-900 text-center">
+                      {customer.namaDealer}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                      {customer.namaCustomer}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                      {customer.pic}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                      <span className="line-clamp-2 max-w-[200px] mx-auto">{customer.alamat}</span>
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                      <a href={customer.maps} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline max-w-[150px] inline-block truncate">
+                        {customer.maps}
+                      </a>
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
+                      {customer.phone}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4 text-gray-500" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuItem onClick={() => onEdit(customer)} className="cursor-pointer">
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onDelete(customer)} className="text-red-600 cursor-pointer focus:text-red-600">
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-32 text-center text-gray-500">
+                    Tidak ada data customer ditemukan
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
 
-      {/* Pagination Controls */}
-      {filteredData.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="text-sm text-slate-500">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
+      {totalPages > 0 && (
+        <div className="flex items-center justify-between px-2 pt-2">
+          <div className="text-sm text-gray-500">
+            Showing {startData}-{endData} of {totalData} data
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="h-8 px-3">
-              Previous
-            </Button>
 
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum: number;
-              if (totalPages <= 5) pageNum = i + 1;
-              else if (currentPage <= 3) pageNum = i + 1;
-              else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
-              else pageNum = currentPage - 2 + i;
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onPageChange(page - 1)}
+                disabled={page === 1}
+                className="text-gray-500"
+              >
+                Previous
+              </Button>
 
-              return (
-                <Button key={pageNum} variant={currentPage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className={`h-8 w-8 p-0 ${currentPage === pageNum ? 'bg-[#1f304f] hover:bg-[#1a2842]' : ''}`}>
-                  {pageNum}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                  key={p}
+                  variant={p === page ? "outline" : "ghost"}
+                  size="sm"
+                  onClick={() => onPageChange(p)}
+                  className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                >
+                  {p}
                 </Button>
-              );
-            })}
+              ))}
 
-            {totalPages > 5 && currentPage < totalPages - 2 && (
-              <>
-                <span className="px-2 text-slate-500">...</span>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} className="h-8 w-8 p-0">
-                  {totalPages}
-                </Button>
-              </>
-            )}
-
-            <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="h-8 px-3">
-              Next
-            </Button>
-          </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onPageChange(page + 1)}
+                disabled={page === totalPages}
+                className="text-gray-500"
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

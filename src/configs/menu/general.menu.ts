@@ -1,0 +1,178 @@
+import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText, Shield } from 'lucide-react';
+import { MenuItem } from '@/types/menu.types';
+
+export const getGeneralMenus = (slug: string): MenuItem[] => {
+    const base = (path: string) => (slug ? `/dashboard/${slug}${path}` : path);
+    const master = (sub: string) => (slug ? `/dashboard/${slug}/master${sub}` : `/master-data${sub}`);
+    const settings = (sub: string) => (slug ? `/dashboard/${slug}/settings${sub}` : `/settings${sub}`);
+
+    return [
+        {
+            label: 'Dashboard',
+            icon: LayoutDashboard,
+            children: [
+                {
+                    label: 'Overview',
+                    href: slug ? `/dashboard/${slug}` : '/dashboard',
+                    exact: true,
+                },
+            ],
+        },
+        {
+            label: 'Master Data',
+            icon: Database,
+            children: [
+                {
+                    label: 'Akun',
+                    href: master('/account'),
+                },
+                {
+                    label: 'Supplier',
+                    href: master('/supplier'),
+                },
+                {
+                    label: 'Customer',
+                    href: master('/customer'),
+                },
+                {
+                    label: 'Tipe Unit',
+                    href: master('/type-unit'),
+                },
+                {
+                    label: 'Sparepart',
+                    href: master('/sparepart'),
+                },
+                {
+                    label: 'Kas',
+                    href: master('/kas'),
+                },
+                {
+                    label: 'User',
+                    href: master('/user'),
+                },
+            ],
+        },
+        {
+            label: 'Transaksi',
+            icon: FileText,
+            children: [
+                {
+                    label: 'Arus Transaksi',
+                    href: base('/transaksi/arus-transaksi'),
+                },
+                {
+                    label: 'Pembelian Unit',
+                    href: base('/transaksi/pembelian-unit'),
+                },
+                {
+                    label: 'Penjualan Unit',
+                    href: base('/sales'),
+                },
+            ],
+        },
+        {
+            label: 'Warehouse',
+            icon: Warehouse,
+            children: [
+                {
+                    label: 'Stok Unit',
+                    href: base('/warehouse/stock-unit'),
+                },
+                {
+                    label: 'Penerimaan Unit',
+                    href: base('/warehouse/penerimaan-unit'),
+                },
+                {
+                    label: 'Pengeluaran Unit',
+                    href: base('/warehouse/pengeluaran-unit'),
+                },
+            ],
+        },
+        {
+            label: 'Finance',
+            icon: DollarSign,
+            children: [
+                {
+                    label: 'Transaksi Kas Harian',
+                    href: base('/finance/transaksi-kas-harian'),
+                },
+                {
+                    label: 'Data PPN Penjualan',
+                    href: base('/finance/data-ppn-penjualan'),
+                },
+                {
+                    label: 'Data PPN Pembelian',
+                    href: base('/finance/data-ppn-pembelian'),
+                },
+                {
+                    label: 'Data Refund Pembelian',
+                    href: base('/finance/refund-beli'),
+                },
+                {
+                    label: 'Data Refund Penjualan',
+                    href: base('/finance/refund-jual'),
+                },
+                {
+                    label: 'Data Hutang',
+                    href: base('/finance/data-hutang'),
+                },
+                {
+                    label: 'Data Pembayaran Hutang',
+                    href: base('/finance/data-pembayaran-hutang'),
+                },
+                {
+                    label: 'Data Piutang',
+                    href: base('/finance/data-piutang'),
+                },
+                {
+                    label: 'Data Pembayaran Piutang',
+                    href: base('/finance/data-penerimaan-piutang'),
+                },
+            ],
+        },
+        {
+            label: 'Laporan',
+            icon: ScrollText,
+            children: [
+                {
+                    label: 'Laporan Transaksi Kas',
+                    href: base('/laporan/laporan-transaksi-kas'),
+                },
+                {
+                    label: 'Laporan Akuntansi',
+                    href: base('/laporan/laporan-akuntansi'),
+                },
+                {
+                    label: 'Laporan Pembelian',
+                    href: base('/laporan/laporan-pembelian'),
+                },
+                {
+                    label: 'Laporan Penjualan',
+                    href: base('/laporan/laporan-penjualan'),
+                },
+                {
+                    label: 'Laporan Penerimaan',
+                    href: base('/laporan/laporan-penerimaan'),
+                },
+                {
+                    label: 'Laporan Stock',
+                    href: base('/laporan/laporan-stock'),
+                },
+            ],
+        },
+        {
+            label: 'Settings',
+            icon: Shield,
+            children: [
+                {
+                    label: 'Roles',
+                    href: settings('/roles'),
+                },
+                {
+                    label: 'Permissions',
+                    href: settings('/permissions'),
+                },
+            ],
+        },
+    ];
+};

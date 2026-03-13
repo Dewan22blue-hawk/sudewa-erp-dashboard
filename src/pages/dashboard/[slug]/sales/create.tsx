@@ -24,18 +24,23 @@ export default function CreateSalesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-1">
-          <button onClick={() => router.push(salesPath)} className="mb-1 inline-flex w-fit items-center text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-4xl font-semibold tracking-tight">Tambah Penjualan</h1>
-          <div className="flex items-center gap-2 text-sm">
+        <div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(salesPath)}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <h1 className="text-2xl font-semibold tracking-tight">Tambah Penjualan</h1>
+          </div>
+          <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
             <span className="text-muted-foreground">Kode Jual</span>
-            <span className="text-blue-600 font-medium">INV-WIN/20260216-0001</span>
+            <span className="text-blue-500 font-medium">INV-WIN/20260202-0001</span>
           </div>
         </div>
 
-        <div className="rounded-xl border bg-white p-6 md:p-8">
+        <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
           <EditUnitForm
             defaultValues={{
               customer: 'PT XX',

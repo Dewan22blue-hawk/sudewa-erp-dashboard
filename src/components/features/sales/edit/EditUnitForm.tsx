@@ -25,7 +25,7 @@ interface EditUnitFormProps {
  * Edit Unit Form - EXACT sesuai Figma
  * Layout: Tipe Unit + Qty | Harga | Satuan (2 cols) | Biaya
  */
-export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, readOnly = false, showAddUnitButton = false, onAddUnitClick }: EditUnitFormProps) {
+export function EditUnitForm({ defaultValues, onSubmit = () => { }, onCancel, readOnly = false, showAddUnitButton = false, onAddUnitClick }: EditUnitFormProps) {
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
     defaultValues,
@@ -48,18 +48,18 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {/* Section Header */}
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Informasi Penjualan</h2>
-          <div className="my-4 h-px bg-border" />
+          <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Penjualan</h2>
+          <div className="my-6 h-px bg-muted/60" />
         </div>
 
         <FormField
           control={form.control}
           name="customer"
           render={({ field }) => (
-            <FormItem className="max-w-sm">
+            <FormItem>
               <FormLabel className="text-sm font-medium">Customer</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="PT XX" disabled={readOnly} />
+                <Input {...field} placeholder="PT XX" className="bg-transparent max-w-sm" disabled={readOnly} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -77,7 +77,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
                 <div className="flex items-center gap-2">
                   <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full bg-transparent">
                         <SelectValue placeholder="Select an item" />
                       </SelectTrigger>
                     </FormControl>
@@ -91,7 +91,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
                   </Select>
 
                   {showAddUnitButton && !readOnly && (
-                    <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0" onClick={onAddUnitClick}>
+                    <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 bg-transparent" onClick={onAddUnitClick}>
                       <Plus className="h-4 w-4" />
                     </Button>
                   )}
@@ -108,7 +108,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">QTY</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <Input type="number" min="1" className="bg-transparent" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -122,7 +122,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Harga</FormLabel>
                 <FormControl>
-                  <MoneyInput {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                  <MoneyInput className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -139,7 +139,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
                 <FormControl>
-                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,9 +151,9 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
             name="biayaEkspedisi"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
+                <FormLabel className="text-sm font-medium">Biaya Expedisi</FormLabel>
                 <FormControl>
-                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -167,7 +167,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
                 <FormControl>
-                  <MoneyInput placeholder="Value" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                  <MoneyInput placeholder="Value" className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -175,52 +175,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
           />
         </div>
 
-        {/* ROW 3: Total HPP, Total DPP, Total PPN */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="totalHpp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
-                <FormControl>
-                  <MoneyInput className="bg-muted/50" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="totalDpp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
-                <FormControl>
-                  <MoneyInput className="bg-muted/50" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="totalPpn"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
-                <FormControl>
-                  <MoneyInput className="bg-muted/50" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* ROW 4: HPP Satuan, DPP Satuan, PPN Satuan */}
+        {/* ROW 3: HPP Satuan, DPP Satuan, PPN Satuan */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FormField
             control={form.control}
@@ -229,7 +184,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
                 <FormControl>
-                  <MoneyInput placeholder="Rp 0" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                  <MoneyInput placeholder="Rp 99.999" className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -243,7 +198,7 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
                 <FormControl>
-                  <MoneyInput placeholder="Rp 0" {...field} value={field.value || 0} onChangeValue={field.onChange} />
+                  <MoneyInput placeholder="Rp 99.999" className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -257,7 +212,52 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
               <FormItem>
                 <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
                 <FormControl>
-                  <MoneyInput placeholder="Rp 0" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                  <MoneyInput placeholder="Rp 99.999" className="bg-transparent" {...field} value={field.value || 0} onChangeValue={field.onChange} disabled={readOnly} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* ROW 4: Total HPP, Total DPP, Total PPN */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FormField
+            control={form.control}
+            name="totalHpp"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
+                <FormControl>
+                  <MoneyInput placeholder="Rp 99.999" className="bg-transparent" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="totalDpp"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
+                <FormControl>
+                  <MoneyInput placeholder="Rp 99.999" className="bg-transparent" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="totalPpn"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
+                <FormControl>
+                  <MoneyInput placeholder="Rp 99.999" className="bg-transparent" disabled {...field} value={field.value || 0} onChangeValue={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -266,12 +266,12 @@ export function EditUnitForm({ defaultValues, onSubmit = () => {}, onCancel, rea
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-3 pt-8">
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={form.formState.isSubmitting} className="text-muted-foreground hover:text-foreground">
+        <div className="flex justify-center items-center gap-6 pt-10">
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={form.formState.isSubmitting} className="text-muted-foreground font-medium hover:text-foreground">
             Batal
           </Button>
           {!readOnly && (
-            <Button type="submit" disabled={form.formState.isSubmitting} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
+            <Button type="submit" disabled={form.formState.isSubmitting} className="bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium min-w-[120px] rounded-lg">
               {form.formState.isSubmitting ? (
                 'Menyimpan...'
               ) : (

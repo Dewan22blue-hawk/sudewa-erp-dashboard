@@ -59,20 +59,18 @@ export default function PurchasePaymentPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div>
-                    <button
-                        onClick={() => router.back()}
-                        className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                        Kembali
-                    </button>
-
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">Pembayaran Unit</h1>
-                        <div className="flex items-center gap-2 text-sm">
-                            <span className="text-muted-foreground">Kode Pembelian</span>
-                            <span className="text-blue-600 font-medium">{purchase.code}</span>
-                        </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => router.back()}
+                            className="text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                        <h1 className="text-2xl font-semibold tracking-tight">Pembayaran Unit</h1>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
+                        <span className="text-muted-foreground">Kode Beli</span>
+                        <span className="text-blue-500 font-medium">{purchase.code}</span>
                     </div>
                 </div>
 
