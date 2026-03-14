@@ -1,15 +1,21 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  wajira-frontend:
+  wajira-finance-frontend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wajira-panel-ui
+    container_name: wajira-finance-frontend
     ports:
       - "3000:3000"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE_URL=https://wajirabackend.hawk-dev.com
-      - NEXT_PUBLIC_AUTH_DOMAIN=wajirabackend.hawk-dev.com
+      - NEXT_PUBLIC_API_URL=http://202.74.75.47:8080
+      - NEXT_PUBLIC_AUTH_DOMAIN=202.74.75.47:3000
+    networks:
+      - wajira-local-net
+
+networks:
+  wajira-local-net:
+    external: true
