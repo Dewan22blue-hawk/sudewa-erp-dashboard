@@ -95,7 +95,7 @@ export function FinanceChart({ data, isLoading }: FinanceChartProps) {
       </div>
 
       <div className="h-96">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={320}>
           <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} />

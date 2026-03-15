@@ -68,7 +68,7 @@ export function IncomeDonutChart() {
       <CardContent>
         {/* Donut Chart - 187px diameter */}
         <div style={{ height: '187px' }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={187}>
             <PieChart>
               <Pie
                 data={data?.incomeBreakdown || []}

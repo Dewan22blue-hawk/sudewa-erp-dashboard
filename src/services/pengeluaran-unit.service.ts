@@ -1,10 +1,11 @@
 import { PengeluaranUnit, PengeluaranUnitDetail } from '@/@types/pengeluaran-unit.types';
+import { v4 as uuidv4 } from 'uuid';
 
 const customers = ['PT Mass Berg Mass', 'PT Jaya Makmur', 'PT Sentosa Abadi'];
 
 const seedPengeluaran = (): PengeluaranUnit[] => {
   return Array.from({ length: 12 }).map((_, idx) => {
-    const id = crypto.randomUUID();
+    const id = uuidv4();
     const nomor = (idx + 1).toString().padStart(4, '0');
 
     return {
@@ -25,7 +26,7 @@ const seedDetail = (pengeluaran: PengeluaranUnit[]): PengeluaranUnitDetail[] => 
     const detailCount = 8;
     for (let i = 0; i < detailCount; i++) {
       details.push({
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         pengeluaranId: item.id,
         kodeJual: `Honda XX`,
         tipeUnit: 'ABC',
@@ -50,7 +51,7 @@ export const getPengeluaranUnitById = async (id: string) => pengeluaranDB.find((
 export const createPengeluaranUnit = async (payload: Omit<PengeluaranUnit, 'id' | 'noPengeluaran'>) => {
   const nextNumber = (pengeluaranDB.length + 1).toString().padStart(4, '0');
   const newData: PengeluaranUnit = {
-    id: crypto.randomUUID(),
+    id: uuidv4(),
     noPengeluaran: `xx${nextNumber}`,
     ...payload,
   };

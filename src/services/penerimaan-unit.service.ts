@@ -1,10 +1,11 @@
 import { PenerimaanUnit, PenerimaanUnitDetail } from '@/@types/penerimaan-unit.types';
+import { v4 as uuidv4 } from 'uuid';
 
 const suppliers = ['PT Mass Berg Mass', 'PT Astra Jaya', 'PT Nusantara Motor'];
 
 const seedPenerimaan = (): PenerimaanUnit[] => {
   return Array.from({ length: 12 }).map((_, idx) => {
-    const id = crypto.randomUUID();
+    const id = uuidv4();
     const nomor = (idx + 1).toString().padStart(4, '0');
 
     return {
@@ -24,7 +25,7 @@ const seedDetail = (penerimaan: PenerimaanUnit[]): PenerimaanUnitDetail[] => {
     const detailCount = 8;
     for (let i = 0; i < detailCount; i++) {
       details.push({
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         penerimaanId: penerimaanItem.id,
         noPembelian: `TMU-${(8000 + idx).toString()}`,
         tipeUnit: 'Honda XX',
@@ -49,7 +50,7 @@ export const getPenerimaanUnitById = async (id: string) => penerimaanDB.find((p)
 export const createPenerimaanUnit = async (payload: Omit<PenerimaanUnit, 'id' | 'noPenerimaan'>) => {
   const nextNumber = (penerimaanDB.length + 1).toString().padStart(4, '0');
   const newData: PenerimaanUnit = {
-    id: crypto.randomUUID(),
+    id: uuidv4(),
     noPenerimaan: `PRU-${nextNumber}`,
     ...payload,
   };
@@ -74,8 +75,8 @@ export const bulkDeleteDetail = async (ids: string[]) => {
 };
 
 export const updatePenerimaanUnit = async (id: string, payload: Partial<PenerimaanUnit>) => {
-  const index = penerimaanDB.findIndex(p => p.id === id);
-  if (index === -1) throw new Error("Penerimaan Unit not found");
+  const index = penerimaanDB.findIndex((p) => p.id === id);
+  if (index === -1) throw new Error('Penerimaan Unit not found');
 
   const updated = { ...penerimaanDB[index], ...payload };
   penerimaanDB[index] = updated;
