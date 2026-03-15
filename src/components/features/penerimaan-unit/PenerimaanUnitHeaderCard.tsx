@@ -25,13 +25,13 @@ function InlineEditField({
   displayValue,
   onSave,
   disabled,
-  renderInput
+  renderInput,
 }: {
   value: any;
   displayValue: React.ReactNode;
   onSave: (val: any) => void;
   disabled?: boolean;
-  renderInput: (props: { onBlur: () => void, autoFocus: boolean }) => React.ReactNode;
+  renderInput: (props: { onBlur: () => void; autoFocus: boolean }) => React.ReactNode;
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -45,19 +45,11 @@ function InlineEditField({
   }
 
   if (isEditing) {
-    return (
-      <div className="relative animate-in fade-in zoom-in-95 duration-200">
-        {renderInput({ onBlur: handleBlur, autoFocus: true })}
-      </div>
-    );
+    return <div className="relative animate-in fade-in zoom-in-95 duration-200">{renderInput({ onBlur: handleBlur, autoFocus: true })}</div>;
   }
 
   return (
-    <div
-      onDoubleClick={() => setIsEditing(true)}
-      className="py-2 px-3 min-h-[40px] text-gray-700 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50/50 cursor-text transition-colors"
-      title="Double click to edit"
-    >
+    <div onDoubleClick={() => setIsEditing(true)} className="py-2 px-3 min-h-[40px] text-gray-700 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50/50 cursor-text transition-colors" title="Double click to edit">
       {displayValue || <span className="text-gray-400 italic">Empty - double click to add</span>}
     </div>
   );
@@ -85,35 +77,18 @@ export default function PenerimaanUnitHeaderCard({ data, onChange, onBlur, disab
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-[15px]">
         <div className="space-y-1">
-          <label className={isCreate ? "text-gray-900 font-medium tracking-tight" : "text-gray-500 font-medium text-xs uppercase tracking-wider"}>No Pemesanan</label>
+          <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-black font-bold text-xs uppercase tracking-wider'}>No Pemesanan</label>
           {isCreate ? (
-            <Input
-              value={data.noPenerimaan}
-              disabled={true}
-              readOnly
-              className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200"
-            />
+            <Input value={data.noPenerimaan} disabled={true} readOnly className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200" />
           ) : (
-            <InlineEditField
-              value={data.noPenerimaan}
-              displayValue={<span className="font-semibold">{data.noPenerimaan}</span>}
-              onSave={() => { }}
-              disabled={true}
-              renderInput={() => null}
-            />
+            <InlineEditField value={data.noPenerimaan} displayValue={<span className="font-semibold">{data.noPenerimaan}</span>} onSave={() => {}} disabled={true} renderInput={() => null} />
           )}
         </div>
 
         <div className="space-y-1">
-          <label className={isCreate ? "text-gray-900 font-medium tracking-tight" : "text-gray-500 font-medium text-xs uppercase tracking-wider"}>Tanggal Terima</label>
+          <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-black font-bold text-xs uppercase tracking-wider'}>Tanggal Terima</label>
           {isCreate ? (
-            <DatePicker
-              value={parsedDate}
-              onChange={(date) => onChange?.('tanggal', date)}
-              disabled={disabled}
-              placeholder="Pick a date"
-              className="h-10 rounded-lg border-gray-200 text-gray-900"
-            />
+            <DatePicker value={parsedDate} onChange={(date) => onChange?.('tanggal', date)} disabled={disabled} placeholder="Pick a date" className="h-10 rounded-lg border-gray-200 text-gray-900" />
           ) : (
             <InlineEditField
               value={parsedDate}
@@ -139,15 +114,9 @@ export default function PenerimaanUnitHeaderCard({ data, onChange, onBlur, disab
         </div>
 
         <div className="space-y-1">
-          <label className={isCreate ? "text-gray-900 font-medium tracking-tight" : "text-gray-500 font-medium text-xs uppercase tracking-wider"}>Supplier</label>
+          <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-black font-bold text text-xs uppercase tracking-wider'}>Supplier</label>
           {isCreate ? (
-            <Input
-              value={data.supplier || ''}
-              disabled={disabled}
-              onChange={(e) => onChange?.('supplier', e.target.value)}
-              placeholder="Masukkan nama supplier"
-              className="bg-white text-gray-900 rounded-lg h-10 border-gray-200"
-            />
+            <Input value={data.supplier || ''} disabled={disabled} onChange={(e) => onChange?.('supplier', e.target.value)} placeholder="Masukkan nama supplier" className="bg-white text-gray-900 rounded-lg h-10 border-gray-200" />
           ) : (
             <InlineEditField
               value={data.supplier}
@@ -169,8 +138,8 @@ export default function PenerimaanUnitHeaderCard({ data, onChange, onBlur, disab
         </div>
       </div>
 
-      <div className={isCreate ? "space-y-2 text-sm mt-4" : "space-y-1 text-[15px] mt-2"}>
-        <label className={isCreate ? "text-gray-900 font-medium tracking-tight" : "text-gray-500 font-medium text-xs uppercase tracking-wider"}>Keterangan</label>
+      <div className={isCreate ? 'space-y-2 text-sm mt-4' : 'space-y-1 text-[15px] mt-2'}>
+        <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-black font-bold text text-xs uppercase tracking-wider'}>Keterangan</label>
         {isCreate ? (
           <Textarea
             value={data.keterangan || ''}
