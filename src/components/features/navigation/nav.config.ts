@@ -70,7 +70,7 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       ],
     },
     {
-      label: 'Transaksi',
+      label: 'Administrasi',
       icon: FileText,
       children: [
         {
@@ -179,6 +179,20 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
     },
     {
       label: 'Settings',
+      icon: Shield,
+      children: [
+        {
+          label: 'Roles',
+          href: settings('/roles'),
+        },
+        {
+          label: 'Permissions',
+          href: settings('/permissions'),
+        },
+      ],
+    },
+    {
+      label: 'Security',
       icon: Shield,
       children: [
         {

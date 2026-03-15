@@ -1,62 +1,73 @@
-import React, { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { CustomerTable, Customer } from '@/components/features/customer/CustomerTable';
+import { Card } from '@/components/ui/card';
+import { CustomerTable as TransindoCustomerTable, Customer as TransindoCustomer } from '@/components/features/customer/CustomerTable';
 import { CustomerFormModal, CustomerFormData } from '@/components/features/customer/CustomerFormModal';
 import { DeleteCustomerModal } from '@/components/features/customer/DeleteCustomerModal';
+import { LegacyCustomerTable } from '@/components/features/customer/LegacyCustomerTable';
+import { CustomerFormDialog } from '@/components/features/customer/CustomerFormDialog';
+import { DeleteCustomerDialog } from '@/components/features/customer/DeleteCustomerDialog';
 import { toast } from 'sonner';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from '@/hooks/useCustomer';
+import { customerSchema, type CustomerFormValues } from '@/scheme/customer.schema';
+import type { Customer as ApiCustomer } from '@/@types/customer.types';
+import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 
 // DUMMY DATA INITIALIZATION
-const INITIAL_CUSTOMERS: Customer[] = [
+const INITIAL_CUSTOMERS: TransindoCustomer[] = [
   {
     id: 1,
-    namaDealer: "Yamaha Sejati Yogyakarta",
-    namaCustomer: "ELLA YOUNG WIDJAYANTO NUGRAHA",
-    pic: "Emilia Clarke",
-    alamat: "Jl. Raya Kalimalang No, Rt 000, Rw 000, Duren Sawit, Duren Sawit, Kota Adm. Jakarta Timur, DKI Jakarta 00000",
-    maps: "https://maps.app.goo.gl/example",
-    phone: "08xx xxxx xxxx"
+    namaDealer: 'Yamaha Sejati Yogyakarta',
+    namaCustomer: 'ELLA YOUNG WIDJAYANTO NUGRAHA',
+    pic: 'Emilia Clarke',
+    alamat: 'Jl. Raya Kalimalang No, Rt 000, Rw 000, Duren Sawit, Duren Sawit, Kota Adm. Jakarta Timur, DKI Jakarta 00000',
+    maps: 'https://maps.app.goo.gl/example',
+    phone: '08xx xxxx xxxx',
   },
   {
     id: 2,
-    namaDealer: "Yamaha Tugu Jogja",
-    namaCustomer: "BUDI SANTOSO",
-    pic: "John Doe",
-    alamat: "Jl. Pangeran Diponegoro No 10, Gowongan, Jetis, Kota Yogyakarta, DIY 55233",
-    maps: "https://maps.app.goo.gl/example",
-    phone: "0812 3456 7890"
+    namaDealer: 'Yamaha Tugu Jogja',
+    namaCustomer: 'BUDI SANTOSO',
+    pic: 'John Doe',
+    alamat: 'Jl. Pangeran Diponegoro No 10, Gowongan, Jetis, Kota Yogyakarta, DIY 55233',
+    maps: 'https://maps.app.goo.gl/example',
+    phone: '0812 3456 7890',
   },
   {
     id: 3,
-    namaDealer: "Honda Nusantara Abadi",
-    namaCustomer: "SITI RAHMAWATI",
-    pic: "Jane Smith",
-    alamat: "Jl. Magelang KM 5.5, Kutu Patran, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284",
-    maps: "https://maps.app.goo.gl/example",
-    phone: "0857 1122 3344"
+    namaDealer: 'Honda Nusantara Abadi',
+    namaCustomer: 'SITI RAHMAWATI',
+    pic: 'Jane Smith',
+    alamat: 'Jl. Magelang KM 5.5, Kutu Patran, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284',
+    maps: 'https://maps.app.goo.gl/example',
+    phone: '0857 1122 3344',
   },
   {
     id: 4,
-    namaDealer: "Suzuki Sumber Baru",
-    namaCustomer: "AHMAD FAUZI",
-    pic: "Tom Holland",
-    alamat: "Jl. Laksda Adisucipto No 15, Ambarukmo, Caturtunggal, Depok, Sleman, DIY 55281",
-    maps: "https://maps.app.goo.gl/example",
-    phone: "0878 9988 5544"
+    namaDealer: 'Suzuki Sumber Baru',
+    namaCustomer: 'AHMAD FAUZI',
+    pic: 'Tom Holland',
+    alamat: 'Jl. Laksda Adisucipto No 15, Ambarukmo, Caturtunggal, Depok, Sleman, DIY 55281',
+    maps: 'https://maps.app.goo.gl/example',
+    phone: '0878 9988 5544',
   },
   {
     id: 5,
-    namaDealer: "Toyota Nasmoco Jogja",
-    namaCustomer: "DEWI KARTIKA",
-    pic: "Emma Watson",
-    alamat: "Jl. Ringroad Utara, Jombor Kidul, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284",
-    maps: "https://maps.app.goo.gl/example",
-    phone: "0819 6633 2211"
+    namaDealer: 'Toyota Nasmoco Jogja',
+    namaCustomer: 'DEWI KARTIKA',
+    pic: 'Emma Watson',
+    alamat: 'Jl. Ringroad Utara, Jombor Kidul, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284',
+    maps: 'https://maps.app.goo.gl/example',
+    phone: '0819 6633 2211',
   },
 ];
 
-export default function CustomerPage() {
-  // Data state
-  const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
+function TransindoCustomerContent() {
+  const [customers, setCustomers] = useState<TransindoCustomer[]>(INITIAL_CUSTOMERS);
 
   // Table state
   const [search, setSearch] = useState('');
@@ -66,15 +77,13 @@ export default function CustomerPage() {
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<TransindoCustomer | null>(null);
 
   // Filter & Pagination logic
   const filteredCustomers = useMemo(() => {
-    return customers.filter(customer =>
-      customer.namaDealer.toLowerCase().includes(search.toLowerCase()) ||
-      customer.namaCustomer.toLowerCase().includes(search.toLowerCase()) ||
-      customer.pic.toLowerCase().includes(search.toLowerCase()) ||
-      customer.phone.includes(search)
+    return customers.filter(
+      (customer) =>
+        customer.namaDealer.toLowerCase().includes(search.toLowerCase()) || customer.namaCustomer.toLowerCase().includes(search.toLowerCase()) || customer.pic.toLowerCase().includes(search.toLowerCase()) || customer.phone.includes(search),
     );
   }, [customers, search]);
 
@@ -89,12 +98,12 @@ export default function CustomerPage() {
     setIsFormOpen(true);
   };
 
-  const handleEditClick = (customer: Customer) => {
+  const handleEditClick = (customer: TransindoCustomer) => {
     setSelectedCustomer(customer);
     setIsFormOpen(true);
   };
 
-  const handleDeleteClick = (customer: Customer) => {
+  const handleDeleteClick = (customer: TransindoCustomer) => {
     setSelectedCustomer(customer);
     setIsDeleteOpen(true);
   };
@@ -102,11 +111,11 @@ export default function CustomerPage() {
   const handleSaveForm = (data: CustomerFormData) => {
     if (selectedCustomer) {
       // Edit
-      setCustomers(customers.map(c => c.id === selectedCustomer.id ? { ...c, ...data } : c));
+      setCustomers(customers.map((c) => (c.id === selectedCustomer.id ? { ...c, ...data } : c)));
       toast.success('Data customer berhasil diubah');
     } else {
       // Add
-      const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+      const newId = customers.length > 0 ? Math.max(...customers.map((c) => c.id)) + 1 : 1;
       setCustomers([{ id: newId, ...data }, ...customers]);
       toast.success('Data customer berhasil ditambahkan');
     }
@@ -115,7 +124,7 @@ export default function CustomerPage() {
 
   const handleConfirmDelete = () => {
     if (selectedCustomer) {
-      setCustomers(customers.filter(c => c.id !== selectedCustomer.id));
+      setCustomers(customers.filter((c) => c.id !== selectedCustomer.id));
       toast.success('Data customer berhasil dihapus');
       setIsDeleteOpen(false);
       setSelectedCustomer(null);
@@ -123,43 +132,254 @@ export default function CustomerPage() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
-        {/* Header */}
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Customer</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola data customer dengan mudah</p>
         </div>
 
-        {/* Content */}
-        <CustomerTable
+        <TransindoCustomerTable
           customers={paginatedCustomers}
           search={search}
-          onSearchChange={(v) => { setSearch(v); setPage(1); }}
+          onSearchChange={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
           page={page}
           perPage={perPage}
           totalData={filteredCustomers.length}
           onPageChange={setPage}
-          onPerPageChange={(v) => { setPerPage(v); setPage(1); }}
+          onPerPageChange={(v) => {
+            setPerPage(v);
+            setPage(1);
+          }}
           onAdd={handleAddClick}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
       </div>
 
-      {/* Modals */}
-      <CustomerFormModal
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSave={handleSaveForm}
-        initialData={selectedCustomer}
+      <CustomerFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSave={handleSaveForm} initialData={selectedCustomer} />
+
+      <DeleteCustomerModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleConfirmDelete} />
+    </>
+  );
+}
+
+function GeneralCustomerContent() {
+  const { companyId } = useCompany();
+  const { data: profile } = useAuthMe();
+  const { data, isLoading, isError } = useCustomers(companyId);
+  const createCustomer = useCreateCustomer();
+  const updateCustomer = useUpdateCustomer();
+  const deleteCustomer = useDeleteCustomer();
+
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [customerToEdit, setCustomerToEdit] = useState<ApiCustomer | null>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<ApiCustomer | null>(null);
+
+  const createForm = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: {
+      name: '',
+      address: '',
+      npwp: '',
+      pic: '',
+      phone: '',
+    },
+  });
+
+  const editForm = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: {
+      name: '',
+      address: '',
+      npwp: '',
+      pic: '',
+      phone: '',
+    },
+  });
+
+  useEffect(() => {
+    if (customerToEdit) {
+      editForm.reset({
+        name: customerToEdit.name,
+        address: customerToEdit.address ?? '',
+        npwp: customerToEdit.npwp ?? '',
+        pic: customerToEdit.pic ?? '',
+        phone: customerToEdit.phone ?? '',
+      });
+    }
+  }, [customerToEdit, editForm]);
+
+  const handleCloseCreateModal = () => {
+    setCreateModalOpen(false);
+    createForm.reset();
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setCustomerToEdit(null);
+    editForm.reset();
+  };
+
+  const onSubmitCreate = async (values: CustomerFormValues) => {
+    if (!companyId) {
+      toast.error('Company ID tidak ditemukan');
+      return;
+    }
+
+    if (!profile?.data?.id) {
+      toast.error('User belum dimuat, silakan coba lagi');
+      return;
+    }
+
+    try {
+      await createCustomer.mutateAsync({
+        ...values,
+        companyId: Number(companyId) || companyId,
+        userId: profile.data.id,
+      });
+      handleCloseCreateModal();
+      toast.success('Data berhasil ditambahkan');
+    } catch (error) {
+      console.error('Failed to create customer:', error);
+      toast.error('Gagal menambahkan data customer');
+    }
+  };
+
+  const onSubmitEdit = async (values: CustomerFormValues) => {
+    if (!customerToEdit) return;
+
+    if (!profile?.data?.id) {
+      toast.error('User belum dimuat, silakan coba lagi');
+      return;
+    }
+
+    try {
+      await updateCustomer.mutateAsync({
+        id: customerToEdit.id,
+        payload: {
+          ...values,
+          companyId: Number(customerToEdit.companyId) || customerToEdit.companyId,
+          userId: profile.data.id,
+        },
+      });
+      handleCloseEditModal();
+      toast.success('Data berhasil diperbarui');
+    } catch (error) {
+      console.error('Failed to update customer:', error);
+      toast.error('Gagal memperbarui data customer');
+    }
+  };
+
+  const handleEditCustomer = (customer: ApiCustomer) => {
+    setCustomerToEdit(customer);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (customer: ApiCustomer) => {
+    setCustomerToDelete(customer);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!customerToDelete) return;
+
+    try {
+      await deleteCustomer.mutateAsync(customerToDelete.id);
+      setDeleteDialogOpen(false);
+      setCustomerToDelete(null);
+      toast.success('Data berhasil dihapus');
+    } catch (error) {
+      console.error('Failed to delete customer:', error);
+      toast.error('Gagal menghapus data customer');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Customer</h1>
+              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
+            </div>
+          </div>
+          <Card className="rounded-xl p-6">
+            <div className="text-center text-muted-foreground">Loading...</div>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  if (isError) {
+    return (
+      <>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Customer</h1>
+              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
+            </div>
+          </div>
+          <Card className="rounded-xl p-6">
+            <div className="text-center text-destructive">Gagal memuat data</div>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Customer</h1>
+            <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
+          </div>
+        </div>
+
+        <LegacyCustomerTable customers={data?.data || []} onEdit={handleEditCustomer} onDelete={handleDeleteClick} onAdd={() => setCreateModalOpen(true)} />
+      </div>
+
+      <CustomerFormDialog
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        form={createForm}
+        onSubmit={onSubmitCreate}
+        title="Tambah Data Customer"
+        description="Masukkan detail customer baru"
+        isSubmitting={createCustomer.isPending}
       />
 
-      <DeleteCustomerModal
-        isOpen={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
-        onConfirm={handleConfirmDelete}
+      <CustomerFormDialog
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        form={editForm}
+        onSubmit={onSubmitEdit}
+        title="Edit Data Customer"
+        description="Perbarui detail customer"
+        submitLabel="Perbarui"
+        isSubmitting={updateCustomer.isPending}
       />
-    </DashboardLayout>
+
+      <DeleteCustomerDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={handleConfirmDelete} isDeleting={deleteCustomer.isPending} />
+    </>
   );
+}
+
+export default function CustomerPage() {
+  const router = useRouter();
+  const slugQuery = router.query.slug;
+  const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
+  const isTransindo = useMemo(() => slug.toLowerCase().includes('transindo'), [slug]);
+
+  return <DashboardLayout>{isTransindo ? <TransindoCustomerContent /> : <GeneralCustomerContent />}</DashboardLayout>;
 }
