@@ -88,7 +88,7 @@ export function RevenueBarChart() {
       </CardHeader>
 
       <CardContent style={{ height: '400px' }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={320}>
           <BarChart
             data={data?.monthlyRevenue || []}
             barCategoryGap={17} // Gap between groups
