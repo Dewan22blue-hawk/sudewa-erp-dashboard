@@ -27,7 +27,7 @@ export default function CreateLPJPerjalananPage() {
             <ChevronLeft className="h-5 w-5 text-gray-500" />
           </button>
           <div>
-            <h1 className="text-[34px] font-semibold text-gray-900 leading-none">Detail DO</h1>
+            <h1 className="text-[34px] font-semibold text-gray-900 leading-none">Detail LPJ</h1>
             <p className="text-sm text-gray-500 mt-1">Kode LPJ -</p>
           </div>
         </div>
