@@ -5,11 +5,40 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wajira-panel-ui
+      args:
+        NODE_ENV: production
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api-finance.deraly.dev}
+        NEXT_PUBLIC_AUTH_DOMAIN: ${NEXT_PUBLIC_AUTH_DOMAIN}
+    container_name: wajira-finance-dashboard
+    image: wajira-finance-frontend:latest
+    restart: unless-stopped
     ports:
       - "3000:3000"
-    restart: unless-stopped
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - /app/node_modules
+      - /app/.next
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE_URL=https://wajirabackend.hawk-dev.com
-      - NEXT_PUBLIC_AUTH_DOMAIN=wajirabackend.hawk-dev.com
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_AUTH_DOMAIN=${NEXT_PUBLIC_AUTH_DOMAIN}
+    networks:
+      - client-wajira-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  client-wajira-net:
+    external: true
