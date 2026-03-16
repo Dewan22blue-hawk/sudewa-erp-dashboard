@@ -11,8 +11,8 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://202.74.75.47:8080
-      - NEXT_PUBLIC_AUTH_DOMAIN=202.74.75.47:3000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_AUTH_DOMAIN=http://202.74.75.47:3000
     networks:
       - wajira-local-net
 
