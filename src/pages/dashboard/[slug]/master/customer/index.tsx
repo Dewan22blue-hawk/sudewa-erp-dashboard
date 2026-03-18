@@ -10,6 +10,7 @@ import { DeleteCustomerModal } from '@/components/features/customer/DeleteCustom
 import { LegacyCustomerTable } from '@/components/features/customer/LegacyCustomerTable';
 import { CustomerFormDialog } from '@/components/features/customer/CustomerFormDialog';
 import { DeleteCustomerDialog } from '@/components/features/customer/DeleteCustomerDialog';
+import { DUMMY_TRANSINDO_CUSTOMERS, setDummyTransindoCustomers } from '@/components/features/customer/transindo-customer.data';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from '@/hooks/useCustomer';
@@ -17,57 +18,8 @@ import { customerSchema, type CustomerFormValues } from '@/scheme/customer.schem
 import type { Customer as ApiCustomer } from '@/@types/customer.types';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 
-// DUMMY DATA INITIALIZATION
-const INITIAL_CUSTOMERS: TransindoCustomer[] = [
-  {
-    id: 1,
-    namaDealer: 'Yamaha Sejati Yogyakarta',
-    namaCustomer: 'ELLA YOUNG WIDJAYANTO NUGRAHA',
-    pic: 'Emilia Clarke',
-    alamat: 'Jl. Raya Kalimalang No, Rt 000, Rw 000, Duren Sawit, Duren Sawit, Kota Adm. Jakarta Timur, DKI Jakarta 00000',
-    maps: 'https://maps.app.goo.gl/example',
-    phone: '08xx xxxx xxxx',
-  },
-  {
-    id: 2,
-    namaDealer: 'Yamaha Tugu Jogja',
-    namaCustomer: 'BUDI SANTOSO',
-    pic: 'John Doe',
-    alamat: 'Jl. Pangeran Diponegoro No 10, Gowongan, Jetis, Kota Yogyakarta, DIY 55233',
-    maps: 'https://maps.app.goo.gl/example',
-    phone: '0812 3456 7890',
-  },
-  {
-    id: 3,
-    namaDealer: 'Honda Nusantara Abadi',
-    namaCustomer: 'SITI RAHMAWATI',
-    pic: 'Jane Smith',
-    alamat: 'Jl. Magelang KM 5.5, Kutu Patran, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284',
-    maps: 'https://maps.app.goo.gl/example',
-    phone: '0857 1122 3344',
-  },
-  {
-    id: 4,
-    namaDealer: 'Suzuki Sumber Baru',
-    namaCustomer: 'AHMAD FAUZI',
-    pic: 'Tom Holland',
-    alamat: 'Jl. Laksda Adisucipto No 15, Ambarukmo, Caturtunggal, Depok, Sleman, DIY 55281',
-    maps: 'https://maps.app.goo.gl/example',
-    phone: '0878 9988 5544',
-  },
-  {
-    id: 5,
-    namaDealer: 'Toyota Nasmoco Jogja',
-    namaCustomer: 'DEWI KARTIKA',
-    pic: 'Emma Watson',
-    alamat: 'Jl. Ringroad Utara, Jombor Kidul, Sinduadi, Mlati, Kabupaten Sleman, DIY 55284',
-    maps: 'https://maps.app.goo.gl/example',
-    phone: '0819 6633 2211',
-  },
-];
-
 function TransindoCustomerContent() {
-  const [customers, setCustomers] = useState<TransindoCustomer[]>(INITIAL_CUSTOMERS);
+  const [customers, setCustomers] = useState<TransindoCustomer[]>(DUMMY_TRANSINDO_CUSTOMERS);
 
   // Table state
   const [search, setSearch] = useState('');
@@ -111,12 +63,20 @@ function TransindoCustomerContent() {
   const handleSaveForm = (data: CustomerFormData) => {
     if (selectedCustomer) {
       // Edit
-      setCustomers(customers.map((c) => (c.id === selectedCustomer.id ? { ...c, ...data } : c)));
+      setCustomers((prev) => {
+        const updated = prev.map((c) => (c.id === selectedCustomer.id ? { ...c, ...data } : c));
+        setDummyTransindoCustomers(updated);
+        return updated;
+      });
       toast.success('Data customer berhasil diubah');
     } else {
       // Add
-      const newId = customers.length > 0 ? Math.max(...customers.map((c) => c.id)) + 1 : 1;
-      setCustomers([{ id: newId, ...data }, ...customers]);
+      setCustomers((prev) => {
+        const newId = prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1;
+        const updated = [{ id: newId, ...data }, ...prev];
+        setDummyTransindoCustomers(updated);
+        return updated;
+      });
       toast.success('Data customer berhasil ditambahkan');
     }
     setIsFormOpen(false);
@@ -124,7 +84,11 @@ function TransindoCustomerContent() {
 
   const handleConfirmDelete = () => {
     if (selectedCustomer) {
-      setCustomers(customers.filter((c) => c.id !== selectedCustomer.id));
+      setCustomers((prev) => {
+        const updated = prev.filter((c) => c.id !== selectedCustomer.id);
+        setDummyTransindoCustomers(updated);
+        return updated;
+      });
       toast.success('Data customer berhasil dihapus');
       setIsDeleteOpen(false);
       setSelectedCustomer(null);
