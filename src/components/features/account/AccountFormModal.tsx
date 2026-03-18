@@ -66,7 +66,7 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                         </SelectTrigger>
                         <SelectContent>
                           {accountGroups.length === 0 && (
-                            <SelectItem value="" disabled>
+                            <SelectItem value="__no_account_group__" disabled>
                               Tidak ada grup akun
                             </SelectItem>
                           )}
