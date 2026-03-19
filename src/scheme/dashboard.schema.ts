@@ -57,16 +57,22 @@ export const accountOverviewSchema = z.object({
 /**
  * Finance series schema (line chart toggle income/expense)
  */
-const accountSeriesSchema = z.object({
+const accountSeriesValuesSchema = z.object({
   bcaUsd: z.number().nonnegative(),
   bcaIdr: z.number().nonnegative(),
   cash: z.number().nonnegative(),
 });
 
+/** Supports both flat (legacy) and nested sales/purchase breakdown */
+const accountSeriesByTypeSchema = accountSeriesValuesSchema.extend({
+  sales: accountSeriesValuesSchema.optional(),
+  purchase: accountSeriesValuesSchema.optional(),
+});
+
 export const financeSeriesSchema = z.object({
   month: z.string().min(1),
-  income: accountSeriesSchema,
-  expense: accountSeriesSchema,
+  income: accountSeriesByTypeSchema,
+  expense: accountSeriesByTypeSchema,
 });
 
 /** Customer overview **/

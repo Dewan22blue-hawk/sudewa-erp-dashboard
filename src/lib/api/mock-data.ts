@@ -117,18 +117,162 @@ export const MOCK_DASHBOARD_DATA: DashboardApiResponse = {
     },
   ],
   financeSeries: [
-    { month: 'jan', income: { bcaUsd: 2.5, bcaIdr: 3.2, cash: 1.8 }, expense: { bcaUsd: 1.8, bcaIdr: 2.4, cash: 1.2 } },
-    { month: 'feb', income: { bcaUsd: 5.4, bcaIdr: 6.9, cash: 4.0 }, expense: { bcaUsd: 2.4, bcaIdr: 3.5, cash: 2.1 } },
-    { month: 'mar', income: { bcaUsd: 9.8, bcaIdr: 7.2, cash: 5.2 }, expense: { bcaUsd: 3.2, bcaIdr: 3.8, cash: 2.3 } },
-    { month: 'apr', income: { bcaUsd: 7.3, bcaIdr: 5.8, cash: 4.1 }, expense: { bcaUsd: 4.1, bcaIdr: 5.4, cash: 3.0 } },
-    { month: 'may', income: { bcaUsd: 4.8, bcaIdr: 4.2, cash: 3.2 }, expense: { bcaUsd: 3.6, bcaIdr: 3.8, cash: 2.5 } },
-    { month: 'jun', income: { bcaUsd: 3.6, bcaIdr: 3.9, cash: 3.5 }, expense: { bcaUsd: 5.1, bcaIdr: 4.8, cash: 3.1 } },
-    { month: 'jul', income: { bcaUsd: 6.2, bcaIdr: 4.9, cash: 2.1 }, expense: { bcaUsd: 6.7, bcaIdr: 5.9, cash: 2.9 } },
-    { month: 'aug', income: { bcaUsd: 8.9, bcaIdr: 6.1, cash: 3.6 }, expense: { bcaUsd: 4.6, bcaIdr: 3.4, cash: 2.2 } },
-    { month: 'sep', income: { bcaUsd: 4.4, bcaIdr: 3.7, cash: 4.2 }, expense: { bcaUsd: 3.5, bcaIdr: 2.8, cash: 2.4 } },
-    { month: 'oct', income: { bcaUsd: 4.9, bcaIdr: 3.5, cash: 4.9 }, expense: { bcaUsd: 4.2, bcaIdr: 3.1, cash: 3.5 } },
-    { month: 'nov', income: { bcaUsd: 5.3, bcaIdr: 3.8, cash: 5.1 }, expense: { bcaUsd: 3.8, bcaIdr: 2.6, cash: 2.7 } },
-    { month: 'dec', income: { bcaUsd: 5.7, bcaIdr: 3.9, cash: 5.3 }, expense: { bcaUsd: 3.9, bcaIdr: 2.9, cash: 2.9 } },
+    {
+      month: 'jan',
+      income: {
+        bcaUsd: 2.5, bcaIdr: 3.2, cash: 1.8,
+        sales:    { bcaUsd: 1.8, bcaIdr: 2.1, cash: 1.2 },
+        purchase: { bcaUsd: 0.7, bcaIdr: 1.1, cash: 0.6 },
+      },
+      expense: {
+        bcaUsd: 1.8, bcaIdr: 2.4, cash: 1.2,
+        sales:    { bcaUsd: 1.0, bcaIdr: 1.5, cash: 0.8 },
+        purchase: { bcaUsd: 0.8, bcaIdr: 0.9, cash: 0.4 },
+      },
+    },
+    {
+      month: 'feb',
+      income: {
+        bcaUsd: 5.4, bcaIdr: 6.9, cash: 4.0,
+        sales:    { bcaUsd: 3.5, bcaIdr: 4.8, cash: 2.8 },
+        purchase: { bcaUsd: 1.9, bcaIdr: 2.1, cash: 1.2 },
+      },
+      expense: {
+        bcaUsd: 2.4, bcaIdr: 3.5, cash: 2.1,
+        sales:    { bcaUsd: 1.4, bcaIdr: 2.0, cash: 1.3 },
+        purchase: { bcaUsd: 1.0, bcaIdr: 1.5, cash: 0.8 },
+      },
+    },
+    {
+      month: 'mar',
+      income: {
+        bcaUsd: 9.8, bcaIdr: 7.2, cash: 5.2,
+        sales:    { bcaUsd: 6.5, bcaIdr: 5.0, cash: 3.5 },
+        purchase: { bcaUsd: 3.3, bcaIdr: 2.2, cash: 1.7 },
+      },
+      expense: {
+        bcaUsd: 3.2, bcaIdr: 3.8, cash: 2.3,
+        sales:    { bcaUsd: 1.8, bcaIdr: 2.2, cash: 1.4 },
+        purchase: { bcaUsd: 1.4, bcaIdr: 1.6, cash: 0.9 },
+      },
+    },
+    {
+      month: 'apr',
+      income: {
+        bcaUsd: 7.3, bcaIdr: 5.8, cash: 4.1,
+        sales:    { bcaUsd: 4.8, bcaIdr: 3.9, cash: 2.7 },
+        purchase: { bcaUsd: 2.5, bcaIdr: 1.9, cash: 1.4 },
+      },
+      expense: {
+        bcaUsd: 4.1, bcaIdr: 5.4, cash: 3.0,
+        sales:    { bcaUsd: 2.3, bcaIdr: 3.1, cash: 1.8 },
+        purchase: { bcaUsd: 1.8, bcaIdr: 2.3, cash: 1.2 },
+      },
+    },
+    {
+      month: 'may',
+      income: {
+        bcaUsd: 4.8, bcaIdr: 4.2, cash: 3.2,
+        sales:    { bcaUsd: 3.1, bcaIdr: 2.8, cash: 2.1 },
+        purchase: { bcaUsd: 1.7, bcaIdr: 1.4, cash: 1.1 },
+      },
+      expense: {
+        bcaUsd: 3.6, bcaIdr: 3.8, cash: 2.5,
+        sales:    { bcaUsd: 2.0, bcaIdr: 2.2, cash: 1.5 },
+        purchase: { bcaUsd: 1.6, bcaIdr: 1.6, cash: 1.0 },
+      },
+    },
+    {
+      month: 'jun',
+      income: {
+        bcaUsd: 3.6, bcaIdr: 3.9, cash: 3.5,
+        sales:    { bcaUsd: 2.2, bcaIdr: 2.5, cash: 2.3 },
+        purchase: { bcaUsd: 1.4, bcaIdr: 1.4, cash: 1.2 },
+      },
+      expense: {
+        bcaUsd: 5.1, bcaIdr: 4.8, cash: 3.1,
+        sales:    { bcaUsd: 2.9, bcaIdr: 2.8, cash: 1.9 },
+        purchase: { bcaUsd: 2.2, bcaIdr: 2.0, cash: 1.2 },
+      },
+    },
+    {
+      month: 'jul',
+      income: {
+        bcaUsd: 6.2, bcaIdr: 4.9, cash: 2.1,
+        sales:    { bcaUsd: 4.0, bcaIdr: 3.2, cash: 1.4 },
+        purchase: { bcaUsd: 2.2, bcaIdr: 1.7, cash: 0.7 },
+      },
+      expense: {
+        bcaUsd: 6.7, bcaIdr: 5.9, cash: 2.9,
+        sales:    { bcaUsd: 3.8, bcaIdr: 3.4, cash: 1.7 },
+        purchase: { bcaUsd: 2.9, bcaIdr: 2.5, cash: 1.2 },
+      },
+    },
+    {
+      month: 'aug',
+      income: {
+        bcaUsd: 8.9, bcaIdr: 6.1, cash: 3.6,
+        sales:    { bcaUsd: 5.8, bcaIdr: 4.0, cash: 2.4 },
+        purchase: { bcaUsd: 3.1, bcaIdr: 2.1, cash: 1.2 },
+      },
+      expense: {
+        bcaUsd: 4.6, bcaIdr: 3.4, cash: 2.2,
+        sales:    { bcaUsd: 2.6, bcaIdr: 2.0, cash: 1.3 },
+        purchase: { bcaUsd: 2.0, bcaIdr: 1.4, cash: 0.9 },
+      },
+    },
+    {
+      month: 'sep',
+      income: {
+        bcaUsd: 4.4, bcaIdr: 3.7, cash: 4.2,
+        sales:    { bcaUsd: 2.8, bcaIdr: 2.4, cash: 2.8 },
+        purchase: { bcaUsd: 1.6, bcaIdr: 1.3, cash: 1.4 },
+      },
+      expense: {
+        bcaUsd: 3.5, bcaIdr: 2.8, cash: 2.4,
+        sales:    { bcaUsd: 2.0, bcaIdr: 1.6, cash: 1.4 },
+        purchase: { bcaUsd: 1.5, bcaIdr: 1.2, cash: 1.0 },
+      },
+    },
+    {
+      month: 'oct',
+      income: {
+        bcaUsd: 4.9, bcaIdr: 3.5, cash: 4.9,
+        sales:    { bcaUsd: 3.1, bcaIdr: 2.3, cash: 3.2 },
+        purchase: { bcaUsd: 1.8, bcaIdr: 1.2, cash: 1.7 },
+      },
+      expense: {
+        bcaUsd: 4.2, bcaIdr: 3.1, cash: 3.5,
+        sales:    { bcaUsd: 2.4, bcaIdr: 1.8, cash: 2.1 },
+        purchase: { bcaUsd: 1.8, bcaIdr: 1.3, cash: 1.4 },
+      },
+    },
+    {
+      month: 'nov',
+      income: {
+        bcaUsd: 5.3, bcaIdr: 3.8, cash: 5.1,
+        sales:    { bcaUsd: 3.4, bcaIdr: 2.5, cash: 3.3 },
+        purchase: { bcaUsd: 1.9, bcaIdr: 1.3, cash: 1.8 },
+      },
+      expense: {
+        bcaUsd: 3.8, bcaIdr: 2.6, cash: 2.7,
+        sales:    { bcaUsd: 2.2, bcaIdr: 1.5, cash: 1.6 },
+        purchase: { bcaUsd: 1.6, bcaIdr: 1.1, cash: 1.1 },
+      },
+    },
+    {
+      month: 'dec',
+      income: {
+        bcaUsd: 5.7, bcaIdr: 3.9, cash: 5.3,
+        sales:    { bcaUsd: 3.7, bcaIdr: 2.6, cash: 3.5 },
+        purchase: { bcaUsd: 2.0, bcaIdr: 1.3, cash: 1.8 },
+      },
+      expense: {
+        bcaUsd: 3.9, bcaIdr: 2.9, cash: 2.9,
+        sales:    { bcaUsd: 2.3, bcaIdr: 1.7, cash: 1.7 },
+        purchase: { bcaUsd: 1.6, bcaIdr: 1.2, cash: 1.2 },
+      },
+    },
   ],
   customers: {
     totalCustomers: 23,
