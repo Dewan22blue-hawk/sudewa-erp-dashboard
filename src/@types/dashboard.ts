@@ -56,20 +56,35 @@ export interface AccountOverview {
 }
 
 /**
- * Monthly finance series (supports income & expense toggle)
+ * Finance series values per account source
+ */
+export interface FinanceSeriesValues {
+  bcaUsd: number;
+  bcaIdr: number;
+  cash: number;
+}
+
+/**
+ * Finance series per transaction type (sales / purchase)
+ * Supports both flat structure (backward compat) and nested structure
+ */
+export interface FinanceSeriesByType extends FinanceSeriesValues {
+  /** Optional nested breakdown by transaction type */
+  sales?: FinanceSeriesValues;
+  purchase?: FinanceSeriesValues;
+}
+
+/**
+ * Monthly finance series (supports income & expense toggle + sales/purchase filter)
+ *
+ * Backward compatible:
+ * - Old shape: item.income.bcaUsd
+ * - New shape: item.income.sales.bcaUsd / item.income.purchase.bcaUsd
  */
 export interface FinanceSeriesPoint {
   month: string;
-  income: {
-    bcaUsd: number;
-    bcaIdr: number;
-    cash: number;
-  };
-  expense: {
-    bcaUsd: number;
-    bcaIdr: number;
-    cash: number;
-  };
+  income: FinanceSeriesByType;
+  expense: FinanceSeriesByType;
 }
 
 /**

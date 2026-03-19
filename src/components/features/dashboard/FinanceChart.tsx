@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FinanceSeriesPoint } from '@/@types/dashboard';
+import type { FinanceSeriesPoint, FinanceSeriesValues } from '@/@types/dashboard';
 
 interface FinanceChartProps {
   data: FinanceSeriesPoint[];
@@ -10,11 +10,12 @@ interface FinanceChartProps {
 }
 
 type ChartMode = 'income' | 'expense';
+type TransactionType = 'sales' | 'purchase';
 
 const SERIES_META = [
   { key: 'bcaUsd', label: 'BCA USD', color: '#B0160D' },
   { key: 'bcaIdr', label: 'BCA IDR', color: '#ECB45B' },
-  { key: 'cash', label: 'Cash', color: '#1C3A58' },
+  { key: 'cash', label: 'CASH IDR', color: '#1C3A58' },
 ] as const;
 
 const MONTH_ORDER = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -22,6 +23,29 @@ const MONTH_ORDER = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'se
 const monthLabel = (month: string) => month.slice(0, 3);
 
 const tooltipFormatter = (value: number) => new Intl.NumberFormat('id-ID').format(value);
+
+/**
+ * Resolve the correct FinanceSeriesValues from a series point.
+ *
+ * Backward compatible:
+ * - If item[mode][transactionType] exists → use nested structure
+ * - Otherwise → fallback to flat item[mode] (old data shape)
+ */
+function resolveSeriesValues(
+  item: FinanceSeriesPoint,
+  mode: ChartMode,
+  transactionType: TransactionType,
+): FinanceSeriesValues {
+  const modeData = item[mode];
+  const nested = modeData[transactionType];
+  if (nested) return nested;
+  // Fallback: use flat structure (backward compat)
+  return {
+    bcaUsd: modeData.bcaUsd,
+    bcaIdr: modeData.bcaIdr,
+    cash: modeData.cash,
+  };
+}
 
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
@@ -49,7 +73,10 @@ function SkeletonChart() {
           <p className="text-sm font-semibold text-slate-900">Grafik</p>
           <p className="text-xs text-slate-500">Memvisualisasikan pemasukan vs pengeluaran</p>
         </div>
-        <div className="h-10 w-36 animate-pulse rounded-md bg-slate-100" />
+        <div className="flex gap-2">
+          <div className="h-10 w-36 animate-pulse rounded-md bg-slate-100" />
+          <div className="h-10 w-36 animate-pulse rounded-md bg-slate-100" />
+        </div>
       </div>
       <div className="h-80 animate-pulse rounded-lg bg-slate-100" />
     </Card>
@@ -58,17 +85,23 @@ function SkeletonChart() {
 
 export function FinanceChart({ data, isLoading }: FinanceChartProps) {
   const [mode, setMode] = useState<ChartMode>('income');
+  const [transactionType, setTransactionType] = useState<TransactionType>('sales');
 
   const chartData = useMemo(() => {
-    const sorted = [...(data || [])].sort((a, b) => MONTH_ORDER.indexOf(a.month.toLowerCase()) - MONTH_ORDER.indexOf(b.month.toLowerCase()));
+    const sorted = [...(data || [])].sort(
+      (a, b) => MONTH_ORDER.indexOf(a.month.toLowerCase()) - MONTH_ORDER.indexOf(b.month.toLowerCase()),
+    );
 
-    return sorted.map((item) => ({
-      month: monthLabel(item.month),
-      'BCA USD': item[mode].bcaUsd,
-      'BCA IDR': item[mode].bcaIdr,
-      Cash: item[mode].cash,
-    }));
-  }, [data, mode]);
+    return sorted.map((item) => {
+      const values = resolveSeriesValues(item, mode, transactionType);
+      return {
+        month: monthLabel(item.month),
+        'BCA USD': values.bcaUsd,
+        'BCA IDR': values.bcaIdr,
+        Cash: values.cash,
+      };
+    });
+  }, [data, mode, transactionType]);
 
   if (isLoading) return <SkeletonChart />;
   if (!data?.length) return null;
@@ -80,17 +113,36 @@ export function FinanceChart({ data, isLoading }: FinanceChartProps) {
           <p className="text-base font-semibold text-slate-900">Grafik</p>
           <p className="text-sm text-slate-500">Pilih tipe arus kas untuk melihat trennya.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-slate-600">Tampilkan</span>
-          <Select value={mode} onValueChange={(val: ChartMode) => setMode(val)}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="income">Pemasukan</SelectItem>
-              <SelectItem value="expense">Pengeluaran</SelectItem>
-            </SelectContent>
-          </Select>
+
+        {/* Filter Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Filter 1: Mode (Pemasukan / Pengeluaran) */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-600">Tampilkan</span>
+            <Select value={mode} onValueChange={(val: ChartMode) => setMode(val)}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="income">Pemasukan</SelectItem>
+                <SelectItem value="expense">Pengeluaran</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filter 2: Transaction Type (Penjualan / Pembelian) */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-600">Tipe</span>
+            <Select value={transactionType} onValueChange={(val: TransactionType) => setTransactionType(val)}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sales">Penjualan</SelectItem>
+                <SelectItem value="purchase">Pembelian</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
