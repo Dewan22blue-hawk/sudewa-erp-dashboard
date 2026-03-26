@@ -33,8 +33,24 @@ type UnitTransactionApiModel = {
 };
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
+const fallbackBasePath = '/wapi/transaction/unit-transaction';
 
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
+
+const readErrorMessage = (error: any): string => {
+  const raw = error?.message ?? error?.response?.data?.message ?? error?.response?.data?.errors;
+  return String(raw ?? '').toLowerCase();
+};
+
+const shouldFallback = (error: any): boolean => {
+  const statusCode = error?.statusCode ?? error?.response?.status;
+  const message = readErrorMessage(error);
+  const hasKnownNullRelationBug =
+    message.includes('attempt to read property') &&
+    (message.includes('"is_paid"') || message.includes("'is_paid'") || message.includes('is_paid'));
+
+  return statusCode === 404 || statusCode === 405 || statusCode === 500 || hasKnownNullRelationBug;
+};
 
 const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => ({
   id: String(item.id ?? ''),
@@ -73,23 +89,38 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
 
 export const unitTransactionService = {
   async getUnitTransactions(params: PaginationParams = {}): Promise<UnitTransactionResponse> {
-    const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-      params: {
-        page: params.page ?? 1,
-        per_page: params.perPage ?? 10,
-        search: params.search || undefined,
-        sort_order: 'asc',
-        type: 'purchase',
-      },
-    });
+    const requestParams = {
+      page: params.page ?? 1,
+      per_page: params.perPage ?? 10,
+      search: params.search || undefined,
+      sort_order: 'asc',
+      type: 'purchase',
+    };
 
-    const payload = ensureSuccess(response.data);
+    let payload: any;
+    try {
+      const response = await apiClient.get<LaravelApiResponse<any>>(basePath, { params: requestParams });
+      payload = ensureSuccess(response.data);
+    } catch (error) {
+      if (!shouldFallback(error)) throw error;
+      const response = await apiClient.get<LaravelApiResponse<any>>(fallbackBasePath, { params: requestParams });
+      payload = ensureSuccess(response.data);
+    }
+
     return toPaginatedResult(payload, mapUnitTransaction);
   },
 
   async getUnitTransactionDetail(id: string): Promise<UnitTransactionDetail> {
-    const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${basePath}/${id}`);
-    const payload = ensureSuccess(response.data);
+    let payload: UnitTransactionApiModel | { data?: UnitTransactionApiModel };
+    try {
+      const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${basePath}/${id}`);
+      payload = ensureSuccess(response.data);
+    } catch (error) {
+      if (!shouldFallback(error)) throw error;
+      const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${fallbackBasePath}/${id}`);
+      payload = ensureSuccess(response.data);
+    }
+
     const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);
   },

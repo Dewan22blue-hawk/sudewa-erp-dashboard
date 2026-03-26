@@ -1,38 +1,96 @@
 "use client"
 
+import { useMemo } from 'react';
 import { useRouter } from "next/router"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
-import { usePurchaseById, useUpdatePayment } from "@/hooks/usePurchase"
+import { usePurchaseById } from '@/hooks/useUnitTransaction';
+import { useCreateBilling, useUnitBillings, useUpdateBilling } from '@/hooks/useUnitBilling';
+import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
+import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
 export default function PurchasePaymentPage() {
     const router = useRouter()
     const { slug, id } = router.query
-    const { data: purchase, isLoading } = usePurchaseById(id as string)
-    const updatePayment = useUpdatePayment()
+        const purchaseId = String(id ?? '');
+        const { companyId } = useCompany();
+        const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId)
+        const { data: billings = [], isLoading: billingLoading } = useUnitBillings(purchaseId);
+        const createBilling = useCreateBilling();
+        const updateBilling = useUpdateBilling();
 
-    const handleSubmit = async (data: any) => {
+        const totalTagihan = Number(purchase?.unit_transaction_item_bruto_total ?? 0);
+        const totalPaid = useMemo(
+            () => billings.reduce((acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0), 0),
+            [billings],
+        );
+        const remainingPayment = Math.max(0, totalTagihan - totalPaid);
+
+        const buildPayload = (data: {
+            bcaPayment: number;
+            cashPayment: number;
+            bcaPayment2: number;
+            paymentDate: string;
+            isPaid: boolean;
+        }): UpsertUnitBillingPayload | null => {
+            if (!companyId) {
+                toast.error('Company belum dipilih');
+                return null;
+            }
+
+            return {
+                company_id: String(companyId),
+                unit_transaction_id: purchaseId,
+                bca_payment: Number(data.bcaPayment ?? 0),
+                cash_payment: Number(data.cashPayment ?? 0),
+                bca_payment_2: Number(data.bcaPayment2 ?? 0),
+                payment_date: data.paymentDate,
+                is_paid: Boolean(data.isPaid),
+            };
+        };
+
+        const handleCreate = async (data: {
+            bcaPayment: number;
+            cashPayment: number;
+            bcaPayment2: number;
+            paymentDate: string;
+            isPaid: boolean;
+        }) => {
         try {
-            await updatePayment.mutateAsync({
-                id: id as string,
-                payload: {
-                    bca: data.paymentBca,
-                    bcaUsd: data.paymentBcaUsd,
-                    cash: data.paymentCash,
-                },
-            })
+                        const payload = buildPayload(data);
+                        if (!payload) return;
+                        await createBilling.mutateAsync(payload);
             toast.success("Pembayaran berhasil disimpan")
-            router.back()
-        } catch {
-            toast.error("Gagal menyimpan pembayaran")
+                } catch (error: any) {
+                        toast.error(error?.message || "Gagal menyimpan pembayaran")
+                }
+        }
+
+        const handleUpdate = async (
+            billingId: string,
+            data: {
+                bcaPayment: number;
+                cashPayment: number;
+                bcaPayment2: number;
+                paymentDate: string;
+                isPaid: boolean;
+            },
+        ) => {
+                try {
+                        const payload = buildPayload(data);
+                        if (!payload) return;
+                        await updateBilling.mutateAsync({ id: billingId, payload });
+                        toast.success("Pembayaran berhasil diperbarui")
+                } catch (error: any) {
+                        toast.error(error?.message || "Gagal menyimpan pembayaran")
         }
     }
 
-    if (isLoading) {
+        if (purchaseLoading || billingLoading) {
         return (
             <DashboardLayout>
                 <div className="flex h-[50vh] items-center justify-center">
@@ -77,10 +135,15 @@ export default function PurchasePaymentPage() {
                 <Card className="rounded-xl">
                     <CardContent className="p-6">
                         <PurchasePaymentForm
-                            purchaseData={purchase}
-                            onSubmit={handleSubmit}
+                            purchaseCode={purchase.code}
+                            totalTagihan={totalTagihan}
+                            totalPaid={totalPaid}
+                            remainingPayment={remainingPayment}
+                            billings={billings}
+                            onCreate={handleCreate}
+                            onUpdate={handleUpdate}
                             onCancel={() => router.back()}
-                            loading={updatePayment.isPending}
+                            loading={createBilling.isPending || updateBilling.isPending}
                         />
                     </CardContent>
                 </Card>
