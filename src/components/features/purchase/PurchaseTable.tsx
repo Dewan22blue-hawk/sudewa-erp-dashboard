@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { PurchaseUnitItemRow } from '@/@types/purchase.types';
+import { UnitTransaction } from '@/@types/unit-transaction.types';
 import { MoreVertical, Plus, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { PaginationMeta } from '@/@types/pagination.types';
 
 export interface PurchaseTableProps {
-  data: PurchaseUnitItemRow[];
+  data: UnitTransaction[];
   meta?: PaginationMeta;
   onDelete: (id: string) => void;
   onAdd?: () => void;
@@ -112,15 +112,15 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
             <TableRow>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">KODE BELI</TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TANGGAL</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">UNIT TYPE</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">QTY</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">HARGA</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">SUPPLIER</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">GUDANG</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL BRUTO</TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BBN</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">EXPEDISI</TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BIAYA LAIN</TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL DPP</TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL PPN</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL HPP</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">STATUS STOK</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BILLING</TableHead>
               <TableHead className="text-right text-xs font-semibold uppercase text-slate-600 px-4 py-3">ACTION</TableHead>
             </TableRow>
           </TableHeader>
@@ -134,19 +134,19 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
             ) : (
               data.map((item) => (
                 <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
-                  <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}`)}>
-                    {item.unitTransactionCode || '-'}
+                  <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
+                    {item.code || '-'}
                   </TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.createdAt ? format(new Date(item.createdAt), 'dd/MM/yyyy') : '-'}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.unitTypeId ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.qtyTotal}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.price)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.bbnPrice)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.expeditionFee)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.otherFee)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.dppTotal)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.ppnTotal)}</TableCell>
-                  <TableCell className="text-slate-800 font-semibold px-4">{formatCurrency(item.hppTotal)}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.supplier || '-'}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.warehouse || '-'}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.stock_state || '-'}</TableCell>
+                  <TableCell className="text-slate-700 px-4">{item.isPaid ? 'Lunas' : 'Belum Lunas'}</TableCell>
 
                   <TableCell className="text-right px-4">
                     <DropdownMenu>
@@ -156,9 +156,9 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}?action=refund`)}>Refund</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}?action=refund`)}>Refund</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                           Hapus
                         </DropdownMenuItem>

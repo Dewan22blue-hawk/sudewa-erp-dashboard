@@ -98,7 +98,7 @@ export function FinanceChart({ data, isLoading }: FinanceChartProps) {
         month: monthLabel(item.month),
         'BCA USD': values.bcaUsd,
         'BCA IDR': values.bcaIdr,
-        Cash: values.cash,
+        'CASH IDR': values.cash,
       };
     });
   }, [data, mode, transactionType]);

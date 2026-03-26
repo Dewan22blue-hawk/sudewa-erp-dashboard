@@ -33,7 +33,7 @@ export default function DashboardPage() {
           <ProductOverviewCard data={data?.products} isLoading={isLoading} />
         </div>
 
-        <CashflowSummary data={data?.cashflow} isLoading={isLoading} />
+        {/* <CashflowSummary data={data?.cashflow} isLoading={isLoading} /> */}
 
         <TransactionTable data={data?.transactions || []} isLoading={isLoading} />
       </div>

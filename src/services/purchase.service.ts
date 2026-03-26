@@ -449,12 +449,13 @@ export const purchaseService = {
 
   async createPurchase(payload: CreatePurchaseRequest): Promise<Purchase> {
     const form = new FormData();
-    form.append('warehouse_id', String(payload.warehouseId ?? 1));
-    form.append('person_id', String(payload.supplierId));
-    form.append('type', payload.type ?? 'purchase');
-    form.append('stock_state', payload.stockState ?? 'draft');
+    form.append('warehouse_id', String(payload.warehouse_id));
+    form.append('person_id', String(payload.person_id));
+    form.append('company_id', String(payload.company_id));
+    form.append('type', payload.type);
+    form.append('stock_state', payload.stock_state);
+    form.append('max_capacity', payload.max_capacity);
     if (payload.code) form.append('code', payload.code);
-    if (payload.maxCapacity !== undefined) form.append('max_capacity', String(payload.maxCapacity));
 
     if (process.env.NODE_ENV !== 'production') {
       const preview = Array.from(form.entries()).reduce<Record<string, any>>((acc, [k, v]) => {

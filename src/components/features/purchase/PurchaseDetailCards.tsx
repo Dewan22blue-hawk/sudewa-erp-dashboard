@@ -1,16 +1,13 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Purchase } from '@/@types/purchase.types';
-import { Calendar, User, FileText, DollarSign, ListTodo } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
+import { Calendar, User, FileText, DollarSign, Warehouse } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 
 interface Props {
-  data: Purchase;
+  data: UnitTransactionDetail;
 }
 
 export function PurchaseDetailCards({ data }: Props) {
-  const percentagePaid = data.totalPurchase > 0 ? Math.round(((data.totalPurchase - data.remainingPayment) / data.totalPurchase) * 100) : 0;
-
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {/* Card 1: Informasi Invoice */}
@@ -32,14 +29,21 @@ export function PurchaseDetailCards({ data }: Props) {
               <p>Tanggal</p>
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <Calendar className="h-4 w-4 text-slate-500" />
-                {new Date(data.date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                {data.created_at ? new Date(data.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-'}
               </div>
             </div>
             <div className="space-y-1">
               <p>Supplier</p>
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <User className="h-4 w-4 text-slate-500" />
-                <span className="uppercase">{data.supplierName}</span>
+                <span className="uppercase">{data.person?.name ?? '-'}</span>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p>Gudang</p>
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                <Warehouse className="h-4 w-4 text-slate-500" />
+                <span>{data.warehouse?.name ?? '-'}</span>
               </div>
             </div>
           </div>
@@ -59,47 +63,42 @@ export function PurchaseDetailCards({ data }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
               <span>Total DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.totalDpp)}</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_total_dpp)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total PPN</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.totalPpn)}</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_total_ppn)}</span>
             </div>
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-900">
               <span>Total Pembelian</span>
-              <span>{formatCurrency(data.totalPurchase)}</span>
+              <span>{formatCurrency(data.unit_transaction_item_bruto_total)}</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Card 3: Status Pembayaran */}
+      {/* Card 3: Ringkasan Transaksi */}
       <Card className="rounded-lg border border-slate-200 shadow-sm h-full">
         <CardContent className="p-5 flex flex-col h-full gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-md bg-red-50">
-              <ListTodo className="h-5 w-5 text-red-500" />
+              <DollarSign className="h-5 w-5 text-red-500" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-700">Status Pembayaran</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Ringkasan Nilai</h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
-              <span>Total Harga</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.totalPurchase)}</span>
+              <span>Bruto</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_bruto_total)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>Total Bayar</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.totalPurchase - data.remainingPayment)}</span>
+              <span>DPP</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_total_dpp)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>Kurang Bayar</span>
-              <span className="text-sm font-semibold text-red-500">{formatCurrency(data.remainingPayment)}</span>
-            </div>
-
-            <div className="pt-1 space-y-1">
-              <Progress value={percentagePaid} className="h-2 bg-slate-200" />
-              <div className="text-[11px] text-slate-500">{percentagePaid}% Terbayar</div>
+              <span>PPN</span>
+              <span className="text-sm font-semibold text-red-500">{formatCurrency(data.unit_transaction_item_total_ppn)}</span>
             </div>
           </div>
         </CardContent>
