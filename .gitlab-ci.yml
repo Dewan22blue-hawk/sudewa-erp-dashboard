@@ -1,0 +1,33 @@
+stages:
+  - deploy
+
+deploy_finance_dash_dev:
+  stage: deploy
+  tags:
+    - development
+  script:
+    - echo "🚀 Memulai sinkronisasi Dashboard Wajira..."
+    
+    # 1. Daftarkan folder asli ke safe directory (Pastikan path-nya benar: finance-dash)
+    - git config --global --add safe.directory /home/alpha-team/development/client/wajira/finance-dash
+    
+    # 2. Pindah ke folder project
+    - cd /home/alpha-team/development/client/wajira/finance-dash
+    
+    # 3. Ambil kode terbaru
+    - echo "🔄 Syncing source code..."
+    - git fetch origin master
+    - git reset --hard origin/master
+    
+    # 4. Docker Magic (Build & Up)
+    # Karena Dockerfile kamu butuh ARGS, docker-compose otomatis narik dari file .env atau shell
+    - echo "🐳 Building and starting Next.js container..."
+    - docker compose up -d --build
+    
+    # 5. Cleanup Image 'dangling' (Biar storage Raspberry gak penuh sama bekas build)
+    - echo "🧹 Cleaning up old Docker images..."
+    - docker image prune -f
+    
+    - echo "✅ Wajira Finance Dashboard is Live on Port 3000!"
+  only:
+    - master
