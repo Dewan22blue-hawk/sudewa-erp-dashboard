@@ -5,13 +5,13 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
 import PurchaseUnitTable from '@/components/features/purchase/PurchaseUnitTable';
-import { usePurchaseById } from '@/hooks/usePurchase';
+import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { ChevronLeft, CreditCard, Loader2 } from 'lucide-react';
 
 export default function PurchaseDetailPage() {
   const router = useRouter();
   const { slug, id } = router.query;
-  const { data: purchase, isLoading } = usePurchaseById(id as string);
+  const { data: purchase, isLoading, isError } = usePurchaseById(id as string);
 
   if (isLoading) {
     return (
@@ -23,7 +23,7 @@ export default function PurchaseDetailPage() {
     );
   }
 
-  if (!purchase) {
+  if (isError || !purchase) {
     return (
       <DashboardLayout>
         <div className="flex h-[50vh] flex-col items-center justify-center gap-4">

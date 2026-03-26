@@ -6,18 +6,21 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseTable from '@/components/features/purchase/PurchaseTable';
 import DeletePurchaseDialog from '@/components/features/purchase/DeletePurchaseDialog';
 import { PageHeader } from '@/components/common/PageHeader';
-import { usePurchases, useDeletePurchaseUnitItem } from '@/hooks/usePurchase';
+import { useDeletePurchase } from '@/hooks/usePurchase';
+import { useUnitTransactions } from '@/hooks/useUnitTransaction';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 
 export default function PurchasePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { slug } = router.query;
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isFetching } = usePurchases(undefined, { page, perPage, search });
-  const deleteMutation = useDeletePurchaseUnitItem();
+  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, search });
+  const deleteMutation = useDeletePurchase();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -25,6 +28,7 @@ export default function PurchasePage() {
     if (!selectedId) return;
     try {
       await deleteMutation.mutateAsync(selectedId);
+      await queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
       toast.success('Data berhasil dihapus');
       setSelectedId(null);
       // Refresh list after deletion

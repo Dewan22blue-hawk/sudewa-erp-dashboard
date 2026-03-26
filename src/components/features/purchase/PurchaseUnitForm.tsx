@@ -7,14 +7,17 @@ import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Save, Plus } from 'lucide-react';
+import { Save, Plus, ChevronsUpDown, Check } from 'lucide-react';
 import { createPurchaseUnitSchema, type CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { useTypeUnits, useCreateTypeUnit } from '@/hooks/useTypeUnit';
 import { useBrands } from '@/hooks/useBrand';
+import { TypeUnit } from '@/@types/type-unit.types';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 // Extending the schema type for the form, or similar
 // For now we map to any for simplicity in this step, but ideal is strict typing.
@@ -34,16 +37,19 @@ interface Props {
   loading?: boolean;
   onCancel?: () => void;
   companyId?: string | null;
+  excludedTypeUnitIds?: string[];
 }
 
-export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel, companyId }: Props) {
+export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel, companyId, excludedTypeUnitIds = [] }: Props) {
+  void companyId;
   const queryClient = useQueryClient();
-  const { data: typeUnitData, isFetching: typeUnitLoading } = useTypeUnits();
+  const { data: typeUnitData, isLoading: typeUnitLoading, isError: typeUnitError, refetch: refetchTypeUnits } = useTypeUnits();
   const { data: brandsData } = useBrands();
   const createTypeUnit = useCreateTypeUnit();
 
   const [openTypeModal, setOpenTypeModal] = useState(false);
   const [typeImage, setTypeImage] = useState<File | null>(null);
+  const [openTypeSelect, setOpenTypeSelect] = useState(false);
 
   const form = useForm<CreatePurchaseUnitFormValues>({
     resolver: zodResolver(createPurchaseUnitSchema),
@@ -72,7 +78,12 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const totalDpp = dppSatuan * qty;
   const totalPpn = ppnSatuan * qty;
 
-  const typeUnitOptions = useMemo(() => typeUnitData?.data ?? [], [typeUnitData]);
+  const typeUnitOptions = useMemo<TypeUnit[]>(() => {
+    const maybeList = (typeUnitData as any)?.data;
+    if (Array.isArray(maybeList)) return maybeList as TypeUnit[];
+    if (maybeList && Array.isArray(maybeList.data)) return maybeList.data as TypeUnit[];
+    return [];
+  }, [typeUnitData]);
   const brandOptions = useMemo(() => brandsData ?? [], [brandsData]);
 
   const handleCreateTypeUnit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -143,22 +154,62 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="typeUnitId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Tipe Unit</FormLabel>
+                  <FormLabel className="text-sm font-medium">Tipe Unit (Opsional)</FormLabel>
                   <div className="flex items-center gap-2">
-                    <Select onValueChange={field.onChange} value={field.value} disabled={readOnly || typeUnitLoading}>
+                    <Popover open={openTypeSelect} onOpenChange={setOpenTypeSelect}>
                       <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Pilih tipe unit" />
-                        </SelectTrigger>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            role="combobox"
+                            aria-expanded={openTypeSelect}
+                            aria-controls="type-unit-combobox-list"
+                            disabled={readOnly}
+                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
+                              {field.value ? typeUnitOptions.find((option) => String(option.id) === field.value)?.name ?? 'Pilih tipe unit' : 'Pilih tipe unit'}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </button>
+                        </PopoverTrigger>
                       </FormControl>
-                      <SelectContent>
-                        {typeUnitOptions.map((option) => (
-                          <SelectItem key={option.id} value={String(option.id)}>
-                            {option.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                          <CommandInput placeholder="Cari tipe unit..." />
+                          <CommandList id="type-unit-combobox-list">
+                            {typeUnitLoading && <div className="px-3 py-2 text-xs text-muted-foreground">Memuat tipe unit...</div>}
+                            {typeUnitError && (
+                              <div className="px-3 py-2 text-xs text-destructive">
+                                Gagal memuat tipe unit.{' '}
+                                <button type="button" className="underline" onClick={() => refetchTypeUnits()}>
+                                  Coba lagi
+                                </button>
+                              </div>
+                            )}
+                            <CommandEmpty>Tipe unit tidak ditemukan.</CommandEmpty>
+                            <CommandGroup>
+                              {typeUnitOptions.map((option) => (
+                                <CommandItem
+                                  key={option.id}
+                                  value={`${option.name} ${option.code ?? ''} ${option.id}`}
+                                  disabled={excludedTypeUnitIds.includes(String(option.id))}
+                                  onSelect={() => {
+                                    if (excludedTypeUnitIds.includes(String(option.id))) return;
+                                    field.onChange(String(option.id));
+                                    setOpenTypeSelect(false);
+                                  }}
+                                >
+                                  <Check className={cn('mr-2 h-4 w-4', field.value === String(option.id) ? 'opacity-100' : 'opacity-0')} />
+                                  <span className="truncate">{option.name}</span>
+                                  {excludedTypeUnitIds.includes(String(option.id)) && <span className="ml-auto text-xs text-muted-foreground">Sudah dipakai</span>}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenTypeModal(true)}>
                       <Plus className="h-4 w-4" />
                     </Button>

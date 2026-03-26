@@ -8,10 +8,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, MoreVertical, Pencil, Trash2, Plus } from 'lucide-react';
-import { PurchaseUnitItemDetail } from '@/@types/purchase.types';
+import { UnitTransactionItem } from '@/@types/unit-transaction.types';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
-import { useDeletePurchaseUnitItemDetail, usePurchaseUnitItemDetails } from '@/hooks/usePurchase';
+import { useBulkDeleteUnitItem, useDeleteUnitItem, usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
+import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { formatCurrency } from '@/lib/utils/currency';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Props {
   purchaseId: string;
@@ -20,20 +23,25 @@ interface Props {
 
 export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
   const router = useRouter();
-  const { data: itemDetails = [], isLoading } = usePurchaseUnitItemDetails(purchaseId);
-  const deleteMutation = useDeletePurchaseUnitItemDetail();
+  const { data, isLoading, isError } = usePurchaseUnitItems(purchaseId);
+  const { data: typeUnits } = useTypeUnits();
+  const deleteMutation = useDeleteUnitItem();
+  const bulkDeleteMutation = useBulkDeleteUnitItem();
   const [unitToDelete, setUnitToDelete] = useState<string | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState({});
+  const items = data?.data ?? [];
 
   // DELETE HANDLER
   const handleDeleteConfirm = async () => {
     if (!unitToDelete) return;
     try {
-      await deleteMutation.mutateAsync({ id: unitToDelete });
-      toast.success('Unit detail deleted');
+      await deleteMutation.mutateAsync({ id: unitToDelete, purchaseId });
+      toast.success('Unit item berhasil dihapus');
       setUnitToDelete(null);
     } catch (error) {
-      console.error('Failed to delete unit detail:', error);
-      toast.error('Failed to delete unit detail');
+      console.error('Failed to delete unit item:', error);
+      toast.error('Gagal menghapus unit item');
     }
   };
 
@@ -46,26 +54,92 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
     router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${unitId}/edit`);
   };
 
-  const columns: ColumnDef<PurchaseUnitItemDetail>[] = [
+  const handleBulkDeleteConfirm = async () => {
+    const selectedIds = table
+      .getSelectedRowModel()
+      .rows.map((row) => row.original.id)
+      .filter(Boolean);
+
+    if (selectedIds.length === 0) {
+      toast.error('Pilih minimal satu item untuk dihapus');
+      return;
+    }
+
+    try {
+      await Promise.all(selectedIds.map((id) => bulkDeleteMutation.mutateAsync({ id, purchaseId })));
+      toast.success(`${selectedIds.length} unit item berhasil dihapus`);
+      table.resetRowSelection();
+      setBulkDeleteOpen(false);
+    } catch (error) {
+      console.error('Failed bulk delete unit items:', error);
+      toast.error('Gagal menghapus beberapa unit item');
+    }
+  };
+
+  const columns: ColumnDef<UnitTransactionItem>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Pilih semua" />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Pilih baris" />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       id: 'no',
       header: () => <div className="text-center text-xs font-semibold text-slate-500">NO</div>,
       cell: ({ row }) => <div className="text-center text-sm font-semibold text-slate-900">{row.index + 1}</div>,
     },
     {
-      accessorKey: 'color',
-      header: () => <div className="text-left text-xs font-semibold text-slate-500">WARNA</div>,
-      cell: ({ row }) => <div className="text-left font-semibold text-slate-900 uppercase">{row.original.color ?? '-'}</div>,
+      accessorKey: 'unit_type_id',
+      header: () => <div className="text-left text-xs font-semibold text-slate-500">UNIT TYPE</div>,
+      cell: ({ row }) => {
+        const unitTypeId = row.original.unit_type_id;
+        const name = typeUnits?.data?.find((type) => String(type.id) === String(unitTypeId))?.name;
+        return <div className="text-left font-semibold text-slate-900">{name ?? unitTypeId ?? '-'}</div>;
+      },
     },
     {
-      accessorKey: 'machineNumber',
-      header: () => <div className="text-left text-xs font-semibold text-slate-500">NOMOR MESIN</div>,
-      cell: ({ row }) => <div className="text-left text-sm text-slate-900">{row.original.machineNumber ?? '-'}</div>,
+      accessorKey: 'qty_total',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">QTY</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{row.original.qty_total}</div>,
     },
     {
-      accessorKey: 'chassisNumber',
-      header: () => <div className="text-left text-xs font-semibold text-slate-500">NOMOR RANGKA</div>,
-      cell: ({ row }) => <div className="text-left text-sm text-slate-900">{row.original.chassisNumber ?? '-'}</div>,
+      accessorKey: 'price',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">PRICE</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{formatCurrency(row.original.price)}</div>,
+    },
+    {
+      accessorKey: 'bbn_price',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">BBN</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{formatCurrency(row.original.bbn_price)}</div>,
+    },
+    {
+      accessorKey: 'expedition_fee',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">EXPEDITION FEE</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{formatCurrency(row.original.expedition_fee)}</div>,
+    },
+    {
+      accessorKey: 'other_fee',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">OTHER FEE</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{formatCurrency(row.original.other_fee)}</div>,
+    },
+    {
+      accessorKey: 'dpp_total_price',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">DPP TOTAL</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{formatCurrency(row.original.dpp_total_price)}</div>,
+    },
+    {
+      accessorKey: 'ppn_total_price',
+      header: () => <div className="text-right text-xs font-semibold text-slate-500">PPN TOTAL</div>,
+      cell: ({ row }) => <div className="text-right text-sm text-slate-900">{formatCurrency(row.original.ppn_total_price)}</div>,
     },
     {
       id: 'actions',
@@ -102,8 +176,13 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
   ];
 
   const table = useReactTable({
-    data: itemDetails,
+    data: items,
     columns,
+    state: {
+      rowSelection,
+    },
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
@@ -122,10 +201,21 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
               <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Unit</h2>
               <p className="text-xs text-slate-500">Rincian lengkap unit yang dibeli</p>
             </div>
-            <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Unit
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={table.getSelectedRowModel().rows.length === 0 || bulkDeleteMutation.isPending}
+                onClick={() => setBulkDeleteOpen(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Bulk Delete ({table.getSelectedRowModel().rows.length})
+              </Button>
+              <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Unit
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-600">
@@ -162,7 +252,13 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
                 ))}
               </TableHeader>
               <TableBody>
-                {isLoading ? (
+                {isError ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center text-destructive">
+                      Gagal memuat unit item
+                    </TableCell>
+                  </TableRow>
+                ) : isLoading ? (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
                       Loading...
@@ -184,7 +280,7 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                      No units found.
+                      Belum ada unit item.
                     </TableCell>
                   </TableRow>
                 )}
@@ -250,7 +346,22 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+              {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus banyak item?</AlertDialogTitle>
+            <AlertDialogDescription>Item yang dipilih akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDeleteConfirm} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
+              {bulkDeleteMutation.isPending ? 'Menghapus...' : 'Hapus Semua'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,6 +1,7 @@
 // src/@types/purchase.types.ts
 
 export type Currency = 'IDR' | 'USD';
+export type UnitTransactionType = 'purchase' | 'sales';
 
 export interface PurchaseUnit {
   id: string;
@@ -63,28 +64,13 @@ export interface Purchase {
 ============================ */
 
 export interface CreatePurchaseRequest {
-  date: string;
-  supplierName: string;
-  companyId: string;
-
-  // New fields for backend payload
-  supplierId: number | string;
-  npwp?: string;
-  address?: string;
-  warehouseId?: number | string;
-  maxCapacity?: number | string;
-  stockState?: string;
-  type?: string;
+  warehouse_id: number;
+  person_id: number;
+  company_id: number;
   code?: string;
-
-  // Optional initial unit fields
-  typeUnitId?: string;
-  typeUnitName?: string;
-  qty?: number;
-  price?: number;
-  biayaBBN?: number;
-  biayaEkspedisi?: number;
-  biayaLain?: number;
+  type: UnitTransactionType;
+  max_capacity: string;
+  stock_state: 'draft';
 }
 
 export interface UpdatePurchaseRequest {

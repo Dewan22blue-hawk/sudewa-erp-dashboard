@@ -75,17 +75,48 @@ const mapTypeUnit = (payload: TypeUnitApiModel): TypeUnit => ({
 const normalizeList = (
   data: TypeUnitApiModel[] | TypeUnitApiModel | { data: TypeUnitApiModel[]; current_page?: number; per_page?: number; total?: number; last_page?: number },
 ): { list: TypeUnitApiModel[]; meta?: { current_page?: number; per_page?: number; total?: number; last_page?: number } } => {
-  if (Array.isArray(data)) return { list: data };
-  if (data && Array.isArray((data as any).data)) {
-    const payload = data as { data: TypeUnitApiModel[]; current_page?: number; per_page?: number; total?: number; last_page?: number };
-    return { list: payload.data, meta: payload };
-  }
-  if (data) return { list: [data as TypeUnitApiModel] };
-  return { list: [] };
+  const walk = (input: any): { list: TypeUnitApiModel[]; meta?: { current_page?: number; per_page?: number; total?: number; last_page?: number } } => {
+    if (!input) return { list: [] };
+
+    if (Array.isArray(input)) {
+      return { list: input as TypeUnitApiModel[] };
+    }
+
+    if (typeof input === 'object') {
+      if (Array.isArray(input.data)) {
+        return {
+          list: input.data as TypeUnitApiModel[],
+          meta: {
+            current_page: input.current_page,
+            per_page: input.per_page,
+            total: input.total,
+            last_page: input.last_page,
+          },
+        };
+      }
+
+      if (Array.isArray(input.items)) {
+        return { list: input.items as TypeUnitApiModel[] };
+      }
+
+      if (input.data) {
+        return walk(input.data);
+      }
+    }
+
+    return { list: [input as TypeUnitApiModel] };
+  };
+
+  return walk(data);
 };
 
 export const getTypeUnits = async (): Promise<TypeUnitListResponse> => {
-  const response = await apiClient.get<TypeUnitListApiResponse>(basePath);
+  const response = await apiClient.get<TypeUnitListApiResponse>(basePath, {
+    params: {
+      sort_by: 'created_at',
+      sort_order: 'asc',
+    },
+  });
   const data = ensureSuccess(response.data);
   const { list: rawList, meta } = normalizeList(data);
   const list = rawList.map(mapTypeUnit);
