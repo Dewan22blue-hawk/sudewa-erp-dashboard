@@ -30,10 +30,11 @@ export const useUpdateUnitItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateUnitTransactionItemPayload }) => unitTransactionItemService.updateItem(id, payload),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.unit_transaction_id] });
-      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
-      queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
+    onSuccess: (_data, variables) => {
+      const purchaseId = String(variables.payload.unit_transaction_id);
+      queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
     },
   });
 };

@@ -79,4 +79,59 @@ export interface CreateUnitTransactionItemPayload {
   other_fee: number;
 }
 
-export interface UpdateUnitTransactionItemPayload extends CreateUnitTransactionItemPayload {}
+export interface UpdateUnitTransactionItemPayload {
+  unit_transaction_id: string;
+  unit_type_id?: string;
+  sparepart_id?: string;
+  qty_total?: number;
+  price?: number;
+  bbn_price?: number;
+  expedition_fee?: number;
+  other_fee?: number;
+}
+
+export interface UnitTransactionItemSummary {
+  id: string;
+  unit_transaction_id: string;
+  unit_transaction_code?: string;
+  unit_type_id?: string;
+  qty_total: number;
+  price: number;
+  bbn_price: number;
+  expedition_fee: number;
+  other_fee: number;
+  hpp_per_unit_price?: number;
+  dpp_per_unit_price?: number;
+  ppn_per_unit_price?: number;
+  hpp_total_price?: number;
+  dpp_total_price?: number;
+  ppn_total_price?: number;
+}
+
+export interface UnitTransactionItemDetail {
+  id: string;
+  unit_transaction_item_id: string;
+  color: string;
+  machine_number: string;
+  chassis_number: string;
+  created_at?: string;
+}
+
+export interface UnitTransactionItemDetailListResponse {
+  data: UnitTransactionItemDetail[];
+  meta: PaginationMeta;
+}
+
+export interface CreateUnitItemDetailPayload {
+  unit_transaction_item_id: string;
+  color: string;
+  machine_number: string;
+  chassis_number: string;
+}
+
+export interface UpdateUnitItemDetailPayload {
+  unit_transaction_item_id: string;
+  color: string;
+  machine_number: string;
+  chassis_number: string;
+}
