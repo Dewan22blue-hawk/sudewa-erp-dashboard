@@ -10,6 +10,7 @@ type UnitTransactionApiModel = {
   code?: string;
   created_at?: string;
   stock_state?: string;
+  max_capacity?: number | string;
   transaction_bruto_total?: string | number;
   transaction_dpp_total?: string | number;
   transaction_ppn_total?: string | number;
@@ -38,7 +39,22 @@ const fallbackBasePath = '/wapi/transaction/unit-transaction';
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
 
 const readErrorMessage = (error: any): string => {
-  const raw = error?.message ?? error?.response?.data?.message ?? error?.response?.data?.errors;
+  const details = error?.details ?? error?.response?.data?.errors;
+
+  if (typeof details === 'string' && details.trim()) {
+    return details.toLowerCase();
+  }
+
+  if (details && typeof details === 'object') {
+    const text = Object.values(details)
+      .flatMap((value: any) => (Array.isArray(value) ? value : [value]))
+      .map((value: any) => String(value))
+      .join(' ')
+      .trim();
+    if (text) return text.toLowerCase();
+  }
+
+  const raw = error?.response?.data?.message ?? error?.message;
   return String(raw ?? '').toLowerCase();
 };
 
@@ -74,6 +90,7 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
   code: item.code ?? '-',
   created_at: item.created_at ?? '',
   stock_state: item.stock_state ?? '-',
+  max_capacity: toNumber(item.max_capacity),
   person: {
     id: String(item.person?.id ?? item.person_id ?? ''),
     name: item.person?.name ?? '-',
