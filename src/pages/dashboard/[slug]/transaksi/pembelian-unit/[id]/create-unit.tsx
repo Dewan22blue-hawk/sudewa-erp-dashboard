@@ -11,6 +11,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { useMemo } from 'react';
 
+const parseApiError = (err: any): string => {
+  const details = err?.details ?? err?.response?.data?.errors;
+  if (typeof details === 'string') return details;
+  if (details && typeof details === 'object') {
+    return Object.entries(details)
+      .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : String(v)}`)
+      .join(', ');
+  }
+
+  const responseMessage = err?.response?.data?.message;
+  if (typeof responseMessage === 'string' && responseMessage.trim()) return responseMessage;
+
+  return err?.message || 'Gagal menambahkan unit';
+};
+
 export default function CreatePurchaseUnitPage() {
   const router = useRouter();
   const { slug, id } = router.query;
@@ -55,6 +70,15 @@ export default function CreatePurchaseUnitPage() {
         return;
       }
 
+      const maxCapacity = Number(purchase?.max_capacity ?? 0);
+      const usedQty = (existingItems?.data ?? []).reduce((acc, item) => acc + Number(item.qty_total ?? 0), 0);
+      const remainingCapacity = Math.max(0, maxCapacity - usedQty);
+
+      if (maxCapacity > 0 && qty > remainingCapacity) {
+        toast.error(`Qty melebihi kapasitas sisa transaksi. Sisa kapasitas: ${remainingCapacity}`);
+        return;
+      }
+
       await addUnitMutation.mutateAsync({
         unit_transaction_id: id as string,
         unit_type_id: data.typeUnitId,
@@ -67,14 +91,7 @@ export default function CreatePurchaseUnitPage() {
       toast.success('Unit berhasil ditambahkan');
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${id}`);
     } catch (err: any) {
-      const fieldErrors = err?.details || err?.response?.data?.errors;
-      const fieldMessage =
-        fieldErrors && typeof fieldErrors === 'object'
-          ? Object.entries(fieldErrors)
-              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : String(v)}`)
-              .join(', ')
-          : '';
-      toast.error(fieldMessage || err?.message || 'Gagal menambahkan unit');
+      toast.error(parseApiError(err));
     }
   };
 

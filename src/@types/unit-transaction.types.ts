@@ -42,6 +42,7 @@ export interface UnitTransactionDetail {
   code: string;
   created_at: string;
   stock_state: string;
+  max_capacity?: number;
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
   unit_transaction_item_total_dpp: number;
@@ -70,7 +71,7 @@ export interface UnitTransactionItemListResponse {
 
 export interface CreateUnitTransactionItemPayload {
   unit_transaction_id: string;
-  unit_type_id?: string;
+  unit_type_id: string;
   sparepart_id?: string;
   qty_total: number;
   price: number;
