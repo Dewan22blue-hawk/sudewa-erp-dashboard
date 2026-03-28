@@ -36,6 +36,18 @@ type UnitTransactionApiModel = {
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
 const fallbackBasePath = '/wapi/transaction/unit-transaction';
 
+const withBaseFallback = async <T>(
+  primary: (activeBasePath: string) => Promise<T>,
+  fallback: (activeBasePath: string) => Promise<T>,
+): Promise<T> => {
+  try {
+    return await primary(basePath);
+  } catch (error) {
+    if (!shouldFallback(error)) throw error;
+    return fallback(fallbackBasePath);
+  }
+};
+
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
 
 const readErrorMessage = (error: any): string => {
@@ -137,6 +149,34 @@ export const unitTransactionService = {
       const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${fallbackBasePath}/${id}`);
       payload = ensureSuccess(response.data);
     }
+
+    const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
+    return mapUnitTransactionDetail(detailPayload);
+  },
+
+  async updateUnitTransactionState(id: string, state: string): Promise<UnitTransactionDetail> {
+    const form = new FormData();
+    form.append('state', state);
+
+    const payload = await withBaseFallback(
+      async (activeBasePath) => {
+        const response = await apiClient.put<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
+          `${activeBasePath}/${id}/update-state`,
+          form,
+        );
+        return ensureSuccess(response.data);
+      },
+      async (activeBasePath) => {
+        const fallbackForm = new FormData();
+        fallbackForm.append('state', state);
+        fallbackForm.append('_method', 'PUT');
+        const response = await apiClient.post<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
+          `${activeBasePath}/${id}/update-state`,
+          fallbackForm,
+        );
+        return ensureSuccess(response.data);
+      },
+    );
 
     const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);

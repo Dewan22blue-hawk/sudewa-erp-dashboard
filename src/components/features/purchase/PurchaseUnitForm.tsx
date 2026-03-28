@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import { useUnitFormula } from '@/hooks/useUnitFormula';
 
 // Extending the schema type for the form, or similar
 // For now we map to any for simplicity in this step, but ideal is strict typing.
@@ -70,13 +71,20 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const biayaEkspedisi = Number(form.watch('biayaEkspedisi') ?? 0);
   const biayaLain = Number(form.watch('biayaLain') ?? 0);
 
-  const hppSatuan = price + (biayaBBN + biayaEkspedisi + biayaLain) / (qty || 1);
-  const ppnSatuan = hppSatuan * 0.11;
-  const dppSatuan = hppSatuan;
+  const { formula } = useUnitFormula({
+    qty_total: qty,
+    price,
+    bbn_price: biayaBBN,
+    expedition_fee: biayaEkspedisi,
+    other_fee: biayaLain,
+  });
 
-  const totalHpp = hppSatuan * qty;
-  const totalDpp = dppSatuan * qty;
-  const totalPpn = ppnSatuan * qty;
+  const hppSatuan = Number(formula?.hpp_per_unit_price ?? 0);
+  const dppSatuan = Number(formula?.dpp_per_unit_price ?? 0);
+  const ppnSatuan = Number(formula?.ppn_per_unit_price ?? 0);
+  const totalHpp = Number(formula?.hpp_total_price ?? 0);
+  const totalDpp = Number(formula?.dpp_total_price ?? 0);
+  const totalPpn = Number(formula?.ppn_total_price ?? 0);
 
   const typeUnitOptions = useMemo<TypeUnit[]>(() => {
     const maybeList = (typeUnitData as any)?.data;

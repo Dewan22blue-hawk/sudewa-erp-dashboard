@@ -5,13 +5,44 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
 import PurchaseUnitTable from '@/components/features/purchase/PurchaseUnitTable';
-import { usePurchaseById } from '@/hooks/useUnitTransaction';
+import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
+import { useUnitBillings } from '@/hooks/useUnitBilling';
 import { ChevronLeft, CreditCard, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+const PURCHASE_RECEIPT_STATE = 'receipt';
 
 export default function PurchaseDetailPage() {
   const router = useRouter();
   const { slug, id } = router.query;
   const { data: purchase, isLoading, isError } = usePurchaseById(id as string);
+  const { data: billings = [] } = useUnitBillings(purchase?.id);
+  const updateState = useUpdateUnitTransactionState();
+
+  const totalTagihan = Number(purchase?.unit_transaction_item_bruto_total ?? 0);
+  const totalPaid = billings.reduce(
+    (acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
+    0,
+  );
+  const isPaid = totalPaid >= totalTagihan && totalTagihan > 0;
+
+  const handleReceipt = async () => {
+    if (!purchase?.id) return;
+
+    try {
+      await updateState.mutateAsync({ id: purchase.id, state: PURCHASE_RECEIPT_STATE });
+      toast.success('Status pembelian diperbarui ke receipt');
+    } catch (error: any) {
+      toast.error(error?.message || 'Gagal update state ke receipt', {
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            void handleReceipt();
+          },
+        },
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -57,6 +88,11 @@ export default function PurchaseDetailPage() {
               <CreditCard className="mr-2 h-4 w-4" />
               Bayar
             </Button>
+            {isPaid && purchase.stock_state !== PURCHASE_RECEIPT_STATE && (
+              <Button variant="outline" className="bg-white hover:bg-gray-50" disabled={updateState.isPending} onClick={handleReceipt}>
+                {updateState.isPending ? 'Memproses...' : 'Terima Barang'}
+              </Button>
+            )}
           </div>
         </div>
 

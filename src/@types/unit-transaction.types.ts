@@ -60,6 +60,7 @@ export interface UnitTransactionItem {
   bbn_price: number;
   expedition_fee: number;
   other_fee: number;
+  hpp_total_price?: number;
   dpp_total_price: number;
   ppn_total_price: number;
 }
@@ -81,7 +82,7 @@ export interface CreateUnitTransactionItemPayload {
 }
 
 export interface UpdateUnitTransactionItemPayload {
-  unit_transaction_id: string;
+  unit_transaction_id?: string;
   unit_type_id?: string;
   sparepart_id?: string;
   qty_total?: number;
@@ -115,6 +116,7 @@ export interface UnitTransactionItemDetail {
   color: string;
   machine_number: string;
   chassis_number: string;
+  in_stock?: boolean;
   created_at?: string;
 }
 

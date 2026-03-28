@@ -19,12 +19,13 @@ interface Props {
     item: SalesItem
     isSelected: boolean
     onToggle: (id: string) => void
+    onDelete?: (id: string) => Promise<void> | void
 }
 
 /**
  * Sales Table Row - EXACT sesuai Figma dengan checkbox state dan navigasi
  */
-export function SalesTableRow({ item, isSelected, onToggle }: Props) {
+export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     const router = useRouter()
     const slugQuery = router.query.slug
     const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
@@ -40,8 +41,7 @@ export function SalesTableRow({ item, isSelected, onToggle }: Props) {
     // Handle delete
     const handleDelete = () => {
         if (confirm(`Hapus ${item.kodeJual}?`)) {
-            console.log('Delete item:', item.id)
-            alert('Item deleted!')
+            onDelete?.(item.id)
         }
     }
 

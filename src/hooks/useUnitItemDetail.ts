@@ -52,3 +52,14 @@ export const useDeleteUnitItemDetail = () => {
     },
   });
 };
+
+export const useImportUnitItemDetails = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ unitItemId, file }: { unitItemId: string; file: File }) => unitItemDetailService.importDetails(unitItemId, file).then(() => ({ unitItemId })),
+    onSuccess: ({ unitItemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details', unitItemId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', unitItemId] });
+    },
+  });
+};

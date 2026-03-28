@@ -5,9 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
-import { SALES_DATA } from '@/components/features/sales/sales.data';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
+import { useSalesDetail, useUpdateSales } from '@/hooks/useSales';
+import { mapSalesDetailToEditForm } from '@/services/sales.mapper';
+import { useCompany } from '@/contexts/CompanyContext';
 
 /**
  * Edit Unit Page - EXACT sesuai Figma
@@ -15,68 +17,56 @@ import { toast } from 'sonner';
  */
 export default function EditUnitPage() {
   const router = useRouter();
+  const { companyId } = useCompany();
   const { itemId } = router.query;
-  const [isLoading, setIsLoading] = useState(true);
-  const [formData, setFormData] = useState<EditUnitFormData | null>(null);
-  const [invoiceCode, setInvoiceCode] = useState('');
+  const salesId = Array.isArray(itemId) ? itemId[0] : itemId;
+  const { data, isLoading, isError } = useSalesDetail(salesId);
+  const updateMutation = useUpdateSales();
+  const formData: EditUnitFormData | null = useMemo(() => {
+    if (!data?.raw) return null;
+    return mapSalesDetailToEditForm(data.raw);
+  }, [data?.raw]);
 
-  // Fetch data imitation
+  const invoiceCode = data?.raw?.code ?? '';
+
   useEffect(() => {
-    if (!itemId) return;
+    if (!salesId || isLoading) return;
 
-    const item = SALES_DATA.find((d) => d.id === itemId);
-
-    if (item) {
-      setInvoiceCode(item.kodeJual);
-
-      // Mocking detailed data since SALES_DATA only has totals
-      // In real app, this would come from API
-      const mockQty = 1;
-
-      // Calculate reverse values or set logic defaults
-      // For now we set based on available totals for display
-
-      setFormData({
-        tipeUnit: 'Product A', // Default/Mock
-        qty: mockQty,
-        harga: 0,
-
-        // Biaya - Mock values because they aren't in list data
-        biayaBbn: 0,
-        biayaEkspedisi: 0,
-        biayaLain: 0,
-
-        // Totals from data
-        totalHpp: item.totalDpp * 0.8, // Mock HPP as 80% of DPP
-        totalDpp: item.totalDpp,
-        totalPpn: item.totalPpn,
-
-        // Satuan (Derived)
-        hppSatuan: (item.totalDpp * 0.8) / mockQty,
-        dppSatuan: item.totalDpp / mockQty,
-        ppnSatuan: item.totalPpn / mockQty,
-      });
-    } else {
+    if (isError || !data?.raw) {
       toast.error('Data penjualan tidak ditemukan');
       const slugQuery = router.query.slug;
       const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
       router.push(slug ? `/dashboard/${slug}/sales` : '/sales');
     }
-    setIsLoading(false);
-  }, [itemId, router]);
+  }, [data?.raw, isError, isLoading, router, salesId]);
 
   /**
    * Handle form submit - API READY
    * TODO: Replace with actual API call when backend ready
    */
-  const handleSubmit = async (data: EditUnitFormData) => {
+  const handleSubmit = async (form: EditUnitFormData) => {
     try {
-      console.log('=== SUBMIT DATA ===');
-      console.log('Item ID:', itemId);
-      console.log('Form Data:', data);
+      if (!salesId || !data?.raw) {
+        toast.error('Data penjualan tidak ditemukan');
+        return;
+      }
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const payload = {
+        company_id: Number(companyId || data.raw.company_id || 0),
+        person_id: Number(data.raw.person?.id ?? data.raw.person_id ?? 0),
+        warehouse_id: Number(data.raw.warehouse?.id ?? data.raw.warehouse_id ?? 1),
+        code: data.raw.code ?? invoiceCode,
+        type: 'sales' as const,
+        max_capacity: Number(form.qty ?? 0),
+        stock_state: data.raw.stock_state ?? 'draft',
+      };
+
+      if (!payload.company_id || !payload.person_id || !payload.warehouse_id || !payload.max_capacity) {
+        toast.error('Data wajib tidak lengkap untuk update penjualan');
+        return;
+      }
+
+      await updateMutation.mutateAsync({ id: salesId, payload });
 
       toast.success('Data berhasil disimpan!');
 

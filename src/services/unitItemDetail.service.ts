@@ -36,6 +36,7 @@ type UnitTransactionItemDetailApiModel = {
   color?: string;
   machine_number?: string;
   chassis_number?: string;
+  in_stock?: boolean | number | string;
   created_at?: string;
 };
 
@@ -45,7 +46,16 @@ const detailBasePath = '/wapi/transaction/unit-transaction-item-detail';
 const detailLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item-detail';
 
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
-const toIntegerString = (value: string | number | undefined): string => String(Math.trunc(Number(value ?? 0)));
+const toIdString = (value: string | number | undefined): string => String(value ?? '');
+const toBool = (value: unknown): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
+    const normalized = value.toLowerCase();
+    return normalized === '1' || normalized === 'true' || normalized === 'yes';
+  }
+  return false;
+};
 const shouldFallback = (error: any): boolean => {
   const statusCode = error?.statusCode ?? error?.response?.status;
   return statusCode === 404 || statusCode === 405;
@@ -84,6 +94,7 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
   color: item.color ?? '-',
   machine_number: item.machine_number ?? '-',
   chassis_number: item.chassis_number ?? '-',
+  in_stock: toBool(item.in_stock),
   created_at: item.created_at,
 });
 
@@ -153,7 +164,7 @@ export const unitItemDetailService = {
 
   async createDetail(payload: CreateUnitItemDetailPayload): Promise<UnitTransactionItemDetail> {
     const form = new FormData();
-    form.append('unit_transaction_item_id', toIntegerString(payload.unit_transaction_item_id));
+    form.append('unit_transaction_item_id', toIdString(payload.unit_transaction_item_id));
     form.append('color', payload.color);
     form.append('machine_number', payload.machine_number);
     form.append('chassis_number', payload.chassis_number);
@@ -169,7 +180,7 @@ export const unitItemDetailService = {
 
   async updateDetail(id: string, payload: UpdateUnitItemDetailPayload): Promise<UnitTransactionItemDetail> {
     const form = new FormData();
-    form.append('unit_transaction_item_id', toIntegerString(payload.unit_transaction_item_id));
+    form.append('unit_transaction_item_id', toIdString(payload.unit_transaction_item_id));
     form.append('color', payload.color);
     form.append('machine_number', payload.machine_number);
     form.append('chassis_number', payload.chassis_number);
@@ -188,6 +199,16 @@ export const unitItemDetailService = {
     await withPathFallback(
       () => apiClient.delete<LaravelApiResponse<null>>(`${detailBasePath}/${id}`),
       () => apiClient.delete<LaravelApiResponse<null>>(`${detailLegacyPath}/${id}`),
+    );
+  },
+
+  async importDetails(unitTransactionItemId: string, file: File): Promise<void> {
+    const form = new FormData();
+    form.append('file', file);
+
+    await withPathFallback(
+      () => apiClient.post<LaravelApiResponse<any>>(`${detailBasePath}/${unitTransactionItemId}/import`, form),
+      () => apiClient.post<LaravelApiResponse<any>>(`${detailLegacyPath}/${unitTransactionItemId}/import`, form),
     );
   },
 };

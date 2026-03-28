@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Table, TableHeader, TableHead, TableRow, TableBody } from '@/components/ui/table';
+import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { SALES_DATA } from './sales.data';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { useDeleteSales, useSalesList } from '@/hooks/useSales';
+import { toast } from 'sonner';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -20,14 +21,17 @@ interface Props {
  * Sales Table Component dengan Pagination dan Bulk Select
  */
 export function SalesTable({ onAdd }: Props) {
+  const { data, isLoading } = useSalesList();
+  const deleteMutation = useDeleteSales();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Filter data based on search
   const [searchTerm, setSearchTerm] = useState('');
+  const salesData = data?.data ?? [];
 
-  const filteredData = SALES_DATA.filter((item) => item.kodeJual.toLowerCase().includes(searchTerm.toLowerCase()) || item.customer.toLowerCase().includes(searchTerm.toLowerCase()) || item.tanggal.includes(searchTerm));
+  const filteredData = salesData.filter((item) => item.kodeJual.toLowerCase().includes(searchTerm.toLowerCase()) || item.customer.toLowerCase().includes(searchTerm.toLowerCase()) || item.tanggal.includes(searchTerm));
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data: filteredData,
@@ -82,6 +86,20 @@ export function SalesTable({ onAdd }: Props) {
     }
 
     setSelectedIds(newSelectedIds);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success('Data berhasil dihapus');
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch {
+      toast.error('Gagal menghapus data');
+    }
   };
 
   return (
@@ -168,9 +186,17 @@ export function SalesTable({ onAdd }: Props) {
           </TableHeader>
 
           <TableBody>
-            {currentData.map((item) => (
-              <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} />
-            ))}
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={10} className="h-20 text-center">
+                  Loading data...
+                </TableCell>
+              </TableRow>
+            ) : (
+              currentData.map((item) => (
+                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} />
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

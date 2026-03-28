@@ -7,9 +7,12 @@ type UnitBillingApiModel = {
   company_id?: string | number;
   unit_transaction_id?: string | number;
   bca_payment?: string | number;
+  bca_payment_amount?: string | number;
   cash_payment?: string | number;
+  cash_payment_amount?: string | number;
   bca_payment_2?: string | number;
   payment_date?: string;
+  payment_at?: string;
   is_paid?: boolean | number | string;
   created_at?: string;
   updated_at?: string;
@@ -44,23 +47,31 @@ const mapBilling = (item: UnitBillingApiModel): UnitBilling => ({
   id: String(item.id ?? ''),
   company_id: String(item.company_id ?? ''),
   unit_transaction_id: String(item.unit_transaction_id ?? ''),
-  bca_payment: toNumber(item.bca_payment),
-  cash_payment: toNumber(item.cash_payment),
+  bca_payment: toNumber(item.bca_payment ?? item.bca_payment_amount),
+  cash_payment: toNumber(item.cash_payment ?? item.cash_payment_amount),
   bca_payment_2: toNumber(item.bca_payment_2),
-  payment_date: item.payment_date ?? '',
+  payment_date: item.payment_date ?? item.payment_at ?? '',
   is_paid: toBool(item.is_paid),
   created_at: item.created_at,
   updated_at: item.updated_at,
 });
 
 const toFormData = (payload: UpsertUnitBillingPayload, asUpdate = false): FormData => {
+  const bcaPayment = Number(payload.bca_payment ?? 0);
+  const cashPayment = Number(payload.cash_payment ?? 0);
+  const paymentDate = payload.payment_date;
+
   const form = new FormData();
   form.append('company_id', String(payload.company_id));
   form.append('unit_transaction_id', String(payload.unit_transaction_id));
-  form.append('bca_payment', String(payload.bca_payment ?? 0));
-  form.append('cash_payment', String(payload.cash_payment ?? 0));
+  form.append('bca_payment', String(bcaPayment));
+  form.append('cash_payment', String(cashPayment));
+  // Compatibility fields for backends expecting the new payment contract.
+  form.append('bca_payment_amount', String(bcaPayment));
+  form.append('cash_payment_amount', String(cashPayment));
   form.append('bca_payment_2', String(payload.bca_payment_2 ?? 0));
-  form.append('payment_date', payload.payment_date);
+  form.append('payment_date', paymentDate);
+  form.append('payment_at', paymentDate);
   form.append('is_paid', payload.is_paid ? '1' : '0');
   if (asUpdate) form.append('_method', 'PUT');
   return form;

@@ -3,6 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
 import { toast } from 'sonner';
+import { useCreateSales } from '@/hooks/useSales';
+import { useCustomers } from '@/hooks/useCustomer';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useRouter } from 'next/router';
+import { generateSalesCode } from '@/lib/utils/sales';
 
 interface CreateSalesModalProps {
     isOpen: boolean;
@@ -11,13 +16,44 @@ interface CreateSalesModalProps {
 }
 
 export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModalProps) {
-    const handleSubmit = (data: EditUnitFormData) => {
-        // Mock submission
-        setTimeout(() => {
+    const router = useRouter();
+    const { companyId } = useCompany();
+    const createSalesMutation = useCreateSales();
+    const { data: customerData } = useCustomers(companyId || null);
+    const generatedCode = generateSalesCode(router.query.slug);
+
+    const handleSubmit = async (data: EditUnitFormData) => {
+        const selectedCustomer =
+            (customerData?.data ?? []).find((item) => String(item.name).trim().toLowerCase() === String(data.customer ?? '').trim().toLowerCase()) ?? null;
+
+        const customerId = Number(selectedCustomer?.id ?? 0);
+        if (!customerId) {
+            toast.error('Customer tidak valid. Silakan isi nama customer sesuai data master.');
+            return;
+        }
+
+        const payload = {
+            person_id: customerId,
+            warehouse_id: 1,
+            code: generatedCode,
+            type: 'sales' as const,
+            max_capacity: Number(data.qty ?? 0),
+            stock_state: 'draft',
+        };
+
+        if (!payload.max_capacity || payload.max_capacity <= 0) {
+            toast.error('QTY wajib diisi dan minimal 1');
+            return;
+        }
+
+        try {
+            await createSalesMutation.mutateAsync(payload);
             toast.success('Penjualan unit berhasil ditambahkan');
             onClose();
             if (onSuccess) onSuccess();
-        }, 800);
+        } catch {
+            toast.error('Gagal menambahkan penjualan unit');
+        }
     };
 
     return (
@@ -32,7 +68,7 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
                             </DialogDescription>
                         </div>
                         <div className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-md border border-blue-100 mr-4">
-                            Kode Jual: <span className="font-semibold">INV-WIN/2026---</span>
+                            Kode Jual: <span className="font-semibold">{generatedCode}</span>
                         </div>
                     </div>
                 </DialogHeader>

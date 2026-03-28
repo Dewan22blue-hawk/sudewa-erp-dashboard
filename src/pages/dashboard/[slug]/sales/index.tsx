@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SalesTable } from '@/components/features/sales/SalesTable';
-import { CreateSalesModal } from '@/components/features/sales/CreateSalesModal';
 import { useRouter } from 'next/router';
 
 /**
@@ -11,7 +9,8 @@ import { useRouter } from 'next/router';
  */
 export default function SalesPage() {
   const router = useRouter();
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const slugQuery = router.query.slug;
+  const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
 
   return (
     <DashboardLayout>
@@ -24,14 +23,9 @@ export default function SalesPage() {
 
         {/* Sales Table */}
         <SalesTable
-          onAdd={() => setIsAddOpen(true)}
+          onAdd={() => router.push(slug ? `/dashboard/${slug}/sales/create` : '/sales/create')}
         />
       </div>
-
-      <CreateSalesModal
-        isOpen={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-      />
     </DashboardLayout>
   );
 }

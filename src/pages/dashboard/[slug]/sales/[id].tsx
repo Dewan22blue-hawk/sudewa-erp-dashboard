@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronLeft, Plus, Wallet } from 'lucide-react';
-import { SALES_DATA } from '@/components/features/sales/sales.data';
+import { ChevronLeft, Wallet } from 'lucide-react';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { SalesItem } from '@/components/features/sales/sales.data';
+import { useSalesDetail } from '@/hooks/useSales';
+import { mapSalesDetailCard } from '@/services/sales.mapper';
 
 /**
  * Detail Data Penjualan Unit - Image 4
@@ -15,23 +15,29 @@ import { SalesItem } from '@/components/features/sales/sales.data';
 export default function SalesDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [isLoading, setIsLoading] = useState(true);
-  const [salesData, setSalesData] = useState<SalesItem | null>(null);
+  const salesId = Array.isArray(id) ? id[0] : id;
+  const { data, isLoading } = useSalesDetail(salesId);
 
   const { slug } = router.query;
+  const salesData = data?.ui ?? null;
+  const mappedDetail = data?.raw
+    ? mapSalesDetailCard(data.raw)
+    : {
+        code: '-',
+        customerName: '-',
+        warehouse: '-',
+        total: 0,
+        dpp: 0,
+        ppn: 0,
+      };
 
   useEffect(() => {
-    if (!id) return;
+    if (!salesId || isLoading) return;
 
-    const data = SALES_DATA.find((item) => item.id === id);
-    if (data) {
-      setSalesData(data);
-    } else {
+    if (!salesData) {
       toast.error('Data penjualan tidak ditemukan');
-      // router.push(slug ? `/dashboard/${slug}/sales` : "/sales")
     }
-    setIsLoading(false);
-  }, [id, slug]);
+  }, [salesData, salesId, isLoading, slug]);
 
   useEffect(() => {
     if (router.query.print === 'true' && !isLoading && salesData) {
@@ -82,10 +88,6 @@ export default function SalesDetailPage() {
               <Wallet className="mr-2 h-4 w-4" />
               Bayar
             </Button>
-            <Button variant="outline" className="bg-white hover:bg-gray-50" onClick={handleCreateUnit}>
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah Unit
-            </Button>
           </div>
         </div>
 
@@ -95,7 +97,7 @@ export default function SalesDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm font-semibold">Kode Jual</p>
-              <p className="text-lg">{salesData.kodeJual}</p>
+              <p className="text-lg">{mappedDetail.code}</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Dicetak pada: {new Date().toLocaleDateString('id-ID')}</p>
@@ -107,7 +109,7 @@ export default function SalesDetailPage() {
         <SalesDetailCards data={salesData} />
 
         {/* Detail Unit Table */}
-        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} />
+        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} />
       </div>
     </DashboardLayout>
   );

@@ -6,12 +6,14 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
-import { usePurchaseById } from '@/hooks/useUnitTransaction';
+import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
 import { useCreateBilling, useUnitBillings, useUpdateBilling } from '@/hooks/useUnitBilling';
 import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+
+const PURCHASE_RECEIPT_STATE = 'receipt';
 
 export default function PurchasePaymentPage() {
     const router = useRouter()
@@ -22,6 +24,7 @@ export default function PurchasePaymentPage() {
         const { data: billings = [], isLoading: billingLoading } = useUnitBillings(purchaseId);
         const createBilling = useCreateBilling();
         const updateBilling = useUpdateBilling();
+        const updateState = useUpdateUnitTransactionState();
 
         const totalTagihan = Number(purchase?.unit_transaction_item_bruto_total ?? 0);
         const totalPaid = useMemo(
@@ -29,6 +32,37 @@ export default function PurchasePaymentPage() {
             [billings],
         );
         const remainingPayment = Math.max(0, totalTagihan - totalPaid);
+
+        const calculatePaymentState = (nextTotalPaid: number) => {
+            const isPaid = nextTotalPaid >= totalTagihan && totalTagihan > 0;
+            return {
+                isPaid,
+                nextTotalPaid,
+                nextRemaining: Math.max(0, totalTagihan - nextTotalPaid),
+            };
+        };
+
+        const syncPurchaseReceiptState = async (shouldMoveToReceipt: boolean) => {
+            if (!shouldMoveToReceipt || !purchaseId) return;
+            if (purchase?.stock_state === PURCHASE_RECEIPT_STATE) return;
+
+            try {
+                await updateState.mutateAsync({
+                    id: purchaseId,
+                    state: PURCHASE_RECEIPT_STATE,
+                });
+                toast.success('Status pembelian diperbarui ke receipt');
+            } catch (error: any) {
+                toast.error(error?.message || 'Payment tersimpan, namun update state gagal', {
+                    action: {
+                        label: 'Retry',
+                        onClick: () => {
+                            void syncPurchaseReceiptState(true);
+                        },
+                    },
+                });
+            }
+        };
 
         const buildPayload = (data: {
             bcaPayment: number;
@@ -61,10 +95,14 @@ export default function PurchasePaymentPage() {
             isPaid: boolean;
         }) => {
         try {
+                const submittedTotal = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+                const paymentState = calculatePaymentState(totalPaid + submittedTotal);
                         const payload = buildPayload(data);
                         if (!payload) return;
+                payload.is_paid = paymentState.isPaid;
                         await createBilling.mutateAsync(payload);
             toast.success("Pembayaran berhasil disimpan")
+                await syncPurchaseReceiptState(paymentState.isPaid);
                 } catch (error: any) {
                         toast.error(error?.message || "Gagal menyimpan pembayaran")
                 }
@@ -81,10 +119,18 @@ export default function PurchasePaymentPage() {
             },
         ) => {
                 try {
+                const currentBilling = billings.find((item) => item.id === billingId);
+                const existingBillingTotal = currentBilling
+                    ? Number(currentBilling.bca_payment ?? 0) + Number(currentBilling.cash_payment ?? 0) + Number(currentBilling.bca_payment_2 ?? 0)
+                    : 0;
+                const submittedTotal = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+                const paymentState = calculatePaymentState(totalPaid - existingBillingTotal + submittedTotal);
                         const payload = buildPayload(data);
                         if (!payload) return;
+                payload.is_paid = paymentState.isPaid;
                         await updateBilling.mutateAsync({ id: billingId, payload });
                         toast.success("Pembayaran berhasil diperbarui")
+                await syncPurchaseReceiptState(paymentState.isPaid);
                 } catch (error: any) {
                         toast.error(error?.message || "Gagal menyimpan pembayaran")
         }
@@ -143,7 +189,7 @@ export default function PurchasePaymentPage() {
                             onCreate={handleCreate}
                             onUpdate={handleUpdate}
                             onCancel={() => router.back()}
-                            loading={createBilling.isPending || updateBilling.isPending}
+                            loading={createBilling.isPending || updateBilling.isPending || updateState.isPending}
                         />
                     </CardContent>
                 </Card>

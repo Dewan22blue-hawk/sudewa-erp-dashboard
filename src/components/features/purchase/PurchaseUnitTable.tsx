@@ -66,7 +66,7 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
     }
 
     try {
-      await Promise.all(selectedIds.map((id) => bulkDeleteMutation.mutateAsync({ id, purchaseId })));
+      await bulkDeleteMutation.mutateAsync({ ids: selectedIds, purchaseId });
       toast.success(`${selectedIds.length} unit item berhasil dihapus`);
       table.resetRowSelection();
       setBulkDeleteOpen(false);
