@@ -4,10 +4,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft } from 'lucide-react';
 import { PaymentForm } from '@/components/features/sales/payment/PaymentForm';
-import { SALES_DATA } from '@/components/features/sales/sales.data';
-import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { SalesItem } from '@/components/features/sales/sales.data';
+import { useSalesDetail } from '@/hooks/useSales';
+import { useCreateBilling, useUnitBillings } from '@/hooks/useUnitBilling';
+import { useCompany } from '@/contexts/CompanyContext';
+import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
 
 /**
  * Pembayaran Unit Page
@@ -15,43 +16,59 @@ import { SalesItem } from '@/components/features/sales/sales.data';
 export default function PaymentPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [isLoading, setIsLoading] = useState(true);
-  const [salesData, setSalesData] = useState<SalesItem | null>(null);
+  const salesId = Array.isArray(id) ? id[0] : id;
+  const { companyId } = useCompany();
+  const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
+  const { data: billings = [], isLoading: billingLoading } = useUnitBillings(salesId);
+  const createBilling = useCreateBilling();
 
-  useEffect(() => {
-    if (!id) return;
-
-    const item = SALES_DATA.find((d) => d.id === id);
-    if (item) {
-      setSalesData(item);
-    } else {
-      toast.error('Data penjualan tidak ditemukan');
-      // router.push("/sales")
-    }
-    setIsLoading(false);
-  }, [id]);
+  const salesData = salesDetail?.ui ?? null;
+  const totalTagihan = Number(salesData?.totalJual ?? 0);
+  const totalPaid = billings.reduce(
+    (acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
+    0,
+  );
 
   const handleSubmit = async (data: any) => {
     try {
-      console.log('=== PAYMENT DATA ===');
-      console.log('Sales ID:', id);
-      console.log('Payment Data:', data);
+      if (!salesId) {
+        toast.error('Data penjualan tidak valid');
+        return;
+      }
+      if (!companyId) {
+        toast.error('Company belum dipilih');
+        return;
+      }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const bcaPayment = Number(data.paymentBca ?? 0);
+      const cashPayment = Number(data.paymentCash ?? 0);
+      const bcaPayment2 = Number(data.paymentBcaUsd ?? 0);
+      const submittedTotal = bcaPayment + cashPayment + bcaPayment2;
+      const isPaid = totalPaid + submittedTotal >= totalTagihan && totalTagihan > 0;
+
+      const payload: UpsertUnitBillingPayload = {
+        company_id: String(companyId),
+        unit_transaction_id: String(salesId),
+        bca_payment: bcaPayment,
+        cash_payment: cashPayment,
+        bca_payment_2: bcaPayment2,
+        payment_date: new Date().toISOString().slice(0, 10),
+        is_paid: isPaid,
+      };
+
+      await createBilling.mutateAsync(payload);
 
       toast.success('Pembayaran berhasil disimpan!');
       const slugQuery = router.query.slug;
       const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
       const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
-      router.push(`${basePath}/${id}`);
-    } catch (error) {
-      console.error('Error saving payment:', error);
-      toast.error('Gagal menyimpan pembayaran.');
+      router.push(`${basePath}/${salesId}`);
+    } catch (error: any) {
+      toast.error(error?.message || 'Gagal menyimpan pembayaran.');
     }
   };
 
-  if (isLoading || !salesData) {
+  if (salesLoading || billingLoading || !salesData) {
     return (
       <DashboardLayout>
         <div className="p-6">Loading data...</div>

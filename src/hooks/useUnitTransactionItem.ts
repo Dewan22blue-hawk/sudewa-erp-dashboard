@@ -14,6 +14,15 @@ export const usePurchaseUnitItems = (purchaseId?: string) => {
   });
 };
 
+export const useSalesItemsByWarehouse = (warehouseId?: string | number) => {
+  return useQuery({
+    queryKey: ['sales-unit-items-by-warehouse', warehouseId],
+    queryFn: () => unitTransactionItemService.getSalesItemsByWarehouse(String(warehouseId)),
+    enabled: warehouseId !== undefined && warehouseId !== null && String(warehouseId).length > 0,
+    staleTime: 1000 * 60,
+  });
+};
+
 export const useCreateUnitItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -22,6 +31,8 @@ export const useCreateUnitItem = () => {
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction', data.unit_transaction_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
     },
   });
 };
@@ -30,11 +41,17 @@ export const useUpdateUnitItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateUnitTransactionItemPayload }) => unitTransactionItemService.updateItem(id, payload),
-    onSuccess: (_data, variables) => {
-      const purchaseId = String(variables.payload.unit_transaction_id);
-      queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
-      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
-      queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
+    onSuccess: (data, variables) => {
+      const transactionId = String(data.unit_transaction_id ?? variables.payload.unit_transaction_id ?? '');
+
+      if (transactionId) {
+        queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', transactionId] });
+        queryClient.invalidateQueries({ queryKey: ['purchase-by-id', transactionId] });
+        queryClient.invalidateQueries({ queryKey: ['unit-transaction', transactionId] });
+        queryClient.invalidateQueries({ queryKey: ['sales-transaction', transactionId] });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
     },
   });
 };
@@ -47,6 +64,8 @@ export const useDeleteUnitItem = () => {
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
     },
   });
 };
@@ -54,11 +73,13 @@ export const useDeleteUnitItem = () => {
 export const useBulkDeleteUnitItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, purchaseId }: { id: string; purchaseId: string }) => unitTransactionItemService.bulkDelete(id).then(() => ({ purchaseId })),
+    mutationFn: ({ ids, purchaseId }: { ids: string[]; purchaseId: string }) => unitTransactionItemService.bulkDelete(ids).then(() => ({ purchaseId })),
     onSuccess: ({ purchaseId }) => {
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
     },
   });
 };

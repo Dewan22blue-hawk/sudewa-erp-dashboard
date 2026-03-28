@@ -7,7 +7,6 @@ import {
 } from '@/@types/unit-transaction.types';
 import { apiClient } from '@/lib/api/client';
 import {
-  ApiResponseError,
   ensureSuccess,
   LaravelApiResponse,
   toPaginatedResult,
@@ -23,11 +22,28 @@ type UnitTransactionItemApiModel = {
   bbn_price?: number | string;
   expedition_fee?: number | string;
   other_fee?: number | string;
+  hpp_total_price?: number | string;
   dpp_total_price?: number | string;
   ppn_total_price?: number | string;
 };
 
-const basePath = '/wapi/transaction/unit-transaction-item';
+export type UnitFormulaInput = {
+  qty_total?: number | string;
+  price?: number | string;
+  bbn_price?: number | string;
+  expedition_fee?: number | string;
+  other_fee?: number | string;
+};
+
+export type UnitFormulaResult = {
+  hpp_per_unit_price: number;
+  dpp_per_unit_price: number;
+  ppn_per_unit_price: number;
+  hpp_total_price: number;
+  dpp_total_price: number;
+  ppn_total_price: number;
+};
+
 const legacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 
 // ======================
@@ -74,8 +90,18 @@ const mapItem = (item: UnitTransactionItemApiModel): UnitTransactionItem => ({
   bbn_price: toNumber(item.bbn_price),
   expedition_fee: toNumber(item.expedition_fee),
   other_fee: toNumber(item.other_fee),
+  hpp_total_price: toNumber(item.hpp_total_price),
   dpp_total_price: toNumber(item.dpp_total_price),
   ppn_total_price: toNumber(item.ppn_total_price),
+});
+
+const mapFormula = (payload: any): UnitFormulaResult => ({
+  hpp_per_unit_price: toNumber(payload?.hpp_per_unit_price),
+  dpp_per_unit_price: toNumber(payload?.dpp_per_unit_price),
+  ppn_per_unit_price: toNumber(payload?.ppn_per_unit_price),
+  hpp_total_price: toNumber(payload?.hpp_total_price),
+  dpp_total_price: toNumber(payload?.dpp_total_price),
+  ppn_total_price: toNumber(payload?.ppn_total_price),
 });
 
 // ======================
@@ -83,6 +109,66 @@ const mapItem = (item: UnitTransactionItemApiModel): UnitTransactionItem => ({
 // ======================
 
 export const unitTransactionItemService = {
+  async getFormula(payload: UnitFormulaInput): Promise<UnitFormulaResult> {
+    const requestParams = {
+      qty_total: toIntegerString(payload.qty_total),
+      price: toDecimalString(payload.price),
+      bbn_price: toDecimalString(payload.bbn_price),
+      expedition_fee: toDecimalString(payload.expedition_fee),
+      other_fee: toDecimalString(payload.other_fee),
+    };
+
+    try {
+      const response = await apiClient.get<LaravelApiResponse<any>>(`${legacyBasePath}/get-formula`, {
+        params: requestParams,
+      });
+
+      const data = ensureSuccess(response.data);
+      const normalized = (data as any)?.data ?? data;
+      return mapFormula(normalized);
+    } catch {
+      const response = await apiClient.get<LaravelApiResponse<any>>('/wapi/transaction/unit-transaction-item/get-formula', {
+        params: requestParams,
+      });
+      const data = ensureSuccess(response.data);
+      const normalized = (data as any)?.data ?? data;
+      return mapFormula(normalized);
+    }
+  },
+
+  async getSalesItemsByWarehouse(
+    warehouseId: string | number,
+    params: PaginationParams = {}
+  ): Promise<UnitTransactionItem[]> {
+    const response = await apiClient.get<LaravelApiResponse<any>>(
+      legacyBasePath,
+      {
+        params: {
+          warehouse_id: String(warehouseId),
+          type: 'sales',
+          page: params.page ?? 1,
+          per_page: params.perPage ?? 200,
+        },
+      }
+    );
+
+    const payload = ensureSuccess(response.data);
+
+    if (Array.isArray(payload)) {
+      return payload.map(mapItem);
+    }
+
+    if (Array.isArray(payload?.data)) {
+      return payload.data.map(mapItem);
+    }
+
+    if (Array.isArray(payload?.data?.data)) {
+      return payload.data.data.map(mapItem);
+    }
+
+    return [];
+  },
+
   // ======================
   // GET ITEMS
   // ======================
@@ -199,9 +285,6 @@ async updateItem(
 ): Promise<UnitTransactionItem> {
   const params = new URLSearchParams();
 
-  // iki tak hapus karena di backendnya gak butuh, tapi kalo ternyata butuh tinggal di uncomment aja
-  // params.append('unit_transaction_id', ...)
-
   if (payload.unit_type_id !== undefined) {
     params.append('unit_type_id', String(payload.unit_type_id));
   }
@@ -249,9 +332,29 @@ async updateItem(
   // ======================
   // BULK DELETE
   // ======================
-  async bulkDelete(id: string): Promise<void> {
-    await apiClient.delete(
-      `${legacyBasePath}/transcation-item-detail-bulk-delete/${id}`
-    );
+  async bulkDelete(ids: string | string[]): Promise<void> {
+    const idList = Array.isArray(ids) ? ids : [ids];
+    const normalizedIds = idList.map((id) => String(id)).filter(Boolean);
+
+    if (normalizedIds.length === 0) return;
+
+    try {
+      await apiClient.delete(`${legacyBasePath}/bulk-delete`, {
+        params: {
+          ids: normalizedIds,
+        },
+      });
+      return;
+    } catch {
+      // Fallback for backends that read ids from multipart body.
+    }
+
+    const form = new FormData();
+    normalizedIds.forEach((itemId) => {
+      form.append('ids[]', itemId);
+    });
+    form.append('_method', 'DELETE');
+
+    await apiClient.post(`${legacyBasePath}/bulk-delete`, form);
   },
 };

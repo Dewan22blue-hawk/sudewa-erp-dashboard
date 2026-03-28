@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unitTransactionService } from '@/services/unitTransaction.service';
 
 export const useUnitTransactions = (options: { page?: number; perPage?: number; search?: string } = {}) => {
@@ -24,5 +24,19 @@ export const usePurchaseById = (id?: string) => {
     queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string),
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useUpdateUnitTransactionState = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, state }: { id: string; state: string }) => unitTransactionService.updateUnitTransactionState(id, state),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billings', data.id] });
+    },
   });
 };

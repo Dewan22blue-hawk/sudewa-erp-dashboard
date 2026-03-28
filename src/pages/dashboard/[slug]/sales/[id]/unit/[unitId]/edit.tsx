@@ -1,99 +1,114 @@
-import { useRouter } from "next/router"
-import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft } from "lucide-react"
-import { EditUnitForm } from "@/components/features/sales/edit/EditUnitForm"
-import { EditUnitFormData } from "@/components/features/sales/edit/edit-unit.schema"
-import { SALES_DATA } from "@/components/features/sales/sales.data"
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
+import { useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
+import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
+import { toast } from 'sonner';
+import { usePurchaseUnitItems, useUpdateUnitItem } from '@/hooks/useUnitTransactionItem';
+import { useSalesDetail } from '@/hooks/useSales';
+import { useTypeUnits } from '@/hooks/useTypeUnit';
 
 /**
  * Edit Unit Page - Nested under Sales Detail
  */
 export default function EditNestedUnitPage() {
-    const router = useRouter()
-    const { id, unitId } = router.query
-    const [invoiceCode, setInvoiceCode] = useState("")
-    const [formData, setFormData] = useState<EditUnitFormData | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const router = useRouter();
+    const { id, unitId, slug } = router.query;
+    const salesId = Array.isArray(id) ? id[0] : id;
+    const selectedUnitId = Array.isArray(unitId) ? unitId[0] : unitId;
 
-    useEffect(() => {
-        if (!id || !unitId) return
+    const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
+    const { data: itemResponse, isLoading: itemLoading } = usePurchaseUnitItems(salesId);
+    const { data: unitTypes, isLoading: typeUnitLoading } = useTypeUnits();
+    const updateMutation = useUpdateUnitItem();
 
-        const item = SALES_DATA.find(d => d.id === id)
-        if (item) {
-            setInvoiceCode(item.kodeJual)
+    const item = (itemResponse?.data ?? []).find((row) => String(row.id) === String(selectedUnitId ?? ''));
+    const invoiceCode = salesDetail?.raw?.code ?? '-';
 
-            // Find specific unit data if available, or mock it based on parent
-            // In real app, we fetch /api/sales/{id}/unit/{unitId}
-            const unit = item.units.find(u => u.id === unitId)
+    const productOptions = useMemo(
+        () =>
+            (unitTypes?.data ?? []).map((option) => ({
+                value: String(option.id),
+                label: option.name,
+            })),
+        [unitTypes?.data],
+    );
 
-            if (unit) {
-                // Determine mock values for form based on unit or parent
-                // Ideally `unit` object should have all these fields. 
-                // Since our mock `UnitItem` is limited, we use parent totals / qty or defaults
+    const formData: EditUnitFormData | null = useMemo(() => {
+        if (!item) return null;
+        const qty = Number(item.qty_total ?? 0) || 1;
 
-                setFormData({
-                    tipeUnit: item.tipeUnit,
-                    qty: 1, // Editing single unit usually involves qty 1 or the specific qty of that row
-                    harga: item.hargaSatuan,
+        return {
+            customer: salesDetail?.ui?.customer ?? '',
+            tipeUnit: String(item.unit_type_id ?? ''),
+            qty,
+            harga: Number(item.price ?? 0),
+            biayaBbn: Number(item.bbn_price ?? 0),
+            biayaEkspedisi: Number(item.expedition_fee ?? 0),
+            biayaLain: Number(item.other_fee ?? 0),
+            hppSatuan: qty > 0 ? Number(item.hpp_total_price ?? 0) / qty : 0,
+            totalHpp: Number(item.hpp_total_price ?? 0),
+            dppSatuan: qty > 0 ? Number(item.dpp_total_price ?? 0) / qty : 0,
+            totalDpp: Number(item.dpp_total_price ?? 0),
+            ppnSatuan: qty > 0 ? Number(item.ppn_total_price ?? 0) / qty : 0,
+            totalPpn: Number(item.ppn_total_price ?? 0),
+        };
+    }, [item, salesDetail?.ui?.customer]);
 
-                    biayaBbn: item.biayaBbn / item.qty,
-                    biayaEkspedisi: item.biayaEkspedisi / item.qty,
-                    biayaLain: item.biayaLain / item.qty,
-
-                    totalHpp: item.totalHpp / item.qty,
-                    totalDpp: item.totalDpp / item.qty,
-                    totalPpn: item.totalPpn / item.qty,
-
-                    hppSatuan: item.totalHpp / item.qty,
-                    dppSatuan: item.totalDpp / item.qty,
-                    ppnSatuan: item.totalPpn / item.qty,
-                })
-            } else {
-                toast.error("Unit tidak ditemukan")
-                router.push(`/sales/${id}`)
-            }
-        }
-        setIsLoading(false)
-    }, [id, unitId, router])
-
-    const handleSubmit = async (data: EditUnitFormData) => {
+    const handleSubmit = async (values: EditUnitFormData) => {
         try {
-            console.log("=== UPDATE UNIT DATA ===")
-            console.log("Sales ID:", id)
-            console.log("Unit ID:", unitId)
-            console.log("Form Data:", data)
+            if (!selectedUnitId) {
+                toast.error('Unit tidak valid');
+                return;
+            }
 
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500))
+            // Send only backend-required fields for edit.
+            await updateMutation.mutateAsync({
+                id: String(selectedUnitId),
+                payload: {
+                    unit_type_id: String(values.tipeUnit),
+                    qty_total: Number(values.qty ?? 0),
+                    price: Number(values.harga ?? 0),
+                    bbn_price: Number(values.biayaBbn ?? 0),
+                    expedition_fee: Number(values.biayaEkspedisi ?? 0),
+                    other_fee: Number(values.biayaLain ?? 0),
+                },
+            });
 
-            toast.success("Unit berhasil diperbarui!")
-            router.push(`/sales/${id}`)
-
-        } catch (error) {
-            console.error("Error updating unit:", error)
-            toast.error("Gagal memperbarui unit.")
+            toast.success('Unit berhasil diperbarui!');
+            const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
+            const basePath = slugValue ? `/dashboard/${slugValue}/sales` : '/sales';
+            router.push(`${basePath}/${salesId}`);
+        } catch (error: any) {
+            toast.error(error?.message || 'Gagal memperbarui unit.');
         }
-    }
+    };
 
-    if (isLoading || !formData) {
+    if (salesLoading || itemLoading || typeUnitLoading) {
         return (
             <DashboardLayout>
-                <div className="p-6">Loading unit data...</div>
+                <div className="flex h-[50vh] items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
             </DashboardLayout>
-        )
+        );
+    }
+
+    if (!formData) {
+        return (
+            <DashboardLayout>
+                <div className="p-6 text-muted-foreground">Unit tidak ditemukan</div>
+            </DashboardLayout>
+        );
     }
 
     return (
         <DashboardLayout>
             <div className="space-y-6">
                 <div>
-                    <button
-                        onClick={() => router.back()}
-                        className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
+                    <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
                         <ArrowLeft className="h-4 w-4" />
                         Kembali
                     </button>
@@ -111,12 +126,17 @@ export default function EditNestedUnitPage() {
                     <CardContent className="p-6">
                         <EditUnitForm
                             defaultValues={formData}
+                            hideCustomerField
+                            productOptions={productOptions}
+                            searchableTypeUnit
                             onSubmit={handleSubmit}
                             onCancel={() => router.back()}
+                            submitDisabled={updateMutation.isPending}
+                            cancelDisabled={updateMutation.isPending}
                         />
                     </CardContent>
                 </Card>
             </div>
         </DashboardLayout>
-    )
+    );
 }
