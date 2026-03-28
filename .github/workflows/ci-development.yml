@@ -21,7 +21,7 @@ jobs:
             whoami
             pwd
             echo "========= Pull Latest Code ========="
-            cd /www/wwwroot/wajirabackend.hawk-dev.com/apps
+            cd /root/docker/finance-dash
             git checkout development
             git reset --hard
             git pull origin development
@@ -42,11 +42,11 @@ jobs:
             whoami
             pwd
             echo "========= Install Dependencies ========="
-            cd /www/wwwroot/wajirabackend.hawk-dev.com/apps
+            cd /root/docker/finance-dash
             npm ci
 
             echo "========= Build NextJS =========" 
             npm run build
 
             echo "========= Restart App ========="
-            pm2 restart wajira-dashboard || pm2 start npm --name "wajira-dashboard" -- start
+            docker-compose restart
