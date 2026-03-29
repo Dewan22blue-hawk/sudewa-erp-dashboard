@@ -1,14 +1,30 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft } from 'lucide-react';
-import { PaymentForm } from '@/components/features/sales/payment/PaymentForm';
 import { toast } from 'sonner';
-import { useSalesDetail } from '@/hooks/useSales';
-import { useCreateBilling, useUnitBillings } from '@/hooks/useUnitBilling';
 import { useCompany } from '@/contexts/CompanyContext';
-import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
+import { usePaymentData, useSubmitBilling } from '@/hooks/useSalesPayment';
+import { formatCurrency } from '@/lib/utils/currency';
+
+const readApiError = (error: any): string => {
+  const details = error?.details ?? error?.response?.data?.errors;
+  if (typeof details === 'string' && details.trim()) return details;
+
+  if (details && typeof details === 'object') {
+    const text = Object.entries(details)
+      .map(([field, value]) => `${field}: ${Array.isArray(value) ? value[0] : String(value)}`)
+      .join(', ')
+      .trim();
+    if (text) return text;
+  }
+
+  return error?.message || 'Gagal menyimpan pembayaran.';
+};
 
 /**
  * Pembayaran Unit Page
@@ -18,16 +34,42 @@ export default function PaymentPage() {
   const { id } = router.query;
   const salesId = Array.isArray(id) ? id[0] : id;
   const { companyId } = useCompany();
-  const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
-  const { data: billings = [], isLoading: billingLoading } = useUnitBillings(salesId);
-  const createBilling = useCreateBilling();
+  const { salesData, billings, existingBilling, total, isLoading } = usePaymentData(salesId);
+  const submitBilling = useSubmitBilling();
 
-  const salesData = salesDetail?.ui ?? null;
-  const totalTagihan = Number(salesData?.totalJual ?? 0);
-  const totalPaid = billings.reduce(
-    (acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
-    0,
-  );
+  // Billing harus mengikuti total transaksi utama (unit transaction),
+  // bukan agregasi item detail yang bisa berbeda kontrak datanya.
+  const totalTagihan = Number(salesData?.totalJual ?? (total > 0 ? total : 0));
+
+  const [form, setForm] = useState({
+    bca_idr: 0,
+    bca_usd: 0,
+    cash: 0,
+    payment_date: '',
+  });
+
+  useEffect(() => {
+    setForm({
+      bca_idr: Number(existingBilling?.bca_payment ?? 0),
+      bca_usd: Number(existingBilling?.bca_payment_2 ?? 0),
+      cash: Number(existingBilling?.cash_payment ?? 0),
+      payment_date: existingBilling?.payment_date ?? new Date().toISOString().slice(0, 10),
+    });
+  }, [existingBilling?.bca_payment, existingBilling?.bca_payment_2, existingBilling?.cash_payment, existingBilling?.payment_date]);
+
+  const totalBayar = useMemo(() => Number(form.bca_idr || 0) + Number(form.cash || 0) + Number(form.bca_usd || 0), [form.bca_idr, form.cash, form.bca_usd]);
+  const kurangBayar = useMemo(() => Math.max(0, totalTagihan - totalBayar), [totalTagihan, totalBayar]);
+  const isPaid = kurangBayar === 0 ? 1 : 0;
+
+  const parseNumericInput = (value: string) => {
+    if (!value) return 0;
+    const normalized = Number(value.replace(/[^\d]/g, ''));
+    return Number.isFinite(normalized) ? normalized : 0;
+  };
+
+  const formatNumberWithDot = (value: number) => {
+    return Number(value || 0).toLocaleString('id-ID');
+  };
 
   const handleSubmit = async (data: any) => {
     try {
@@ -43,32 +85,45 @@ export default function PaymentPage() {
       const bcaPayment = Number(data.paymentBca ?? 0);
       const cashPayment = Number(data.paymentCash ?? 0);
       const bcaPayment2 = Number(data.paymentBcaUsd ?? 0);
-      const submittedTotal = bcaPayment + cashPayment + bcaPayment2;
-      const isPaid = totalPaid + submittedTotal >= totalTagihan && totalTagihan > 0;
 
-      const payload: UpsertUnitBillingPayload = {
-        company_id: String(companyId),
-        unit_transaction_id: String(salesId),
-        bca_payment: bcaPayment,
-        cash_payment: cashPayment,
-        bca_payment_2: bcaPayment2,
-        payment_date: new Date().toISOString().slice(0, 10),
-        is_paid: isPaid,
-      };
+      if (bcaPayment > totalTagihan) {
+        toast.error('Nominal BCA IDR tidak boleh melebihi total transaksi.');
+        return;
+      }
 
-      await createBilling.mutateAsync(payload);
+      if (cashPayment > totalTagihan) {
+        toast.error('Nominal Cash tidak boleh melebihi total transaksi.');
+        return;
+      }
 
-      toast.success('Pembayaran berhasil disimpan!');
+      if (bcaPayment + cashPayment + bcaPayment2 > totalTagihan) {
+        toast.error('Total pembayaran tidak boleh melebihi total transaksi.');
+        return;
+      }
+
+      const result = await submitBilling.mutateAsync({
+        salesId: String(salesId),
+        companyId: String(companyId),
+        paymentBca: bcaPayment,
+        paymentCash: cashPayment,
+        paymentBcaUsd: bcaPayment2,
+        totalTagihan,
+        existingBillingId: existingBilling?.id,
+        billings,
+        paymentAt: new Date().toISOString().slice(0, 10),
+      });
+
+      toast.success(result.mode === 'update' ? 'Pembayaran berhasil diperbarui!' : 'Pembayaran berhasil disimpan!');
       const slugQuery = router.query.slug;
       const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
       const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
       router.push(`${basePath}/${salesId}`);
     } catch (error: any) {
-      toast.error(error?.message || 'Gagal menyimpan pembayaran.');
+      toast.error(readApiError(error));
     }
   };
 
-  if (salesLoading || billingLoading || !salesData) {
+  if (isLoading || !salesData) {
     return (
       <DashboardLayout>
         <div className="p-6">Loading data...</div>
@@ -87,7 +142,7 @@ export default function PaymentPage() {
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold tracking-tight">Pembayaran Unit</h1>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Jual</span>
+              <span className="text-muted-foreground">Kode Beli / Kode Jual</span>
               <span className="text-blue-600 font-medium">{salesData.kodeJual}</span>
             </div>
           </div>
@@ -97,7 +152,109 @@ export default function PaymentPage() {
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
             <Separator className="my-4" />
-            <PaymentForm salesData={salesData} onSubmit={handleSubmit} onCancel={() => router.back()} />
+            <div className="space-y-6">
+              <div className="rounded-lg border">
+                <div className="border-b px-4 py-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground">Biaya</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Total Beli</p>
+                    <Input value={formatCurrency(Number(salesData.totalDpp ?? 0))} disabled />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Total PPN</p>
+                    <Input value={formatCurrency(Number(salesData.totalPpn ?? 0))} disabled />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Total Biaya</p>
+                    <Input value={formatCurrency(totalTagihan)} disabled />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border">
+                <div className="border-b px-4 py-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground">Pembayaran</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">BCA IDR</p>
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="BCA IDR"
+                      value={formatNumberWithDot(form.bca_idr)}
+                      onChange={(e) => setForm((prev) => ({ ...prev, bca_idr: parseNumericInput(e.target.value) }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">BCA USD</p>
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="BCA USD"
+                      value={form.bca_usd}
+                      onChange={(e) => setForm((prev) => ({ ...prev, bca_usd: parseNumericInput(e.target.value) }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Cash</p>
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Cash"
+                      value={formatNumberWithDot(form.cash)}
+                      onChange={(e) => setForm((prev) => ({ ...prev, cash: parseNumericInput(e.target.value) }))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border">
+                <div className="border-b px-4 py-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground">Invoice</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Tanggal</p>
+                    <Input
+                      type="date"
+                      value={form.payment_date}
+                      onChange={(e) => setForm((prev) => ({ ...prev, payment_date: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Total Bayar</p>
+                    <Input value={formatCurrency(totalBayar)} disabled />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Kurang Bayar</p>
+                    <Input value={formatCurrency(kurangBayar)} disabled />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <Button variant="outline" onClick={() => router.back()}>
+                  Batal
+                </Button>
+                <Button
+                  className="bg-green-600 hover:bg-green-700"
+                  data-is-paid={isPaid}
+                  onClick={() =>
+                    handleSubmit({
+                      paymentBca: form.bca_idr,
+                      paymentCash: form.cash,
+                      paymentBcaUsd: form.bca_usd,
+                    })
+                  }
+                  disabled={submitBilling.isPending}
+                >
+                  {submitBilling.isPending ? 'Menyimpan...' : 'Bayar'}
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

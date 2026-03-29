@@ -9,8 +9,12 @@ interface Props {
 }
 
 export function SalesDetailCards({ data }: Props) {
-  const totalPaid = data.totalBayar ?? data.totalJual - data.kurangBayar;
-  const percentagePaid = data.totalJual > 0 ? Math.round((totalPaid / data.totalJual) * 100) : 0;
+  const totalJual = Number(data.totalJual ?? 0);
+  const totalPaidFromField = Number(data.totalBayar ?? 0);
+  const totalPaidFromDiff = Math.max(0, totalJual - Number(data.kurangBayar ?? 0));
+  const totalPaid = Math.min(totalJual, Math.max(totalPaidFromField, totalPaidFromDiff));
+  const kurangBayar = Math.max(0, totalJual - totalPaid);
+  const percentagePaid = totalJual > 0 ? Math.min(100, Math.max(0, Math.round((totalPaid / totalJual) * 100))) : 0;
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
@@ -106,7 +110,7 @@ export function SalesDetailCards({ data }: Props) {
             <div className="pt-4 mt-auto border-t space-y-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Kurang Bayar</span>
-                <span className="font-bold text-lg text-red-500">{formatCurrency(data.kurangBayar)}</span>
+                <span className="font-bold text-lg text-red-500">{formatCurrency(kurangBayar)}</span>
               </div>
 
               <div className="space-y-2">

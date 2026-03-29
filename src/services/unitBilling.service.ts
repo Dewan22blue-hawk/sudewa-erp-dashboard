@@ -11,6 +11,7 @@ type UnitBillingApiModel = {
   cash_payment?: string | number;
   cash_payment_amount?: string | number;
   bca_payment_2?: string | number;
+  bca_payment_usd_amount?: string | number;
   payment_date?: string;
   payment_at?: string;
   is_paid?: boolean | number | string;
@@ -49,7 +50,7 @@ const mapBilling = (item: UnitBillingApiModel): UnitBilling => ({
   unit_transaction_id: String(item.unit_transaction_id ?? ''),
   bca_payment: toNumber(item.bca_payment ?? item.bca_payment_amount),
   cash_payment: toNumber(item.cash_payment ?? item.cash_payment_amount),
-  bca_payment_2: toNumber(item.bca_payment_2),
+  bca_payment_2: toNumber(item.bca_payment_2 ?? item.bca_payment_usd_amount),
   payment_date: item.payment_date ?? item.payment_at ?? '',
   is_paid: toBool(item.is_paid),
   created_at: item.created_at,
@@ -70,6 +71,7 @@ const toFormData = (payload: UpsertUnitBillingPayload, asUpdate = false): FormDa
   form.append('bca_payment_amount', String(bcaPayment));
   form.append('cash_payment_amount', String(cashPayment));
   form.append('bca_payment_2', String(payload.bca_payment_2 ?? 0));
+  form.append('bca_payment_usd_amount', String(payload.bca_payment_2 ?? 0));
   form.append('payment_date', paymentDate);
   form.append('payment_at', paymentDate);
   form.append('is_paid', payload.is_paid ? '1' : '0');
@@ -81,13 +83,13 @@ export const unitBillingService = {
   async getBillings(unitTransactionId: string): Promise<UnitBilling[]> {
     const response = await withPathFallback(
       () =>
-        apiClient.get<LaravelApiResponse<any>>(basePath, {
+        apiClient.get<LaravelApiResponse<any>>(legacyBasePath, {
           params: {
             unit_transaction_id: unitTransactionId,
           },
         }),
       () =>
-        apiClient.get<LaravelApiResponse<any>>(legacyBasePath, {
+        apiClient.get<LaravelApiResponse<any>>(basePath, {
           params: {
             unit_transaction_id: unitTransactionId,
           },
@@ -113,8 +115,8 @@ export const unitBillingService = {
 
   async getBillingById(id: string): Promise<UnitBilling> {
     const response = await withPathFallback(
-      () => apiClient.get<LaravelApiResponse<UnitBillingApiModel>>(`${basePath}/${id}`),
       () => apiClient.get<LaravelApiResponse<UnitBillingApiModel>>(`${legacyBasePath}/${id}`),
+      () => apiClient.get<LaravelApiResponse<UnitBillingApiModel>>(`${basePath}/${id}`),
     );
     const payload = ensureSuccess(response.data);
     const data = ((payload as any)?.data ? (payload as any).data : payload) as UnitBillingApiModel;
@@ -123,8 +125,8 @@ export const unitBillingService = {
 
   async createBilling(payload: UpsertUnitBillingPayload): Promise<UnitBilling> {
     const response = await withPathFallback(
-      () => apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(basePath, toFormData(payload)),
       () => apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(legacyBasePath, toFormData(payload)),
+      () => apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(basePath, toFormData(payload)),
     );
     const data = ensureSuccess(response.data);
     return mapBilling(data as UnitBillingApiModel);
@@ -132,8 +134,8 @@ export const unitBillingService = {
 
   async updateBilling(id: string, payload: UpsertUnitBillingPayload): Promise<UnitBilling> {
     const response = await withPathFallback(
-      () => apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(`${basePath}/${id}`, toFormData(payload, true)),
       () => apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(`${legacyBasePath}/${id}`, toFormData(payload, true)),
+      () => apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(`${basePath}/${id}`, toFormData(payload, true)),
     );
     const data = ensureSuccess(response.data);
     return mapBilling(data as UnitBillingApiModel);
