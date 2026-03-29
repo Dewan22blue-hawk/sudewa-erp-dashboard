@@ -1,3 +1,4 @@
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import {
@@ -5,6 +6,16 @@ import {
     TableCell,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -27,6 +38,8 @@ interface Props {
  */
 export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     const router = useRouter()
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
     const slugQuery = router.query.slug
     const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
 
@@ -38,10 +51,15 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
         router.push(slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`)
     }
 
-    // Handle delete
-    const handleDelete = () => {
-        if (confirm(`Hapus ${item.kodeJual}?`)) {
-            onDelete?.(item.id)
+    const handleDelete = async () => {
+        if (!onDelete) return
+
+        setIsDeleting(true)
+        try {
+            await onDelete(item.id)
+        } finally {
+            setIsDeleting(false)
+            setIsDeleteOpen(false)
         }
     }
 
@@ -114,11 +132,35 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                         <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/sales/${item.id}?print=true` : `/sales/${item.id}?print=true`, '_blank')}>
                             Print
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-red-600">
                             Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Apakah anda yakin?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Data penjualan {item.kodeJual} akan dihapus permanen.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isDeleting}>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={(event) => {
+                                    event.preventDefault()
+                                    void handleDelete()
+                                }}
+                                disabled={isDeleting}
+                                className="bg-red-600 text-white hover:bg-red-700"
+                            >
+                                {isDeleting ? 'Menghapus...' : 'Hapus'}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </TableCell>
         </TableRow>
     )

@@ -6,8 +6,38 @@ type ItemSalesApiModel = {
   id?: string | number;
   unit_transaction_item_id?: string | number;
   unit_transaction_details?: Array<number | string>;
-  details?: Array<any>;
-  unit_details?: Array<any>;
+};
+
+type UnitTransactionItemApiModel = {
+  id?: string | number;
+  unit_type_id?: string | number;
+  qty_total?: string | number;
+};
+
+type UnitTypeDetailApiModel = {
+  id?: string | number;
+  unit_transaction_detail_id?: string | number;
+  color?: string;
+  warna?: string;
+  machine_number?: string;
+  no_mesin?: string;
+  chassis_number?: string;
+  no_rangka?: string;
+  is_available?: boolean | number | string;
+  in_stock?: boolean | number | string;
+};
+
+type UnitTypeApiModel = {
+  unit_type_details?: UnitTypeDetailApiModel[];
+  unit_item_details?: UnitTypeDetailApiModel[];
+  data?: {
+    unit_type_details?: UnitTypeDetailApiModel[];
+    unit_item_details?: UnitTypeDetailApiModel[];
+    data?: {
+      unit_type_details?: UnitTypeDetailApiModel[];
+      unit_item_details?: UnitTypeDetailApiModel[];
+    };
+  };
 };
 
 type WarehouseActivityApiModel = {
@@ -21,8 +51,9 @@ type WarehouseActivityApiModel = {
 
 const itemSalesBasePath = '/wapi/transaction/unit-transaction-item-sales';
 const itemSalesLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item-sales';
-const itemDetailBasePath = '/wapi/transaction/unit-transaction-item-detail';
-const itemDetailLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item-detail';
+const unitTransactionItemBasePath = '/wapi/transaction/unit-transaction-item';
+const unitTransactionItemLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+const unitTypeBasePath = '/wapi/master-data/unit-type';
 
 const warehouseActivityBasePath = '/wapi/transaction/warehouse-activity';
 const warehouseActivityLegacyPath = '/wapi/transaction/unit-transaction/warehouse-activity';
@@ -47,44 +78,37 @@ const toIdNumber = (value: unknown): number => {
 };
 
 const toIdString = (value: unknown): string => String(value ?? '');
+const toNumber = (value: unknown): number => {
+  const normalized = Number(value ?? 0);
+  return Number.isFinite(normalized) ? normalized : 0;
+};
+const toBool = (value: unknown): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
+    const normalized = value.toLowerCase();
+    return normalized === '1' || normalized === 'true' || normalized === 'yes';
+  }
+  return false;
+};
 
-const normalizeDetails = (payload: any): any[] => {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.details)) return payload.details;
-  if (Array.isArray(payload?.unit_details)) return payload.unit_details;
-  if (Array.isArray(payload?.unit_transaction_details)) return payload.unit_transaction_details;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.data?.details)) return payload.data.details;
-  if (Array.isArray(payload?.data?.unit_details)) return payload.data.unit_details;
+const normalizeUnitTypeDetails = (payload: any): UnitTypeDetailApiModel[] => {
+  if (Array.isArray(payload?.unit_type_details)) return payload.unit_type_details;
+  if (Array.isArray(payload?.unit_item_details)) return payload.unit_item_details;
+  if (Array.isArray(payload?.data?.unit_type_details)) return payload.data.unit_type_details;
+  if (Array.isArray(payload?.data?.unit_item_details)) return payload.data.unit_item_details;
+  if (Array.isArray(payload?.data?.data?.unit_type_details)) return payload.data.data.unit_type_details;
+  if (Array.isArray(payload?.data?.data?.unit_item_details)) return payload.data.data.unit_item_details;
   return [];
 };
 
-const mapWarehouseStockUnit = (payload: any): WarehouseStockUnit => ({
+const mapWarehouseStockUnit = (payload: UnitTypeDetailApiModel): WarehouseStockUnit => ({
   id: toIdNumber(payload?.id ?? payload?.unit_transaction_detail_id),
   color: String(payload?.color ?? payload?.warna ?? '-'),
   machine_number: String(payload?.machine_number ?? payload?.no_mesin ?? '-'),
   chassis_number: String(payload?.chassis_number ?? payload?.no_rangka ?? '-'),
-  unit_type_id: payload?.unit_type_id !== undefined ? toIdString(payload.unit_type_id) : undefined,
-  warehouse_id: payload?.warehouse_id !== undefined ? toIdString(payload.warehouse_id) : undefined,
-  in_stock: payload?.in_stock !== undefined ? Boolean(payload.in_stock) : undefined,
+  in_stock: toBool(payload?.is_available ?? payload?.in_stock),
 });
-
-const mapAssignment = (payload: ItemSalesApiModel): UnitTransactionItemSalesAssignment => {
-  const detailSource = payload.details ?? payload.unit_details ?? [];
-  const details = normalizeDetails(detailSource).map(mapWarehouseStockUnit);
-  const idsFromPayload = Array.isArray(payload.unit_transaction_details)
-    ? payload.unit_transaction_details.map((item) => toIdNumber(item)).filter((item) => item > 0)
-    : [];
-
-  const unitTransactionDetails = idsFromPayload.length > 0 ? idsFromPayload : details.map((item) => item.id).filter((item) => item > 0);
-
-  return {
-    id: toIdString(payload.id),
-    unit_transaction_item_id: toIdString(payload.unit_transaction_item_id),
-    unit_transaction_details: unitTransactionDetails,
-    details,
-  };
-};
 
 const appendUnitTransactionDetails = (form: FormData, ids: number[]) => {
   ids.forEach((id) => {
@@ -98,96 +122,34 @@ const extractWarehouseActivityId = (payload: WarehouseActivityApiModel): string 
   return String(resolved ?? '');
 };
 
-const buildParams = (params: { unitTypeId: string; warehouseId?: string; companyId?: string; search?: string }) => {
-  const cleaned: Record<string, string | number> = {
-    unit_type_id: params.unitTypeId,
-    in_stock: 1,
-    available: 1,
-  };
-
-  if (params.warehouseId && params.warehouseId.trim()) {
-    cleaned.warehouse_id = params.warehouseId;
-  }
-
-  if (params.companyId && params.companyId.trim()) {
-    cleaned.company_id = params.companyId;
-  }
-
-  if (params.search && params.search.trim()) {
-    cleaned.search = params.search.trim();
-  }
-
-  return cleaned;
-};
+const mapUnitItem = (payload: UnitTransactionItemApiModel) => ({
+  id: toIdString(payload.id),
+  unit_type_id: toIdString(payload.unit_type_id),
+  qty_total: toNumber(payload.qty_total),
+});
 
 export const unitTransactionItemSalesService = {
-  async getAssignments(unitTransactionItemId: string): Promise<UnitTransactionItemSalesAssignment[]> {
+  async getUnitItemById(unitTransactionItemId: string): Promise<{ id: string; unit_type_id: string; qty_total: number }> {
     const response = await withPathFallback(
-      () =>
-        apiClient.get<LaravelApiResponse<any>>(itemSalesBasePath, {
-          params: {
-            unit_transaction_item_id: unitTransactionItemId,
-          },
-        }),
-      () =>
-        apiClient.get<LaravelApiResponse<any>>(itemSalesLegacyPath, {
-          params: {
-            unit_transaction_item_id: unitTransactionItemId,
-          },
-        }),
+      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${unitTransactionItemLegacyPath}/${unitTransactionItemId}`),
+      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${unitTransactionItemBasePath}/${unitTransactionItemId}`),
     );
 
     const payload = ensureSuccess(response.data);
-
-    if (Array.isArray(payload)) return payload.map(mapAssignment);
-    if (Array.isArray(payload?.data)) return payload.data.map(mapAssignment);
-    if (payload && typeof payload === 'object') return [mapAssignment(payload as ItemSalesApiModel)];
-
-    return [];
+    return mapUnitItem(payload);
   },
 
-  async getAvailableStockUnits(params: {
-    unitTypeId: string;
-    warehouseId?: string;
-    companyId?: string;
-    search?: string;
-  }): Promise<WarehouseStockUnit[]> {
-    const requestParams = buildParams(params);
+  async getStockByUnitType(unitTypeId: string, companyId = '1'): Promise<WarehouseStockUnit[]> {
+    const response = await apiClient.get<LaravelApiResponse<UnitTypeApiModel>>(`${unitTypeBasePath}/${unitTypeId}`, {
+      params: {
+        company_id: companyId,
+      },
+    });
 
-    const candidates = [
-      itemDetailBasePath,
-      itemDetailLegacyPath,
-      `${itemSalesBasePath}/available`,
-      itemSalesBasePath,
-      itemSalesLegacyPath,
-    ];
-
-    let lastError: any;
-
-    for (const endpoint of candidates) {
-      try {
-        const response = await apiClient.get<LaravelApiResponse<any>>(endpoint, { params: requestParams });
-        const payload = ensureSuccess(response.data);
-        const rows = normalizeDetails(payload).map(mapWarehouseStockUnit).filter((item) => item.id > 0);
-
-        if (rows.length > 0 || endpoint.includes('item-detail')) {
-          return rows;
-        }
-      } catch (error: any) {
-        lastError = error;
-
-        const statusCode = error?.statusCode ?? error?.response?.status;
-        if (statusCode !== 404 && statusCode !== 405) {
-          throw error;
-        }
-      }
-    }
-
-    if (lastError) {
-      throw lastError;
-    }
-
-    return [];
+    const payload = ensureSuccess(response.data);
+    return normalizeUnitTypeDetails(payload)
+      .map(mapWarehouseStockUnit)
+      .filter((item) => item.id > 0);
   },
 
   async assignStock(payload: { unitTransactionItemId: string; unitTransactionDetails: number[] }): Promise<UnitTransactionItemSalesAssignment> {
@@ -201,7 +163,12 @@ export const unitTransactionItemSalesService = {
     );
 
     const data = ensureSuccess(response.data);
-    return mapAssignment(data);
+    return {
+      id: toIdString(data.id),
+      unit_transaction_item_id: toIdString(data.unit_transaction_item_id),
+      unit_transaction_details: (data.unit_transaction_details ?? []).map((item) => toIdNumber(item)).filter((item) => item > 0),
+      details: [],
+    };
   },
 
   async dispatchStockInit(

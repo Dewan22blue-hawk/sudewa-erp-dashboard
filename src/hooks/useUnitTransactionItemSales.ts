@@ -1,33 +1,32 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
 
-export const useUnitItemSalesAssignments = (unitTransactionItemId?: string) => {
-  return useQuery({
-    queryKey: ['unit-item-sales-assignment', unitTransactionItemId],
-    queryFn: () => unitTransactionItemSalesService.getAssignments(unitTransactionItemId as string),
-    enabled: !!unitTransactionItemId,
+export const useStockUnits = (itemId?: string, options?: { companyId?: string }) => {
+  const unitItemQuery = useQuery({
+    queryKey: ['unit-transaction-item', itemId ?? ''],
+    queryFn: () => unitTransactionItemSalesService.getUnitItemById(itemId as string),
+    enabled: !!itemId,
     staleTime: 1000 * 60,
   });
-};
 
-export const useAvailableStockUnits = (params: {
-  unitTypeId?: string;
-  warehouseId?: string;
-  companyId?: string;
-  search?: string;
-}) => {
-  return useQuery({
-    queryKey: ['available-stock-units', params.unitTypeId ?? '', params.warehouseId ?? '', params.companyId ?? '', params.search ?? ''],
-    queryFn: () =>
-      unitTransactionItemSalesService.getAvailableStockUnits({
-        unitTypeId: params.unitTypeId as string,
-        warehouseId: params.warehouseId,
-        companyId: params.companyId,
-        search: params.search,
-      }),
-    enabled: !!params.unitTypeId,
+  const stockQuery = useQuery({
+    queryKey: ['stock-units', itemId ?? '', unitItemQuery.data?.unit_type_id ?? '', options?.companyId ?? '1'],
+    queryFn: () => unitTransactionItemSalesService.getStockByUnitType(unitItemQuery.data?.unit_type_id as string, options?.companyId ?? '1'),
+    enabled: !!itemId && !!unitItemQuery.data?.unit_type_id,
     staleTime: 1000 * 30,
   });
+
+  return {
+    unitItem: unitItemQuery.data,
+    stockUnits: stockQuery.data ?? [],
+    isUnitItemLoading: unitItemQuery.isLoading,
+    isStockLoading: stockQuery.isLoading,
+    isLoading: unitItemQuery.isLoading || stockQuery.isLoading,
+    isUnitItemError: unitItemQuery.isError,
+    isStockError: stockQuery.isError,
+    unitItemError: unitItemQuery.error,
+    stockError: stockQuery.error,
+  };
 };
 
 export const useAssignUnitItemSales = () => {
@@ -36,8 +35,8 @@ export const useAssignUnitItemSales = () => {
   return useMutation({
     mutationFn: (payload: { unitTransactionItemId: string; unitTransactionDetails: number[] }) => unitTransactionItemSalesService.assignStock(payload),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['unit-item-sales-assignment', variables.unitTransactionItemId] });
-      queryClient.invalidateQueries({ queryKey: ['available-stock-units'] });
+      queryClient.invalidateQueries({ queryKey: ['stock-units', variables.unitTransactionItemId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', variables.unitTransactionItemId] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items'] });
     },
@@ -71,8 +70,7 @@ export const useDispatchStockLifecycle = () => {
       queryClient.invalidateQueries({ queryKey: ['sales-transaction', variables.transactionId] });
       queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', variables.transactionId] });
-      queryClient.invalidateQueries({ queryKey: ['unit-item-sales-assignment'] });
-      queryClient.invalidateQueries({ queryKey: ['available-stock-units'] });
+      queryClient.invalidateQueries({ queryKey: ['stock-units'] });
     },
   });
 };
