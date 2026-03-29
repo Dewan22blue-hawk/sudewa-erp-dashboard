@@ -124,7 +124,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
   return (
     <div className="rounded-xl border bg-white">
       <div className="border-b px-6 py-5">
-        <h3 className="text-xl font-semibold">Detail Pembelian Unit</h3>
+        <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
         <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dibeli</p>
       </div>
 

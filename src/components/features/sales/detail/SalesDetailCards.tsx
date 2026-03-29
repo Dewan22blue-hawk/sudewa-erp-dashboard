@@ -45,6 +45,13 @@ export function SalesDetailCards({ data }: Props) {
                 <span className="font-medium uppercase truncate">{data.customer}</span>
               </div>
             </div>
+
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">Warehouse</p>
+              <div className="flex items-center gap-2">
+                <span className="font-medium uppercase truncate">{data.warehouse ?? '-'}</span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

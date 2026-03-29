@@ -201,7 +201,7 @@ export default function UnitPurchaseDetailPage() {
               </div>
             </CardContent>
           </Card>
-
+    
           <Card className="border-slate-200">
             <CardContent className="p-5 space-y-2">
                           <div className="flex items-center gap-3">

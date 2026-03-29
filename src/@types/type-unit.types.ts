@@ -23,6 +23,7 @@ export interface TypeUnit {
   brutoWeight?: number | null;
   sellPrice?: number | null;
   buyPrice?: number | null;
+  availableStock?: number | null;
   createdAt?: string;
   updatedAt?: string;
   brand?: UnitBrand | null;

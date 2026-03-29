@@ -21,6 +21,7 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCreateUnitItem } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { getTypeUnitById } from '@/services/type-unit.service';
 
 type SalesCreateFormState = {
   customerId: string;
@@ -190,6 +191,14 @@ export default function CreateSalesPage() {
     };
 
     try {
+      const selectedTypeUnit = await getTypeUnitById(unitTypeId, { companyId: companyIdNumber });
+      const availableStock = Number(selectedTypeUnit.availableStock ?? 0);
+
+      if (availableStock < qty) {
+        toast.error('Stock tidak mencukupi');
+        return;
+      }
+
       // STEP 1: create transaction
       const transaction = await createSalesMutation.mutateAsync(transactionPayload);
       const transactionId = Number(transaction?.id ?? 0);

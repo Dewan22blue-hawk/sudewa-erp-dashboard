@@ -14,6 +14,7 @@ interface TypeUnitApiModel {
   unit_model?: string | null;
   netto_weight?: number | string | null;
   bruto_weight?: number | string | null;
+  available_stock?: number | string | null;
   created_at?: string;
   updated_at?: string;
   brand?: {
@@ -67,6 +68,7 @@ const mapTypeUnit = (payload: TypeUnitApiModel): TypeUnit => ({
   unitModel: payload.unit_model ?? null,
   nettoWeight: payload.netto_weight === undefined || payload.netto_weight === null ? null : Number(payload.netto_weight),
   brutoWeight: payload.bruto_weight === undefined || payload.bruto_weight === null ? null : Number(payload.bruto_weight),
+  availableStock: payload.available_stock === undefined || payload.available_stock === null ? null : Number(payload.available_stock),
   createdAt: payload.created_at,
   updatedAt: payload.updated_at,
   brand: mapBrand(payload.brand),
@@ -131,8 +133,12 @@ export const getTypeUnits = async (): Promise<TypeUnitListResponse> => {
   };
 };
 
-export const getTypeUnitById = async (id: number | string): Promise<TypeUnit> => {
-  const response = await apiClient.get<TypeUnitItemResponse>(`${basePath}/${id}`);
+export const getTypeUnitById = async (id: number | string, options?: { companyId?: number | string }): Promise<TypeUnit> => {
+  const response = await apiClient.get<TypeUnitItemResponse>(`${basePath}/${id}`, {
+    params: {
+      company_id: options?.companyId,
+    },
+  });
   const data = ensureSuccess(response.data);
   return mapTypeUnit(data);
 };
