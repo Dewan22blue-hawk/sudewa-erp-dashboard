@@ -11,8 +11,11 @@ export type SalesApiModel = {
   max_capacity?: number | string;
   stock_state?: string;
   created_at?: string;
+  unit_transaction_bruto_total?: string | number;
   transaction_bruto_total?: string | number;
+  unit_transaction_dpp_total?: string | number;
   transaction_dpp_total?: string | number;
+  unit_transaction_ppn_total?: string | number;
   transaction_ppn_total?: string | number;
   transaction_bbn_total?: string | number;
   transaction_other_fee?: string | number;
@@ -27,9 +30,18 @@ export type SalesApiModel = {
   unit_transaction_billing?: {
     is_paid?: boolean;
     total_paid?: string | number;
+    total_payment?: string | number;
+    paid_total?: string | number;
+    bca_payment?: string | number;
+    bca_payment_amount?: string | number;
+    cash_payment?: string | number;
+    cash_payment_amount?: string | number;
+    bca_payment_2?: string | number;
+    bca_payment_usd_amount?: string | number;
   } | null;
   unit_transaction_item_total_dpp?: string | number;
   unit_transaction_item_total_ppn?: string | number;
+  unit_transaction_item_total_bruto?: string | number;
   unit_transaction_item_bruto_total?: string | number;
   unit_transaction_items?: Array<{
     id?: number | string;
@@ -65,6 +77,52 @@ export type SalesListUI = {
 };
 
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
+const toBool = (value: unknown): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+  return false;
+};
+
+const getTotalPaid = (billing: SalesApiModel['unit_transaction_billing']): number => {
+  if (!billing) return 0;
+
+  const directTotal = toNumber(billing.total_paid ?? billing.total_payment ?? billing.paid_total);
+  const fromComponents =
+    toNumber(billing.bca_payment ?? billing.bca_payment_amount) +
+    toNumber(billing.cash_payment ?? billing.cash_payment_amount) +
+    toNumber(billing.bca_payment_2 ?? billing.bca_payment_usd_amount);
+
+  return Math.max(directTotal, fromComponents, 0);
+};
+
+const sumLineItems = (
+  items: SalesApiModel['unit_transaction_items'],
+  selector: (item: NonNullable<SalesApiModel['unit_transaction_items']>[number]) => string | number | undefined,
+): number => {
+  if (!Array.isArray(items) || items.length === 0) return 0;
+  return items.reduce((acc, row) => acc + toNumber(selector(row)), 0);
+};
+
+const getBrutoTotal = (item: SalesApiModel): number =>
+  toNumber(
+    item.unit_transaction_bruto_total ??
+      item.unit_transaction_item_bruto_total ??
+      item.unit_transaction_item_total_bruto ??
+      item.transaction_bruto_total,
+  );
+
+const getDppTotal = (item: SalesApiModel): number => {
+  const headerDpp = toNumber(item.unit_transaction_item_total_dpp ?? item.unit_transaction_dpp_total ?? item.transaction_dpp_total);
+  if (headerDpp > 0) return headerDpp;
+  return sumLineItems(item.unit_transaction_items, (row) => row.dpp_total_price);
+};
+
+const getPpnTotal = (item: SalesApiModel): number => {
+  const headerPpn = toNumber(item.unit_transaction_item_total_ppn ?? item.unit_transaction_ppn_total ?? item.transaction_ppn_total);
+  if (headerPpn > 0) return headerPpn;
+  return sumLineItems(item.unit_transaction_items, (row) => row.ppn_total_price);
+};
 
 const formatDate = (value?: string): string => {
   if (!value) return '-';
@@ -79,19 +137,19 @@ export function mapSalesToUI(item: SalesApiModel): SalesListUI {
     code: item.code ?? '-',
     customerName: item.person?.name ?? '-',
     warehouseName: item.warehouse?.name ?? '-',
-    total: toNumber(item.transaction_bruto_total),
+    total: getBrutoTotal(item),
     date: item.created_at ?? '',
-    status: item.unit_transaction_billing?.is_paid ? 'Lunas' : 'Belum',
+    status: toBool(item.unit_transaction_billing?.is_paid) ? 'Lunas' : 'Belum',
   };
 }
 
 export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
   const mapped = mapSalesToUI(item);
-  const totalDpp = toNumber(item.transaction_dpp_total);
-  const totalPpn = toNumber(item.transaction_ppn_total);
+  const totalDpp = getDppTotal(item);
+  const totalPpn = getPpnTotal(item);
   const totalBiaya = toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee);
-  const totalJual = mapped.total;
-  const totalBayar = toNumber(item.unit_transaction_billing?.total_paid);
+  const totalJual = getBrutoTotal(item) || mapped.total;
+  const totalBayar = getTotalPaid(item.unit_transaction_billing);
 
   return {
     id: mapped.id,
@@ -143,10 +201,10 @@ const mapSalesLineItem = (item: NonNullable<SalesApiModel['unit_transaction_item
 };
 
 export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
-  const totalDpp = toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total);
-  const totalPpn = toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total);
-  const totalJual = toNumber(item.unit_transaction_item_bruto_total ?? item.transaction_bruto_total);
-  const totalBayar = toNumber(item.unit_transaction_billing?.total_paid);
+  const totalDpp = getDppTotal(item);
+  const totalPpn = getPpnTotal(item);
+  const totalJual = getBrutoTotal(item);
+  const totalBayar = getTotalPaid(item.unit_transaction_billing);
   const qty = toNumber(item.max_capacity);
 
   return {
@@ -177,15 +235,15 @@ export const mapSalesDetailCard = (item: SalesApiModel) => ({
   code: item.code ?? '-',
   customerName: item.person?.name ?? '-',
   warehouse: item.warehouse?.name ?? '-',
-  total: toNumber(item.unit_transaction_item_bruto_total),
-  dpp: toNumber(item.unit_transaction_item_total_dpp),
-  ppn: toNumber(item.unit_transaction_item_total_ppn),
+  total: getBrutoTotal(item),
+  dpp: getDppTotal(item),
+  ppn: getPpnTotal(item),
 });
 
 export const mapSalesDetailToEditForm = (item: SalesApiModel): EditUnitFormData => {
   const qty = Math.max(toNumber(item.max_capacity), 1);
-  const totalDpp = toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total);
-  const totalPpn = toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total);
+  const totalDpp = getDppTotal(item);
+  const totalPpn = getPpnTotal(item);
 
   return {
     customer: item.person?.name ?? '',
