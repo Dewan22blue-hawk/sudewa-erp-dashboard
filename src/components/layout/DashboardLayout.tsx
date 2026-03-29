@@ -15,39 +15,39 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     // ===== ROUTE GUARD =====
     useEffect(() => {
-        if (isLoading) return // Wait for company check
-
+        if (isLoading) return
         const token = getToken()
 
-        // Jika TIDAK ADA token → redirect ke /login
         if (!token) {
             router.replace("/login")
             return
         }
 
-        // Jika ADA token tapi TIDAK ADA company_id → redirect ke /select-company
         if (!companyId) {
             router.replace("/select-company")
             return
         }
     }, [router, companyId, isLoading])
 
-    // Jangan render jika belum ada token atau company_id (tapi tunggu loading)
-    if (isLoading) {
-        return null // Or a loading spinner
-    }
+    if (isLoading) return null
 
     const token = getToken()
-    if (!token || !companyId) {
-        return null
-    }
+    if (!token || !companyId) return null
 
     return (
-        <div className="grid h-screen w-full grid-cols-[256px_1fr] overflow-hidden">
-            <div className="print:hidden shrink-0 h-full overflow-hidden">
+        <div className="flex h-screen w-full overflow-hidden">
+            {/* ── Desktop Sidebar (hidden on mobile) ── */}
+            <div className="print:hidden hidden md:flex shrink-0 w-64 h-full overflow-hidden">
                 <Sidebar />
             </div>
-            <div className="flex flex-col h-full overflow-hidden">
+
+            {/* ── Mobile Sidebar (rendered inside Sidebar component itself) ── */}
+            <div className="print:hidden md:hidden">
+                <Sidebar />
+            </div>
+
+            {/* ── Main content area ── */}
+            <div className="flex flex-col flex-1 h-full overflow-hidden min-w-0">
                 <div className="print:hidden shrink-0">
                     <Topbar />
                 </div>
