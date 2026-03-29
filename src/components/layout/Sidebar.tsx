@@ -1,4 +1,4 @@
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies, Company } from '@/services/company.service';
@@ -17,6 +17,7 @@ export function Sidebar() {
   const { companyId, setCompanyId } = useCompany();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     fetchUserCompanies().then((data) => {
@@ -36,6 +37,11 @@ export function Sidebar() {
     }
   }, [slug, companies, companyId, setCompanyId]);
 
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [router.asPath]);
+
   const selectedCompany = companies.find((c) => String(c.id) === companyId);
 
   const handleSelectCompany = (company: Company) => {
@@ -45,41 +51,48 @@ export function Sidebar() {
     router.push(`/dashboard/${targetSlug}`);
   };
 
-  return (
+  const sidebarContent = (
     <aside className="flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB]">
-      {/* Company Selector */}
       <div className="flex h-16 shrink-0 items-center px-4 border-b border-gray-200">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
-              <div className="flex flex-col overflow-hidden">
-                <span className="text-[10px] uppercase font-semibold text-gray-400">Company</span>
-                <span className="font-medium text-gray-900 truncate uppercase">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>
-              </div>
-              <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isOpen && 'rotate-180')} />
-            </button>
-          </PopoverTrigger>
+        <div className="flex w-full items-center gap-2">
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>
+              <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-[10px] uppercase font-semibold text-gray-400">Company</span>
+                  <span className="font-medium text-gray-900 truncate uppercase">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>
+                </div>
+                <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isOpen && 'rotate-180')} />
+              </button>
+            </PopoverTrigger>
 
-          <PopoverContent className="w-64 p-2" align="start">
-            <div className="space-y-1">
-              {companies.map((company) => (
-                <button
-                  key={company.id}
-                  onClick={() => handleSelectCompany(company)}
-                  className={cn('flex w-full items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-gray-100', String(company.id) === companyId && 'bg-gray-100')}
-                >
-                  <span className="uppercase">{company.name}</span>
-                  {String(company.id) === companyId && <Check className="h-4 w-4 text-primary" />}
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+            <PopoverContent className="w-64 p-2" align="start">
+              <div className="space-y-1">
+                {companies.map((company) => (
+                  <button
+                    key={company.id}
+                    onClick={() => handleSelectCompany(company)}
+                    className={cn('flex w-full items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-gray-100', String(company.id) === companyId && 'bg-gray-100')}
+                  >
+                    <span className="uppercase">{company.name}</span>
+                    {String(company.id) === companyId && <Check className="h-4 w-4 text-primary" />}
+                  </button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="md:hidden ml-1 shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-gray-200 transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Scrollable Navigation */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
-        {/* Section Label */}
         <div className="mb-4 text-sm font-semibold text-gray-500">Main Menu</div>
 
         <nav className="space-y-1">
@@ -90,16 +103,44 @@ export function Sidebar() {
       </div>
     </aside>
   );
-}
 
-/* =========================================
-   CUSTOM NAV ITEM (FOR PERFECT CONTROL)
-========================================= */
+  return (
+    <>
+      <button
+        onClick={() => setIsMobileOpen(true)}
+        className="md:hidden fixed mt-3 left-4 z-40 rounded-md border border-gray-200 bg-white p-2 shadow-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <div className="hidden md:flex h-full w-full">
+        {sidebarContent}
+      </div>
+
+      {isMobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
+          onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <div
+        className={cn(
+          'md:hidden fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-in-out',
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
+      >
+        {sidebarContent}
+      </div>
+    </>
+  );
+}
 
 function SidebarNavItem({ item }: { item: MenuItem }) {
   const router = useRouter();
 
-  // Modular function for exact route awareness
   const isActiveRoute = (href?: string, exact?: boolean) => {
     if (!href) return false;
     const currentPath = router.asPath.split('?')[0];
@@ -113,7 +154,6 @@ function SidebarNavItem({ item }: { item: MenuItem }) {
 
   const [open, setOpen] = useState(isChildActive || false);
 
-  // Tetap terbuka saat refresh (dan saat navigasi parent active)
   useEffect(() => {
     if (isChildActive) {
       setOpen(true);
@@ -121,13 +161,12 @@ function SidebarNavItem({ item }: { item: MenuItem }) {
   }, [isChildActive]);
 
   const handleToggle = () => {
-    if (isChildActive) return; // Tidak boleh collapse saat active
+    if (isChildActive) return;
     setOpen(!open);
   };
 
   return (
     <div>
-      {/* Parent Button */}
       <button
         onClick={handleToggle}
         className={cn(
@@ -139,10 +178,8 @@ function SidebarNavItem({ item }: { item: MenuItem }) {
         {item.children && <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', open && 'rotate-180 text-gray-900', !open && 'text-gray-500')} />}
       </button>
 
-      {/* Children Links */}
       {item.children && open && (
         <div className="relative mt-1 ml-3 space-y-1">
-          {/* Vertical Line */}
           <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-200" />
 
           {item.children.map((child, idx) => {
