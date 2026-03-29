@@ -138,3 +138,20 @@ export interface UpdateUnitItemDetailPayload {
   machine_number: string;
   chassis_number: string;
 }
+
+export interface WarehouseStockUnit {
+  id: number;
+  color: string;
+  machine_number: string;
+  chassis_number: string;
+  unit_type_id?: string;
+  warehouse_id?: string;
+  in_stock?: boolean;
+}
+
+export interface UnitTransactionItemSalesAssignment {
+  id: string;
+  unit_transaction_item_id: string;
+  unit_transaction_details: number[];
+  details: WarehouseStockUnit[];
+}

@@ -37,6 +37,9 @@ export const useUpdateUnitTransactionState = () => {
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['unit-billings', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.id] });
     },
   });
 };

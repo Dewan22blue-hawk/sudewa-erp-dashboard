@@ -13,10 +13,10 @@ export function useTypeUnits() {
   });
 }
 
-export function useTypeUnit(id: string | number) {
+export function useTypeUnit(id: string | number, options?: { companyId?: number | string }) {
   return useQuery({
-    queryKey: [TYPE_UNIT_ITEM_KEY, id],
-    queryFn: () => getTypeUnitById(id),
+    queryKey: [TYPE_UNIT_ITEM_KEY, id, options?.companyId ?? ''],
+    queryFn: () => getTypeUnitById(id, options),
     enabled: !!id,
   });
 }

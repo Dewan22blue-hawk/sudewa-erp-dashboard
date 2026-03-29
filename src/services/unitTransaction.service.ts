@@ -157,6 +157,7 @@ export const unitTransactionService = {
   async updateUnitTransactionState(id: string, state: string): Promise<UnitTransactionDetail> {
     const form = new FormData();
     form.append('state', state);
+    form.append('stock_state', state);
 
     const payload = await withBaseFallback(
       async (activeBasePath) => {
@@ -169,6 +170,7 @@ export const unitTransactionService = {
       async (activeBasePath) => {
         const fallbackForm = new FormData();
         fallbackForm.append('state', state);
+        fallbackForm.append('stock_state', state);
         fallbackForm.append('_method', 'PUT');
         const response = await apiClient.post<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
           `${activeBasePath}/${id}/update-state`,
