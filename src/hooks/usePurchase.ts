@@ -41,6 +41,10 @@ export const useCreatePurchase = () => {
       queryClient.invalidateQueries({
         queryKey: ['purchases', data.companyId],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ['unit-transactions'],
+      });
     },
   });
 };

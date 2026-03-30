@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
-import { MoreVertical, Plus, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, MoreVertical, Plus, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -26,6 +26,8 @@ export interface PurchaseTableProps {
 export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, onSearch, loading }: PurchaseTableProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
+  const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -35,12 +37,97 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
     return () => clearTimeout(handler);
   }, [searchTerm, onSearch, onPageChange]);
 
+  const processedData = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    const filtered = data.filter((item) => {
+      const matchesSearch =
+        normalizedSearch.length === 0 ||
+        [item.code, item.supplier, item.warehouse, item.stock_state, item.isPaid ? 'lunas' : 'belum lunas']
+          .map((value) => String(value ?? '').toLowerCase())
+          .some((value) => value.includes(normalizedSearch));
+
+      if (!matchesSearch) return false;
+      if (billingFilter === 'paid') return Boolean(item.isPaid);
+      if (billingFilter === 'unpaid') return !Boolean(item.isPaid);
+      return true;
+    });
+
+    const sorted = [...filtered].sort((a, b) => {
+      const factor = sortConfig.direction === 'asc' ? 1 : -1;
+
+      const compareDate = (valueA?: string, valueB?: string) => {
+        const dateA = valueA ? new Date(valueA).getTime() : 0;
+        const dateB = valueB ? new Date(valueB).getTime() : 0;
+        return (dateA - dateB) * factor;
+      };
+
+      const compareNumber = (valueA?: number, valueB?: number) => ((Number(valueA ?? 0) - Number(valueB ?? 0)) * factor);
+      const compareText = (valueA?: string, valueB?: string) => (String(valueA ?? '').localeCompare(String(valueB ?? '')) * factor);
+
+      switch (sortConfig.key) {
+        case 'code':
+          return compareText(a.code, b.code);
+        case 'created_at':
+          return compareDate(a.created_at, b.created_at);
+        case 'supplier':
+          return compareText(a.supplier, b.supplier);
+        case 'warehouse':
+          return compareText(a.warehouse, b.warehouse);
+        case 'transaction_bruto_total':
+          return compareNumber(a.transaction_bruto_total, b.transaction_bruto_total);
+        case 'transaction_bbn_total':
+          return compareNumber(a.transaction_bbn_total, b.transaction_bbn_total);
+        case 'transaction_other_fee':
+          return compareNumber(a.transaction_other_fee, b.transaction_other_fee);
+        case 'transaction_dpp_total':
+          return compareNumber(a.transaction_dpp_total, b.transaction_dpp_total);
+        case 'transaction_ppn_total':
+          return compareNumber(a.transaction_ppn_total, b.transaction_ppn_total);
+        case 'stock_state':
+          return compareText(a.stock_state, b.stock_state);
+        case 'billing':
+          return compareText(a.isPaid ? 'Lunas' : 'Belum Lunas', b.isPaid ? 'Lunas' : 'Belum Lunas');
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [data, billingFilter, sortConfig, searchTerm]);
+
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? 10;
   const totalPages = meta?.lastPage ?? 1;
-  const totalEntries = meta?.total ?? data.length;
+  const totalEntries = billingFilter === 'all' ? meta?.total ?? processedData.length : processedData.length;
   const startIndex = totalEntries === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const endIndex = startIndex === 0 ? 0 : startIndex + data.length - 1;
+  const endIndex = startIndex === 0 ? 0 : startIndex + processedData.length - 1;
+
+  const handleSort = (key: string, direction: 'asc' | 'desc') => {
+    setSortConfig({ key, direction });
+  };
+
+  const SortableHeader = ({ label, sortKey }: { label: string; sortKey: string }) => (
+    <div className="flex items-center gap-2">
+      <span>{label}</span>
+      <button
+        type="button"
+        className={`rounded p-0.5 ${sortConfig.key === sortKey && sortConfig.direction === 'asc' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-700'}`}
+        onClick={() => handleSort(sortKey, 'asc')}
+        aria-label={`Sort ${label} ascending`}
+      >
+        <ArrowUp className="h-3.5 w-3.5" />
+      </button>
+      <button
+        type="button"
+        className={`rounded p-0.5 ${sortConfig.key === sortKey && sortConfig.direction === 'desc' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-700'}`}
+        onClick={() => handleSort(sortKey, 'desc')}
+        aria-label={`Sort ${label} descending`}
+      >
+        <ArrowDown className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
 
   const handleItemsPerPageChange = (value: string) => {
     const parsed = Number(value);
@@ -94,6 +181,20 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
             </Select>
             <span className="text-sm font-medium">Page</span>
           </div>
+
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <span className="text-sm font-medium">Billing</span>
+            <Select value={billingFilter} onValueChange={(value: 'all' | 'paid' | 'unpaid') => setBillingFilter(value)}>
+              <SelectTrigger className="w-[150px] bg-white">
+                <SelectValue placeholder="Semua" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua</SelectItem>
+                <SelectItem value="paid">Lunas</SelectItem>
+                <SelectItem value="unpaid">Belum Lunas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="flex w-full sm:w-auto items-center gap-2 justify-end">
@@ -110,29 +211,29 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
         <Table>
           <TableHeader className="bg-[#f5f6f8]">
             <TableRow>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">KODE BELI</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TANGGAL</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">SUPPLIER</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">GUDANG</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL BRUTO</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BBN</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BIAYA LAIN</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL DPP</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL PPN</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">STATUS STOK</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BILLING</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="KODE BELI" sortKey="code" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TANGGAL" sortKey="created_at" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="SUPPLIER" sortKey="supplier" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="GUDANG" sortKey="warehouse" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL BRUTO" sortKey="transaction_bruto_total" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BBN" sortKey="transaction_bbn_total" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BIAYA LAIN" sortKey="transaction_other_fee" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL DPP" sortKey="transaction_dpp_total" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL PPN" sortKey="transaction_ppn_total" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="STATUS STOK" sortKey="stock_state" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BILLING" sortKey="billing" /></TableHead>
               <TableHead className="text-right text-xs font-semibold uppercase text-slate-600 px-4 py-3">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 ? (
+            {processedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
                   Tidak ada data
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((item) => (
+              processedData.map((item) => (
                 <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
                   <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
                     {item.code || '-'}
@@ -174,7 +275,7 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
       </div>
 
       {/* Pagination */}
-      {data.length > 0 && (
+      {processedData.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <div className="text-sm text-slate-500">
             Showing {startIndex} to {endIndex} of {totalEntries} data

@@ -239,7 +239,7 @@ export default function SalesUnitDetailPage() {
     }
 
     try {
-      await updateStateMutation.mutateAsync({ id: salesId, state: 'outbound_delivered' });
+      await updateStateMutation.mutateAsync({ id: salesId, stockState: 'outbound_delivered' });
       toast.success('State transaksi berhasil diubah ke outbound_delivered');
     } catch (error: any) {
       toast.error(readApiError(error));
@@ -277,7 +277,7 @@ export default function SalesUnitDetailPage() {
         unitTransactionDetails: assignedIds,
       });
 
-      await updateStateMutation.mutateAsync({ id: salesId, state: 'completed' });
+      await updateStateMutation.mutateAsync({ id: salesId, stockState: 'completed' });
       toast.success('Dispatch stock berhasil dan transaksi diselesaikan');
     } catch (error: any) {
       toast.error(readApiError(error));

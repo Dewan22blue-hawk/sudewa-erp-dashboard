@@ -119,6 +119,14 @@ export function PurchasePaymentForm({
         resetForm();
     };
 
+    const getPaymentMethods = (item: UnitBilling): string[] => {
+        const methods: string[] = [];
+        if (Number(item.bca_payment ?? 0) > 0) methods.push('BCA IDR');
+        if (Number(item.bca_payment_2 ?? 0) > 0) methods.push('BCA USD');
+        if (Number(item.cash_payment ?? 0) > 0) methods.push('Cash');
+        return methods;
+    };
+
     return (
         <div className="space-y-6">
             <div className="space-y-1">
@@ -272,7 +280,9 @@ export function PurchasePaymentForm({
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Tanggal</TableHead>
+                                <TableHead>Metode Pembayaran</TableHead>
                                 <TableHead className="text-right">BCA Payment</TableHead>
+                                <TableHead className="text-right">BCA USD</TableHead>
                                 <TableHead className="text-right">Cash Payment</TableHead>
                                 <TableHead className="text-right">Total</TableHead>
                                 <TableHead>Status</TableHead>
@@ -282,17 +292,32 @@ export function PurchasePaymentForm({
                         <TableBody>
                             {billings.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+                                    <TableCell colSpan={8} className="h-20 text-center text-muted-foreground">
                                         Belum ada histori pembayaran
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 billings.map((item) => {
                                     const total = Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0);
+                                    const methods = getPaymentMethods(item);
                                     return (
                                         <TableRow key={item.id}>
                                             <TableCell>{item.payment_date ? format(new Date(item.payment_date), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
+                                            <TableCell>
+                                                {methods.length > 0 ? (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {methods.map((method) => (
+                                                            <span key={`${item.id}-${method}`} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                                                                {method}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">-</span>
+                                                )}
+                                            </TableCell>
                                             <TableCell className="text-right">{formatCurrency(item.bca_payment)}</TableCell>
+                                            <TableCell className="text-right">{formatCurrency(item.bca_payment_2, 'USD')}</TableCell>
                                             <TableCell className="text-right">{formatCurrency(item.cash_payment)}</TableCell>
                                             <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
                                             <TableCell>

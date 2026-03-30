@@ -8,6 +8,8 @@ interface Props {
 }
 
 export function PurchaseDetailCards({ data }: Props) {
+  const totalBruto = Number(data.unit_transaction_bruto_total ?? data.unit_transaction_item_bruto_total ?? 0);
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {/* Card 1: Informasi Invoice */}
@@ -71,7 +73,7 @@ export function PurchaseDetailCards({ data }: Props) {
             </div>
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-900">
               <span>Total Pembelian</span>
-              <span>{formatCurrency(data.unit_transaction_item_bruto_total)}</span>
+              <span>{formatCurrency(totalBruto)}</span>
             </div>
           </div>
         </CardContent>
@@ -90,7 +92,7 @@ export function PurchaseDetailCards({ data }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
               <span>Bruto</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_bruto_total)}</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalBruto)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>DPP</span>

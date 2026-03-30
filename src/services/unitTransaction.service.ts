@@ -11,6 +11,7 @@ type UnitTransactionApiModel = {
   created_at?: string;
   stock_state?: string;
   max_capacity?: number | string;
+  unit_transaction_bruto_total?: string | number;
   transaction_bruto_total?: string | number;
   transaction_dpp_total?: string | number;
   transaction_ppn_total?: string | number;
@@ -97,24 +98,30 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
 });
 
-const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactionDetail => ({
-  id: String(item.id ?? ''),
-  code: item.code ?? '-',
-  created_at: item.created_at ?? '',
-  stock_state: item.stock_state ?? '-',
-  max_capacity: toNumber(item.max_capacity),
-  person: {
-    id: String(item.person?.id ?? item.person_id ?? ''),
-    name: item.person?.name ?? '-',
-  },
-  warehouse: {
-    id: String(item.warehouse?.id ?? item.warehouse_id ?? ''),
-    name: item.warehouse?.name ?? '-',
-  },
-  unit_transaction_item_total_dpp: toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
-  unit_transaction_item_total_ppn: toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
-  unit_transaction_item_bruto_total: toNumber(item.unit_transaction_item_bruto_total ?? item.transaction_bruto_total),
-});
+const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactionDetail => {
+  const mainBruto = toNumber(item.unit_transaction_bruto_total ?? item.unit_transaction_item_bruto_total ?? item.transaction_bruto_total);
+  const itemBruto = toNumber(item.unit_transaction_item_bruto_total ?? item.unit_transaction_bruto_total ?? item.transaction_bruto_total);
+
+  return {
+    id: String(item.id ?? ''),
+    code: item.code ?? '-',
+    created_at: item.created_at ?? '',
+    stock_state: item.stock_state ?? '-',
+    max_capacity: toNumber(item.max_capacity),
+    person: {
+      id: String(item.person?.id ?? item.person_id ?? ''),
+      name: item.person?.name ?? '-',
+    },
+    warehouse: {
+      id: String(item.warehouse?.id ?? item.warehouse_id ?? ''),
+      name: item.warehouse?.name ?? '-',
+    },
+    unit_transaction_bruto_total: mainBruto,
+    unit_transaction_item_total_dpp: toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
+    unit_transaction_item_total_ppn: toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
+    unit_transaction_item_bruto_total: itemBruto,
+  };
+};
 
 export const unitTransactionService = {
   async getUnitTransactions(params: PaginationParams = {}): Promise<UnitTransactionResponse> {
@@ -122,7 +129,7 @@ export const unitTransactionService = {
       page: params.page ?? 1,
       per_page: params.perPage ?? 10,
       search: params.search || undefined,
-      sort_order: 'asc',
+      sort_order: 'desc',
       type: 'purchase',
     };
 
@@ -154,33 +161,65 @@ export const unitTransactionService = {
     return mapUnitTransactionDetail(detailPayload);
   },
 
-  async updateUnitTransactionState(id: string, state: string): Promise<UnitTransactionDetail> {
-    const form = new FormData();
-    form.append('state', state);
-    form.append('stock_state', state);
+  async updateUnitTransactionState(
+    id: string,
+    statePayload:
+      | string
+      | {
+          stockState?: string;
+          unitTransactionDetails?: Array<string | number>;
+        },
+  ): Promise<UnitTransactionDetail> {
+    const normalizedStockState = typeof statePayload === 'string' ? statePayload : statePayload.stockState ?? '';
+    const normalizedDetails =
+      typeof statePayload === 'string'
+        ? []
+        : (statePayload.unitTransactionDetails ?? []).map((item) => String(item)).filter((item) => item.length > 0);
 
-    const payload = await withBaseFallback(
+    const body = new URLSearchParams();
+    if (normalizedStockState) body.append('stock_state', normalizedStockState);
+    if (normalizedDetails.length > 0) {
+      normalizedDetails.forEach((item) => body.append('unit_transaction_details[]', item));
+      body.append('unit_transaction_details', JSON.stringify(normalizedDetails));
+    }
+
+    const responsePayload = await withBaseFallback(
       async (activeBasePath) => {
         const response = await apiClient.put<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
           `${activeBasePath}/${id}/update-state`,
-          form,
+          body,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          },
         );
         return ensureSuccess(response.data);
       },
       async (activeBasePath) => {
-        const fallbackForm = new FormData();
-        fallbackForm.append('state', state);
-        fallbackForm.append('stock_state', state);
-        fallbackForm.append('_method', 'PUT');
+        const fallbackBody = new URLSearchParams();
+        if (normalizedStockState) fallbackBody.append('stock_state', normalizedStockState);
+        if (normalizedDetails.length > 0) {
+          normalizedDetails.forEach((item) => fallbackBody.append('unit_transaction_details[]', item));
+          fallbackBody.append('unit_transaction_details', JSON.stringify(normalizedDetails));
+        }
+        fallbackBody.append('_method', 'PUT');
         const response = await apiClient.post<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
           `${activeBasePath}/${id}/update-state`,
-          fallbackForm,
+          fallbackBody,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          },
         );
         return ensureSuccess(response.data);
       },
     );
 
-    const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
+    const detailPayload =
+      ((responsePayload as any)?.data ? ((responsePayload as any).data as UnitTransactionApiModel) : (responsePayload as UnitTransactionApiModel)) ??
+      ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);
   },
 };

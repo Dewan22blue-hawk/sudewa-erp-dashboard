@@ -6,14 +6,12 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
-import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
+import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useCreateBilling, useUnitBillings, useUpdateBilling } from '@/hooks/useUnitBilling';
 import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-
-const PURCHASE_RECEIPT_STATE = 'receipt';
 
 export default function PurchasePaymentPage() {
     const router = useRouter()
@@ -24,9 +22,8 @@ export default function PurchasePaymentPage() {
         const { data: billings = [], isLoading: billingLoading } = useUnitBillings(purchaseId);
         const createBilling = useCreateBilling();
         const updateBilling = useUpdateBilling();
-        const updateState = useUpdateUnitTransactionState();
 
-        const totalTagihan = Number(purchase?.unit_transaction_item_bruto_total ?? 0);
+        const totalTagihan = Number(purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
         const totalPaid = useMemo(
             () => billings.reduce((acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0), 0),
             [billings],
@@ -42,26 +39,45 @@ export default function PurchasePaymentPage() {
             };
         };
 
-        const syncPurchaseReceiptState = async (shouldMoveToReceipt: boolean) => {
-            if (!shouldMoveToReceipt || !purchaseId) return;
-            if (purchase?.stock_state === PURCHASE_RECEIPT_STATE) return;
-
-            try {
-                await updateState.mutateAsync({
-                    id: purchaseId,
-                    state: PURCHASE_RECEIPT_STATE,
-                });
-                toast.success('Status pembelian diperbarui ke receipt');
-            } catch (error: any) {
-                toast.error(error?.message || 'Payment tersimpan, namun update state gagal', {
-                    action: {
-                        label: 'Retry',
-                        onClick: () => {
-                            void syncPurchaseReceiptState(true);
-                        },
-                    },
-                });
+        const ensurePaymentWithinBruto = (total: number, currentTotalPaid: number, submittedTotal: number, existingBillingTotal = 0) => {
+            if (submittedTotal < 0) {
+                toast.error('Total pembayaran tidak valid.');
+                return false;
             }
+
+            const afterSubmitTotal = currentTotalPaid - existingBillingTotal + submittedTotal;
+            if (afterSubmitTotal > total) {
+                toast.error('Total pembayaran tidak boleh melebihi nilai bruto transaksi.');
+                return false;
+            }
+
+            if (afterSubmitTotal < 0) {
+                toast.error('Total pembayaran setelah update tidak valid.');
+                return false;
+            }
+
+            return true;
+        };
+
+        const ensureNonNegativeChannels = (total: number, bcaPayment: number, cashPayment: number, bcaPayment2: number) => {
+            if (bcaPayment < 0 || cashPayment < 0 || bcaPayment2 < 0) {
+                toast.error('Nilai pembayaran tidak boleh negatif.');
+                return false;
+            }
+
+            if (bcaPayment > total) {
+                toast.error('Total IDR Bca payment (BCA) tidak boleh melebihi nilai bruto transaksi.');
+                return false;
+            }
+            if (cashPayment > total) {
+                toast.error('Total IDR Cash payment (Cash) tidak boleh melebihi nilai bruto transaksi.');
+                return false;
+            }
+            if (bcaPayment + cashPayment > total) {
+                toast.error('Total pembayaran IDR tidak boleh melebihi nilai bruto transaksi.');
+                return false;
+            }
+            return true;
         };
 
         const buildPayload = (data: {
@@ -95,14 +111,18 @@ export default function PurchasePaymentPage() {
             isPaid: boolean;
         }) => {
         try {
-                const submittedTotal = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+            const bcaPayment = Number(data.bcaPayment ?? 0);
+            const cashPayment = Number(data.cashPayment ?? 0);
+            const bcaPayment2 = Number(data.bcaPayment2 ?? 0);
+            const submittedTotal = bcaPayment + cashPayment + bcaPayment2;
                 const paymentState = calculatePaymentState(totalPaid + submittedTotal);
+            if (!ensureNonNegativeChannels(totalTagihan, bcaPayment, cashPayment, bcaPayment2)) return;
+            if (!ensurePaymentWithinBruto(totalTagihan, totalPaid, submittedTotal)) return;
                         const payload = buildPayload(data);
                         if (!payload) return;
                 payload.is_paid = paymentState.isPaid;
                         await createBilling.mutateAsync(payload);
-            toast.success("Pembayaran berhasil disimpan")
-                await syncPurchaseReceiptState(paymentState.isPaid);
+                toast.success("Pembayaran berhasil disimpan")
                 } catch (error: any) {
                         toast.error(error?.message || "Gagal menyimpan pembayaran")
                 }
@@ -119,18 +139,29 @@ export default function PurchasePaymentPage() {
             },
         ) => {
                 try {
+                const wasPaidBefore = totalPaid >= totalTagihan && totalTagihan > 0;
                 const currentBilling = billings.find((item) => item.id === billingId);
                 const existingBillingTotal = currentBilling
                     ? Number(currentBilling.bca_payment ?? 0) + Number(currentBilling.cash_payment ?? 0) + Number(currentBilling.bca_payment_2 ?? 0)
                     : 0;
-                const submittedTotal = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+                const bcaPayment = Number(data.bcaPayment ?? 0);
+                const cashPayment = Number(data.cashPayment ?? 0);
+                const bcaPayment2 = Number(data.bcaPayment2 ?? 0);
+                const submittedTotal = bcaPayment + cashPayment + bcaPayment2;
                 const paymentState = calculatePaymentState(totalPaid - existingBillingTotal + submittedTotal);
+                if (!ensureNonNegativeChannels(totalTagihan, bcaPayment, cashPayment, bcaPayment2)) return;
+                if (!ensurePaymentWithinBruto(totalTagihan, totalPaid, submittedTotal, existingBillingTotal)) return;
                         const payload = buildPayload(data);
                         if (!payload) return;
                 payload.is_paid = paymentState.isPaid;
                         await updateBilling.mutateAsync({ id: billingId, payload });
+
+                if (!wasPaidBefore && paymentState.isPaid) {
+                    toast.success("Pembayaran berhasil diperbarui. Silakan klik Terima Barang pada halaman detail pembelian untuk sinkronisasi stok.")
+                    return;
+                }
+
                         toast.success("Pembayaran berhasil diperbarui")
-                await syncPurchaseReceiptState(paymentState.isPaid);
                 } catch (error: any) {
                         toast.error(error?.message || "Gagal menyimpan pembayaran")
         }
@@ -189,7 +220,7 @@ export default function PurchasePaymentPage() {
                             onCreate={handleCreate}
                             onUpdate={handleUpdate}
                             onCancel={() => router.back()}
-                            loading={createBilling.isPending || updateBilling.isPending || updateState.isPending}
+                            loading={createBilling.isPending || updateBilling.isPending}
                         />
                     </CardContent>
                 </Card>

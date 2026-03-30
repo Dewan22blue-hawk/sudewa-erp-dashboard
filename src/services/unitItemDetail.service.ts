@@ -101,8 +101,8 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
 export const unitItemDetailService = {
   async getUnitTransactionItemById(id: string): Promise<UnitTransactionItemSummary> {
     const response = await withPathFallback(
-      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemBasePath}/${id}`),
       () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemLegacyPath}/${id}`),
+      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemBasePath}/${id}`),
     );
 
     const payload = ensureSuccess(response.data);
@@ -112,7 +112,7 @@ export const unitItemDetailService = {
   async getDetails(unitTransactionItemId: string, params: PaginationParams = {}): Promise<UnitTransactionItemDetailListResponse> {
     const response = await withPathFallback(
       () =>
-        apiClient.get<LaravelApiResponse<any>>(detailBasePath, {
+        apiClient.get<LaravelApiResponse<any>>(detailLegacyPath, {
           params: {
             unit_transaction_item_id: unitTransactionItemId,
             page: params.page ?? 1,
@@ -120,7 +120,7 @@ export const unitItemDetailService = {
           },
         }),
       () =>
-        apiClient.get<LaravelApiResponse<any>>(detailLegacyPath, {
+        apiClient.get<LaravelApiResponse<any>>(detailBasePath, {
           params: {
             unit_transaction_item_id: unitTransactionItemId,
             page: params.page ?? 1,
