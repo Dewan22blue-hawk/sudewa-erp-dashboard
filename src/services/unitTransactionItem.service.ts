@@ -44,7 +44,7 @@ export type UnitFormulaResult = {
   ppn_total_price: number;
 };
 
-const legacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+const basePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 
 // ======================
 // UTILS
@@ -102,7 +102,7 @@ const mapFormula = (payload: any): UnitFormulaResult => ({
   hpp_total_price: toNumber(payload?.hpp_total_price),
   dpp_total_price: toNumber(payload?.dpp_total_price),
   ppn_total_price: toNumber(payload?.ppn_total_price),
-});
+});x``
 
 // ======================
 // SERVICE
@@ -118,22 +118,13 @@ export const unitTransactionItemService = {
       other_fee: toDecimalString(payload.other_fee),
     };
 
-    try {
-      const response = await apiClient.get<LaravelApiResponse<any>>(`${legacyBasePath}/get-formula`, {
-        params: requestParams,
-      });
+    const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/get-formula`, {
+      params: requestParams,
+    });
 
-      const data = ensureSuccess(response.data);
-      const normalized = (data as any)?.data ?? data;
-      return mapFormula(normalized);
-    } catch {
-      const response = await apiClient.get<LaravelApiResponse<any>>('/wapi/transaction/unit-transaction-item/get-formula', {
-        params: requestParams,
-      });
-      const data = ensureSuccess(response.data);
-      const normalized = (data as any)?.data ?? data;
-      return mapFormula(normalized);
-    }
+    const data = ensureSuccess(response.data);
+    const normalized = (data as any)?.data ?? data;
+    return mapFormula(normalized);
   },
 
   async getSalesItemsByWarehouse(
@@ -141,7 +132,7 @@ export const unitTransactionItemService = {
     params: PaginationParams = {}
   ): Promise<UnitTransactionItem[]> {
     const response = await apiClient.get<LaravelApiResponse<any>>(
-      legacyBasePath,
+      basePath,
       {
         params: {
           warehouse_id: String(warehouseId),
@@ -177,7 +168,7 @@ export const unitTransactionItemService = {
     params: PaginationParams = {}
   ): Promise<UnitTransactionItemListResponse> {
     const response = await apiClient.get<LaravelApiResponse<any>>(
-      legacyBasePath,
+      basePath,
       {
         params: {
           unit_transaction_id: purchaseId,
@@ -271,7 +262,7 @@ export const unitTransactionItemService = {
 
     const response = await apiClient.post<
       LaravelApiResponse<UnitTransactionItemApiModel>
-    >(legacyBasePath, form);
+    >(basePath, form);
 
     return mapItem(ensureSuccess(response.data));
   },
@@ -310,7 +301,7 @@ async updateItem(
   }
 
   const response = await apiClient.put(
-    `/wapi/transaction/unit-transaction/unit-transaction-item/${id}`,
+    `${basePath}/${id}`,
     params,
     {
       headers: {
@@ -326,7 +317,7 @@ async updateItem(
   // DELETE
   // ======================
   async deleteItem(id: string): Promise<void> {
-    await apiClient.delete(`${legacyBasePath}/${id}`);
+    await apiClient.delete(`${basePath}/${id}`);
   },
 
   // ======================
@@ -338,23 +329,10 @@ async updateItem(
 
     if (normalizedIds.length === 0) return;
 
-    try {
-      await apiClient.delete(`${legacyBasePath}/bulk-delete`, {
-        params: {
-          ids: normalizedIds,
-        },
-      });
-      return;
-    } catch {
-      // Fallback for backends that read ids from multipart body.
-    }
-
-    const form = new FormData();
-    normalizedIds.forEach((itemId) => {
-      form.append('ids[]', itemId);
+    await apiClient.delete(`${basePath}/bulk-delete`, {
+      params: {
+        ids: normalizedIds,
+      },
     });
-    form.append('_method', 'DELETE');
-
-    await apiClient.post(`${legacyBasePath}/bulk-delete`, form);
   },
 };

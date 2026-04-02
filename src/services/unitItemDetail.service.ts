@@ -41,9 +41,23 @@ type UnitTransactionItemDetailApiModel = {
 };
 
 const itemBasePath = '/wapi/transaction/unit-transaction-item';
-const itemLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 const detailBasePath = '/wapi/transaction/unit-transaction-item-detail';
-const detailLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item-detail';
+const detailLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item-detail';
+
+const shouldFallback = (error: any): boolean => {
+  const statusCode = error?.statusCode ?? error?.response?.status;
+  return statusCode === 404 || statusCode === 405 || statusCode === 500;
+};
+
+const withPathFallback = async <T>(primary: () => Promise<T>, legacy: () => Promise<T>): Promise<T> => {
+  try {
+    return await primary();
+  } catch (error) {
+    if (!shouldFallback(error)) throw error;
+    return legacy();
+  }
+};
 
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
 const toIdString = (value: string | number | undefined): string => String(value ?? '');
@@ -56,20 +70,6 @@ const toBool = (value: unknown): boolean => {
   }
   return false;
 };
-const shouldFallback = (error: any): boolean => {
-  const statusCode = error?.statusCode ?? error?.response?.status;
-  return statusCode === 404 || statusCode === 405;
-};
-
-const withPathFallback = async <T>(primary: () => Promise<T>, legacy: () => Promise<T>): Promise<T> => {
-  try {
-    return await primary();
-  } catch (error) {
-    if (!shouldFallback(error)) throw error;
-    return legacy();
-  }
-};
-
 const mapUnitTransactionItem = (item: UnitTransactionItemApiModel): UnitTransactionItemSummary => ({
   id: String(item.id ?? ''),
   unit_transaction_id: String(item.unit_transaction_id ?? item.unit_transaction?.id ?? ''),
@@ -101,7 +101,7 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
 export const unitItemDetailService = {
   async getUnitTransactionItemById(id: string): Promise<UnitTransactionItemSummary> {
     const response = await withPathFallback(
-      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemLegacyPath}/${id}`),
+      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemLegacyBasePath}/${id}`),
       () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemBasePath}/${id}`),
     );
 
@@ -110,22 +110,20 @@ export const unitItemDetailService = {
   },
 
   async getDetails(unitTransactionItemId: string, params: PaginationParams = {}): Promise<UnitTransactionItemDetailListResponse> {
+    const requestParams = {
+      unit_transaction_item_id: unitTransactionItemId,
+      page: params.page ?? 1,
+      per_page: params.perPage ?? 50,
+    };
+
     const response = await withPathFallback(
       () =>
-        apiClient.get<LaravelApiResponse<any>>(detailLegacyPath, {
-          params: {
-            unit_transaction_item_id: unitTransactionItemId,
-            page: params.page ?? 1,
-            per_page: params.perPage ?? 50,
-          },
+        apiClient.get<LaravelApiResponse<any>>(detailLegacyBasePath, {
+          params: requestParams,
         }),
       () =>
         apiClient.get<LaravelApiResponse<any>>(detailBasePath, {
-          params: {
-            unit_transaction_item_id: unitTransactionItemId,
-            page: params.page ?? 1,
-            per_page: params.perPage ?? 50,
-          },
+          params: requestParams,
         }),
     );
 
@@ -163,15 +161,21 @@ export const unitItemDetailService = {
   },
 
   async createDetail(payload: CreateUnitItemDetailPayload): Promise<UnitTransactionItemDetail> {
-    const form = new FormData();
-    form.append('unit_transaction_item_id', toIdString(payload.unit_transaction_item_id));
-    form.append('color', payload.color);
-    form.append('machine_number', payload.machine_number);
-    form.append('chassis_number', payload.chassis_number);
+    const body = new URLSearchParams();
+    body.append('unit_transaction_item_id', toIdString(payload.unit_transaction_item_id));
+    body.append('color', payload.color);
+    body.append('machine_number', payload.machine_number);
+    body.append('chassis_number', payload.chassis_number);
 
     const response = await withPathFallback(
-      () => apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(detailBasePath, form),
-      () => apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(detailLegacyPath, form),
+      () =>
+        apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(detailLegacyBasePath, body, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }),
+      () =>
+        apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(detailBasePath, body, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }),
     );
 
     const data = ensureSuccess(response.data);
@@ -179,16 +183,21 @@ export const unitItemDetailService = {
   },
 
   async updateDetail(id: string, payload: UpdateUnitItemDetailPayload): Promise<UnitTransactionItemDetail> {
-    const form = new FormData();
-    form.append('unit_transaction_item_id', toIdString(payload.unit_transaction_item_id));
-    form.append('color', payload.color);
-    form.append('machine_number', payload.machine_number);
-    form.append('chassis_number', payload.chassis_number);
-    form.append('_method', 'PUT');
+    const body = new URLSearchParams();
+    body.append('unit_transaction_item_id', toIdString(payload.unit_transaction_item_id));
+    body.append('color', payload.color);
+    body.append('machine_number', payload.machine_number);
+    body.append('chassis_number', payload.chassis_number);
 
     const response = await withPathFallback(
-      () => apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${detailBasePath}/${id}`, form),
-      () => apiClient.post<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${detailLegacyPath}/${id}`, form),
+      () =>
+        apiClient.put<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${detailLegacyBasePath}/${id}`, body, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }),
+      () =>
+        apiClient.put<LaravelApiResponse<UnitTransactionItemDetailApiModel>>(`${detailBasePath}/${id}`, body, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }),
     );
 
     const data = ensureSuccess(response.data);
@@ -197,8 +206,8 @@ export const unitItemDetailService = {
 
   async deleteDetail(id: string): Promise<void> {
     await withPathFallback(
+      () => apiClient.delete<LaravelApiResponse<null>>(`${detailLegacyBasePath}/${id}`),
       () => apiClient.delete<LaravelApiResponse<null>>(`${detailBasePath}/${id}`),
-      () => apiClient.delete<LaravelApiResponse<null>>(`${detailLegacyPath}/${id}`),
     );
   },
 
@@ -207,8 +216,8 @@ export const unitItemDetailService = {
     form.append('file', file);
 
     await withPathFallback(
+      () => apiClient.post<LaravelApiResponse<any>>(`${detailLegacyBasePath}/${unitTransactionItemId}/import`, form),
       () => apiClient.post<LaravelApiResponse<any>>(`${detailBasePath}/${unitTransactionItemId}/import`, form),
-      () => apiClient.post<LaravelApiResponse<any>>(`${detailLegacyPath}/${unitTransactionItemId}/import`, form),
     );
   },
 };

@@ -16,9 +16,9 @@ import {
   PurchaseUnitItemRow,
 } from '@/@types/purchase.types';
 
-// Legacy in-memory store kept as a fallback for create/update flows that are not yet wired to the backend
+// Local in-memory store for UI state only.
 let purchases: Purchase[] = [];
-// cache for unit item details when API unavailable
+// Cache mirrors latest fetched details.
 const purchaseUnitItemDetails: PurchaseUnitItemDetail[] = [];
 type UnitTransactionItemListApiModel = {
   id?: number;
@@ -293,20 +293,19 @@ const mapUnitTransactionItemList = (item: UnitTransactionItemListApiModel): Purc
 
 export const purchaseService = {
   async getPurchases(companyId: string, params: PaginationParams & { withTotals?: boolean } = {}): Promise<PurchasePaginatedResponse> {
-    try {
-      const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-        params: {
-          company_id: companyId,
-          page: params.page ?? 1,
-          per_page: params.perPage ?? 10,
-          sort_order: 'asc',
-          type: 'purchase',
-          search: params.search || undefined,
-        },
-      });
+    const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
+      params: {
+        company_id: companyId,
+        page: params.page ?? 1,
+        per_page: params.perPage ?? 10,
+        sort_order: 'asc',
+        type: 'purchase',
+        search: params.search || undefined,
+      },
+    });
 
-      const payload = ensureSuccess(response.data);
-      const mapped = (payload.data ?? []).map((item: UnitTransactionListApiModel) => mapListItemToPurchase(item));
+    const payload = ensureSuccess(response.data);
+    const mapped = (payload.data ?? []).map((item: UnitTransactionListApiModel) => mapListItemToPurchase(item));
 
       // Optionally enrich totals with detail fetch when billing is empty
       let purchasesWithTotals = mapped;
@@ -316,7 +315,7 @@ export const purchaseService = {
         if (needsTotals.length > 0) {
           const enriched = await Promise.all(
             needsTotals.map(async (item: Purchase) => {
-              const detail = await this.getPurchaseById(item.id, true);
+              const detail = await this.getPurchaseById(item.id);
               if (!detail) return item;
               return {
                 ...item,
@@ -335,45 +334,23 @@ export const purchaseService = {
         }
       }
 
-      return {
-        data: purchasesWithTotals,
-        meta: mapLaravelPaginationMeta(payload),
-      };
-    } catch {
-      // Fallback to legacy mocked data to avoid breaking UI if API is unreachable
-      const page = params.page ?? 1;
-      const perPage = params.perPage ?? 10;
-      const start = (page - 1) * perPage;
-      const end = start + perPage;
-      return {
-        data: purchases.slice(start, end),
-        meta: {
-          currentPage: page,
-          perPage,
-          total: purchases.length,
-          lastPage: Math.max(1, Math.ceil(purchases.length / perPage)),
-        },
-      };
-    }
+    return {
+      data: purchasesWithTotals,
+      meta: mapLaravelPaginationMeta(payload),
+    };
   },
 
-  async getPurchaseById(id: string, skipFallback = false): Promise<Purchase | undefined> {
-    try {
-      const response = await apiClient.get<LaravelApiResponse<UnitTransactionDetailApiModel>>(`${basePath}/${id}`);
-      const payload = ensureSuccess(response.data);
-      const mapped = mapDetailToPurchase(payload);
-      // keep legacy store in sync so addUnit can work offline/in-memory
-      const existingIdx = purchases.findIndex((p) => p.id === mapped.id);
-      if (existingIdx >= 0) {
-        purchases[existingIdx] = mapped;
-      } else {
-        purchases = [...purchases, mapped];
-      }
-      return mapped;
-    } catch {
-      if (skipFallback) return undefined;
-      return purchases.find((p) => p.id === id);
+  async getPurchaseById(id: string): Promise<Purchase | undefined> {
+    const response = await apiClient.get<LaravelApiResponse<UnitTransactionDetailApiModel>>(`${basePath}/${id}`);
+    const payload = ensureSuccess(response.data);
+    const mapped = mapDetailToPurchase(payload);
+    const existingIdx = purchases.findIndex((p) => p.id === mapped.id);
+    if (existingIdx >= 0) {
+      purchases[existingIdx] = mapped;
+    } else {
+      purchases = [...purchases, mapped];
     }
+    return mapped;
   },
 
   /* =====================================
@@ -456,6 +433,13 @@ export const purchaseService = {
     form.append('stock_state', payload.stock_state);
     form.append('max_capacity', payload.max_capacity);
     if (payload.code) form.append('code', payload.code);
+    if (payload.unit_type_id !== undefined) form.append('unit_type_id', String(payload.unit_type_id));
+    if (payload.sparepart_id !== undefined) form.append('sparepart_id', String(payload.sparepart_id));
+    if (payload.qty_total !== undefined) form.append('qty_total', String(payload.qty_total));
+    if (payload.price !== undefined) form.append('price', String(payload.price));
+    if (payload.bbn_price !== undefined) form.append('bbn_price', String(payload.bbn_price));
+    if (payload.expedition_fee !== undefined) form.append('expedition_fee', String(payload.expedition_fee));
+    if (payload.other_fee !== undefined) form.append('other_fee', String(payload.other_fee));
 
     if (process.env.NODE_ENV !== 'production') {
       const preview = Array.from(form.entries()).reduce<Record<string, any>>((acc, [k, v]) => {
@@ -511,14 +495,9 @@ export const purchaseService = {
 
     await apiClient.post<LaravelApiResponse<any>>(`${basePath}-item`, form);
 
-    // Refresh detail to return the latest purchase with units
-    const refreshed = await this.getPurchaseById(payload.purchaseId, true);
-    if (refreshed) return refreshed;
-
-    // fallback to legacy store if API detail not available
-    const purchase = purchases.find((p) => p.id === payload.purchaseId);
-    if (purchase) return purchase;
-    throw new Error('Purchase not found');
+    const refreshed = await this.getPurchaseById(payload.purchaseId);
+    if (!refreshed) throw new Error('Purchase not found');
+    return refreshed;
   },
 
   async updatePayment(id: string, payload: { bca: number; bcaUsd: number; cash: number }): Promise<Purchase> {

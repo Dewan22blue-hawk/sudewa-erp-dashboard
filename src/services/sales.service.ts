@@ -4,6 +4,29 @@ import { ensureSuccess, LaravelApiResponse } from '@/lib/api/response';
 import { SalesApiModel, mapSalesDetailToUI, mapSalesToTableItem, mapSalesToUI } from '@/services/sales.mapper';
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
+const fallbackBasePath = '/wapi/transaction/unit-transaction';
+const itemBasePath = '/wapi/transaction/unit-transaction-item';
+const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+
+const listBasePaths = [fallbackBasePath, itemBasePath, basePath, itemLegacyBasePath];
+
+type SalesItemApiModel = {
+  id?: number | string;
+  unit_transaction_id?: number | string;
+  qty_total?: number | string;
+  price?: number | string;
+  bbn_price?: number | string;
+  other_fee?: number | string;
+  dpp_per_unit_price?: number | string;
+  ppn_per_unit_price?: number | string;
+  dpp_total_price?: number | string;
+  ppn_total_price?: number | string;
+  created_at?: string;
+  unit_transaction?: {
+    id?: number | string;
+    code?: string;
+  };
+};
 
 export type SalesPayload = {
   company_id: number;
@@ -38,20 +61,104 @@ const unwrapDetail = (payload: SalesApiModel | { data?: SalesApiModel }): SalesA
   return payload as SalesApiModel;
 };
 
+const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
+
+const normalizeSalesRows = (rows: SalesItemApiModel[]): SalesApiModel[] => {
+  const grouped = new Map<string, SalesApiModel>();
+
+  rows.forEach((row) => {
+    const transactionId = String(row.unit_transaction_id ?? row.unit_transaction?.id ?? row.id ?? '');
+    if (!transactionId) return;
+
+    const qty = toNumber(row.qty_total);
+    const bruto = toNumber(row.price) * qty;
+    const dpp = toNumber(row.dpp_per_unit_price) > 0 ? toNumber(row.dpp_per_unit_price) * qty : toNumber(row.dpp_total_price);
+    const ppn = toNumber(row.ppn_per_unit_price) > 0 ? toNumber(row.ppn_per_unit_price) * qty : toNumber(row.ppn_total_price);
+    const bbn = toNumber(row.bbn_price) * qty;
+    const other = toNumber(row.other_fee);
+
+    const existing = grouped.get(transactionId);
+
+    if (!existing) {
+      grouped.set(transactionId, {
+        id: transactionId,
+        code: row.unit_transaction?.code ?? '-',
+        created_at: row.created_at,
+        transaction_bruto_total: bruto,
+        transaction_dpp_total: dpp,
+        transaction_ppn_total: ppn,
+        transaction_bbn_total: bbn,
+        transaction_other_fee: other,
+      });
+      return;
+    }
+
+    existing.transaction_bruto_total = toNumber(existing.transaction_bruto_total) + bruto;
+    existing.transaction_dpp_total = toNumber(existing.transaction_dpp_total) + dpp;
+    existing.transaction_ppn_total = toNumber(existing.transaction_ppn_total) + ppn;
+    existing.transaction_bbn_total = toNumber(existing.transaction_bbn_total) + bbn;
+    existing.transaction_other_fee = toNumber(existing.transaction_other_fee) + other;
+  });
+
+  return Array.from(grouped.values()).sort((a, b) => {
+    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return timeB - timeA;
+  });
+};
+
 export const salesService = {
   async getSalesList() {
-    const response = await apiClient.get<LaravelApiResponse<LaravelPagination<SalesApiModel>>>(basePath, {
-      params: {
-        type: 'sales',
-        sort_order: 'asc',
-      },
-    });
+    let rows: SalesApiModel[] = [];
+    let responseData: LaravelPagination<SalesApiModel> | null = null;
 
-    const responseData = ensureSuccess(response.data);
-    const mappedData = (responseData.data ?? []).map(mapSalesToUI);
+    for (const path of listBasePaths) {
+      try {
+        const response = await apiClient.get<LaravelApiResponse<LaravelPagination<any>>>(path, {
+          params: {
+            type: 'sales',
+            sort_order: 'asc',
+          },
+        });
+
+        const payload = ensureSuccess(response.data);
+
+        if (path.includes('unit-transaction-item')) {
+          rows = normalizeSalesRows(payload.data ?? []);
+          responseData = {
+            ...(payload as LaravelPagination<any>),
+            data: rows,
+            total: rows.length,
+            last_page: 1,
+          };
+        } else {
+          responseData = payload as LaravelPagination<SalesApiModel>;
+          rows = responseData.data ?? [];
+        }
+
+        break;
+      } catch {
+        // Try next fallback path.
+      }
+    }
+
+    if (!responseData) {
+      return {
+        data: [],
+        mappedData: [],
+        meta: {
+          currentPage: 1,
+          perPage: 10,
+          total: 0,
+          lastPage: 1,
+        },
+      };
+    }
+
+    const mappedData = rows.map(mapSalesToUI);
 
     return {
-      data: (responseData.data ?? []).map(mapSalesToTableItem),
+      data: rows.map(mapSalesToTableItem),
       mappedData,
       meta: {
         currentPage: responseData.current_page ?? 1,

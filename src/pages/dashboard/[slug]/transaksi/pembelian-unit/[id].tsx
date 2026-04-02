@@ -42,10 +42,10 @@ export default function PurchaseDetailPage() {
 
   const totalTagihan = Number(purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
   const totalPaid = billings.reduce(
-    (acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
+    (acc: number, item: any) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
     0,
   );
-  const hasPaidBilling = billings.some((item) => Boolean(item.is_paid));
+  const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
   const isPaid = hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0);
   const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
   const isAlreadyReceived = PURCHASE_RECEIVED_STATE_SET.has(currentStockState);
@@ -75,6 +75,14 @@ export default function PurchaseDetailPage() {
       const detailRows = await Promise.all(
         unitItems.map((item) => unitItemDetailService.getDetails(String(item.id), { page: 1, perPage: 200 })),
       );
+
+      const qtyTotal = unitItems.reduce((acc, item) => acc + Number(item.qty_total ?? 0), 0);
+      const detailTotal = detailRows.reduce((acc, row) => acc + row.data.length, 0);
+      if (qtyTotal !== detailTotal) {
+        toast.error(`Jumlah detail unit tidak sesuai qty_total. qty_total=${qtyTotal}, detail=${detailTotal}.`);
+        return;
+      }
+
       const detailIds = detailRows
         .flatMap((row) => row.data)
         .map((detail) => Number(detail.id ?? 0))
@@ -85,12 +93,19 @@ export default function PurchaseDetailPage() {
         return;
       }
 
-      if (currentStockState !== PURCHASE_PREPARE_STOCK_STATE) {
+      let stockStateForWarehouse = currentStockState;
+      if (stockStateForWarehouse !== PURCHASE_PREPARE_STOCK_STATE) {
         await updateState.mutateAsync({
           id: purchase.id,
           stockState: PURCHASE_PREPARE_STOCK_STATE,
           unitTransactionDetails: detailIds,
         });
+        stockStateForWarehouse = PURCHASE_PREPARE_STOCK_STATE;
+      }
+
+      if (stockStateForWarehouse !== PURCHASE_PREPARE_STOCK_STATE) {
+        toast.error('State transaksi harus inbound_incoming_goods sebelum membuat warehouse activity.');
+        return;
       }
 
       const activityId = await warehouseActivityService.createReceiptActivity({

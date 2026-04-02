@@ -5,6 +5,8 @@ export const useUnitTransactions = (options: { page?: number; perPage?: number; 
   return useQuery({
     queryKey: ['unit-transactions', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
     queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search }),
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });
 };

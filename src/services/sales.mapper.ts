@@ -113,15 +113,23 @@ const getBrutoTotal = (item: SalesApiModel): number =>
   );
 
 const getDppTotal = (item: SalesApiModel): number => {
+  const lineDpp = sumLineItems(item.unit_transaction_items, (row) => row.dpp_total_price ?? row.hpp_total_price);
+  if (lineDpp > 0) return lineDpp;
+
   const headerDpp = toNumber(item.unit_transaction_item_total_dpp ?? item.unit_transaction_dpp_total ?? item.transaction_dpp_total);
   if (headerDpp > 0) return headerDpp;
-  return sumLineItems(item.unit_transaction_items, (row) => row.dpp_total_price);
+
+  return 0;
 };
 
 const getPpnTotal = (item: SalesApiModel): number => {
+  const linePpn = sumLineItems(item.unit_transaction_items, (row) => row.ppn_total_price);
+  if (linePpn > 0) return linePpn;
+
   const headerPpn = toNumber(item.unit_transaction_item_total_ppn ?? item.unit_transaction_ppn_total ?? item.transaction_ppn_total);
   if (headerPpn > 0) return headerPpn;
-  return sumLineItems(item.unit_transaction_items, (row) => row.ppn_total_price);
+
+  return 0;
 };
 
 const formatDate = (value?: string): string => {
