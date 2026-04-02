@@ -102,7 +102,7 @@ const mapFormula = (payload: any): UnitFormulaResult => ({
   hpp_total_price: toNumber(payload?.hpp_total_price),
   dpp_total_price: toNumber(payload?.dpp_total_price),
   ppn_total_price: toNumber(payload?.ppn_total_price),
-});x``
+})
 
 // ======================
 // SERVICE
