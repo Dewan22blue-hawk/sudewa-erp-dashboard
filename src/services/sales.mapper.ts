@@ -63,6 +63,10 @@ export type SalesApiModel = {
       machine_number?: string;
       chassis_number?: string;
     }>;
+    unit_transaction_item_sales?: Array<{
+      id?: number | string;
+      unit_transaction_item_detail_id?: number | string;
+    }>;
   }>;
 };
 

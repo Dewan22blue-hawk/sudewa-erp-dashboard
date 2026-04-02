@@ -276,8 +276,16 @@ async updateItem(
 ): Promise<UnitTransactionItem> {
   const params = new URLSearchParams();
 
+  if (payload.unit_transaction_id !== undefined) {
+    params.append('unit_transaction_id', String(payload.unit_transaction_id));
+  }
+
   if (payload.unit_type_id !== undefined) {
     params.append('unit_type_id', String(payload.unit_type_id));
+  }
+
+  if (payload.sparepart_id !== undefined && payload.sparepart_id !== null && String(payload.sparepart_id).length > 0) {
+    params.append('sparepart_id', String(payload.sparepart_id));
   }
 
   if (payload.qty_total !== undefined) {

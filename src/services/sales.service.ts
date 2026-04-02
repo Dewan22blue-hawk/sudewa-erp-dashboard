@@ -5,10 +5,6 @@ import { SalesApiModel, mapSalesDetailToUI, mapSalesToTableItem, mapSalesToUI } 
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
 const fallbackBasePath = '/wapi/transaction/unit-transaction';
-const itemBasePath = '/wapi/transaction/unit-transaction-item';
-const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
-
-const listBasePaths = [fallbackBasePath, itemBasePath, basePath, itemLegacyBasePath];
 
 type SalesItemApiModel = {
   id?: number | string;
@@ -52,6 +48,20 @@ const appendPayload = (form: FormData, payload: SalesPayload) => {
   form.append('type', payload.type);
   form.append('max_capacity', String(payload.max_capacity));
   form.append('stock_state', payload.stock_state);
+};
+
+const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
+  const params = new URLSearchParams();
+  params.append('company_id', String(payload.company_id));
+  params.append('person_id', String(payload.person_id));
+  if (payload.warehouse_id !== undefined && payload.warehouse_id !== null) {
+    params.append('warehouse_id', String(payload.warehouse_id));
+  }
+  params.append('code', payload.code);
+  params.append('type', payload.type);
+  params.append('max_capacity', String(payload.max_capacity));
+  params.append('stock_state', payload.stock_state);
+  return params;
 };
 
 const unwrapDetail = (payload: SalesApiModel | { data?: SalesApiModel }): SalesApiModel => {
@@ -112,33 +122,32 @@ export const salesService = {
     let rows: SalesApiModel[] = [];
     let responseData: LaravelPagination<SalesApiModel> | null = null;
 
-    for (const path of listBasePaths) {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<LaravelPagination<any>>>(basePath, {
+        params: {
+          type: 'sales',
+          sort_order: 'desc',
+        },
+      });
+
+      const payload = ensureSuccess(response.data) as LaravelPagination<SalesApiModel>;
+      responseData = payload;
+      rows = payload.data ?? [];
+    } catch {
+      // Compatibility fallback for environments exposing the shorter base path.
       try {
-        const response = await apiClient.get<LaravelApiResponse<LaravelPagination<any>>>(path, {
+        const fallbackResponse = await apiClient.get<LaravelApiResponse<LaravelPagination<any>>>(fallbackBasePath, {
           params: {
             type: 'sales',
-            sort_order: 'asc',
+            sort_order: 'desc',
           },
         });
 
-        const payload = ensureSuccess(response.data);
-
-        if (path.includes('unit-transaction-item')) {
-          rows = normalizeSalesRows(payload.data ?? []);
-          responseData = {
-            ...(payload as LaravelPagination<any>),
-            data: rows,
-            total: rows.length,
-            last_page: 1,
-          };
-        } else {
-          responseData = payload as LaravelPagination<SalesApiModel>;
-          rows = responseData.data ?? [];
-        }
-
-        break;
+        const fallbackPayload = ensureSuccess(fallbackResponse.data) as LaravelPagination<SalesApiModel>;
+        responseData = fallbackPayload;
+        rows = fallbackPayload.data ?? [];
       } catch {
-        // Try next fallback path.
+        responseData = null;
       }
     }
 
@@ -190,10 +199,13 @@ export const salesService = {
   },
 
   async updateSales(id: string, payload: SalesPayload) {
-    const form = new FormData();
-    appendPayload(form, payload);
+    const params = toUrlEncodedPayload(payload);
 
-    const response = await apiClient.put<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`, form);
+    const response = await apiClient.put<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`, params, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
     const data = ensureSuccess(response.data);
     return unwrapDetail(data);
   },

@@ -82,20 +82,42 @@ export default function SalesUnitDetailPage() {
 
   const requiredQty = Number(unitItem?.qty_total ?? 0);
 
-  const salesItem = useMemo(() => {
-    const rows = salesData?.raw?.unit_transaction_items ?? [];
-    return rows.find((row) => String(row?.id ?? '') === String(selectedUnitId ?? ''));
-  }, [salesData?.raw?.unit_transaction_items, selectedUnitId]);
-
   const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
-    return (salesItem?.unit_transaction_item_details ?? []).map((detail) => ({
+    const mappedFromItemDetails = (unitItem?.unit_transaction_item_details ?? []).map((detail) => ({
       id: toNumberId(detail?.id),
       color: String(detail?.color ?? '-'),
       machine_number: String(detail?.machine_number ?? '-'),
       chassis_number: String(detail?.chassis_number ?? '-'),
-      in_stock: true,
+      in_stock: detail?.in_stock,
     }));
-  }, [salesItem?.unit_transaction_item_details]);
+
+    const detailLookup = new Map<number, WarehouseStockUnit>();
+    stockUnits.forEach((detail) => {
+      detailLookup.set(detail.id, detail);
+    });
+    mappedFromItemDetails.forEach((detail) => {
+      detailLookup.set(detail.id, detail);
+    });
+
+    const assignedBySales = (unitItem?.unit_transaction_item_sales ?? [])
+      .map((row) => toNumberId(row?.unit_transaction_item_detail_id))
+      .filter((detailId) => detailId > 0)
+      .map((detailId) =>
+        detailLookup.get(detailId) ?? {
+          id: detailId,
+          color: '-',
+          machine_number: '-',
+          chassis_number: '-',
+          in_stock: false,
+        },
+      );
+
+    if (assignedBySales.length > 0) {
+      return assignedBySales;
+    }
+
+    return mappedFromItemDetails;
+  }, [stockUnits, unitItem?.unit_transaction_item_details, unitItem?.unit_transaction_item_sales]);
 
   const assignedIds = useMemo(() => {
     return assignedDetailRows.map((item) => item.id).filter((item) => item > 0);
@@ -137,7 +159,7 @@ export default function SalesUnitDetailPage() {
 
     return rows.every((item) => {
       const required = Number(item?.qty_total ?? 0);
-      const assigned = item?.unit_transaction_item_details?.length ?? 0;
+      const assigned = Math.max(item?.unit_transaction_item_details?.length ?? 0, item?.unit_transaction_item_sales?.length ?? 0);
       return required > 0 && assigned >= required;
     });
   }, [salesData?.raw?.unit_transaction_items]);
