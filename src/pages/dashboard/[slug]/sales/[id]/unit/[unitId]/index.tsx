@@ -166,6 +166,19 @@ export default function SalesUnitDetailPage() {
 
   const selectedCount = selectedIds.size;
   const stockState = String(salesData?.raw?.stock_state ?? 'draft');
+  const hasPendingSelectionChanges = useMemo(() => {
+    if (selectedIds.size !== assignedIds.length) return true;
+
+    const assignedSet = new Set(assignedIds);
+    for (const id of selectedIds) {
+      if (!assignedSet.has(id)) return true;
+    }
+
+    return false;
+  }, [selectedIds, assignedIds]);
+
+  const selectedFromSalesCount = Array.isArray(unitItem?.unit_transaction_item_sales) ? unitItem.unit_transaction_item_sales.length : 0;
+  const selectedFromDetailCount = Array.isArray(unitItem?.unit_transaction_item_details) ? unitItem.unit_transaction_item_details.length : 0;
 
   const canAssignStock = requiredQty > 0 && selectedCount === requiredQty;
   const canMoveToOutbound = allItemsAssigned && stockState === 'draft';
@@ -389,14 +402,31 @@ export default function SalesUnitDetailPage() {
                 State: <span className="font-medium text-foreground">{stockState}</span>
               </span>
               <span className="text-muted-foreground">
-                Assigned Item:{' '}
+                Assigned Tersimpan:{' '}
                 <span className="font-medium text-foreground">
                   {assignedIds.length}/{requiredQty}
                 </span>
               </span>
               <span className="text-muted-foreground">
+                Pilihan Saat Ini:{' '}
+                <span className="font-medium text-foreground">
+                  {selectedCount}/{requiredQty}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                Sumber Sales Mapping:{' '}
+                <span className="font-medium text-foreground">{selectedFromSalesCount}</span>
+              </span>
+              <span className="text-muted-foreground">
+                Sumber Detail Legacy:{' '}
+                <span className="font-medium text-foreground">{selectedFromDetailCount}</span>
+              </span>
+              <span className="text-muted-foreground">
                 Semua Item Assigned: <span className="font-medium text-foreground">{allItemsAssigned ? 'Ya' : 'Belum'}</span>
               </span>
+              {hasPendingSelectionChanges && (
+                <span className="text-amber-600">Ada perubahan pilihan yang belum di-assign. Klik tombol Assign Stock untuk menyimpan.</span>
+              )}
             </div>
 
             <StockPickerTable

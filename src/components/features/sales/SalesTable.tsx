@@ -39,9 +39,12 @@ export function SalesTable({ onAdd }: Props) {
 
   // Pagination logic
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const safeTotalPages = Math.max(1, totalPages);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentData = sortedData.slice(startIndex, endIndex);
+  const isDataEmpty = salesData.length === 0;
+  const isSearchEmpty = !isDataEmpty && sortedData.length === 0;
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
@@ -192,6 +195,18 @@ export function SalesTable({ onAdd }: Props) {
                   Loading data...
                 </TableCell>
               </TableRow>
+            ) : isDataEmpty ? (
+              <TableRow>
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
+                  Data penjualan masih kosong.
+                </TableCell>
+              </TableRow>
+            ) : isSearchEmpty ? (
+              <TableRow>
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
+                  Data tidak ditemukan. Coba ubah kata kunci pencarian.
+                </TableCell>
+              </TableRow>
             ) : (
               currentData.map((item) => (
                 <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} />
@@ -213,15 +228,15 @@ export function SalesTable({ onAdd }: Props) {
           </Button>
 
           {/* Page numbers */}
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+          {Array.from({ length: Math.min(5, safeTotalPages) }, (_, i) => {
             let pageNum: number;
 
-            if (totalPages <= 5) {
+            if (safeTotalPages <= 5) {
               pageNum = i + 1;
             } else if (currentPage <= 3) {
               pageNum = i + 1;
-            } else if (currentPage >= totalPages - 2) {
-              pageNum = totalPages - 4 + i;
+            } else if (currentPage >= safeTotalPages - 2) {
+              pageNum = safeTotalPages - 4 + i;
             } else {
               pageNum = currentPage - 2 + i;
             }
@@ -233,16 +248,21 @@ export function SalesTable({ onAdd }: Props) {
             );
           })}
 
-          {totalPages > 5 && (
+          {safeTotalPages > 5 && (
             <>
               <span className="text-muted-foreground">...</span>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} className="w-10">
-                {totalPages}
+              <Button variant="outline" size="sm" onClick={() => setCurrentPage(safeTotalPages)} className="w-10">
+                {safeTotalPages}
               </Button>
             </>
           )}
 
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((prev) => Math.min(safeTotalPages, prev + 1))}
+            disabled={currentPage >= safeTotalPages}
+          >
             Next
           </Button>
         </div>

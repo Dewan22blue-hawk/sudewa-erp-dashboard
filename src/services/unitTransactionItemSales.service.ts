@@ -26,6 +26,9 @@ type UnitTransactionItemApiModel = {
 
 type UnitTypeDetailApiModel = {
   id?: string | number;
+  unit_type?: {
+    id?: string | number;
+  };
   unit_transaction_detail_id?: string | number;
   unit_transaction_item_detail_id?: string | number;
   unit_type_detail_id?: string | number;
@@ -44,6 +47,8 @@ type UnitTypeDetailApiModel = {
   is_sold?: boolean | number | string;
   is_available?: boolean | number | string;
   in_stock?: boolean | number | string;
+  stock_available?: boolean | number | string;
+  stock_forecast?: boolean | number | string;
 };
 
 type UnitTypeApiModel = {
@@ -85,6 +90,7 @@ const itemSalesLegacyPath = '/wapi/transaction/unit-transaction-item-sales';
 const unitTransactionItemBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 const unitTransactionItemLegacyPath = '/wapi/transaction/unit-transaction-item';
 const unitTypeBasePath = '/wapi/master-data/unit-type';
+const warehouseUnitDetailsBasePath = '/wapi/warehouse/warehouse-get-unit-transaction-item-details';
 
 const warehouseActivityBasePath = '/wapi/transaction/warehouse-activity';
 const warehouseActivityLegacyPath = '/wapi/transaction/unit-transaction/warehouse-activity';
@@ -137,6 +143,12 @@ const looksLikeDetailRow = (item: any): boolean => {
 };
 
 const isOnHandUnit = (item: UnitTypeDetailApiModel): boolean => {
+  const stockAvailableNumber = toNumber(item?.stock_available);
+  const stockForecastNumber = toNumber(item?.stock_forecast);
+  if (stockAvailableNumber > 0 || stockForecastNumber > 0) {
+    return true;
+  }
+
   const hasExplicitAvailability =
     item?.is_available !== undefined || item?.in_stock !== undefined || item?.is_on_hand !== undefined || item?.on_hand !== undefined;
 
@@ -205,6 +217,13 @@ const normalizeUnitTypeDetails = (payload: any): UnitTypeDetailApiModel[] => {
   return [];
 };
 
+const normalizeWarehouseItemDetails = (payload: any): UnitTypeDetailApiModel[] => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  return [];
+};
+
 const mapWarehouseStockUnit = (payload: UnitTypeDetailApiModel): WarehouseStockUnit => ({
   id: toIdNumber(
     payload?.id ?? payload?.unit_transaction_detail_id ?? payload?.unit_transaction_item_detail_id ?? payload?.unit_type_detail_id ?? payload?.detail_id,
@@ -267,16 +286,35 @@ export const unitTransactionItemSalesService = {
   },
 
   async getStockByUnitType(unitTypeId: string, companyId = '1'): Promise<WarehouseStockUnit[]> {
-    const response = await apiClient.get<LaravelApiResponse<UnitTypeApiModel>>(`${unitTypeBasePath}/${unitTypeId}`, {
+    const response = await apiClient.get<LaravelApiResponse<any>>(`${warehouseUnitDetailsBasePath}/${companyId}`, {
       params: {
-        company_id: companyId,
+        per_page: 200,
+        page: 1,
+        unit_type_id: unitTypeId,
       },
     });
 
     const payload = ensureSuccess(response.data);
-    const mapped = normalizeUnitTypeDetails(payload)
+    const warehouseRows = normalizeWarehouseItemDetails(payload);
+    const filteredByType = warehouseRows.filter((row) => {
+      const rowTypeId = String(row?.unit_type?.id ?? '');
+      return rowTypeId === String(unitTypeId);
+    });
+
+    const mapped = filteredByType
       .map(mapWarehouseStockUnit)
       .filter((item) => item.id > 0 && item.in_stock);
+
+    // Legacy fallback (do not remove): keep old source for quick rollback.
+    // const legacyResponse = await apiClient.get<LaravelApiResponse<UnitTypeApiModel>>(`${unitTypeBasePath}/${unitTypeId}`, {
+    //   params: {
+    //     company_id: companyId,
+    //   },
+    // });
+    // const legacyPayload = ensureSuccess(legacyResponse.data);
+    // const mappedLegacy = normalizeUnitTypeDetails(legacyPayload)
+    //   .map(mapWarehouseStockUnit)
+    //   .filter((item) => item.id > 0 && item.in_stock);
 
     const deduped = new Map<number, WarehouseStockUnit>();
     mapped.forEach((item) => {

@@ -231,8 +231,15 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
             ) : (
               processedData.map((item) => (
                 <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
-                  <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
-                    {item.code || '-'}
+                  {/* Kode Jual - Link biru */}
+                  <TableCell className="px-4">
+                    <button
+                      type="button"
+                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
+                      onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}
+                    >
+                      {item.code || '-'}
+                    </button>
                   </TableCell>
                   <TableCell className="text-slate-700 px-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
                   <TableCell className="text-slate-700 px-4">{item.supplier || '-'}</TableCell>

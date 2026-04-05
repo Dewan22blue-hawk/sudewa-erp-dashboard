@@ -56,6 +56,8 @@ export const useCreateBillingV2 = () => {
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
     },
   });
 };
@@ -78,6 +80,8 @@ export const useCreateBillingHistory = () => {
       queryClient.invalidateQueries({ queryKey: ['unit-billing-current'] });
       queryClient.invalidateQueries({ queryKey: ['unit-billings'] });
       queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
     },
   });
 };
@@ -90,6 +94,8 @@ export const useUpdateBilling = () => {
       queryClient.invalidateQueries({ queryKey: ['unit-billings', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
     },
   });
 };

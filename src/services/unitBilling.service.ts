@@ -184,12 +184,14 @@ const toFormData = (payload: UpsertUnitBillingPayload, asUpdate = false): FormDa
 
 export const unitBillingService = {
   async checkRightAmount(companyId: string, unitTransactionId: string): Promise<void> {
-    await apiClient.get<LaravelApiResponse<any>>(`${basePath}/check-right-amount`, {
+    const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/check-right-amount`, {
       params: {
         company_id: companyId,
         unit_transaction_id: unitTransactionId,
       },
     });
+
+    ensureSuccess(response.data);
   },
 
   async getCurrentBilling(unitTransactionId: string): Promise<UnitBilling | null> {
@@ -302,11 +304,31 @@ export const unitBillingService = {
 
   async createBillingHistory(payload: CreateUnitBillingHistoryPayload): Promise<UnitBillingHistory> {
     const form = new FormData();
+    const bcaPaymentAmount = Number(payload.bca_payment_amount ?? 0);
+    const cashPaymentAmount = Number(payload.cash_payment_amount ?? 0);
+    const bcaPaymentUsdAmount = Number(payload.bca_payment_usd_amount ?? 0);
+    const totalPayment = bcaPaymentAmount + cashPaymentAmount + bcaPaymentUsdAmount;
+
     form.append('unit_transaction_billing_id', String(payload.unit_transaction_billing_id));
-    form.append('bca_payment_amount', String(payload.bca_payment_amount ?? 0));
-    form.append('cash_payment_amount', String(payload.cash_payment_amount ?? 0));
-    form.append('bca_payment_usd_amount', String(payload.bca_payment_usd_amount ?? 0));
+    form.append('bca_payment_amount', String(bcaPaymentAmount));
+    form.append('cash_payment_amount', String(cashPaymentAmount));
+    form.append('bca_payment_usd_amount', String(bcaPaymentUsdAmount));
+
+    // Compatibility aliases for backend variants.
+    form.append('bca_payment', String(bcaPaymentAmount));
+    form.append('cash_payment', String(cashPaymentAmount));
+    form.append('bca_payment_2', String(bcaPaymentUsdAmount));
+    form.append('bca_usd_payment', String(bcaPaymentUsdAmount));
+
+    form.append('payment', String(totalPayment));
+    form.append('payment_amount', String(totalPayment));
+    form.append('amount', String(totalPayment));
+    form.append('total_payment', String(totalPayment));
+    form.append('total_paid', String(totalPayment));
+    form.append('paid_total', String(totalPayment));
+
     form.append('payment_at', payload.payment_at);
+    form.append('payment_date', payload.payment_at);
     if (payload.note) form.append('note', payload.note);
 
     const response = await apiClient.post<LaravelApiResponse<UnitBillingHistoryApiModel>>(historyBasePath, form);
