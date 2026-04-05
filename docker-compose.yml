@@ -5,7 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: wajira-finance-frontend
+      args:
+        NODE_ENV: production
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api-finance.deraly.dev}
+        NEXT_PUBLIC_AUTH_DOMAIN: ${NEXT_PUBLIC_AUTH_DOMAIN}
+    container_name: wajira-finance-dashboard
+    image: wajira-finance-frontend:latest
+    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
@@ -24,10 +30,15 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-      - NEXT_PUBLIC_AUTH_DOMAIN=http://202.74.75.47:3000
+      - NEXT_PUBLIC_AUTH_DOMAIN=${NEXT_PUBLIC_AUTH_DOMAIN}
     networks:
-      - wajira-local-net
+      - client-wajira-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
-  wajira-local-net:
+  client-wajira-net:
     external: true
