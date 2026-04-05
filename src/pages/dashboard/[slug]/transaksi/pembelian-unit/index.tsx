@@ -17,7 +17,13 @@ export default function PurchasePage() {
   const { slug } = router.query;
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+<<<<<<< HEAD
   const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage });
+=======
+  const [search, setSearch] = useState('');
+
+  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, search });
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   const deleteMutation = useDeletePurchase();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 

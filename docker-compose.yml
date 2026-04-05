@@ -1,13 +1,17 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  wajira-frontend:
+  wajira-finance-frontend:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         NODE_ENV: production
+<<<<<<< HEAD
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api-finance.deraly.dev}
+=======
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
         NEXT_PUBLIC_AUTH_DOMAIN: ${NEXT_PUBLIC_AUTH_DOMAIN}
     container_name: wajira-finance-dashboard
     image: wajira-finance-frontend:latest
@@ -32,7 +36,11 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_AUTH_DOMAIN=${NEXT_PUBLIC_AUTH_DOMAIN}
     networks:
+<<<<<<< HEAD
       - client-wajira-net
+=======
+      - wajira-local-net
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     logging:
       driver: "json-file"
       options:
@@ -40,5 +48,9 @@ services:
         max-file: "3"
 
 networks:
+<<<<<<< HEAD
   client-wajira-net:
+=======
+  wajira-local-net:
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     external: true

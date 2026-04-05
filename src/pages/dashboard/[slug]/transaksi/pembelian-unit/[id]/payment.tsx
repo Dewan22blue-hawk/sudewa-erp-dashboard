@@ -1,10 +1,15 @@
 "use client"
 
+<<<<<<< HEAD
 import { useState } from 'react';
+=======
+import { useMemo } from 'react';
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 import { useRouter } from "next/router"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Loader2 } from "lucide-react"
+<<<<<<< HEAD
 import { PaymentFormData, PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import {
@@ -14,10 +19,17 @@ import {
     useCreateBillingV2,
     useCurrentBilling,
 } from '@/hooks/useUnitBilling';
+=======
+import { PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
+import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
+import { useCreateBilling, useUnitBillings, useUpdateBilling } from '@/hooks/useUnitBilling';
+import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
+<<<<<<< HEAD
 const readApiError = (error: any): string => {
     const stringifyDetail = (value: unknown): string => {
         if (value === null || value === undefined) return '';
@@ -101,6 +113,9 @@ const getInvalidItemIds = (error: any): string[] => {
 
     return Array.from(new Set([...idsFromInvalid, ...idsFromSummary]));
 };
+=======
+const PURCHASE_RECEIPT_STATE = 'receipt';
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 export default function PurchasePaymentPage() {
     const router = useRouter()
@@ -108,6 +123,7 @@ export default function PurchasePaymentPage() {
         const purchaseId = String(id ?? '');
         const { companyId } = useCompany();
         const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId)
+<<<<<<< HEAD
         const { refetch: revalidateAmount } = useBillingValidation(
             companyId ? String(companyId) : undefined,
             purchaseId,
@@ -227,9 +243,127 @@ export default function PurchasePaymentPage() {
             } finally {
                 setIsSubmitting(false);
             }
+=======
+        const { data: billings = [], isLoading: billingLoading } = useUnitBillings(purchaseId);
+        const createBilling = useCreateBilling();
+        const updateBilling = useUpdateBilling();
+        const updateState = useUpdateUnitTransactionState();
+
+        const totalTagihan = Number(purchase?.unit_transaction_item_bruto_total ?? 0);
+        const totalPaid = useMemo(
+            () => billings.reduce((acc, item) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0), 0),
+            [billings],
+        );
+        const remainingPayment = Math.max(0, totalTagihan - totalPaid);
+
+        const calculatePaymentState = (nextTotalPaid: number) => {
+            const isPaid = nextTotalPaid >= totalTagihan && totalTagihan > 0;
+            return {
+                isPaid,
+                nextTotalPaid,
+                nextRemaining: Math.max(0, totalTagihan - nextTotalPaid),
+            };
+        };
+
+        const syncPurchaseReceiptState = async (shouldMoveToReceipt: boolean) => {
+            if (!shouldMoveToReceipt || !purchaseId) return;
+            if (purchase?.stock_state === PURCHASE_RECEIPT_STATE) return;
+
+            try {
+                await updateState.mutateAsync({
+                    id: purchaseId,
+                    state: PURCHASE_RECEIPT_STATE,
+                });
+                toast.success('Status pembelian diperbarui ke receipt');
+            } catch (error: any) {
+                toast.error(error?.message || 'Payment tersimpan, namun update state gagal', {
+                    action: {
+                        label: 'Retry',
+                        onClick: () => {
+                            void syncPurchaseReceiptState(true);
+                        },
+                    },
+                });
+            }
+        };
+
+        const buildPayload = (data: {
+            bcaPayment: number;
+            cashPayment: number;
+            bcaPayment2: number;
+            paymentDate: string;
+            isPaid: boolean;
+        }): UpsertUnitBillingPayload | null => {
+            if (!companyId) {
+                toast.error('Company belum dipilih');
+                return null;
+            }
+
+            return {
+                company_id: String(companyId),
+                unit_transaction_id: purchaseId,
+                bca_payment: Number(data.bcaPayment ?? 0),
+                cash_payment: Number(data.cashPayment ?? 0),
+                bca_payment_2: Number(data.bcaPayment2 ?? 0),
+                payment_date: data.paymentDate,
+                is_paid: Boolean(data.isPaid),
+            };
+        };
+
+        const handleCreate = async (data: {
+            bcaPayment: number;
+            cashPayment: number;
+            bcaPayment2: number;
+            paymentDate: string;
+            isPaid: boolean;
+        }) => {
+        try {
+                const submittedTotal = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+                const paymentState = calculatePaymentState(totalPaid + submittedTotal);
+                        const payload = buildPayload(data);
+                        if (!payload) return;
+                payload.is_paid = paymentState.isPaid;
+                        await createBilling.mutateAsync(payload);
+            toast.success("Pembayaran berhasil disimpan")
+                await syncPurchaseReceiptState(paymentState.isPaid);
+                } catch (error: any) {
+                        toast.error(error?.message || "Gagal menyimpan pembayaran")
+                }
         }
 
+        const handleUpdate = async (
+            billingId: string,
+            data: {
+                bcaPayment: number;
+                cashPayment: number;
+                bcaPayment2: number;
+                paymentDate: string;
+                isPaid: boolean;
+            },
+        ) => {
+                try {
+                const currentBilling = billings.find((item) => item.id === billingId);
+                const existingBillingTotal = currentBilling
+                    ? Number(currentBilling.bca_payment ?? 0) + Number(currentBilling.cash_payment ?? 0) + Number(currentBilling.bca_payment_2 ?? 0)
+                    : 0;
+                const submittedTotal = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+                const paymentState = calculatePaymentState(totalPaid - existingBillingTotal + submittedTotal);
+                        const payload = buildPayload(data);
+                        if (!payload) return;
+                payload.is_paid = paymentState.isPaid;
+                        await updateBilling.mutateAsync({ id: billingId, payload });
+                        toast.success("Pembayaran berhasil diperbarui")
+                await syncPurchaseReceiptState(paymentState.isPaid);
+                } catch (error: any) {
+                        toast.error(error?.message || "Gagal menyimpan pembayaran")
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
+        }
+
+<<<<<<< HEAD
         if (purchaseLoading || billingLoading || historyLoading) {
+=======
+        if (purchaseLoading || billingLoading) {
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
         return (
             <DashboardLayout>
                 <div className="flex h-[50vh] items-center justify-center">
@@ -276,6 +410,7 @@ export default function PurchasePaymentPage() {
                         <PurchasePaymentForm
                             purchaseCode={purchase.code}
                             totalTagihan={totalTagihan}
+<<<<<<< HEAD
                             billing={currentBilling ?? null}
                             histories={billingHistories}
                             onSubmitPayment={handleSubmitPayment}
@@ -283,6 +418,15 @@ export default function PurchasePaymentPage() {
                             loading={isSubmitting || createBilling.isPending || createBillingHistory.isPending}
                             canSubmit={true}
                             validationMessage={validationMessage}
+=======
+                            totalPaid={totalPaid}
+                            remainingPayment={remainingPayment}
+                            billings={billings}
+                            onCreate={handleCreate}
+                            onUpdate={handleUpdate}
+                            onCancel={() => router.back()}
+                            loading={createBilling.isPending || updateBilling.isPending || updateState.isPending}
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                         />
                     </CardContent>
                 </Card>

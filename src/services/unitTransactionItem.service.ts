@@ -44,7 +44,11 @@ export type UnitFormulaResult = {
   ppn_total_price: number;
 };
 
+<<<<<<< HEAD
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+=======
+const legacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 // ======================
 // UTILS
@@ -102,7 +106,11 @@ const mapFormula = (payload: any): UnitFormulaResult => ({
   hpp_total_price: toNumber(payload?.hpp_total_price),
   dpp_total_price: toNumber(payload?.dpp_total_price),
   ppn_total_price: toNumber(payload?.ppn_total_price),
+<<<<<<< HEAD
 })
+=======
+});
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 // ======================
 // SERVICE
@@ -118,6 +126,7 @@ export const unitTransactionItemService = {
       other_fee: toDecimalString(payload.other_fee),
     };
 
+<<<<<<< HEAD
     const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/get-formula`, {
       params: requestParams,
     });
@@ -125,6 +134,24 @@ export const unitTransactionItemService = {
     const data = ensureSuccess(response.data);
     const normalized = (data as any)?.data ?? data;
     return mapFormula(normalized);
+=======
+    try {
+      const response = await apiClient.get<LaravelApiResponse<any>>(`${legacyBasePath}/get-formula`, {
+        params: requestParams,
+      });
+
+      const data = ensureSuccess(response.data);
+      const normalized = (data as any)?.data ?? data;
+      return mapFormula(normalized);
+    } catch {
+      const response = await apiClient.get<LaravelApiResponse<any>>('/wapi/transaction/unit-transaction-item/get-formula', {
+        params: requestParams,
+      });
+      const data = ensureSuccess(response.data);
+      const normalized = (data as any)?.data ?? data;
+      return mapFormula(normalized);
+    }
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   },
 
   async getSalesItemsByWarehouse(
@@ -132,7 +159,11 @@ export const unitTransactionItemService = {
     params: PaginationParams = {}
   ): Promise<UnitTransactionItem[]> {
     const response = await apiClient.get<LaravelApiResponse<any>>(
+<<<<<<< HEAD
       basePath,
+=======
+      legacyBasePath,
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       {
         params: {
           warehouse_id: String(warehouseId),
@@ -168,7 +199,11 @@ export const unitTransactionItemService = {
     params: PaginationParams = {}
   ): Promise<UnitTransactionItemListResponse> {
     const response = await apiClient.get<LaravelApiResponse<any>>(
+<<<<<<< HEAD
       basePath,
+=======
+      legacyBasePath,
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       {
         params: {
           unit_transaction_id: purchaseId,
@@ -262,7 +297,11 @@ export const unitTransactionItemService = {
 
     const response = await apiClient.post<
       LaravelApiResponse<UnitTransactionItemApiModel>
+<<<<<<< HEAD
     >(basePath, form);
+=======
+    >(legacyBasePath, form);
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
     return mapItem(ensureSuccess(response.data));
   },
@@ -276,18 +315,24 @@ async updateItem(
 ): Promise<UnitTransactionItem> {
   const params = new URLSearchParams();
 
+<<<<<<< HEAD
   if (payload.unit_transaction_id !== undefined) {
     params.append('unit_transaction_id', String(payload.unit_transaction_id));
   }
 
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   if (payload.unit_type_id !== undefined) {
     params.append('unit_type_id', String(payload.unit_type_id));
   }
 
+<<<<<<< HEAD
   if (payload.sparepart_id !== undefined && payload.sparepart_id !== null && String(payload.sparepart_id).length > 0) {
     params.append('sparepart_id', String(payload.sparepart_id));
   }
 
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   if (payload.qty_total !== undefined) {
     params.append('qty_total', String(payload.qty_total));
   }
@@ -309,7 +354,11 @@ async updateItem(
   }
 
   const response = await apiClient.put(
+<<<<<<< HEAD
     `${basePath}/${id}`,
+=======
+    `/wapi/transaction/unit-transaction/unit-transaction-item/${id}`,
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     params,
     {
       headers: {
@@ -325,7 +374,11 @@ async updateItem(
   // DELETE
   // ======================
   async deleteItem(id: string): Promise<void> {
+<<<<<<< HEAD
     await apiClient.delete(`${basePath}/${id}`);
+=======
+    await apiClient.delete(`${legacyBasePath}/${id}`);
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   },
 
   // ======================
@@ -337,10 +390,31 @@ async updateItem(
 
     if (normalizedIds.length === 0) return;
 
+<<<<<<< HEAD
     await apiClient.delete(`${basePath}/bulk-delete`, {
       params: {
         ids: normalizedIds,
       },
     });
+=======
+    try {
+      await apiClient.delete(`${legacyBasePath}/bulk-delete`, {
+        params: {
+          ids: normalizedIds,
+        },
+      });
+      return;
+    } catch {
+      // Fallback for backends that read ids from multipart body.
+    }
+
+    const form = new FormData();
+    normalizedIds.forEach((itemId) => {
+      form.append('ids[]', itemId);
+    });
+    form.append('_method', 'DELETE');
+
+    await apiClient.post(`${legacyBasePath}/bulk-delete`, form);
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   },
 };

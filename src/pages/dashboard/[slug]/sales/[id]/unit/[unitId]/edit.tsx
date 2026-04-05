@@ -68,9 +68,13 @@ export default function EditNestedUnitPage() {
             await updateMutation.mutateAsync({
                 id: String(selectedUnitId),
                 payload: {
+<<<<<<< HEAD
                     unit_transaction_id: String(item.unit_transaction_id),
                     unit_type_id: String(values.tipeUnit),
                     sparepart_id: item.sparepart_id,
+=======
+                    unit_type_id: String(values.tipeUnit),
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                     qty_total: Number(values.qty ?? 0),
                     price: Number(values.harga ?? 0),
                     bbn_price: Number(values.biayaBbn ?? 0),

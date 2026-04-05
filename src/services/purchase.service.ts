@@ -433,6 +433,7 @@ export const purchaseService = {
     form.append('stock_state', payload.stock_state);
     form.append('max_capacity', payload.max_capacity);
     if (payload.code) form.append('code', payload.code);
+<<<<<<< HEAD
     if (payload.unit_type_id !== undefined) form.append('unit_type_id', String(payload.unit_type_id));
     if (payload.sparepart_id !== undefined) form.append('sparepart_id', String(payload.sparepart_id));
     if (payload.qty_total !== undefined) form.append('qty_total', String(payload.qty_total));
@@ -440,6 +441,8 @@ export const purchaseService = {
     if (payload.bbn_price !== undefined) form.append('bbn_price', String(payload.bbn_price));
     if (payload.expedition_fee !== undefined) form.append('expedition_fee', String(payload.expedition_fee));
     if (payload.other_fee !== undefined) form.append('other_fee', String(payload.other_fee));
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
     if (process.env.NODE_ENV !== 'production') {
       const preview = Array.from(form.entries()).reduce<Record<string, any>>((acc, [k, v]) => {

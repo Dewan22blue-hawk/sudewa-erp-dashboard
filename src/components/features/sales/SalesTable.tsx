@@ -195,6 +195,7 @@ export function SalesTable({ onAdd }: Props) {
                   Loading data...
                 </TableCell>
               </TableRow>
+<<<<<<< HEAD
             ) : isDataEmpty ? (
               <TableRow>
                 <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
@@ -207,6 +208,8 @@ export function SalesTable({ onAdd }: Props) {
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>
               </TableRow>
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
             ) : (
               currentData.map((item) => (
                 <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} />

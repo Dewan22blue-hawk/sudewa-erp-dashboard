@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+<<<<<<< HEAD
 import { CreateUnitBillingHistoryPayload, CreateUnitBillingPayloadV2, UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
+=======
+import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 import { unitBillingService } from '@/services/unitBilling.service';
 
 export const useUnitBillings = (purchaseId?: string) => {
@@ -7,7 +11,10 @@ export const useUnitBillings = (purchaseId?: string) => {
     queryKey: ['unit-billings', purchaseId],
     queryFn: () => unitBillingService.getBillings(purchaseId as string),
     enabled: !!purchaseId,
+<<<<<<< HEAD
     retry: false,
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     staleTime: 1000 * 30,
   });
 };
@@ -24,6 +31,7 @@ export const useCreateBilling = () => {
   });
 };
 
+<<<<<<< HEAD
 export const useBillingValidation = (companyId?: string, purchaseId?: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['unit-billing-validation', companyId, purchaseId],
@@ -86,6 +94,8 @@ export const useCreateBillingHistory = () => {
   });
 };
 
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 export const useUpdateBilling = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -94,8 +104,11 @@ export const useUpdateBilling = () => {
       queryClient.invalidateQueries({ queryKey: ['unit-billings', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
+<<<<<<< HEAD
       queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     },
   });
 };

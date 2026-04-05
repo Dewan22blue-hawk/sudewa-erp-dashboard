@@ -4,6 +4,7 @@ import { ensureSuccess, LaravelApiResponse } from '@/lib/api/response';
 import { SalesApiModel, mapSalesDetailToUI, mapSalesToTableItem, mapSalesToUI } from '@/services/sales.mapper';
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
+<<<<<<< HEAD
 const fallbackBasePath = '/wapi/transaction/unit-transaction';
 
 type SalesItemApiModel = {
@@ -23,6 +24,8 @@ type SalesItemApiModel = {
     code?: string;
   };
 };
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 export type SalesPayload = {
   company_id: number;
@@ -50,6 +53,7 @@ const appendPayload = (form: FormData, payload: SalesPayload) => {
   form.append('stock_state', payload.stock_state);
 };
 
+<<<<<<< HEAD
 const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
   const params = new URLSearchParams();
   params.append('company_id', String(payload.company_id));
@@ -64,6 +68,8 @@ const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
   return params;
 };
 
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 const unwrapDetail = (payload: SalesApiModel | { data?: SalesApiModel }): SalesApiModel => {
   if ((payload as { data?: SalesApiModel })?.data) {
     return (payload as { data: SalesApiModel }).data;
@@ -71,6 +77,7 @@ const unwrapDetail = (payload: SalesApiModel | { data?: SalesApiModel }): SalesA
   return payload as SalesApiModel;
 };
 
+<<<<<<< HEAD
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
 
 const normalizeSalesRows = (rows: SalesItemApiModel[]): SalesApiModel[] => {
@@ -168,6 +175,22 @@ export const salesService = {
 
     return {
       data: rows.map(mapSalesToTableItem),
+=======
+export const salesService = {
+  async getSalesList() {
+    const response = await apiClient.get<LaravelApiResponse<LaravelPagination<SalesApiModel>>>(basePath, {
+      params: {
+        type: 'sales',
+        sort_order: 'asc',
+      },
+    });
+
+    const responseData = ensureSuccess(response.data);
+    const mappedData = (responseData.data ?? []).map(mapSalesToUI);
+
+    return {
+      data: (responseData.data ?? []).map(mapSalesToTableItem),
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       mappedData,
       meta: {
         currentPage: responseData.current_page ?? 1,
@@ -199,6 +222,7 @@ export const salesService = {
   },
 
   async updateSales(id: string, payload: SalesPayload) {
+<<<<<<< HEAD
     const params = toUrlEncodedPayload(payload);
 
     const response = await apiClient.put<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`, params, {
@@ -206,6 +230,12 @@ export const salesService = {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
+=======
+    const form = new FormData();
+    appendPayload(form, payload);
+
+    const response = await apiClient.put<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`, form);
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     const data = ensureSuccess(response.data);
     return unwrapDetail(data);
   },

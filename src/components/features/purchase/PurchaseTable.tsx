@@ -2,7 +2,11 @@ import { useMemo, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
+<<<<<<< HEAD
 import { ArrowDown, ArrowUp, MoreVertical, Plus, Search } from 'lucide-react';
+=======
+import { MoreVertical, Plus, Search } from 'lucide-react';
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -207,6 +211,7 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
         <Table>
           <TableHeader className="bg-[#f5f6f8]">
             <TableRow>
+<<<<<<< HEAD
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="KODE BELI" sortKey="code" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TANGGAL" sortKey="created_at" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="SUPPLIER" sortKey="supplier" /></TableHead>
@@ -218,6 +223,19 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL PPN" sortKey="transaction_ppn_total" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="STATUS STOK" sortKey="stock_state" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BILLING" sortKey="billing" /></TableHead>
+=======
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">KODE BELI</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TANGGAL</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">SUPPLIER</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">GUDANG</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL BRUTO</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BBN</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BIAYA LAIN</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL DPP</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">TOTAL PPN</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">STATUS STOK</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3">BILLING</TableHead>
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
               <TableHead className="text-right text-xs font-semibold uppercase text-slate-600 px-4 py-3">ACTION</TableHead>
             </TableRow>
           </TableHeader>
@@ -231,6 +249,7 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
             ) : (
               processedData.map((item) => (
                 <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
+<<<<<<< HEAD
                   {/* Kode Jual - Link biru */}
                   <TableCell className="px-4">
                     <button
@@ -240,6 +259,10 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                     >
                       {item.code || '-'}
                     </button>
+=======
+                  <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
+                    {item.code || '-'}
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                   </TableCell>
                   <TableCell className="text-slate-700 px-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
                   <TableCell className="text-slate-700 px-4">{item.supplier || '-'}</TableCell>

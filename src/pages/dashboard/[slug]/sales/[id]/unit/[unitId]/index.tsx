@@ -82,12 +82,23 @@ export default function SalesUnitDetailPage() {
 
   const requiredQty = Number(unitItem?.qty_total ?? 0);
 
+<<<<<<< HEAD
   const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
     const mappedFromItemDetails = (unitItem?.unit_transaction_item_details ?? []).map((detail) => ({
+=======
+  const salesItem = useMemo(() => {
+    const rows = salesData?.raw?.unit_transaction_items ?? [];
+    return rows.find((row) => String(row?.id ?? '') === String(selectedUnitId ?? ''));
+  }, [salesData?.raw?.unit_transaction_items, selectedUnitId]);
+
+  const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
+    return (salesItem?.unit_transaction_item_details ?? []).map((detail) => ({
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       id: toNumberId(detail?.id),
       color: String(detail?.color ?? '-'),
       machine_number: String(detail?.machine_number ?? '-'),
       chassis_number: String(detail?.chassis_number ?? '-'),
+<<<<<<< HEAD
       in_stock: detail?.in_stock,
     }));
 
@@ -118,6 +129,11 @@ export default function SalesUnitDetailPage() {
 
     return mappedFromItemDetails;
   }, [stockUnits, unitItem?.unit_transaction_item_details, unitItem?.unit_transaction_item_sales]);
+=======
+      in_stock: true,
+    }));
+  }, [salesItem?.unit_transaction_item_details]);
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
   const assignedIds = useMemo(() => {
     return assignedDetailRows.map((item) => item.id).filter((item) => item > 0);
@@ -159,13 +175,18 @@ export default function SalesUnitDetailPage() {
 
     return rows.every((item) => {
       const required = Number(item?.qty_total ?? 0);
+<<<<<<< HEAD
       const assigned = Math.max(item?.unit_transaction_item_details?.length ?? 0, item?.unit_transaction_item_sales?.length ?? 0);
+=======
+      const assigned = item?.unit_transaction_item_details?.length ?? 0;
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       return required > 0 && assigned >= required;
     });
   }, [salesData?.raw?.unit_transaction_items]);
 
   const selectedCount = selectedIds.size;
   const stockState = String(salesData?.raw?.stock_state ?? 'draft');
+<<<<<<< HEAD
   const hasPendingSelectionChanges = useMemo(() => {
     if (selectedIds.size !== assignedIds.length) return true;
 
@@ -179,6 +200,8 @@ export default function SalesUnitDetailPage() {
 
   const selectedFromSalesCount = Array.isArray(unitItem?.unit_transaction_item_sales) ? unitItem.unit_transaction_item_sales.length : 0;
   const selectedFromDetailCount = Array.isArray(unitItem?.unit_transaction_item_details) ? unitItem.unit_transaction_item_details.length : 0;
+=======
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
   const canAssignStock = requiredQty > 0 && selectedCount === requiredQty;
   const canMoveToOutbound = allItemsAssigned && stockState === 'draft';
@@ -274,7 +297,11 @@ export default function SalesUnitDetailPage() {
     }
 
     try {
+<<<<<<< HEAD
       await updateStateMutation.mutateAsync({ id: salesId, stockState: 'outbound_delivered' });
+=======
+      await updateStateMutation.mutateAsync({ id: salesId, state: 'outbound_delivered' });
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       toast.success('State transaksi berhasil diubah ke outbound_delivered');
     } catch (error: any) {
       toast.error(readApiError(error));
@@ -312,7 +339,11 @@ export default function SalesUnitDetailPage() {
         unitTransactionDetails: assignedIds,
       });
 
+<<<<<<< HEAD
       await updateStateMutation.mutateAsync({ id: salesId, stockState: 'completed' });
+=======
+      await updateStateMutation.mutateAsync({ id: salesId, state: 'completed' });
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       toast.success('Dispatch stock berhasil dan transaksi diselesaikan');
     } catch (error: any) {
       toast.error(readApiError(error));
@@ -402,12 +433,17 @@ export default function SalesUnitDetailPage() {
                 State: <span className="font-medium text-foreground">{stockState}</span>
               </span>
               <span className="text-muted-foreground">
+<<<<<<< HEAD
                 Assigned Tersimpan:{' '}
+=======
+                Assigned Item:{' '}
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                 <span className="font-medium text-foreground">
                   {assignedIds.length}/{requiredQty}
                 </span>
               </span>
               <span className="text-muted-foreground">
+<<<<<<< HEAD
                 Pilihan Saat Ini:{' '}
                 <span className="font-medium text-foreground">
                   {selectedCount}/{requiredQty}
@@ -427,6 +463,10 @@ export default function SalesUnitDetailPage() {
               {hasPendingSelectionChanges && (
                 <span className="text-amber-600">Ada perubahan pilihan yang belum di-assign. Klik tombol Assign Stock untuk menyimpan.</span>
               )}
+=======
+                Semua Item Assigned: <span className="font-medium text-foreground">{allItemsAssigned ? 'Ya' : 'Belum'}</span>
+              </span>
+>>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
             </div>
 
             <StockPickerTable
