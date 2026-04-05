@@ -1,16 +1,4 @@
-export type StockStatus =
-  | 'draft'
-  | 'cancel'
-  | 'rejected'
-  | 'prepare'
-  | 'inbound_purcase_order'
-  | 'inbound_incoming_goods'
-  | 'inbound_receipt'
-  | 'inbound_return'
-  | 'outbound_reserved'
-  | 'outbound_in_transit'
-  | 'outbound_delivered'
-  | 'outbound_return';
+export type StockStatus = 'in_transit' | 'available' | 'reserved';
 
 export interface StockUnit {
   id: string;
@@ -18,5 +6,7 @@ export interface StockUnit {
   warna: string;
   noMesin: string;
   noRangka: string;
+  supplier: string;
+  customer?: string | null;
   status: StockStatus;
 }

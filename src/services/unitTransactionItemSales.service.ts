@@ -8,7 +8,6 @@ type ItemSalesApiModel = {
   unit_transaction_details?: Array<number | string>;
 };
 
-<<<<<<< HEAD
 type UnitTransactionItemSalesRelationApiModel = {
   id?: string | number;
   unit_transaction_item_id?: string | number;
@@ -23,17 +22,10 @@ type UnitTransactionItemApiModel = {
   qty_total?: string | number;
   unit_transaction_item_details?: UnitTypeDetailApiModel[];
   unit_transaction_item_sales?: UnitTransactionItemSalesRelationApiModel[];
-=======
-type UnitTransactionItemApiModel = {
-  id?: string | number;
-  unit_type_id?: string | number;
-  qty_total?: string | number;
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 };
 
 type UnitTypeDetailApiModel = {
   id?: string | number;
-<<<<<<< HEAD
   unit_type?: {
     id?: string | number;
   };
@@ -41,16 +33,12 @@ type UnitTypeDetailApiModel = {
   unit_transaction_item_detail_id?: string | number;
   unit_type_detail_id?: string | number;
   detail_id?: string | number;
-=======
-  unit_transaction_detail_id?: string | number;
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   color?: string;
   warna?: string;
   machine_number?: string;
   no_mesin?: string;
   chassis_number?: string;
   no_rangka?: string;
-<<<<<<< HEAD
   stock_state?: string;
   status?: string;
   state?: string;
@@ -61,16 +49,11 @@ type UnitTypeDetailApiModel = {
   in_stock?: boolean | number | string;
   stock_available?: boolean | number | string;
   stock_forecast?: boolean | number | string;
-=======
-  is_available?: boolean | number | string;
-  in_stock?: boolean | number | string;
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 };
 
 type UnitTypeApiModel = {
   unit_type_details?: UnitTypeDetailApiModel[];
   unit_item_details?: UnitTypeDetailApiModel[];
-<<<<<<< HEAD
   unit_transaction_details?: UnitTypeDetailApiModel[];
   details?: UnitTypeDetailApiModel[];
   stock_units?: UnitTypeDetailApiModel[];
@@ -89,14 +72,6 @@ type UnitTypeApiModel = {
       details?: UnitTypeDetailApiModel[];
       stock_units?: UnitTypeDetailApiModel[];
       warehouse_stock_units?: UnitTypeDetailApiModel[];
-=======
-  data?: {
-    unit_type_details?: UnitTypeDetailApiModel[];
-    unit_item_details?: UnitTypeDetailApiModel[];
-    data?: {
-      unit_type_details?: UnitTypeDetailApiModel[];
-      unit_item_details?: UnitTypeDetailApiModel[];
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     };
   };
 };
@@ -110,20 +85,12 @@ type WarehouseActivityApiModel = {
   };
 };
 
-<<<<<<< HEAD
 const itemSalesBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item-sales';
 const itemSalesLegacyPath = '/wapi/transaction/unit-transaction-item-sales';
 const unitTransactionItemBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 const unitTransactionItemLegacyPath = '/wapi/transaction/unit-transaction-item';
 const unitTypeBasePath = '/wapi/master-data/unit-type';
 const warehouseUnitDetailsBasePath = '/wapi/warehouse/warehouse-get-unit-transaction-item-details';
-=======
-const itemSalesBasePath = '/wapi/transaction/unit-transaction-item-sales';
-const itemSalesLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item-sales';
-const unitTransactionItemBasePath = '/wapi/transaction/unit-transaction-item';
-const unitTransactionItemLegacyPath = '/wapi/transaction/unit-transaction/unit-transaction-item';
-const unitTypeBasePath = '/wapi/master-data/unit-type';
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 const warehouseActivityBasePath = '/wapi/transaction/warehouse-activity';
 const warehouseActivityLegacyPath = '/wapi/transaction/unit-transaction/warehouse-activity';
@@ -162,7 +129,6 @@ const toBool = (value: unknown): boolean => {
   return false;
 };
 
-<<<<<<< HEAD
 const looksLikeDetailRow = (item: any): boolean => {
   if (!item || typeof item !== 'object') return false;
 
@@ -255,20 +221,10 @@ const normalizeWarehouseItemDetails = (payload: any): UnitTypeDetailApiModel[] =
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.data)) return payload.data;
   if (Array.isArray(payload?.data?.data)) return payload.data.data;
-=======
-const normalizeUnitTypeDetails = (payload: any): UnitTypeDetailApiModel[] => {
-  if (Array.isArray(payload?.unit_type_details)) return payload.unit_type_details;
-  if (Array.isArray(payload?.unit_item_details)) return payload.unit_item_details;
-  if (Array.isArray(payload?.data?.unit_type_details)) return payload.data.unit_type_details;
-  if (Array.isArray(payload?.data?.unit_item_details)) return payload.data.unit_item_details;
-  if (Array.isArray(payload?.data?.data?.unit_type_details)) return payload.data.data.unit_type_details;
-  if (Array.isArray(payload?.data?.data?.unit_item_details)) return payload.data.data.unit_item_details;
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   return [];
 };
 
 const mapWarehouseStockUnit = (payload: UnitTypeDetailApiModel): WarehouseStockUnit => ({
-<<<<<<< HEAD
   id: toIdNumber(
     payload?.id ?? payload?.unit_transaction_detail_id ?? payload?.unit_transaction_item_detail_id ?? payload?.unit_type_detail_id ?? payload?.detail_id,
   ),
@@ -276,13 +232,6 @@ const mapWarehouseStockUnit = (payload: UnitTypeDetailApiModel): WarehouseStockU
   machine_number: String(payload?.machine_number ?? payload?.no_mesin ?? '-'),
   chassis_number: String(payload?.chassis_number ?? payload?.no_rangka ?? '-'),
   in_stock: isOnHandUnit(payload),
-=======
-  id: toIdNumber(payload?.id ?? payload?.unit_transaction_detail_id),
-  color: String(payload?.color ?? payload?.warna ?? '-'),
-  machine_number: String(payload?.machine_number ?? payload?.no_mesin ?? '-'),
-  chassis_number: String(payload?.chassis_number ?? payload?.no_rangka ?? '-'),
-  in_stock: toBool(payload?.is_available ?? payload?.in_stock),
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 });
 
 const appendUnitTransactionDetails = (form: FormData, ids: number[]) => {
@@ -299,7 +248,6 @@ const extractWarehouseActivityId = (payload: WarehouseActivityApiModel): string 
 
 const mapUnitItem = (payload: UnitTransactionItemApiModel) => ({
   id: toIdString(payload.id),
-<<<<<<< HEAD
   unit_transaction_id: toIdString(payload.unit_transaction_id),
   unit_type_id: toIdString(payload.unit_type_id),
   sparepart_id: payload.sparepart_id !== undefined && payload.sparepart_id !== null ? toIdString(payload.sparepart_id) : undefined,
@@ -331,17 +279,6 @@ export const unitTransactionItemSalesService = {
     const response = await withPathFallback(
       () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${unitTransactionItemBasePath}/${unitTransactionItemId}`),
       () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${unitTransactionItemLegacyPath}/${unitTransactionItemId}`),
-=======
-  unit_type_id: toIdString(payload.unit_type_id),
-  qty_total: toNumber(payload.qty_total),
-});
-
-export const unitTransactionItemSalesService = {
-  async getUnitItemById(unitTransactionItemId: string): Promise<{ id: string; unit_type_id: string; qty_total: number }> {
-    const response = await withPathFallback(
-      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${unitTransactionItemLegacyPath}/${unitTransactionItemId}`),
-      () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${unitTransactionItemBasePath}/${unitTransactionItemId}`),
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     );
 
     const payload = ensureSuccess(response.data);
@@ -349,22 +286,15 @@ export const unitTransactionItemSalesService = {
   },
 
   async getStockByUnitType(unitTypeId: string, companyId = '1'): Promise<WarehouseStockUnit[]> {
-<<<<<<< HEAD
     const response = await apiClient.get<LaravelApiResponse<any>>(`${warehouseUnitDetailsBasePath}/${companyId}`, {
       params: {
         per_page: 200,
         page: 1,
         unit_type_id: unitTypeId,
-=======
-    const response = await apiClient.get<LaravelApiResponse<UnitTypeApiModel>>(`${unitTypeBasePath}/${unitTypeId}`, {
-      params: {
-        company_id: companyId,
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       },
     });
 
     const payload = ensureSuccess(response.data);
-<<<<<<< HEAD
     const warehouseRows = normalizeWarehouseItemDetails(payload);
     const filteredByType = warehouseRows.filter((row) => {
       const rowTypeId = String(row?.unit_type?.id ?? '');
@@ -394,11 +324,6 @@ export const unitTransactionItemSalesService = {
     });
 
     return Array.from(deduped.values());
-=======
-    return normalizeUnitTypeDetails(payload)
-      .map(mapWarehouseStockUnit)
-      .filter((item) => item.id > 0);
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   },
 
   async assignStock(payload: { unitTransactionItemId: string; unitTransactionDetails: number[] }): Promise<UnitTransactionItemSalesAssignment> {

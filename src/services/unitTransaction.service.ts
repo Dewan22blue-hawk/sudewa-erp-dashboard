@@ -11,10 +11,7 @@ type UnitTransactionApiModel = {
   created_at?: string;
   stock_state?: string;
   max_capacity?: number | string;
-<<<<<<< HEAD
   unit_transaction_bruto_total?: string | number;
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   transaction_bruto_total?: string | number;
   transaction_dpp_total?: string | number;
   transaction_ppn_total?: string | number;
@@ -31,7 +28,6 @@ type UnitTransactionApiModel = {
   unit_transaction_item_total_dpp?: string | number;
   unit_transaction_item_total_ppn?: string | number;
   unit_transaction_item_bruto_total?: string | number;
-<<<<<<< HEAD
   unit_transaction_items?: Array<{
     id?: number | string;
     qty_total?: number | string;
@@ -43,15 +39,12 @@ type UnitTransactionApiModel = {
     expedition_fee?: number | string;
     other_fee?: number | string;
   }>;
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   unit_transaction_billing?: {
     is_paid?: boolean;
     payment_at?: string | null;
   } | null;
 };
 
-<<<<<<< HEAD
 type UnitTransactionItemListApiModel = {
   id?: number | string;
   unit_transaction_id?: number | string;
@@ -89,10 +82,6 @@ const itemBasePath = '/wapi/transaction/unit-transaction-item';
 const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 
 const listBasePaths = [fallbackBasePath, itemBasePath, basePath, itemLegacyBasePath];
-=======
-const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
-const fallbackBasePath = '/wapi/transaction/unit-transaction';
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 const withBaseFallback = async <T>(
   primary: (activeBasePath: string) => Promise<T>,
@@ -155,7 +144,6 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
 });
 
-<<<<<<< HEAD
 const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): UnitTransaction[] => {
   const grouped = new Map<string, UnitTransaction>();
 
@@ -392,26 +380,6 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
     unit_transaction_item_bruto_total: itemBruto,
   };
 };
-=======
-const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactionDetail => ({
-  id: String(item.id ?? ''),
-  code: item.code ?? '-',
-  created_at: item.created_at ?? '',
-  stock_state: item.stock_state ?? '-',
-  max_capacity: toNumber(item.max_capacity),
-  person: {
-    id: String(item.person?.id ?? item.person_id ?? ''),
-    name: item.person?.name ?? '-',
-  },
-  warehouse: {
-    id: String(item.warehouse?.id ?? item.warehouse_id ?? ''),
-    name: item.warehouse?.name ?? '-',
-  },
-  unit_transaction_item_total_dpp: toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
-  unit_transaction_item_total_ppn: toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
-  unit_transaction_item_bruto_total: toNumber(item.unit_transaction_item_bruto_total ?? item.transaction_bruto_total),
-});
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 export const unitTransactionService = {
   async getUnitTransactions(params: PaginationParams = {}): Promise<UnitTransactionResponse> {
@@ -419,7 +387,6 @@ export const unitTransactionService = {
       page: params.page ?? 1,
       per_page: params.perPage ?? 10,
       search: params.search || undefined,
-<<<<<<< HEAD
       sort_order: 'desc',
       type: 'purchase',
     };
@@ -464,41 +431,11 @@ export const unitTransactionService = {
   async getUnitTransactionDetail(id: string): Promise<UnitTransactionDetail> {
     const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${strictBasePath}/${id}`);
     const payload = ensureSuccess(response.data);
-=======
-      sort_order: 'asc',
-      type: 'purchase',
-    };
-
-    let payload: any;
-    try {
-      const response = await apiClient.get<LaravelApiResponse<any>>(basePath, { params: requestParams });
-      payload = ensureSuccess(response.data);
-    } catch (error) {
-      if (!shouldFallback(error)) throw error;
-      const response = await apiClient.get<LaravelApiResponse<any>>(fallbackBasePath, { params: requestParams });
-      payload = ensureSuccess(response.data);
-    }
-
-    return toPaginatedResult(payload, mapUnitTransaction);
-  },
-
-  async getUnitTransactionDetail(id: string): Promise<UnitTransactionDetail> {
-    let payload: UnitTransactionApiModel | { data?: UnitTransactionApiModel };
-    try {
-      const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${basePath}/${id}`);
-      payload = ensureSuccess(response.data);
-    } catch (error) {
-      if (!shouldFallback(error)) throw error;
-      const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${fallbackBasePath}/${id}`);
-      payload = ensureSuccess(response.data);
-    }
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
     const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);
   },
 
-<<<<<<< HEAD
   async updateUnitTransactionState(
     id: string,
     statePayload:
@@ -535,35 +472,6 @@ export const unitTransactionService = {
     const detailPayload =
       ((responsePayload as any)?.data ? ((responsePayload as any).data as UnitTransactionApiModel) : (responsePayload as UnitTransactionApiModel)) ??
       ({} as UnitTransactionApiModel);
-=======
-  async updateUnitTransactionState(id: string, state: string): Promise<UnitTransactionDetail> {
-    const form = new FormData();
-    form.append('state', state);
-    form.append('stock_state', state);
-
-    const payload = await withBaseFallback(
-      async (activeBasePath) => {
-        const response = await apiClient.put<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
-          `${activeBasePath}/${id}/update-state`,
-          form,
-        );
-        return ensureSuccess(response.data);
-      },
-      async (activeBasePath) => {
-        const fallbackForm = new FormData();
-        fallbackForm.append('state', state);
-        fallbackForm.append('stock_state', state);
-        fallbackForm.append('_method', 'PUT');
-        const response = await apiClient.post<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
-          `${activeBasePath}/${id}/update-state`,
-          fallbackForm,
-        );
-        return ensureSuccess(response.data);
-      },
-    );
-
-    const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     return mapUnitTransactionDetail(detailPayload);
   },
 };

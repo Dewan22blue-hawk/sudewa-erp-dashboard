@@ -99,11 +99,7 @@ function TransindoCustomerContent() {
     <>
       <div className="space-y-6">
         <div>
-<<<<<<< HEAD
           <h1 className="text-2xl font-semibold text-gray-900">Customer</h1>
-=======
-          <h1 className="text-2xl font-semibold text-gray-900">Customer asdasd</h1>
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
           <p className="text-sm text-gray-500 mt-1">Kelola data customer dengan mudah</p>
         </div>
 
@@ -268,22 +264,16 @@ function GeneralCustomerContent() {
     }
   };
 
-  const PanelName = function () {
-    return (
-      <div className="flex items-center justify-between" >
-        <div>
-          <h1 className="text-2xl font-semibold">Customer</h1>
-          <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-        </div>
-      </div >
-    )
-  }
-
   if (isLoading) {
     return (
       <>
         <div className="space-y-6">
-          <PanelName />
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Customer</h1>
+              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
+            </div>
+          </div>
           <Card className="rounded-xl p-6">
             <div className="text-center text-muted-foreground">Loading...</div>
           </Card>
@@ -296,7 +286,12 @@ function GeneralCustomerContent() {
     return (
       <>
         <div className="space-y-6">
-          <PanelName />
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Customer</h1>
+              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
+            </div>
+          </div>
           <Card className="rounded-xl p-6">
             <div className="text-center text-destructive">Gagal memuat data</div>
           </Card>
@@ -308,16 +303,12 @@ function GeneralCustomerContent() {
   return (
     <>
       <div className="space-y-6">
-<<<<<<< HEAD
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Customer</h1>
             <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
           </div>
         </div>
-=======
-        <PanelName />
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
         <LegacyCustomerTable customers={data?.data || []} onEdit={handleEditCustomer} onDelete={handleDeleteClick} onAdd={() => setCreateModalOpen(true)} />
       </div>

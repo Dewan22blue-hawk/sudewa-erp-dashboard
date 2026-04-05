@@ -9,13 +9,10 @@ interface Props {
 }
 
 export function SalesDetailCards({ data }: Props) {
-<<<<<<< HEAD
   const totalDppFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.dpp ?? 0), 0);
   const totalPpnFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.ppn ?? 0), 0);
   const totalDpp = totalDppFromItems > 0 ? totalDppFromItems : Number(data.totalDpp ?? 0);
   const totalPpn = totalPpnFromItems > 0 ? totalPpnFromItems : Number(data.totalPpn ?? 0);
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   const totalJual = Number(data.totalJual ?? 0);
   const totalPaidFromField = Number(data.totalBayar ?? 0);
   const totalPaidFromDiff = Math.max(0, totalJual - Number(data.kurangBayar ?? 0));

@@ -45,11 +45,8 @@ export interface UnitTransactionDetail {
   max_capacity?: number;
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
-<<<<<<< HEAD
   unit_transaction_bruto_total: number;
   unit_transaction_item_total_hpp: number;
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;

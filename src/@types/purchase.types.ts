@@ -71,7 +71,6 @@ export interface CreatePurchaseRequest {
   type: UnitTransactionType;
   max_capacity: string;
   stock_state: 'draft';
-<<<<<<< HEAD
   unit_type_id?: number;
   sparepart_id?: number;
   qty_total?: number;
@@ -79,8 +78,6 @@ export interface CreatePurchaseRequest {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 }
 
 export interface UpdatePurchaseRequest {

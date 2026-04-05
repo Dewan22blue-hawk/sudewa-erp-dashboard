@@ -1,18 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { getStockUnits } from '@/services/stock-unit.service';
-import type { PaginationParams } from '@/@types/pagination.types';
+import { getStockUnits, getStockUnitById } from '@/services/stock-unit.service';
 
-export const useStockUnits = (
-  companyId: number | string | null,
-  params: PaginationParams & {
-    stock_state?: string;
-    machine_number?: string;
-    chassis_number?: string;
-    color?: string;
-  },
-) =>
+export const useStockUnits = () =>
   useQuery({
-    queryKey: ['stock-unit', companyId, params],
-    queryFn: () => getStockUnits(companyId!, params),
-    enabled: !!companyId,
+    queryKey: ['stock-unit'],
+    queryFn: getStockUnits,
+  });
+
+export const useStockUnitDetail = (id: string) =>
+  useQuery({
+    queryKey: ['stock-unit', id],
+    queryFn: () => getStockUnitById(id),
+    enabled: !!id,
   });

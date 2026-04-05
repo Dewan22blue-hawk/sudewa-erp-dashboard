@@ -9,15 +9,10 @@ import { useCreatePurchase } from '@/hooks/usePurchase';
 import { ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
-<<<<<<< HEAD
-=======
-import { useCustomers } from '@/hooks/useCustomer';
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
-<<<<<<< HEAD
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -54,13 +49,6 @@ const getWarehouseRemainingCapacity = async (warehouseId: number): Promise<{ rem
 
   return { remaining, used, capacity };
 };
-=======
-import { CreatePurchaseRequest, UnitTransactionType } from '@/@types/purchase.types';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
 export default function CreatePurchasePage() {
   const router = useRouter();
@@ -68,24 +56,12 @@ export default function CreatePurchasePage() {
   const { companyId } = useCompany();
   const mutation = useCreatePurchase();
   const { data: supplierData } = useSuppliers(companyId || null);
-<<<<<<< HEAD
   const [personId, setPersonId] = useState('');
   const [warehouseId, setWarehouseId] = useState('1');
   const [maxCapacity, setMaxCapacity] = useState('90.0');
   const [supplierOpen, setSupplierOpen] = useState(false);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
-=======
-  const { data: customerData } = useCustomers(companyId || null);
-  const [personId, setPersonId] = useState('');
-  const [warehouseId, setWarehouseId] = useState('1');
-  const [transactionType, setTransactionType] = useState<UnitTransactionType>('purchase');
-  const [supplierOpen, setSupplierOpen] = useState(false);
-
-  const personOptions = useMemo(() => {
-    return transactionType === 'sales' ? customerData?.data ?? [] : supplierData?.data ?? [];
-  }, [transactionType, customerData, supplierData]);
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
   const selectedPerson = useMemo(() => {
     return personOptions.find((person) => String(person.id) === personId);
@@ -93,11 +69,7 @@ export default function CreatePurchasePage() {
 
   useEffect(() => {
     setPersonId('');
-<<<<<<< HEAD
   }, []);
-=======
-  }, [transactionType]);
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 
   const generatedCode = useMemo(() => {
     const now = new Date();
@@ -117,7 +89,6 @@ export default function CreatePurchasePage() {
       const warehouseNumeric = Number(warehouseId);
       const companyNumeric = Number(companyId);
       const qtyNumber = Number(data.qty ?? 0);
-<<<<<<< HEAD
       const maxCapacityNumber = Number(maxCapacity);
       const unitTypeIdNumber = Number(data.typeUnitId ?? 0);
       const priceNumber = Number(data.price ?? 0);
@@ -127,11 +98,6 @@ export default function CreatePurchasePage() {
 
       if (!personNumeric || personNumeric <= 0) {
         toast.error('Supplier wajib dipilih (person_id tidak boleh kosong)');
-=======
-
-      if (!personNumeric || personNumeric <= 0) {
-        toast.error(`${transactionType === 'sales' ? 'Customer' : 'Supplier'} wajib dipilih (person_id tidak boleh kosong)`);
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
         return;
       }
 
@@ -150,7 +116,6 @@ export default function CreatePurchasePage() {
         return;
       }
 
-<<<<<<< HEAD
       if (!maxCapacityNumber || Number.isNaN(maxCapacityNumber) || maxCapacityNumber <= 0) {
         toast.error('Max capacity wajib diisi dan lebih dari 0.');
         return;
@@ -169,14 +134,11 @@ export default function CreatePurchasePage() {
       // Non-blocking precheck: backend remains the source of truth for capacity validation.
       await getWarehouseRemainingCapacity(warehouseNumeric);
 
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       const payload: CreatePurchaseRequest = {
         warehouse_id: warehouseNumeric,
         person_id: personNumeric,
         company_id: companyNumeric,
         code: generatedCode,
-<<<<<<< HEAD
         type: 'purchase',
         max_capacity: String(maxCapacityNumber),
         stock_state: 'draft',
@@ -186,11 +148,6 @@ export default function CreatePurchasePage() {
         bbn_price: bbnNumber,
         expedition_fee: expeditionNumber,
         other_fee: otherFeeNumber,
-=======
-        type: transactionType,
-        max_capacity: qtyNumber.toFixed(2),
-        stock_state: 'draft',
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       };
 
       if (process.env.NODE_ENV !== 'production') {
@@ -273,11 +230,7 @@ export default function CreatePurchasePage() {
         <div className="rounded-xl border bg-white p-6 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="space-y-2">
-<<<<<<< HEAD
               <Label>Supplier</Label>
-=======
-              <Label>{transactionType === 'sales' ? 'Customer' : 'Supplier'}</Label>
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
               <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -287,25 +240,15 @@ export default function CreatePurchasePage() {
                     aria-controls="supplier-combobox-list"
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   >
-<<<<<<< HEAD
                     <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : 'Pilih supplier'}</span>
-=======
-                    <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : `Pilih ${transactionType === 'sales' ? 'customer' : 'supplier'}`}</span>
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-<<<<<<< HEAD
                     <CommandInput placeholder="Cari supplier..." />
                     <CommandList id="supplier-combobox-list">
                       <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
-=======
-                    <CommandInput placeholder={`Cari ${transactionType === 'sales' ? 'customer' : 'supplier'}...`} />
-                    <CommandList id="supplier-combobox-list">
-                      <CommandEmpty>{transactionType === 'sales' ? 'Customer' : 'Supplier'} tidak ditemukan.</CommandEmpty>
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                       <CommandGroup>
                         {personOptions.map((person) => (
                           <CommandItem
@@ -334,7 +277,6 @@ export default function CreatePurchasePage() {
 
             <div className="space-y-2">
               <Label>Tipe</Label>
-<<<<<<< HEAD
               <Input value="purchase" disabled readOnly />
             </div>
 
@@ -349,17 +291,6 @@ export default function CreatePurchasePage() {
                 onChange={(e) => setMaxCapacity(e.target.value)}
                 placeholder="Contoh: 90.0"
               />
-=======
-              <Select value={transactionType} onValueChange={(value) => setTransactionType(value as UnitTransactionType)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih tipe" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="purchase">purchase</SelectItem>
-                  <SelectItem value="sales">sales</SelectItem>
-                </SelectContent>
-              </Select>
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
             </div>
           </div>
 

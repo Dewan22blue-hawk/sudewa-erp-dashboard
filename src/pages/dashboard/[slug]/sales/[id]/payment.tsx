@@ -8,7 +8,6 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
-<<<<<<< HEAD
 import { useSalesDetail } from '@/hooks/useSales';
 import {
   useBillingValidation,
@@ -34,33 +33,22 @@ const readApiError = (error: any): string => {
     }
   };
 
-=======
-import { usePaymentData, useSubmitBilling } from '@/hooks/useSalesPayment';
-import { formatCurrency } from '@/lib/utils/currency';
-
-const readApiError = (error: any): string => {
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   const details = error?.details ?? error?.response?.data?.errors;
   if (typeof details === 'string' && details.trim()) return details;
 
   if (details && typeof details === 'object') {
     const text = Object.entries(details)
-<<<<<<< HEAD
       .map(([field, value]) => {
         if (Array.isArray(value)) {
           return `${field}: ${value.map((item) => stringifyDetail(item)).join(' | ')}`;
         }
         return `${field}: ${stringifyDetail(value)}`;
       })
-=======
-      .map(([field, value]) => `${field}: ${Array.isArray(value) ? value[0] : String(value)}`)
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
       .join(', ')
       .trim();
     if (text) return text;
   }
 
-<<<<<<< HEAD
   return error?.response?.data?.message || error?.message || 'Gagal menyimpan pembayaran.';
 };
 
@@ -167,9 +155,6 @@ const hasCompleteAssignmentsFromUnitItems = async (invalidItemIds: string[]): Pr
   );
 
   return checks.every((result) => result.status === 'fulfilled' && result.value === true);
-=======
-  return error?.message || 'Gagal menyimpan pembayaran.';
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
 };
 
 /**
@@ -180,7 +165,6 @@ export default function PaymentPage() {
   const { id } = router.query;
   const salesId = Array.isArray(id) ? id[0] : id;
   const { companyId } = useCompany();
-<<<<<<< HEAD
   const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
   const { refetch: revalidateAmount } = useBillingValidation(
     companyId ? String(companyId) : undefined,
@@ -209,22 +193,12 @@ export default function PaymentPage() {
   // bukan agregasi item detail yang bisa berbeda kontrak datanya.
   const totalTagihan = Number(existingBilling?.grand_total ?? salesData?.totalJual ?? 0);
 
-=======
-  const { salesData, billings, existingBilling, total, isLoading } = usePaymentData(salesId);
-  const submitBilling = useSubmitBilling();
-
-  // Billing harus mengikuti total transaksi utama (unit transaction),
-  // bukan agregasi item detail yang bisa berbeda kontrak datanya.
-  const totalTagihan = Number(salesData?.totalJual ?? (total > 0 ? total : 0));
-
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
   const [form, setForm] = useState({
     bca_idr: 0,
     bca_usd: 0,
     cash: 0,
     payment_date: '',
   });
-<<<<<<< HEAD
 
   useEffect(() => {
     setForm({
@@ -398,85 +372,6 @@ export default function PaymentPage() {
   };
 
   if (salesLoading || billingLoading || historyLoading || !salesData) {
-=======
-
-  useEffect(() => {
-    setForm({
-      bca_idr: Number(existingBilling?.bca_payment ?? 0),
-      bca_usd: Number(existingBilling?.bca_payment_2 ?? 0),
-      cash: Number(existingBilling?.cash_payment ?? 0),
-      payment_date: existingBilling?.payment_date ?? new Date().toISOString().slice(0, 10),
-    });
-  }, [existingBilling?.bca_payment, existingBilling?.bca_payment_2, existingBilling?.cash_payment, existingBilling?.payment_date]);
-
-  const totalBayar = useMemo(() => Number(form.bca_idr || 0) + Number(form.cash || 0) + Number(form.bca_usd || 0), [form.bca_idr, form.cash, form.bca_usd]);
-  const kurangBayar = useMemo(() => Math.max(0, totalTagihan - totalBayar), [totalTagihan, totalBayar]);
-  const isPaid = kurangBayar === 0 ? 1 : 0;
-
-  const parseNumericInput = (value: string) => {
-    if (!value) return 0;
-    const normalized = Number(value.replace(/[^\d]/g, ''));
-    return Number.isFinite(normalized) ? normalized : 0;
-  };
-
-  const formatNumberWithDot = (value: number) => {
-    return Number(value || 0).toLocaleString('id-ID');
-  };
-
-  const handleSubmit = async (data: any) => {
-    try {
-      if (!salesId) {
-        toast.error('Data penjualan tidak valid');
-        return;
-      }
-      if (!companyId) {
-        toast.error('Company belum dipilih');
-        return;
-      }
-
-      const bcaPayment = Number(data.paymentBca ?? 0);
-      const cashPayment = Number(data.paymentCash ?? 0);
-      const bcaPayment2 = Number(data.paymentBcaUsd ?? 0);
-
-      if (bcaPayment > totalTagihan) {
-        toast.error('Nominal BCA IDR tidak boleh melebihi total transaksi.');
-        return;
-      }
-
-      if (cashPayment > totalTagihan) {
-        toast.error('Nominal Cash tidak boleh melebihi total transaksi.');
-        return;
-      }
-
-      if (bcaPayment + cashPayment + bcaPayment2 > totalTagihan) {
-        toast.error('Total pembayaran tidak boleh melebihi total transaksi.');
-        return;
-      }
-
-      const result = await submitBilling.mutateAsync({
-        salesId: String(salesId),
-        companyId: String(companyId),
-        paymentBca: bcaPayment,
-        paymentCash: cashPayment,
-        paymentBcaUsd: bcaPayment2,
-        totalTagihan,
-        existingBillingId: existingBilling?.id,
-        billings,
-        paymentAt: new Date().toISOString().slice(0, 10),
-      });
-
-      toast.success(result.mode === 'update' ? 'Pembayaran berhasil diperbarui!' : 'Pembayaran berhasil disimpan!');
-      const slugQuery = router.query.slug;
-      const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-      const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
-      router.push(`${basePath}/${salesId}`);
-    } catch (error: any) {
-      toast.error(readApiError(error));
-    }
-  };
-
-  if (isLoading || !salesData) {
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
     return (
       <DashboardLayout>
         <div className="p-6">Loading data...</div>
@@ -526,13 +421,10 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-<<<<<<< HEAD
               {validationMessage && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">{validationMessage}</div>
               )}
 
-=======
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
               <div className="rounded-lg border">
                 <div className="border-b px-4 py-3">
                   <h3 className="text-sm font-semibold text-muted-foreground">Pembayaran</h3>
@@ -551,17 +443,10 @@ export default function PaymentPage() {
                   <div className="space-y-2">
                     <p className="text-sm font-medium">BCA USD</p>
                     <Input
-<<<<<<< HEAD
                       type="text"
                       inputMode="numeric"
                       placeholder="BCA USD"
                       value={formatNumberWithDot(form.bca_usd)}
-=======
-                      type="number"
-                      min={0}
-                      placeholder="BCA USD"
-                      value={form.bca_usd}
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                       onChange={(e) => setForm((prev) => ({ ...prev, bca_usd: parseNumericInput(e.target.value) }))}
                     />
                   </div>
@@ -593,11 +478,7 @@ export default function PaymentPage() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Total Bayar</p>
-<<<<<<< HEAD
                     <Input value={formatCurrency(totalPaid + totalBayarInput)} disabled />
-=======
-                    <Input value={formatCurrency(totalBayar)} disabled />
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Kurang Bayar</p>
@@ -620,7 +501,6 @@ export default function PaymentPage() {
                       paymentBcaUsd: form.bca_usd,
                     })
                   }
-<<<<<<< HEAD
                   disabled={isSubmitting || createBilling.isPending || createBillingHistory.isPending}
                 >
                   {isSubmitting || createBilling.isPending || createBillingHistory.isPending ? 'Menyimpan...' : 'Bayar'}
@@ -669,13 +549,6 @@ export default function PaymentPage() {
                   </Table>
                 </div>
               </div>
-=======
-                  disabled={submitBilling.isPending}
-                >
-                  {submitBilling.isPending ? 'Menyimpan...' : 'Bayar'}
-                </Button>
-              </div>
->>>>>>> e6a2b33f9467f195c084c3687a1b0cadbce99988
             </div>
           </CardContent>
         </Card>
