@@ -8,51 +8,102 @@ import { PenerimaanUnitDetail } from '@/@types/penerimaan-unit.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { useCompany } from '@/contexts/CompanyContext';
+import { usePenerimaanReceiptTable } from '@/hooks/usePenerimaanReceiptTable';
 
 interface Props {
-  data: PenerimaanUnitDetail[];
-  onTerima: (ids: string[]) => Promise<void>;
-  onDelete: (ids: string[]) => Promise<void>;
+  data?: PenerimaanUnitDetail[];
+  personId?: string;
+  onTerima: (ids: number[]) => Promise<void>;
+  onDelete: (ids: number[]) => Promise<void>;
 }
 
-export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: Props) {
+export default function PenerimaanUnitDetailTable({ data, personId, onTerima, onDelete }: Props) {
+  const { companyId } = useCompany();
   const [search, setSearch] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState('25');
+  const [receivedFilter, setReceivedFilter] = useState<'all' | 'received' | 'pending'>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [confirmDeleteIds, setConfirmDeleteIds] = useState<string[]>([]);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [confirmDeleteIds, setConfirmDeleteIds] = useState<number[]>([]);
+  const [receivedIds, setReceivedIds] = useState<number[]>([]);
+
+  const { rows, meta, isLoading, isError, error } = usePenerimaanReceiptTable(
+    {
+      companyId: companyId || '',
+      personId,
+      page: currentPage,
+      perPage: Number(itemsPerPage),
+      search,
+    },
+    Boolean(companyId),
+  );
+
+  const mappedFallback = useMemo(() => {
+    const source = data ?? [];
+    return source.map((item) => ({
+      id: item.id,
+      purchaseCode: item.noPembelian,
+      unitTypeName: item.tipeUnit,
+      color: item.warna,
+      machineNumber: item.noMesin,
+      chassisNumber: item.noRangka,
+      status: 'Belum Lunas' as const,
+      unitTransactionId: Number(item.penerimaanId || 0),
+      received: false,
+    }));
+  }, [data]);
+
+  const isFallbackMode = mappedFallback.length > 0;
+  const tableRows = isFallbackMode ? mappedFallback : rows;
+
+  useEffect(() => {
+    const serverReceivedIds = tableRows.filter((item) => item.received).map((item) => item.id);
+    setReceivedIds((prev) => Array.from(new Set([...prev, ...serverReceivedIds])));
+  }, [tableRows]);
+
+  const filteredRows = useMemo(() => {
+    if (receivedFilter === 'all') return tableRows;
+    return tableRows.filter((item) => (receivedFilter === 'received' ? receivedIds.includes(item.id) : !receivedIds.includes(item.id)));
+  }, [tableRows, receivedFilter, receivedIds]);
 
   useEffect(() => {
     setSelected([]);
-  }, [data]);
-
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return data.filter((item) => [item.noPembelian, item.tipeUnit, item.warna, item.noMesin, item.noRangka].some((field) => field.toLowerCase().includes(q)));
-  }, [data, search]);
+  }, [filteredRows]);
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: filtered,
+    data: filteredRows,
   });
 
   const perPage = Number(itemsPerPage);
-  const totalItems = sortedData.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
-  const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * perPage;
-  const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + perPage, totalItems);
-  const paginated = sortedData.slice(startIndex, startIndex + perPage);
+  const totalItems = isFallbackMode ? sortedData.length : meta.total || sortedData.length;
+  const totalPages = isFallbackMode ? Math.max(1, Math.ceil(totalItems / perPage)) : Math.max(1, meta.lastPage || 1);
+  const safeCurrentPage = isFallbackMode ? Math.min(currentPage, totalPages) : meta.currentPage;
+  const startIndex = totalItems === 0 ? 0 : (safeCurrentPage - 1) * (isFallbackMode ? perPage : meta.perPage);
+  const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + (isFallbackMode ? perPage : sortedData.length), totalItems);
+  const paginated = isFallbackMode ? sortedData.slice(startIndex, startIndex + perPage) : sortedData;
+  const receivedCount = useMemo(() => tableRows.filter((item) => receivedIds.includes(item.id)).length, [tableRows, receivedIds]);
+  const pendingCount = Math.max(0, tableRows.length - receivedCount);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [itemsPerPage, search]);
+  }, [itemsPerPage, search, receivedFilter]);
 
-  const toggleSelect = (id: string) => {
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const toggleSelect = (id: number) => {
+    if (receivedIds.includes(id)) return;
     setSelected((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
   };
 
   const toggleAll = () => {
     if (paginated.length === 0) return;
-    const allIds = paginated.map((d) => d.id);
+    const allIds = paginated.filter((d) => !receivedIds.includes(d.id)).map((d) => d.id);
+    if (allIds.length === 0) return;
     const isAllSelected = allIds.every((id) => selected.includes(id));
     setSelected((prev) => (isAllSelected ? prev.filter((id) => !allIds.includes(id)) : Array.from(new Set([...prev, ...allIds]))));
   };
@@ -60,6 +111,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
   const handleTerima = async () => {
     if (selected.length === 0) return;
     await onTerima(selected);
+    setReceivedIds((prev) => Array.from(new Set([...prev, ...selected])));
     setSelected([]);
   };
 
@@ -67,6 +119,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
     if (confirmDeleteIds.length === 0) return;
     await onDelete(confirmDeleteIds);
     setSelected((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
+    setReceivedIds((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
     setConfirmDeleteIds([]);
   };
 
@@ -107,11 +160,30 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
             </Select>
             <span>Page</span>
           </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <span>Filter</span>
+            <Select value={receivedFilter} onValueChange={(val) => setReceivedFilter(val as 'all' | 'received' | 'pending')}>
+              <SelectTrigger className="h-10 w-[180px] border-gray-200 rounded-lg">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Data</SelectItem>
+                <SelectItem value="pending">Belum Diterima</SelectItem>
+                <SelectItem value="received">Sudah Diterima</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <Button size="sm" className="h-10 px-5 bg-[#1FBE78] hover:bg-[#19ac6c] font-medium rounded-lg gap-2 text-white" onClick={handleTerima} disabled={selected.length === 0}>
-          <ArrowDown size={16} /> Terima
-        </Button>
+      </div>
+
+      {isLoading ? <div className="text-sm text-gray-500">Memuat data unit transaksi...</div> : null}
+      {isError ? <div className="text-sm text-red-500">{(error as { message?: string })?.message || 'Gagal memuat data unit transaksi'}</div> : null}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Diterima ke stock: {receivedCount}</span>
+        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">Belum diterima: {pendingCount}</span>
       </div>
 
       <div className="flex items-center justify-between min-h-[40px]">
@@ -120,9 +192,15 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
           <span>{selected.length} data terpilih</span>
         </div>
 
-        <Button size="sm" variant="outline" className="h-10 px-6 border-red-400 text-red-500 hover:bg-red-50 font-medium rounded-lg bg-white" onClick={() => setConfirmDeleteIds(selected)} disabled={selected.length === 0}>
-          Hapus
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" className="h-10 px-5 bg-[#1FBE78] hover:bg-[#19ac6c] font-medium rounded-lg gap-2 text-white" onClick={handleTerima} disabled={selected.length === 0}>
+            <ArrowDown size={16} /> Terima
+          </Button>
+
+          <Button size="sm" variant="outline" className="h-10 px-6 border-red-400 text-red-500 hover:bg-red-50 font-medium rounded-lg bg-white" onClick={() => setConfirmDeleteIds(selected)} disabled={selected.length === 0}>
+            Hapus
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -130,25 +208,31 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
           <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700">
             <tr>
               <th className="px-4 py-3 text-center w-[48px]">
-                <Checkbox checked={paginated.length > 0 && paginated.every((d) => selected.includes(d.id))} onCheckedChange={() => toggleAll()} />
+                <Checkbox
+                  checked={paginated.filter((d) => !receivedIds.includes(d.id)).length > 0 && paginated.filter((d) => !receivedIds.includes(d.id)).every((d) => selected.includes(d.id))}
+                  onCheckedChange={() => toggleAll()}
+                />
               </th>
               <th className="py-2 text-left">
                 <SortableHeader title="NO" sortKey="id" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="NO PEMBELIAN" sortKey="noPembelian" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
+                <SortableHeader title="NO PEMBELIAN" sortKey="purchaseCode" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="TIPE UNIT" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
+                <SortableHeader title="TIPE UNIT" sortKey="unitTypeName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="WARNA" sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
+                <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="NO MESIN" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
+                <SortableHeader title="NO MESIN" sortKey="machineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="NO RANGKA" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
+                <SortableHeader title="NO RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="STATUS" sortKey="status" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
               </th>
               <th className="px-4 py-3 text-center">Action</th>
             </tr>
@@ -159,14 +243,21 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
               paginated.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-center">
-                    <Checkbox checked={selected.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
+                    <Checkbox checked={selected.includes(item.id) || receivedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} disabled={receivedIds.includes(item.id)} />
                   </td>
                   <td className="px-4 py-3">{startIndex + index + 1}</td>
-                  <td className="px-4 py-3">{item.noPembelian}</td>
-                  <td className="px-4 py-3">{item.tipeUnit}</td>
-                  <td className="px-4 py-3">{item.warna}</td>
-                  <td className="px-4 py-3">{item.noMesin}</td>
-                  <td className="px-4 py-3">{item.noRangka}</td>
+                  <td className="px-4 py-3">{item.purchaseCode}</td>
+                  <td className="px-4 py-3">{item.unitTypeName}</td>
+                  <td className="px-4 py-3">{item.color}</td>
+                  <td className="px-4 py-3">{item.machineNumber}</td>
+                  <td className="px-4 py-3">{item.chassisNumber}</td>
+                  <td className="px-4 py-3">
+                    {receivedIds.includes(item.id) ? (
+                      <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Sudah Diterima</span>
+                    ) : (
+                      item.status
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     <Button variant="ghost" size="icon" onClick={() => setConfirmDeleteIds([item.id])}>
                       <Trash size={16} className="text-red-600" />
@@ -176,7 +267,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete }: 
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
                   Tidak ada data.
                 </td>
               </tr>

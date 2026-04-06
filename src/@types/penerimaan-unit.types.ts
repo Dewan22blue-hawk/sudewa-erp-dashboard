@@ -7,7 +7,7 @@ export interface PenerimaanUnit {
 }
 
 export interface PenerimaanUnitDetail {
-  id: string;
+  id: number;
   penerimaanId: string;
   noPembelian: string;
   tipeUnit: string;
@@ -15,4 +15,16 @@ export interface PenerimaanUnitDetail {
   noMesin: string;
   noRangka: string;
   diterima: boolean;
+}
+
+export interface TransformedReceiptUnitData {
+  id: number;
+  purchaseCode: string;
+  unitTypeName: string;
+  color: string;
+  machineNumber: string;
+  chassisNumber: string;
+  status: 'Lunas' | 'Belum Lunas';
+  unitTransactionId: number;
+  received: boolean;
 }
