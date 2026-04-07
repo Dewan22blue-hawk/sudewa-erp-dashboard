@@ -9,16 +9,46 @@ import { useCreatePurchase } from '@/hooks/usePurchase';
 import { ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
-import { useCustomers } from '@/hooks/useCustomer';
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
-import { CreatePurchaseRequest, UnitTransactionType } from '@/@types/purchase.types';
+import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { apiClient } from '@/lib/api/client';
+import { purchaseService } from '@/services/purchase.service';
+
+type WarehouseDataResponse = {
+  success?: boolean;
+  data?: {
+    capacity?: number | string;
+    unit_transactions?: {
+      data?: Array<{
+        max_capacity?: number | string;
+      }>;
+      total?: number;
+    };
+  };
+};
+
+const getWarehouseRemainingCapacity = async (warehouseId: number): Promise<{ remaining: number; used: number; capacity: number }> => {
+  const response = await apiClient.get<WarehouseDataResponse>(`/wapi/warehouse/warehouse-data/${warehouseId}`, {
+    params: {
+      per_page: 500,
+    },
+  });
+
+  const payload = response.data;
+  const capacity = Number(payload?.data?.capacity ?? 0);
+  const rows = payload?.data?.unit_transactions?.data ?? [];
+
+  const used = rows.reduce((acc, row) => acc + Number(row?.max_capacity ?? 0), 0);
+  const remaining = Math.max(0, capacity - used);
+
+  return { remaining, used, capacity };
+};
 
 export default function CreatePurchasePage() {
   const router = useRouter();
@@ -26,15 +56,12 @@ export default function CreatePurchasePage() {
   const { companyId } = useCompany();
   const mutation = useCreatePurchase();
   const { data: supplierData } = useSuppliers(companyId || null);
-  const { data: customerData } = useCustomers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [warehouseId, setWarehouseId] = useState('1');
-  const [transactionType, setTransactionType] = useState<UnitTransactionType>('purchase');
+  const [maxCapacity, setMaxCapacity] = useState('90.0');
   const [supplierOpen, setSupplierOpen] = useState(false);
 
-  const personOptions = useMemo(() => {
-    return transactionType === 'sales' ? customerData?.data ?? [] : supplierData?.data ?? [];
-  }, [transactionType, customerData, supplierData]);
+  const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
   const selectedPerson = useMemo(() => {
     return personOptions.find((person) => String(person.id) === personId);
@@ -42,7 +69,7 @@ export default function CreatePurchasePage() {
 
   useEffect(() => {
     setPersonId('');
-  }, [transactionType]);
+  }, []);
 
   const generatedCode = useMemo(() => {
     const now = new Date();
@@ -62,9 +89,15 @@ export default function CreatePurchasePage() {
       const warehouseNumeric = Number(warehouseId);
       const companyNumeric = Number(companyId);
       const qtyNumber = Number(data.qty ?? 0);
+      const maxCapacityNumber = Number(maxCapacity);
+      const unitTypeIdNumber = Number(data.typeUnitId ?? 0);
+      const priceNumber = Number(data.price ?? 0);
+      const bbnNumber = Number(data.biayaBBN ?? 0);
+      const expeditionNumber = Number(data.biayaEkspedisi ?? 0);
+      const otherFeeNumber = Number(data.biayaLain ?? 0);
 
       if (!personNumeric || personNumeric <= 0) {
-        toast.error(`${transactionType === 'sales' ? 'Customer' : 'Supplier'} wajib dipilih (person_id tidak boleh kosong)`);
+        toast.error('Supplier wajib dipilih (person_id tidak boleh kosong)');
         return;
       }
 
@@ -83,14 +116,38 @@ export default function CreatePurchasePage() {
         return;
       }
 
+      if (!maxCapacityNumber || Number.isNaN(maxCapacityNumber) || maxCapacityNumber <= 0) {
+        toast.error('Max capacity wajib diisi dan lebih dari 0.');
+        return;
+      }
+
+      if (maxCapacityNumber < qtyNumber) {
+        toast.error('Max capacity tidak boleh lebih kecil dari qty unit.');
+        return;
+      }
+
+      if (!unitTypeIdNumber || unitTypeIdNumber <= 0) {
+        toast.error('Tipe unit wajib dipilih sebelum menyimpan pembelian.');
+        return;
+      }
+
+      // Non-blocking precheck: backend remains the source of truth for capacity validation.
+      await getWarehouseRemainingCapacity(warehouseNumeric);
+
       const payload: CreatePurchaseRequest = {
         warehouse_id: warehouseNumeric,
         person_id: personNumeric,
         company_id: companyNumeric,
         code: generatedCode,
-        type: transactionType,
-        max_capacity: qtyNumber.toFixed(2),
+        type: 'purchase',
+        max_capacity: String(maxCapacityNumber),
         stock_state: 'draft',
+        unit_type_id: unitTypeIdNumber,
+        qty_total: qtyNumber,
+        price: priceNumber,
+        bbn_price: bbnNumber,
+        expedition_fee: expeditionNumber,
+        other_fee: otherFeeNumber,
       };
 
       if (process.env.NODE_ENV !== 'production') {
@@ -103,10 +160,36 @@ export default function CreatePurchasePage() {
       toast.success('Pembelian berhasil dibuat');
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
     } catch (err: any) {
+      const statusCode = err?.statusCode ?? err?.response?.status;
       const apiMessage = err?.message;
       const apiErrors = err?.details || err?.response?.data?.errors;
+
+      // Some backend deployments persist the transaction but return 405.
+      if (statusCode === 405 || String(apiMessage ?? '').toLowerCase().includes('method not allowed')) {
+        try {
+          const probe = await purchaseService.getPurchases(String(companyId), {
+            page: 1,
+            perPage: 20,
+            search: generatedCode,
+            withTotals: false,
+          });
+          const alreadyCreated = probe.data.find((item) => item.code === generatedCode);
+          if (alreadyCreated) {
+            toast.success('Pembelian berhasil dibuat');
+            router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
+            return;
+          }
+        } catch {
+          // Continue to normal error toast below.
+        }
+      }
+
       let detail = '';
       if (apiErrors && typeof apiErrors === 'object') {
+        if (Array.isArray((apiErrors as any).max_capacity)) {
+          toast.error('Kapasitas gudang tidak cukup. Gunakan Warehouse ID lain atau sesuaikan max capacity.');
+          return;
+        }
         const entries = Object.entries(apiErrors)
           .map(([k, v]) => {
             const msg = Array.isArray(v) ? v[0] : String(v);
@@ -147,7 +230,7 @@ export default function CreatePurchasePage() {
         <div className="rounded-xl border bg-white p-6 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="space-y-2">
-              <Label>{transactionType === 'sales' ? 'Customer' : 'Supplier'}</Label>
+              <Label>Supplier</Label>
               <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -157,15 +240,15 @@ export default function CreatePurchasePage() {
                     aria-controls="supplier-combobox-list"
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   >
-                    <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : `Pilih ${transactionType === 'sales' ? 'customer' : 'supplier'}`}</span>
+                    <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : 'Pilih supplier'}</span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder={`Cari ${transactionType === 'sales' ? 'customer' : 'supplier'}...`} />
+                    <CommandInput placeholder="Cari supplier..." />
                     <CommandList id="supplier-combobox-list">
-                      <CommandEmpty>{transactionType === 'sales' ? 'Customer' : 'Supplier'} tidak ditemukan.</CommandEmpty>
+                      <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
                       <CommandGroup>
                         {personOptions.map((person) => (
                           <CommandItem
@@ -194,15 +277,20 @@ export default function CreatePurchasePage() {
 
             <div className="space-y-2">
               <Label>Tipe</Label>
-              <Select value={transactionType} onValueChange={(value) => setTransactionType(value as UnitTransactionType)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih tipe" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="purchase">purchase</SelectItem>
-                  <SelectItem value="sales">sales</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input value="purchase" disabled readOnly />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="max-capacity">Max Capacity</Label>
+              <Input
+                id="max-capacity"
+                type="number"
+                min={1}
+                step="0.1"
+                value={maxCapacity}
+                onChange={(e) => setMaxCapacity(e.target.value)}
+                placeholder="Contoh: 90.0"
+              />
             </div>
           </div>
 

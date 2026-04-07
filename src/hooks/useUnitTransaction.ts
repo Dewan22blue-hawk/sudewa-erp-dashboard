@@ -5,6 +5,8 @@ export const useUnitTransactions = (options: { page?: number; perPage?: number; 
   return useQuery({
     queryKey: ['unit-transactions', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
     queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search }),
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });
 };
@@ -31,7 +33,19 @@ export const useUpdateUnitTransactionState = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, state }: { id: string; state: string }) => unitTransactionService.updateUnitTransactionState(id, state),
+    mutationFn: ({
+      id,
+      stockState,
+      unitTransactionDetails,
+    }: {
+      id: string;
+      stockState?: string;
+      unitTransactionDetails?: Array<string | number>;
+    }) =>
+      unitTransactionService.updateUnitTransactionState(id, {
+        stockState,
+        unitTransactionDetails,
+      }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.id] });

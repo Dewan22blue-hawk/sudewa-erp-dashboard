@@ -11,6 +11,7 @@ type UnitTransactionApiModel = {
   created_at?: string;
   stock_state?: string;
   max_capacity?: number | string;
+  unit_transaction_bruto_total?: string | number;
   transaction_bruto_total?: string | number;
   transaction_dpp_total?: string | number;
   transaction_ppn_total?: string | number;
@@ -27,14 +28,60 @@ type UnitTransactionApiModel = {
   unit_transaction_item_total_dpp?: string | number;
   unit_transaction_item_total_ppn?: string | number;
   unit_transaction_item_bruto_total?: string | number;
+  unit_transaction_items?: Array<{
+    id?: number | string;
+    qty_total?: number | string;
+    price?: number | string;
+    hpp_total_price?: number | string;
+    dpp_total_price?: number | string;
+    ppn_total_price?: number | string;
+    bbn_price?: number | string;
+    expedition_fee?: number | string;
+    other_fee?: number | string;
+  }>;
   unit_transaction_billing?: {
     is_paid?: boolean;
     payment_at?: string | null;
   } | null;
 };
 
+type UnitTransactionItemListApiModel = {
+  id?: number | string;
+  unit_transaction_id?: number | string;
+  qty_total?: number | string;
+  price?: number | string;
+  bbn_price?: number | string;
+  other_fee?: number | string;
+  dpp_per_unit_price?: number | string;
+  ppn_per_unit_price?: number | string;
+  dpp_total_price?: number | string;
+  ppn_total_price?: number | string;
+  created_at?: string;
+  unit_transaction?: {
+    id?: number | string;
+    person_id?: number | string;
+    warehouse_id?: number | string;
+    code?: string;
+    stock_state?: string;
+    created_at?: string;
+    person?: {
+      id?: number | string;
+      name?: string;
+    };
+    warehouse?: {
+      id?: number | string;
+      name?: string;
+    };
+  };
+};
+
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
 const fallbackBasePath = '/wapi/transaction/unit-transaction';
+const strictBasePath = '/wapi/transaction/unit-transaction/unit-transaction';
+const itemBasePath = '/wapi/transaction/unit-transaction-item';
+const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
+
+const listBasePaths = [fallbackBasePath, itemBasePath, basePath, itemLegacyBasePath];
 
 const withBaseFallback = async <T>(
   primary: (activeBasePath: string) => Promise<T>,
@@ -97,24 +144,242 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
 });
 
-const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactionDetail => ({
-  id: String(item.id ?? ''),
-  code: item.code ?? '-',
-  created_at: item.created_at ?? '',
-  stock_state: item.stock_state ?? '-',
-  max_capacity: toNumber(item.max_capacity),
-  person: {
-    id: String(item.person?.id ?? item.person_id ?? ''),
-    name: item.person?.name ?? '-',
-  },
-  warehouse: {
-    id: String(item.warehouse?.id ?? item.warehouse_id ?? ''),
-    name: item.warehouse?.name ?? '-',
-  },
-  unit_transaction_item_total_dpp: toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
-  unit_transaction_item_total_ppn: toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
-  unit_transaction_item_bruto_total: toNumber(item.unit_transaction_item_bruto_total ?? item.transaction_bruto_total),
-});
+const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): UnitTransaction[] => {
+  const grouped = new Map<string, UnitTransaction>();
+
+  rows.forEach((row) => {
+    const transactionId = String(row.unit_transaction_id ?? row.unit_transaction?.id ?? row.id ?? '');
+    if (!transactionId) return;
+
+    const qty = toNumber(row.qty_total || 0);
+    const brutoPerUnit = toNumber(row.price);
+    const dppPerUnit = toNumber(row.dpp_per_unit_price);
+    const ppnPerUnit = toNumber(row.ppn_per_unit_price);
+    const dppFallback = toNumber(row.dpp_total_price);
+    const ppnFallback = toNumber(row.ppn_total_price);
+    const bbnPerUnit = toNumber(row.bbn_price);
+    const otherFee = toNumber(row.other_fee);
+
+    const transactionBruto = brutoPerUnit * qty;
+    const transactionDpp = dppPerUnit > 0 ? dppPerUnit * qty : dppFallback;
+    const transactionPpn = ppnPerUnit > 0 ? ppnPerUnit * qty : ppnFallback;
+    const transactionBbn = bbnPerUnit * qty;
+
+    const existing = grouped.get(transactionId);
+    if (!existing) {
+      const personId = row.unit_transaction?.person_id;
+      const warehouseId = row.unit_transaction?.warehouse_id;
+
+      grouped.set(transactionId, {
+        id: transactionId,
+        code: row.unit_transaction?.code ?? '-',
+        created_at: row.unit_transaction?.created_at ?? row.created_at ?? '',
+        supplier: row.unit_transaction?.person?.name ?? (personId ? `Supplier #${personId}` : '-'),
+        warehouse: row.unit_transaction?.warehouse?.name ?? (warehouseId ? `Warehouse #${warehouseId}` : '-'),
+        transaction_bruto_total: transactionBruto,
+        transaction_dpp_total: transactionDpp,
+        transaction_ppn_total: transactionPpn,
+        transaction_bbn_total: transactionBbn,
+        transaction_other_fee: otherFee,
+        stock_state: row.unit_transaction?.stock_state ?? '-',
+        unit_transaction_billing: null,
+        isPaid: false,
+        paymentAt: null,
+      });
+      return;
+    }
+
+    existing.transaction_bruto_total += transactionBruto;
+    existing.transaction_dpp_total += transactionDpp;
+    existing.transaction_ppn_total += transactionPpn;
+    existing.transaction_bbn_total += transactionBbn;
+    existing.transaction_other_fee += otherFee;
+    if (existing.stock_state === '-' && row.unit_transaction?.stock_state) {
+      existing.stock_state = row.unit_transaction.stock_state;
+    }
+  });
+
+  return Array.from(grouped.values()).sort((a, b) => {
+    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return timeB - timeA;
+  });
+};
+
+const mapUnitTransactionsFromItems = (
+  rows: UnitTransactionItemListApiModel[],
+  params: { page?: number; perPage?: number; search?: string },
+): UnitTransactionResponse => {
+  const allTransactions = buildUnitTransactionFromRows(rows);
+
+  const normalizedSearch = String(params.search ?? '')
+    .trim()
+    .toLowerCase();
+
+  const filtered =
+    normalizedSearch.length === 0
+      ? allTransactions
+      : allTransactions.filter((item) =>
+          [item.code, item.supplier, item.warehouse, item.stock_state]
+            .map((value) => String(value ?? '').toLowerCase())
+            .some((value) => value.includes(normalizedSearch)),
+        );
+
+  const page = params.page ?? 1;
+  const perPage = params.perPage ?? 10;
+  const startIndex = (page - 1) * perPage;
+  const data = filtered.slice(startIndex, startIndex + perPage);
+  const total = filtered.length;
+  const lastPage = Math.max(1, Math.ceil(total / perPage));
+
+  return {
+    data,
+    meta: {
+      currentPage: page,
+      perPage,
+      total,
+      lastPage,
+    },
+  };
+};
+
+const fetchAllFallbackItemRows = async (
+  activePath: string,
+  params: { search?: string },
+): Promise<UnitTransactionItemListApiModel[]> => {
+  const perPage = 200;
+  const requestBaseParams = {
+    type: 'purchase',
+    sort_order: 'desc',
+    search: params.search || undefined,
+    per_page: perPage,
+  };
+
+  const firstResponse = await apiClient.get<LaravelApiResponse<any>>(activePath, {
+    params: {
+      ...requestBaseParams,
+      page: 1,
+    },
+  });
+  const firstPayload = ensureSuccess(firstResponse.data);
+  const firstRows: UnitTransactionItemListApiModel[] = Array.isArray(firstPayload?.data) ? firstPayload.data : [];
+
+  const lastPage = Number(firstPayload?.last_page ?? 1);
+  if (!Number.isFinite(lastPage) || lastPage <= 1) {
+    return firstRows;
+  }
+
+  const pageRequests: Array<Promise<UnitTransactionItemListApiModel[]>> = [];
+  for (let page = 2; page <= lastPage; page += 1) {
+    pageRequests.push(
+      apiClient
+        .get<LaravelApiResponse<any>>(activePath, {
+          params: {
+            ...requestBaseParams,
+            page,
+          },
+        })
+        .then((response) => {
+          const payload = ensureSuccess(response.data);
+          return Array.isArray(payload?.data) ? (payload.data as UnitTransactionItemListApiModel[]) : [];
+        })
+        .catch(() => []),
+    );
+  }
+
+  const restRows = await Promise.all(pageRequests);
+  return [...firstRows, ...restRows.flat()];
+};
+
+const enrichTransactionsFromDetail = async (items: UnitTransaction[]): Promise<UnitTransaction[]> => {
+  const enriched = await Promise.all(
+    items.map(async (item) => {
+      try {
+        const payload = await withBaseFallback(
+          async (activeBasePath) => {
+            const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${activeBasePath}/${item.id}`);
+            return ensureSuccess(response.data);
+          },
+          async (activeBasePath) => {
+            const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${activeBasePath}/${item.id}`);
+            return ensureSuccess(response.data);
+          },
+        );
+
+        const detailPayload =
+          ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ??
+          ({} as UnitTransactionApiModel);
+
+        const supplierName = detailPayload.person?.name ?? (detailPayload.person_id ? `Supplier #${detailPayload.person_id}` : item.supplier);
+        const warehouseName = detailPayload.warehouse?.name ?? (detailPayload.warehouse_id ? `Warehouse #${detailPayload.warehouse_id}` : item.warehouse);
+
+        return {
+          ...item,
+          supplier: supplierName,
+          warehouse: warehouseName,
+          stock_state: detailPayload.stock_state ?? item.stock_state,
+        };
+      } catch {
+        return item;
+      }
+    }),
+  );
+
+  return enriched;
+};
+
+const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactionDetail => {
+  const itemRows = item.unit_transaction_items ?? [];
+
+  const totalsFromItems = itemRows.reduce(
+    (acc, row) => {
+      const qty = toNumber(row.qty_total);
+      const hpp = toNumber(row.hpp_total_price);
+      const dpp = toNumber(row.dpp_total_price);
+      const ppn = toNumber(row.ppn_total_price);
+
+      const hppFallback = toNumber(row.price) * qty;
+      const itemBruto = hpp + ppn + toNumber(row.bbn_price) + toNumber(row.expedition_fee) + toNumber(row.other_fee);
+
+      return {
+        hpp: acc.hpp + (hpp > 0 ? hpp : hppFallback),
+        dpp: acc.dpp + dpp,
+        ppn: acc.ppn + ppn,
+        bruto: acc.bruto + (itemBruto > 0 ? itemBruto : hppFallback),
+      };
+    },
+    { hpp: 0, dpp: 0, ppn: 0, bruto: 0 },
+  );
+
+  const mainBruto =
+    toNumber(item.unit_transaction_bruto_total ?? item.unit_transaction_item_bruto_total ?? item.transaction_bruto_total) || totalsFromItems.bruto;
+  const itemBruto =
+    toNumber(item.unit_transaction_item_bruto_total ?? item.unit_transaction_bruto_total ?? item.transaction_bruto_total) || totalsFromItems.bruto;
+  const itemHpp = totalsFromItems.hpp;
+  const itemDpp = totalsFromItems.dpp;
+  const itemPpn = totalsFromItems.ppn;
+
+  return {
+    id: String(item.id ?? ''),
+    code: item.code ?? '-',
+    created_at: item.created_at ?? '',
+    stock_state: item.stock_state ?? '-',
+    max_capacity: toNumber(item.max_capacity),
+    person: {
+      id: String(item.person?.id ?? item.person_id ?? ''),
+      name: item.person?.name ?? '-',
+    },
+    warehouse: {
+      id: String(item.warehouse?.id ?? item.warehouse_id ?? ''),
+      name: item.warehouse?.name ?? '-',
+    },
+    unit_transaction_bruto_total: mainBruto,
+    unit_transaction_item_total_hpp: itemHpp,
+    unit_transaction_item_total_dpp: itemDpp || toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
+    unit_transaction_item_total_ppn: itemPpn || toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
+    unit_transaction_item_bruto_total: itemBruto,
+  };
+};
 
 export const unitTransactionService = {
   async getUnitTransactions(params: PaginationParams = {}): Promise<UnitTransactionResponse> {
@@ -122,65 +387,91 @@ export const unitTransactionService = {
       page: params.page ?? 1,
       per_page: params.perPage ?? 10,
       search: params.search || undefined,
-      sort_order: 'asc',
+      sort_order: 'desc',
       type: 'purchase',
     };
 
-    let payload: any;
-    try {
-      const response = await apiClient.get<LaravelApiResponse<any>>(basePath, { params: requestParams });
-      payload = ensureSuccess(response.data);
-    } catch (error) {
-      if (!shouldFallback(error)) throw error;
-      const response = await apiClient.get<LaravelApiResponse<any>>(fallbackBasePath, { params: requestParams });
-      payload = ensureSuccess(response.data);
+    for (const path of listBasePaths) {
+      try {
+        const response = await apiClient.get<LaravelApiResponse<any>>(path, { params: requestParams });
+        const payload = ensureSuccess(response.data);
+
+        // `/unit-transaction-item` returns line-items, so we aggregate by transaction.
+        if (path.includes('unit-transaction-item')) {
+          const rows = await fetchAllFallbackItemRows(path, { search: params.search });
+          const normalized = mapUnitTransactionsFromItems(rows, {
+            page: params.page,
+            perPage: params.perPage,
+            search: params.search,
+          });
+          const enrichedData = await enrichTransactionsFromDetail(normalized.data);
+          return {
+            ...normalized,
+            data: enrichedData,
+          };
+        }
+
+        return toPaginatedResult(payload, mapUnitTransaction);
+      } catch (error) {
+        if (!shouldFallback(error)) throw error;
+      }
     }
 
-    return toPaginatedResult(payload, mapUnitTransaction);
+    return {
+      data: [],
+      meta: {
+        currentPage: 1,
+        perPage: params.perPage ?? 10,
+        total: 0,
+        lastPage: 1,
+      },
+    };
   },
 
   async getUnitTransactionDetail(id: string): Promise<UnitTransactionDetail> {
-    let payload: UnitTransactionApiModel | { data?: UnitTransactionApiModel };
-    try {
-      const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${basePath}/${id}`);
-      payload = ensureSuccess(response.data);
-    } catch (error) {
-      if (!shouldFallback(error)) throw error;
-      const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${fallbackBasePath}/${id}`);
-      payload = ensureSuccess(response.data);
-    }
+    const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${strictBasePath}/${id}`);
+    const payload = ensureSuccess(response.data);
 
     const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);
   },
 
-  async updateUnitTransactionState(id: string, state: string): Promise<UnitTransactionDetail> {
-    const form = new FormData();
-    form.append('state', state);
-    form.append('stock_state', state);
+  async updateUnitTransactionState(
+    id: string,
+    statePayload:
+      | string
+      | {
+          stockState?: string;
+          unitTransactionDetails?: Array<string | number>;
+        },
+  ): Promise<UnitTransactionDetail> {
+    const normalizedStockState = typeof statePayload === 'string' ? statePayload : statePayload.stockState ?? '';
+    const normalizedDetails =
+      typeof statePayload === 'string'
+        ? []
+        : (statePayload.unitTransactionDetails ?? []).map((item) => String(item)).filter((item) => item.length > 0);
 
-    const payload = await withBaseFallback(
-      async (activeBasePath) => {
-        const response = await apiClient.put<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
-          `${activeBasePath}/${id}/update-state`,
-          form,
-        );
-        return ensureSuccess(response.data);
-      },
-      async (activeBasePath) => {
-        const fallbackForm = new FormData();
-        fallbackForm.append('state', state);
-        fallbackForm.append('stock_state', state);
-        fallbackForm.append('_method', 'PUT');
-        const response = await apiClient.post<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
-          `${activeBasePath}/${id}/update-state`,
-          fallbackForm,
-        );
-        return ensureSuccess(response.data);
+    const body = new URLSearchParams();
+    if (normalizedStockState) body.append('stock_state', normalizedStockState);
+    if (normalizedDetails.length > 0) {
+      normalizedDetails.forEach((item) => body.append('unit_transaction_details[]', item));
+      body.append('unit_transaction_details', JSON.stringify(normalizedDetails));
+    }
+
+    const response = await apiClient.put<LaravelApiResponse<UnitTransactionApiModel | { data?: UnitTransactionApiModel }>>(
+      `${strictBasePath}/${id}/update-state`,
+      body,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       },
     );
+    const responsePayload = ensureSuccess(response.data);
 
-    const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
+    const detailPayload =
+      ((responsePayload as any)?.data ? ((responsePayload as any).data as UnitTransactionApiModel) : (responsePayload as UnitTransactionApiModel)) ??
+      ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);
   },
 };
