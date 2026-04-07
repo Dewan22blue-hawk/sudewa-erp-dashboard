@@ -1,19 +1,86 @@
-export interface PengeluaranUnit {
-    id: string
-    noPengeluaran: string
-    tanggal: string
-    customer: string
-    supplier?: string
-    keterangan?: string
+import { PaginationMeta } from '@/@types/pagination.types';
+
+export type WarehouseActivityType = 'issue' | 'receipt';
+export type SortDirection = 'asc' | 'desc';
+export type DispatchStatusFilter = 'all' | 'pending' | 'issued';
+
+export interface WarehouseOption {
+  id: number;
+  name: string;
 }
 
-export interface PengeluaranUnitDetail {
-    id: string
-    pengeluaranId: string
-    kodeJual: string
-    tipeUnit: string
-    warna: string
-    noMesin: string
-    noRangka: string
-    dikirim: boolean
+export interface PersonOption {
+  id: number;
+  name: string;
+}
+
+export interface PengeluaranUnit {
+  id: number;
+  uuid: string;
+  personId: number;
+  warehouseId: number;
+  activityNumber: string;
+  activityType: WarehouseActivityType;
+  activityDate: string;
+  description: string | null;
+  createdAt: string;
+  warehouse: WarehouseOption | null;
+  person: PersonOption | null;
+}
+
+export interface DispatchUnitTableRow {
+  id: number;
+  salesCode: string;
+  unitTypeName: string;
+  color: string;
+  machineNumber: string;
+  chassisNumber: string;
+  stockState: string;
+  inStock: boolean | null;
+  isDispatched: boolean;
+  warehouseId: number;
+  unitTransactionItemDetailId: number;
+}
+
+export interface DispatchUnitTableParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  warehouseId?: number;
+}
+
+export interface DispatchUnitTableResult {
+  data: DispatchUnitTableRow[];
+  meta: PaginationMeta;
+}
+
+export interface PengeluaranUnitListParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  sortBy?: string;
+  sortDirection?: SortDirection;
+}
+
+export interface PengeluaranUnitListResult {
+  data: PengeluaranUnit[];
+  meta: PaginationMeta;
+}
+
+export interface SavePengeluaranUnitPayload {
+  personId: number;
+  warehouseId: number;
+  activityDate: string;
+  description?: string;
+}
+
+export interface PengeluaranUnitFormValues {
+  personId: number;
+  warehouseId: number;
+  activityDate: Date;
+  description: string;
+}
+
+export interface ApiFieldErrors {
+  [key: string]: string[];
 }
