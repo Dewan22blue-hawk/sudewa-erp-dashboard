@@ -97,12 +97,12 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/finance/transaksi-kas-harian'),
         },
         {
-          label: 'Data PPN Penjualan',
-          href: base('/finance/data-ppn-penjualan'),
-        },
-        {
           label: 'Data PPN Pembelian',
           href: base('/finance/data-ppn-pembelian'),
+        },
+                {
+          label: 'Data PPN Penjualan',
+          href: base('/finance/data-ppn-penjualan'),
         },
         {
           label: 'Data Refund Pembelian',
@@ -125,7 +125,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/finance/data-piutang'),
         },
         {
-          label: 'Data Pembayaran Piutang',
+          label: 'Data Terima Piutang',
           href: base('/finance/data-penerimaan-piutang'),
         },
       ],

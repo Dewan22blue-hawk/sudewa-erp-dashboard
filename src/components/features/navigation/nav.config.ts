@@ -114,12 +114,12 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           href: base('/finance/transaksi-kas-harian'),
         },
         {
-          label: 'Data PPN Penjualan',
-          href: base('/finance/data-ppn-penjualan'),
-        },
-        {
           label: 'Data PPN Pembelian',
           href: base('/finance/data-ppn-pembelian'),
+        },
+        {
+          label: 'Data PPN Penjualan',
+          href: base('/finance/data-ppn-penjualan'),
         },
         {
           label: 'Data Refund Pembelian',
