@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useKasHarian } from '@/hooks/useKasHarian';
 import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
-import KasHarianSummary from '@/components/features/kas-harian/KasHarianSummary';
+// import KasHarianSummary from '@/components/features/kas-harian/KasHarianSummary';
 import AddKasHarianDialog from '@/components/features/kas-harian/AddKasHarianDialog';
 import EditKasHarianDialog from '@/components/features/kas-harian/EditKasHarianDialog';
 import DeleteKasHarianDialog from '@/components/features/kas-harian/DeleteKasHarianDialog';
@@ -54,7 +54,7 @@ export default function KasHarianPage() {
           </Button>
         </div>
 
-        <KasHarianSummary data={filteredData} />
+       {/* <KasHarianSummary data={filteredData} /> */}
 
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-4">
