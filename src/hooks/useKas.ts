@@ -12,7 +12,9 @@ export function useKas(companyId?: string | number) {
   return useQuery({
     queryKey: kasKeys.list(companyId),
     queryFn: () => getKas(companyId),
-    enabled: !!companyId, // Prevent query if companyId is missing
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }
 
