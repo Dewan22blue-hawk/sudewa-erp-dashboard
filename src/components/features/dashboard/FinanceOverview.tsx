@@ -7,6 +7,7 @@ import { Banknote, CreditCard } from 'lucide-react';
 interface FinanceOverviewProps {
   accounts: AccountOverview[];
   isLoading?: boolean;
+  isError?: boolean;
 }
 
 type PaletteKey = 'cash' | 'USD' | 'IDR';
@@ -61,7 +62,7 @@ function SkeletonCard() {
   return <Skeleton className="h-[210px] rounded-2xl" />;
 }
 
-export function FinanceOverview({ accounts, isLoading }: FinanceOverviewProps) {
+export function FinanceOverview({ accounts, isLoading, isError }: FinanceOverviewProps) {
   if (isLoading) {
     return (
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -72,7 +73,26 @@ export function FinanceOverview({ accounts, isLoading }: FinanceOverviewProps) {
     );
   }
 
-  if (!accounts?.length) return null;
+  if (isError) {
+    return (
+      <Card className="rounded-2xl border border-red-200 bg-red-50 p-6 flex flex-col items-center justify-center min-h-[210px]">
+        <p className="text-red-600 font-medium text-center">Gagal memuat overview keuangan</p>
+        <p className="text-red-500 text-sm mt-1 text-center">Silakan refresh halaman untuk mencoba lagi</p>
+      </Card>
+    );
+  }
+
+  if (!accounts?.length) {
+    return (
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, idx) => (
+          <Card key={idx} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col items-center justify-center min-h-[210px] text-slate-500">
+            <p className="font-medium">Data Belum Tersedia</p>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
