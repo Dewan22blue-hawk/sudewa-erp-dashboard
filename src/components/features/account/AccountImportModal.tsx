@@ -1,0 +1,29 @@
+'use client';
+
+import { DataImportModal } from '../master-data/DataImportModal';
+import { useImportAccount } from '@/hooks/useAccount';
+
+interface Props {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    companyId: string | number;
+}
+
+export function AccountImportModal({ open, onOpenChange, companyId }: Props) {
+    const mutation = useImportAccount();
+
+    const handleImport = async (file: File) => {
+        await mutation.mutateAsync({ companyId, file });
+    };
+
+    return (
+        <DataImportModal
+            open={open}
+            onOpenChange={onOpenChange}
+            title="Import Data Akun"
+            description="Unggah file .xlsx untuk mengimport data akun."
+            onImport={handleImport}
+            isPending={mutation.isPending}
+        />
+    );
+}

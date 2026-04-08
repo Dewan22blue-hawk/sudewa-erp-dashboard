@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AccountPayload } from '@/@types/account.types';
 import type { PaginationParams } from '@/@types/pagination.types';
-import { createAccount, deleteAccount, getAccountById, getAccountHierarchy, getAccounts, updateAccount } from '@/services/account.service';
+import { createAccount, deleteAccount, getAccountById, getAccountHierarchy, getAccounts, importAccount, updateAccount } from '@/services/account.service';
 
 export const useAccounts = (params: PaginationParams & { search?: string; enabled?: boolean }) => {
   const { enabled = true, ...rest } = params;
@@ -64,3 +64,16 @@ export const useDeleteAccount = () => {
     },
   });
 };
+
+export const useImportAccount = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importAccount(companyId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account-hierarchy'] });
+    },
+  });
+};
+

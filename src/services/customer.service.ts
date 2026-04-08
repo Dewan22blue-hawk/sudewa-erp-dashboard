@@ -146,3 +146,19 @@ export const deleteCustomer = async (id: number | string): Promise<void> => {
     throw new ApiResponseError(payload.message ?? 'Failed to delete customer');
   }
 };
+
+export const importCustomer = async (companyId: string | number, file: File): Promise<void> => {
+  const body = new FormData();
+  body.append('file', file);
+
+  const response = await apiClient.post(`${basePath}/${companyId}/import`, body, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const payload = response.data as LaravelApiResponse<null>;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to import customer');
+  }
+};

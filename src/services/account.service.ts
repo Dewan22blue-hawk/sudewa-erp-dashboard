@@ -139,3 +139,19 @@ export const getAccountHierarchy = async (): Promise<Account[]> => {
   const { data } = await getAccounts({ page: 1, perPage: 1000 });
   return data;
 };
+
+export const importAccount = async (companyId: string | number, file: File): Promise<void> => {
+  const body = new FormData();
+  body.append('file', file);
+
+  const response = await apiClient.post(`${basePath}/${companyId}/import`, body, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const payload = response.data as LaravelApiResponse<null>;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to import account');
+  }
+};

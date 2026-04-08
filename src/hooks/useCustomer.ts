@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getCustomers, createCustomer, updateCustomer, deleteCustomer } from '@/services/customer.service';
+import { getCustomers, createCustomer, updateCustomer, deleteCustomer, importCustomer } from '@/services/customer.service';
 import { CustomerPayload } from '@/@types/customer.types';
 
 // Hooks
@@ -47,3 +47,15 @@ export function useDeleteCustomer() {
     },
   });
 }
+
+export function useImportCustomer() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importCustomer(companyId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    },
+  });
+}
+
