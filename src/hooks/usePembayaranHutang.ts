@@ -1,36 +1,51 @@
-import { useState, useEffect } from 'react';
-import { PembayaranHutang } from '@/types/pembayaran-hutang.types';
-import { PembayaranHutangService } from '@/services/pembayaran-hutang.service';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { liabilityService } from '@/services/liability.service';
+import type { CreateLiabilityPaymentPayload } from '@/types/pembayaran-hutang.types';
 
-export const usePembayaranHutang = () => {
-  const [data, setData] = useState<PembayaranHutang[]>([]);
-  const [loading, setLoading] = useState(true);
+type LiabilityListOptions = {
+  page?: number;
+  perPage?: number;
+  search?: string;
+};
 
-  useEffect(() => {
-    // Simulate API delay
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // In real app, await API call
-        const result = PembayaranHutangService.getAll();
-        setData(result);
-      } catch (error) {
-        console.error('Failed to fetch pembayaran hutang:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+export const usePembayaranHutang = (options: LiabilityListOptions = {}) => {
+  return useQuery({
+    queryKey: ['liability-list', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
+    queryFn: () => liabilityService.getList({ page: options.page, per_page: options.perPage, search: options.search }),
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previous) => previous,
+  });
+};
 
-    fetchData();
-  }, []);
+export const usePembayaranHutangDetail = (id?: number) => {
+  return useQuery({
+    queryKey: ['liability-detail', id],
+    queryFn: () => liabilityService.getDetail(id as number),
+    enabled: typeof id === 'number' && Number.isFinite(id),
+    staleTime: 1000 * 60 * 5,
+  });
+};
 
-  const deletePembayaranHutang = (id: string) => {
-    const success = PembayaranHutangService.deleteById(id);
-    if (success) {
-      setData((prev) => prev.filter((item) => item.id !== id));
-    }
-    return success;
-  };
+export const useDeletePembayaranHutang = () => {
+  const queryClient = useQueryClient();
 
-  return { data, loading, deletePembayaranHutang };
+  return useMutation({
+    mutationFn: (id: number) => liabilityService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liability-list'] });
+      queryClient.invalidateQueries({ queryKey: ['liability-detail'] });
+    },
+  });
+};
+
+export const useCreatePembayaranHutangPayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateLiabilityPaymentPayload | FormData) => liabilityService.createPayment(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liability-list'] });
+      queryClient.invalidateQueries({ queryKey: ['liability-detail'] });
+    },
+  });
 };
