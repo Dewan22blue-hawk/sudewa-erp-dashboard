@@ -1,51 +1,42 @@
-import { useState, useEffect } from "react"
-import { PenerimaanPiutang, PenerimaanPiutangDetail } from "@/@types/penerimaan-piutang.types"
-import { PenerimaanPiutangService } from "@/services/penerimaan-piutang.service"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { liabilityService } from '@/services/liability.service';
+import type { CreatePenerimaanPiutangPaymentPayload } from '@/@types/penerimaan-piutang.types';
 
-export const usePenerimaanPiutang = () => {
-    const [data, setData] = useState<PenerimaanPiutang[]>([])
-    const [loading, setLoading] = useState(true)
+type PenerimaanPiutangListOptions = {
+    page?: number;
+    perPage?: number;
+    search?: string;
+};
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            try {
-                const result = PenerimaanPiutangService.getAll()
-                setData(result)
-            } catch (error) {
-                console.error("Failed to fetch penerimaan piutang:", error)
-            } finally {
-                setLoading(false)
-            }
-        }
+export const usePenerimaanPiutang = (options: PenerimaanPiutangListOptions = {}) => {
+    return useQuery({
+        queryKey: ['sales-liability-list', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
+        queryFn: () => liabilityService.getList({ type: 'sales', page: options.page, per_page: options.perPage, search: options.search }),
+        staleTime: 1000 * 60 * 5,
+        placeholderData: (previous) => previous,
+    });
+};
 
-        fetchData()
-    }, [])
+export const useDeletePenerimaanPiutang = () => {
+    const queryClient = useQueryClient();
 
-    return { data, loading }
-}
+    return useMutation({
+        mutationFn: (id: number) => liabilityService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['sales-liability-list'] });
+            queryClient.invalidateQueries({ queryKey: ['sales-liability-detail'] });
+        },
+    });
+};
 
-export const usePenerimaanPiutangDetail = (id: string) => {
-    const [data, setData] = useState<PenerimaanPiutangDetail | null>(null)
-    const [loading, setLoading] = useState(false)
+export const useCreatePenerimaanPiutangPayment = () => {
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        if (!id) return
-
-        const fetchData = async () => {
-            setLoading(true)
-            try {
-                const result = PenerimaanPiutangService.getById(id)
-                setData(result)
-            } catch (error) {
-                console.error("Failed to fetch detail:", error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchData()
-    }, [id])
-
-    return { data, loading }
-}
+    return useMutation({
+        mutationFn: (payload: CreatePenerimaanPiutangPaymentPayload | FormData) => liabilityService.createPayment(payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['sales-liability-list'] });
+            queryClient.invalidateQueries({ queryKey: ['sales-liability-detail'] });
+        },
+    });
+};
