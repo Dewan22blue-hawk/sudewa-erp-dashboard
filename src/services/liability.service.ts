@@ -14,6 +14,7 @@ type LiabilityListApiModel = {
   code?: string;
   date?: string;
   supplier_name?: string;
+  customer_name?: string;
   grand_total?: string | number;
   total_paid?: string | number;
   remaining_payment?: string | number;
@@ -86,7 +87,7 @@ const mapListItem = (item: LiabilityListApiModel): LiabilityListItem => ({
   id: toNumber(item.id),
   code: String(item.code ?? ''),
   date: String(item.date ?? ''),
-  supplier_name: String(item.supplier_name ?? ''),
+  supplier_name: String(item.supplier_name ?? item.customer_name ?? ''),
   grand_total: toNumber(item.grand_total),
   total_paid: toNumber(item.total_paid),
   remaining_payment: toNumber(item.remaining_payment),
@@ -142,14 +143,14 @@ const buildFormData = (payload: CreateLiabilityPaymentPayload): FormData => {
 };
 
 export const liabilityService = {
-  async getList(params: { page?: number; per_page?: number; search?: string } = {}): Promise<{
+  async getList(params: { type?: 'purchase' | 'sales'; page?: number; per_page?: number; search?: string } = {}): Promise<{
     data: LiabilityListItem[];
     meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
   }> {
     const response = await apiClient.get<LaravelApiResponse<LiabilityListResponse>>(basePath, {
       params: {
         liability_status: 'unpaid',
-        type: 'purchase',
+        type: params.type ?? 'purchase',
         page: params.page ?? 1,
         per_page: params.per_page ?? 10,
         ...(params.search ? { search: params.search } : {}),

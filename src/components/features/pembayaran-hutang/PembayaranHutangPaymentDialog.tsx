@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { z } from 'zod';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Paperclip, Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,53 +14,39 @@ import { useCreatePembayaranHutangPayment } from '@/hooks/usePembayaranHutang';
 import type { CreateLiabilityPaymentPayload } from '@/types/pembayaran-hutang.types';
 
 type FormValues = {
-  cash_payment_amount: string;
-  bca_payment_amount: string;
-  bca_payment_usd_amount: string;
-  payment_at: string;
-  note: string;
-  payment_proof: FileList | null;
+  cash_payment_amount?: string;
+  bca_payment_amount?: string;
+  bca_payment_usd_amount?: string;
+  payment_at?: string;
+  note?: string;
+  payment_proof?: FileList | null;
 };
 
 const currentDate = () => new Date().toISOString().slice(0, 10);
 
-const createSchema = (remainingPayment: number) =>
-  z
-    .object({
-      cash_payment_amount: z.string().trim().default(''),
-      bca_payment_amount: z.string().trim().default(''),
-      bca_payment_usd_amount: z.string().trim().default(''),
-      payment_at: z.string().optional().default(''),
-      note: z.string().optional().default(''),
-      payment_proof: z.any().optional().nullable(),
-    })
-    .superRefine((values, context) => {
-      const cashAmount = Number(values.cash_payment_amount || 0);
-      const bcaAmount = Number(values.bca_payment_amount || 0);
-      const usdAmount = Number(values.bca_payment_usd_amount || 0);
-      const primaryPayment = cashAmount + bcaAmount;
-      const totalPayment = primaryPayment + usdAmount;
+const formatIdrInput = (value: string) => {
+  const digits = value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  if (!digits) return '';
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
 
-      if (!Number.isFinite(cashAmount) || cashAmount < 0) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'Nominal cash tidak valid', path: ['cash_payment_amount'] });
-      }
+const parseMoneyInput = (value: string) => {
+  const normalized = value.replace(/\D/g, '');
+  if (!normalized) return 0;
 
-      if (!Number.isFinite(bcaAmount) || bcaAmount < 0) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'Nominal BCA tidak valid', path: ['bca_payment_amount'] });
-      }
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? amount : Number.NaN;
+};
 
-      if (!Number.isFinite(usdAmount) || usdAmount < 0) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'Nominal USD tidak valid', path: ['bca_payment_usd_amount'] });
-      }
-
-      if (primaryPayment <= 0) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'Minimal isi cash atau BCA lebih dari 0', path: ['cash_payment_amount'] });
-      }
-
-      if (remainingPayment > 0 && totalPayment > remainingPayment) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'Total pembayaran tidak boleh melebihi sisa hutang', path: ['cash_payment_amount'] });
-      }
-    });
+const createSchema = () =>
+  z.object({
+    cash_payment_amount: z.string().trim().optional().default(''),
+    bca_payment_amount: z.string().trim().optional().default(''),
+    bca_payment_usd_amount: z.string().trim().optional().default(''),
+    payment_at: z.string().trim().optional().default(''),
+    note: z.string().trim().optional().default(''),
+    payment_proof: z.any().optional().nullable().default(null),
+  });
 
 interface Props {
   open: boolean;
@@ -72,7 +58,7 @@ interface Props {
 
 export default function PembayaranHutangPaymentDialog({ open, onOpenChange, billingId, remainingPayment, code }: Props) {
   const mutation = useCreatePembayaranHutangPayment();
-  const schema = useMemo(() => createSchema(remainingPayment), [remainingPayment]);
+  const schema = useMemo(() => createSchema(), []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -102,11 +88,44 @@ export default function PembayaranHutangPaymentDialog({ open, onOpenChange, bill
   const handleSubmit = async (values: FormValues) => {
     if (!billingId) return;
 
+    form.clearErrors();
+
+    const cashAmount = parseMoneyInput(values.cash_payment_amount || '');
+    const bcaAmount = parseMoneyInput(values.bca_payment_amount || '');
+    const usdAmount = parseMoneyInput(values.bca_payment_usd_amount || '');
+    const primaryPayment = cashAmount + bcaAmount;
+    const totalPayment = primaryPayment + usdAmount;
+
+    if (!Number.isFinite(cashAmount) || cashAmount < 0) {
+      form.setError('cash_payment_amount', { type: 'manual', message: 'Nominal cash tidak valid' });
+      return;
+    }
+
+    if (!Number.isFinite(bcaAmount) || bcaAmount < 0) {
+      form.setError('bca_payment_amount', { type: 'manual', message: 'Nominal BCA tidak valid' });
+      return;
+    }
+
+    if (!Number.isFinite(usdAmount) || usdAmount < 0) {
+      form.setError('bca_payment_usd_amount', { type: 'manual', message: 'Nominal USD tidak valid' });
+      return;
+    }
+
+    if (primaryPayment <= 0) {
+      form.setError('cash_payment_amount', { type: 'manual', message: 'Minimal isi cash atau BCA lebih dari 0' });
+      return;
+    }
+
+    if (remainingPayment > 0 && totalPayment > remainingPayment) {
+      form.setError('cash_payment_amount', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa hutang' });
+      return;
+    }
+
     const payload: CreateLiabilityPaymentPayload = {
       unit_transaction_billing_id: billingId,
-      cash_payment_amount: values.cash_payment_amount || 0,
-      bca_payment_amount: values.bca_payment_amount || 0,
-      bca_payment_usd_amount: values.bca_payment_usd_amount || 0,
+      cash_payment_amount: cashAmount,
+      bca_payment_amount: bcaAmount,
+      bca_payment_usd_amount: usdAmount,
       payment_at: values.payment_at || undefined,
       note: values.note || undefined,
       payment_proof: values.payment_proof?.[0] ?? null,
@@ -139,20 +158,68 @@ export default function PembayaranHutangPaymentDialog({ open, onOpenChange, bill
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium">Cash Payment</label>
-              <Input type="number" min="0" step="0.01" placeholder="0" {...form.register('cash_payment_amount')} disabled={isBusy} />
+              <Controller
+                control={form.control}
+                name="cash_payment_amount"
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={field.value ?? ''}
+                    onChange={(event) => {
+                      field.onChange(formatIdrInput(event.target.value));
+                      form.clearErrors('cash_payment_amount');
+                    }}
+                    disabled={isBusy}
+                  />
+                )}
+              />
               {form.formState.errors.cash_payment_amount && <p className="text-xs text-destructive">{form.formState.errors.cash_payment_amount.message}</p>}
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">BCA Payment</label>
-              <Input type="number" min="0" step="0.01" placeholder="0" {...form.register('bca_payment_amount')} disabled={isBusy} />
+              <Controller
+                control={form.control}
+                name="bca_payment_amount"
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={field.value ?? ''}
+                    onChange={(event) => {
+                      field.onChange(formatIdrInput(event.target.value));
+                      form.clearErrors('cash_payment_amount');
+                    }}
+                    disabled={isBusy}
+                  />
+                )}
+              />
               {form.formState.errors.bca_payment_amount && <p className="text-xs text-destructive">{form.formState.errors.bca_payment_amount.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium">BCA Payment USD</label>
-            <Input type="number" min="0" step="0.01" placeholder="0" {...form.register('bca_payment_usd_amount')} disabled={isBusy} />
+            <Controller
+              control={form.control}
+              name="bca_payment_usd_amount"
+              render={({ field }) => (
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={field.value ?? ''}
+                  onChange={(event) => {
+                    field.onChange(formatIdrInput(event.target.value));
+                    form.clearErrors('cash_payment_amount');
+                  }}
+                  disabled={isBusy}
+                />
+              )}
+            />
             {form.formState.errors.bca_payment_usd_amount && <p className="text-xs text-destructive">{form.formState.errors.bca_payment_usd_amount.message}</p>}
           </div>
 

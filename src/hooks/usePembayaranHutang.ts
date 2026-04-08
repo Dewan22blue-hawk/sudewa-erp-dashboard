@@ -34,6 +34,8 @@ export const useDeletePembayaranHutang = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liability-list'] });
       queryClient.invalidateQueries({ queryKey: ['liability-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-liability-list'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-liability-detail'] });
     },
   });
 };
@@ -46,6 +48,8 @@ export const useCreatePembayaranHutangPayment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liability-list'] });
       queryClient.invalidateQueries({ queryKey: ['liability-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-liability-list'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-liability-detail'] });
     },
   });
 };

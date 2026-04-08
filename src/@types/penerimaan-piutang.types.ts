@@ -1,19 +1,6 @@
-export interface PenerimaanPiutang {
-    id: string
-    kodeTerima: string
-    kodeJual: string
-    tanggalTerima: string
-    kasMasuk: string
-    jumlahTerima: number
-}
+import type { CreateLiabilityPaymentPayload, LiabilityDetail, LiabilityListItem, LiabilityListResult } from '@/types/pembayaran-hutang.types';
 
-export interface PenerimaanPiutangDetail {
-    id: string
-    kodeJual: string
-    tanggal: string
-    customer: string
-    totalJual: number
-    totalTerima: number
-    totalPiutang: number
-    payments: PenerimaanPiutang[]
-}
+export type PenerimaanPiutang = LiabilityListItem;
+export type PenerimaanPiutangListResult = LiabilityListResult;
+export type PenerimaanPiutangDetail = LiabilityDetail;
+export type CreatePenerimaanPiutangPaymentPayload = CreateLiabilityPaymentPayload;
