@@ -59,7 +59,7 @@ export default function DetailPenerimaanPiutangPage() {
       return {
         id: history.id,
         kodeTerima: detail.code,
-        tanggal: history.payment_at,
+        tanggal: history.payment_at || history.created_at,
         kasMasuk: buildKasMasukLabel(cashAmount, bcaAmount, usdAmount),
         jumlahTerima: cashAmount + bcaAmount + usdAmount,
       };
@@ -99,7 +99,7 @@ export default function DetailPenerimaanPiutangPage() {
 
   const isLoading = query.isLoading || router.isFallback;
   const errorMessage = query.error instanceof Error ? query.error.message : query.error ? 'Gagal memuat detail penerimaan piutang' : null;
-  const infoDate = paymentRows[0]?.tanggal ?? '';
+  const infoDate = detail?.date || paymentRows[0]?.tanggal || '';
   const paymentPercentage =
     detail && detail.billing_summary.grand_total > 0
       ? Math.min(100, Math.round((detail.billing_summary.total_paid / detail.billing_summary.grand_total) * 100))
@@ -153,7 +153,7 @@ export default function DetailPenerimaanPiutangPage() {
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                     <CreditCard className="h-4 w-4" />
                   </span>
-                  <p className="text-sm font-medium text-gray-600">Informasi Pembayaran Hutang</p>
+                  <p className="text-sm font-medium text-gray-600">Informasi Piutang</p>
                 </div>
 
                 <div className="space-y-3 text-sm text-gray-700">
@@ -184,23 +184,23 @@ export default function DetailPenerimaanPiutangPage() {
 
                 <div className="space-y-2 text-sm text-gray-700">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-500">Total Beli</span>
+                    <span className="text-gray-500">Total Piutang</span>
                     <span className="font-medium text-gray-900">{formatCurrency(detail.billing_summary.grand_total)}</span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-500">Total Bayar</span>
-                    <span className="font-medium text-gray-900">{formatCurrency(detail.billing_summary.total_paid)}</span>
+                    <span className="text-gray-500">Total Diterima</span>
+                    <span className="font-medium text-emerald-600">{formatCurrency(detail.billing_summary.total_paid)}</span>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-500">Total Hutang</span>
-                    <span className="font-medium text-gray-900">{formatCurrency(detail.billing_summary.remaining_payment)}</span>
+                    <span className="text-gray-500">Sisa Piutang</span>
+                    <span className="font-medium text-orange-600">{formatCurrency(detail.billing_summary.remaining_payment)}</span>
                   </div>
                 </div>
 
                 <div className="mt-4 border-t pt-4">
                   <div className="mb-2 flex items-center justify-between gap-4 text-sm">
                     <span className="text-gray-700">Kurang Bayar</span>
-                    <span className="font-medium text-red-500">{formatCurrency(detail.billing_summary.remaining_payment)}</span>
+                    <span className="font-medium text-orange-500">{formatCurrency(detail.billing_summary.remaining_payment)}</span>
                   </div>
                   <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
                     <div className="h-full rounded-full bg-emerald-500" style={{ width: `${paymentPercentage}%` }} />

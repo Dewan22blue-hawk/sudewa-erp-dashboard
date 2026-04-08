@@ -47,6 +47,7 @@ export interface LiabilityUnitItem {
 export interface LiabilityDetail {
     id: number;
     code: string;
+    date: string;
     person: {
         id: number;
         name: string;

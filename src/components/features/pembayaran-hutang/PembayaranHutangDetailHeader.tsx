@@ -11,13 +11,16 @@ interface Props {
   data: LiabilityDetail;
   onAddPayment: () => void;
   addPaymentDisabled?: boolean;
+  backHref?: string;
 }
 
-export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPaymentDisabled }: Props) {
+export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPaymentDisabled, backHref }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const summary = data.billing_summary;
   const percentage = Math.max(0, Math.min(100, summary.paid_percentage));
+  const defaultBackHref = slug ? `/dashboard/${slug}/finance/data-pembayaran-hutang` : '/dashboard';
+  const resolvedBackHref = backHref ?? defaultBackHref;
 
   return (
     <div className="space-y-6">
@@ -25,7 +28,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
             <Button variant="ghost" size="sm" asChild className="px-0 text-gray-500 hover:bg-transparent hover:text-gray-900">
-              <Link href={slug ? `/dashboard/${slug}/finance/data-pembayaran-hutang` : '/dashboard'}>
+              <Link href={resolvedBackHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Kembali
               </Link>

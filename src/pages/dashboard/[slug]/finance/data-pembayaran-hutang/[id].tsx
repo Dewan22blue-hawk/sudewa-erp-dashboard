@@ -118,6 +118,7 @@ export default function PembayaranHutangDetailPage() {
             data={detail}
             onAddPayment={() => setPaymentDialogOpen(true)}
             addPaymentDisabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0}
+            backHref={typeof router.query.slug === 'string' ? `/dashboard/${router.query.slug}/finance/data-pembayaran-hutang` : '/dashboard'}
           />
 
           <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">

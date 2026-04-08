@@ -29,6 +29,7 @@ type LiabilityListResponse = LaravelPagination<LiabilityListApiModel> & {
 type LiabilityDetailApiModel = {
   id?: string | number;
   code?: string;
+  date?: string;
   person?: {
     id?: string | number;
     name?: string;
@@ -143,6 +144,64 @@ const buildFormData = (payload: CreateLiabilityPaymentPayload): FormData => {
 };
 
 export const liabilityService = {
+  async getAllReceivables(params: { page?: number; per_page?: number; search?: string } = {}): Promise<{
+    data: LiabilityListItem[];
+    meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
+  }> {
+    const response = await apiClient.get<LaravelApiResponse<LiabilityListResponse>>(basePath, {
+      params: {
+        type: 'sales',
+        page: params.page ?? 1,
+        per_page: params.per_page ?? 10,
+        ...(params.search ? { search: params.search } : {}),
+      },
+    });
+
+    const payload = ensureSuccess(response.data);
+    const paginated = toPaginatedResult(payload, mapListItem);
+
+    return {
+      data: paginated.data,
+      meta: {
+        currentPage: paginated.meta.currentPage,
+        perPage: paginated.meta.perPage,
+        total: paginated.meta.total,
+        lastPage: paginated.meta.lastPage,
+        from: payload.from ?? null,
+        to: payload.to ?? null,
+      },
+    };
+  },
+
+  async getAllLiabilities(params: { page?: number; per_page?: number; search?: string } = {}): Promise<{
+    data: LiabilityListItem[];
+    meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
+  }> {
+    const response = await apiClient.get<LaravelApiResponse<LiabilityListResponse>>(basePath, {
+      params: {
+        type: 'purchase',
+        page: params.page ?? 1,
+        per_page: params.per_page ?? 10,
+        ...(params.search ? { search: params.search } : {}),
+      },
+    });
+
+    const payload = ensureSuccess(response.data);
+    const paginated = toPaginatedResult(payload, mapListItem);
+
+    return {
+      data: paginated.data,
+      meta: {
+        currentPage: paginated.meta.currentPage,
+        perPage: paginated.meta.perPage,
+        total: paginated.meta.total,
+        lastPage: paginated.meta.lastPage,
+        from: payload.from ?? null,
+        to: payload.to ?? null,
+      },
+    };
+  },
+
   async getList(params: { type?: 'purchase' | 'sales'; page?: number; per_page?: number; search?: string } = {}): Promise<{
     data: LiabilityListItem[];
     meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
@@ -181,6 +240,7 @@ export const liabilityService = {
     return {
       id: toNumber(detail.id),
       code: String(detail.code ?? ''),
+      date: String(detail.date ?? ''),
       person: {
         id: toNumber(detail.person?.id),
         name: String(detail.person?.name ?? ''),
