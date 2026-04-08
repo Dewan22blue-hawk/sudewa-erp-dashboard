@@ -33,7 +33,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data: typeUnits,
-    defaultSortKey: 'code',
+    defaultSortKey: 'createdAt',
+    defaultSortOrder: 'desc',
   });
 
   return (
@@ -85,10 +86,10 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 <SortableHeader title="TIPE UNIT" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
-                <SortableHeader title="HARGA BELI" sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+                <SortableHeader title="HARGA BELI" sortKey="buyPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
-                <SortableHeader title="HARGA JUAL" sortKey="salePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+                <SortableHeader title="HARGA JUAL" sortKey="sellPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[120px]">
                 <SortableHeader title="JENIS" sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
@@ -124,8 +125,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <TableCell className="font-medium text-slate-800 uppercase pl-4 py-4">{item.code}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="font-medium text-slate-800 uppercase py-4">{item.name}</TableCell>
-                  <TableCell className="text-slate-700 uppercase py-4">{(item as any).purchasePrice ? formatCurrency(Number((item as any).purchasePrice)) : '-'}</TableCell>
-                  <TableCell className="text-slate-700 uppercase py-4">{(item as any).salePrice ? formatCurrency(Number((item as any).salePrice)) : '-'}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.buyPrice !== null && item.buyPrice !== undefined ? formatCurrency(item.buyPrice) : '-'}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.sellPrice !== null && item.sellPrice !== undefined ? formatCurrency(item.sellPrice) : '-'}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.unitType || '-'}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.unitModel || '-'}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.nettoWeight ?? '-'}</TableCell>

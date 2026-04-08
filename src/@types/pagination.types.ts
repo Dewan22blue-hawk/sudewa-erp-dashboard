@@ -22,4 +22,16 @@ export interface LaravelPagination<T> {
   per_page: number;
   total: number;
   last_page: number;
+  from?: number | null;
+  to?: number | null;
+  path?: string;
+  first_page_url?: string;
+  last_page_url?: string;
+  next_page_url?: string | null;
+  prev_page_url?: string | null;
+  links?: Array<{
+    url: string | null;
+    label: string;
+    active: boolean;
+  }>;
 }

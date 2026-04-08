@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Sparepart } from '@/@types/sparepart.types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus, Upload } from 'lucide-react';
+import { MoreVertical, Plus, Search, Upload } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -18,11 +19,23 @@ interface Props {
 }
 
 export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Props) {
+  const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const filteredData = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return data;
+
+    return data.filter((item) =>
+      [item.code, item.name, item.category?.name, item.group, item.unitType]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term)),
+    );
+  }, [data, search]);
+
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data,
+    data: filteredData,
     defaultSortKey: 'code',
     defaultSortOrder: 'asc',
   });
@@ -41,20 +54,35 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="flex items-center gap-2 whitespace-nowrap">
-          <span className="text-sm font-medium">Show</span>
-          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-            <SelectTrigger className="w-[70px] bg-white">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-sm font-medium">Entries</span>
+        <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Cari sparepart"
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setCurrentPage(1);
+              }}
+              className="bg-white pl-9"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <span className="text-sm font-medium">Show</span>
+            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="10" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm font-medium">Entries</span>
+          </div>
         </div>
 
         <div className="flex w-full sm:w-auto gap-2 justify-end">
@@ -137,10 +165,10 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
       </div>
 
       {/* Pagination Controls */}
-      {data.length > 0 && (
+      {filteredData.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <div className="text-sm text-slate-500">
-            Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} entries
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
           </div>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="h-8 px-3">
