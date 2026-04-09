@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 
-export interface PenerimaanParams {
+export interface PengirimanParams {
   page?: number;
   per_page?: number;
   start_date?: string;
@@ -8,9 +8,10 @@ export interface PenerimaanParams {
   person_id?: number;
   unit_type_id?: number;
   sort_dir?: 'asc' | 'desc';
+  type?: string;
 }
 
-export interface PenerimaanItem {
+export interface PengirimanItem {
   id: number;
   transaction_code: string;
   receipt_date: string;
@@ -22,9 +23,9 @@ export interface PenerimaanItem {
   warehouse_movement?: { serial_number: string };
 }
 
-export interface PenerimaanResponse {
+export interface PengirimanResponse {
   current_page: number;
-  data: PenerimaanItem[];
+  data: PengirimanItem[];
   last_page: number;
   per_page: number;
   total: number;
@@ -32,7 +33,7 @@ export interface PenerimaanResponse {
   to: number;
 }
 
-const normalizePenerimaanItem = (item: any): PenerimaanItem => ({
+const normalizePengirimanItem = (item: any): PengirimanItem => ({
   id: item.id,
   transaction_code: item.transaction_code || item.code || '-',
   receipt_date: item.receipt_date || item.created_date || item.created_at || new Date().toISOString(),
@@ -47,9 +48,9 @@ const normalizePenerimaanItem = (item: any): PenerimaanItem => ({
   warehouse_movement: item.warehouse_movement,
 });
 
-export const getLaporanPenerimaan = async (
-  params: PenerimaanParams = {}
-): Promise<PenerimaanResponse> => {
+export const getLaporanPengiriman = async (
+  params: PengirimanParams = {}
+): Promise<PengirimanResponse> => {
   const response = await apiClient.get('/wapi/report/unit-type-detail-report', {
     params: {
       sort_dir: 'asc',
@@ -62,7 +63,7 @@ export const getLaporanPenerimaan = async (
 
   return {
     current_page: payload.current_page || 1,
-    data: rows.map(normalizePenerimaanItem),
+    data: rows.map(normalizePengirimanItem),
     last_page: payload.last_page || 1,
     per_page: payload.per_page || params.per_page || 10,
     total: payload.total || 0,
@@ -71,8 +72,8 @@ export const getLaporanPenerimaan = async (
   };
 };
 
-export const getSuppliers = async () => {
-  const response = await apiClient.get('/wapi/master-data/supplier', {
+export const getCustomers = async () => {
+  const response = await apiClient.get('/wapi/master-data/customer', {
     params: { per_page: 1000 },
   });
   const payload = response.data?.data;

@@ -5,19 +5,19 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
-import { getSuppliers, getUnitTypes } from '@/services/laporan-penerimaan.service';
+import { getCustomers, getUnitTypes } from '@/services/laporan-pengiriman.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-interface LaporanPenerimaanFilterProps {
+interface LaporanPengirimanFilterProps {
   activeTab: string;
   startDate: string | null;
   endDate: string | null;
   onApplyFilters: (filters: {
     startDate: string | null;
     endDate: string | null;
-    supplierId: number | null;
+    customerId: number | null;
     unitTypeId: number | null;
     perPage: number;
   }) => void;
@@ -30,20 +30,20 @@ interface OptionItem {
   name: string;
 }
 
-export default function LaporanPenerimaanFilter({
+export default function LaporanPengirimanFilter({
   activeTab,
   startDate,
   endDate,
   onApplyFilters,
   onPrint,
   onDownload,
-}: LaporanPenerimaanFilterProps) {
+}: LaporanPengirimanFilterProps) {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
     if (startDate && endDate) return { from: new Date(startDate), to: new Date(endDate) };
     if (startDate) return { from: new Date(startDate), to: undefined };
     return undefined;
   });
-  const [suppliers, setSuppliers] = useState<OptionItem[]>([]);
+  const [customers, setCustomers] = useState<OptionItem[]>([]);
   const [unitTypes, setUnitTypes] = useState<OptionItem[]>([]);
   const [openBox, setOpenBox] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,13 +59,13 @@ export default function LaporanPenerimaanFilter({
   }, [startDate, endDate, dateRange?.from, dateRange?.to]);
 
   useEffect(() => {
-    const fetchSuppliers = async () => {
+    const fetchCustomers = async () => {
       try {
-        const data = await getSuppliers();
-        setSuppliers(Array.isArray(data) ? data : []);
+        const data = await getCustomers();
+        setCustomers(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
-        setSuppliers([]);
+        setCustomers([]);
       }
     };
 
@@ -79,8 +79,8 @@ export default function LaporanPenerimaanFilter({
       }
     };
 
-    if (activeTab === 'per-supplier') {
-      fetchSuppliers();
+    if (activeTab === 'per-customer') {
+      fetchCustomers();
     } else if (activeTab === 'per-tipe') {
       fetchUnitTypes();
     }
@@ -94,7 +94,7 @@ export default function LaporanPenerimaanFilter({
     if (!openBox) setSearchTermInside('');
   }, [openBox]);
 
-  const currentOptions = activeTab === 'per-supplier' ? suppliers : unitTypes;
+  const currentOptions = activeTab === 'per-customer' ? customers : unitTypes;
 
   const filteredOptions = currentOptions.filter((option) =>
     option.name?.toLowerCase().includes(searchTermInside.toLowerCase())
@@ -104,14 +104,14 @@ export default function LaporanPenerimaanFilter({
     const appliedStartDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
-    let supplierId: number | null = null;
+    let customerId: number | null = null;
     let unitTypeId: number | null = null;
 
-    if (activeTab === 'per-supplier') {
-      const matchedSupplier = suppliers.find(
-        (supplier) => supplier.name?.toLowerCase() === searchQuery.trim().toLowerCase()
+    if (activeTab === 'per-customer') {
+      const matchedCustomer = customers.find(
+        (customer) => customer.name?.toLowerCase() === searchQuery.trim().toLowerCase()
       );
-      supplierId = matchedSupplier ? matchedSupplier.id : null;
+      customerId = matchedCustomer ? matchedCustomer.id : null;
     }
 
     if (activeTab === 'per-tipe') {
@@ -124,7 +124,7 @@ export default function LaporanPenerimaanFilter({
     onApplyFilters({
       startDate: appliedStartDate,
       endDate: appliedEndDate,
-      supplierId,
+      customerId,
       unitTypeId,
       perPage: parseInt(perPage, 10),
     });
@@ -143,7 +143,7 @@ export default function LaporanPenerimaanFilter({
         {activeTab !== 'per-nota' && (
           <div className="flex flex-col space-y-2">
             <label className="text-[13px] font-bold text-gray-900">
-              {activeTab === 'per-tipe' ? 'Masukkan Tipe ' : 'Masukkan Supplier '}
+              {activeTab === 'per-tipe' ? 'Masukkan Tipe ' : 'Masukkan Customer '}
               <span className="text-red-500">*</span>
             </label>
 
@@ -160,7 +160,7 @@ export default function LaporanPenerimaanFilter({
                       ? currentOptions.find((option) => option.name === searchQuery)?.name || searchQuery
                       : activeTab === 'per-tipe'
                         ? 'Pilih atau cari tipe...'
-                        : 'Pilih atau cari supplier...'}
+                        : 'Pilih atau cari customer...'}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>

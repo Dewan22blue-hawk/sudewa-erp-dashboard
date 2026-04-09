@@ -3,20 +3,20 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import LaporanPenerimaanFilter from '@/components/features/laporan-penerimaan/LaporanPenerimaanFilter';
-import LaporanPenerimaanTable from '@/components/features/laporan-penerimaan/LaporanPenerimaanTable';
-import LaporanPenerimaanPerTipe from '@/components/features/laporan-penerimaan/LaporanPenerimaanPerTipe';
-import LaporanPenerimaanPerSupplier from '@/components/features/laporan-penerimaan/LaporanPenerimaanPerSupplier';
-import { useLaporanPenerimaan } from '@/hooks/useLaporanPenerimaan';
+import LaporanPengirimanFilter from '@/components/features/laporan-pengiriman/LaporanPengirimanFilter';
+import LaporanPengirimanTable from '@/components/features/laporan-pengiriman/LaporanPengirimanTable';
+import LaporanPengirimanPerTipe from '@/components/features/laporan-pengiriman/LaporanPengirimanPerTipe';
+import LaporanPengirimanPerCustomer from '@/components/features/laporan-pengiriman/LaporanPengirimanPerCustomer';
+import { useLaporanPengiriman } from '@/hooks/useLaporanPengiriman';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 
-type TabType = 'per-nota' | 'per-tipe' | 'per-supplier';
+type TabType = 'per-nota' | 'per-tipe' | 'per-customer';
 
-export default function LaporanPenerimaanPage() {
+export default function LaporanPengirimanPage() {
   const [activeTab, setActiveTab] = useState<TabType>('per-nota');
 
   const router = useRouter();
@@ -30,9 +30,9 @@ export default function LaporanPenerimaanPage() {
     setPage,
     setPerPage,
     setDateRange,
-    setSupplier,
+    setCustomer,
     setUnitType,
-  } = useLaporanPenerimaan();
+  } = useLaporanPengiriman();
 
   const slugParam = router.query.slug;
   const resolvedCompanyId = resolveCompanyId(slugParam, companyId);
@@ -40,19 +40,19 @@ export default function LaporanPenerimaanPage() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as TabType);
-    setSupplier(null);
+    setCustomer(null);
     setUnitType(null);
   };
 
   const handleApplyFilters = (filters: {
     startDate: string | null;
     endDate: string | null;
-    supplierId: number | null;
+    customerId: number | null;
     unitTypeId: number | null;
     perPage: number;
   }) => {
     setDateRange(filters.startDate, filters.endDate);
-    setSupplier(filters.supplierId);
+    setCustomer(filters.customerId);
     setUnitType(filters.unitTypeId);
     setPerPage(filters.perPage);
   };
@@ -69,9 +69,9 @@ export default function LaporanPenerimaanPage() {
 
     const headers: string[] = [
       'NO',
-      'NO PENERIMAAN',
-      'TGL TERIMA',
-      'NAMA SUPPLIER',
+      'NO PENGIRIMAN',
+      'TGL KIRIM',
+      'NAMA CUSTOMER',
       'TIPE UNIT',
       'WARNA',
       'NO MESIN',
@@ -98,20 +98,20 @@ export default function LaporanPenerimaanPage() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `laporan-penerimaan-${activeTab}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `laporan-pengiriman-${activeTab}-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen laporan-penerimaan-page">
+      <div className="p-6 space-y-6 bg-white min-h-screen laporan-pengiriman-page laporan-penerimaan-page">
         <div className="no-print">
-          <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Laporan Penerimaan</h1>
-          <p className="text-[15px] text-gray-500">Pantau semua transaksi penerimaan unit</p>
+          <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Laporan Pengiriman</h1>
+          <p className="text-[15px] text-gray-500">Pantau semua transaksi pengiriman unit</p>
         </div>
 
-        <LaporanPenerimaanFilter
+        <LaporanPengirimanFilter
           activeTab={activeTab}
           startDate={startDate}
           endDate={endDate}
@@ -124,26 +124,26 @@ export default function LaporanPenerimaanPage() {
           <div className="flex mb-12 no-print">
             <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
               <TabsTrigger value="per-nota" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Penerimaan
+                Laporan Pengiriman
               </TabsTrigger>
               <TabsTrigger value="per-tipe" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Penerimaan Per Tipe
+                Laporan Pengiriman Per Tipe
               </TabsTrigger>
-              <TabsTrigger value="per-supplier" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Penerimaan Per Supplier
+              <TabsTrigger value="per-customer" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                Laporan Pengiriman Per Customer
               </TabsTrigger>
             </TabsList>
           </div>
 
           <PrintLetterPage
-            id="laporan-penerimaan-print"
-            className="laporan-penerimaan-print-area"
+            id="laporan-pengiriman-print"
+            className="laporan-pengiriman-print-area laporan-penerimaan-print-area"
             letterheadSrc={selectedPrintBackground}
           >
-            <div className="laporan-penerimaan-print-content">
+            <div className="laporan-pengiriman-print-content laporan-penerimaan-print-content">
               <div className="flex flex-col items-center justify-center text-center space-y-1 mb-8">
                 <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
-                  REKAP PENERIMAAN {activeTab.replace('-', ' ')}
+                  REKAP PENGIRIMAN {activeTab.replace('-', ' ')}
                 </h2>
                 <p className="text-[13px] font-bold text-gray-900 tracking-wide">
                   PT WAJIRA JAGRATARA MORINDO
@@ -156,7 +156,7 @@ export default function LaporanPenerimaanPage() {
               </div>
 
               <TabsContent value="per-nota" className="mt-0">
-                <LaporanPenerimaanTable
+                <LaporanPengirimanTable
                   data={data}
                   pagination={pagination}
                   isLoading={isLoading}
@@ -165,7 +165,7 @@ export default function LaporanPenerimaanPage() {
               </TabsContent>
 
               <TabsContent value="per-tipe" className="mt-0">
-                <LaporanPenerimaanPerTipe
+                <LaporanPengirimanPerTipe
                   data={data}
                   pagination={pagination}
                   isLoading={isLoading}
@@ -173,8 +173,8 @@ export default function LaporanPenerimaanPage() {
                 />
               </TabsContent>
 
-              <TabsContent value="per-supplier" className="mt-0">
-                <LaporanPenerimaanPerSupplier
+              <TabsContent value="per-customer" className="mt-0">
+                <LaporanPengirimanPerCustomer
                   data={data}
                   pagination={pagination}
                   isLoading={isLoading}

@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PenerimaanItem } from '@/services/laporan-penerimaan.service';
+import { PengirimanItem } from '@/services/laporan-pengiriman.service';
 
 interface Props {
-  data: PenerimaanItem[];
+  data: PengirimanItem[];
   pagination: { currentPage: number; lastPage: number; total: number; from: number; to: number; perPage: number };
   isLoading: boolean;
   onPageChange: (page: number) => void;
@@ -19,7 +19,7 @@ interface Props {
 
 const formatDate = (date: string) => new Date(date).toLocaleDateString('id-ID');
 
-export default function LaporanPenerimaanTable({
+export default function LaporanPengirimanTable({
   data,
   pagination,
   isLoading,
@@ -36,7 +36,7 @@ export default function LaporanPenerimaanTable({
   if (data.length === 0) {
     return (
       <div className="flex justify-center items-center py-20 bg-white rounded-xl border">
-        <p className="text-gray-500">Tidak ada data penerimaan</p>
+        <p className="text-gray-500">Tidak ada data pengiriman</p>
       </div>
     );
   }
@@ -48,9 +48,9 @@ export default function LaporanPenerimaanTable({
           <TableHeader className="bg-gray-50">
             <TableRow>
               <TableHead className="text-center w-12">NO</TableHead>
-              <TableHead >NO PENERIMAAN</TableHead>
-              <TableHead>TGL TERIMA</TableHead>
-              <TableHead>NAMA SUPPLIER</TableHead>
+              <TableHead>NO PENGIRIMAN</TableHead>
+              <TableHead>TGL KIRIM</TableHead>
+              <TableHead>NAMA CUSTOMER</TableHead>
               <TableHead>TIPE UNIT</TableHead>
               <TableHead>WARNA</TableHead>
               <TableHead>NO MESIN</TableHead>
@@ -76,7 +76,6 @@ export default function LaporanPenerimaanTable({
         </Table>
       </div>
 
-      {/* Pagination */}
       {pagination.total > 0 && (
         <div className="print-hide-pagination flex flex-col sm:flex-row justify-between items-center p-4 border-t gap-4">
           <div className="text-sm text-gray-500">

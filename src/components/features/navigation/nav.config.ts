@@ -168,8 +168,8 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           href: base('/laporan/laporan-penjualan'),
         },
         {
-          label: 'Laporan Penerimaan',
-          href: base('/laporan/laporan-penerimaan'),
+          label: 'Laporan Pengeluaran',
+          href: base('/laporan/laporan-pengeluaran'),
         },
         {
           label: 'Laporan Stock',

@@ -1,21 +1,21 @@
-import LaporanPenerimaanTable from '@/components/features/laporan-penerimaan/LaporanPenerimaanTable';
-import { PenerimaanItem } from '@/services/laporan-penerimaan.service';
+import LaporanPengirimanTable from '@/components/features/laporan-pengiriman/LaporanPengirimanTable';
+import { PengirimanItem } from '@/services/laporan-pengiriman.service';
 
 interface Props {
-  data: PenerimaanItem[];
+  data: PengirimanItem[];
   pagination: { currentPage: number; lastPage: number; total: number; from: number; to: number; perPage: number };
   isLoading: boolean;
   onPageChange: (page: number) => void;
 }
 
-export default function LaporanPenerimaanPerSupplier({
+export default function LaporanPengirimanPerCustomer({
   data,
   pagination,
   isLoading,
   onPageChange,
 }: Props) {
   return (
-    <LaporanPenerimaanTable
+    <LaporanPengirimanTable
       data={data}
       pagination={pagination}
       isLoading={isLoading}
