@@ -104,7 +104,16 @@ export function FinanceChart({ data, isLoading }: FinanceChartProps) {
   }, [data, mode, transactionType]);
 
   if (isLoading) return <SkeletonChart />;
-  if (!data?.length) return null;
+  if (!data?.length) {
+    return (
+      <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="text-center py-12 text-slate-500">
+          <p className="font-medium">Belum ada data transaksi</p>
+          <p className="text-sm mt-2">Data akan muncul setelah ada mutasi dari sistem</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

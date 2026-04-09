@@ -9,14 +9,14 @@ import { TransactionTable } from '@/components/features/dashboard/TransactionTab
 import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function DashboardPage() {
-  const { data, isLoading } = useDashboardData();
+  const { data, isLoading, isError } = useDashboardData();
 
   return (
     <DashboardLayout>
       <div className="space-y-8">
         <PageHeader title="Overview Keuangan" />
 
-        <FinanceOverview accounts={data?.accounts || []} isLoading={isLoading} />
+        <FinanceOverview accounts={data?.accounts || []} isLoading={isLoading} isError={isError} />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-3">

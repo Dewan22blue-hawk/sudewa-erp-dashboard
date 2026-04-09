@@ -27,7 +27,7 @@ function LoadingTable() {
 }
 
 export function TransactionTable({ data, isLoading }: TransactionTableProps) {
-  const [filter, setFilter] = useState<FilterMode>('all');
+  const [filter, setFilter] = useState<FilterMode>('expense');
 
   const filtered = useMemo(() => {
     if (!data) return [];
