@@ -1,168 +1,203 @@
 'use client';
 
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { useMemo, useState } from 'react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { format, isValid } from 'date-fns';
+import { PersonOption, WarehouseOption } from '@/@types/pengeluaran-unit.types';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
-interface Props {
-  data: {
-    noPengeluaran: string;
-    tanggal: Date | undefined;
-    supplier?: string;
-    keterangan?: string;
-  };
-  onChange?: (field: string, value: any) => void;
-  onBlur?: (field: string, value: any) => void;
-  disabled?: boolean;
-  mode?: 'create' | 'edit';
+interface PengeluaranUnitHeaderValues {
+  activityNumber?: string;
+  activityDate?: Date;
+  warehouseId?: number;
+  warehouseName?: string;
+  supplierId?: number;
+  supplierName?: string;
+  description?: string;
 }
 
-// Reusable Inline Edit Component
-function InlineEditField({
-  value,
-  displayValue,
-  onSave,
-  disabled,
-  renderInput,
-}: {
-  value: any;
-  displayValue: React.ReactNode;
-  onSave: (val: any) => void;
+interface PengeluaranUnitHeaderErrors {
+  activityDate?: string;
+  warehouseId?: string;
+  supplierId?: string;
+  description?: string;
+}
+
+interface Props {
+  mode: 'create' | 'edit' | 'detail';
+  values: PengeluaranUnitHeaderValues;
+  errors?: PengeluaranUnitHeaderErrors;
+  warehouses: WarehouseOption[];
+  suppliers: PersonOption[];
+  isLoadingOptions?: boolean;
+  onActivityDateChange?: (value?: Date) => void;
+  onWarehouseChange?: (value: number) => void;
+  onSupplierChange?: (value: number) => void;
+  onDescriptionChange?: (value: string) => void;
+}
+
+const errorClassName = 'text-xs text-red-600 mt-1';
+
+interface SearchableSelectOption {
+  id: number;
+  name: string;
+}
+
+interface SearchableSelectProps {
+  value?: number;
+  options: SearchableSelectOption[];
+  placeholder: string;
+  searchPlaceholder: string;
+  emptyText: string;
   disabled?: boolean;
-  renderInput: (props: { onBlur: () => void; autoFocus: boolean }) => React.ReactNode;
-}) {
-  const [isEditing, setIsEditing] = useState(false);
+  onChange?: (value: number) => void;
+}
 
-  const handleBlur = () => {
-    setIsEditing(false);
-    onSave(value);
-  };
+function SearchableSelect({
+  value,
+  options,
+  placeholder,
+  searchPlaceholder,
+  emptyText,
+  disabled,
+  onChange,
+}: SearchableSelectProps) {
+  const [open, setOpen] = useState(false);
 
-  if (disabled) {
-    return <div className="py-2 text-gray-700 min-h-10 px-3 bg-gray-50/50 rounded-lg border border-transparent">{displayValue}</div>;
-  }
-
-  if (isEditing) {
-    return <div className="relative animate-in fade-in zoom-in-95 duration-200">{renderInput({ onBlur: handleBlur, autoFocus: true })}</div>;
-  }
+  const selectedLabel = useMemo(() => {
+    if (!value) return '';
+    const selected = options.find((item) => item.id === value);
+    return selected?.name ?? '';
+  }, [options, value]);
 
   return (
-    <div onDoubleClick={() => setIsEditing(true)} className="py-2 px-3 min-h-10 text-gray-700 rounded-lg border border-transparent hover:border-gray-200 hover:bg-gray-50/50 cursor-text transition-colors" title="Double click to edit">
-      {displayValue || <span className="text-gray-400 italic">Empty - double click to add</span>}
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button type="button" variant="outline" role="combobox" aria-expanded={open} disabled={disabled} className="w-full justify-between font-normal bg-white h-10 rounded-lg border-gray-200">
+          <span className={cn('truncate', !selectedLabel && 'text-gray-400')}>{selectedLabel || placeholder}</span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+        <Command>
+          <CommandInput placeholder={searchPlaceholder} />
+          <CommandList>
+            <CommandEmpty>{emptyText}</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem
+                  key={option.id}
+                  value={`${option.name} ${option.id}`}
+                  onSelect={() => {
+                    onChange?.(option.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check className={cn('mr-2 h-4 w-4', value === option.id ? 'opacity-100' : 'opacity-0')} />
+                  {option.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
-export default function PengeluaranUnitHeaderCard({ data, onChange, onBlur, disabled, mode = 'edit' }: Props) {
-  const isCreate = mode === 'create';
-
-  const handleSave = (field: string) => {
-    if (onBlur) {
-      onBlur(field, data[field as keyof typeof data]);
-    }
-  };
+export default function PengeluaranUnitHeaderCard({
+  mode,
+  values,
+  errors,
+  warehouses,
+  suppliers,
+  isLoadingOptions,
+  onActivityDateChange,
+  onWarehouseChange,
+  onSupplierChange,
+  onDescriptionChange,
+}: Props) {
+  const isDetail = mode === 'detail';
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">Data Pengeluaran Unit</h2>
-        {!disabled && !isCreate && <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Double-click fields to edit</span>}
       </div>
       <hr className="border-gray-100" />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-[15px]">
         <div className="space-y-1">
-          <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-gray-500 font-medium text-xs uppercase tracking-wider'}>No Pengeluaran</label>
-          {isCreate ? (
-            <Input value={data.noPengeluaran} disabled={true} readOnly className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200" />
-          ) : (
-            <InlineEditField value={data.noPengeluaran} displayValue={<span className="font-semibold">{data.noPengeluaran}</span>} onSave={() => {}} disabled={true} renderInput={() => null} />
-          )}
+          <label className="text-gray-500 font-medium text-xs uppercase tracking-wider">No Pengeluaran</label>
+          <Input value={values.activityNumber ?? '-'} disabled readOnly className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200" />
         </div>
 
         <div className="space-y-1">
-          <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-gray-500 font-medium text-xs uppercase tracking-wider'}>Tanggal Terima</label>
-          {isCreate ? (
-            <DatePicker value={data.tanggal} onChange={(date) => onChange?.('tanggal', date)} disabled={disabled} placeholder="Pick a date" className="h-10 rounded-lg border-gray-200 text-gray-900" />
-          ) : (
-            <InlineEditField
-              value={data.tanggal}
-              displayValue={data.tanggal && isValid(data.tanggal) ? format(data.tanggal, 'd MMMM yyyy') : ''}
-              onSave={() => handleSave('tanggal')}
-              disabled={disabled}
-              renderInput={({ onBlur: closeEditor }) => (
-                <DatePicker
-                  value={data.tanggal}
-                  onChange={(date) => {
-                    onChange?.('tanggal', date);
-                    // Save and close on selection
-                    setTimeout(() => {
-                      if (onBlur) onBlur('tanggal', date);
-                      closeEditor();
-                    }, 100);
-                  }}
-                  disabled={disabled}
-                  className="h-10 rounded-lg border-blue-500 ring-2 ring-blue-500/20 text-gray-900 shadow-sm"
-                />
-              )}
-            />
-          )}
+          <label className="text-gray-500 font-medium text-xs uppercase tracking-wider">Tanggal Pengeluaran</label>
+          <DatePicker
+            value={values.activityDate}
+            onChange={onActivityDateChange}
+            disabled={isDetail}
+            placeholder="Pilih tanggal"
+            className="h-10 rounded-lg border-gray-200 text-gray-900"
+          />
+          {errors?.activityDate ? <p className={errorClassName}>{errors.activityDate}</p> : null}
         </div>
 
         <div className="space-y-1">
-          <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-gray-500 font-medium text-xs uppercase tracking-wider'}>Supplier</label>
-          {isCreate ? (
-            <Input value={data.supplier || ''} disabled={disabled} onChange={(e) => onChange?.('supplier', e.target.value)} placeholder="Masukkan nama supplier" className="bg-white text-gray-900 rounded-lg h-10 border-gray-200" />
+          <label className="text-gray-500 font-medium text-xs uppercase tracking-wider">Warehouse</label>
+          {isDetail ? (
+            <Input value={values.warehouseName ?? '-'} disabled readOnly className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200" />
           ) : (
-            <InlineEditField
-              value={data.supplier}
-              displayValue={data.supplier}
-              onSave={() => handleSave('supplier')}
-              disabled={disabled}
-              renderInput={({ onBlur, autoFocus }) => (
-                <Input
-                  autoFocus={autoFocus}
-                  value={data.supplier || ''}
-                  onChange={(e) => onChange?.('supplier', e.target.value)}
-                  onBlur={onBlur}
-                  onKeyDown={(e) => e.key === 'Enter' && onBlur()}
-                  className="bg-white text-gray-900 rounded-lg h-10 border-blue-500 ring-2 ring-blue-500/20 shadow-sm"
-                />
-              )}
+            <SearchableSelect
+              value={values.warehouseId}
+              options={warehouses}
+              placeholder={isLoadingOptions ? 'Memuat warehouse...' : 'Pilih warehouse'}
+              searchPlaceholder="Cari warehouse..."
+              emptyText="Warehouse tidak ditemukan."
+              disabled={isLoadingOptions}
+              onChange={onWarehouseChange}
             />
           )}
+          {errors?.warehouseId ? <p className={errorClassName}>{errors.warehouseId}</p> : null}
         </div>
       </div>
 
-      <div className={isCreate ? 'space-y-2 text-sm mt-4' : 'space-y-1 text-[15px] mt-2'}>
-        <label className={isCreate ? 'text-gray-900 font-medium tracking-tight' : 'text-gray-500 font-medium text-xs uppercase tracking-wider'}>Keterangan</label>
-        {isCreate ? (
-          <Textarea
-            value={data.keterangan || ''}
-            disabled={disabled}
-            onChange={(e) => onChange?.('keterangan', e.target.value)}
-            placeholder="Type your message here."
-            className="bg-white text-gray-900 rounded-lg min-h-25 border-gray-200 resize-y"
-          />
-        ) : (
-          <InlineEditField
-            value={data.keterangan}
-            displayValue={<div className="whitespace-pre-wrap">{data.keterangan}</div>}
-            onSave={() => handleSave('keterangan')}
-            disabled={disabled}
-            renderInput={({ onBlur, autoFocus }) => (
-              <Textarea
-                autoFocus={autoFocus}
-                value={data.keterangan || ''}
-                onChange={(e) => onChange?.('keterangan', e.target.value)}
-                onBlur={onBlur}
-                className="bg-white text-gray-900 rounded-lg min-h-25 border-blue-500 ring-2 ring-blue-500/20 shadow-sm resize-y"
-              />
-            )}
-          />
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[15px]">
+        <div className="space-y-1">
+          <label className="text-gray-500 font-medium text-xs uppercase tracking-wider">Supplier</label>
+          {isDetail ? (
+            <Input value={values.supplierName ?? '-'} disabled readOnly className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200" />
+          ) : (
+            <SearchableSelect
+              value={values.supplierId}
+              options={suppliers}
+              placeholder={isLoadingOptions ? 'Memuat supplier...' : 'Pilih supplier'}
+              searchPlaceholder="Cari supplier..."
+              emptyText="Supplier tidak ditemukan."
+              disabled={isLoadingOptions}
+              onChange={onSupplierChange}
+            />
+          )}
+          {errors?.supplierId ? <p className={errorClassName}>{errors.supplierId}</p> : null}
+        </div>
+      </div>
+
+      <div className="space-y-1 text-[15px] mt-2">
+        <label className="text-gray-500 font-medium text-xs uppercase tracking-wider">Keterangan</label>
+        <Textarea
+          value={values.description ?? ''}
+          disabled={isDetail}
+          onChange={(event) => onDescriptionChange?.(event.target.value)}
+          placeholder="Masukkan keterangan"
+          className="bg-white text-gray-900 rounded-lg min-h-24 border-gray-200 resize-y"
+        />
+        {errors?.description ? <p className={errorClassName}>{errors.description}</p> : null}
       </div>
     </div>
   );

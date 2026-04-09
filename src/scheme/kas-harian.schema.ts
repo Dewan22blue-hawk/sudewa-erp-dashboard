@@ -1,13 +1,43 @@
-import { z } from "zod"
+import { z } from 'zod';
 
-export const kasHarianSchema = z.object({
-    tanggal: z.date({
-        required_error: "Tanggal wajib diisi",
-    }),
-    akun: z.string().min(1, "Akun wajib dipilih"),
-    keterangan: z.string().min(1, "Keterangan wajib diisi"),
-    nominal: z.number().min(1, "Nominal harus lebih dari 0"),
-    type: z.enum(["debit", "kredit"]),
-})
+export const kasHarianSchema = z
+  .object({
+    company_id: z.number({ required_error: 'Perusahaan wajib dipilih' }).min(1, 'Perusahaan wajib dipilih'),
+    cash_id: z.number({ required_error: 'Kas wajib dipilih' }).min(1, 'Kas wajib dipilih'),
+    date: z.date({ required_error: 'Tanggal wajib diisi' }),
+    note: z.string().min(3, 'Keterangan minimal 3 karakter'),
+    debet: z.number().min(0, 'Debet tidak valid'),
+    credit: z.number().min(0, 'Kredit tidak valid'),
+  })
+  .superRefine((value, ctx) => {
+    const hasDebet = value.debet > 0;
+    const hasCredit = value.credit > 0;
 
-export type KasHarianFormValues = z.infer<typeof kasHarianSchema>
+    if (!hasDebet && !hasCredit) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Minimal salah satu debet atau kredit harus diisi',
+        path: ['debet'],
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Minimal salah satu debet atau kredit harus diisi',
+        path: ['credit'],
+      });
+    }
+
+    if (hasDebet && hasCredit) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Debet dan kredit tidak boleh diisi bersamaan',
+        path: ['debet'],
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Debet dan kredit tidak boleh diisi bersamaan',
+        path: ['credit'],
+      });
+    }
+  });
+
+export type KasHarianFormValues = z.infer<typeof kasHarianSchema>;

@@ -3,9 +3,10 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { useTypeUnits, useDeleteTypeUnit } from '@/hooks/useTypeUnit';
+import { useTypeUnits, useDeleteTypeUnit, useImportTypeUnit } from '@/hooks/useTypeUnit';
 import { TypeUnitTable } from '@/components/features/type-unit/TypeUnitTable';
 import { DeleteTypeUnitDialog } from '@/components/features/type-unit/DeleteTypeUnitDialog';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import type { TypeUnit } from '@/@types/type-unit.types';
 
 export default function TypeUnitPage() {
@@ -42,8 +43,10 @@ export default function TypeUnitPage() {
     }
   }, [page, manualMeta.lastPage, setPage]);
   const deleteTypeUnit = useDeleteTypeUnit();
+  const importMutation = useImportTypeUnit();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [typeUnitToDelete, setTypeUnitToDelete] = useState<TypeUnit | null>(null);
 
   const handleCreateClick = () => {
@@ -75,6 +78,12 @@ export default function TypeUnitPage() {
       toast.error('Gagal menghapus data tipe unit');
     }
   };
+
+  const handleImport = async (file: File) => {
+    await importMutation.mutateAsync(file);
+    refetch();
+  };
+
 
   if (isLoading) {
     return (
@@ -144,11 +153,21 @@ export default function TypeUnitPage() {
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
             onAdd={handleCreateClick}
+            onImport={() => setOpenImport(true)}
           />
         </div>
       </div>
 
       <DeleteTypeUnitDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={handleConfirmDelete} isDeleting={deleteTypeUnit.isPending} />
+      <DataImportModal
+        open={openImport}
+        onOpenChange={setOpenImport}
+        title="Import Data Tipe Unit"
+        description="Unggah file .xlsx untuk mengimport data tipe unit."
+        onImport={handleImport}
+        isPending={importMutation.isPending}
+        templateUrl="https://docs.google.com/spreadsheets/d/1iR1WZMEO_G8x91noO9q4T8hUMzIAD8U18qrmPmode2I/edit?usp=sharing"
+      />
     </DashboardLayout>
   );
 }

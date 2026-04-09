@@ -9,6 +9,10 @@ interface Props {
 }
 
 export function SalesDetailCards({ data }: Props) {
+  const totalDppFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.dpp ?? 0), 0);
+  const totalPpnFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.ppn ?? 0), 0);
+  const totalDpp = totalDppFromItems > 0 ? totalDppFromItems : Number(data.totalDpp ?? 0);
+  const totalPpn = totalPpnFromItems > 0 ? totalPpnFromItems : Number(data.totalPpn ?? 0);
   const totalJual = Number(data.totalJual ?? 0);
   const totalPaidFromField = Number(data.totalBayar ?? 0);
   const totalPaidFromDiff = Math.max(0, totalJual - Number(data.kurangBayar ?? 0));
@@ -73,11 +77,11 @@ export function SalesDetailCards({ data }: Props) {
           <div className="space-y-3 pt-2 flex-1">
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total DPP</span>
-              <span className="font-medium">{formatCurrency(data.totalDpp)}</span>
+              <span className="font-medium">{formatCurrency(totalDpp)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-500">Total PPN</span>
-              <span className="font-medium">{formatCurrency(data.totalPpn)}</span>
+              <span className="font-medium">{formatCurrency(totalPpn)}</span>
             </div>
             <div className="pt-4 mt-auto border-t flex justify-between items-center">
               <span className="font-medium">Total Pembelian</span>

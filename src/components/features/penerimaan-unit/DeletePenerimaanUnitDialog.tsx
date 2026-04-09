@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useDeletePenerimaanUnit } from '@/hooks/usePenerimaanUnit';
 import { toast } from 'sonner';
 
 interface Props {
@@ -12,11 +11,9 @@ interface Props {
 }
 
 export default function DeletePenerimaanUnitDialog({ id, open, onClose }: Props) {
-  const mutation = useDeletePenerimaanUnit();
-
   const handleDelete = async () => {
-    await mutation.mutateAsync(id);
-    toast.success('Data berhasil dihapus');
+    if (!id) return;
+    toast.error('Endpoint hapus belum tersedia pada API warehouse activity');
     onClose();
   };
 
@@ -31,8 +28,8 @@ export default function DeletePenerimaanUnitDialog({ id, open, onClose }: Props)
           <Button variant="outline" className="w-full sm:w-auto" onClick={onClose}>
             Batal
           </Button>
-          <Button variant="destructive" className="w-full sm:w-auto" onClick={handleDelete} disabled={mutation.isPending}>
-            {mutation.isPending ? 'Menghapus...' : 'Hapus'}
+          <Button variant="destructive" className="w-full sm:w-auto" onClick={handleDelete}>
+            Hapus
           </Button>
         </DialogFooter>
       </DialogContent>

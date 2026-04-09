@@ -5,7 +5,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
-import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from '@/hooks/useSupplier';
+import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, useImportSupplier } from '@/hooks/useSupplier';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { useUserOptions } from '@/hooks/useUser';
 import { createSupplierSchema, type CreateSupplierFormValues } from '@/scheme/supplier.schema';
 import { SupplierTable } from '@/components/features/supplier/SupplierTable';
@@ -22,10 +23,12 @@ export default function SupplierPage() {
   const createSupplier = useCreateSupplier();
   const updateSupplier = useUpdateSupplier();
   const deleteSupplier = useDeleteSupplier();
+  const importMutation = useImportSupplier();
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [supplierToEdit, setSupplierToEdit] = useState<Supplier | null>(null);
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(null);
 
@@ -157,6 +160,12 @@ export default function SupplierPage() {
     }
   };
 
+  const handleImport = async (file: File) => {
+    if (!companyId) return;
+    await importMutation.mutateAsync({ companyId, file });
+  };
+
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -204,8 +213,9 @@ export default function SupplierPage() {
         </div>
 
         <div className="">
-          <SupplierTable suppliers={data?.data || []} onEdit={handleEditSupplier} onDelete={handleDeleteClick} onAdd={handleCreateClick} />
+          <SupplierTable suppliers={data?.data || []} onEdit={handleEditSupplier} onDelete={handleDeleteClick} onAdd={handleCreateClick} onImport={() => setOpenImport(true)} />
         </div>
+
       </div>
 
       <SupplierFormDialog
@@ -234,6 +244,16 @@ export default function SupplierPage() {
       />
 
       <DeleteSupplierDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={handleConfirmDelete} isDeleting={deleteSupplier.isPending} />
+
+      <DataImportModal
+        open={openImport}
+        onOpenChange={setOpenImport}
+        title="Import Data Supplier"
+        description="Unggah file .xlsx untuk mengimport data supplier."
+        onImport={handleImport}
+        isPending={importMutation.isPending}
+        templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
+      />
     </DashboardLayout>
   );
 }

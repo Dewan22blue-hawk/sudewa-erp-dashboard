@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Search, Plus, MoreVertical, Upload } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,9 +22,11 @@ interface DealerTableProps {
     onPageChange: (page: number) => void;
     onPerPageChange: (perPage: number) => void;
     onAdd: () => void;
+    onImport?: () => void;
     onEdit: (dealer: Dealer) => void;
     onDelete: (dealer: Dealer) => void;
 }
+
 
 export function DealerTable({
     dealers,
@@ -36,9 +38,11 @@ export function DealerTable({
     onPageChange,
     onPerPageChange,
     onAdd,
+    onImport,
     onEdit,
     onDelete
 }: DealerTableProps) {
+
     const totalPages = Math.ceil(totalData / perPage);
     const startData = (page - 1) * perPage + 1;
     const endData = Math.min(page * perPage, totalData);
@@ -74,9 +78,19 @@ export function DealerTable({
                     </div>
                 </div>
 
-                <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                    <Plus className="mr-2 h-4 w-4" /> Tambah
-                </Button>
+                <div className="flex items-center gap-2">
+                    {onImport && (
+                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                            <Upload className="h-4 w-4" />
+                            Import
+                        </Button>
+                    )}
+                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                        <Plus className="h-4 w-4" />
+                        Tambah
+                    </Button>
+                </div>
+
             </div>
 
             <Card className="rounded-xl overflow-hidden border border-gray-200">

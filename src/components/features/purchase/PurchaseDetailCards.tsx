@@ -9,6 +9,9 @@ interface Props {
 
 export function PurchaseDetailCards({ data }: Props) {
   const totalBruto = Number(data.unit_transaction_bruto_total ?? data.unit_transaction_item_bruto_total ?? 0);
+  const totalHpp = Number(data.unit_transaction_item_total_hpp ?? 0);
+  const totalDpp = Number(data.unit_transaction_item_total_dpp ?? 0);
+  const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -64,12 +67,16 @@ export function PurchaseDetailCards({ data }: Props) {
 
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
+              <span>Total HPP</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalHpp)}</span>
+            </div>
+            <div className="flex items-center justify-between">
               <span>Total DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_total_dpp)}</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total PPN</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_total_ppn)}</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalPpn)}</span>
             </div>
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-900">
               <span>Total Pembelian</span>
@@ -96,11 +103,11 @@ export function PurchaseDetailCards({ data }: Props) {
             </div>
             <div className="flex items-center justify-between">
               <span>DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.unit_transaction_item_total_dpp)}</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>PPN</span>
-              <span className="text-sm font-semibold text-red-500">{formatCurrency(data.unit_transaction_item_total_ppn)}</span>
+              <span className="text-sm font-semibold text-red-500">{formatCurrency(totalPpn)}</span>
             </div>
           </div>
         </CardContent>

@@ -1,258 +1,226 @@
-"use client"
+'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { MoneyInput } from "@/components/ui/money-input"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ppnPembelianSchema, PPNPembelianFormValues } from "@/scheme/ppn-pembelian.schema"
-import { PPNPembelian } from "@/@types/ppn-pembelian.types"
-import { useCreatePPNPembelian, useUpdatePPNPembelian } from "@/hooks/usePPNPembelian"
-import { toast } from "sonner"
-import { useEffect } from "react"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { DatePicker } from "@/components/ui/date-picker"
-import { format } from "date-fns"
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { ApiError } from '@/@types/api';
+import { type PPNPembelian, UpdatePPNPembelianSchema, type UpdatePPNPembelianFormValues } from '@/@types/ppn-pembelian.types';
+import { useUpdatePPNPembelian } from '@/hooks/usePPNPembelian';
+import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { formatCurrency } from '@/lib/utils/currency';
+import { format } from 'date-fns';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface Props {
-    open: boolean
-    onClose: () => void
-    initialData?: PPNPembelian | null
+  open: boolean;
+  onClose: () => void;
+  initialData?: PPNPembelian | null;
 }
 
-export default function PPNPembelianFormDialog({
-    open,
-    onClose,
-    initialData,
-}: Props) {
-    const isEdit = !!initialData
+const toDate = (value: string | null | undefined) => {
+  if (!value) return null;
 
-    const createMutation = useCreatePPNPembelian()
-    const updateMutation = useUpdatePPNPembelian()
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
 
-    const form = useForm<PPNPembelianFormValues>({
-        resolver: zodResolver(ppnPembelianSchema) as any,
-        defaultValues: {
-            kodeBeli: "Generated XX",
-            noMesin: "",
-            nsfpmMasukan: "",
-            biaya: 0,
-        }
-    })
+const normalizeFieldErrors = (error: unknown): Partial<Record<keyof UpdatePPNPembelianFormValues, string>> => {
+  if (!error || typeof error !== 'object' || !('details' in error)) return {};
 
-    useEffect(() => {
-        if (initialData) {
-            // Parse dates from string "dd/MM/yyyy" or ISO?
-            // The service returns "28/01/2026". This is tricky to parse directly with new Date().
-            // For now, assuming dummy data is consistent.
-            // Actually, I should probably standardise on ISO strings in service or handle parsing.
-            // Let's assume for now we might need to fix date parsing.
-            // But since I generated data as "28/01/2026", I'll just use new Date() which might fail if locale is wrong.
-            // Better to just set defaults if parsing fails or use a helper.
-            // For this task, I'll use a simple fallback.
+  const details = (error as ApiError).details;
+  if (!details || typeof details !== 'object') return {};
 
-            form.reset({
-                kodeBeli: initialData.kodeBeli,
-                noMesin: initialData.noMesin,
-                nsfpmMasukan: initialData.nsfpmMasukan,
-                biaya: initialData.biaya,
-                // Attempt to parse date or default to now
-                tanggalFPM: new Date(),
-                masaNSFPM: new Date(),
-            })
-        } else {
-            form.reset({
-                kodeBeli: "Generated XX",
-                noMesin: "",
-                nsfpmMasukan: "",
-                biaya: 0,
-                tanggalFPM: new Date(),
-                masaNSFPM: new Date(),
-            })
-        }
-    }, [initialData, form])
+  const entries = Object.entries(details).filter(([, value]) => Array.isArray(value) && value.length > 0);
 
-    const onSubmit = async (values: PPNPembelianFormValues) => {
-        try {
-            const formattedData = {
-                ...values,
-                tanggalFPM: format(values.tanggalFPM, "dd/MM/yyyy"), // Format back to string
-                masaNSFPM: format(values.masaNSFPM, "MMM yyyy"), // Format per requirement
-            }
-
-            if (isEdit && initialData) {
-                await updateMutation.mutateAsync({
-                    ...initialData,
-                    ...formattedData,
-                    biaya: formattedData.biaya ?? 0,
-                })
-                toast.success("Data berhasil diperbarui")
-            } else {
-                await createMutation.mutateAsync({
-                    ...formattedData,
-                    biaya: formattedData.biaya ?? 0,
-                    // Mock other fields
-                    kodeBeli: "PBL-WIN/20260202-XXXX",
-                    tanggalBeli: "28/01/2026",
-                    supplier: "WAJIRA JAGATARA MORINDO",
-                    qty: 1,
-                    tipeUnit: "Stylo 190 CBS",
-                    noRangka: "MH847420JVIDO",
-                    hargaBeli: 99999999,
-                    hargaUnit: 99999999,
-                    dppBeli: 99999999,
-                    ppn: 99999999,
-                    paymentBeli: 99999999,
-                })
-                toast.success("Data berhasil ditambahkan")
-            }
-
-            onClose()
-            form.reset()
-        } catch {
-            toast.error("Terjadi kesalahan")
-        }
+  return entries.reduce<Partial<Record<keyof UpdatePPNPembelianFormValues, string>>>((accumulator, [field, messages]) => {
+    if (field in UpdatePPNPembelianSchema.shape) {
+      accumulator[field as keyof UpdatePPNPembelianFormValues] = String((messages as unknown[])[0]);
     }
 
-    return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>
-                        {isEdit ? "Ubah Data PPN" : "Tambah PPN"}
-                    </DialogTitle>
-                    <p className="text-sm text-muted-foreground">
-                        Masukkan detail PPN baru
-                    </p>
-                </DialogHeader>
+    return accumulator;
+  }, {});
+};
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                        <FormField
-                            control={form.control}
-                            name="kodeBeli"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Kode Beli</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} readOnly className="bg-gray-50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+export default function PPNPembelianFormDialog({ open, onClose, initialData }: Props) {
+  const updateMutation = useUpdatePPNPembelian();
 
-                        <FormField
-                            control={form.control}
-                            name="noMesin"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>No Mesin</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Masukkan No Mesin" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+  const form = useForm<UpdatePPNPembelianFormValues>({
+    resolver: zodResolver(UpdatePPNPembelianSchema),
+    defaultValues: {
+      fp_date: null,
+      nsfp_age: null,
+      nsfp_amount: null,
+      amount: null,
+    },
+  });
 
-                        <FormField
-                            control={form.control}
-                            name="tanggalFPM"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Tanggal FPM</FormLabel>
-                                    <FormControl>
-                                        <DatePicker
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            placeholder="Pilih Tanggal"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+  useEffect(() => {
+    if (!initialData) {
+      form.reset({
+        fp_date: null,
+        nsfp_age: null,
+        nsfp_amount: null,
+        amount: null,
+      });
+      return;
+    }
 
-                        <FormField
-                            control={form.control}
-                            name="masaNSFPM"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Masa FPM</FormLabel>
-                                    <FormControl>
-                                        <DatePicker
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            placeholder="Pilih Masa"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+    form.reset({
+      fp_date: toDate(initialData.fp_date),
+      nsfp_age: toDate(initialData.nsfp_age),
+      nsfp_amount: initialData.nsfp_input || null,
+      amount: initialData.payment_amount || null,
+    });
+  }, [form, initialData]);
 
-                        <FormField
-                            control={form.control}
-                            name="nsfpmMasukan"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>NSFPM Masukan</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Tambahkan NSFPM" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+  const onSubmit = async (values: UpdatePPNPembelianFormValues) => {
+    if (!initialData) return;
 
-                        <FormField
-                            control={form.control}
-                            name="biaya"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Biaya</FormLabel>
-                                    <FormControl>
-                                        <MoneyInput
-                                            placeholder="Tambahkan Biaya"
-                                            {...field}
-                                            value={field.value || 0}
-                                            onChangeValue={field.onChange}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+    try {
+      await updateMutation.mutateAsync({
+        id: initialData.id,
+        payload: {
+          fp_date: values.fp_date ? format(values.fp_date, 'yyyy-MM-dd') : undefined,
+          nsfp_age: values.nsfp_age ? format(values.nsfp_age, 'yyyy-MM-dd') : undefined,
+          nsfp_amount: values.nsfp_amount ?? undefined,
+          amount: values.amount ?? undefined,
+        },
+      });
 
-                        <div className="flex flex-col gap-3 mt-6">
-                            <Button
-                                type="submit"
-                                className="w-full bg-[#1e293b] hover:bg-[#0f172a]"
-                                disabled={form.formState.isSubmitting}
-                            >
-                                Simpan
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                className="w-full"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
-    )
+      toast.success('Data PPN pembelian berhasil diperbarui');
+      onClose();
+    } catch (error) {
+      const fieldErrors = normalizeFieldErrors(error);
+
+      Object.entries(fieldErrors).forEach(([field, message]) => {
+        form.setError(field as keyof UpdatePPNPembelianFormValues, { message });
+      });
+
+      const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Gagal memperbarui data PPN pembelian';
+      toast.error(message);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(nextOpen) => (!nextOpen ? onClose() : undefined)}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Ubah Data PPN Pembelian</DialogTitle>
+          <p className="text-sm text-muted-foreground">Perubahan disimpan melalui endpoint finance PPN dengan fallback POST jika PUT tidak diizinkan.</p>
+        </DialogHeader>
+
+        {initialData ? (
+          <>
+            <div className="grid gap-3 rounded-lg border bg-slate-50 p-4 text-sm md:grid-cols-2">
+              <div>
+                <div className="text-xs uppercase text-slate-500">Kode Pembelian</div>
+                <div className="font-medium text-slate-900">{initialData.code}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase text-slate-500">Supplier</div>
+                <div className="font-medium text-slate-900">{initialData.supplier}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase text-slate-500">Tipe Unit</div>
+                <div className="font-medium text-slate-900">{initialData.unit_type.name}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase text-slate-500">Harga Unit</div>
+                <div className="font-medium text-slate-900">{formatCurrency(initialData.unit_price)}</div>
+              </div>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="fp_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tanggal FP</FormLabel>
+                        <FormControl>
+                          <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal FP" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="nsfp_age"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Usia NSFP</FormLabel>
+                        <FormControl>
+                          <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih usia NSFP" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="nsfp_amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nilai NSFP</FormLabel>
+                        <FormControl>
+                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan nilai NSFP" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Jumlah Pembayaran</FormLabel>
+                        <FormControl>
+                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan jumlah pembayaran" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <FormLabel>Nomor Mesin</FormLabel>
+                    <Input value={initialData.unit_transaction_item_detail.machine_number} readOnly className="bg-slate-50" />
+                  </div>
+                  <div className="space-y-2">
+                    <FormLabel>Nomor Rangka</FormLabel>
+                    <Input value={initialData.unit_transaction_item_detail.chassis_number} readOnly className="bg-slate-50" />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 pt-4 border-t">
+                  <Button type="submit" className="w-full bg-[#1e293b] hover:bg-[#0f172a]" disabled={updateMutation.isPending}>
+                    {updateMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  </Button>
+                  <Button type="button" variant="outline" className="w-full" onClick={onClose} disabled={updateMutation.isPending}>
+                    Batal
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
 }

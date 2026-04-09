@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { useForm, Controller } from 'react-hook-form';
 import { MoneyInput } from '@/components/ui/money-input';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,6 +15,8 @@ import { Sparepart } from '@/@types/sparepart.types';
 import { useCreateSparepart, useSparepartCategories, useUpdateSparepart } from '@/hooks/useSparepart';
 import { toast } from 'sonner';
 import { CreateSparepartCategoryDialog } from './CreateSparepartCategoryDialog';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Props {
   open: boolean;
@@ -38,6 +42,7 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
   const updateMutation = useUpdateSparepart(companyId);
   const { data: categories, isLoading: loadingCategories } = useSparepartCategories();
   const [openCreateGroup, setOpenCreateGroup] = useState(false);
+  const [openGroupSelect, setOpenGroupSelect] = useState(false);
 
   const {
     handleSubmit,
@@ -154,18 +159,39 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
                 name="categoryId"
                 render={({ field }) => (
                   <div className="flex gap-2">
-                    <Select value={field.value ? String(field.value) : ''} onValueChange={(value) => field.onChange(Number(value))} disabled={loadingCategories}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder={loadingCategories ? 'Memuat grup...' : 'Pilih grup'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(categories ?? []).map((category) => (
-                          <SelectItem key={category.id} value={String(category.id)}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={openGroupSelect} onOpenChange={setOpenGroupSelect}>
+                      <PopoverTrigger asChild>
+                        <Button type="button" variant="outline" role="combobox" aria-expanded={openGroupSelect} disabled={loadingCategories} className="flex-1 justify-between font-normal">
+                          <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
+                            {field.value ? categories?.find((category) => category.id === Number(field.value))?.name ?? 'Pilih grup' : loadingCategories ? 'Memuat grup...' : 'Pilih grup'}
+                          </span>
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Cari grup..." />
+                          <CommandList>
+                            <CommandEmpty>Grup tidak ditemukan.</CommandEmpty>
+                            <CommandGroup>
+                              {(categories ?? []).map((category) => (
+                                <CommandItem
+                                  key={category.id}
+                                  value={`${category.name} ${category.id}`}
+                                  onSelect={() => {
+                                    field.onChange(category.id);
+                                    setOpenGroupSelect(false);
+                                  }}
+                                >
+                                  <Check className={cn('mr-2 h-4 w-4', Number(field.value) === category.id ? 'opacity-100' : 'opacity-0')} />
+                                  <span className="truncate">{category.name}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenCreateGroup(true)}>
                       +
                     </Button>

@@ -82,20 +82,42 @@ export default function SalesUnitDetailPage() {
 
   const requiredQty = Number(unitItem?.qty_total ?? 0);
 
-  const salesItem = useMemo(() => {
-    const rows = salesData?.raw?.unit_transaction_items ?? [];
-    return rows.find((row) => String(row?.id ?? '') === String(selectedUnitId ?? ''));
-  }, [salesData?.raw?.unit_transaction_items, selectedUnitId]);
-
   const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
-    return (salesItem?.unit_transaction_item_details ?? []).map((detail) => ({
+    const mappedFromItemDetails = (unitItem?.unit_transaction_item_details ?? []).map((detail) => ({
       id: toNumberId(detail?.id),
       color: String(detail?.color ?? '-'),
       machine_number: String(detail?.machine_number ?? '-'),
       chassis_number: String(detail?.chassis_number ?? '-'),
-      in_stock: true,
+      in_stock: detail?.in_stock,
     }));
-  }, [salesItem?.unit_transaction_item_details]);
+
+    const detailLookup = new Map<number, WarehouseStockUnit>();
+    stockUnits.forEach((detail) => {
+      detailLookup.set(detail.id, detail);
+    });
+    mappedFromItemDetails.forEach((detail) => {
+      detailLookup.set(detail.id, detail);
+    });
+
+    const assignedBySales = (unitItem?.unit_transaction_item_sales ?? [])
+      .map((row) => toNumberId(row?.unit_transaction_item_detail_id))
+      .filter((detailId) => detailId > 0)
+      .map((detailId) =>
+        detailLookup.get(detailId) ?? {
+          id: detailId,
+          color: '-',
+          machine_number: '-',
+          chassis_number: '-',
+          in_stock: false,
+        },
+      );
+
+    if (assignedBySales.length > 0) {
+      return assignedBySales;
+    }
+
+    return mappedFromItemDetails;
+  }, [stockUnits, unitItem?.unit_transaction_item_details, unitItem?.unit_transaction_item_sales]);
 
   const assignedIds = useMemo(() => {
     return assignedDetailRows.map((item) => item.id).filter((item) => item > 0);
@@ -137,13 +159,26 @@ export default function SalesUnitDetailPage() {
 
     return rows.every((item) => {
       const required = Number(item?.qty_total ?? 0);
-      const assigned = item?.unit_transaction_item_details?.length ?? 0;
+      const assigned = Math.max(item?.unit_transaction_item_details?.length ?? 0, item?.unit_transaction_item_sales?.length ?? 0);
       return required > 0 && assigned >= required;
     });
   }, [salesData?.raw?.unit_transaction_items]);
 
   const selectedCount = selectedIds.size;
   const stockState = String(salesData?.raw?.stock_state ?? 'draft');
+  const hasPendingSelectionChanges = useMemo(() => {
+    if (selectedIds.size !== assignedIds.length) return true;
+
+    const assignedSet = new Set(assignedIds);
+    for (const id of selectedIds) {
+      if (!assignedSet.has(id)) return true;
+    }
+
+    return false;
+  }, [selectedIds, assignedIds]);
+
+  const selectedFromSalesCount = Array.isArray(unitItem?.unit_transaction_item_sales) ? unitItem.unit_transaction_item_sales.length : 0;
+  const selectedFromDetailCount = Array.isArray(unitItem?.unit_transaction_item_details) ? unitItem.unit_transaction_item_details.length : 0;
 
   const canAssignStock = requiredQty > 0 && selectedCount === requiredQty;
   const canMoveToOutbound = allItemsAssigned && stockState === 'draft';
@@ -367,14 +402,31 @@ export default function SalesUnitDetailPage() {
                 State: <span className="font-medium text-foreground">{stockState}</span>
               </span>
               <span className="text-muted-foreground">
-                Assigned Item:{' '}
+                Assigned Tersimpan:{' '}
                 <span className="font-medium text-foreground">
                   {assignedIds.length}/{requiredQty}
                 </span>
               </span>
               <span className="text-muted-foreground">
+                Pilihan Saat Ini:{' '}
+                <span className="font-medium text-foreground">
+                  {selectedCount}/{requiredQty}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                Sumber Sales Mapping:{' '}
+                <span className="font-medium text-foreground">{selectedFromSalesCount}</span>
+              </span>
+              <span className="text-muted-foreground">
+                Sumber Detail Legacy:{' '}
+                <span className="font-medium text-foreground">{selectedFromDetailCount}</span>
+              </span>
+              <span className="text-muted-foreground">
                 Semua Item Assigned: <span className="font-medium text-foreground">{allItemsAssigned ? 'Ya' : 'Belum'}</span>
               </span>
+              {hasPendingSelectionChanges && (
+                <span className="text-amber-600">Ada perubahan pilihan yang belum di-assign. Klik tombol Assign Stock untuk menyimpan.</span>
+              )}
             </div>
 
             <StockPickerTable

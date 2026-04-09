@@ -1,75 +1,49 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as service from '@/services/penerimaan-unit.service';
+import { useMutation } from '@tanstack/react-query';
+import {
+  useCreateWarehouseActivity,
+  useReceiptStock,
+  useUpdateWarehouseActivity,
+  useWarehouseActivities,
+  useWarehouseActivityDetail,
+} from '@/hooks/useWarehouseActivity';
 
-export const usePenerimaanUnits = () =>
-  useQuery({
-    queryKey: ['penerimaan-unit'],
-    queryFn: service.getPenerimaanUnits,
-  });
+export const usePenerimaanUnits = () => {
+  return useWarehouseActivities({ activityType: 'receipt' });
+};
 
-export const usePenerimaanUnitById = (id?: string) =>
-  useQuery({
-    queryKey: ['penerimaan-unit', id],
-    queryFn: () => service.getPenerimaanUnitById(id as string),
-    enabled: !!id,
-  });
+export const usePenerimaanUnitById = (id?: string) => {
+  return useWarehouseActivityDetail(id);
+};
 
 export const useCreatePenerimaanUnit = () => {
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: service.createPenerimaanUnit,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['penerimaan-unit'] }),
-  });
+  return useCreateWarehouseActivity();
 };
 
 export const useDeletePenerimaanUnit = () => {
-  const qc = useQueryClient();
-
+  // Endpoint delete warehouse activity is not available in current backend contract.
   return useMutation({
-    mutationFn: service.deletePenerimaanUnit,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['penerimaan-unit'] }),
-  });
-};
-
-export const usePenerimaanDetail = (penerimaanId?: string) =>
-  useQuery({
-    queryKey: ['penerimaan-unit-detail', penerimaanId],
-    queryFn: () => service.getPenerimaanDetail(penerimaanId as string),
-    enabled: !!penerimaanId,
-  });
-
-export const useBulkTerimaDetail = () => {
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: service.bulkTerimaDetail,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['penerimaan-unit-detail'] });
+    mutationFn: async () => {
+      throw new Error('Delete endpoint tidak tersedia untuk warehouse activity');
     },
   });
 };
 
-export const useBulkDeleteDetail = () => {
-  const qc = useQueryClient();
+export const usePenerimaanDetail = (penerimaanId?: string) => {
+  return useWarehouseActivityDetail(penerimaanId);
+};
 
+export const useBulkTerimaDetail = () => {
+  return useReceiptStock();
+};
+
+export const useBulkDeleteDetail = () => {
   return useMutation({
-    mutationFn: service.bulkDeleteDetail,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['penerimaan-unit-detail'] });
+    mutationFn: async () => {
+      throw new Error('Delete detail endpoint tidak tersedia untuk warehouse activity');
     },
   });
 };
 
 export const useUpdatePenerimaanUnit = () => {
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: Partial<import('@/@types/penerimaan-unit.types').PenerimaanUnit> }) =>
-      service.updatePenerimaanUnit(id, payload),
-    onSuccess: (_, { id }) => {
-      qc.invalidateQueries({ queryKey: ['penerimaan-unit'] });
-      qc.invalidateQueries({ queryKey: ['penerimaan-unit', id] });
-    },
-  });
+  return useUpdateWarehouseActivity();
 };

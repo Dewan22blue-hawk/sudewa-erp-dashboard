@@ -1,122 +1,242 @@
-import { PPNPembelian } from "@/@types/ppn-pembelian.types"
-import { MoreVertical } from "lucide-react"
-import { useTableSort } from "@/hooks/useTableSort"
-import { SortableHeader } from "@/components/ui/sortable-header"
-import { formatCurrency } from "@/lib/utils/currency"
+import type { PPNPembelian } from '@/@types/ppn-pembelian.types';
+import type { PaginationMeta } from '@/@types/pagination.types';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SortableHeader } from '@/components/ui/sortable-header';
+import { formatCurrency } from '@/lib/utils/currency';
+import { format } from 'date-fns';
+import { MoreVertical } from 'lucide-react';
 
 interface Props {
-    data: PPNPembelian[]
-    onEdit: (item: PPNPembelian) => void
-    onDelete: (item: PPNPembelian) => void
+  data: PPNPembelian[];
+  meta: PaginationMeta;
+  sortBy: string;
+  sortDirection: 'asc' | 'desc';
+  hasNextPage: boolean;
+  isTotalExact: boolean;
+  isLoading?: boolean;
+  isFetching?: boolean;
+  isError?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
+  onEdit: (item: PPNPembelian) => void;
+  onSortChange: (sortBy: string) => void;
+  onPageChange: (page: number) => void;
 }
 
-export default function PPNPembelianTable({
-    data,
-    onEdit,
-    onDelete,
-}: Props) {
-    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-        data,
-    })
-    return (
-        <div className="bg-white rounded-xl border overflow-x-auto">
-            <table className="min-w-[1800px] w-full text-sm">
-                <thead className="text-center bg-gray-50/50 uppercase text-sm font-semibold text-gray-900">
-                    <tr className="text-center border-b border-gray-200">
-                        <th className="py-2 text-left">
-                            <SortableHeader title="Kode Beli" sortKey="kodeBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="Tanggal Beli" sortKey="tanggalBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="Supplier" sortKey="supplier" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="Tanggal FPM" sortKey="tanggalFPM" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="Masa NSFPM" sortKey="masaNSFPM" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="NSFPM Masukan" sortKey="nsfpmMasukan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="Tipe Unit" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="No Mesin" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-left">
-                            <SortableHeader title="No Rangka" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="Harga Beli" sortKey="hargaBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="Biaya" sortKey="biaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="Harga Unit" sortKey="hargaUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="DPP Beli" sortKey="dppBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="PPN 11%" sortKey="ppn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="py-2 text-right">
-                            <SortableHeader title="Payment Beli" sortKey="paymentBeli" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full px-4" />
-                        </th>
-                        <th className="px-4 py-3 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sortedData.map(item => (
-                        <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="px-4 py-3 text-blue-600">{item.kodeBeli}</td>
-                            <td className="px-4 py-3">{item.tanggalBeli}</td>
-                            <td className="px-4 py-3">{item.supplier}</td>
-                            <td className="px-4 py-3">{item.tanggalFPM}</td>
-                            <td className="px-4 py-3">{item.masaNSFPM}</td>
-                            <td className="px-4 py-3">{item.nsfpmMasukan}</td>
-                            <td className="px-4 py-3 text-right">{item.qty}</td>
-                            <td className="px-4 py-3">{item.tipeUnit}</td>
-                            <td className="px-4 py-3">{item.noMesin}</td>
-                            <td className="px-4 py-3">{item.noRangka}</td>
-                            <td className="px-4 py-3 text-right">{formatCurrency(item.hargaBeli)}</td>
-                            <td className="px-4 py-3 text-right">{formatCurrency(item.biaya)}</td>
-                            <td className="px-4 py-3 text-right">{formatCurrency(item.hargaUnit)}</td>
-                            <td className="px-4 py-3 text-right">{formatCurrency(item.dppBeli)}</td>
-                            <td className="px-4 py-3 text-right">{formatCurrency(item.ppn)}</td>
-                            <td className="px-4 py-3 text-right">{formatCurrency(item.paymentBeli)}</td>
-                            <td className="px-4 py-3 text-center">
-                                <div className="relative group">
-                                    <MoreVertical size={18} className="cursor-pointer" />
-                                    <div className="absolute right-0 hidden group-hover:block bg-white shadow-md rounded-md border text-sm">
-                                        <button
-                                            onClick={() => onEdit(item)}
-                                            className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => onDelete(item)}
-                                            className="block px-4 py-2 hover:bg-gray-100 text-red-600 w-full text-left"
-                                        >
-                                            Hapus
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
+const formatDate = (value: string | null) => {
+  if (!value) return '-';
 
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : format(parsed, 'dd MMM yyyy');
+};
+
+const renderStatusBadge = (hasValue: boolean, readyLabel: string, emptyLabel: string) => (
+  <Badge className={hasValue ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-amber-100 text-amber-700 hover:bg-amber-100'}>
+    {hasValue ? readyLabel : emptyLabel}
+  </Badge>
+);
+
+const SkeletonRow = () => (
+  <tr className="border-b border-gray-200">
+    {Array.from({ length: 12 }).map((_, index) => (
+      <td key={index} className="px-4 py-4">
+        <Skeleton className="h-4 w-full max-w-[140px]" />
+      </td>
+    ))}
+  </tr>
+);
+
+export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, hasNextPage, isTotalExact, isLoading, isFetching, isError, errorMessage, onRetry, onEdit, onSortChange, onPageChange }: Props) {
+  const page = meta.currentPage;
+  const hasData = data.length > 0;
+  const startIndex = hasData ? (page - 1) * meta.perPage + 1 : 0;
+  const endIndex = hasData ? startIndex + data.length - 1 : 0;
+  const canGoPrevious = page > 1;
+  const canGoNext = isTotalExact ? page < meta.lastPage : hasNextPage;
+  const pageNumbers = isTotalExact
+    ? Array.from({ length: Math.min(5, meta.lastPage) }, (_, index) => {
+        if (meta.lastPage <= 5) return index + 1;
+        if (page <= 3) return index + 1;
+        if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
+        return page - 2 + index;
+      })
+    : [page];
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-white rounded-xl border overflow-x-auto">
+        {isFetching && !isLoading ? (
+          <div className="border-b bg-blue-50 px-4 py-2 text-xs text-blue-700">
+            Memperbarui data...
+          </div>
+        ) : null}
+        <table className="min-w-[1800px] w-full text-sm">
+          <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900">
+            <tr className="text-center border-b border-gray-200">
+              <th className="py-2 text-left">
+                <SortableHeader title="Kode Pembelian" sortKey="code" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Tanggal Beli" sortKey="buy_date" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Supplier" sortKey="supplier" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Tanggal FP" sortKey="fp_date" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Usia NSFP" sortKey="nsfp_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Input NSFP" sortKey="nsfp_input" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-left">
+                <SortableHeader title="Tipe Unit" sortKey="unit_type.name" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+              </th>
+              <th className="py-2 text-left">No Mesin</th>
+              <th className="py-2 text-left">No Rangka</th>
+              <th className="py-2 text-right">
+                <SortableHeader title="Harga Unit" sortKey="unit_price" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="DPP" sortKey="dpp_amount" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="PPN 11%" sortKey="ppn_11" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="Total Bayar" sortKey="payment_amount" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="px-4 py-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+            ) : isError ? (
+              <tr>
+                <td colSpan={15} className="px-4 py-10 text-center">
+                  <div className="space-y-3">
+                    <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data PPN pembelian'}</p>
+                    {onRetry ? (
+                      <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+                        Retry
+                      </Button>
+                    ) : null}
+                  </div>
+                </td>
+              </tr>
+            ) : data.length === 0 ? (
+              <tr>
+                <td colSpan={15} className="px-4 py-10 text-center text-gray-500">
+                  Tidak ada data PPN pembelian
+                </td>
+              </tr>
+            ) : (
+              data.map((item) => {
+                const hasFp = Boolean(item.fp_date);
+                const hasNsfpAge = Boolean(item.nsfp_age);
+                const hasNsfpInput = item.nsfp_input > 0;
+
+                return (
+                  <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-blue-600">{item.code}</td>
+                    <td className="px-4 py-3">{formatDate(item.buy_date)}</td>
+                    <td className="px-4 py-3">{item.supplier}</td>
+                    <td className="px-4 py-3">
+                      <div className="space-y-1">
+                        <div>{formatDate(item.fp_date)}</div>
+                        {renderStatusBadge(hasFp, 'FP Terisi', 'Belum FP')}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="space-y-1">
+                        <div>{formatDate(item.nsfp_age)}</div>
+                        {renderStatusBadge(hasNsfpAge, 'NSFP Terisi', 'Belum NSFP')}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="space-y-1">
+                        <div>{formatCurrency(item.nsfp_input)}</div>
+                        {renderStatusBadge(hasNsfpInput, 'Sudah Input', 'Belum Input')}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right">{item.qty}</td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{item.unit_type.name}</div>
+                      <div className="text-xs text-gray-500">{item.unit_type.code}</div>
+                    </td>
+                    <td className="px-4 py-3">{item.unit_transaction_item_detail.machine_number}</td>
+                    <td className="px-4 py-3">{item.unit_transaction_item_detail.chassis_number}</td>
+                    <td className="px-4 py-3 text-right">{formatCurrency(item.unit_price)}</td>
+                    <td className="px-4 py-3 text-right">{formatCurrency(item.dpp_amount)}</td>
+                    <td className="px-4 py-3 text-right">{formatCurrency(item.ppn_11)}</td>
+                    <td className="px-4 py-3 text-right">{formatCurrency(item.payment_amount)}</td>
+                    <td className="px-4 py-3 text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onEdit(item)}>Edit</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-col gap-3 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
+        <div>
+          {isTotalExact
+            ? `Showing ${startIndex}-${endIndex} of ${meta.total} data`
+            : `Showing ${startIndex}-${endIndex} on page ${page}${hasNextPage ? ' (lebih banyak data tersedia)' : ''}`}
         </div>
-    )
+        <div className="flex flex-wrap gap-2">
+          {isTotalExact ? (
+            <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(1)} disabled={!canGoPrevious}>
+              First
+            </Button>
+          ) : null}
+          <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(page - 1)} disabled={!canGoPrevious}>
+            Previous
+          </Button>
+          {pageNumbers.map((pageNumber) => (
+            <Button
+              key={pageNumber}
+              type="button"
+              variant="outline"
+              size="sm"
+              className={pageNumber === page ? 'bg-gray-100' : ''}
+              onClick={() => onPageChange(pageNumber)}
+              disabled={pageNumber === page}
+            >
+              {pageNumber}
+            </Button>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(page + 1)} disabled={!canGoNext}>
+            Next
+          </Button>
+          {isTotalExact ? (
+            <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(meta.lastPage)} disabled={!canGoNext}>
+              Last
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
 }

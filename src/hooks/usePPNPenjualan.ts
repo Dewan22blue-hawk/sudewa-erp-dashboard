@@ -1,37 +1,35 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-    getPPNPenjualan,
-    createPPNPenjualan,
-    updatePPNPenjualan,
-    deletePPNPenjualan,
-} from "@/services/ppn-penjualan.service"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { PPNPenjualanFilterParams, UpdatePPNPenjualanMutationPayload } from '@/@types/ppn-penjualan.types';
+import { getPPNPenjualanList, updatePPNPenjualan } from '@/services/api/ppn-penjualan';
 
-export const usePPNPenjualan = () =>
-    useQuery({
-        queryKey: ["ppn-penjualan"],
-        queryFn: getPPNPenjualan,
-    })
+const PPN_PENJUALAN_KEY = 'ppn-penjualan';
 
-export const useCreatePPNPenjualan = () => {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: createPPNPenjualan,
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["ppn-penjualan"] }),
-    })
+export const ppnPenjualanKeys = {
+  all: [PPN_PENJUALAN_KEY] as const,
+  list: (params: PPNPenjualanFilterParams) => [PPN_PENJUALAN_KEY, 'list', params] as const,
+};
+
+export function usePPNPenjualan(params: PPNPenjualanFilterParams) {
+  return useQuery({
+    queryKey: ppnPenjualanKeys.list(params),
+    queryFn: () => getPPNPenjualanList(params),
+    placeholderData: keepPreviousData,
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+  });
 }
 
-export const useUpdatePPNPenjualan = () => {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: updatePPNPenjualan,
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["ppn-penjualan"] }),
-    })
-}
+export function useUpdatePPNPenjualan() {
+  const queryClient = useQueryClient();
 
-export const useDeletePPNPenjualan = () => {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: deletePPNPenjualan,
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["ppn-penjualan"] }),
-    })
+  return useMutation({
+    mutationFn: (variables: UpdatePPNPenjualanMutationPayload) => updatePPNPenjualan(variables),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ppnPenjualanKeys.all });
+    },
+  });
 }

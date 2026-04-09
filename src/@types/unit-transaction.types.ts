@@ -46,6 +46,7 @@ export interface UnitTransactionDetail {
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
   unit_transaction_bruto_total: number;
+  unit_transaction_item_total_hpp: number;
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;

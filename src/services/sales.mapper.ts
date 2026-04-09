@@ -38,6 +38,20 @@ export type SalesApiModel = {
     cash_payment_amount?: string | number;
     bca_payment_2?: string | number;
     bca_payment_usd_amount?: string | number;
+    unit_transaction_billing_histories?: Array<{
+      bca_payment_amount?: string | number;
+      cash_payment_amount?: string | number;
+      bca_payment_usd_amount?: string | number;
+    }>;
+  } | null;
+  billing_summary?: {
+    grand_total?: string | number;
+    total_cash_payment?: string | number;
+    total_bca_payment?: string | number;
+    total_bca_usd_payment?: string | number;
+    total_paid?: string | number;
+    remaining_payment?: string | number;
+    is_paid?: boolean | number | string;
   } | null;
   unit_transaction_item_total_dpp?: string | number;
   unit_transaction_item_total_ppn?: string | number;
@@ -62,6 +76,10 @@ export type SalesApiModel = {
       color?: string;
       machine_number?: string;
       chassis_number?: string;
+    }>;
+    unit_transaction_item_sales?: Array<{
+      id?: number | string;
+      unit_transaction_item_detail_id?: number | string;
     }>;
   }>;
 };
@@ -96,6 +114,39 @@ const getTotalPaid = (billing: SalesApiModel['unit_transaction_billing']): numbe
   return Math.max(directTotal, fromComponents, 0);
 };
 
+const getTotalPaidFromBillingSummary = (item: SalesApiModel): number => {
+  const summary = item.billing_summary;
+  if (!summary) return 0;
+
+  const directTotal = toNumber(summary.total_paid);
+  const fromComponents =
+    toNumber(summary.total_cash_payment) +
+    toNumber(summary.total_bca_payment) +
+    toNumber(summary.total_bca_usd_payment);
+
+  return Math.max(directTotal, fromComponents, 0);
+};
+
+const getTotalPaidFromBillingHistory = (billing: SalesApiModel['unit_transaction_billing']): number => {
+  const rows = billing?.unit_transaction_billing_histories ?? [];
+  if (!Array.isArray(rows) || rows.length === 0) return 0;
+
+  return rows.reduce(
+    (acc, row) =>
+      acc + toNumber(row.bca_payment_amount) + toNumber(row.cash_payment_amount) + toNumber(row.bca_payment_usd_amount),
+    0,
+  );
+};
+
+const getRemainingPayment = (item: SalesApiModel, totalJual: number, totalPaid: number): number => {
+  const remainingFromSummary = toNumber(item.billing_summary?.remaining_payment);
+  if (remainingFromSummary > 0 || (toBool(item.billing_summary?.is_paid) && remainingFromSummary === 0)) {
+    return remainingFromSummary;
+  }
+
+  return Math.max(totalJual - totalPaid, 0);
+};
+
 const sumLineItems = (
   items: SalesApiModel['unit_transaction_items'],
   selector: (item: NonNullable<SalesApiModel['unit_transaction_items']>[number]) => string | number | undefined,
@@ -113,15 +164,23 @@ const getBrutoTotal = (item: SalesApiModel): number =>
   );
 
 const getDppTotal = (item: SalesApiModel): number => {
+  const lineDpp = sumLineItems(item.unit_transaction_items, (row) => row.dpp_total_price ?? row.hpp_total_price);
+  if (lineDpp > 0) return lineDpp;
+
   const headerDpp = toNumber(item.unit_transaction_item_total_dpp ?? item.unit_transaction_dpp_total ?? item.transaction_dpp_total);
   if (headerDpp > 0) return headerDpp;
-  return sumLineItems(item.unit_transaction_items, (row) => row.dpp_total_price);
+
+  return 0;
 };
 
 const getPpnTotal = (item: SalesApiModel): number => {
+  const linePpn = sumLineItems(item.unit_transaction_items, (row) => row.ppn_total_price);
+  if (linePpn > 0) return linePpn;
+
   const headerPpn = toNumber(item.unit_transaction_item_total_ppn ?? item.unit_transaction_ppn_total ?? item.transaction_ppn_total);
   if (headerPpn > 0) return headerPpn;
-  return sumLineItems(item.unit_transaction_items, (row) => row.ppn_total_price);
+
+  return 0;
 };
 
 const formatDate = (value?: string): string => {
@@ -139,7 +198,7 @@ export function mapSalesToUI(item: SalesApiModel): SalesListUI {
     warehouseName: item.warehouse?.name ?? '-',
     total: getBrutoTotal(item),
     date: item.created_at ?? '',
-    status: toBool(item.unit_transaction_billing?.is_paid) ? 'Lunas' : 'Belum',
+    status: toBool(item.billing_summary?.is_paid ?? item.unit_transaction_billing?.is_paid) ? 'Lunas' : 'Belum',
   };
 }
 
@@ -149,7 +208,12 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
   const totalPpn = getPpnTotal(item);
   const totalBiaya = toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee);
   const totalJual = getBrutoTotal(item) || mapped.total;
-  const totalBayar = getTotalPaid(item.unit_transaction_billing);
+  const totalBayar = Math.max(
+    getTotalPaidFromBillingSummary(item),
+    getTotalPaid(item.unit_transaction_billing),
+    getTotalPaidFromBillingHistory(item.unit_transaction_billing),
+  );
+  const kurangBayar = getRemainingPayment(item, totalJual, totalBayar);
 
   return {
     id: mapped.id,
@@ -169,7 +233,7 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
     totalBiaya,
     totalJual,
     totalBayar,
-    kurangBayar: Math.max(totalJual - totalBayar, 0),
+    kurangBayar,
     lineItems: [],
     units: [],
   };
@@ -204,7 +268,12 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
   const totalDpp = getDppTotal(item);
   const totalPpn = getPpnTotal(item);
   const totalJual = getBrutoTotal(item);
-  const totalBayar = getTotalPaid(item.unit_transaction_billing);
+  const totalBayar = Math.max(
+    getTotalPaidFromBillingSummary(item),
+    getTotalPaid(item.unit_transaction_billing),
+    getTotalPaidFromBillingHistory(item.unit_transaction_billing),
+  );
+  const kurangBayar = getRemainingPayment(item, totalJual, totalBayar);
   const qty = toNumber(item.max_capacity);
 
   return {
@@ -225,7 +294,7 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
     totalBiaya: toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee),
     totalJual,
     totalBayar,
-    kurangBayar: Math.max(totalJual - totalBayar, 0),
+    kurangBayar,
     lineItems: (item.unit_transaction_items ?? []).map(mapSalesLineItem),
     units: [],
   };

@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus, Search } from 'lucide-react';
+import { MoreVertical, Plus, Search, Upload } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -22,10 +22,11 @@ interface TypeUnitTableProps {
   onEdit: (typeUnit: TypeUnit) => void;
   onDelete: (typeUnit: TypeUnit) => void;
   onAdd?: () => void;
+  onImport?: () => void;
   isLoading?: boolean;
 }
 
-export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, isLoading }: TypeUnitTableProps) {
+export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, onImport, isLoading }: TypeUnitTableProps) {
   const totalPages = meta?.lastPage ?? Math.max(1, Math.ceil((meta?.total ?? typeUnits.length) / perPage));
   const hasData = (meta?.total ?? typeUnits.length) > 0;
   const startIndex = meta ? (page - 1) * perPage + 1 : 1;
@@ -33,7 +34,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data: typeUnits,
-    defaultSortKey: 'code',
+    defaultSortKey: 'createdAt',
+    defaultSortOrder: 'desc',
   });
 
   return (
@@ -61,10 +63,16 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto justify-end">
+        <div className="flex w-full sm:w-auto justify-end gap-2">
+          {onImport && (
+            <Button onClick={onImport} variant="outline" className="gap-2">
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+          )}
           {onAdd && (
             <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               Tambah
             </Button>
           )}
@@ -85,10 +93,10 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 <SortableHeader title="TIPE UNIT" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
-                <SortableHeader title="HARGA BELI" sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+                <SortableHeader title="HARGA BELI" sortKey="buyPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[150px]">
-                <SortableHeader title="HARGA JUAL" sortKey="salePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+                <SortableHeader title="HARGA JUAL" sortKey="sellPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead className="font-semibold uppercase text-slate-700 h-12 w-[120px]">
                 <SortableHeader title="JENIS" sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
@@ -124,8 +132,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <TableCell className="font-medium text-slate-800 uppercase pl-4 py-4">{item.code}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="font-medium text-slate-800 uppercase py-4">{item.name}</TableCell>
-                  <TableCell className="text-slate-700 uppercase py-4">{(item as any).purchasePrice ? formatCurrency(Number((item as any).purchasePrice)) : '-'}</TableCell>
-                  <TableCell className="text-slate-700 uppercase py-4">{(item as any).salePrice ? formatCurrency(Number((item as any).salePrice)) : '-'}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.buyPrice !== null && item.buyPrice !== undefined ? formatCurrency(item.buyPrice) : '-'}</TableCell>
+                  <TableCell className="text-slate-700 uppercase py-4">{item.sellPrice !== null && item.sellPrice !== undefined ? formatCurrency(item.sellPrice) : '-'}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.unitType || '-'}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.unitModel || '-'}</TableCell>
                   <TableCell className="text-slate-700 uppercase py-4">{item.nettoWeight ?? '-'}</TableCell>

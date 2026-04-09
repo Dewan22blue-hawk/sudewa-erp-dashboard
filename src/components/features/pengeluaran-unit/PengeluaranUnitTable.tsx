@@ -1,68 +1,99 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
 import { MoreVertical, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import DeletePengeluaranUnitDialog from './DeletePengeluaranUnitDialog';
+import { useRouter } from 'next/router';
 import { PengeluaranUnit } from '@/@types/pengeluaran-unit.types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
+import { PaginationMeta } from '@/@types/pagination.types';
 
 interface Props {
   data: PengeluaranUnit[];
-  onDelete: (id: string) => Promise<void>;
+  meta: PaginationMeta;
+  search: string;
+  perPage: number;
+  page: number;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage?: string;
+  onSearchChange: (value: string) => void;
+  onPerPageChange: (value: number) => void;
+  onPageChange: (value: number) => void;
+  onRetry: () => void;
 }
 
-export default function PengeluaranUnitTable({ data, onDelete }: Props) {
+const formatDate = (value: string): string => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+};
+
+export default function PengeluaranUnitTable({
+  data,
+  meta,
+  search,
+  perPage,
+  page,
+  isLoading,
+  isError,
+  errorMessage,
+  onSearchChange,
+  onPerPageChange,
+  onPageChange,
+  onRetry,
+}: Props) {
   const router = useRouter();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState('10');
-  const [currentPage, setCurrentPage] = useState(1);
+  const slugValue = Array.isArray(router.query.slug) ? router.query.slug[0] : router.query.slug;
+  const slug = slugValue ? String(slugValue) : '';
+  const resolveBasePath = (): string => {
+    if (slug) {
+      return `/dashboard/${slug}/warehouse/pengeluaran-unit`;
+    }
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return data.filter((item) => [item.noPengeluaran, item.tanggal, item.customer].some((val) => String(val).toLowerCase().includes(q)));
-  }, [data, search]);
+    const cleanPath = router.asPath.split('?')[0];
+    if (cleanPath.includes('/warehouse/pengeluaran-unit')) {
+      return cleanPath.replace(/\/+$/, '');
+    }
 
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: filtered,
-  });
-
-  const perPage = Number(itemsPerPage);
-  const totalItems = sortedData.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
-  const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * perPage;
-  const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + perPage, totalItems);
-  const paginated = sortedData.slice(startIndex, startIndex + perPage);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [itemsPerPage, search]);
-
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    await onDelete(deleteId);
-    setDeleteId(null);
+    return '/dashboard/warehouse/pengeluaran-unit';
   };
+
+  const navigateToDetail = (id: number): void => {
+    const base = resolveBasePath();
+    void router.push(`${base}/${id}`);
+  };
+
+  const navigateToEdit = (id: number): void => {
+    const base = resolveBasePath();
+    void router.push(`${base}/${id}/edit`);
+  };
+
+  const totalPages = Math.max(1, meta.lastPage);
 
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (currentPage <= 3) {
+      for (let index = 1; index <= totalPages; index += 1) pages.push(index);
+    } else if (page <= 3) {
       pages.push(1, 2, 3, 4, '...', totalPages);
-    } else if (currentPage >= totalPages - 2) {
+    } else if (page >= totalPages - 2) {
       pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
     } else {
-      pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      pages.push(1, '...', page - 1, page, page + 1, '...', totalPages);
     }
+
     return pages;
   };
+
+  const startIndex = meta.total === 0 ? 0 : (meta.currentPage - 1) * meta.perPage + 1;
+  const endIndex = meta.total === 0 ? 0 : Math.min(startIndex + data.length - 1, meta.total);
 
   return (
     <div className="space-y-4">
@@ -70,12 +101,12 @@ export default function PengeluaranUnitTable({ data, onDelete }: Props) {
         <div className="flex items-center gap-4">
           <div className="relative w-60 sm:w-64 text-gray-400 focus-within:text-gray-900">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
-            <Input placeholder="Search here" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-10 border-gray-200 rounded-lg text-gray-900" />
+            <Input placeholder="Search here" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 h-10 border-gray-200 rounded-lg text-gray-900" />
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <span>Show</span>
-            <Select value={itemsPerPage} onValueChange={(val) => setItemsPerPage(val)}>
+            <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
               <SelectTrigger className="h-10 w-20 border-gray-200 rounded-lg bg-white">
                 <SelectValue />
               </SelectTrigger>
@@ -94,55 +125,66 @@ export default function PengeluaranUnitTable({ data, onDelete }: Props) {
         <table className="w-full text-sm">
           <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700 uppercase">
             <tr>
-              <th className="py-2 text-left">
-                <SortableHeader title="NO PENGELUARAN" sortKey="noPengeluaran" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="CUSTOMER" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="KETERANGAN" sortKey="keterangan" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-              </th>
+              <th className="px-4 py-3 text-left">NO PENGELUARAN</th>
+              <th className="px-4 py-3 text-left">TANGGAL</th>
+              <th className="px-4 py-3 text-left">CUSTOMER</th>
+              <th className="px-4 py-3 text-left">WAREHOUSE</th>
+              <th className="px-4 py-3 text-left">KETERANGAN</th>
               <th className="px-4 py-3 text-center w-15">ACTION</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {paginated.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4 text-gray-900 font-medium">{item.noPengeluaran}</td>
-                <td className="px-4 py-4 text-gray-600">{item.tanggal}</td>
-                <td className="px-4 py-4 text-gray-600">{item.customer}</td>
-                <td className="px-4 py-4 text-gray-600">{item.keterangan || '-'}</td>
-                <td className="px-4 py-4 text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="p-1 outline-none text-gray-400 hover:text-gray-700 transition">
-                        <MoreVertical size={18} className="mx-auto" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-36 rounded-lg shadow-lg border-gray-100 p-1 font-medium text-[13px]">
-                      <DropdownMenuItem onClick={() => router.push(`${window.location.pathname}/${item.id}/edit`)} className="cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md py-2.5 px-3">
-                        Detail
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md py-2.5 px-3">Print</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setDeleteId(item.id)} className="cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700 rounded-md py-2.5 px-3 focus:text-red-600 focus:bg-red-50">
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                  Loading...
                 </td>
               </tr>
-            ))}
-            {paginated.length === 0 && (
+            ) : isError ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-red-600">
+                  <div className="space-y-2">
+                    <p>{errorMessage ?? 'Gagal memuat data pengeluaran unit'}</p>
+                    <Button variant="outline" size="sm" onClick={onRetry}>
+                      Coba Lagi
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ) : data.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   Tidak ada data.
                 </td>
               </tr>
+            ) : (
+              data.map((item) => (
+                <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-4 text-gray-900 font-medium">{item.activityNumber}</td>
+                  <td className="px-4 py-4 text-gray-600">{formatDate(item.activityDate)}</td>
+                  <td className="px-4 py-4 text-gray-600">{item.person?.name ?? '-'}</td>
+                  <td className="px-4 py-4 text-gray-600">{item.warehouse?.name ?? '-'}</td>
+                  <td className="px-4 py-4 text-gray-600">{item.description || '-'}</td>
+                  <td className="px-4 py-4 text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button type="button" className="p-1 outline-none text-gray-400 hover:text-gray-700 transition" aria-label="Aksi data pengeluaran unit">
+                          <MoreVertical size={18} className="mx-auto" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-36 rounded-lg shadow-lg border-gray-100 p-1 font-medium text-[13px]">
+                        <DropdownMenuItem onClick={() => navigateToDetail(item.id)} className="cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md py-2.5 px-3">
+                          Detail
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigateToEdit(item.id)} className="cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md py-2.5 px-3">
+                          Edit
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
@@ -150,37 +192,37 @@ export default function PengeluaranUnitTable({ data, onDelete }: Props) {
 
       <div className="flex justify-between items-center text-sm text-gray-500 mt-4 px-1">
         <div>
-          Showing {startIndex === 0 && endIndex === 0 ? '0' : `${startIndex + 1}-${endIndex}`} of {totalItems} data
+          Showing {startIndex === 0 && endIndex === 0 ? '0' : `${startIndex}-${endIndex}`} of {meta.total} data
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="text-gray-600 font-medium hover:bg-transparent hover:text-gray-900 px-3 disabled:opacity-50" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
+          <Button variant="ghost" size="sm" className="text-gray-600 font-medium hover:bg-transparent hover:text-gray-900 px-3 disabled:opacity-50" disabled={page === 1} onClick={() => onPageChange(page - 1)}>
             Previous
           </Button>
-          {getPageNumbers().map((page, idx) => (
+          {getPageNumbers().map((pageNumber, index) => (
             <Button
-              key={idx}
-              variant={page === currentPage ? 'outline' : 'ghost'}
+              key={`${String(pageNumber)}-${index}`}
+              variant={pageNumber === page ? 'outline' : 'ghost'}
               size="sm"
-              className={`w-9 h-9 p-0 rounded-lg border-gray-200 font-medium ${page === currentPage ? 'text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-transparent'}`}
-              onClick={() => typeof page === 'number' && setCurrentPage(page)}
-              disabled={typeof page !== 'number'}
+              className={`w-9 h-9 p-0 rounded-lg border-gray-200 font-medium ${pageNumber === page ? 'text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-transparent'}`}
+              onClick={() => {
+                if (typeof pageNumber === 'number') onPageChange(pageNumber);
+              }}
+              disabled={typeof pageNumber !== 'number'}
             >
-              {page}
+              {pageNumber}
             </Button>
           ))}
           <Button
             variant="ghost"
             size="sm"
             className="text-gray-600 font-medium hover:bg-transparent hover:text-gray-900 px-3 disabled:opacity-50"
-            disabled={currentPage === totalPages || totalItems === 0}
-            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={page >= totalPages || meta.total === 0}
+            onClick={() => onPageChange(page + 1)}
           >
             Next
           </Button>
         </div>
       </div>
-
-      <DeletePengeluaranUnitDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)} onConfirm={handleDelete} />
     </div>
   );
 }

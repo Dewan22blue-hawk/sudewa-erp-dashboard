@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card } from "@/components/ui/card"
-import { useSpareparts } from "@/hooks/useSparepart"
+import { useSpareparts, useImportSparepart } from "@/hooks/useSparepart"
 import { SparepartTable } from "@/components/features/sparepart/SparepartTable"
 import { SparepartFormDialog } from "@/components/features/sparepart/SparepartFormDialog"
 import { DeleteSparepartDialog } from "@/components/features/sparepart/DeleteSparepartDialog"
-import { ImportSparepartDialog } from "@/components/features/sparepart/ImportSparepartDialog"
+import { DataImportModal } from "@/components/features/master-data/DataImportModal"
 import { useCompany } from "@/contexts/CompanyContext"
 import { Sparepart } from "@/@types/sparepart.types"
 
@@ -14,12 +14,18 @@ export default function SparepartPage() {
     // Defaulting to "1" if context is missing, but DashboardLayout guards this.
     const safeCompanyId = companyId || "1"
 
-    const { data, isLoading, isError } = useSpareparts(safeCompanyId)
+    const { data, isLoading, isError, refetch } = useSpareparts(safeCompanyId)
+    const importMutation = useImportSparepart(safeCompanyId)
 
     const [selected, setSelected] = useState<Sparepart | null>(null)
     const [openForm, setOpenForm] = useState(false)
     const [openDelete, setOpenDelete] = useState(false)
     const [openImport, setOpenImport] = useState(false)
+
+    const handleImport = async (file: File) => {
+        await importMutation.mutateAsync({ file });
+        refetch();
+    };
 
     if (isLoading) {
         return (
@@ -108,10 +114,14 @@ export default function SparepartPage() {
                     companyId={safeCompanyId}
                 />
 
-                <ImportSparepartDialog
+                <DataImportModal
                     open={openImport}
                     onOpenChange={setOpenImport}
-                    companyId={safeCompanyId}
+                    title="Import Data Sparepart"
+                    description="Unggah file .xlsx untuk mengimport data sparepart."
+                    onImport={handleImport}
+                    isPending={importMutation.isPending}
+                    templateUrl="https://docs.google.com/spreadsheets/d/16yxx_9Yxx9eHMx85b42dwqr7BQ8okess45wGkd-TUig/edit?usp=sharing"
                 />
             </div>
         </DashboardLayout>

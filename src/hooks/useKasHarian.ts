@@ -1,44 +1,57 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { kasHarianService } from "@/services/kas-harian.service"
-import { toast } from "sonner"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { CashFlowFilterParams, CashFlowPayload } from '@/@types/kas-harian.types';
+import { createCashFlow, deleteCashFlow, fetchCashFlow, updateCashFlow } from '@/services/cashFlowService';
 
-export const useKasHarian = () => {
-    return useQuery({
-        queryKey: ["kas-harian"],
-        queryFn: () => kasHarianService.getAll("1"),
-    })
+const CASH_FLOW_KEY = 'cash-flow';
+
+export const cashFlowKeys = {
+  all: [CASH_FLOW_KEY] as const,
+  list: (params: CashFlowFilterParams) => [CASH_FLOW_KEY, 'list', params] as const,
+};
+
+export function useKasHarian(params: CashFlowFilterParams) {
+  return useQuery({
+    queryKey: cashFlowKeys.list(params),
+    queryFn: () => fetchCashFlow(params),
+    placeholderData: keepPreviousData,
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+  });
 }
 
-export const useCreateKasHarian = () => {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: kasHarianService.create,
-        onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["kas-harian"] })
-            toast.success("Data berhasil ditambahkan")
-        },
-    })
+export function useCreateKasHarian() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CashFlowPayload) => createCashFlow(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cashFlowKeys.all });
+    },
+  });
 }
 
-export const useUpdateKasHarian = () => {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ id, data }: any) =>
-            kasHarianService.update(id, data),
-        onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["kas-harian"] })
-            toast.success("Data berhasil diperbarui")
-        },
-    })
+export function useUpdateKasHarian() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number | string; payload: CashFlowPayload }) => updateCashFlow(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cashFlowKeys.all });
+    },
+  });
 }
 
-export const useDeleteKasHarian = () => {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: kasHarianService.delete,
-        onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["kas-harian"] })
-            toast.success("Data berhasil dihapus")
-        },
-    })
+export function useDeleteKasHarian() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => deleteCashFlow(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cashFlowKeys.all });
+    },
+  });
 }

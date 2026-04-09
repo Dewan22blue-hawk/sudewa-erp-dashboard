@@ -13,6 +13,8 @@ interface SparepartApiModel {
   unit_type?: string;
   price?: number | string;
   capacity?: number | string;
+  buy_price?: number | string;
+  sell_price?: number | string;
   purchase_price?: number | string;
   selling_price?: number | string;
   company_id?: number | string;
@@ -41,6 +43,8 @@ type DeleteResponse = LaravelApiResponse<null>;
 const sparepartBasePath = '/wapi/master-data/sparepart';
 const categoryBasePath = '/wapi/master-data/sparepart-category';
 
+export const SPAREPART_EXPORT_PATH = `${sparepartBasePath}/export`;
+
 const mapCategory = (payload?: SparepartCategoryApiModel | null): SparepartCategory | null => {
   if (!payload) return null;
   return {
@@ -54,8 +58,8 @@ const mapCategory = (payload?: SparepartCategoryApiModel | null): SparepartCateg
 
 const mapSparepart = (payload: SparepartApiModel): Sparepart => {
   const category = mapCategory(payload.sparepart_category);
-  const rawPurchase = payload.purchase_price;
-  const rawSelling = payload.selling_price ?? payload.price;
+  const rawPurchase = payload.buy_price ?? payload.purchase_price;
+  const rawSelling = payload.sell_price ?? payload.selling_price ?? payload.price;
   const price = payload.price ?? rawSelling ?? rawPurchase;
   const capacity = payload.capacity;
 
@@ -106,8 +110,8 @@ const buildPayload = (payload: SparepartPayload, opts?: { asUpdate?: boolean }) 
   const capacityValue = payload.capacity ?? 0;
   body.append('price', String(priceValue));
   body.append('capacity', String(capacityValue));
-  if (payload.purchasePrice !== undefined) body.append('purchase_price', String(payload.purchasePrice));
-  if (payload.sellingPrice !== undefined) body.append('selling_price', String(payload.sellingPrice));
+  if (payload.purchasePrice !== undefined) body.append('buy_price', String(payload.purchasePrice));
+  if (payload.sellingPrice !== undefined) body.append('sell_price', String(payload.sellingPrice));
   if (payload.companyId) body.append('company_id', String(payload.companyId));
 
   return body;

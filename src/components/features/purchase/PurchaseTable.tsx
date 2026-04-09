@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
@@ -19,23 +19,14 @@ export interface PurchaseTableProps {
   slug: string;
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
-  onSearch?: (term: string) => void;
   loading?: boolean;
 }
 
-export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, onSearch, loading }: PurchaseTableProps) {
+export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, loading }: PurchaseTableProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      onPageChange?.(1);
-      onSearch?.(searchTerm);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [searchTerm, onSearch, onPageChange]);
 
   const processedData = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -97,7 +88,7 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
   }, [data, billingFilter, sortConfig, searchTerm]);
 
   const currentPage = meta?.currentPage ?? 1;
-  const itemsPerPage = meta?.perPage ?? 10;
+  const itemsPerPage = meta?.perPage ?? 25;
   const totalPages = meta?.lastPage ?? 1;
   const totalEntries = billingFilter === 'all' ? meta?.total ?? processedData.length : processedData.length;
   const startIndex = totalEntries === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
@@ -138,6 +129,11 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
     onPageChange?.(page);
   };
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    onPageChange?.(1);
+  };
+
   const renderPageButtons = () => {
     const buttons = [] as number[];
     if (totalPages <= 5) {
@@ -164,13 +160,13 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <div className="relative w-full sm:w-[250px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input type="text" placeholder="Search here..." className="pl-8 bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <Input type="text" placeholder="Search here..." className="pl-8 bg-white" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
           </div>
           <div className="flex items-center gap-2 whitespace-nowrap">
             <span className="text-sm font-medium">Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
               <SelectTrigger className="w-[70px] bg-white">
-                <SelectValue placeholder="10" />
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="10">10</SelectItem>
@@ -235,8 +231,15 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
             ) : (
               processedData.map((item) => (
                 <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
-                  <TableCell className="font-medium text-[#1f304f] cursor-pointer hover:underline px-4" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
-                    {item.code || '-'}
+                  {/* Kode Jual - Link biru */}
+                  <TableCell className="px-4">
+                    <button
+                      type="button"
+                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
+                      onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}
+                    >
+                      {item.code || '-'}
+                    </button>
                   </TableCell>
                   <TableCell className="text-slate-700 px-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
                   <TableCell className="text-slate-700 px-4">{item.supplier || '-'}</TableCell>
@@ -257,9 +260,9 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}?action=refund`)}>Refund</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}?action=refund`)}>Refund</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}`)}>Detail</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                           Hapus
                         </DropdownMenuItem>

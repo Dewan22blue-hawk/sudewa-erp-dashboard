@@ -1,14 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { MoneyInput } from '@/components/ui/money-input';
 import { UseFormReturn } from 'react-hook-form';
 import type { TypeUnitFormValues } from '@/scheme/type-unit.schema';
-import { Save } from 'lucide-react';
+import { Check, ChevronsUpDown, Save } from 'lucide-react';
 import { useBrands } from '@/hooks/useBrand';
 import { useState } from 'react';
 import { CreateBrandDialog } from './CreateBrandDialog';
+import { cn } from '@/lib/utils';
 
 interface TypeUnitFormProps {
   form: UseFormReturn<TypeUnitFormValues>;
@@ -23,6 +25,13 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
   const parseNumber = (value: string) => (value === '' ? undefined : Number(value));
   const { data: brands = [], isLoading: isBrandLoading } = useBrands();
   const [openBrandDialog, setOpenBrandDialog] = useState(false);
+  const [openBrandSelect, setOpenBrandSelect] = useState(false);
+  const [brandSearch, setBrandSearch] = useState('');
+  const filteredBrands = brands.filter((brand) => {
+    if (!brandSearch.trim()) return true;
+    const keyword = brandSearch.toLowerCase();
+    return brand.name.toLowerCase().includes(keyword) || String(brand.id).includes(keyword);
+  });
 
   return (
     <>
@@ -38,20 +47,46 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                   name="brandId"
                   render={({ field }) => (
                     <FormItem className="max-w-[300px] flex-1">
-                      <Select value={field.value ? field.value.toString() : ''} onValueChange={(val) => field.onChange(Number(val))} disabled={isBrandLoading}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white border-gray-200 h-10 rounded-lg text-gray-500 font-medium">
-                            <SelectValue placeholder={isBrandLoading ? 'Memuat...' : 'Pilih Merk'} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {brands.map((brand) => (
-                            <SelectItem key={brand.id} value={brand.id.toString()}>
-                              {brand.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Popover
+                        open={openBrandSelect}
+                        onOpenChange={(open) => {
+                          setOpenBrandSelect(open);
+                          if (!open) setBrandSearch('');
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant="outline" role="combobox" aria-expanded={openBrandSelect} disabled={isBrandLoading} className="h-10 w-full justify-between rounded-lg border-gray-200 bg-white font-medium text-gray-500">
+                            <span className={cn('truncate', !field.value && 'text-gray-400')}>
+                              {field.value ? brands.find((brand) => brand.id === Number(field.value))?.name ?? 'Pilih Merk' : isBrandLoading ? 'Memuat...' : 'Pilih Merk'}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                          <Command shouldFilter={false}>
+                            <CommandInput placeholder="Cari merk..." value={brandSearch} onValueChange={setBrandSearch} />
+                            <CommandList>
+                              <CommandEmpty>Merk tidak ditemukan.</CommandEmpty>
+                              <CommandGroup>
+                                {filteredBrands.map((brand) => (
+                                  <CommandItem
+                                    key={brand.id}
+                                    value={`${brand.name} ${brand.id}`}
+                                    onSelect={() => {
+                                      field.onChange(brand.id);
+                                      setOpenBrandSelect(false);
+                                      setBrandSearch('');
+                                    }}
+                                  >
+                                    <Check className={cn('mr-2 h-4 w-4', Number(field.value) === brand.id ? 'opacity-100' : 'opacity-0')} />
+                                    <span className="truncate">{brand.name}</span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -189,20 +224,41 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
             <div className="space-y-4 pt-2">
               <h3 className="text-[13px] font-medium text-gray-400">Harga</h3>
               <div className="space-y-4 max-w-[500px]">
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Jual</FormLabel>
+                                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
+                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Beli</FormLabel>
                   <FormField
                     control={form.control}
-                    name="sellPrice"
-                    render={({ field }) => (
+                    name="buyPrice"
+                    render={({ field: { onChange, value, ...rest } }) => (
                       <FormItem>
                         <FormControl>
                           <MoneyInput
                             placeholder="Masukkan Harga"
                             className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
-                            {...field}
-                            value={field.value ?? 0}
-                            onChangeValue={field.onChange}
+                            {...rest}
+                            value={value ?? 0}
+                            onChangeValue={onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
+                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Jual</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="sellPrice"
+                    render={({ field: { onChange, value, ...rest } }) => (
+                      <FormItem>
+                        <FormControl>
+                          <MoneyInput
+                            placeholder="Masukkan Harga"
+                            className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
+                            {...rest}
+                            value={value ?? 0}
+                            onChangeValue={onChange}
                           />
                         </FormControl>
                         <FormMessage />
@@ -211,27 +267,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                   />
                 </div>
 
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Beli</FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="buyPrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <MoneyInput
-                            placeholder="Masukkan Harga"
-                            className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
-                            {...field}
-                            value={field.value ?? 0}
-                            onChangeValue={field.onChange}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+
               </div>
             </div>
           </div>
