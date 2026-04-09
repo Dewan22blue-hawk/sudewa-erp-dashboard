@@ -6,6 +6,9 @@ import type { InvoiceRecord } from './create-invoice.data';
 import { formatDate, formatCurrency } from './create-invoice.data';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useRouter } from 'next/router';
+import { useCompany } from '@/contexts/CompanyContext';
+import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 
 interface InvoicePrintViewProps {
   invoice: InvoiceRecord;
@@ -13,6 +16,11 @@ interface InvoicePrintViewProps {
 
 export function InvoicePrintView({ invoice }: InvoicePrintViewProps) {
   const printRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { companyId } = useCompany();
+
+  const resolvedCompanyId = resolveCompanyId(router.query.slug, companyId);
+  const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId) || '/invoice-letter/1-morindo-letter.jpeg';
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -106,7 +114,7 @@ export function InvoicePrintView({ invoice }: InvoicePrintViewProps) {
       >
         {/* Background Letter Template */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/invoice-letter/jagrataratransindo-letter.jpeg" alt="Invoice Letter Template" className="absolute inset-0 h-full w-full object-cover" style={{ zIndex: 0 }} />
+        <img src={selectedPrintBackground} alt="Invoice Letter Template" className="absolute inset-0 h-full w-full object-cover" style={{ zIndex: 0 }} />
 
         {/* Invoice Content Overlay */}
         <div
