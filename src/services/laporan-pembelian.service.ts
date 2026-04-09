@@ -1,29 +1,72 @@
-import { FilterLaporanPembelian } from "@/@types/laporan-pembelian.types"
+import { apiClient } from '@/lib/api/client';
+
+export interface PurchaseTransactionParams {
+  page?: number;
+  per_page?: number;
+  start_date?: string;
+  end_date?: string;
+  person_id?: number;
+  search?: string;
+  sort_order?: 'asc' | 'desc';
+}
+
+export interface PurchaseTransactionItem {
+  id: number;
+  code: string;
+  created_at: string;
+  person: { id: number; name: string };
+  unit_transaction_items: Array<{
+    unit_type: { name: string };
+    qty_total: number;
+    price: number;
+    bbn_price: number;
+    expedition_fee: number;
+    other_fee: number;
+    hpp_total_price: number;
+    dpp_total_price: number;
+    ppn_total_price: number;
+  }>;
+  transaction_bruto_total: number;
+  transaction_dpp_total: number;
+  transaction_ppn_total: number;
+  transaction_bbn_total: number;
+  transaction_other_fee: number;
+}
+
+export interface PurchaseTransactionResponse {
+  current_page: number;
+  data: PurchaseTransactionItem[];
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
+}
 
 export const getLaporanPembelian = async (
-    filter: FilterLaporanPembelian
-) => {
+  params: PurchaseTransactionParams
+): Promise<PurchaseTransactionResponse> => {
+  const response = await apiClient.get('/wapi/transaction/unit-transaction/unit-transaction', {
+    params: {
+      type: 'purchase',
+      is_paid: true,
+      sort_order: 'desc',
+      ...params,
+    },
+  });
+  return response.data.data;
+};
 
-    if (filter.jenis === "per-nota") {
-        return [
-            { nota: "INV-001", supplier: "PT XX", total: 12000000 },
-            { nota: "INV-002", supplier: "PT YY", total: 25000000 },
-        ]
-    }
+export const getSuppliers = async () => {
+  const response = await apiClient.get('/wapi/master-data/supplier', {
+    params: { per_page: 1000 }
+  });
+  return response.data.data;
+};
 
-    if (filter.jenis === "per-type") {
-        return [
-            { type: "Honda Vario", qty: 12, total: 80000000 },
-            { type: "Beat", qty: 5, total: 40000000 },
-        ]
-    }
-
-    if (filter.jenis === "per-supplier") {
-        return [
-            { supplier: "PT XX", total: 120000000 },
-            { supplier: "PT YY", total: 90000000 },
-        ]
-    }
-
-    return []
-}
+export const getUnitTypes = async () => {
+  const response = await apiClient.get('/wapi/master-data/unit-type', {
+    params: { sort_by: 'created_at', sort_order: 'asc' }
+  });
+  return response.data.data;
+};
