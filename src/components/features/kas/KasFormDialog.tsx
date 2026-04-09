@@ -12,6 +12,7 @@ import { Kas } from '@/@types/kas.types';
 import { useCreateKas, useUpdateKas } from '@/hooks/useKas';
 import { toast } from 'sonner';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
   open: boolean;
@@ -97,7 +98,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kode Kas</FormLabel>
+                  <FormLabel>Kode Kas<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan kode" {...field} disabled={isLoading} />
                   </FormControl>
@@ -111,7 +112,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
+                  <FormLabel>Deskripsi<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nama" {...field} disabled={isLoading} />
                   </FormControl>
@@ -125,7 +126,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Jenis</FormLabel>
+                  <FormLabel>Jenis<RequiredMark /></FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={isLoading}>
                     <FormControl>
                       <SelectTrigger className="w-full">
