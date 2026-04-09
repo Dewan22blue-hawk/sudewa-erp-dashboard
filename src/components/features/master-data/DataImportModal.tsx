@@ -13,9 +13,10 @@ interface Props {
     description: string;
     onImport: (file: File) => Promise<void>;
     isPending: boolean;
+    templateUrl?: string;
 }
 
-export function DataImportModal({ open, onOpenChange, title, description, onImport, isPending }: Props) {
+export function DataImportModal({ open, onOpenChange, title, description, onImport, isPending, templateUrl }: Props) {
     const [file, setFile] = useState<File | null>(null);
 
     useEffect(() => {
@@ -61,7 +62,11 @@ export function DataImportModal({ open, onOpenChange, title, description, onImpo
                         />
                     </label>
 
-                    <span className="text-xs text-muted-foreground">Berikut adalah <a href="https://docs.google.com/spreadsheets/d/1WdGMJEme7eGxp6GDJ-px2PmVurSdYHoKkv6za0VN8AI/edit?usp=sharing" className="text-blue-600 underline cursor-pointer" target="_blank" rel="noopener noreferrer">template import file</a></span>
+                    {templateUrl && (
+                        <span className="text-xs text-muted-foreground">
+                            Berikut adalah <a href={templateUrl} className="text-blue-600 underline cursor-pointer" target="_blank" rel="noopener noreferrer">template import file</a>
+                        </span>
+                    )}
 
                     <div className="flex gap-3 pt-2">
                         <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>

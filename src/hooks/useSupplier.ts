@@ -51,7 +51,7 @@ export function useImportSupplier() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importSupplier(companyId, file),
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importSupplier(file, companyId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     },

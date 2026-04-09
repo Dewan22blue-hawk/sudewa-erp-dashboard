@@ -9,6 +9,7 @@ import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import type { Account } from '@/@types/account.types';
 import { toast } from 'sonner';
+import { Plus, Upload } from 'lucide-react';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -134,7 +135,7 @@ export const AccountListPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Akun</h1>
-            <p className="text-sm text-muted-foreground">Kelola akun transaksi</p>
+            <p className="text-sm text-muted-foreground">Kelola akun transaksi dengan mudah</p>
           </div>
         </div>
         <div className="space-y-4">
@@ -144,9 +145,11 @@ export const AccountListPage = () => {
             </div>
             <div className="flex flex-row gap-2">
               <Button onClick={() => setOpenImport(true)} className="gap-2" variant="outline">
-                + Import
+                <Upload className="h-4 w-4" />
+                Import
               </Button>
               <Button onClick={handleAdd} className="gap-2">
+                <Plus className="h-4 w-4" />
                 + Tambah
               </Button>
             </div>

@@ -69,7 +69,7 @@ export const useImportAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importAccount(companyId, file),
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importAccount(file, companyId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-hierarchy'] });

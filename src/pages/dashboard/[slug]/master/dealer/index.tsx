@@ -5,6 +5,10 @@ import { DealerFormModal, DealerFormData } from '@/components/features/dealer/De
 import { DeleteDealerModal } from '@/components/features/dealer/DeleteDealerModal';
 import { DUMMY_DEALERS, setDummyDealers } from '@/components/features/dealer/dealer.data';
 import { toast } from 'sonner';
+import { useImportDealer } from '@/hooks/useDealer';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
+import { useCompany } from '@/contexts/CompanyContext';
+
 
 export default function DealerPage() {
   // Data state
@@ -15,10 +19,15 @@ export default function DealerPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
+  const { companyId } = useCompany();
+  const importMutation = useImportDealer();
+
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [selectedDealer, setSelectedDealer] = useState<Dealer | null>(null);
+
 
   // Filter & Pagination logic
   const filteredDealers = useMemo(() => {
@@ -81,6 +90,12 @@ export default function DealerPage() {
     }
   };
 
+  const handleImport = async (file: File) => {
+    if (!companyId) return;
+    await importMutation.mutateAsync({ companyId, file });
+  };
+
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -107,15 +122,28 @@ export default function DealerPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
+          onImport={() => setOpenImport(true)}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
+
       </div>
 
       {/* Modals */}
       <DealerFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSave={handleSaveForm} initialData={selectedDealer} />
 
       <DeleteDealerModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleConfirmDelete} />
+
+      <DataImportModal
+        open={openImport}
+        onOpenChange={setOpenImport}
+        title="Import Data Dealer"
+        description="Unggah file .xlsx untuk mengimport data dealer."
+        onImport={handleImport}
+        isPending={importMutation.isPending}
+        templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
+      />
     </DashboardLayout>
+
   );
 }

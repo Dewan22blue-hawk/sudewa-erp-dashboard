@@ -5,6 +5,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { useCompany } from '@/contexts/CompanyContext';
 import { DataImportModal } from '../../master-data/DataImportModal';
+import { Plus, Upload } from 'lucide-react';
 import { useImportCustomer } from '@/hooks/useCustomer';
 
 export const CustomerListPage = () => {
@@ -26,10 +27,12 @@ export const CustomerListPage = () => {
                     </div>
                     <div className="flex gap-2">
                         <Button onClick={() => setOpenImport(true)} variant="outline" className="gap-2">
+                            <Upload className="h-4 w-4" />
                             Import
                         </Button>
                         <Button className="gap-2">
-                            + Tambah
+                            <Plus className="h-4 w-4" />
+                            Tambah
                         </Button>
                     </div>
                 </div>
@@ -46,6 +49,7 @@ export const CustomerListPage = () => {
                 description="Unggah file .xlsx untuk mengimport data customer."
                 onImport={handleImport}
                 isPending={importMutation.isPending}
+                templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
             />
         </DashboardLayout>
     );

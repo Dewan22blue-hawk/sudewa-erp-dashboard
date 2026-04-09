@@ -24,6 +24,7 @@ export function AccountImportModal({ open, onOpenChange, companyId }: Props) {
             description="Unggah file .xlsx untuk mengimport data akun."
             onImport={handleImport}
             isPending={mutation.isPending}
+            templateUrl="https://docs.google.com/spreadsheets/d/1WdGMJEme7eGxp6GDJ-px2PmVurSdYHoKkv6za0VN8AI/edit?usp=sharing"
         />
     );
 }

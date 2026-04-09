@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus, Search } from 'lucide-react';
+import { MoreVertical, Plus, Search, Upload } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -22,10 +22,11 @@ interface TypeUnitTableProps {
   onEdit: (typeUnit: TypeUnit) => void;
   onDelete: (typeUnit: TypeUnit) => void;
   onAdd?: () => void;
+  onImport?: () => void;
   isLoading?: boolean;
 }
 
-export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, isLoading }: TypeUnitTableProps) {
+export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, onImport, isLoading }: TypeUnitTableProps) {
   const totalPages = meta?.lastPage ?? Math.max(1, Math.ceil((meta?.total ?? typeUnits.length) / perPage));
   const hasData = (meta?.total ?? typeUnits.length) > 0;
   const startIndex = meta ? (page - 1) * perPage + 1 : 1;
@@ -62,10 +63,16 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto justify-end">
+        <div className="flex w-full sm:w-auto justify-end gap-2">
+          {onImport && (
+            <Button onClick={onImport} variant="outline" className="gap-2">
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+          )}
           {onAdd && (
             <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               Tambah
             </Button>
           )}

@@ -34,11 +34,13 @@ export const getDealers = async (params: PaginationParams & { search?: string; c
     );
 };
 
-export const importDealer = async (companyId: string | number, file: File): Promise<void> => {
+export const importDealer = async (file: File, companyId?: string | number): Promise<void> => {
     const body = new FormData();
     body.append('file', file);
 
-    const response = await apiClient.post(`${basePath}/${companyId}/import`, body, {
+    const url = companyId ? `${basePath}/${companyId}/import` : `${basePath}/import`;
+
+    const response = await apiClient.post(url, body, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

@@ -17,7 +17,7 @@ export function useImportDealer() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importDealer(companyId, file),
+        mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importDealer(file, companyId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['dealers'] });
         },

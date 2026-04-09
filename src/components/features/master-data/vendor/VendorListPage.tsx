@@ -46,6 +46,7 @@ export const VendorListPage = () => {
                 description="Unggah file .xlsx untuk mengimport data vendor."
                 onImport={handleImport}
                 isPending={importMutation.isPending}
+                templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
             />
         </DashboardLayout>
     );

@@ -49,13 +49,9 @@ export function useDeleteCustomer() {
 }
 
 export function useImportCustomer() {
-  const queryClient = useQueryClient();
-
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importCustomer(companyId, file),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
-    },
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importCustomer(file, companyId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['customers'] }),
   });
 }
-
