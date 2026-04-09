@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getSuppliers, createSupplier, updateSupplier, deleteSupplier } from '@/services/supplier.service';
+import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, importSupplier } from '@/services/supplier.service';
 import type { SupplierPayload } from '@/@types/supplier.types';
 
 export function useSuppliers(companyId: string | null) {
@@ -46,3 +46,15 @@ export function useDeleteSupplier() {
     },
   });
 }
+
+export function useImportSupplier() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importSupplier(file, companyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+    },
+  });
+}
+

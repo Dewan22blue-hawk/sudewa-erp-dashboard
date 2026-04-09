@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getTypeUnits, getTypeUnitById, createTypeUnit, updateTypeUnit, deleteTypeUnit } from '@/services/type-unit.service';
+import { getTypeUnits, getTypeUnitById, createTypeUnit, updateTypeUnit, deleteTypeUnit, importTypeUnit } from '@/services/type-unit.service';
 import { TypeUnitPayload } from '@/@types/type-unit.types';
 
 const TYPE_UNIT_LIST_KEY = 'type-units';
@@ -49,6 +49,17 @@ export function useDeleteTypeUnit() {
 
   return useMutation({
     mutationFn: (id: string | number) => deleteTypeUnit(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TYPE_UNIT_LIST_KEY] });
+    },
+  });
+}
+
+export function useImportTypeUnit(companyId?: string | number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ file }: { file: File }) => importTypeUnit(file, companyId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TYPE_UNIT_LIST_KEY] });
     },
