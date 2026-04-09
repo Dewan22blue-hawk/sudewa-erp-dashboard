@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
-import { MoreHorizontal, Plus, Search } from 'lucide-react';
+import { MoreHorizontal, Plus, Search, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,10 @@ interface LegacyCustomerTableProps {
   onEdit: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
   onAdd?: () => void;
+  onImport?: () => void;
 }
 
-export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd }: LegacyCustomerTableProps) {
+export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImport }: LegacyCustomerTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
@@ -72,10 +73,16 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd }: Lega
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto justify-end">
+        <div className="flex w-full sm:w-auto justify-end gap-2">
+          {onImport && (
+            <Button onClick={onImport} variant="outline" className="gap-2">
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+          )}
           {onAdd && (
             <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               Tambah
             </Button>
           )}

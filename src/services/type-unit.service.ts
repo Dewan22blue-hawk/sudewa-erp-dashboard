@@ -188,3 +188,21 @@ export const deleteTypeUnit = async (id: number | string): Promise<void> => {
     throw new ApiResponseError(payload.message ?? 'Failed to delete type unit');
   }
 };
+
+export const importTypeUnit = async (file: File, companyId?: string | number): Promise<void> => {
+  const body = new FormData();
+  body.append('file', file);
+  if (companyId) body.append('company_id', String(companyId));
+
+  const response = await apiClient.post(`${basePath}/import`, body, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const payload = response.data as LaravelApiResponse<null>;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to import type unit');
+  }
+};
+

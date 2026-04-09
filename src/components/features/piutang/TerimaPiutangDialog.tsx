@@ -16,7 +16,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSubmit: (values: TerimaPiutangFormValues) => void;
+  onSubmit: (values: TerimaPiutangFormValues) => Promise<void> | void;
 }
 
 export default function TerimaPiutangDialog({ open, onClose, onSubmit }: Props) {
@@ -29,11 +29,15 @@ export default function TerimaPiutangDialog({ open, onClose, onSubmit }: Props) 
     },
   });
 
-  const handleFormSubmit = (values: TerimaPiutangFormValues) => {
-    onSubmit(values);
-    toast.success('Pembayaran berhasil diterima');
-    form.reset();
-    onClose();
+  const handleFormSubmit = async (values: TerimaPiutangFormValues) => {
+    try {
+      await onSubmit(values);
+      toast.success('Pembayaran berhasil diterima');
+      form.reset();
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Gagal menerima pembayaran');
+    }
   };
 
   const handleClose = () => {

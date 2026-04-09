@@ -12,8 +12,9 @@ import { CustomerFormDialog } from '@/components/features/customer/CustomerFormD
 import { DeleteCustomerDialog } from '@/components/features/customer/DeleteCustomerDialog';
 import { DUMMY_TRANSINDO_CUSTOMERS, setDummyTransindoCustomers } from '@/components/features/customer/transindo-customer.data';
 import { toast } from 'sonner';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { useCompany } from '@/contexts/CompanyContext';
-import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from '@/hooks/useCustomer';
+import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer, useImportCustomer } from '@/hooks/useCustomer';
 import { customerSchema, type CustomerFormValues } from '@/scheme/customer.schema';
 import type { Customer as ApiCustomer } from '@/@types/customer.types';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
@@ -138,10 +139,12 @@ function GeneralCustomerContent() {
   const createCustomer = useCreateCustomer();
   const updateCustomer = useUpdateCustomer();
   const deleteCustomer = useDeleteCustomer();
+  const importCustomer = useImportCustomer();
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [customerToEdit, setCustomerToEdit] = useState<ApiCustomer | null>(null);
   const [customerToDelete, setCustomerToDelete] = useState<ApiCustomer | null>(null);
 
@@ -264,6 +267,12 @@ function GeneralCustomerContent() {
     }
   };
 
+  const handleImport = async (file: File) => {
+    if (!companyId) return;
+    await importCustomer.mutateAsync({ companyId, file });
+  };
+
+
   if (isLoading) {
     return (
       <>
@@ -310,8 +319,15 @@ function GeneralCustomerContent() {
           </div>
         </div>
 
-        <LegacyCustomerTable customers={data?.data || []} onEdit={handleEditCustomer} onDelete={handleDeleteClick} onAdd={() => setCreateModalOpen(true)} />
+        <LegacyCustomerTable
+          customers={data?.data || []}
+          onEdit={handleEditCustomer}
+          onDelete={handleDeleteClick}
+          onAdd={() => setCreateModalOpen(true)}
+          onImport={() => setOpenImport(true)}
+        />
       </div>
+
 
       <CustomerFormDialog
         open={createModalOpen}
@@ -335,7 +351,18 @@ function GeneralCustomerContent() {
       />
 
       <DeleteCustomerDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={handleConfirmDelete} isDeleting={deleteCustomer.isPending} />
+
+      <DataImportModal
+        open={openImport}
+        onOpenChange={setOpenImport}
+        title="Import Data Customer"
+        description="Unggah file .xlsx untuk mengimport data customer."
+        onImport={handleImport}
+        isPending={importCustomer.isPending}
+        templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
+      />
     </>
+
   );
 }
 

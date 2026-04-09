@@ -9,11 +9,15 @@ import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import type { Account } from '@/@types/account.types';
 import { toast } from 'sonner';
+import { Plus, Upload } from 'lucide-react';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { accountSchema, type AccountFormValues } from '@/scheme/account-master.schema';
+import { useCompany } from '@/contexts/CompanyContext';
+import { AccountImportModal } from '@/components/features/account/AccountImportModal';
+
 
 export const AccountListPage = () => {
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
@@ -28,7 +32,11 @@ export const AccountListPage = () => {
 
   const [selected, setSelected] = useState<Account | null>(null);
   const [openForm, setOpenForm] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [editing, setEditing] = useState<Account | null>(null);
+
+  const { companyId } = useCompany();
+
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
@@ -127,7 +135,7 @@ export const AccountListPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Akun</h1>
-            <p className="text-sm text-muted-foreground">Kelola akun transaksi</p>
+            <p className="text-sm text-muted-foreground">Kelola akun transaksi dengan mudah</p>
           </div>
         </div>
         <div className="space-y-4">
@@ -135,9 +143,16 @@ export const AccountListPage = () => {
             <div className="relative w-64 text-gray-400 focus-within:text-gray-900">
               <Input placeholder="Search here" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-3 h-10 border-gray-200 rounded-lg text-gray-900" />
             </div>
-            <Button onClick={handleAdd} className="gap-2">
-              + Tambah
-            </Button>
+            <div className="flex flex-row gap-2">
+              <Button onClick={() => setOpenImport(true)} className="gap-2" variant="outline">
+                <Upload className="h-4 w-4" />
+                Import
+              </Button>
+              <Button onClick={handleAdd} className="gap-2">
+                <Plus className="h-4 w-4" />
+                + Tambah
+              </Button>
+            </div>
           </div>
 
           {isError ? (
@@ -146,7 +161,7 @@ export const AccountListPage = () => {
             <AccountTable data={data?.data ?? []} total={data?.meta.total} isLoading={isLoading || isFetching} onEdit={handleEdit} onDelete={setSelected} page={page} perPage={perPage} onPageChange={setPage} onPerPageChange={setPerPage} />
           )}
         </div>
-      </div>
+      </div >
 
       <AlertDialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <AlertDialogContent>
@@ -181,6 +196,13 @@ export const AccountListPage = () => {
         accountGroups={accountGroups}
         isLoadingGroups={isLoadingGroups}
       />
-    </DashboardLayout>
+
+      <AccountImportModal
+        open={openImport}
+        onOpenChange={setOpenImport}
+        companyId={companyId ?? ''}
+      />
+    </DashboardLayout >
+
   );
 };

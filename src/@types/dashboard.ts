@@ -163,3 +163,66 @@ export interface DashboardStats {
   netWorth: number;
   monthlyGrowth: number;
 }
+
+/**
+ * Billing Stats API Response Raw Data
+ */
+export interface BillingStatsRaw {
+  opening_balance: {
+    debet: { cash: number; bca_idr: number; bca_usd: number };
+    kredit?: { cash: number; bca_idr: number; bca_usd: number };
+  };
+  mutation: {
+    debet: { cash: number; bca_idr: number; bca_usd: number };
+    kredit: { cash: number; bca_idr: number; bca_usd: number };
+  };
+  percentage?: any;
+}
+
+/**
+ * Customer Stats API Response Raw Data
+ */
+export interface CustomerStatsRaw {
+  summary: {
+    total_customer: number;
+    total_revenue: number;
+    average_revenue_per_customer: number;
+  };
+  customers: {
+    current_page: number;
+    data: any[];
+    total: number;
+    last_page?: number;
+    per_page?: number;
+  };
+}
+
+/**
+ * Product Stats API Response Raw Data
+ */
+export interface ProductStatsRaw {
+  summary: {
+    total_unit_type: number;
+    total_unit_type_sold: number;
+  };
+  data: {
+    current_page: number;
+    data: any[];
+    total: number;
+    last_page?: number;
+    per_page?: number;
+  };
+}
+
+/**
+ * Transaction Unit API Response Raw Data
+ */
+export interface TransactionStatsRaw {
+  current_page: number;
+  data: any[];
+  first_page_url?: string;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+}
+
