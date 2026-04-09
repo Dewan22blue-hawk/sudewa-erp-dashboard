@@ -5,63 +5,44 @@ import { useState, useEffect } from 'react';
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme();
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const toasts = document.querySelectorAll('[data-sonner-toast]');
-      let isVisible = false;
-      toasts.forEach((t) => {
-        if (t.getAttribute('data-removed') !== 'true') {
-          isVisible = true;
-        }
-      });
-      setActive(isVisible);
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['data-removed'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
-    <>
-      {active && <div aria-hidden="true" className="pointer-events-none fixed inset-0 bg-black/20 backdrop-blur-sm z-999 transition-opacity" />}
-      <Sonner
-        theme={theme as ToasterProps['theme']}
-        className="toaster group"
-        toastOptions={{
-          classNames: {
-            toast: 'rounded-xl border shadow-lg backdrop-blur-md bg-white/80 z-[1000]',
-            success: '!bg-[#22c55e] !text-white !border-[#1ea34d]',
-            description: 'group-[.toast]:text-muted-foreground',
-            actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
-            cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
-          },
-        }}
-        icons={{
-          success: <CircleCheckIcon className="size-5 text-white" />,
-          info: <InfoIcon className="size-4" />,
-          warning: <TriangleAlertIcon className="size-4" />,
-          error: <OctagonXIcon className="size-4" />,
-          loading: <Loader2Icon className="size-4 animate-spin" />,
-        }}
-        style={
-          {
-            '--normal-bg': 'var(--popover)',
-            '--normal-text': 'var(--popover-foreground)',
-            '--normal-border': 'var(--border)',
-            '--border-radius': 'var(--radius)',
-          } as React.CSSProperties
-        }
-        {...props}
-      />
-    </>
+    <Sonner
+      theme={theme as ToasterProps['theme']}
+      className="toaster group"
+      closeButton
+      toastOptions={{
+        classNames: {
+          toast: 'group toast rounded-2xl border shadow-2xl backdrop-blur-xl bg-white/70 dark:bg-black/70 border-white/20 dark:border-white/10 z-[1000] p-4 flex items-center gap-4',
+          title: 'text-sm font-semibold',
+          description: 'group-[.toast]:text-muted-foreground text-xs',
+          actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground font-medium',
+          cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground font-medium',
+          success: '!bg-green-500/20 !text-green-700 dark:!text-green-400 !border-green-500/30 !backdrop-blur-xl',
+          error: '!bg-red-500/20 !text-red-700 dark:!text-red-400 !border-red-500/30 !backdrop-blur-xl',
+          info: '!bg-blue-500/20 !text-blue-700 dark:!text-blue-400 !border-blue-500/30 !backdrop-blur-xl',
+          warning: '!bg-amber-500/20 !text-amber-700 dark:!text-amber-400 !border-amber-500/30 !backdrop-blur-xl',
+          closeButton: 'bg-white/10 hover:bg-white/20 dark:hover:bg-white/10 border-none transition-all duration-200 !text-inherit opacity-100',
+        },
+      }}
+      icons={{
+        success: <CircleCheckIcon className="size-5 text-green-600 dark:text-green-400" />,
+        info: <InfoIcon className="size-5 text-blue-600 dark:text-blue-400" />,
+        warning: <TriangleAlertIcon className="size-5 text-amber-600 dark:text-amber-400" />,
+        error: <OctagonXIcon className="size-5 text-red-600 dark:text-red-400" />,
+        loading: <Loader2Icon className="size-5 animate-spin text-primary" />,
+      }}
+      style={
+        {
+          '--normal-bg': 'transparent',
+          '--normal-text': 'var(--foreground)',
+          '--normal-border': 'transparent',
+          '--border-radius': '1rem',
+          '--offset': '5rem',
+        } as React.CSSProperties
+      }
+      {...props}
+    />
   );
 };
 
