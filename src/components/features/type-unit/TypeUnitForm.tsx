@@ -11,6 +11,7 @@ import { useBrands } from '@/hooks/useBrand';
 import { useState } from 'react';
 import { CreateBrandDialog } from './CreateBrandDialog';
 import { cn } from '@/lib/utils';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface TypeUnitFormProps {
   form: UseFormReturn<TypeUnitFormValues>;
@@ -40,7 +41,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
           <div className="space-y-8">
             {/* Section Merk */}
             <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-              <FormLabel className="text-sm font-semibold text-gray-900">Merk</FormLabel>
+              <FormLabel className="text-sm font-semibold text-gray-900">Merk<RequiredMark /></FormLabel>
               <div className="flex items-center gap-2">
                 <FormField
                   control={form.control}
@@ -103,7 +104,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                 <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Kode</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-gray-900">Kode<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
                     name="code"
@@ -119,7 +120,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                 </div>
 
                 <div className="grid grid-cols-[120px_1fr] md:grid-cols-[100px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Jenis</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-gray-900">Jenis<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
                     name="name"
@@ -137,7 +138,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                 <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Tipe</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-gray-900">Tipe<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
                     name="unitType"
@@ -225,7 +226,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
               <h3 className="text-[13px] font-medium text-gray-400">Harga</h3>
               <div className="space-y-4 max-w-[500px]">
                                 <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Beli</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Beli<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
                     name="buyPrice"
@@ -246,7 +247,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                   />
                 </div>
                 <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Jual</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Jual<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
                     name="sellPrice"

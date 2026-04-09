@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import RequiredMark from '@/components/ui/required-mark';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { UseFormReturn } from 'react-hook-form';
@@ -42,7 +43,7 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kode Akun</FormLabel>
+                  <FormLabel>Kode Akun<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Masukkan kode akun" {...field} />
                   </FormControl>
@@ -57,7 +58,7 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               name="accountGroupId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Grup Akun</FormLabel>
+                  <FormLabel>Grup Akun<RequiredMark /></FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
                       <Select value={field.value ? String(field.value) : ''} onValueChange={(val) => field.onChange(Number(val))}>
@@ -93,7 +94,7 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kategori</FormLabel>
+                  <FormLabel>Kategori<RequiredMark /></FormLabel>
                   <FormControl>
                     <Select value={field.value ?? 'debet'} onValueChange={(val) => field.onChange(val)}>
                       <SelectTrigger>
@@ -116,7 +117,7 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Akun</FormLabel>
+                  <FormLabel>Nama Akun<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Masukkan nama akun" {...field} />
                   </FormControl>

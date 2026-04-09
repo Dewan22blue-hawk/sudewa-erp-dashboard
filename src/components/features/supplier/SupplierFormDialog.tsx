@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { UseFormReturn } from 'react-hook-form';
 import type { CreateSupplierFormValues } from '@/scheme/supplier.schema';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface SupplierFormDialogProps {
   open: boolean;
@@ -36,7 +37,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Supplier</FormLabel>
+                  <FormLabel>Nama Supplier<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nama" {...field} />
                   </FormControl>
@@ -50,7 +51,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Alamat</FormLabel>
+                  <FormLabel>Alamat<RequiredMark /></FormLabel>
                   <FormControl>
                     <Textarea placeholder="Tambahkan Alamat" className="resize-none" rows={3} {...field} />
                   </FormControl>
@@ -78,7 +79,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="pic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>PIC</FormLabel>
+                  <FormLabel>PIC<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan PIC" {...field} />
                   </FormControl>
@@ -92,7 +93,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>Phone<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nomer telepon" {...field} />
                   </FormControl>
