@@ -169,149 +169,189 @@ body {
     visibility: hidden;
   }
 
-  #laporan-pembelian-print,
-  #laporan-pembelian-print *,
-  #laporan-penjualan-print,
-  #laporan-penjualan-print *,
-  .print-letter-page,
-  .print-letter-page * {
-    visibility: visible;
-  }
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
 
-  .no-print {
-    display: none !important;
-  }
+    body {
+      background: #fff !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-  .laporan-pembelian-page,
-  .laporan-penjualan-page {
-    padding: 0 !important;
-    margin: 0 !important;
-    min-height: auto !important;
-  }
+    body * {
+      visibility: hidden;
+    }
 
-  .laporan-pembelian-print-area,
-  .print-letter-page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 210mm !important;
-    height: 297mm !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #fff;
-    display: block;
-  }
+    #laporan-pembelian-print,
+    #laporan-pembelian-print *,
+    #laporan-penjualan-print,
+    #laporan-penjualan-print *,
+    #laporan-penerimaan-print,
+    #laporan-penerimaan-print *,
+    .print-letter-page,
+    .print-letter-page * {
+      visibility: visible;
+    }
 
-  .print-letterhead {
-    display: block !important;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    object-fit: contain;
-    object-position: center top;
-  }
+    .no-print {
+      display: none !important;
+    }
 
-  .laporan-pembelian-print-content,
-  .print-letter-content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 56mm 8mm 26mm;
-    display: flex;
-    flex-direction: column;
-    gap: 4mm;
-    align-items: center;
-    justify-content: flex-start;
-  }
+    .laporan-pembelian-page,
+    .laporan-penjualan-page,
+    .laporan-penerimaan-page {
+      padding: 0 !important;
+      margin: 0 !important;
+      min-height: auto !important;
+    }
 
-  .laporan-pembelian-print-content > :first-child,
-  .print-letter-content > :first-child {
-    margin-bottom: 1mm !important;
-  }
+    .laporan-pembelian-print-area,
+    .laporan-penjualan-print-area,
+    .laporan-penerimaan-print-area,
+    .print-letter-page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 210mm !important;
+      height: 297mm !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff;
+      display: block;
+    }
 
-  .laporan-pembelian-print-area .overflow-x-auto,
-  .laporan-penjualan-print-area .overflow-x-auto {
-    overflow: visible !important;
-  }
+    .print-letterhead {
+      display: block !important;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      object-fit: contain;
+      object-position: center top;
+    }
 
-  .laporan-pembelian-print-area .overflow-hidden,
-  .laporan-penjualan-print-area .overflow-hidden {
-    overflow: visible !important;
-  }
+    .laporan-pembelian-print-content,
+    .laporan-penjualan-print-content,
+    .laporan-penerimaan-print-content,
+    .print-letter-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 56mm 8mm 26mm;
+      display: flex;
+      flex-direction: column;
+      gap: 4mm;
+      align-items: center;
+      justify-content: flex-start;
+    }
 
-  .laporan-pembelian-print-area .bg-white,
-  .laporan-penjualan-print-area .bg-white {
-    background: transparent !important;
-  }
+    .laporan-pembelian-print-content > :first-child,
+    .laporan-penjualan-print-content > :first-child,
+    .laporan-penerimaan-print-content > :first-child,
+    .print-letter-content > :first-child {
+      margin-bottom: 1mm !important;
+    }
 
-  .laporan-pembelian-print-area [data-slot='tabs-content'],
-  .laporan-penjualan-print-area [data-slot='tabs-content'] {
-    margin-top: 0 !important;
-    width: 100% !important;
-  }
+    .laporan-pembelian-print-area .overflow-x-auto,
+    .laporan-penjualan-print-area .overflow-x-auto,
+    .laporan-penerimaan-print-area .overflow-x-auto {
+      overflow: visible !important;
+    }
 
-  .laporan-pembelian-print-area table,
-  .laporan-penjualan-print-area table {
-    width: 100% !important;
-    table-layout: fixed !important;
-    font-size: 8px !important;
-    border-collapse: collapse !important;
-  }
+    .laporan-pembelian-print-area .overflow-hidden,
+    .laporan-penjualan-print-area .overflow-hidden,
+    .laporan-penerimaan-print-area .overflow-hidden {
+      overflow: visible !important;
+    }
 
-  .laporan-pembelian-print-area th,
-  .laporan-pembelian-print-area td,
-  .laporan-penjualan-print-area th,
-  .laporan-penjualan-print-area td {
-    padding: 2.5px 3px !important;
-    white-space: nowrap !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-    border: 0.7px solid #9ca3af !important;
-    color: #111827 !important;
-  }
+    .laporan-pembelian-print-area .bg-white,
+    .laporan-penjualan-print-area .bg-white,
+    .laporan-penerimaan-print-area .bg-white {
+      background: transparent !important;
+    }
 
-  .laporan-pembelian-print-area th,
-  .laporan-penjualan-print-area th {
-    font-weight: 700 !important;
-    background: #f3f4f6 !important;
-    color: #0f172a !important;
-  }
+    .laporan-pembelian-print-area [data-slot='tabs-content'],
+    .laporan-penjualan-print-area [data-slot='tabs-content'],
+    .laporan-penerimaan-print-area [data-slot='tabs-content'] {
+      margin-top: 0 !important;
+      width: 100% !important;
+    }
 
-  .laporan-pembelian-print-area .rounded-xl,
-  .laporan-pembelian-print-area .shadow-sm,
-  .laporan-pembelian-print-area .border,
-  .laporan-penjualan-print-area .rounded-xl,
-  .laporan-penjualan-print-area .shadow-sm,
-  .laporan-penjualan-print-area .border {
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
+    .laporan-pembelian-print-area table,
+    .laporan-penjualan-print-area table,
+    .laporan-penerimaan-print-area table {
+      width: 100% !important;
+      table-layout: fixed !important;
+      font-size: 8px !important;
+      border-collapse: collapse !important;
+    }
 
-  .laporan-pembelian-print-content h2,
-  .laporan-penjualan-print-content h2,
-  .print-letter-content h2 {
-    font-size: 22px !important;
-    line-height: 1.15 !important;
-    letter-spacing: 0.02em;
-  }
+    .laporan-pembelian-print-area th,
+    .laporan-pembelian-print-area td,
+    .laporan-penjualan-print-area th,
+    .laporan-penjualan-print-area td,
+    .laporan-penerimaan-print-area th,
+    .laporan-penerimaan-print-area td {
+      padding: 2.5px 3px !important;
+      white-space: nowrap !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+      border: 0.7px solid #9ca3af !important;
+      color: #111827 !important;
+    }
 
-  .laporan-pembelian-print-content p:nth-of-type(1),
-  .laporan-penjualan-print-content p:nth-of-type(1),
-  .print-letter-content p:nth-of-type(1) {
-    font-size: 16px !important;
-    line-height: 1.2 !important;
-  }
+    .laporan-pembelian-print-area th,
+    .laporan-penjualan-print-area th,
+    .laporan-penerimaan-print-area th {
+      font-weight: 700 !important;
+      background: #f3f4f6 !important;
+      color: #0f172a !important;
+    }
 
-  .laporan-pembelian-print-content p:nth-of-type(2),
-  .laporan-penjualan-print-content p:nth-of-type(2),
-  .print-letter-content p:nth-of-type(2) {
-    font-size: 13px !important;
-    line-height: 1.2 !important;
-  }
+    .laporan-pembelian-print-area .rounded-xl,
+    .laporan-pembelian-print-area .shadow-sm,
+    .laporan-pembelian-print-area .border,
+    .laporan-penjualan-print-area .rounded-xl,
+    .laporan-penjualan-print-area .shadow-sm,
+    .laporan-penjualan-print-area .border,
+    .laporan-penerimaan-print-area .rounded-xl,
+    .laporan-penerimaan-print-area .shadow-sm,
+    .laporan-penerimaan-print-area .border {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .laporan-pembelian-print-content h2,
+    .laporan-penjualan-print-content h2,
+    .laporan-penerimaan-print-content h2,
+    .print-letter-content h2 {
+      font-size: 22px !important;
+      line-height: 1.15 !important;
+      letter-spacing: 0.02em;
+    }
+
+    .laporan-pembelian-print-content p:nth-of-type(1),
+    .laporan-penjualan-print-content p:nth-of-type(1),
+    .laporan-penerimaan-print-content p:nth-of-type(1),
+    .print-letter-content p:nth-of-type(1) {
+      font-size: 16px !important;
+      line-height: 1.2 !important;
+    }
+
+    .laporan-pembelian-print-content p:nth-of-type(2),
+    .laporan-penjualan-print-content p:nth-of-type(2),
+    .laporan-penerimaan-print-content p:nth-of-type(2),
+    .print-letter-content p:nth-of-type(2) {
+      font-size: 13px !important;
+      line-height: 1.2 !important;
+    }
 }
+  }
