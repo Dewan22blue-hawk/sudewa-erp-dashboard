@@ -29,7 +29,8 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
         (item.address ?? '').toLowerCase().includes(lowercasedTerm) ||
         (item.npwp ?? '').toLowerCase().includes(lowercasedTerm) ||
         (item.pic ?? '').toLowerCase().includes(lowercasedTerm) ||
-        (item.phone ?? '').toLowerCase().includes(lowercasedTerm),
+        (item.phone ?? '').toLowerCase().includes(lowercasedTerm) ||
+        (item.map_link ?? '').toLowerCase().includes(lowercasedTerm),
     );
   }, [customers, searchTerm]);
 
@@ -99,6 +100,7 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
               <TableHead className="font-semibold uppercase text-slate-700">NPWP</TableHead>
               <TableHead className="font-semibold uppercase text-slate-700">PIC</TableHead>
               <TableHead className="font-semibold uppercase text-slate-700">Phone</TableHead>
+              <TableHead className="font-semibold uppercase text-slate-700">Maps</TableHead>
               <TableHead className="text-right font-semibold uppercase text-slate-700">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -120,6 +122,15 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
                   <TableCell className="text-slate-700">{customer.npwp ?? '-'}</TableCell>
                   <TableCell className="text-slate-700">{customer.pic ?? '-'}</TableCell>
                   <TableCell className="text-slate-700">{customer.phone ?? '-'}</TableCell>
+                  <TableCell className="text-slate-700">
+                    {customer.map_link ? (
+                      <a href={customer.map_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        [link]
+                      </a>
+                    ) : (
+                      '-'
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

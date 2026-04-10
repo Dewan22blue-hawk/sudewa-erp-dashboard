@@ -19,6 +19,7 @@ interface CustomerApiModel {
   company_id?: number | string;
   created_at?: string;
   updated_at?: string;
+  map_link?: string | null;
 }
 
 const mapCustomer = (payload: CustomerApiModel): Customer => ({
@@ -35,6 +36,7 @@ const mapCustomer = (payload: CustomerApiModel): Customer => ({
   companyId: payload.company_id,
   createdAt: payload.created_at,
   updatedAt: payload.updated_at,
+  map_link: payload.map_link ?? null,
 });
 
 const basePath = '/wapi/master-data/customer';
@@ -108,6 +110,7 @@ const buildPayload = (payload: CustomerPayload, opts?: { asUpdate?: boolean }) =
     body.append('pic', payload.pic);
     body.append('pic_name', payload.pic);
   }
+  if (payload.map_link) body.append('map_link', payload.map_link);
   return body;
 };
 

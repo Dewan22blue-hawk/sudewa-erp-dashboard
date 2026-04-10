@@ -13,7 +13,7 @@ export interface CustomerFormData {
     pic: string;
     alamat: string;
     phone: string;
-    maps: string;
+    map_link?: string;
 }
 
 interface CustomerFormModalProps {
@@ -31,14 +31,14 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
             pic: '',
             alamat: '',
             phone: '',
-            maps: ''
+            map_link: ''
         },
-        values: initialData || { namaDealer: '', namaCustomer: '', pic: '', alamat: '', phone: '', maps: '' }
+        values: initialData || { namaDealer: '', namaCustomer: '', pic: '', alamat: '', phone: '', map_link: '' }
     });
 
     useEffect(() => {
         if (!isOpen) {
-            reset({ namaDealer: '', namaCustomer: '', pic: '', alamat: '', phone: '', maps: '' });
+            reset({ namaDealer: '', namaCustomer: '', pic: '', alamat: '', phone: '', map_link: '' });
         }
     }, [isOpen, reset]);
 
@@ -116,14 +116,12 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="maps">Maps<RequiredMark /></Label>
+                            <Label htmlFor="map_link">Maps</Label>
                             <Input
-                                id="maps"
+                                id="map_link"
                                 placeholder="Tambahkan link maps"
-                                {...register('maps', { required: 'Maps wajib diisi' })}
-                                className={errors.maps ? 'border-red-500' : ''}
+                                {...register('map_link')}
                             />
-                            {errors.maps && <p className="text-red-500 text-xs">{errors.maps.message}</p>}
                         </div>
 
                         <div className="flex flex-col space-y-2 pt-4">

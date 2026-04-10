@@ -110,9 +110,13 @@ export function CustomerTable({
                       <span className="line-clamp-2 max-w-[200px] mx-auto">{customer.alamat}</span>
                     </TableCell>
                     <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
-                      <a href={customer.maps} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline max-w-[150px] inline-block truncate">
-                        {customer.maps}
-                      </a>
+                      {customer.map_link ? (
+                        <a href={customer.map_link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                          [link]
+                        </a>
+                      ) : (
+                        '-'
+                      )}
                     </TableCell>
                     <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
                       {customer.phone}
