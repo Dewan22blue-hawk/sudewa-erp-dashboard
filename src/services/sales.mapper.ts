@@ -92,6 +92,8 @@ export type SalesListUI = {
   total: number;
   date: string;
   status: 'Lunas' | 'Belum';
+  stockState: string;
+  isRefunded: boolean;
 };
 
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
@@ -191,6 +193,7 @@ const formatDate = (value?: string): string => {
 };
 
 export function mapSalesToUI(item: SalesApiModel): SalesListUI {
+  const stockState = String(item.stock_state ?? '').toLowerCase();
   return {
     id: String(item.id ?? ''),
     code: item.code ?? '-',
@@ -199,6 +202,8 @@ export function mapSalesToUI(item: SalesApiModel): SalesListUI {
     total: getBrutoTotal(item),
     date: item.created_at ?? '',
     status: toBool(item.billing_summary?.is_paid ?? item.unit_transaction_billing?.is_paid) ? 'Lunas' : 'Belum',
+    stockState,
+    isRefunded: stockState === 'outbound_return',
   };
 }
 
@@ -220,6 +225,8 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
     kodeJual: mapped.code,
     tanggal: formatDate(mapped.date),
     customer: mapped.customerName,
+    stockState: mapped.stockState,
+    isRefunded: mapped.isRefunded,
     warehouse: mapped.warehouseName,
     tipeUnit: '-',
     hargaSatuan: 0,
@@ -281,6 +288,8 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
     kodeJual: item.code ?? '-',
     tanggal: formatDate(item.created_at),
     customer: item.person?.name ?? '-',
+    stockState: String(item.stock_state ?? '').toLowerCase(),
+    isRefunded: String(item.stock_state ?? '').toLowerCase() === 'outbound_return',
     warehouse: item.warehouse?.name ?? '-',
     tipeUnit: item.unit_transaction_items?.[0]?.unit_type?.name ?? '-',
     hargaSatuan: toNumber(item.unit_transaction_items?.[0]?.price),

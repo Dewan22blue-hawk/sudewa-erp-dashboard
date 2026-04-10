@@ -11,7 +11,6 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -50,6 +49,8 @@ const getWarehouseRemainingCapacity = async (warehouseId: number): Promise<{ rem
   return { remaining, used, capacity };
 };
 
+const DEFAULT_WAREHOUSE_ID = 1;
+
 export default function CreatePurchasePage() {
   const router = useRouter();
   const { slug } = router.query;
@@ -57,8 +58,6 @@ export default function CreatePurchasePage() {
   const mutation = useCreatePurchase();
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
-  const [warehouseId, setWarehouseId] = useState('1');
-  const [maxCapacity, setMaxCapacity] = useState('90.0');
   const [supplierOpen, setSupplierOpen] = useState(false);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
@@ -86,10 +85,9 @@ export default function CreatePurchasePage() {
   const handleSubmit = async (data: CreatePurchaseUnitFormValues) => {
     try {
       const personNumeric = Number(personId);
-      const warehouseNumeric = Number(warehouseId);
+      const warehouseNumeric = DEFAULT_WAREHOUSE_ID;
       const companyNumeric = Number(companyId);
       const qtyNumber = Number(data.qty ?? 0);
-      const maxCapacityNumber = Number(maxCapacity);
       const unitTypeIdNumber = Number(data.typeUnitId ?? 0);
       const priceNumber = Number(data.price ?? 0);
       const bbnNumber = Number(data.biayaBBN ?? 0);
@@ -116,16 +114,6 @@ export default function CreatePurchasePage() {
         return;
       }
 
-      if (!maxCapacityNumber || Number.isNaN(maxCapacityNumber) || maxCapacityNumber <= 0) {
-        toast.error('Max capacity wajib diisi dan lebih dari 0.');
-        return;
-      }
-
-      if (maxCapacityNumber < qtyNumber) {
-        toast.error('Max capacity tidak boleh lebih kecil dari qty unit.');
-        return;
-      }
-
       if (!unitTypeIdNumber || unitTypeIdNumber <= 0) {
         toast.error('Tipe unit wajib dipilih sebelum menyimpan pembelian.');
         return;
@@ -140,7 +128,7 @@ export default function CreatePurchasePage() {
         company_id: companyNumeric,
         code: generatedCode,
         type: 'purchase',
-        max_capacity: String(maxCapacityNumber),
+        max_capacity: String(qtyNumber),
         stock_state: 'draft',
         unit_type_id: unitTypeIdNumber,
         qty_total: qtyNumber,
@@ -228,7 +216,7 @@ export default function CreatePurchasePage() {
         </div>
 
         <div className="rounded-xl border bg-white p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 gap-6 mb-8">
             <div className="space-y-2">
               <Label>Supplier</Label>
               <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
@@ -268,29 +256,6 @@ export default function CreatePurchasePage() {
                   </Command>
                 </PopoverContent>
               </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="warehouse-id">Warehouse ID</Label>
-              <Input id="warehouse-id" type="number" min={1} value={warehouseId} onChange={(e) => setWarehouseId(e.target.value)} placeholder="Contoh: 1" />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Tipe</Label>
-              <Input value="purchase" disabled readOnly />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="max-capacity">Max Capacity</Label>
-              <Input
-                id="max-capacity"
-                type="number"
-                min={1}
-                step="0.1"
-                value={maxCapacity}
-                onChange={(e) => setMaxCapacity(e.target.value)}
-                placeholder="Contoh: 90.0"
-              />
             </div>
           </div>
 

@@ -98,7 +98,7 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
               <TableHead className="font-semibold uppercase text-slate-700">Alamat</TableHead>
               <TableHead className="font-semibold uppercase text-slate-700">NPWP</TableHead>
               <TableHead className="font-semibold uppercase text-slate-700">PIC</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Handphone</TableHead>
+              <TableHead className="font-semibold uppercase text-slate-700">Phone</TableHead>
               <TableHead className="text-right font-semibold uppercase text-slate-700">Action</TableHead>
             </TableRow>
           </TableHeader>

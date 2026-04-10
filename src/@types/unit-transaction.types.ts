@@ -20,6 +20,7 @@ export interface UnitTransaction {
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;
   paymentAt: string | null;
+  remainingPayment: number;
 }
 
 export interface UnitTransactionResponse {

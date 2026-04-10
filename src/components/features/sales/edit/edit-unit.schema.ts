@@ -8,7 +8,7 @@ export const editUnitSchema = z.object({
 
   // Main fields
   tipeUnit: z.string().min(1, 'Tipe Unit wajib dipilih'),
-  qty: z.number().min(1, 'Qty minimal 1'),
+  qty: z.number().optional(),
 
   // Harga section
   harga: z.number().min(0, 'Harga tidak boleh negatif'),

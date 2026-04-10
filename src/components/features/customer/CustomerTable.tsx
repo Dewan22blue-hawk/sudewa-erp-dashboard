@@ -89,7 +89,7 @@ export function CustomerTable({
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">PIC</TableHead>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">ALAMAT</TableHead>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">MAPS</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">HANDPHONE</TableHead>
+                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">PHONE</TableHead>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">ACTION</TableHead>
               </TableRow>
             </TableHeader>

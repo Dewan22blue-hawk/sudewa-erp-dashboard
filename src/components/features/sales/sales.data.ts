@@ -27,6 +27,8 @@ export interface SalesItem {
   kodeJual: string;
   tanggal: string;
   customer: string;
+  stockState?: string;
+  isRefunded?: boolean;
   warehouse?: string;
   tipeUnit: string;
   hargaSatuan: number;

@@ -43,6 +43,14 @@ type UnitTransactionApiModel = {
     is_paid?: boolean;
     payment_at?: string | null;
   } | null;
+  billing_summary?: {
+    grand_total?: number | string;
+    total_cash_payment?: number | string;
+    total_bca_payment?: number | string;
+    total_paid?: number | string;
+    remaining_payment?: number | string;
+    is_paid?: boolean;
+  } | null;
 };
 
 type UnitTransactionItemListApiModel = {
@@ -140,8 +148,9 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   transaction_other_fee: toNumber(item.transaction_other_fee),
   stock_state: item.stock_state ?? '-',
   unit_transaction_billing: item.unit_transaction_billing ?? null,
-  isPaid: Boolean(item.unit_transaction_billing?.is_paid),
+  isPaid: Boolean(item.unit_transaction_billing?.is_paid || item.billing_summary?.is_paid),
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
+  remainingPayment: toNumber(item.billing_summary?.remaining_payment),
 });
 
 const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): UnitTransaction[] => {
@@ -185,6 +194,7 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
         unit_transaction_billing: null,
         isPaid: false,
         paymentAt: null,
+        remainingPayment: 0,
       });
       return;
     }
@@ -443,6 +453,8 @@ export const unitTransactionService = {
       | {
           stockState?: string;
           unitTransactionDetails?: Array<string | number>;
+          cashId?: string | number;
+          description?: string;
         },
   ): Promise<UnitTransactionDetail> {
     const normalizedStockState = typeof statePayload === 'string' ? statePayload : statePayload.stockState ?? '';
@@ -450,9 +462,13 @@ export const unitTransactionService = {
       typeof statePayload === 'string'
         ? []
         : (statePayload.unitTransactionDetails ?? []).map((item) => String(item)).filter((item) => item.length > 0);
+    const normalizedCashId = typeof statePayload === 'string' ? '' : String(statePayload.cashId ?? '').trim();
+    const normalizedDescription = typeof statePayload === 'string' ? '' : String(statePayload.description ?? '').trim();
 
     const body = new URLSearchParams();
     if (normalizedStockState) body.append('stock_state', normalizedStockState);
+    if (normalizedCashId) body.append('cash_id', normalizedCashId);
+    if (normalizedDescription) body.append('description', normalizedDescription);
     if (normalizedDetails.length > 0) {
       normalizedDetails.forEach((item) => body.append('unit_transaction_details[]', item));
       body.append('unit_transaction_details', JSON.stringify(normalizedDetails));

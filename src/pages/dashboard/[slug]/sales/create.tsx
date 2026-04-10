@@ -20,18 +20,19 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCreateUnitItem } from '@/hooks/useUnitTransactionItem';
-import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { useCreateTypeUnit, useTypeUnits } from '@/hooks/useTypeUnit';
 import { getTypeUnitById } from '@/services/type-unit.service';
+import { useBrands } from '@/hooks/useBrand';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 type SalesCreateFormState = {
   customerId: string;
-  warehouseId: string;
   unitTypeId: string;
   code: string;
   tanggal: string;
   alamat: string;
   npwp: string;
-  qty: number;
+  qty?: number;
   price: number;
 };
 
@@ -40,7 +41,9 @@ export default function CreateSalesPage() {
   const { companyId } = useCompany();
   const createSalesMutation = useCreateSales();
   const createItemMutation = useCreateUnitItem();
+  const createTypeUnitMutation = useCreateTypeUnit();
   const { data: unitTypeData, isLoading: isLoadingUnitTypes } = useTypeUnits();
+  const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
   const slugQuery = router.query.slug;
   const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
   const salesPath = slug ? `/dashboard/${slug}/sales` : '/sales';
@@ -51,16 +54,17 @@ export default function CreateSalesPage() {
   const [isCustomerOpen, setIsCustomerOpen] = useState(false);
   const [isLoadingCustomerList, setIsLoadingCustomerList] = useState(false);
   const [isLoadingCustomerDetail, setIsLoadingCustomerDetail] = useState(false);
+  const [isOpenCreateTypeUnitModal, setIsOpenCreateTypeUnitModal] = useState(false);
+  const [typeUnitImage, setTypeUnitImage] = useState<File | null>(null);
 
   const [form, setForm] = useState<SalesCreateFormState>({
     customerId: '',
-    warehouseId: '',
     unitTypeId: '',
     code: generatedCode,
     tanggal: new Date().toISOString().split('T')[0],
     alamat: '',
     npwp: '',
-    qty: 1,
+    qty: undefined,
     price: 0,
   });
 
@@ -74,6 +78,11 @@ export default function CreateSalesPage() {
       label: item.name,
     }));
   }, [unitTypeData?.data]);
+
+  const brandOptions = useMemo(() => {
+    const maybeList = (brandsData as any)?.data;
+    return Array.isArray(maybeList) ? maybeList : [];
+  }, [brandsData]);
 
   useEffect(() => {
     let isMounted = true;
@@ -129,7 +138,6 @@ export default function CreateSalesPage() {
 
     const customerId = Number(form.customerId || 0);
     const companyIdNumber = Number(companyId || 0);
-    const warehouseId = Number(form.warehouseId || 0);
     const unitTypeId = Number(data.tipeUnit || form.unitTypeId || 0);
     const qty = toNumber(data.qty);
     const price = toNumber(data.harga);
@@ -155,7 +163,6 @@ export default function CreateSalesPage() {
     const transactionPayload = {
       company_id: companyIdNumber,
       person_id: customerId,
-      warehouse_id: warehouseId > 0 ? warehouseId : undefined,
       code: form.code,
       type: 'sales' as const,
       max_capacity: qty,
@@ -226,6 +233,48 @@ export default function CreateSalesPage() {
         toast.error('Stok untuk tipe unit ini tidak tersedia di warehouse. Silakan pilih tipe unit lain yang tersedia.');
         return;
       }
+      toast.error(message);
+    }
+  };
+
+  const handleCreateTypeUnit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const code = String(formData.get('code') || '').trim();
+    const name = String(formData.get('name') || '').trim();
+    const brandId = Number(formData.get('brandId') || 0);
+    const description = String(formData.get('description') || '').trim();
+    const netto = formData.get('nettoWeight');
+    const bruto = formData.get('brutoWeight');
+
+    if (!code) {
+      toast.error('Kode tipe wajib diisi');
+      return;
+    }
+
+    if (!brandId) {
+      toast.error('Merk kendaraan wajib dipilih');
+      return;
+    }
+
+    try {
+      await createTypeUnitMutation.mutateAsync({
+        code,
+        name: name || code,
+        brandId,
+        unitType: description || undefined,
+        unitModel: description || undefined,
+        nettoWeight: netto ? Number(netto) : undefined,
+        brutoWeight: bruto ? Number(bruto) : undefined,
+        image: typeUnitImage,
+      });
+
+      toast.success('Tipe unit berhasil ditambahkan');
+      setIsOpenCreateTypeUnitModal(false);
+      setTypeUnitImage(null);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || 'Gagal menambahkan tipe unit';
       toast.error(message);
     }
   };
@@ -322,14 +371,73 @@ export default function CreateSalesPage() {
             hideCustomerField
             productOptions={unitTypeOptions}
             searchableTypeUnit
+            showAddUnitButton
+            onAddUnitClick={() => setIsOpenCreateTypeUnitModal(true)}
             onSubmit={handleSubmit}
             onCancel={() => router.push(salesPath)}
-            showAddUnitButton
             submitDisabled={createSalesMutation.isPending || createItemMutation.isPending || isLoadingCustomerList || isLoadingCustomerDetail || isLoadingUnitTypes}
             cancelDisabled={createSalesMutation.isPending || createItemMutation.isPending}
           />
         </div>
       </div>
+
+      <Dialog open={isOpenCreateTypeUnitModal} onOpenChange={setIsOpenCreateTypeUnitModal}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle>Tambah Data Tipe</DialogTitle>
+          </DialogHeader>
+          <form className="space-y-4" onSubmit={handleCreateTypeUnit}>
+            <div className="space-y-2">
+              <Label htmlFor="code">Kode Tipe</Label>
+              <Input id="code" name="code" placeholder="Masukkan kode tipe" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Nama Tipe</Label>
+              <Input id="name" name="name" placeholder="Masukkan nama tipe" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Deskripsi</Label>
+              <Input id="description" name="description" placeholder="Masukkan deskripsi" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="brandId">Merk Kendaraan</Label>
+              <select id="brandId" name="brandId" className="w-full border rounded-md h-10 px-3" required defaultValue="" disabled={isLoadingBrands}>
+                <option value="" disabled>
+                  {isLoadingBrands ? 'Memuat merk...' : 'Pilih merk'}
+                </option>
+                {brandOptions.map((brand: any) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="nettoWeight">Berat Netto</Label>
+                <Input id="nettoWeight" name="nettoWeight" type="number" step="0.01" placeholder="Masukkan berat" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="brutoWeight">Berat Bruto</Label>
+                <Input id="brutoWeight" name="brutoWeight" type="number" step="0.01" placeholder="Masukkan berat" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="image">Gambar (opsional)</Label>
+              <Input id="image" name="image" type="file" accept="image/*" onChange={(e) => setTypeUnitImage(e.target.files?.[0] || null)} />
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="ghost" onClick={() => setIsOpenCreateTypeUnitModal(false)}>
+                Batal
+              </Button>
+              <Button type="submit" disabled={createTypeUnitMutation.isPending} className="bg-[#1e293b] hover:bg-[#0f172a] text-white">
+                {createTypeUnitMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
