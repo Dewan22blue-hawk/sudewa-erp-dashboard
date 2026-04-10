@@ -12,15 +12,18 @@ import { Kas } from '@/@types/kas.types';
 import { useCreateKas, useUpdateKas } from '@/hooks/useKas';
 import { toast } from 'sonner';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   kas: Kas | null;
   companyId: string;
+  title: string;
+  description: string;
 }
 
-export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
+export function KasFormDialog({ open, onOpenChange, kas, companyId, title, description }: Props) {
   const isEdit = Boolean(kas);
 
   const createMutation = useCreateKas(companyId);
@@ -86,8 +89,8 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Ubah Data Kas' : 'Tambah Data Kas'}</DialogTitle>
-          <DialogDescription className="hidden">Form untuk {isEdit ? 'mengubah' : 'menambah'} data kas</DialogDescription>
+          <DialogTitle className="text-xl">{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -97,7 +100,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kode Kas</FormLabel>
+                  <FormLabel>Kode Kas<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan kode" {...field} disabled={isLoading} />
                   </FormControl>
@@ -111,7 +114,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
+                  <FormLabel>Deskripsi<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nama" {...field} disabled={isLoading} />
                   </FormControl>
@@ -125,7 +128,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Jenis</FormLabel>
+                  <FormLabel>Jenis<RequiredMark /></FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={isLoading}>
                     <FormControl>
                       <SelectTrigger className="w-full">

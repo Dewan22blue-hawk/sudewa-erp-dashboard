@@ -109,7 +109,14 @@ export default function KasPage() {
         </div>
 
 
-        <KasFormDialog open={openForm} onOpenChange={handleOpenFormChange} kas={selectedKas} companyId={safeCompanyId} />
+        <KasFormDialog
+          open={openForm}
+          onOpenChange={handleOpenFormChange}
+          kas={selectedKas}
+          title={selectedKas ? 'Ubah Data Kas' : 'Tambah Data Kas'}
+          description={selectedKas ? 'Form untuk mengubah data kas' : 'Form untuk menambah data kas'}
+          companyId={safeCompanyId}
+        />
 
         <DeleteKasDialog open={openDelete} onOpenChange={handleOpenDeleteChange} kas={selectedKas} companyId={safeCompanyId} />
 

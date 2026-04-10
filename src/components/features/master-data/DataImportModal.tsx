@@ -34,10 +34,11 @@ export function DataImportModal({ open, onOpenChange, title, description, onImpo
         try {
             await onImport(file);
             toast.success('Data berhasil diimport');
-            onOpenChange(false);
-            setFile(null);
         } catch (error: any) {
             toast.error(error?.message || 'Terjadi kesalahan saat mengimport data');
+        } finally {
+            onOpenChange(false);
+            setFile(null);
         }
     };
 

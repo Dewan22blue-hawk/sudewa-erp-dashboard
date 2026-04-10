@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { CreateSparepartCategoryDialog } from './CreateSparepartCategoryDialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
   open: boolean;
@@ -141,19 +142,19 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-bold mb-1">Kode Part</label>
+              <label className="block text-sm font-bold mb-1">Kode Part<RequiredMark /></label>
               <Controller control={control} name="code" render={({ field }) => <Input placeholder="Tambahkan kode" value={field.value ?? ''} onChange={field.onChange} />} />
               {errors.code && <p className="text-xs text-destructive mt-1">{errors.code.message}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Nama Part</label>
+              <label className="block text-sm font-bold mb-1">Nama Part<RequiredMark /></label>
               <Controller control={control} name="name" render={({ field }) => <Input placeholder="Tambahkan nama" value={field.value ?? ''} onChange={field.onChange} />} />
               {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Grup</label>
+              <label className="block text-sm font-bold mb-1">Grup<RequiredMark /></label>
               <Controller
                 control={control}
                 name="categoryId"
@@ -202,7 +203,7 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Satuan</label>
+              <label className="block text-sm font-bold mb-1">Satuan<RequiredMark /></label>
               <Controller
                 control={control}
                 name="unitType"
@@ -223,13 +224,13 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Harga Beli</label>
+              <label className="block text-sm font-bold mb-1">Harga Beli<RequiredMark /></label>
               <Controller control={control} name="purchasePrice" render={({ field: { onChange, value, ...rest } }) => <MoneyInput placeholder="Tambahkan harga beli" {...rest} value={value || 0} onChangeValue={onChange} />} />
               {errors.purchasePrice && <p className="text-xs text-destructive mt-1">{errors.purchasePrice.message}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Harga Jual</label>
+              <label className="block text-sm font-bold mb-1">Harga Jual<RequiredMark /></label>
               <Controller control={control} name="sellingPrice" render={({ field: { onChange, value, ...rest } }) => <MoneyInput placeholder="Tambahkan harga jual" {...rest} value={value || 0} onChangeValue={onChange} />} />
               {errors.sellingPrice && <p className="text-xs text-destructive mt-1">{errors.sellingPrice.message}</p>}
             </div>

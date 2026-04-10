@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import RequiredMark from '@/components/ui/required-mark';
 
 export interface CustomerFormData {
     namaDealer: string;
@@ -53,13 +54,13 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                 <DialogHeader>
                     <DialogTitle>{isEdit ? 'Edit Data Customer' : 'Tambah Data Customer'}</DialogTitle>
                     <DialogDescription>
-                        {isEdit ? 'Edit detail customer baru' : 'Masukkan detail customer baru'}
+                        {isEdit ? 'Edit data customer baru' : 'Masukkan data customer baru'}
                     </DialogDescription>
                 </DialogHeader>
                 {isOpen && (
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4 max-h-[70vh] overflow-y-auto px-1">
                         <div className="space-y-2">
-                            <Label htmlFor="namaDealer">Nama Dealer</Label>
+                            <Label htmlFor="namaDealer">Nama Dealer<RequiredMark /></Label>
                             <Input
                                 id="namaDealer"
                                 placeholder="Tambahkan nama dealer"
@@ -70,7 +71,7 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="namaCustomer">Nama Customer</Label>
+                            <Label htmlFor="namaCustomer">Nama Customer<RequiredMark /></Label>
                             <Input
                                 id="namaCustomer"
                                 placeholder="Tambahkan nama customer"
@@ -81,7 +82,7 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="pic">PIC</Label>
+                            <Label htmlFor="pic">PIC<RequiredMark /></Label>
                             <Input
                                 id="pic"
                                 placeholder="Tambahkan PIC"
@@ -92,7 +93,7 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="alamat">Alamat</Label>
+                            <Label htmlFor="alamat">Alamat<RequiredMark /></Label>
                             <Textarea
                                 id="alamat"
                                 placeholder="Tambahkan Alamat"
@@ -104,7 +105,7 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="phone">Phone</Label>
+                            <Label htmlFor="phone">Phone<RequiredMark /></Label>
                             <Input
                                 id="phone"
                                 placeholder="Tambahkan nomer telepon"
@@ -115,7 +116,7 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="maps">Maps</Label>
+                            <Label htmlFor="maps">Maps<RequiredMark /></Label>
                             <Input
                                 id="maps"
                                 placeholder="Tambahkan link maps"

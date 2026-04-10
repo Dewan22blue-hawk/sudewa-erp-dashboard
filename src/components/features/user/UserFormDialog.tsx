@@ -14,6 +14,7 @@ import { useAssignRole, useCreateUser, useUpdateUser } from '@/hooks/useUser';
 import { useRoles } from '@/hooks/useRole';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
   open: boolean;
@@ -127,7 +128,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Lengkap</FormLabel>
+                  <FormLabel>Nama Lengkap<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nama" {...field} disabled={isBusy} />
                   </FormControl>
@@ -142,7 +143,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email<RequiredMark /></FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="user@mail.com" {...field} disabled={isBusy || isEdit} />
                     </FormControl>
@@ -156,7 +157,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>Username<RequiredMark /></FormLabel>
                     <FormControl>
                       <Input placeholder="username" {...field} disabled={isBusy || isEdit} />
                     </FormControl>
@@ -172,7 +173,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                 name="firstname"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama Depan</FormLabel>
+                    <FormLabel>Nama Depan<RequiredMark /></FormLabel>
                     <FormControl>
                       <Input placeholder="Nama depan" {...field} disabled={isBusy} />
                     </FormControl>
@@ -201,7 +202,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password {isEdit && '(Opsional)'}</FormLabel>
+                  <FormLabel>Password {isEdit && '(Opsional)'}{!isEdit && <RequiredMark />}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input type={showPassword ? 'text' : 'password'} placeholder={isEdit ? 'Kosongkan jika tidak diubah' : 'Masukkan password'} {...field} disabled={isBusy} />
@@ -221,7 +222,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
               name="password_confirmation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Konfirmasi Password</FormLabel>
+                  <FormLabel>Konfirmasi Password{!isEdit && <RequiredMark />}</FormLabel>
                   <FormControl>
                     <Input type={showPassword ? 'text' : 'password'} placeholder="Ulangi password" {...field} disabled={isBusy} />
                   </FormControl>
@@ -235,7 +236,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
               name="roles"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel>Role<RequiredMark /></FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={isBusy || isRolesLoading}>
                     <FormControl>
                       <SelectTrigger className="w-full">

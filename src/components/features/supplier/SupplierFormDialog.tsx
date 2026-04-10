@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { UseFormReturn } from 'react-hook-form';
 import type { CreateSupplierFormValues } from '@/scheme/supplier.schema';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface SupplierFormDialogProps {
   open: boolean;
@@ -36,7 +37,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Supplier</FormLabel>
+                  <FormLabel>Nama Supplier<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nama" {...field} />
                   </FormControl>
