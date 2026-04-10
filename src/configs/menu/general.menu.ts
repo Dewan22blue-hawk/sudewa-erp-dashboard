@@ -23,12 +23,12 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
       icon: Database,
       children: [
         {
-          label: 'Grup Akun',
-          href: master('/account-group'),
-        },
-        {
           label: 'Akun',
           href: master('/account'),
+        },
+        {
+          label: 'Grup Akun',
+          href: master('/account-group'),
         },
         {
           label: 'Supplier',
@@ -38,10 +38,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Customer',
           href: master('/customer'),
         },
-        {
-          label: 'Merk Unit Tipe',
-          href: master('/brand'),
-        },
+        // {
+        //   label: 'Merk Unit Tipe',
+        //   href: master('/brand'),
+        // },
         {
           label: 'Tipe Unit',
           href: master('/type-unit'),

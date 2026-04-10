@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Card } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccountGroupTable } from './AccountGroupTable';
 import { AccountGroupFormModal } from './AccountGroupFormModal';
@@ -14,6 +13,9 @@ import { accountGroupSchema, type AccountGroupFormValues } from '@/scheme/accoun
 import { toast } from 'sonner';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { useCompany } from '@/contexts/CompanyContext';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Plus, Upload } from 'lucide-react';
 
 export const AccountGroupListPage = () => {
   const router = useRouter();
@@ -112,26 +114,44 @@ export const AccountGroupListPage = () => {
           </div>
         </div>
 
-        <Card className="p-6">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <div className="relative w-64 text-gray-400 focus-within:text-gray-900">
+              <Input
+                placeholder="Search here"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-3 h-10 border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+            <div className="flex flex-row gap-2">
+              <Button onClick={() => {}} className="gap-2" variant="outline">
+                <Upload className="h-4 w-4" />
+                Import
+              </Button>
+              <Button onClick={handleAdd} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Tambah
+              </Button>
+            </div>
+          </div>
+
           {isError ? (
             <div className="text-center text-red-600">Gagal memuat data grup akun</div>
           ) : (
             <AccountGroupTable
               data={data?.data ?? []}
               meta={data?.meta}
-              search={search}
               page={page}
               perPage={perPage}
               isLoading={isLoading || isFetching}
-              onSearchChange={setSearch}
-              onAdd={handleAdd}
               onEdit={handleEdit}
               onDelete={setSelectedToDelete}
               onPageChange={setPage}
               onPerPageChange={setPerPage}
             />
           )}
-        </Card>
+        </div>
       </div>
 
       <AccountGroupFormModal
