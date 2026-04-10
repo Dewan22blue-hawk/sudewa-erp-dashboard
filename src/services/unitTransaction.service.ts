@@ -43,6 +43,14 @@ type UnitTransactionApiModel = {
     is_paid?: boolean;
     payment_at?: string | null;
   } | null;
+  billing_summary?: {
+    grand_total?: number | string;
+    total_cash_payment?: number | string;
+    total_bca_payment?: number | string;
+    total_paid?: number | string;
+    remaining_payment?: number | string;
+    is_paid?: boolean;
+  } | null;
 };
 
 type UnitTransactionItemListApiModel = {
@@ -140,8 +148,9 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   transaction_other_fee: toNumber(item.transaction_other_fee),
   stock_state: item.stock_state ?? '-',
   unit_transaction_billing: item.unit_transaction_billing ?? null,
-  isPaid: Boolean(item.unit_transaction_billing?.is_paid),
+  isPaid: Boolean(item.unit_transaction_billing?.is_paid || item.billing_summary?.is_paid),
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
+  remainingPayment: toNumber(item.billing_summary?.remaining_payment),
 });
 
 const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): UnitTransaction[] => {
@@ -185,6 +194,7 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
         unit_transaction_billing: null,
         isPaid: false,
         paymentAt: null,
+        remainingPayment: 0,
       });
       return;
     }

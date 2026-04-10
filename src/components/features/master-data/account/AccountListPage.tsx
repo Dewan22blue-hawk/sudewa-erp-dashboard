@@ -150,7 +150,7 @@ export const AccountListPage = () => {
               </Button>
               <Button onClick={handleAdd} className="gap-2">
                 <Plus className="h-4 w-4" />
-                + Tambah
+                Tambah
               </Button>
             </div>
           </div>

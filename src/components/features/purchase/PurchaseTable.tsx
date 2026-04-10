@@ -28,6 +28,12 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
 
+  const getRemainingPayment = (item: UnitTransaction) => {
+    if (item.isPaid) return item.remainingPayment || 0;
+    if (!item.remainingPayment) return item.transaction_bruto_total || 0;
+    return item.remainingPayment || 0;
+  };
+
   const processedData = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
@@ -75,6 +81,8 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
           return compareNumber(a.transaction_dpp_total, b.transaction_dpp_total);
         case 'transaction_ppn_total':
           return compareNumber(a.transaction_ppn_total, b.transaction_ppn_total);
+        case 'remainingPayment':
+          return compareNumber(getRemainingPayment(a), getRemainingPayment(b));
         case 'stock_state':
           return compareText(a.stock_state, b.stock_state);
         case 'billing':
@@ -210,13 +218,14 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="KODE BELI" sortKey="code" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TANGGAL" sortKey="created_at" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="SUPPLIER" sortKey="supplier" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="GUDANG" sortKey="warehouse" /></TableHead>
+              {/* <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="GUDANG" sortKey="warehouse" /></TableHead> */}
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL BRUTO" sortKey="transaction_bruto_total" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BBN" sortKey="transaction_bbn_total" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BIAYA LAIN" sortKey="transaction_other_fee" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL DPP" sortKey="transaction_dpp_total" /></TableHead>
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL PPN" sortKey="transaction_ppn_total" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="STATUS STOK" sortKey="stock_state" /></TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="KURANG BAYAR" sortKey="remainingPayment" /></TableHead>
+              {/* <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="STATUS STOK" sortKey="stock_state" /></TableHead> */}
               <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BILLING" sortKey="billing" /></TableHead>
               <TableHead className="text-right text-xs font-semibold uppercase text-slate-600 px-4 py-3">ACTION</TableHead>
             </TableRow>
@@ -243,13 +252,14 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                   </TableCell>
                   <TableCell className="text-slate-700 px-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
                   <TableCell className="text-slate-700 px-4">{item.supplier || '-'}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.warehouse || '-'}</TableCell>
+                  {/* <TableCell className="text-slate-700 px-4">{item.warehouse || '-'}</TableCell> */}
                   <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
                   <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
                   <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
                   <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
                   <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.stock_state || '-'}</TableCell>
+                  <TableCell className={`px-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{formatCurrency(getRemainingPayment(item))}</TableCell>
+                  {/* <TableCell className="text-slate-700 px-4">{item.stock_state || '-'}</TableCell> */}
                   <TableCell className="text-slate-700 px-4">{item.isPaid ? 'Lunas' : 'Belum Lunas'}</TableCell>
 
                   <TableCell className="text-right px-4">
@@ -260,9 +270,10 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}?action=refund`)}>Refund</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.unitTransactionId}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}?action=refund`)}>Refund</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                           Hapus
                         </DropdownMenuItem>

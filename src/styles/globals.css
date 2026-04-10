@@ -191,6 +191,8 @@ body {
     #laporan-penjualan-print *,
     #laporan-penerimaan-print,
     #laporan-penerimaan-print *,
+    #laporan-stock-print,
+    #laporan-stock-print *,
     .print-letter-page,
     .print-letter-page * {
       visibility: visible;
@@ -202,7 +204,8 @@ body {
 
     .laporan-pembelian-page,
     .laporan-penjualan-page,
-    .laporan-penerimaan-page {
+    .laporan-penerimaan-page,
+    .laporan-stock-page {
       padding: 0 !important;
       margin: 0 !important;
       min-height: auto !important;
@@ -211,6 +214,7 @@ body {
     .laporan-pembelian-print-area,
     .laporan-penjualan-print-area,
     .laporan-penerimaan-print-area,
+    .laporan-stock-print-area,
     .print-letter-page {
       position: fixed;
       top: 2px;
@@ -238,6 +242,7 @@ body {
     .laporan-pembelian-print-content,
     .laporan-penjualan-print-content,
     .laporan-penerimaan-print-content,
+    .laporan-stock-print-content,
     .print-letter-content {
        padding-top: 35mm !important;      /* tepat di bawah kop */
   padding-right: 5mm !important;
@@ -267,6 +272,24 @@ body {
       padding-left: 4mm !important;
       gap: 0.2mm !important;
       align-items: center !important;
+    }
+
+    .laporan-stock-print-content {
+      padding-top: 35mm !important;
+      padding-right: 5mm !important;
+      padding-bottom: 27mm !important;
+      padding-left: 5mm !important;
+      gap: 0.5mm !important;
+      align-items: center !important;
+      overflow: hidden !important;
+      box-sizing: border-box !important;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     .laporan-penerimaan-print-content > :first-child {
@@ -318,25 +341,29 @@ body {
 
     .laporan-pembelian-print-area .overflow-x-auto,
     .laporan-penjualan-print-area .overflow-x-auto,
-    .laporan-penerimaan-print-area .overflow-x-auto {
+    .laporan-penerimaan-print-area .overflow-x-auto,
+    .laporan-stock-print-area .overflow-x-auto {
       overflow: visible !important;
     }
 
     .laporan-pembelian-print-area .overflow-hidden,
     .laporan-penjualan-print-area .overflow-hidden,
-    .laporan-penerimaan-print-area .overflow-hidden {
+    .laporan-penerimaan-print-area .overflow-hidden,
+    .laporan-stock-print-area .overflow-hidden {
       overflow: visible !important;
     }
 
     .laporan-pembelian-print-area .bg-white,
     .laporan-penjualan-print-area .bg-white,
-    .laporan-penerimaan-print-area .bg-white {
+    .laporan-penerimaan-print-area .bg-white,
+    .laporan-stock-print-area .bg-white {
       background: transparent !important;
     }
 
     .laporan-pembelian-print-area [data-slot='tabs-content'],
     .laporan-penjualan-print-area [data-slot='tabs-content'],
-    .laporan-penerimaan-print-area [data-slot='tabs-content'] {
+    .laporan-penerimaan-print-area [data-slot='tabs-content'],
+    .laporan-stock-print-area [data-slot='tabs-content'] {
       width: 100% !important;
   max-width: 200mm !important;
   margin: 0 !important;
@@ -344,7 +371,8 @@ body {
 
     .laporan-pembelian-print-area table,
     .laporan-penjualan-print-area table,
-    .laporan-penerimaan-print-area table {
+    .laporan-penerimaan-print-area table,
+    .laporan-stock-print-area table {
       width: 100% !important;
       table-layout: fixed !important;
       font-size: 8px !important;
@@ -356,7 +384,9 @@ body {
     .laporan-penjualan-print-area th,
     .laporan-penjualan-print-area td,
     .laporan-penerimaan-print-area th,
-    .laporan-penerimaan-print-area td {
+    .laporan-penerimaan-print-area td,
+    .laporan-stock-print-area th,
+    .laporan-stock-print-area td {
       padding: 2.5px 3px !important;
       white-space: nowrap !important;
       overflow: hidden;
@@ -368,7 +398,8 @@ body {
 
     .laporan-pembelian-print-area th,
     .laporan-penjualan-print-area th,
-    .laporan-penerimaan-print-area th {
+    .laporan-penerimaan-print-area th,
+    .laporan-stock-print-area th {
       font-weight: 700 !important;
       background: #f3f4f6 !important;
       color: #0f172a !important;
@@ -390,6 +421,7 @@ body {
     .laporan-pembelian-print-content h2,
     .laporan-penjualan-print-content h2,
     .laporan-penerimaan-print-content h2,
+    .laporan-stock-print-content h2,
     .print-letter-content h2 {
 font-size: 20px !important;
   line-height: 1.2 !important;
@@ -399,6 +431,7 @@ font-size: 20px !important;
     .laporan-pembelian-print-content p:nth-of-type(1),
     .laporan-penjualan-print-content p:nth-of-type(1),
     .laporan-penerimaan-print-content p:nth-of-type(1),
+    .laporan-stock-print-content p:nth-of-type(1),
     .print-letter-content p:nth-of-type(1) {
 font-size: 20px !important;
   line-height: 1.2 !important;
@@ -408,6 +441,7 @@ font-size: 20px !important;
     .laporan-pembelian-print-content p:nth-of-type(2),
     .laporan-penjualan-print-content p:nth-of-type(2),
     .laporan-penerimaan-print-content p:nth-of-type(2),
+    .laporan-stock-print-content p:nth-of-type(2),
     .print-letter-content p:nth-of-type(2) {
       font-size: 20px !important;
       line-height: 1.2 !important;
