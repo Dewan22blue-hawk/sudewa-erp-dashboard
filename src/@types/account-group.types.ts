@@ -13,10 +13,9 @@ export interface AccountGroup {
 export type AccountGroupDetail = AccountGroup;
 
 export interface AccountGroupPayload {
-  code: string;
-  name: string;
+  company_id: string | number;
+  group_code: string;
   description?: string | null;
-  isActive?: boolean;
 }
 
-export interface AccountGroupListResponse extends PaginatedResult<AccountGroup> {}
+export interface AccountGroupListResponse extends PaginatedResult<AccountGroup> { }

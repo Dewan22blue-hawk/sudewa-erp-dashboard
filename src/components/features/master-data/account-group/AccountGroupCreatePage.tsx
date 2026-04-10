@@ -24,10 +24,13 @@ export const AccountGroupCreatePage = () => {
   const createMutation = useCreateAccountGroup();
 
   const handleSubmit = async (values: AccountGroupFormValues) => {
+    const slug = router.query.slug as string;
+    const backPath = slug ? `/dashboard/${slug}/master/account-group` : '/master-data/account-group';
+
     try {
       await createMutation.mutateAsync(values);
       toast.success('Grup akun berhasil dibuat');
-      router.push('/master-data/account-group');
+      router.push(backPath);
     } catch (error) {
       if (error instanceof ApiValidationError) {
         Object.entries(error.fieldErrors).forEach(([field, messages]) => {
@@ -38,6 +41,12 @@ export const AccountGroupCreatePage = () => {
       }
       toast.error('Gagal membuat grup akun');
     }
+  };
+
+  const onCancel = () => {
+    const slug = router.query.slug as string;
+    const backPath = slug ? `/dashboard/${slug}/master/account-group` : '/master-data/account-group';
+    router.push(backPath);
   };
 
   return (
@@ -51,7 +60,7 @@ export const AccountGroupCreatePage = () => {
         </div>
 
         <Card className="p-6">
-          <AccountGroupForm form={form} onSubmit={handleSubmit} onCancel={() => router.push('/master-data/account-group')} isSubmitting={createMutation.isPending} />
+          <AccountGroupForm form={form} onSubmit={handleSubmit} onCancel={onCancel} isSubmitting={createMutation.isPending} />
         </Card>
       </div>
     </DashboardLayout>

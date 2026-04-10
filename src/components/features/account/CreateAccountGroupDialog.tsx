@@ -11,6 +11,7 @@ import { useQuickCreateAccountGroup } from '@/hooks/useAccountGroup';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from 'sonner';
 import { ApiValidationError } from '@/lib/api/response';
+import RequiredMark from '@/components/ui/required-mark';
 
 const schema = z.object({
   groupCode: z.string().min(1, 'Kode grup wajib diisi'),
@@ -87,7 +88,7 @@ export function CreateAccountGroupDialog({ open, onOpenChange, onCreated }: Crea
               name="groupCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kode Grup</FormLabel>
+                  <FormLabel>Kode Grup<RequiredMark /></FormLabel>
                   <FormControl>
                     <Input placeholder="Masukkan kode grup" {...field} />
                   </FormControl>
