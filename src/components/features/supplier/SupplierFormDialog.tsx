@@ -51,7 +51,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Alamat<RequiredMark /></FormLabel>
+                  <FormLabel>Alamat</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Tambahkan Alamat" className="resize-none" rows={3} {...field} />
                   </FormControl>
@@ -79,7 +79,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="pic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>PIC<RequiredMark /></FormLabel>
+                  <FormLabel>PIC</FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan PIC" {...field} />
                   </FormControl>
@@ -93,7 +93,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone<RequiredMark /></FormLabel>
+                  <FormLabel>Phone</FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nomer telepon" {...field} />
                   </FormControl>

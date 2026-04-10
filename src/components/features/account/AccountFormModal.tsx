@@ -73,7 +73,7 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                           )}
                           {accountGroups.map((group) => (
                             <SelectItem key={group.id} value={String(group.id)}>
-                              {group.code ? `${group.code}${group.description ? ` - ${group.description}` : ''}` : group.id}
+                              {group.code || group.id}
                             </SelectItem>
                           ))}
                         </SelectContent>
