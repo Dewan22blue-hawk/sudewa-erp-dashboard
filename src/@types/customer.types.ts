@@ -10,6 +10,7 @@ export interface Customer {
   npwp?: string | null;
   pic?: string | null;
   phone?: string | null;
+  map_link?: string | null;
   userId?: number | string;
   companyId?: number | string;
   createdAt?: string;
@@ -22,6 +23,7 @@ export interface CustomerPayload {
   npwp?: string;
   pic?: string;
   phone?: string;
+  map_link?: string;
   userId?: number | string;
   companyId?: number | string;
 }

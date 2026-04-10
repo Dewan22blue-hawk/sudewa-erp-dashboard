@@ -9,6 +9,7 @@ export const customerSchema = z.object({
   pic: z.string().optional(),
   // phone: z.string().min(1, 'Nomer telepon wajib diisi'),
   phone: z.string().optional(),
+  map_link: z.string().optional(),
 });
 
 export type CustomerFormValues = z.infer<typeof customerSchema>;

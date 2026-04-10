@@ -99,6 +99,20 @@ export function CustomerFormDialog({ open, onOpenChange, form, onSubmit, title, 
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="map_link"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Link Maps</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Tambahkan link maps" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="flex flex-col gap-2 pt-2">
               <Button type="submit" className="w-full bg-black hover:bg-black/90" disabled={isSubmitting}>
                 {isSubmitting ? 'Menyimpan...' : submitLabel}

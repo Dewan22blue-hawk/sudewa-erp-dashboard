@@ -36,7 +36,7 @@ function TransindoCustomerContent() {
   const filteredCustomers = useMemo(() => {
     return customers.filter(
       (customer) =>
-        customer.namaDealer.toLowerCase().includes(search.toLowerCase()) || customer.namaCustomer.toLowerCase().includes(search.toLowerCase()) || customer.pic.toLowerCase().includes(search.toLowerCase()) || customer.phone.includes(search),
+        customer.namaDealer.toLowerCase().includes(search.toLowerCase()) || customer.namaCustomer.toLowerCase().includes(search.toLowerCase()) || customer.pic.toLowerCase().includes(search.toLowerCase()) || customer.phone.includes(search) || (customer.map_link ?? '').toLowerCase().includes(search.toLowerCase()),
     );
   }, [customers, search]);
 
@@ -156,6 +156,7 @@ function GeneralCustomerContent() {
       npwp: '',
       pic: '',
       phone: '',
+      map_link: '',
     },
   });
 
@@ -167,6 +168,7 @@ function GeneralCustomerContent() {
       npwp: '',
       pic: '',
       phone: '',
+      map_link: '',
     },
   });
 
@@ -178,6 +180,7 @@ function GeneralCustomerContent() {
         npwp: customerToEdit.npwp ?? '',
         pic: customerToEdit.pic ?? '',
         phone: customerToEdit.phone ?? '',
+        map_link: customerToEdit.map_link ?? '',
       });
     }
   }, [customerToEdit, editForm]);
