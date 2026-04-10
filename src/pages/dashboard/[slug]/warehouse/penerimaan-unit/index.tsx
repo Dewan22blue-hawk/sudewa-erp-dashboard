@@ -19,17 +19,28 @@ export default function PenerimaanUnitPage() {
 
   const { data: activities, isLoading, isError, error } = useWarehouseActivities({
     activityType: 'receipt',
-    page: currentPage,
-    perPage,
-    search: search || undefined,
+    perPage: 10000,
   });
 
-  const data = activities?.data ?? [];
-  const meta = activities?.meta;
-  const totalItems = meta?.total ?? 0;
-  const totalPages = Math.max(1, meta?.lastPage ?? 1);
-  const startIndex = totalItems === 0 ? 0 : ((meta?.currentPage ?? currentPage) - 1) * (meta?.perPage ?? perPage);
-  const endIndex = totalItems === 0 ? 0 : Math.min(startIndex + data.length, totalItems);
+  const allData = activities?.data ?? [];
+
+  const filteredData = useMemo(() => {
+    if (!search) return allData;
+    const lowerSearch = search.toLowerCase();
+    return allData.filter((item) => {
+      const matchNo = item.noPenerimaan?.toLowerCase().includes(lowerSearch);
+      const matchSupplier = item.supplier?.toLowerCase().includes(lowerSearch);
+      const matchKet = item.keterangan?.toLowerCase().includes(lowerSearch);
+      const matchDate = item.tanggal?.toLowerCase().includes(lowerSearch);
+      return matchNo || matchSupplier || matchKet || matchDate;
+    });
+  }, [allData, search]);
+
+  const totalItems = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * perPage;
+  const endIndex = Math.min(startIndex + perPage, totalItems);
+  const data = filteredData.slice(startIndex, endIndex);
 
   useEffect(() => {
     if (currentPage > totalPages) {
