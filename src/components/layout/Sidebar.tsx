@@ -9,6 +9,48 @@ import Link from 'next/link';
 import { useCompanyMenu } from '@/hooks/use-company-menu';
 import { MenuItem } from '@/types/menu.types';
 
+function CompanySelector({ companies, companyId, setCompanyId }: { companies: Company[], companyId: string | null, setCompanyId: (id: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const selectedCompany = companies.find((c) => String(c.id) === String(companyId));
+
+  const handleSelectCompany = (company: Company) => {
+    setCompanyId(String(company.id));
+    setIsOpen(false);
+    const targetSlug = company.slug || company.id;
+    router.push(`/dashboard/${targetSlug}`);
+  };
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-[10px] uppercase font-semibold text-gray-400">Company</span>
+            <span className="font-medium text-gray-900 truncate uppercase">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>
+          </div>
+          <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isOpen && 'rotate-180')} />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent className="w-64 p-2" align="start">
+        <div className="space-y-1">
+          {companies.map((company) => (
+            <button
+              key={company.id}
+              onClick={() => handleSelectCompany(company)}
+              className={cn('flex w-full items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-gray-100', String(company.id) === String(companyId) && 'bg-gray-100')}
+            >
+              <span className="uppercase">{company.name}</span>
+              {String(company.id) === String(companyId) && <Check className="h-4 w-4 text-primary" />}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function Sidebar() {
   const router = useRouter();
   const slugQuery = router.query.slug;
@@ -16,7 +58,6 @@ export function Sidebar() {
 
   const { companyId, setCompanyId } = useCompany();
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -31,7 +72,7 @@ export function Sidebar() {
     if (slug && companies.length > 0) {
       const matchedCompany = companies.find((c) => c.slug === slug || String(c.id) === String(slug));
 
-      if (matchedCompany && String(matchedCompany.id) !== companyId) {
+      if (matchedCompany && String(matchedCompany.id) !== String(companyId)) {
         setCompanyId(String(matchedCompany.id));
       }
     }
@@ -42,45 +83,16 @@ export function Sidebar() {
     setIsMobileOpen(false);
   }, [router.asPath]);
 
-  const selectedCompany = companies.find((c) => String(c.id) === companyId);
-
-  const handleSelectCompany = (company: Company) => {
-    setCompanyId(String(company.id));
-    setIsOpen(false);
-    const targetSlug = company.slug || company.id;
-    router.push(`/dashboard/${targetSlug}`);
-  };
 
   const sidebarContent = (
     <aside className="flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB]">
       <div className="flex h-16 shrink-0 items-center px-4 border-b border-gray-200">
         <div className="flex w-full items-center gap-2">
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
-                <div className="flex flex-col overflow-hidden">
-                  <span className="text-[10px] uppercase font-semibold text-gray-400">Company</span>
-                  <span className="font-medium text-gray-900 truncate uppercase">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>
-                </div>
-                <ChevronDown className={cn('h-4 w-4 text-gray-500 transition-transform', isOpen && 'rotate-180')} />
-              </button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-64 p-2" align="start">
-              <div className="space-y-1">
-                {companies.map((company) => (
-                  <button
-                    key={company.id}
-                    onClick={() => handleSelectCompany(company)}
-                    className={cn('flex w-full items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-gray-100', String(company.id) === companyId && 'bg-gray-100')}
-                  >
-                    <span className="uppercase">{company.name}</span>
-                    {String(company.id) === companyId && <Check className="h-4 w-4 text-primary" />}
-                  </button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+          <CompanySelector
+            companies={companies}
+            companyId={companyId}
+            setCompanyId={setCompanyId}
+          />
 
           <button
             onClick={() => setIsMobileOpen(false)}
