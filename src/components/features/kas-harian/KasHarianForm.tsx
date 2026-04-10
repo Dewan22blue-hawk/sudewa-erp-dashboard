@@ -13,17 +13,21 @@ import { Textarea } from '@/components/ui/textarea';
 import type { KasHarianFormValues } from '@/scheme/kas-harian.schema';
 import { cn } from '@/lib/utils';
 
+import type { Account } from '@/@types/account.types';
+
 interface Props {
   form: UseFormReturn<KasHarianFormValues>;
   onSubmit: (data: KasHarianFormValues) => void;
   companies: Company[];
   cashOptions: Kas[];
+  accountOptions?: Account[];
   isLoadingCompanies?: boolean;
   isLoadingCash?: boolean;
+  isLoadingAccounts?: boolean;
   id?: string;
 }
 
-export default function KasHarianForm({ form, onSubmit, companies, cashOptions, isLoadingCompanies, isLoadingCash, id }: Props) {
+export default function KasHarianForm({ form, onSubmit, companies, cashOptions, accountOptions = [], isLoadingCompanies, isLoadingCash, isLoadingAccounts, id }: Props) {
   const [cashOpen, setCashOpen] = useState(false);
   const [cashSearch, setCashSearch] = useState('');
   const cashDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -53,10 +57,39 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
     };
   }, [cashOpen]);
 
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountSearch, setAccountSearch] = useState('');
+  const accountDropdownRef = useRef<HTMLDivElement | null>(null);
+  const selectedAccountId = form.watch('account_id');
+  const selectedAccount = useMemo(() => accountOptions.find((acc) => Number(acc.id) === selectedAccountId), [accountOptions, selectedAccountId]);
+  const filteredAccountOptions = useMemo(() => {
+    const query = accountSearch.trim().toLowerCase();
+    if (!query) return accountOptions;
+
+    return accountOptions.filter((acc) => [acc.code, acc.name, acc.description].some((value) => value?.toLowerCase().includes(query)));
+  }, [accountOptions, accountSearch]);
+
+  useEffect(() => {
+    const handlePointerDownAccount = (event: MouseEvent) => {
+      if (!accountDropdownRef.current?.contains(event.target as Node)) {
+        setAccountOpen(false);
+        setAccountSearch('');
+      }
+    };
+
+    if (accountOpen) {
+      document.addEventListener('mousedown', handlePointerDownAccount);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDownAccount);
+    };
+  }, [accountOpen]);
+
   return (
     <Form {...form}>
       <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="hidden">
           <FormField
             control={form.control}
             name="company_id"
@@ -81,6 +114,21 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
               </FormItem>
             )}
           />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Tanggal</FormLabel>
+              <FormControl>
+                <DatePicker value={field.value} onChange={field.onChange} placeholder="Jan 20, 2025" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
           <FormField
             control={form.control}
@@ -101,7 +149,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                         setCashOpen((prev) => !prev);
                       }}
                     >
-                      {isLoadingCash ? 'Memuat kas...' : selectedCash ? `${selectedCash.code} - ${selectedCash.description}` : 'Pilih kas'}
+                      {isLoadingCash ? 'Memuat kas...' : selectedCash ? `${selectedCash.code} - ${selectedCash.description}` : 'Select an item'}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
@@ -144,21 +192,68 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
               </FormItem>
             )}
           />
-        </div>
-
         <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Tanggal</FormLabel>
-              <FormControl>
-                <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="account_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nama Akun</FormLabel>
+                <div ref={accountDropdownRef} className="relative">
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      type="button"
+                      className={cn('w-full justify-between font-normal', !field.value && 'text-muted-foreground')}
+                      disabled={isLoadingAccounts}
+                      onClick={() => {
+                        if (isLoadingAccounts) return;
+                        setAccountOpen((prev) => !prev);
+                      }}
+                    >
+                      {isLoadingAccounts ? 'Memuat akun...' : selectedAccount ? `${selectedAccount.code} - ${selectedAccount.name}` : 'Select an item'}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+
+                  {accountOpen ? (
+                    <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] rounded-md border bg-popover shadow-md">
+                      <div className="border-b p-2">
+                        <Input placeholder="Cari akun..." value={accountSearch} onChange={(event) => setAccountSearch(event.target.value)} autoFocus />
+                      </div>
+                      <div className="max-h-[260px] overflow-y-auto p-1">
+                        {filteredAccountOptions.length === 0 ? (
+                          <div className="px-3 py-6 text-center text-sm text-muted-foreground">Akun tidak ditemukan.</div>
+                        ) : (
+                          filteredAccountOptions.map((acc) => (
+                            <button
+                              key={acc.id}
+                              type="button"
+                              className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                              onClick={() => {
+                                field.onChange(Number(acc.id));
+                                setAccountSearch('');
+                                setAccountOpen(false);
+                              }}
+                            >
+                              <Check className={cn('h-4 w-4', Number(acc.id) === field.value ? 'opacity-100' : 'opacity-0')} />
+                              <div className="flex flex-col">
+                                <span>{acc.name}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {acc.code} - {acc.type}
+                                </span>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
         <FormField
           control={form.control}
@@ -167,14 +262,14 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
             <FormItem>
               <FormLabel>Keterangan</FormLabel>
               <FormControl>
-                <Textarea placeholder="Masukkan keterangan transaksi" className="resize-none" {...field} />
+                <Textarea placeholder="Tulis deskripsi di sini" className="resize-none" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-1">
           <FormField
             control={form.control}
             name="debet"
@@ -190,7 +285,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                         form.setValue('credit', 0, { shouldValidate: true });
                       }
                     }}
-                    placeholder="Masukkan debet"
+                    placeholder="Tambahkan nominal"
                   />
                 </FormControl>
                 <FormMessage />
@@ -213,7 +308,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                         form.setValue('debet', 0, { shouldValidate: true });
                       }
                     }}
-                    placeholder="Masukkan kredit"
+                    placeholder="Tambahkan nominal"
                   />
                 </FormControl>
                 <FormMessage />

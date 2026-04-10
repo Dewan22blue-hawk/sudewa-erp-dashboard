@@ -398,7 +398,7 @@ export default function PaymentPage() {
 
         <Card className="rounded-xl">
           <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
+            <h2 className="text-2xl font-semibold">Informasi Penjualan</h2>
             <Separator className="my-4" />
             <div className="space-y-6">
               <div className="rounded-lg border">

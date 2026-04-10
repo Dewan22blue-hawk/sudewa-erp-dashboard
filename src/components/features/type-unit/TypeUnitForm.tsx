@@ -124,11 +124,11 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                   <FormLabel className="text-sm font-semibold text-gray-900">Jenis<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="unitType"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input placeholder="Masukkan Jenis" className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400" {...field} />
+                          <Input placeholder="Masukkan Jenis" className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -139,10 +139,10 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                 <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Tipe<RequiredMark /></FormLabel>
+                  <FormLabel className="text-sm font-semibold text-gray-900">Tipe Unit<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}
-                    name="unitType"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
@@ -226,7 +226,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
             <div className="space-y-4 pt-2">
               <h3 className="text-[13px] font-medium text-gray-400">Harga</h3>
               <div className="space-y-4 max-w-[500px]">
-                                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
+                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
                   <FormLabel className="text-sm font-semibold text-gray-900">Harga Beli<RequiredMark /></FormLabel>
                   <FormField
                     control={form.control}

@@ -44,13 +44,13 @@ export function PurchaseDetailCards({ data }: Props) {
                 <span className="uppercase">{data.person?.name ?? '-'}</span>
               </div>
             </div>
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <p>Gudang</p>
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <Warehouse className="h-4 w-4 text-slate-500" />
                 <span>{data.warehouse?.name ?? '-'}</span>
               </div>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>
