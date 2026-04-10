@@ -74,10 +74,9 @@ export const getAccountGroupById = async (id: number | string): Promise<AccountG
 export const createAccountGroup = async (payload: AccountGroupPayload): Promise<AccountGroup> => {
   try {
     const response = await apiClient.post<AccountGroupItemResponse>(basePath, {
-      code: payload.code,
-      name: payload.name,
+      company_id: payload.company_id,
+      group_code: payload.group_code,
       description: payload.description,
-      is_active: payload.isActive ?? true,
     });
 
     const data = ensureSuccess(response.data);
@@ -111,10 +110,9 @@ export const quickCreateAccountGroup = async (payload: QuickCreateAccountGroupPa
 export const updateAccountGroup = async (id: number | string, payload: AccountGroupPayload): Promise<AccountGroup> => {
   try {
     const response = await apiClient.put<AccountGroupItemResponse>(`${basePath}/${id}`, {
-      code: payload.code,
-      name: payload.name,
+      company_id: payload.company_id,
+      group_code: payload.group_code,
       description: payload.description,
-      is_active: payload.isActive ?? true,
     });
 
     const data = ensureSuccess(response.data);

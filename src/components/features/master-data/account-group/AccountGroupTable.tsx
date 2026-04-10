@@ -12,6 +12,9 @@ import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
 
+import { format } from 'date-fns';
+import { id as localeId } from 'date-fns/locale';
+
 interface AccountGroupTableProps {
   data: AccountGroup[];
   meta?: PaginationMeta;
@@ -36,26 +39,28 @@ export const AccountGroupTable = ({ data, meta, search, page, perPage, isLoading
     () => [
       {
         accessorKey: 'code',
-        header: () => <SortableHeader title="Kode" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
-        cell: ({ row }) => <span className="font-semibold text-sm text-foreground">{row.original.code}</span>,
-      },
-      {
-        accessorKey: 'name',
-        header: () => <SortableHeader title="Nama Grup" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
-        cell: ({ row }) => <span className="text-sm text-foreground">{row.original.name}</span>,
+        header: () => <SortableHeader title="Kode Grup" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
+        cell: ({ row }) => <span className="text-sm font-medium text-foreground">{row.original.code}</span>,
       },
       {
         accessorKey: 'description',
         header: () => <SortableHeader title="Deskripsi" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
-        cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.description || '-'}</span>,
+        cell: ({ row }) => {
+          const desc = row.original.description || '-';
+          return (
+            <span className="text-sm text-muted-foreground">
+              {desc.length > 50 ? `${desc.substring(0, 50)}...` : desc}
+            </span>
+          );
+        },
       },
       {
-        accessorKey: 'isActive',
-        header: () => <SortableHeader title="Status" sortKey="isActive" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
+        accessorKey: 'createdAt',
+        header: () => <SortableHeader title="Tanggal" sortKey="createdAt" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="px-0 py-0" />,
         cell: ({ row }) => (
-          <Badge variant={row.original.isActive ? 'default' : 'secondary'} className={row.original.isActive ? '' : 'bg-gray-200 text-gray-700'}>
-            {row.original.isActive ? 'Aktif' : 'Nonaktif'}
-          </Badge>
+          <span className="text-sm text-muted-foreground">
+            {row.original.createdAt ? format(new Date(row.original.createdAt), 'dd MMMM yyyy', { locale: localeId }) : '-'}
+          </span>
         ),
       },
       {

@@ -1,39 +1,106 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccountGroupTable } from './AccountGroupTable';
-import { useAccountGroups, useDeleteAccountGroup } from '@/hooks/useAccountGroup';
+import { AccountGroupFormModal } from './AccountGroupFormModal';
+import { useAccountGroups, useDeleteAccountGroup, useCreateAccountGroup, useUpdateAccountGroup } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import type { AccountGroup } from '@/@types/account-group.types';
+import { accountGroupSchema, type AccountGroupFormValues } from '@/scheme/account-group.schema';
 import { toast } from 'sonner';
-import { ApiResponseError } from '@/lib/api/response';
+import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
+import { useCompany } from '@/contexts/CompanyContext';
 
 export const AccountGroupListPage = () => {
   const router = useRouter();
+  const { companyId } = useCompany();
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
 
   const { data, isLoading, isError, isFetching } = useAccountGroups({ page, perPage, search });
+  const createMutation = useCreateAccountGroup();
+  const updateMutation = useUpdateAccountGroup();
   const deleteMutation = useDeleteAccountGroup();
 
-  const [selected, setSelected] = useState<AccountGroup | null>(null);
+  const [selectedToDelete, setSelectedToDelete] = useState<AccountGroup | null>(null);
+  const [editing, setEditing] = useState<AccountGroup | null>(null);
+  const [openForm, setOpenForm] = useState(false);
+
+  const form = useForm<AccountGroupFormValues>({
+    resolver: zodResolver(accountGroupSchema),
+    defaultValues: {
+      group_code: '',
+      description: '',
+    },
+  });
 
   const handleDelete = async () => {
-    if (!selected) return;
+    if (!selectedToDelete) return;
     try {
-      await deleteMutation.mutateAsync(selected.id);
+      await deleteMutation.mutateAsync(selectedToDelete.id);
       toast.success('Grup akun berhasil dihapus');
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus grup akun';
       toast.error(message);
     } finally {
-      setSelected(null);
+      setSelectedToDelete(null);
     }
   };
 
-  const handleEdit = (item: AccountGroup) => router.push(`/master-data/account-group/${item.id}/edit`);
-  const handleAdd = () => router.push('/master-data/account-group/create');
+  const handleAdd = () => {
+    setEditing(null);
+    form.reset({
+      group_code: '',
+      description: '',
+    });
+    setOpenForm(true);
+  };
+
+  const handleEdit = (item: AccountGroup) => {
+    setEditing(item);
+    form.reset({
+      group_code: item.code,
+      description: item.description ?? '',
+    });
+    setOpenForm(true);
+  };
+
+  const handleSubmit = async (values: AccountGroupFormValues) => {
+    if (!companyId) {
+      toast.error('ID Perusahaan tidak ditemukan');
+      return;
+    }
+
+    const payload = {
+      ...values,
+      company_id: companyId,
+    };
+
+    try {
+      if (editing) {
+        await updateMutation.mutateAsync({ id: editing.id, payload });
+        toast.success('Grup akun berhasil diperbarui');
+      } else {
+        await createMutation.mutateAsync(payload);
+        toast.success('Grup akun berhasil dibuat');
+      }
+      setOpenForm(false);
+      setEditing(null);
+    } catch (error) {
+      if (error instanceof ApiValidationError) {
+        Object.entries(error.fieldErrors).forEach(([field, messages]) => {
+          const fieldName = field === 'group_code' ? 'group_code' : field;
+          form.setError(fieldName as any, { message: messages?.[0] || 'Validasi gagal' });
+        });
+        toast.error(error.message || 'Validasi gagal');
+        return;
+      }
+      toast.error(editing ? 'Gagal memperbarui grup akun' : 'Gagal membuat grup akun');
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -59,7 +126,7 @@ export const AccountGroupListPage = () => {
               onSearchChange={setSearch}
               onAdd={handleAdd}
               onEdit={handleEdit}
-              onDelete={setSelected}
+              onDelete={setSelectedToDelete}
               onPageChange={setPage}
               onPerPageChange={setPerPage}
             />
@@ -67,7 +134,18 @@ export const AccountGroupListPage = () => {
         </Card>
       </div>
 
-      <AlertDialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+      <AccountGroupFormModal
+        open={openForm}
+        onOpenChange={setOpenForm}
+        form={form}
+        onSubmit={handleSubmit}
+        title={editing ? 'Edit Grup Akun' : 'Tambah Grup Akun'}
+        description={editing ? 'Perbarui informasi grup akun' : 'Buat grup akun baru untuk mengelompokkan akun'}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
+        submitLabel={editing ? 'Perbarui' : 'Simpan'}
+      />
+
+      <AlertDialog open={!!selectedToDelete} onOpenChange={(open) => !open && setSelectedToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Grup Akun?</AlertDialogTitle>
