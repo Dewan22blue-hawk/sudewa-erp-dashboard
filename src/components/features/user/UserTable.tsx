@@ -4,9 +4,12 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus } from 'lucide-react';
+import { Loader2, MoreVertical, Plus } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+import { Switch } from '@/components/ui/switch';
+import { useActivateUser, useDeactivateUser } from '@/hooks/useUser';
+import { toast } from 'sonner';
 
 interface Props {
   data: User[];
@@ -18,6 +21,9 @@ interface Props {
 export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const activateMutation = useActivateUser();
+  const deactivateMutation = useDeactivateUser();
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
@@ -31,6 +37,20 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
   const handleItemsPerPageChange = (value: string) => {
     setItemsPerPage(Number(value));
     setCurrentPage(1);
+  };
+
+  const handleToggleStatus = async (user: User, checked: boolean) => {
+    try {
+      if (checked) {
+        await activateMutation.mutateAsync(user.id);
+        toast.success(`User ${user.name} berhasil diaktifkan`);
+      } else {
+        await deactivateMutation.mutateAsync(user.id);
+        toast.success(`User ${user.name} berhasil dinonaktifkan`);
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal mengubah status user');
+    }
   };
 
   return (
@@ -74,13 +94,14 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 <SortableHeader title="Nama Pengguna" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs" />
               </TableHead>
               <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">Role</TableHead>
+              <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">Status</TableHead>
               <TableHead className="py-3 pr-6 text-right text-sm font-semibold uppercase text-slate-700 tracking-wide">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                   Tidak ada data
                 </TableCell>
               </TableRow>
@@ -88,12 +109,38 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
               currentData.map((user) => {
                 const roleNames = user.roles?.map((r) => r.name).join(', ') || '-';
                 const userIdLabel = user.username || user.id;
+                const isActive = user.isActive === true || user.isActive === 1;
+
+                const isActivating = activateMutation.isPending && activateMutation.variables === user.id;
+                const isDeactivating = deactivateMutation.isPending && deactivateMutation.variables === user.id;
+                const isUpdating = isActivating || isDeactivating;
 
                 return (
                   <TableRow key={user.id} className="hover:bg-slate-50/60">
                     <TableCell className="font-medium text-slate-800 text-sm">{userIdLabel}</TableCell>
                     <TableCell className="text-slate-700 text-sm">{user.name}</TableCell>
                     <TableCell className="text-slate-700 text-sm">{roleNames}</TableCell>
+                    <TableCell className="text-slate-700 text-sm">
+                      <div className="flex items-center gap-2">
+                        {isUpdating ? (
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                            <span className="text-xs font-medium text-slate-400 italic">Memproses...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={isActive}
+                              onCheckedChange={(checked) => handleToggleStatus(user, checked)}
+                              disabled={activateMutation.isPending || deactivateMutation.isPending}
+                            />
+                            <span className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-slate-400'}`}>
+                              {isActive ? 'Aktif' : 'Nonaktif'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right pr-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
