@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils/currency';
 import { PaginationMeta } from '@/@types/pagination.types';
+import { Badge } from '@/components/ui/badge';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -28,6 +29,12 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
 
+  const isRefunded = (item: UnitTransaction) => String(item.stock_state ?? '').toLowerCase() === 'inbound_return';
+  const getBillingLabel = useCallback((item: UnitTransaction) => {
+    if (isRefunded(item)) return 'Refund';
+    return item.isPaid ? 'Lunas' : 'Belum Lunas';
+  }, []);
+
   const getRemainingPayment = (item: UnitTransaction) => {
     if (item.isPaid) return item.remainingPayment || 0;
     if (!item.remainingPayment) return item.transaction_bruto_total || 0;
@@ -40,7 +47,7 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
     const filtered = data.filter((item) => {
       const matchesSearch =
         normalizedSearch.length === 0 ||
-        [item.code, item.supplier, item.warehouse, item.stock_state, item.isPaid ? 'lunas' : 'belum lunas']
+        [item.code, item.supplier, item.warehouse, item.stock_state, getBillingLabel(item)]
           .map((value) => String(value ?? '').toLowerCase())
           .some((value) => value.includes(normalizedSearch));
 
@@ -86,14 +93,14 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
         case 'stock_state':
           return compareText(a.stock_state, b.stock_state);
         case 'billing':
-          return compareText(a.isPaid ? 'Lunas' : 'Belum Lunas', b.isPaid ? 'Lunas' : 'Belum Lunas');
+          return compareText(getBillingLabel(a), getBillingLabel(b));
         default:
           return 0;
       }
     });
 
     return sorted;
-  }, [data, billingFilter, sortConfig, searchTerm]);
+  }, [data, billingFilter, sortConfig, searchTerm, getBillingLabel]);
 
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? 25;
@@ -260,7 +267,21 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                   <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
                   <TableCell className={`px-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{formatCurrency(getRemainingPayment(item))}</TableCell>
                   {/* <TableCell className="text-slate-700 px-4">{item.stock_state || '-'}</TableCell> */}
-                  <TableCell className="text-slate-700 px-4">{item.isPaid ? 'Lunas' : 'Belum Lunas'}</TableCell>
+                  <TableCell className="text-slate-700 px-4">
+                    {isRefunded(item) ? (
+                      <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
+                        Sudah Refund
+                      </Badge>
+                    ) : item.isPaid ? (
+                      <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-700">
+                        Lunas
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-slate-300 bg-slate-50 text-slate-700">
+                        Belum Lunas
+                      </Badge>
+                    )}
+                  </TableCell>
 
                   <TableCell className="text-right px-4">
                     <DropdownMenu>
@@ -270,9 +291,12 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}?action=refund`)}>Refund</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/detail?print=true`, '_blank')}>Print</DropdownMenuItem>
+                        <DropdownMenuItem disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
+                          {isRefunded(item) ? 'Sudah Refund' : 'Refund'}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}?print=true`, '_blank')}>Print</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                           Hapus
                         </DropdownMenuItem>

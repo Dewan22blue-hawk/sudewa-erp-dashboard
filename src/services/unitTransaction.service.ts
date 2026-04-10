@@ -453,6 +453,8 @@ export const unitTransactionService = {
       | {
           stockState?: string;
           unitTransactionDetails?: Array<string | number>;
+          cashId?: string | number;
+          description?: string;
         },
   ): Promise<UnitTransactionDetail> {
     const normalizedStockState = typeof statePayload === 'string' ? statePayload : statePayload.stockState ?? '';
@@ -460,9 +462,13 @@ export const unitTransactionService = {
       typeof statePayload === 'string'
         ? []
         : (statePayload.unitTransactionDetails ?? []).map((item) => String(item)).filter((item) => item.length > 0);
+    const normalizedCashId = typeof statePayload === 'string' ? '' : String(statePayload.cashId ?? '').trim();
+    const normalizedDescription = typeof statePayload === 'string' ? '' : String(statePayload.description ?? '').trim();
 
     const body = new URLSearchParams();
     if (normalizedStockState) body.append('stock_state', normalizedStockState);
+    if (normalizedCashId) body.append('cash_id', normalizedCashId);
+    if (normalizedDescription) body.append('description', normalizedDescription);
     if (normalizedDetails.length > 0) {
       normalizedDetails.forEach((item) => body.append('unit_transaction_details[]', item));
       body.append('unit_transaction_details', JSON.stringify(normalizedDetails));

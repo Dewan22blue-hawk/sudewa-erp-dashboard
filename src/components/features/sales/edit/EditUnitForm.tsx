@@ -121,25 +121,26 @@ export function EditUnitForm({
             control={form.control}
             name="tipeUnit"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="min-w-0">
                 <FormLabel className="text-sm font-medium">Tipe Unit</FormLabel>
                 <div className="flex items-center gap-2">
                   {searchableTypeUnit ? (
                     <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          role="combobox"
-                          disabled={readOnly}
-                          className="w-full justify-between bg-transparent font-normal"
-                        >
-                          <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
-                            {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
-                          </span>
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
+                      <FormControl>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            role="combobox"
+                            disabled={readOnly}
+                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
+                              {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </button>
+                        </PopoverTrigger>
+                      </FormControl>
                       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                         <Command>
                           <CommandInput placeholder="Cari tipe unit..." />
@@ -192,7 +193,17 @@ export function EditUnitForm({
               <FormItem>
                 <FormLabel className="text-sm font-medium">QTY</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" className="bg-transparent" {...field} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                  <Input
+                    type="number"
+                      min="1"
+                    className="bg-transparent"
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === '' ? undefined : Number(value));
+                    }}
+                    disabled={readOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -56,7 +56,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     resolver: zodResolver(createPurchaseUnitSchema),
     defaultValues: {
       typeUnitId: defaultValues?.typeUnitId || '',
-      qty: defaultValues?.qty ?? 1,
+      qty: defaultValues?.qty,
       price: defaultValues?.price || 0,
       biayaBBN: defaultValues?.biayaBBN || 0,
       biayaEkspedisi: defaultValues?.biayaEkspedisi || 0,
@@ -92,7 +92,10 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     if (maybeList && Array.isArray(maybeList.data)) return maybeList.data as TypeUnit[];
     return [];
   }, [typeUnitData]);
-  const brandOptions = useMemo(() => brandsData ?? [], [brandsData]);
+  const brandOptions = useMemo(() => {
+    const maybeList = (brandsData as any)?.data;
+    return Array.isArray(maybeList) ? maybeList : [];
+  }, [brandsData]);
 
   const handleCreateTypeUnit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

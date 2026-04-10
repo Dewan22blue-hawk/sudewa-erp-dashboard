@@ -11,8 +11,8 @@ export const brandKeys = {
   detail: (id: string | number) => [...brandKeys.details(), id] as const,
 };
 
-export const useBrands = (params: PaginationParams & { search?: string; enabled?: boolean }) => {
-  const { enabled = true, ...rest } = params;
+export const useBrands = (params?: PaginationParams & { search?: string; enabled?: boolean }) => {
+  const { enabled = true, ...rest } = params ?? {};
 
   return useQuery({
     queryKey: brandKeys.list(rest),

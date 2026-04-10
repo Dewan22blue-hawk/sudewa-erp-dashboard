@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
 import PurchaseUnitTable from '@/components/features/purchase/PurchaseUnitTable';
 import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
@@ -48,9 +50,18 @@ export default function PurchaseDetailPage() {
   const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
   const isPaid = hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0);
   const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
+  const isRefunded = currentStockState === 'inbound_return';
   const isAlreadyReceived = PURCHASE_RECEIVED_STATE_SET.has(currentStockState);
-  const canReceive = isPaid && !isAlreadyReceived;
+  const canReceive = isPaid && !isAlreadyReceived && !isRefunded;
   const unitItems = unitItemsResponse?.data ?? [];
+
+  useEffect(() => {
+    if (router.query.print === 'true' && !isLoading && purchase) {
+      setTimeout(() => {
+        window.print();
+      }, 800);
+    }
+  }, [router.query.print, isLoading, purchase]);
 
   const handleReceipt = async () => {
     if (!purchase?.id) return;
@@ -178,12 +189,17 @@ export default function PurchaseDetailPage() {
               <div className="text-xs text-slate-500 flex items-center gap-2">
                 <span>Kode Beli:</span>
                 <span className="text-blue-600 font-semibold">{purchase.code}</span>
+                {isRefunded ? (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
+                    Sudah Refund
+                  </Badge>
+                ) : null}
               </div>
             </div>
           </div>
 
           <div className="flex gap-2">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
+            <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
               <CreditCard className="mr-2 h-4 w-4" />
               Bayar
             </Button>
@@ -200,11 +216,19 @@ export default function PurchaseDetailPage() {
 
         {!canReceive && (
           <p className="text-xs text-muted-foreground">
-            {isAlreadyReceived
+            {isRefunded
+              ? 'Transaksi sudah direfund (inbound_return). Proses terima barang dinonaktifkan.'
+              : isAlreadyReceived
               ? 'Stok sudah diterima (inbound_receipt).'
               : 'Tombol Terima Barang aktif setelah pembayaran lunas.'}
           </p>
         )}
+
+        {isRefunded ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Transaksi ini sudah direfund. Status stok saat ini: <span className="font-semibold">inbound_return</span>.
+          </div>
+        ) : null}
 
         {/* 3-COLUMN CARDS */}
         <PurchaseDetailCards data={purchase} />

@@ -23,7 +23,7 @@ export const updatePurchaseSchema = z.object({
 
 export const createPurchaseUnitSchema = z.object({
   typeUnitId: z.string().optional(),
-  qty: z.number().min(1, 'Qty minimal 1'),
+  qty: z.number().min(1, 'Qty minimal 1').optional(),
   price: z.number().min(0),
   biayaBBN: z.number().min(0),
   biayaEkspedisi: z.number().min(0),

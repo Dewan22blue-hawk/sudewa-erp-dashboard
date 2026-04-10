@@ -25,6 +25,7 @@ import {
 import { MoreVertical } from "lucide-react"
 import { SalesItem } from "./sales.data"
 import { formatCurrency } from "@/lib/utils/currency"
+import { Badge } from "@/components/ui/badge"
 
 interface Props {
     item: SalesItem
@@ -49,6 +50,10 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
 
     const handleDetail = () => {
         router.push(slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`)
+    }
+
+    const handleRefund = () => {
+        router.push(slug ? `/dashboard/${slug}/sales/${item.id}/refund` : `/sales/${item.id}/refund`)
     }
 
     const handleDelete = async () => {
@@ -87,7 +92,14 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             <TableCell className="transition-all duration-200">{item.tanggal}</TableCell>
 
             {/* Customer */}
-            <TableCell className="transition-all duration-200">{item.customer}</TableCell>
+            <TableCell className="transition-all duration-200">
+                <div className="flex items-center gap-2">
+                    <span>{item.customer}</span>
+                    {item.isRefunded ? (
+                        <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">Sudah Refund</Badge>
+                    ) : null}
+                </div>
+            </TableCell>
 
             {/* Total Biaya */}
             <TableCell className="text-left transition-all duration-200">
@@ -128,6 +140,9 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDetail}>
                             Detail
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
+                            {item.isRefunded ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/sales/${item.id}?print=true` : `/sales/${item.id}?print=true`, '_blank')}>
                             Print

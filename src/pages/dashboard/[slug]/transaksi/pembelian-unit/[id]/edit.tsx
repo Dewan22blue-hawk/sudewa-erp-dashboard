@@ -25,7 +25,7 @@ export default function EditPurchasePage() {
 
             toast.success("Data berhasil diperbarui")
             router.push(
-                `/dashboard/${slug}/transaksi/pembelian-unit/${id}/detail`
+                `/dashboard/${slug}/transaksi/pembelian-unit/${id}`
             )
         } catch {
             toast.error("Gagal update data")

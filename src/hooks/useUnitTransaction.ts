@@ -37,14 +37,20 @@ export const useUpdateUnitTransactionState = () => {
       id,
       stockState,
       unitTransactionDetails,
+      cashId,
+      description,
     }: {
       id: string;
       stockState?: string;
       unitTransactionDetails?: Array<string | number>;
+      cashId?: string | number;
+      description?: string;
     }) =>
       unitTransactionService.updateUnitTransactionState(id, {
         stockState,
         unitTransactionDetails,
+        cashId,
+        description,
       }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.id] });

@@ -90,7 +90,7 @@ export function CustomerFormDialog({ open, onOpenChange, form, onSubmit, title, 
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nomer Telepon</FormLabel>
+                  <FormLabel>Phone</FormLabel>
                   <FormControl>
                     <Input placeholder="Tambahkan nomer telepon" {...field} />
                   </FormControl>

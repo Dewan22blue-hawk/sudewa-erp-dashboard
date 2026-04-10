@@ -5,7 +5,7 @@
 export interface EditUnitFormData {
     // Main fields
     tipeUnit: string
-    qty: number
+    qty?: number
 
     // Harga section
     harga: number

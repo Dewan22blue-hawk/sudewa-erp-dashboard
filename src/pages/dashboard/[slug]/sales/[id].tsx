@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Wallet } from 'lucide-react';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
@@ -19,7 +20,10 @@ export default function SalesDetailPage() {
   const { data, isLoading } = useSalesDetail(salesId);
 
   const { slug } = router.query;
+  const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
   const salesData = data?.ui ?? null;
+  const stockState = String(data?.raw?.stock_state ?? salesData?.stockState ?? '').toLowerCase();
+  const isRefunded = stockState === 'outbound_return';
   const mappedDetail = data?.raw
     ? mapSalesDetailCard(data.raw)
     : {
@@ -48,12 +52,10 @@ export default function SalesDetailPage() {
   }, [router.query.print, isLoading, salesData]);
 
   const handleCreateUnit = () => {
-    const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
     router.push(`${basePath}/${id}/create-unit`);
   };
 
   const handlePayment = () => {
-    const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
     router.push(`${basePath}/${id}/payment`);
   };
 
@@ -79,14 +81,22 @@ export default function SalesDetailPage() {
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">Kode Jual</span>
                 <span className="font-medium text-blue-600">{salesData.kodeJual}</span>
+                {isRefunded ? (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
+                    Sudah Refund
+                  </Badge>
+                ) : null}
               </div>
             </div>
           </div>
 
           <div className="flex gap-3 ml-12 md:ml-0">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handlePayment}>
+            <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
               <Wallet className="mr-2 h-4 w-4" />
               Bayar
+            </Button>
+            <Button variant="outline" disabled={isRefunded} className="bg-white hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`${basePath}/${id}/refund`)}>
+              {isRefunded ? 'Sudah Refund' : 'Refund'}
             </Button>
           </div>
         </div>
@@ -104,6 +114,12 @@ export default function SalesDetailPage() {
             </div>
           </div>
         </div>
+
+        {isRefunded ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 print:hidden">
+            Transaksi ini sudah direfund. Status stok saat ini: <span className="font-semibold">outbound_return</span>.
+          </div>
+        ) : null}
 
         {/* 3 Info Cards */}
         <SalesDetailCards data={salesData} />
