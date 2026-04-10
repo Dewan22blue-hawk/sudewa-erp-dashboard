@@ -24,6 +24,12 @@ export default function SalesDetailPage() {
   const salesData = data?.ui ?? null;
   const stockState = String(data?.raw?.stock_state ?? salesData?.stockState ?? '').toLowerCase();
   const isRefunded = stockState === 'outbound_return';
+  
+  const totalTagihan = salesData?.totalJual ?? 0;
+  const totalPaid = salesData?.totalBayar ?? 0;
+  const isPaidFromBilling = data?.raw?.billing_summary?.is_paid || data?.raw?.unit_transaction_billing?.is_paid;
+  const isPaid = Boolean(isPaidFromBilling) || (totalPaid >= totalTagihan && totalTagihan > 0);
+
   const mappedDetail = data?.raw
     ? mapSalesDetailCard(data.raw)
     : {
@@ -81,6 +87,15 @@ export default function SalesDetailPage() {
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">Kode Jual</span>
                 <span className="font-medium text-blue-600">{salesData.kodeJual}</span>
+                {isPaid ? (
+                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
+                    Lunas
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700">
+                    Belum Lunas
+                  </Badge>
+                )}
                 {isRefunded ? (
                   <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
                     Sudah Refund

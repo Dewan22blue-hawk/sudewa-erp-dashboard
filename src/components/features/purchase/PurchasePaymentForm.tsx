@@ -37,6 +37,7 @@ export type PaymentFormData = z.infer<typeof paymentSchema>;
 interface Props {
     purchaseCode: string;
     totalTagihan: number;
+    totalPpn: number;
     billing: UnitBilling | null;
     histories: UnitBillingHistory[];
     onSubmitPayment: (data: PaymentFormData) => Promise<void>;
@@ -49,6 +50,7 @@ interface Props {
 export function PurchasePaymentForm({
     purchaseCode,
     totalTagihan,
+    totalPpn,
     billing,
     histories,
     onSubmitPayment,
@@ -126,17 +128,21 @@ export function PurchasePaymentForm({
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-xl border p-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-xl border p-5">
                 <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Total Tagihan</p>
+                    <p className="text-xs text-muted-foreground">Total Beli</p>
                     <p className="text-base font-semibold">{formatCurrency(totalTagihan)}</p>
                 </div>
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Total Dibayar</p>
                     <p className="text-base font-semibold">{formatCurrency(totalPaid)}</p>
+                </div> */}
+                <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Total PPN</p>
+                    <p className="text-base font-semibold">{formatCurrency(totalPpn)}</p>
                 </div>
                 <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Sisa Bayar</p>
+                    <p className="text-xs text-muted-foreground">Total Biaya</p>
                     <p className="text-base font-semibold">{formatCurrency(remainingPayment)}</p>
                 </div>
             </div>
@@ -155,7 +161,7 @@ export function PurchasePaymentForm({
                             name="bcaPayment"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>BCA Payment</FormLabel>
+                                    <FormLabel>BCA USD</FormLabel>
                                     <FormControl>
                                         <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
                                     </FormControl>
@@ -164,26 +170,27 @@ export function PurchasePaymentForm({
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="cashPayment"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Cash Payment</FormLabel>
-                                    <FormControl>
-                                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+
 
                         <FormField
                             control={form.control}
                             name="bcaPayment2"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>BCA Payment 2 (Opsional)</FormLabel>
+                                    <FormLabel>BCA IDR</FormLabel>
+                                    <FormControl>
+                                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="cashPayment"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Cash IDR</FormLabel>
                                     <FormControl>
                                         <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
                                     </FormControl>
@@ -199,7 +206,7 @@ export function PurchasePaymentForm({
                             name="paymentDate"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel>Payment Date</FormLabel>
+                                    <FormLabel>Tanggal</FormLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <FormControl>
@@ -223,12 +230,12 @@ export function PurchasePaymentForm({
                         />
 
                         <div className="space-y-2">
-                            <Label>Total Payment (Input)</Label>
+                            <Label>Total Bayar</Label>
                             <Input readOnly value={formatCurrency(totalPaymentInput)} />
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Sisa Setelah Submit</Label>
+                            <Label>Kurang Bayar</Label>
                             <Input readOnly value={formatCurrency(projectedRemaining)} />
                         </div>
                     </div>

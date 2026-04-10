@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, ArrowUpDown } from 'lucide-react';
 
 interface Props {
   data: KasHarian[];
@@ -28,7 +28,7 @@ const formatDate = (value: string) => {
 
 const SkeletonRow = () => (
   <tr className="border-b border-gray-200">
-    {Array.from({ length: 8 }).map((_, index) => (
+    {Array.from({ length: 7 }).map((_, index) => (
       <td key={index} className="px-4 py-4">
         <Skeleton className="h-4 w-full max-w-[120px]" />
       </td>
@@ -66,24 +66,27 @@ export default function KasHarianTable({ data, meta, hasNextPage, isLoading, isF
         <table className="min-w-[1400px] w-full text-sm">
           <thead className="bg-gray-100 text-xs uppercase tracking-wide font-medium">
             <tr>
-              <th className="px-4 py-3 text-left">Kode Transaksi</th>
-              <th className="px-4 py-3 text-left">Tanggal</th>
-              <th className="px-4 py-3 text-left">Keterangan</th>
-              <th className="px-4 py-3 text-left">Kas</th>
-              <th className="px-4 py-3 text-left">Perusahaan</th>
-              <th className="px-4 py-3 text-right">Debet</th>
-              <th className="px-4 py-3 text-right">Kredit</th>
-              <th className="px-4 py-3 text-right">Saldo</th>
-              <th className="px-4 py-3 text-center w-[60px]">Action</th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-2 cursor-pointer">
+                  TANGGAL
+                  <ArrowUpDown className="h-3 w-3 opacity-50" />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">NOTA REFF</th>
+              <th className="px-4 py-3 text-left">KETERANGAN</th>
+              <th className="px-4 py-3 text-left">DEBET</th>
+              <th className="px-4 py-3 text-left">KREDIT</th>
+              <th className="px-4 py-3 text-left">AKUN</th>
+              <th className="px-4 py-3 text-center w-[80px]">ACTION</th>
             </tr>
           </thead>
 
           <tbody>
             {isLoading ? (
-              Array.from({ length: 8 }).map((_, index) => <SkeletonRow key={index} />)
+              Array.from({ length: 7 }).map((_, index) => <SkeletonRow key={index} />)
             ) : isError ? (
               <tr>
-                <td colSpan={9} className="px-4 py-10 text-center">
+                <td colSpan={7} className="px-4 py-10 text-center">
                   <div className="space-y-3">
                     <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data transaksi kas harian'}</p>
                     {onRetry ? (
@@ -96,21 +99,19 @@ export default function KasHarianTable({ data, meta, hasNextPage, isLoading, isF
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                   Belum ada data transaksi
                 </td>
               </tr>
             ) : (
               data.map((item, index) => (
                 <tr key={item.id} className="border-b last:border-none hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-blue-600">{item.code}</td>
                   <td className="px-4 py-3">{formatDate(item.date)}</td>
+                  <td className="px-4 py-3">{item.code}</td>
                   <td className="px-4 py-3">{item.note}</td>
-                  <td className="px-4 py-3">{item.cash.description}</td>
-                  <td className="px-4 py-3">{item.company.name}</td>
-                  <td className="px-4 py-3 text-right text-green-600 font-medium">{formatCurrency(item.debet)}</td>
-                  <td className="px-4 py-3 text-right text-red-600 font-medium">{formatCurrency(item.credit)}</td>
-                  <td className={`px-4 py-3 text-right font-medium ${balances[index] >= 0 ? 'text-slate-900' : 'text-red-600'}`}>{formatCurrency(balances[index])}</td>
+                  <td className="px-4 py-3 text-green-600 font-medium">{formatCurrency(item.debet)}</td>
+                  <td className="px-4 py-3 text-red-600 font-medium">{formatCurrency(item.credit)}</td>
+                  <td className="px-4 py-3">{item.account?.name ?? '-'}</td>
                   <td className="px-4 py-3 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

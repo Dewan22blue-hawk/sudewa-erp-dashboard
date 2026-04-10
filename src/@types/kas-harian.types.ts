@@ -11,6 +11,11 @@ export interface KasHarianCompany {
   name: string;
 }
 
+export interface KasHarianAccount {
+  id: number;
+  name: string;
+}
+
 export interface KasHarian {
   id: number;
   code: string;
@@ -20,11 +25,13 @@ export interface KasHarian {
   credit: number;
   cash: KasHarianCash;
   company: KasHarianCompany;
+  account?: KasHarianAccount;
 }
 
 export interface CashFlowPayload {
   company_id: number;
   cash_id: number;
+  account_id: number;
   date: string;
   note: string;
   debet: number;
