@@ -236,7 +236,7 @@ export default function SupplierPage() {
         form={editForm}
         onSubmit={onSubmitEdit}
         title="Edit Data Supplier"
-        description="Perbarui detail supplier"
+        description="Perbarui data detail supplier"
         submitLabel="Perbarui"
         isSubmitting={updateSupplier.isPending}
         userOptions={userOptions}

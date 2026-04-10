@@ -23,6 +23,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
       icon: Database,
       children: [
         {
+          label: 'Grup Akun',
+          href: master('/account-group'),
+        },
+        {
           label: 'Akun',
           href: master('/account'),
         },
@@ -33,6 +37,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         {
           label: 'Customer',
           href: master('/customer'),
+        },
+        {
+          label: 'Merk Unit Tipe',
+          href: master('/brand'),
         },
         {
           label: 'Tipe Unit',
@@ -100,7 +108,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Data PPN Pembelian',
           href: base('/finance/data-ppn-pembelian'),
         },
-                {
+        {
           label: 'Data PPN Penjualan',
           href: base('/finance/data-ppn-penjualan'),
         },

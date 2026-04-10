@@ -54,7 +54,7 @@ export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: Cust
                 <DialogHeader>
                     <DialogTitle>{isEdit ? 'Edit Data Customer' : 'Tambah Data Customer'}</DialogTitle>
                     <DialogDescription>
-                        {isEdit ? 'Edit detail customer baru' : 'Masukkan detail customer baru'}
+                        {isEdit ? 'Edit data customer baru' : 'Masukkan data customer baru'}
                     </DialogDescription>
                 </DialogHeader>
                 {isOpen && (

@@ -19,9 +19,11 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   kas: Kas | null;
   companyId: string;
+  title: string;
+  description: string;
 }
 
-export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
+export function KasFormDialog({ open, onOpenChange, kas, companyId, title, description }: Props) {
   const isEdit = Boolean(kas);
 
   const createMutation = useCreateKas(companyId);
@@ -87,8 +89,8 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Ubah Data Kas' : 'Tambah Data Kas'}</DialogTitle>
-          <DialogDescription className="hidden">Form untuk {isEdit ? 'mengubah' : 'menambah'} data kas</DialogDescription>
+          <DialogTitle className="text-xl">{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
