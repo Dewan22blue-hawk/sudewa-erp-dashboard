@@ -13,7 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <QueryClientProvider client={queryClient}>
       <CompanyProvider>
         <Component {...pageProps} />
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </CompanyProvider>
     </QueryClientProvider>
   )
