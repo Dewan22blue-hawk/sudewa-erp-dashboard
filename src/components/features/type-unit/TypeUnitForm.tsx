@@ -24,7 +24,11 @@ interface TypeUnitFormProps {
 export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, submitLabel = 'Simpan' }: TypeUnitFormProps) {
   // Utility for parsing number fields nicely
   const parseNumber = (value: string) => (value === '' ? undefined : Number(value));
-  const { data: brandsData, isLoading: isBrandLoading } = useBrands();
+  const { data: brandsData, isLoading: isBrandLoading } = useBrands({ 
+    perPage: 100,
+    sort_by: 'name',
+    sort_order: 'asc' 
+  });
   const brands = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
   const [openBrandDialog, setOpenBrandDialog] = useState(false);
   const [openBrandSelect, setOpenBrandSelect] = useState(false);
