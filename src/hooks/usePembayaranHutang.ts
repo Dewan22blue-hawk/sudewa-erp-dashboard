@@ -6,12 +6,13 @@ type LiabilityListOptions = {
   page?: number;
   perPage?: number;
   search?: string;
+  type?: 'purchase' | 'sales';
 };
 
 export const usePembayaranHutang = (options: LiabilityListOptions = {}) => {
   return useQuery({
     queryKey: ['liability-list', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
-    queryFn: () => liabilityService.getList({ page: options.page, per_page: options.perPage, search: options.search }),
+    queryFn: () => liabilityService.getList({ type: options.type, page: options.page, per_page: options.perPage, search: options.search }),
     staleTime: 1000 * 60 * 5,
     placeholderData: (previous) => previous,
   });

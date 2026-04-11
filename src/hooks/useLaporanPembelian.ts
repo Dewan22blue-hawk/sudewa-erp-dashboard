@@ -38,7 +38,7 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     lastPage: 1,
-    perPage: 10,
+    perPage: 50,
     total: 0,
     from: 0,
     to: 0,
@@ -48,7 +48,7 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
 
   // Filter states
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPerPage, setCurrentPerPage] = useState(10);
+  const [currentPerPage, setCurrentPerPage] = useState(50);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<number | null>(null);
@@ -101,9 +101,12 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
       if (currentSearch) {
         const q = String(currentSearch).toLowerCase();
         filteredData = filteredData.filter(item => {
-          return (item?.unit_transaction_items || []).some(
+          const matchesCode = item?.code?.toLowerCase().includes(q);
+          const matchesSupplier = item?.person?.name?.toLowerCase().includes(q);
+          const matchesUnitType = (item?.unit_transaction_items || []).some(
             u => u?.unit_type?.name?.toLowerCase().includes(q)
           );
+          return Boolean(matchesCode || matchesSupplier || matchesUnitType);
         });
       }
 
@@ -111,7 +114,7 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
       setPagination({
         currentPage: result?.current_page || 1,
         lastPage: result?.last_page || 1,
-        perPage: result?.per_page || 10,
+        perPage: result?.per_page || 50,
         total: result?.total || 0,
         from: result?.from || 0,
         to: result?.to || 0,

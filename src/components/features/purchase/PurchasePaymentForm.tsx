@@ -22,10 +22,10 @@ const paymentSchema = z
     .object({
         bcaPayment: z.number().min(0, 'Tidak boleh negatif'),
         cashPayment: z.number().min(0, 'Tidak boleh negatif'),
-        bcaPayment2: z.number().min(0, 'Tidak boleh negatif').optional().default(0),
+        bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
         paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
-        note: z.string().max(255, 'Maksimal 255 karakter').optional().default(''),
-        isPaid: z.boolean().default(false),
+        note: z.string().max(255, 'Maksimal 255 karakter'),
+        isPaid: z.boolean(),
     })
     .refine((value) => (value.bcaPayment || 0) + (value.cashPayment || 0) + (value.bcaPayment2 || 0) > 0, {
         path: ['bcaPayment'],

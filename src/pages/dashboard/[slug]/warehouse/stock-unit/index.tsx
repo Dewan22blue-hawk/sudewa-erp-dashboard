@@ -59,9 +59,9 @@ export default function StockUnitPage() {
 
   useEffect(() => {
     if (data) {
-      setTablePage(data.current_page || 1);
-      setTablePerPage(data.per_page || 10);
-      setTableTotalData(data.total || 0);
+      setTablePage(data.meta?.currentPage || 1);
+      setTablePerPage(data.meta?.perPage || 10);
+      setTableTotalData(data.meta?.total || 0);
     }
   }, [data]);
 

@@ -274,6 +274,15 @@ body {
       align-items: center !important;
     }
 
+    .laporan-pembelian-print-content {
+      padding-top: 0mm !important;
+      padding-right: 4mm !important;
+      padding-bottom: 0mm !important;
+      padding-left: 4mm !important;
+      gap: 0.2mm !important;
+      align-items: center !important;
+    }
+
     .laporan-stock-print-content {
       padding-top: 35mm !important;
       padding-right: 5mm !important;
@@ -304,7 +313,20 @@ body {
       max-width: 194mm !important;
     }
 
+    .laporan-pembelian-print-content [data-slot='tabs-content'] {
+      width: 100% !important;
+      margin: 0 !important;
+      max-width: 194mm !important;
+    }
+
     .laporan-penerimaan-print-area .bg-white {
+      width: 100% !important;
+      max-width: 194mm !important;
+      margin: 0 auto !important;
+      border: 0 !important;
+    }
+
+    .laporan-pembelian-print-area .bg-white {
       width: 100% !important;
       max-width: 194mm !important;
       margin: 0 auto !important;
@@ -318,8 +340,25 @@ body {
   border-collapse: collapse !important;
 }
 
+    .laporan-pembelian-print-area table {
+  font-size: 6px !important;
+  width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
     .laporan-penerimaan-print-area th,
     .laporan-penerimaan-print-area td {
+    padding: 0.8px 1.2px !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  border: 0.5px solid #9ca3af !important;
+    }
+
+    .laporan-pembelian-print-area th,
+    .laporan-pembelian-print-area td {
     padding: 0.8px 1.2px !important;
   line-height: 1.05 !important;
   white-space: nowrap !important;
@@ -369,7 +408,6 @@ body {
   margin: 0 !important;
     }
 
-    .laporan-pembelian-print-area table,
     .laporan-penjualan-print-area table,
     .laporan-penerimaan-print-area table,
     .laporan-stock-print-area table {
@@ -379,8 +417,6 @@ body {
       border-collapse: collapse !important;
     }
 
-    .laporan-pembelian-print-area th,
-    .laporan-pembelian-print-area td,
     .laporan-penjualan-print-area th,
     .laporan-penjualan-print-area td,
     .laporan-penerimaan-print-area th,
@@ -396,7 +432,6 @@ body {
       color: #111827 !important;
     }
 
-    .laporan-pembelian-print-area th,
     .laporan-penjualan-print-area th,
     .laporan-penerimaan-print-area th,
     .laporan-stock-print-area th {
@@ -446,5 +481,57 @@ font-size: 20px !important;
       font-size: 20px !important;
       line-height: 1.2 !important;
     }
+
+    /* Fine tuning khusus laporan pembelian agar tabel print lebih rapi dan proporsional. */
+    .laporan-pembelian-print-area table {
+      table-layout: fixed !important;
+      font-size: 6.6px !important;
+      width: 100% !important;
+    }
+
+    .laporan-pembelian-print-area th,
+    .laporan-pembelian-print-area td {
+      padding: 1px 2px !important;
+      line-height: 1.15 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      vertical-align: middle !important;
+    }
+
+    .laporan-pembelian-print-area th {
+      text-align: center !important;
+    }
+
+    .laporan-pembelian-print-area tbody tr {
+      height: 14px !important;
+    }
+
+    .laporan-pembelian-print-area th:nth-child(1),
+    .laporan-pembelian-print-area td:nth-child(1) { width: 3%; }
+    .laporan-pembelian-print-area th:nth-child(2),
+    .laporan-pembelian-print-area td:nth-child(2) { width: 10%; }
+    .laporan-pembelian-print-area th:nth-child(3),
+    .laporan-pembelian-print-area td:nth-child(3) { width: 6.5%; }
+    .laporan-pembelian-print-area th:nth-child(4),
+    .laporan-pembelian-print-area td:nth-child(4) { width: 9%; }
+    .laporan-pembelian-print-area th:nth-child(5),
+    .laporan-pembelian-print-area td:nth-child(5) { width: 3.5%; }
+    .laporan-pembelian-print-area th:nth-child(6),
+    .laporan-pembelian-print-area td:nth-child(6) { width: 8.5%; }
+    .laporan-pembelian-print-area th:nth-child(7),
+    .laporan-pembelian-print-area td:nth-child(7) { width: 8%; }
+    .laporan-pembelian-print-area th:nth-child(8),
+    .laporan-pembelian-print-area td:nth-child(8) { width: 8.5%; }
+    .laporan-pembelian-print-area th:nth-child(9),
+    .laporan-pembelian-print-area td:nth-child(9) { width: 8%; }
+    .laporan-pembelian-print-area th:nth-child(10),
+    .laporan-pembelian-print-area td:nth-child(10) { width: 8%; }
+    .laporan-pembelian-print-area th:nth-child(11),
+    .laporan-pembelian-print-area td:nth-child(11) { width: 8%; }
+    .laporan-pembelian-print-area th:nth-child(12),
+    .laporan-pembelian-print-area td:nth-child(12) { width: 7%; }
+    .laporan-pembelian-print-area th:nth-child(13),
+    .laporan-pembelian-print-area td:nth-child(13) { width: 12%; }
 }
   }

@@ -80,7 +80,7 @@ export default function TypeUnitPage() {
   };
 
   const handleImport = async (file: File) => {
-    await importMutation.mutateAsync(file);
+    await importMutation.mutateAsync({ file });
     refetch();
   };
 

@@ -1,4 +1,4 @@
-import { PenerimaanPiutang } from "@/@types/penerimaan-piutang.types"
+import { LiabilityPaymentHistory } from "@/types/pembayaran-hutang.types"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useTableSort } from "@/hooks/useTableSort"
@@ -15,7 +15,7 @@ import { formatCurrency } from "@/lib/utils/currency"
 export default function PenerimaanPiutangPaymentTable({
     payments,
 }: {
-    payments: PenerimaanPiutang[]
+    payments: LiabilityPaymentHistory[]
 }) {
     const [itemsPerPage, setItemsPerPage] = useState("25")
     const [currentPage, setCurrentPage] = useState(1)
@@ -54,7 +54,7 @@ export default function PenerimaanPiutangPaymentTable({
     }
 
     // Subtotal based on ALL payments (not just paginated)
-    const total = payments.reduce((acc, cur) => acc + cur.jumlahTerima, 0)
+    const total = payments.reduce((acc, cur) => acc + cur.cash_payment_amount + cur.bca_payment_amount, 0)
 
     return (
         <div className="space-y-4">
@@ -106,11 +106,11 @@ export default function PenerimaanPiutangPaymentTable({
                         {paginatedData.map((item, index) => (
                             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-4 py-3">{startIndex + index + 1}</td>
-                                <td className="px-4 py-3 font-medium">{item.kodeTerima}</td>
-                                <td className="px-4 py-3">{item.tanggalTerima}</td>
-                                <td className="px-4 py-3">{item.kasMasuk}</td>
+                                <td className="px-4 py-3 font-medium">{item.id}</td>
+                                <td className="px-4 py-3">{item.payment_at}</td>
+                                <td className="px-4 py-3">{item.cash_payment_amount}</td>
                                 <td className="px-4 py-3 text-right">
-                                    {formatCurrency(item.jumlahTerima)}
+                                    {formatCurrency((item.cash_payment_amount + item.bca_payment_amount))}
                                 </td>
                             </tr>
                         ))}

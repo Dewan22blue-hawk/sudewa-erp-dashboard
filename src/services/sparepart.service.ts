@@ -82,16 +82,16 @@ const mapSparepart = (payload: SparepartApiModel): Sparepart => {
   };
 };
 
-const normalizeList = (data: SparepartApiModel[] | LaravelPagination<SparepartApiModel>): { list: SparepartApiModel[]; meta: { current_page: number; per_page: number; total: number; last_page: number } } => {
+const normalizeList = (data: SparepartApiModel[] | LaravelPagination<SparepartApiModel>): { list: SparepartApiModel[]; meta: { current_page: number; perPage: number; total: number; last_page: number } } => {
   if (Array.isArray(data)) {
-    return { list: data, meta: { current_page: 1, per_page: data.length || 1, total: data.length, last_page: 1 } };
+    return { list: data, meta: { current_page: 1, perPage: data.length || 1, total: data.length, last_page: 1 } };
   }
 
   return {
     list: data.data ?? [],
     meta: {
       current_page: data.current_page ?? 1,
-      per_page: data.per_page ?? (data.data?.length || 1),
+      perPage: data.per_page ?? (data.data?.length || 1),
       total: data.total ?? data.data?.length ?? 0,
       last_page: data.last_page ?? 1,
     },
@@ -134,7 +134,7 @@ export const getSpareparts = async (companyId?: string | number): Promise<Sparep
     data: list.map(mapSparepart),
     meta: {
       currentPage: meta.current_page,
-      perPage: meta.per_page,
+      perPage: meta.perPage,
       total: meta.total,
       lastPage: meta.last_page,
     },
