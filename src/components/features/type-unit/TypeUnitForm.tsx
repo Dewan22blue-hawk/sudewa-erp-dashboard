@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { CreateBrandDialog } from './CreateBrandDialog';
 import { cn } from '@/lib/utils';
 import RequiredMark from '@/components/ui/required-mark';
+import type { Brand } from '@/@types/brand.types';
 
 interface TypeUnitFormProps {
   form: UseFormReturn<TypeUnitFormValues>;
@@ -29,11 +30,11 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
     sort_by: 'name',
     sort_order: 'asc' 
   });
-  const brands = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const brands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
   const [openBrandDialog, setOpenBrandDialog] = useState(false);
   const [openBrandSelect, setOpenBrandSelect] = useState(false);
   const [brandSearch, setBrandSearch] = useState('');
-  const filteredBrands = brands.filter((brand) => {
+  const filteredBrands = brands.filter((brand: Brand) => {
     if (!brandSearch.trim()) return true;
     const keyword = brandSearch.toLowerCase();
     return brand.name.toLowerCase().includes(keyword) || String(brand.id).includes(keyword);
@@ -63,7 +64,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                         <PopoverTrigger asChild>
                           <Button type="button" variant="outline" role="combobox" aria-expanded={openBrandSelect} disabled={isBrandLoading} className="h-10 w-full justify-between rounded-lg border-gray-200 bg-white font-medium text-gray-500">
                             <span className={cn('truncate', !field.value && 'text-gray-400')}>
-                              {field.value ? brands.find((brand) => brand.id === Number(field.value))?.name ?? 'Pilih Merk' : isBrandLoading ? 'Memuat...' : 'Pilih Merk'}
+                              {field.value ? brands.find((brand: Brand) => brand.id === Number(field.value))?.name ?? 'Pilih Merk' : isBrandLoading ? 'Memuat...' : 'Pilih Merk'}
                             </span>
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -74,7 +75,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                             <CommandList>
                               <CommandEmpty>Merk tidak ditemukan.</CommandEmpty>
                               <CommandGroup>
-                                {filteredBrands.map((brand) => (
+                                {filteredBrands.map((brand: Brand) => (
                                   <CommandItem
                                     key={brand.id}
                                     value={`${brand.name} ${brand.id}`}

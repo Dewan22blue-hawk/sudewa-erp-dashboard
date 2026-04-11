@@ -48,13 +48,12 @@ export function CreateBrandDialog({ open, onOpenChange, onCreated }: Props) {
     try {
       const brand = await mutation.mutateAsync({
         name: values.name,
-        description: values.description || undefined,
         image: values.image as File | null | undefined,
       });
       toast.success('Merk berhasil dibuat');
       onOpenChange(false);
       reset();
-      if (brand?.id && onCreated) onCreated(brand.id);
+      if (brand?.id && onCreated) onCreated(Number(brand.id));
     } catch (error: any) {
       const msg = error?.response?.data?.message || error?.message || 'Gagal membuat merk';
       toast.error(msg);

@@ -171,7 +171,7 @@ export const salesService = {
       mappedData,
       meta: {
         currentPage: responseData.current_page ?? 1,
-        perPage: responseData.per_page ?? 10,
+        per_page: responseData.per_page ?? 10,
         total: responseData.total ?? 0,
         lastPage: responseData.last_page ?? 1,
       },

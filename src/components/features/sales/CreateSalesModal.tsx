@@ -33,6 +33,7 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
         }
 
         const payload = {
+            company_id: Number(companyId || 0),
             person_id: customerId,
             warehouse_id: 1,
             code: generatedCode,

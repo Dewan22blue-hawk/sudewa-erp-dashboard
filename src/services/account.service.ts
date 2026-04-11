@@ -41,7 +41,7 @@ const basePath = '/wapi/master-data/account';
 type PaginatedAccountResponse = LaravelApiResponse<{
   data: AccountApiModel[];
   current_page: number;
-  per_page: number;
+  perPage: number;
   total: number;
   last_page: number;
 }>;
@@ -61,7 +61,7 @@ export const getAccounts = async (params: PaginationParams & { search?: string }
     {
       data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.per_page,
+      per_page: data.perPage,
       total: data.total,
       last_page: data.last_page,
     },

@@ -44,7 +44,7 @@ const basePath = '/wapi/master-data/customer';
 type PaginatedCustomerResponse = LaravelApiResponse<{
   data: CustomerApiModel[];
   current_page: number;
-  per_page: number;
+  perPage: number;
   total: number;
   last_page: number;
 }>;
@@ -83,7 +83,7 @@ export const getCustomers = async (
     {
       data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.per_page,
+      per_page: data.perPage,
       total: data.total,
       last_page: data.last_page,
     },

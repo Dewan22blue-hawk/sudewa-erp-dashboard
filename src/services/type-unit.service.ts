@@ -35,7 +35,7 @@ type TypeUnitListApiResponse = LaravelApiResponse<
   | {
       data: TypeUnitApiModel[];
       current_page?: number;
-      per_page?: number;
+      perPage?: number;
       total?: number;
       last_page?: number;
     }
@@ -79,9 +79,9 @@ const mapTypeUnit = (payload: TypeUnitApiModel): TypeUnit => ({
 });
 
 const normalizeList = (
-  data: TypeUnitApiModel[] | TypeUnitApiModel | { data: TypeUnitApiModel[]; current_page?: number; per_page?: number; total?: number; last_page?: number },
-): { list: TypeUnitApiModel[]; meta?: { current_page?: number; per_page?: number; total?: number; last_page?: number } } => {
-  const walk = (input: any): { list: TypeUnitApiModel[]; meta?: { current_page?: number; per_page?: number; total?: number; last_page?: number } } => {
+  data: TypeUnitApiModel[] | TypeUnitApiModel | { data: TypeUnitApiModel[]; current_page?: number; perPage?: number; total?: number; last_page?: number },
+): { list: TypeUnitApiModel[]; meta?: { current_page?: number; perPage?: number; total?: number; last_page?: number } } => {
+  const walk = (input: any): { list: TypeUnitApiModel[]; meta?: { current_page?: number; perPage?: number; total?: number; last_page?: number } } => {
     if (!input) return { list: [] };
 
     if (Array.isArray(input)) {
@@ -94,7 +94,7 @@ const normalizeList = (
           list: input.data as TypeUnitApiModel[],
           meta: {
             current_page: input.current_page,
-            per_page: input.per_page,
+            perPage: input.perPage,
             total: input.total,
             last_page: input.last_page,
           },
@@ -130,7 +130,7 @@ export const getTypeUnits = async (): Promise<TypeUnitListResponse> => {
     data: list,
     meta: {
       currentPage: meta?.current_page ?? 1,
-      perPage: meta?.per_page ?? (list.length || 1),
+      perPage: meta?.perPage ?? (list.length || 1),
       total: meta?.total ?? list.length,
       lastPage: meta?.last_page ?? 1,
     },

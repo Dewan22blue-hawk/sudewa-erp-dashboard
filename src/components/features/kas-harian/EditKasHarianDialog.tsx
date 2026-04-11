@@ -43,7 +43,7 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
   });
 
   const cashQuery = useKas();
-  const accountQuery = useAccounts({ per_page: 100 });
+  const accountQuery = useAccounts({ perPage: 100 });
 
   useEffect(() => {
     if (data && open) {

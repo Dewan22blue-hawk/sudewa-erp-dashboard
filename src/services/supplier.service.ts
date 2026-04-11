@@ -42,7 +42,7 @@ const basePath = '/wapi/master-data/supplier';
 type PaginatedSupplierResponse = LaravelApiResponse<{
   data: SupplierApiModel[];
   current_page: number;
-  per_page: number;
+  perPage: number;
   total: number;
   last_page: number;
 }>;
@@ -81,7 +81,7 @@ export const getSuppliers = async (
     {
       data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.per_page,
+      per_page: data.perPage,
       total: data.total,
       last_page: data.last_page,
     },

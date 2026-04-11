@@ -24,9 +24,8 @@ export default function DetailLaporanPembelianPage() {
         queryKey: ["laporan-pembelian", type, awal, akhir],
         queryFn: () =>
             getLaporanPembelian({
-                jenis: type as any,
-                periodeAwal: awal,
-                periodeAkhir: akhir,
+                start_date: awal,
+                end_date: akhir,
             }),
     })
 

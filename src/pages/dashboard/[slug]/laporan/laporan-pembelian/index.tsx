@@ -67,6 +67,25 @@ export default function LaporanPembelianPage() {
       let index = 1;
       data.forEach((item) => {
         const items = item.unit_transaction_items || [];
+
+        if (items.length === 0) {
+          csvContent += `${index},`;
+          csvContent += `"${item.code}",`;
+          csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
+          csvContent += `"-",`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `0,`;
+          csvContent += `${item.transaction_bruto_total}\n`;
+          index++;
+          return;
+        }
+
         items.forEach((unit) => {
           csvContent += `${index},`;
           csvContent += `"${item.code}",`;

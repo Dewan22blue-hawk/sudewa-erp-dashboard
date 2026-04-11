@@ -73,7 +73,7 @@ type UnitTypeApiModel = {
 type PaginationLike<T> = {
   data?: T[];
   current_page?: number;
-  per_page?: number;
+  perPage?: number;
   total?: number;
   last_page?: number;
 };
@@ -178,7 +178,7 @@ const extractPagination = <T>(payload: unknown): PaginationLike<T> => {
     return {
       data: [],
       current_page: 1,
-      per_page: 10,
+      perPage: 10,
       total: 0,
       last_page: 1,
     };
@@ -199,7 +199,7 @@ const extractPagination = <T>(payload: unknown): PaginationLike<T> => {
   return {
     data: [],
     current_page: 1,
-    per_page: 10,
+    perPage: 10,
     total: 0,
     last_page: 1,
   };
@@ -296,7 +296,7 @@ const fetchItemDetails = async (itemId: number): Promise<SalesItemDetailApiModel
         params: {
           unit_transaction_item_id: itemId,
           page: 1,
-          per_page: 200,
+          perPage: 200,
         },
       }),
     () =>
@@ -304,7 +304,7 @@ const fetchItemDetails = async (itemId: number): Promise<SalesItemDetailApiModel
         params: {
           unit_transaction_item_id: itemId,
           page: 1,
-          per_page: 200,
+          perPage: 200,
         },
       }),
   );
@@ -343,7 +343,7 @@ export const getPengeluaranUnits = async (params: PengeluaranUnitListParams = {}
     params: {
       activity_type: 'issue',
       page: params.page ?? 1,
-      per_page: params.perPage ?? 10,
+      perPage: params.perPage ?? 10,
       search: params.search?.trim() || undefined,
       sort_by: params.sortBy ?? 'created_at',
       sort_direction: params.sortDirection ?? 'desc',
@@ -446,7 +446,7 @@ export const getWarehouseOptions = async (): Promise<WarehouseOption[]> => {
   const response = await apiClient.get<unknown>(warehouseDataPath, {
     params: {
       page: 1,
-      per_page: 200,
+      perPage: 200,
     },
   });
 
@@ -466,7 +466,7 @@ export const getCustomerOptions = async (): Promise<PersonOption[]> => {
   const response = await apiClient.get<unknown>(customerPath, {
     params: {
       page: 1,
-      per_page: 200,
+      perPage: 200,
     },
   });
 
@@ -486,7 +486,7 @@ export const getSupplierOptions = async (): Promise<PersonOption[]> => {
   const response = await apiClient.get<unknown>(customerPath, {
     params: {
       page: 1,
-      per_page: 200,
+      perPage: 200,
     },
   });
 
@@ -528,7 +528,7 @@ export const getDispatchUnitRows = async (params: DispatchUnitTableParams = {}):
         params: {
           type: 'sales',
           page: 1,
-          per_page: 500,
+          perPage: 500,
           search: params.search?.trim() || undefined,
           sort_order: 'desc',
         },
@@ -538,7 +538,7 @@ export const getDispatchUnitRows = async (params: DispatchUnitTableParams = {}):
         params: {
           type: 'sales',
           page: 1,
-          per_page: 500,
+          perPage: 500,
           search: params.search?.trim() || undefined,
           sort_order: 'desc',
         },
@@ -562,7 +562,7 @@ export const getDispatchUnitRows = async (params: DispatchUnitTableParams = {}):
           warehouse_id: warehouseId,
           type: 'sales',
           page: 1,
-          per_page: 500,
+          perPage: 500,
         },
       }),
     () =>
@@ -571,7 +571,7 @@ export const getDispatchUnitRows = async (params: DispatchUnitTableParams = {}):
           warehouse_id: warehouseId,
           type: 'sales',
           page: 1,
-          per_page: 500,
+          perPage: 500,
         },
       }),
   );
