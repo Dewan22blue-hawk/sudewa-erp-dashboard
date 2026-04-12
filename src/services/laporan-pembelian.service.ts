@@ -166,7 +166,7 @@ export const getSuppliers = async () => {
 
 export const getUnitTypes = async () => {
   const response = await apiClient.get('/wapi/master-data/unit-type', {
-    params: { sort_by: 'created_at', sort_order: 'asc' }
+    params: { sort_by: 'created_at', sort_order: 'asc', per_page: 50 }
   });
   return response.data.data;
 };
