@@ -1,58 +1,14 @@
-import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
-import { useKas, useImportKas } from '@/hooks/useKas';
+import { useKas } from '@/hooks/useKas';
 import { KasTable } from '@/components/features/kas/KasTable';
-import { KasFormDialog } from '@/components/features/kas/KasFormDialog';
-import { DeleteKasDialog } from '@/components/features/kas/DeleteKasDialog';
-import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { useCompany } from '@/contexts/CompanyContext';
-import { Kas } from '@/@types/kas.types';
 
 export default function KasPage() {
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
 
-  const { data, isLoading, isError, refetch } = useKas(safeCompanyId);
-  const importMutation = useImportKas(safeCompanyId);
-
-  const [selectedKas, setSelectedKas] = useState<Kas | null>(null);
-  const [openForm, setOpenForm] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [openImport, setOpenImport] = useState(false);
-
-  // State Handler Helpers
-  const handleEdit = (item: Kas) => {
-    setSelectedKas(item);
-    setOpenForm(true);
-  };
-
-  const handleDelete = (item: Kas) => {
-    setSelectedKas(item);
-    setOpenDelete(true);
-  };
-
-  const handleCreate = () => {
-    setSelectedKas(null);
-    setOpenForm(true);
-  };
-
-  // Modal Close Handlers (Reset selection)
-  const handleOpenFormChange = (open: boolean) => {
-    setOpenForm(open);
-    if (!open) setSelectedKas(null);
-  };
-
-  const handleOpenDeleteChange = (open: boolean) => {
-    setOpenDelete(open);
-    if (!open) setSelectedKas(null);
-  };
-
-  const handleImport = async (file: File) => {
-    await importMutation.mutateAsync({ file });
-    refetch();
-  };
-
+  const { data, isLoading, isError } = useKas(safeCompanyId);
 
   // --- RENDER STATES ---
 
@@ -105,32 +61,9 @@ export default function KasPage() {
 
         {/* TABLE CARD */}
         <div className="">
-          <KasTable data={data?.data ?? []} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleCreate} onImport={() => setOpenImport(true)} />
+          <KasTable data={data?.data ?? []} />
         </div>
-
-
-        <KasFormDialog
-          open={openForm}
-          onOpenChange={handleOpenFormChange}
-          kas={selectedKas}
-          title={selectedKas ? 'Ubah Data Kas' : 'Tambah Data Kas'}
-          description={selectedKas ? 'Form untuk mengubah data kas' : 'Form untuk menambah data kas'}
-          companyId={safeCompanyId}
-        />
-
-        <DeleteKasDialog open={openDelete} onOpenChange={handleOpenDeleteChange} kas={selectedKas} companyId={safeCompanyId} />
-
-        <DataImportModal
-          open={openImport}
-          onOpenChange={setOpenImport}
-          title="Import Data Kas"
-          description="Unggah file .xlsx untuk mengimport data kas."
-          onImport={handleImport}
-          isPending={importMutation.isPending}
-          templateUrl="https://docs.google.com/spreadsheets/d/1I2RdGudm6XfJZ8WDG5lWu4tuCoU-UEj7wTW6sUAh2XY/edit?usp=sharing"
-        />
       </div>
-
     </DashboardLayout>
   );
 }

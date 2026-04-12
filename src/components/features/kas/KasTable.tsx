@@ -1,22 +1,16 @@
 import { useState } from 'react';
 import { Kas } from '@/@types/kas.types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus, Upload } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   data: Kas[];
-  onEdit: (item: Kas) => void;
-  onDelete: (item: Kas) => void;
-  onAdd?: () => void;
-  onImport?: () => void;
 }
 
-export function KasTable({ data, onEdit, onDelete, onAdd, onImport }: Props) {
+export function KasTable({ data }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
@@ -52,21 +46,6 @@ export function KasTable({ data, onEdit, onDelete, onAdd, onImport }: Props) {
           </Select>
           <span className="text-sm font-medium">Entries</span>
         </div>
-
-        <div className="flex w-full sm:w-auto justify-end gap-2">
-          {onImport && (
-            <Button onClick={onImport} variant="outline" className="gap-2">
-              <Upload className="h-4 w-4" />
-              Import
-            </Button>
-          )}
-          {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
-              <Plus className="h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -82,13 +61,12 @@ export function KasTable({ data, onEdit, onDelete, onAdd, onImport }: Props) {
               <TableHead>
                 <SortableHeader title="Jenis" sortKey="type" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
                   Tidak ada data
                 </TableCell>
               </TableRow>
@@ -98,21 +76,6 @@ export function KasTable({ data, onEdit, onDelete, onAdd, onImport }: Props) {
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
                   <TableCell className="text-slate-700">{item.description}</TableCell>
                   <TableCell className="text-slate-700">{item.type === 'cash' ? 'Cash' : 'Bank'}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(item)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
                 </TableRow>
               ))
             )}
