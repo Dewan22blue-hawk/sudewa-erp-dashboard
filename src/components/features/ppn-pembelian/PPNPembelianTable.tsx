@@ -58,11 +58,11 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
   const canGoNext = isTotalExact ? page < meta.lastPage : hasNextPage;
   const pageNumbers = isTotalExact
     ? Array.from({ length: Math.min(5, meta.lastPage) }, (_, index) => {
-        if (meta.lastPage <= 5) return index + 1;
-        if (page <= 3) return index + 1;
-        if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
-        return page - 2 + index;
-      })
+      if (meta.lastPage <= 5) return index + 1;
+      if (page <= 3) return index + 1;
+      if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
+      return page - 2 + index;
+    })
     : [page];
 
   return (
@@ -89,7 +89,7 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
                 <SortableHeader title="Tanggal FP" sortKey="fp_date" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="Usia NSFP" sortKey="nsfp_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+                <SortableHeader title="Masa NSFP" sortKey="nsfp_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
               </th>
               <th className="py-2 text-left">
                 <SortableHeader title="Input NSFP" sortKey="nsfp_input" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />

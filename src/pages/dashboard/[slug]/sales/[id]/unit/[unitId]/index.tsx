@@ -366,7 +366,7 @@ export default function SalesUnitDetailPage() {
           <CardContent className="space-y-4 p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-lg font-semibold">Assign Stock Unit</h3>
+                <h3 className="text-lg font-semibold">Detail Penjualan Unit</h3>
                 <p className="text-sm text-muted-foreground">Pilih stock unit dari warehouse, bukan input manual detail unit</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -376,9 +376,9 @@ export default function SalesUnitDetailPage() {
                   disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending}
                   onClick={handleAssignStock}
                 >
-                  {assignMutation.isPending ? 'Assigning...' : `Assign Stock (${selectedCount}/${requiredQty})`}
+                  {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}
                 </Button>
-                <Button
+                {/* <Button
                   size="sm"
                   variant="outline"
                   disabled={!canMoveToOutbound || updateStateMutation.isPending || dispatchMutation.isPending}
@@ -393,11 +393,11 @@ export default function SalesUnitDetailPage() {
                   onClick={handleDispatch}
                 >
                   {dispatchMutation.isPending ? 'Dispatching...' : 'Dispatch Stock'}
-                </Button>
+                </Button> */}
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            {/* <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
               <span className="text-muted-foreground">
                 State: <span className="font-medium text-foreground">{stockState}</span>
               </span>
@@ -427,7 +427,7 @@ export default function SalesUnitDetailPage() {
               {hasPendingSelectionChanges && (
                 <span className="text-amber-600">Ada perubahan pilihan yang belum di-assign. Klik tombol Assign Stock untuk menyimpan.</span>
               )}
-            </div>
+            </div> */}
 
             <StockPickerTable
               units={pickerRows}

@@ -15,7 +15,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { SalesItem } from "../sales.data"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 
 const paymentSchema = z.object({
@@ -45,6 +45,8 @@ function formatMoney(amount: number) {
 }
 
 export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
+    const [tanggalBayar, setTanggalBayar] = useState('')
+
     const form = useForm<PaymentFormData>({
         resolver: zodResolver(paymentSchema),
         defaultValues: {
@@ -99,7 +101,12 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
 
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="col-span-1">Tanggal</Label>
-                                <Input className="col-span-2 bg-muted/50" readOnly value={salesData.tanggal} />
+                                <Input
+                                    type="date"
+                                    className="col-span-2"
+                                    value={tanggalBayar}
+                                    onChange={(e) => setTanggalBayar(e.target.value)}
+                                />
                             </div>
                             <div className="grid grid-cols-3 items-center gap-4">
                                 <Label className="col-span-1">Total Bayar</Label>
@@ -168,7 +175,7 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
                                 name="paymentCash"
                                 render={({ field }) => (
                                     <FormItem className="grid grid-cols-3 items-center gap-4 space-y-0">
-                                        <FormLabel className="col-span-1">Cash</FormLabel>
+                                        <FormLabel className="col-span-1">CASH IDR</FormLabel>
                                         <FormControl>
                                             <MoneyInput
                                                 className="col-span-2"
