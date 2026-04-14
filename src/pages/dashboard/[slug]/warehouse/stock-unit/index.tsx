@@ -1,30 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import StockUnitTable from '@/components/features/stock-unit/StockUnitTable';
-import StockStatusFilterModal from '@/components/features/stock-unit/StockStatusFilterModal';
+import StockUnitFilterTabs from '@/components/features/stock-unit/StockUnitFilterTabs';
 import { useStockUnits } from '@/hooks/useStockUnit';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Filter, X } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import type { StockStatus } from '@/@types/stock-unit.types';
-
-const statusDisplayNames: Record<string, string> = {
-  all: 'Semua Status',
-  draft: 'Draf',
-  cancel: 'Batal',
-  rejected: 'Ditolak',
-  prepare: 'Persiapan',
-  inbound_purcase_order: 'Inbound Pesanan Pembelian',
-  inbound_incoming_goods: 'Inbound Barang Masuk',
-  inbound_receipt: 'Inbound Penerimaan',
-  inbound_return: 'Inbound Retur',
-  outbound_reserved: 'Outbound Dipesan',
-  outbound_in_transit: 'Outbound Dalam Pengiriman',
-  outbound_delivered: 'Outbound Terkirim',
-  outbound_return: 'Outbound Retur',
-};
 
 export default function StockUnitPage() {
   const { companyId } = useCompany();
@@ -32,17 +13,15 @@ export default function StockUnitPage() {
   const [search, setSearch] = useState('');
   // State for the hook's parameters
   const [hookPage, setHookPage] = useState(1);
-  const [hookPerPage, setHookPerPage] = useState(10);
-  const [stockState, setStockState] = useState<string | undefined>(undefined);
-  const [machineNumber, setMachineNumber] = useState<string | undefined>(undefined);
-  const [chassisNumber, setChassisNumber] = useState<string | undefined>(undefined);
-  const [color, setColor] = useState<string | undefined>(undefined);
-
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [hookPerPage, setHookPerPage] = useState(25);
+  const [stockState, setStockState] = useState<StockStatus | undefined>(undefined);
+  const [machineNumber] = useState<string | undefined>(undefined);
+  const [chassisNumber] = useState<string | undefined>(undefined);
+  const [color] = useState<string | undefined>(undefined);
 
   const params = useMemo(() => ({
     page: hookPage,
-    per_page: hookPerPage, // Changed 'perPage' to 'per_page'
+    perPage: hookPerPage,
     search,
     stock_state: stockState,
     machine_number: machineNumber,
@@ -54,13 +33,13 @@ export default function StockUnitPage() {
 
   // State for the table's pagination display, derived from hook data
   const [tablePage, setTablePage] = useState(1);
-  const [tablePerPage, setTablePerPage] = useState(10);
+  const [tablePerPage, setTablePerPage] = useState(25);
   const [tableTotalData, setTableTotalData] = useState(0);
 
   useEffect(() => {
     if (data) {
       setTablePage(data.meta?.currentPage || 1);
-      setTablePerPage(data.meta?.perPage || 10);
+      setTablePerPage(data.meta?.perPage || 25);
       setTableTotalData(data.meta?.total || 0);
     }
   }, [data]);
@@ -107,37 +86,23 @@ export default function StockUnitPage() {
       <div className="space-y-6">
         <PanelName />
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            {stockState && (
-              <Badge variant="secondary" className="pl-3 pr-1 py-1 rounded-full flex items-center gap-1">
-                <span className="font-normal text-muted-foreground">Status:</span> {statusDisplayNames[stockState]}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-auto w-auto p-0.5 rounded-full"
-                  onClick={() => {
-                    setStockState(undefined);
-                    setHookPage(1); // Reset hook page when filter is cleared
-                  }}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-          </div>
-
-          <Button variant="outline" onClick={() => setIsFilterModalOpen(true)}>
-            <Filter className="mr-2 h-4 w-4" /> Filter Status
-          </Button>
-        </div>
-
         <StockUnitTable
           data={data?.data || []}
           isLoading={isLoading}
           page={tablePage} // Pass tablePage state
           perPage={tablePerPage} // Pass tablePerPage state
           totalData={tableTotalData} // Pass tableTotalData state
+          statusTabs={(
+            <StockUnitFilterTabs
+              active={(stockState as StockStatus) ?? 'all'}
+              onChange={(value) => {
+                const nextStatus = value === 'all' ? undefined : value;
+                setStockState(nextStatus);
+                setHookPage(1);
+                setTablePage(1);
+              }}
+            />
+          )}
           onPageChange={(p) => {
             setHookPage(p); // Update hook's page state
             setTablePage(p); // Update table's page state
@@ -154,39 +119,8 @@ export default function StockUnitPage() {
             setHookPage(1); // Reset hook page when search changes
             setTablePage(1); // Reset table's page state
           }}
-          onStockStateChange={(s) => {
-            setStockState(s);
-            setHookPage(1); // Reset hook page when status filter changes
-            setTablePage(1); // Reset table's page state
-          }}
-          onMachineNumberChange={(mn) => {
-            setMachineNumber(mn);
-            setHookPage(1); // Reset hook page for other filters too
-            setTablePage(1);
-          }}
-          onChassisNumberChange={(cn) => {
-            setChassisNumber(cn);
-            setHookPage(1);
-            setTablePage(1);
-          }}
-          onColorChange={(c) => {
-            setColor(c);
-            setHookPage(1);
-            setTablePage(1);
-          }}
         />
       </div>
-
-      <StockStatusFilterModal
-        isOpen={isFilterModalOpen}
-        onClose={() => setIsFilterModalOpen(false)}
-        activeStatus={stockState as any}
-        onSelectStatus={(status) => {
-          setStockState(status);
-          setHookPage(1); // Reset hook page when status filter changes
-          setTablePage(1); // Reset table's page state
-        }}
-      />
     </DashboardLayout>
   );
 }
