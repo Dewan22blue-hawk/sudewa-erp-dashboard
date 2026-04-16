@@ -1,12 +1,12 @@
-import type { Vendor, VendorListResponse, VendorPayload } from '@/@types/vendor.types';
+import type { Material, MaterialListResponse, MaterialPayload } from '@/@types/material.types';
 import type { PaginationParams } from '@/@types/pagination.types';
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
 import { ApiResponseError, LaravelApiResponse, ensureSuccess, toPaginatedResult, ApiValidationError } from '@/lib/api/response';
 
-const basePath = '/wapi/master-data/vendor';
+const basePath = '/wapi/master-data/material';
 
-export const getVendors = async (params: PaginationParams & { search?: string }): Promise<VendorListResponse> => {
+export const getMaterials = async (params: PaginationParams & { search?: string }): Promise<MaterialListResponse> => {
     const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
         params: buildLaravelPaginationQuery(params),
     });
@@ -24,64 +24,38 @@ export const getVendors = async (params: PaginationParams & { search?: string })
         (item: any) => ({
             id: item.id,
             uuid: item.uuid,
-            picName: item.pic_name || '',
             code: item.code || '',
-            type: item.type || '',
             name: item.name || '',
-            address: item.address || '',
-            npwp: item.npwp || '',
-            phone: item.phone || '',
-            identityNumber: item.identity_number,
-            driveLicenseIdentityNumber: item.drive_license_identity_number,
-            image: item.image,
-            mapLink: item.map_link,
-            socialMedia1Link: item.social_media_1_link,
-            socialMedia2Link: item.social_media_2_link,
-            socialMedia3Link: item.social_media_3_link,
-            socialMedia4Link: item.social_media_4_link,
-            websiteLink: item.website_link,
+            price: Number(item.price) || 0,
+            type: item.type || '',
             createdAt: item.created_at,
             updatedAt: item.updated_at,
         }),
     );
 };
 
-export const getVendorById = async (id: string | number): Promise<Vendor> => {
+export const getMaterialById = async (id: string | number): Promise<Material> => {
     const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/${id}`);
     const data = ensureSuccess(response.data);
     
     return {
         id: data.id,
         uuid: data.uuid,
-        picName: data.pic_name || '',
         code: data.code || '',
-        type: data.type || '',
         name: data.name || '',
-        address: data.address || '',
-        npwp: data.npwp || '',
-        phone: data.phone || '',
-        identityNumber: data.identity_number,
-        driveLicenseIdentityNumber: data.drive_license_identity_number,
-        image: data.image,
-        mapLink: data.map_link,
-        socialMedia1Link: data.social_media_1_link,
-        socialMedia2Link: data.social_media_2_link,
-        socialMedia3Link: data.social_media_3_link,
-        socialMedia4Link: data.social_media_4_link,
-        websiteLink: data.website_link,
+        price: Number(data.price) || 0,
+        type: data.type || '',
         createdAt: data.created_at,
         updatedAt: data.updated_at,
     };
 };
 
-export const createVendor = async (data: Partial<VendorPayload>): Promise<void> => {
+export const createMaterial = async (data: Partial<MaterialPayload>): Promise<void> => {
     const formData = new FormData();
-    if (data.companyId) formData.append('company_id', String(data.companyId));
+    if (data.code) formData.append('code', data.code);
     if (data.name) formData.append('name', data.name);
-    if (data.address) formData.append('address', data.address);
-    if (data.phone) formData.append('phone', data.phone);
-    if (data.npwp) formData.append('npwp', data.npwp); // Backend will ignore if empty string because it expects 15 char if present, but since we provide form-data, we shouldn't append if it's undefined
-    if (data.picName) formData.append('pic_name', data.picName);
+    if (data.price !== undefined) formData.append('price', String(data.price));
+    if (data.type) formData.append('type', data.type);
 
     try {
         const response = await apiClient.post<LaravelApiResponse<any>>(basePath, formData, {
@@ -92,7 +66,7 @@ export const createVendor = async (data: Partial<VendorPayload>): Promise<void> 
 
         const payload = response.data;
         if (!payload.status) {
-            throw new ApiResponseError(payload.message ?? 'Failed to create vendor');
+            throw new ApiResponseError(payload.message ?? 'Failed to create material');
         }
     } catch (error) {
         if (error instanceof ApiValidationError) throw error;
@@ -100,15 +74,13 @@ export const createVendor = async (data: Partial<VendorPayload>): Promise<void> 
     }
 };
 
-export const updateVendor = async (id: string | number, data: Partial<VendorPayload>): Promise<void> => {
+export const updateMaterial = async (id: string | number, data: Partial<MaterialPayload>): Promise<void> => {
     const formData = new FormData();
-    formData.append('_method', 'PUT');
-    if (data.companyId) formData.append('company_id', String(data.companyId));
+    formData.append('_method', 'PUT'); // Spoofing PUT for safe Form-Data handling in laravel
+    if (data.code) formData.append('code', data.code);
     if (data.name) formData.append('name', data.name);
-    if (data.address) formData.append('address', data.address);
-    if (data.phone) formData.append('phone', data.phone);
-    if (data.npwp) formData.append('npwp', data.npwp);
-    if (data.picName) formData.append('pic_name', data.picName);
+    if (data.price !== undefined) formData.append('price', String(data.price));
+    if (data.type) formData.append('type', data.type);
 
     try {
         const response = await apiClient.post<LaravelApiResponse<any>>(`${basePath}/${id}`, formData, {
@@ -119,7 +91,7 @@ export const updateVendor = async (id: string | number, data: Partial<VendorPayl
 
         const payload = response.data;
         if (!payload.status) {
-            throw new ApiResponseError(payload.message ?? 'Failed to update vendor');
+            throw new ApiResponseError(payload.message ?? 'Failed to update material');
         }
     } catch (error) {
         if (error instanceof ApiValidationError) throw error;
@@ -127,20 +99,20 @@ export const updateVendor = async (id: string | number, data: Partial<VendorPayl
     }
 };
 
-export const deleteVendor = async (id: string | number): Promise<void> => {
+export const deleteMaterial = async (id: string | number): Promise<void> => {
     const response = await apiClient.delete<LaravelApiResponse<any>>(`${basePath}/${id}`);
     
     const payload = response.data;
     if (!payload.status) {
-        throw new ApiResponseError(payload.message ?? 'Failed to delete vendor');
+        throw new ApiResponseError(payload.message ?? 'Failed to delete material');
     }
 };
 
-export const importVendor = async (companyId: string | number, file: File): Promise<void> => {
+export const importMaterial = async (file: File): Promise<void> => {
     const body = new FormData();
     body.append('file', file);
 
-    const response = await apiClient.post(`${basePath}/${companyId}/import`, body, {
+    const response = await apiClient.post(`${basePath}/import`, body, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -148,11 +120,11 @@ export const importVendor = async (companyId: string | number, file: File): Prom
 
     const payload = response.data as LaravelApiResponse<null>;
     if (!payload.status) {
-        throw new ApiResponseError(payload.message ?? 'Failed to import vendor');
+        throw new ApiResponseError(payload.message ?? 'Failed to import material');
     }
 };
 
-export const exportVendor = async (): Promise<void> => {
+export const exportMaterial = async (): Promise<void> => {
     const response = await apiClient.get(`${basePath}/export`, {
         responseType: 'blob',
     });
@@ -171,7 +143,7 @@ export const exportVendor = async (): Promise<void> => {
     link.href = url;
     
     const timestamp = new Date().getTime();
-    link.setAttribute('download', `Vendor_${timestamp}.xlsx`);
+    link.setAttribute('download', `Material_${timestamp}.xlsx`);
     
     document.body.appendChild(link);
     link.click();

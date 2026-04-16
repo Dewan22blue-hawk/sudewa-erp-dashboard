@@ -50,8 +50,15 @@ export default function SalesUnitDetailPage() {
   const router = useRouter();
   const { id, unitId, slug } = router.query;
 
-  const salesId = Array.isArray(id) ? id[0] : id;
-  const selectedUnitId = Array.isArray(unitId) ? unitId[0] : unitId;
+  const pathParts = String(router.asPath ?? '')
+    .split('?')[0]
+    .split('/')
+    .filter(Boolean);
+  const fallbackSalesId = pathParts[3];
+  const fallbackUnitId = pathParts[5];
+
+  const salesId = (Array.isArray(id) ? id[0] : id) ?? fallbackSalesId;
+  const selectedUnitId = (Array.isArray(unitId) ? unitId[0] : unitId) ?? fallbackUnitId;
 
   const {
     data: salesData,
@@ -59,7 +66,33 @@ export default function SalesUnitDetailPage() {
     isError: salesError,
   } = useSalesDetail(salesId);
 
+  const fallbackUnitItemFromSales = useMemo(() => {
+    const rows = salesData?.raw?.unit_transaction_items ?? [];
+    const hit = rows.find((item) => String(item?.id ?? '') === String(selectedUnitId ?? ''));
+    if (!hit) return null;
+
+    return {
+      id: String(hit.id ?? ''),
+      unit_transaction_id: String(salesId ?? ''),
+      unit_type_id: String(hit.unit_type_id ?? ''),
+      qty_total: Number(hit.qty_total ?? 0),
+      unit_transaction_item_details: (hit.unit_transaction_item_details ?? []).map((detail) => ({
+        id: Number(detail?.id ?? 0),
+        color: String(detail?.color ?? '-'),
+        machine_number: String(detail?.machine_number ?? '-'),
+        chassis_number: String(detail?.chassis_number ?? '-'),
+        in_stock: true,
+      })),
+      unit_transaction_item_sales: (hit.unit_transaction_item_sales ?? []).map((item) => ({
+        id: Number(item?.id ?? 0),
+        unit_transaction_item_id: Number(hit.id ?? 0),
+        unit_transaction_item_detail_id: Number(item?.unit_transaction_item_detail_id ?? 0),
+      })),
+    };
+  }, [salesData?.raw?.unit_transaction_items, selectedUnitId, salesId]);
+
   const companyId = String(salesData?.raw?.company_id ?? '1');
+  const fallbackUnitTypeId = String(fallbackUnitItemFromSales?.unit_type_id ?? '');
 
   const {
     unitItem,
@@ -69,7 +102,9 @@ export default function SalesUnitDetailPage() {
     isUnitItemError,
     isStockError,
     stockError,
-  } = useStockUnits(selectedUnitId, { companyId });
+  } = useStockUnits(selectedUnitId, { companyId, unitTypeIdFallback: fallbackUnitTypeId });
+
+  const effectiveUnitItem = unitItem ?? fallbackUnitItemFromSales;
 
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,10 +115,10 @@ export default function SalesUnitDetailPage() {
   const dispatchMutation = useDispatchStockLifecycle();
   const updateStateMutation = useUpdateUnitTransactionState();
 
-  const requiredQty = Number(unitItem?.qty_total ?? 0);
+  const requiredQty = Number(effectiveUnitItem?.qty_total ?? 0);
 
   const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
-    const mappedFromItemDetails = (unitItem?.unit_transaction_item_details ?? []).map((detail) => ({
+    const mappedFromItemDetails = (effectiveUnitItem?.unit_transaction_item_details ?? []).map((detail) => ({
       id: toNumberId(detail?.id),
       color: String(detail?.color ?? '-'),
       machine_number: String(detail?.machine_number ?? '-'),
@@ -99,7 +134,7 @@ export default function SalesUnitDetailPage() {
       detailLookup.set(detail.id, detail);
     });
 
-    const assignedBySales = (unitItem?.unit_transaction_item_sales ?? [])
+    const assignedBySales = (effectiveUnitItem?.unit_transaction_item_sales ?? [])
       .map((row) => toNumberId(row?.unit_transaction_item_detail_id))
       .filter((detailId) => detailId > 0)
       .map((detailId) =>
@@ -117,7 +152,7 @@ export default function SalesUnitDetailPage() {
     }
 
     return mappedFromItemDetails;
-  }, [stockUnits, unitItem?.unit_transaction_item_details, unitItem?.unit_transaction_item_sales]);
+  }, [stockUnits, effectiveUnitItem?.unit_transaction_item_details, effectiveUnitItem?.unit_transaction_item_sales]);
 
   const assignedIds = useMemo(() => {
     return assignedDetailRows.map((item) => item.id).filter((item) => item > 0);
@@ -140,12 +175,21 @@ export default function SalesUnitDetailPage() {
   }, [stockUnits, assignedDetailRows]);
 
   useEffect(() => {
-    if (assignedIds.length === 0) {
-      setSelectedIds(new Set());
-      return;
-    }
+    const next = new Set(assignedIds);
+    setSelectedIds((prev) => {
+      if (prev.size === next.size) {
+        let isSame = true;
+        for (const id of prev) {
+          if (!next.has(id)) {
+            isSame = false;
+            break;
+          }
+        }
+        if (isSame) return prev;
+      }
 
-    setSelectedIds(new Set(assignedIds));
+      return next;
+    });
   }, [assignedIds]);
 
   useEffect(() => {
@@ -177,8 +221,8 @@ export default function SalesUnitDetailPage() {
     return false;
   }, [selectedIds, assignedIds]);
 
-  const selectedFromSalesCount = Array.isArray(unitItem?.unit_transaction_item_sales) ? unitItem.unit_transaction_item_sales.length : 0;
-  const selectedFromDetailCount = Array.isArray(unitItem?.unit_transaction_item_details) ? unitItem.unit_transaction_item_details.length : 0;
+  const selectedFromSalesCount = Array.isArray(effectiveUnitItem?.unit_transaction_item_sales) ? effectiveUnitItem.unit_transaction_item_sales.length : 0;
+  const selectedFromDetailCount = Array.isArray(effectiveUnitItem?.unit_transaction_item_details) ? effectiveUnitItem.unit_transaction_item_details.length : 0;
 
   const canAssignStock = requiredQty > 0 && selectedCount === requiredQty;
   const canMoveToOutbound = allItemsAssigned && stockState === 'draft';
@@ -191,6 +235,7 @@ export default function SalesUnitDetailPage() {
   const salesCode = salesData?.raw?.code ?? '-';
   const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
   const salesPath = slugValue ? `/dashboard/${slugValue}/sales` : '/sales';
+  const hasRequiredRouteParams = Boolean(salesId && selectedUnitId);
 
   const toggleOne = (stockId: number, checked: boolean) => {
     setSelectedIds((prev) => {
@@ -319,6 +364,27 @@ export default function SalesUnitDetailPage() {
     }
   };
 
+  if (!router.isReady && !hasRequiredRouteParams) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!hasRequiredRouteParams) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
+          <p className="text-muted-foreground">URL detail penjualan tidak valid</p>
+          <Button onClick={() => router.push(salesPath)}>Kembali ke List Penjualan</Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   if (salesLoading || isUnitItemLoading) {
     return (
       <DashboardLayout>
@@ -329,7 +395,7 @@ export default function SalesUnitDetailPage() {
     );
   }
 
-  if (salesError || !salesData?.ui || !salesData?.raw || isUnitItemError || !unitItem) {
+  if (salesError || !salesData?.ui || !salesData?.raw || (isUnitItemError && !fallbackUnitItemFromSales) || !effectiveUnitItem) {
     return (
       <DashboardLayout>
         <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
@@ -370,14 +436,6 @@ export default function SalesUnitDetailPage() {
                 <p className="text-sm text-muted-foreground">Pilih stock unit dari warehouse, bukan input manual detail unit</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  size="sm"
-                  className="bg-slate-900 text-white hover:bg-slate-800"
-                  disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending}
-                  onClick={handleAssignStock}
-                >
-                  {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}
-                </Button>
                 {/* <Button
                   size="sm"
                   variant="outline"
@@ -428,6 +486,7 @@ export default function SalesUnitDetailPage() {
                 <span className="text-amber-600">Ada perubahan pilihan yang belum di-assign. Klik tombol Assign Stock untuk menyimpan.</span>
               )}
             </div> */}
+            
 
             <StockPickerTable
               units={pickerRows}
@@ -441,6 +500,16 @@ export default function SalesUnitDetailPage() {
               isLoading={isStockLoading}
               isError={isStockError}
               searchValue={search}
+              searchAction={(
+                <Button
+                  size="sm"
+                  className="bg-slate-900 text-white hover:bg-slate-800"
+                  disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending}
+                  onClick={handleAssignStock}
+                >
+                  {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}
+                </Button>
+              )}
               onSearchChange={(value) => {
                 setSearch(value);
                 setCurrentPage(1);

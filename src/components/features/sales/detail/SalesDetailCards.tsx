@@ -84,7 +84,7 @@ export function SalesDetailCards({ data }: Props) {
               <span className="font-medium">{formatCurrency(totalPpn)}</span>
             </div>
             <div className="pt-4 mt-auto border-t flex justify-between items-center">
-              <span className="font-medium">Total Pembelian</span>
+              <span className="font-medium">Total Penjualan</span>
               <span className="font-bold text-lg">{formatCurrency(data.totalJual)}</span>
             </div>
           </div>

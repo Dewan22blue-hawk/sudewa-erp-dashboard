@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import type { Dealer } from '@/@types/dealer.types';
+import type { Region } from '@/@types/region.types';
 
-interface DealerTableProps {
-    dealers: Dealer[];
+interface RegionTableProps {
+    regions: Region[];
     search: string;
     onSearchChange: (value: string) => void;
     page: number;
@@ -20,14 +20,13 @@ interface DealerTableProps {
     onAdd: () => void;
     onImport?: () => void;
     onExport?: () => void;
-    onEdit: (dealer: Dealer) => void;
-    onDelete: (dealer: Dealer) => void;
+    onEdit: (region: Region) => void;
+    onDelete: (region: Region) => void;
     isExporting?: boolean;
 }
 
-
-export function DealerTable({
-    dealers,
+export function RegionTable({
+    regions,
     search,
     onSearchChange,
     page,
@@ -41,11 +40,57 @@ export function DealerTable({
     onEdit,
     onDelete,
     isExporting = false,
-}: DealerTableProps) {
+}: RegionTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
     const startData = (page - 1) * perPage + 1;
     const endData = Math.min(page * perPage, totalData);
+
+    const renderPaginationNumbers = () => {
+        if (totalPages <= 7) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                    key={p}
+                    variant={p === page ? "outline" : "ghost"}
+                    size="sm"
+                    onClick={() => onPageChange(p)}
+                    className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                >
+                    {p}
+                </Button>
+            ));
+        }
+
+        const pages = [];
+        if (page <= 3) {
+            for (let i = 1; i <= 4; i++) pages.push(i);
+            pages.push('...');
+            pages.push(totalPages);
+        } else if (page >= totalPages - 2) {
+            pages.push(1);
+            pages.push('...');
+            for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            pages.push('...');
+            pages.push(page - 1, page, page + 1);
+            pages.push('...');
+            pages.push(totalPages);
+        }
+
+        return pages.map((p, idx) => (
+            <Button
+                key={idx}
+                variant={p === page ? "outline" : "ghost"}
+                size="sm"
+                disabled={p === '...'}
+                onClick={() => typeof p === 'number' && onPageChange(p)}
+                className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+            >
+                {p}
+            </Button>
+        ));
+    };
 
     return (
         <div className="space-y-4">
@@ -101,39 +146,26 @@ export function DealerTable({
                         Tambah
                     </Button>
                 </div>
-
             </div>
 
             <Card className="rounded-xl overflow-hidden border border-gray-200">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">KODE DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[25%] uppercase px-4 py-3">NAMA DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">ALAMAT</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PIC</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">HANDPHONE</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">KODE WILAYAH</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[60%] uppercase px-4 py-3">NAMA WILAYAH</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {dealers.length > 0 ? (
-                            dealers.map((dealer) => (
-                                <TableRow key={dealer.id} className="hover:bg-gray-50/50">
+                        {regions.length > 0 ? (
+                            regions.map((region) => (
+                                <TableRow key={region.uuid} className="hover:bg-gray-50/50">
                                     <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        {dealer.code || '-'}
+                                        {region.code || '-'}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 truncate">
-                                        {dealer.namaDealer}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        <span className="line-clamp-2">{dealer.alamat || '-'}</span>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        {dealer.pic || '-'}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        {dealer.handphone || '-'}
+                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 truncate uppercase">
+                                        {region.name}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-center">
                                         <DropdownMenu>
@@ -143,10 +175,10 @@ export function DealerTable({
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-[160px]">
-                                                <DropdownMenuItem onClick={() => onEdit(dealer)} className="cursor-pointer">
+                                                <DropdownMenuItem onClick={() => onEdit(region)} className="cursor-pointer">
                                                     Edit
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => onDelete(dealer)} className="text-red-600 cursor-pointer focus:text-red-600">
+                                                <DropdownMenuItem onClick={() => onDelete(region)} className="text-red-600 cursor-pointer focus:text-red-600">
                                                     Hapus
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -156,8 +188,8 @@ export function DealerTable({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-32 text-center text-gray-500">
-                                    Tidak ada data dealer ditemukan
+                                <TableCell colSpan={3} className="h-32 text-center text-gray-500">
+                                    Tidak ada data wilayah ditemukan
                                 </TableCell>
                             </TableRow>
                         )}
@@ -181,18 +213,8 @@ export function DealerTable({
                         >
                             Previous
                         </Button>
-
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                            <Button
-                                key={p}
-                                variant={p === page ? "outline" : "ghost"}
-                                size="sm"
-                                onClick={() => onPageChange(p)}
-                                className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
-                            >
-                                {p}
-                            </Button>
-                        ))}
+                        
+                        {renderPaginationNumbers()}
 
                         <Button
                             variant="ghost"

@@ -22,11 +22,11 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             children: [
                 {
                     label: 'Dealer',
-                    href: base('/dealer'),
+                    href: base('/master/dealer'),
                 },
                 {
                     label: 'Wilayah',
-                    href: base('/wilayah'),
+                    href: base('/master/wilayah'),
                 },
                 {
                     label: 'BBN',
@@ -34,12 +34,20 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 },
                 {
                     label: 'Material',
-                    href: base('/material'),
+                    href: base('/master/material'),
                 },
                 {
                     label: 'Vendor',
-                    href: base('/vendor'),
+                    href: base('/master/vendor'),
                 },
+                {
+                    label: 'Aset',
+                    href: base('/master/aset'),
+                },
+                {
+                    label: 'Biaya (BBN)',
+                    href: base('/master/bbn'),
+                }
             ],
         },
         {

@@ -207,6 +207,7 @@ export default function PaymentPage() {
       bca_usd: Number(existingBilling?.bca_payment_2 ?? 0),
       cash: Number(existingBilling?.cash_payment ?? 0),
       payment_date: existingBilling?.payment_date ? String(existingBilling.payment_date).slice(0, 10) : new Date().toISOString().slice(0, 10),
+      note: '',
     });
   }, [existingBilling?.bca_payment, existingBilling?.bca_payment_2, existingBilling?.cash_payment, existingBilling?.payment_date]);
 

@@ -17,18 +17,16 @@ interface DealerFormModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (data: DealerFormData) => void;
-    initialData?: DealerFormData | null;
 }
 
-export function DealerFormModal({ isOpen, onClose, onSave, initialData }: DealerFormModalProps) {
+export function DealerFormModal({ isOpen, onClose, onSave }: DealerFormModalProps) {
     const { register, handleSubmit, reset, formState: { errors } } = useForm<DealerFormData>({
         defaultValues: {
             namaDealer: '',
             alamat: '',
             pic: '',
             handphone: ''
-        },
-        values: initialData || { namaDealer: '', alamat: '', pic: '', handphone: '' }
+        }
     });
 
     useEffect(() => {
@@ -41,19 +39,16 @@ export function DealerFormModal({ isOpen, onClose, onSave, initialData }: Dealer
         onSave(data);
     };
 
-    const isEdit = !!initialData;
-
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{isEdit ? 'Edit Data Dealer' : 'Tambah Data Dealer'}</DialogTitle>
+                    <DialogTitle>Tambah Data Dealer</DialogTitle>
                     <DialogDescription>
-                        {isEdit ? 'Edit data dealer' : 'Masukkan detail dealer baru'}
+                        Masukkan detail dealer baru
                     </DialogDescription>
                 </DialogHeader>
-                {isOpen && (
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
                         <div className="space-y-2">
                             <Label htmlFor="namaDealer">Nama Dealer</Label>
                             <Input
@@ -104,7 +99,6 @@ export function DealerFormModal({ isOpen, onClose, onSave, initialData }: Dealer
                             <Button type="button" variant="outline" className="w-full" onClick={onClose}>Batal</Button>
                         </div>
                     </form>
-                )}
             </DialogContent>
         </Dialog>
     );
