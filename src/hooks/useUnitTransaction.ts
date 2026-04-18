@@ -63,3 +63,29 @@ export const useUpdateUnitTransactionState = () => {
     },
   });
 };
+
+export const useSubmitTransactionAdjustment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: { cashId: string; amount: number; description: string; itemDetailIds: string[] } }) =>
+      unitTransactionService.submitTransactionAdjustment(id, payload),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transaction-adjustments', variables.id] });
+    },
+  });
+};
+
+export const useTransactionAdjustments = (transactionId?: string) => {
+  return useQuery({
+    queryKey: ['transaction-adjustments', transactionId],
+    queryFn: () => unitTransactionService.getTransactionAdjustments(transactionId as string),
+    enabled: !!transactionId,
+    staleTime: 1000 * 60 * 2,
+  });
+};

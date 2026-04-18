@@ -51,6 +51,7 @@ type UnitTransactionApiModel = {
     remaining_payment?: number | string;
     is_paid?: boolean;
   } | null;
+  unit_transaction_adjustments?: any[];
 };
 
 type UnitTransactionItemListApiModel = {
@@ -388,6 +389,8 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
     unit_transaction_item_total_dpp: itemDpp || toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
     unit_transaction_item_total_ppn: itemPpn || toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
     unit_transaction_item_bruto_total: itemBruto,
+    unit_transaction_adjustments: item.unit_transaction_adjustments ?? [],
+    unit_transaction_items: item.unit_transaction_items ?? [],
   };
 };
 
@@ -490,4 +493,63 @@ export const unitTransactionService = {
       ({} as UnitTransactionApiModel);
     return mapUnitTransactionDetail(detailPayload);
   },
+
+  /**
+   * POST transaction-adjustment (Refund Pembelian)
+   * Endpoint: POST /wapi/transaction/unit-transaction/unit-transaction/{id}/transaction-adjustment
+   * Body (urlencoded): cash_id, amount, description
+   */
+  async submitTransactionAdjustment(
+    id: string,
+    payload: { cashId: string; amount: number; description: string; itemDetailIds: string[] },
+  ): Promise<void> {
+    const body = new URLSearchParams();
+    body.append('cash_id', payload.cashId);
+    body.append('amount', String(payload.amount));
+    body.append('description', payload.description);
+
+    if (payload.itemDetailIds && payload.itemDetailIds.length > 0) {
+      payload.itemDetailIds.forEach((detailId) => {
+        body.append('unit_transaction_item_details_ids[]', detailId);
+      });
+    }
+
+    await apiClient.post(`${strictBasePath}/${id}/transaction-adjustment`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+  },
+
+  /**
+   * GET transaction-adjustment list (History Refund)
+   * Endpoint: GET /wapi/transaction/unit-transaction/unit-transaction/{id}/transaction-adjustment
+   */
+  async getTransactionAdjustments(id: string): Promise<TransactionAdjustmentApiItem[]> {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<any>>(`${strictBasePath}/${id}/transaction-adjustment`);
+      const payload = ensureSuccess(response.data);
+      const rows: any[] = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
+      return rows.map((row: any) => ({
+        id: String(row.id ?? ''),
+        unit_transaction_id: String(row.unit_transaction_id ?? id),
+        cash_id: row.cash_id ? String(row.cash_id) : undefined,
+        amount: Number(row.amount ?? 0),
+        description: row.description ?? '-',
+        date: row.date ?? row.created_at ?? '',
+        created_at: row.created_at ?? '',
+      }));
+    } catch {
+      return [];
+    }
+  },
 };
+
+export type TransactionAdjustmentApiItem = {
+  id: string;
+  unit_transaction_id: string;
+  cash_id?: string;
+  amount: number;
+  description: string;
+  date?: string;
+  created_at?: string;
+};
+

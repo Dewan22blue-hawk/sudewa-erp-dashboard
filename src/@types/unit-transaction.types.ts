@@ -51,6 +51,8 @@ export interface UnitTransactionDetail {
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;
+  unit_transaction_adjustments?: any[];
+  unit_transaction_items?: any[];
 }
 
 export interface UnitTransactionItem {
@@ -116,10 +118,23 @@ export interface UnitTransactionItemSummary {
 export interface UnitTransactionItemDetail {
   id: string;
   unit_transaction_item_id: string;
+  unit_type_name?: string;
+  price?: number;
   color: string;
   machine_number: string;
   chassis_number: string;
   in_stock?: boolean;
+  status?: string;
+  created_at?: string;
+}
+
+export interface TransactionAdjustment {
+  id: string;
+  unit_transaction_id: string;
+  cash_id?: string;
+  amount: number;
+  description: string;
+  date?: string;
   created_at?: string;
 }
 
