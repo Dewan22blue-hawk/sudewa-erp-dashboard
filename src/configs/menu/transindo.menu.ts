@@ -40,6 +40,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Armada',
           href: base('/master/armada'),
         },
+        {
+          label: 'Aset',
+          href: base('/master/asset'),
+        },
       ],
     },
     {

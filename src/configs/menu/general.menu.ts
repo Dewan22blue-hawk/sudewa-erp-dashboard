@@ -58,6 +58,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'User',
           href: master('/user'),
         },
+        {
+          label: 'Aset',
+          href: master('/asset'),
+        },
       ],
     },
     {

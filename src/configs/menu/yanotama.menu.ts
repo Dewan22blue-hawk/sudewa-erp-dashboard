@@ -42,7 +42,7 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 },
                 {
                     label: 'Aset',
-                    href: base('/master/aset'),
+                    href: base('/master/asset'),
                 },
                 {
                     label: 'Biaya (BBN)',
