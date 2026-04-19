@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale/id';
-import { CalendarIcon, Wallet } from 'lucide-react';
+import { CalendarIcon, Save, Wallet } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -86,7 +87,6 @@ export function PurchasePaymentForm({
     const totalPaymentInput = paymentBca + paymentCash + paymentBca2;
 
     const projectedTotalPaid = useMemo(() => totalPaid + totalPaymentInput, [totalPaid, totalPaymentInput]);
-
     const projectedRemaining = Math.max(0, totalTagihan - projectedTotalPaid);
 
     useEffect(() => {
@@ -107,7 +107,6 @@ export function PurchasePaymentForm({
 
     const handleSubmit = async (values: PaymentFormData) => {
         await onSubmitPayment(values);
-
         resetForm();
     };
 
@@ -121,205 +120,256 @@ export function PurchasePaymentForm({
 
     return (
         <div className="space-y-6">
-            <div className="space-y-1">
-                <h2 className="text-xl font-semibold tracking-tight">Pembayaran Unit</h2>
-                <p className="text-xs text-muted-foreground">
-                    Kode Beli <span className="text-blue-500 font-medium">{purchaseCode}</span>
-                </p>
+            {/* Header */}
+            <div>
+                <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
+                <Separator className="my-4" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-xl border p-5">
-                <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Total Beli</p>
-                    <p className="text-base font-semibold">{formatCurrency(totalTagihan)}</p>
-                </div>
-                {/* <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Total Dibayar</p>
-                    <p className="text-base font-semibold">{formatCurrency(totalPaid)}</p>
-                </div> */}
-                <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Total PPN</p>
-                    <p className="text-base font-semibold">{formatCurrency(totalPpn)}</p>
-                </div>
-                <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Total Biaya</p>
-                    <p className="text-base font-semibold">{formatCurrency(remainingPayment)}</p>
-                </div>
-            </div>
-
-            {validationMessage && (
-                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-                    {validationMessage}
-                </div>
-            )}
-
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5 rounded-xl border p-5">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="bcaPayment"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>BCA USD</FormLabel>
-                                    <FormControl>
-                                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-
-
-                        <FormField
-                            control={form.control}
-                            name="bcaPayment2"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>BCA IDR</FormLabel>
-                                    <FormControl>
-                                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="cashPayment"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Cash IDR</FormLabel>
-                                    <FormControl>
-                                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={field.onChange} onBlur={field.onBlur} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+            <div className="space-y-6">
+                {/* ── Section: Biaya ── */}
+                <div className="rounded-lg border">
+                    <div className="border-b px-4 py-3">
+                        <h3 className="text-sm font-semibold text-muted-foreground">Biaya</h3>
                     </div>
+                    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Total Beli</p>
+                            <Input value={formatCurrency(totalTagihan)} disabled />
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Total PPN</p>
+                            <Input value={formatCurrency(totalPpn)} disabled />
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Total Biaya</p>
+                            <Input value={formatCurrency(remainingPayment)} disabled />
+                        </div>
+                    </div>
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="paymentDate"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Tanggal</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
+                {/* Validation warning */}
+                {validationMessage && (
+                    <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+                        {validationMessage}
+                    </div>
+                )}
+
+                {/* ── Section: Pembayaran ── */}
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+
+                        <div className="rounded-lg border">
+                            <div className="border-b px-4 py-3">
+                                <h3 className="text-sm font-semibold text-muted-foreground">Pembayaran</h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                                <FormField
+                                    control={form.control}
+                                    name="bcaPayment"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-2">
+                                            <FormLabel className="text-sm font-medium">BCA USD</FormLabel>
                                             <FormControl>
-                                                <Button variant="outline" className={cn('justify-start text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {field.value ? format(new Date(field.value), 'PPP', { locale: idLocale }) : 'Pilih tanggal'}
-                                                </Button>
+                                                <MoneyInput
+                                                    name={field.name}
+                                                    value={Number(field.value) || 0}
+                                                    onChangeValue={field.onChange}
+                                                    onBlur={field.onBlur}
+                                                />
                                             </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value ? new Date(field.value) : undefined}
-                                                onSelect={(date) => field.onChange(date ? date.toISOString().slice(0, 10) : '')}
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="space-y-2">
-                            <Label>Total Bayar</Label>
-                            <Input readOnly value={formatCurrency(totalPaymentInput)} />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="bcaPayment2"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-2">
+                                            <FormLabel className="text-sm font-medium">BCA IDR</FormLabel>
+                                            <FormControl>
+                                                <MoneyInput
+                                                    name={field.name}
+                                                    value={Number(field.value) || 0}
+                                                    onChangeValue={field.onChange}
+                                                    onBlur={field.onBlur}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="cashPayment"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-2">
+                                            <FormLabel className="text-sm font-medium">CASH IDR</FormLabel>
+                                            <FormControl>
+                                                <MoneyInput
+                                                    name={field.name}
+                                                    value={Number(field.value) || 0}
+                                                    onChangeValue={field.onChange}
+                                                    onBlur={field.onBlur}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>Kurang Bayar</Label>
-                            <Input readOnly value={formatCurrency(projectedRemaining)} />
-                        </div>
-                    </div>
-
-                    <FormField
-                        control={form.control}
-                        name="note"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Note</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Catatan pembayaran (opsional)" {...field} value={field.value ?? ''} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="isPaid"
-                        render={({ field }) => (
-                            <FormItem className="flex flex-row items-center gap-2 rounded-md border p-3 w-fit">
-                                <FormControl>
-                                    <Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(Boolean(checked))} />
-                                </FormControl>
-                                <div>
-                                    <FormLabel className="text-sm">Tandai Lunas</FormLabel>
+                        {/* ── Section: Invoice ── */}
+                        <div className="rounded-lg border">
+                            <div className="border-b px-4 py-3">
+                                <h3 className="text-sm font-semibold text-muted-foreground">Invoice</h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                                {/* Tanggal */}
+                                <FormField
+                                    control={form.control}
+                                    name="paymentDate"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-2">
+                                            <FormLabel className="text-sm font-medium">Tanggal</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="date"
+                                                    value={field.value}
+                                                    onChange={(e) => field.onChange(e.target.value)}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                {/* Total Bayar */}
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Total Bayar</p>
+                                    <Input value={formatCurrency(totalPaymentInput)} disabled />
                                 </div>
-                            </FormItem>
-                        )}
-                    />
+                                {/* Kurang Bayar */}
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Kurang Bayar</p>
+                                    <Input value={formatCurrency(projectedRemaining)} disabled />
+                                </div>
+                            </div>
+                        </div>
 
-                    <div className="flex justify-end gap-3">
-                        <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
-                            Kembali
-                        </Button>
-                        <Button type="submit" disabled={loading || !canSubmit} className="bg-[#00d05a] hover:bg-[#00ba51] text-white min-w-[140px]">
-                            <Wallet className="mr-2 h-4 w-4" />
-                            {loading ? 'Menyimpan...' : 'Simpan Payment'}
-                        </Button>
+                        {/* Note + Tandai Lunas */}
+                        <div className="rounded-lg border">
+                            <div className="border-b px-4 py-3">
+                                <h3 className="text-sm font-semibold text-muted-foreground">Catatan</h3>
+                            </div>
+                            <div className="flex flex-col gap-4 p-4 md:flex-row md:items-end">
+                                <FormField
+                                    control={form.control}
+                                    name="note"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1 space-y-2">
+                                            <FormLabel className="text-sm font-medium">Note</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Catatan pembayaran (opsional)"
+                                                    {...field}
+                                                    value={field.value ?? ''}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="isPaid"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center gap-2 rounded-md border px-4 py-3 w-fit">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                                                />
+                                            </FormControl>
+                                            <FormLabel className="text-sm cursor-pointer">Tandai Lunas</FormLabel>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Footer Buttons */}
+                        <div className="flex justify-end gap-3 pt-4">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={onCancel}
+                                disabled={loading}
+                            >
+                                Batal
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={loading || !canSubmit}
+                                className="bg-green-600 hover:bg-green-700 text-white min-w-[120px]"
+                            >
+                                {loading ? (
+                                    'Menyimpan...'
+                                ) : (
+                                    <>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        Bayar
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
+
+                {/* ── Section: Histori Pembayaran ── */}
+                <div className="rounded-lg border">
+                    <div className="border-b px-4 py-3">
+                        <h3 className="text-sm font-semibold text-muted-foreground">Histori Pembayaran</h3>
                     </div>
-                </form>
-            </Form>
-
-            <div className="rounded-xl border p-5 space-y-3">
-                <div>
-                    <h3 className="text-base font-semibold">Histori Pembayaran</h3>
-                    <p className="text-xs text-muted-foreground">Daftar transaksi pembayaran pada pembelian ini.</p>
-                </div>
-
-                <div className="rounded-md border overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Tanggal</TableHead>
-                                <TableHead>Metode</TableHead>
-                                <TableHead className="text-right">Jumlah</TableHead>
-                                <TableHead>Note</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {histories.length === 0 ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-20 text-center text-muted-foreground">
-                                        Belum ada histori pembayaran
-                                    </TableCell>
+                                    <TableHead>Tanggal</TableHead>
+                                    <TableHead>BCA IDR</TableHead>
+                                    <TableHead>BCA USD</TableHead>
+                                    <TableHead>Cash</TableHead>
+                                    <TableHead className="text-right">Total</TableHead>
+                                    <TableHead>Note</TableHead>
                                 </TableRow>
-                            ) : (
-                                histories.map((item) => {
-                                    const total = Number(item.bca_payment_amount ?? 0) + Number(item.cash_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0);
-                                    const methods = getPaymentMethods(item);
-                                    return (
-                                        <TableRow key={item.id}>
-                                            <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
-                                            <TableCell>{methods.length > 0 ? methods.join(', ') : '-'}</TableCell>
-                                            <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
-                                            <TableCell>{item.note || '-'}</TableCell>
-                                        </TableRow>
-                                    );
-                                })
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {histories.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+                                            Belum ada histori pembayaran
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    histories.map((item) => {
+                                        const total = Number(item.bca_payment_amount ?? 0) + Number(item.cash_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0);
+                                        const methods = getPaymentMethods(item);
+                                        return (
+                                            <TableRow key={item.id}>
+                                                <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
+                                                <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
+                                                <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
+                                                <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
+                                                <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
+                                                <TableCell>{item.note || '-'}</TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
             </div>
         </div>

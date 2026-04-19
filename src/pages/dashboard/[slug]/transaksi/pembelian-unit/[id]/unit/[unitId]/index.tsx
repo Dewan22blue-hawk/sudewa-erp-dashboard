@@ -68,11 +68,20 @@ export default function UnitPurchaseDetailPage() {
   const otherFee = Number(unitItem?.other_fee ?? 0);
   const expeditionFee = Number(unitItem?.expedition_fee ?? 0);
 
-  const hppPerUnit = Number(unitItem?.hpp_per_unit_price ?? price + (bbnPrice + expeditionFee + otherFee) / (qty || 1));
-  const dppPerUnit = Number(unitItem?.dpp_per_unit_price ?? unitItem?.dpp_total_price ?? hppPerUnit * qty) / (qty || 1);
-  const ppnPerUnit = Number(unitItem?.ppn_per_unit_price ?? unitItem?.ppn_total_price ?? dppPerUnit * qty * 0.11) / (qty || 1);
+  const fallbackHppPerUnit = price + (bbnPrice + expeditionFee + otherFee) / (qty || 1);
+  const hppPerUnitFromApi = Number(unitItem?.hpp_per_unit_price ?? 0);
+  const hppPerUnit = hppPerUnitFromApi > 0 ? hppPerUnitFromApi : fallbackHppPerUnit;
+  const totalHppFromApi = Number(unitItem?.hpp_total_price ?? 0);
+  const totalHpp = totalHppFromApi > 0 ? totalHppFromApi : hppPerUnit * (qty || 1);
+  const dppPerUnitFromApi = Number(unitItem?.dpp_per_unit_price ?? 0);
+  const dppPerUnit = dppPerUnitFromApi > 0
+    ? dppPerUnitFromApi
+    : Number(unitItem?.dpp_total_price ?? hppPerUnit * qty) / (qty || 1);
+  const ppnPerUnitFromApi = Number(unitItem?.ppn_per_unit_price ?? 0);
+  const ppnPerUnit = ppnPerUnitFromApi > 0
+    ? ppnPerUnitFromApi
+    : Number(unitItem?.ppn_total_price ?? dppPerUnit * qty * 0.11) / (qty || 1);
   const totalPembelian = price * qty;
-  const totalBiayaLainnya = bbnPrice + hppPerUnit + dppPerUnit + ppnPerUnit;
 
   const openCreateForm = () => {
     setEditingItem(null);
@@ -225,13 +234,21 @@ export default function UnitPurchaseDetailPage() {
                 <span>Harga Unit</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(price)}</span>
               </div>
+                            <div className="flex items-center justify-between text-sm text-slate-600">
+                <span>BBN</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(bbnPrice)}</span>
+              </div>
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>Quantity</span>
                 <span className="font-semibold text-slate-900">{qty}</span>
               </div>
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+              {/* <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total Pembelian</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(totalPembelian)}</span>
+              </div> */}
+                            <div className="flex items-center justify-between text-sm text-slate-600">
+                <span>Total HPP</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(totalHpp)}</span>
               </div>
             </CardContent>
           </Card>
@@ -244,14 +261,14 @@ export default function UnitPurchaseDetailPage() {
                 </div>
                 <h3 className="text-sm font-semibold text-slate-700">Rincian Biaya</h3>
               </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
+              {/* <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>BBN</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(bbnPrice)}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
+              </div> */}
+              {/* <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>HPP</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(hppPerUnit)}</span>
-              </div>
+              </div> */}
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>DPP</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(dppPerUnit)}</span>
@@ -260,9 +277,13 @@ export default function UnitPurchaseDetailPage() {
                 <span>PPN</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(ppnPerUnit)}</span>
               </div>
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+              {/* <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(totalBiayaLainnya)}</span>
+              </div> */}
+                            <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+                <span className="font-medium text-slate-700">Total Pembelian</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(totalPembelian)}</span>
               </div>
             </CardContent>
           </Card>

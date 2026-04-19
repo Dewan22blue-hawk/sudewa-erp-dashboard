@@ -112,6 +112,24 @@ const mapStockItem = (item: unknown): StockItem => {
   const unitType = (source.unit_type ?? {}) as Record<string, unknown>;
   const brand = (unitType.brand ?? {}) as Record<string, unknown>;
 
+  // person/supplier can live in multiple places depending on the API response:
+  // 1. source.person (string)
+  // 2. source.unit_transaction.person (string or object)
+  // 3. source.person.name (object with name)
+  const unitTx = (source.unit_transaction ?? {}) as Record<string, unknown>;
+  const personRaw =
+    source.person ??
+    unitTx.person ??
+    null;
+
+  let personName = '';
+  if (typeof personRaw === 'string' && personRaw.trim().length > 0) {
+    personName = personRaw;
+  } else if (personRaw && typeof personRaw === 'object') {
+    const personObj = personRaw as Record<string, unknown>;
+    personName = toString(personObj.name, '');
+  }
+
   return {
     id: toNumber(source.id),
     unit_type: {
@@ -128,35 +146,66 @@ const mapStockItem = (item: unknown): StockItem => {
     stock_available: toNumber(source.stock_available),
     stock_forecast: toNumber(source.stock_forecast),
     purchase_price: toNumber(source.purchase_price),
-    person: toString(source.person, ''),
+    person: personName,
   };
 };
 
-const mapOrderItem = (item: unknown, type: 'purchase' | 'sales'): OrderOutstandingItem => {
+const mapOrderItemToRows = (item: unknown, type: 'purchase' | 'sales'): OrderOutstandingItem[] => {
   const source = (item ?? {}) as Record<string, unknown>;
-  const unitType = source.unit_type;
+  const items = toArray(source.items) as Record<string, unknown>[];
 
+  const person = toString(source.person, '');
+  const supplier_name = toString(source.supplier_name, person);
+  const customer_name = toString(source.customer_name, person);
+  const code = toString(source.code);
+  const date = toString(source.date, '');
+
+  if (items.length > 0) {
+    return items.map((i) => {
+      const uType = (i.unit_type ?? {}) as Record<string, unknown>;
+      const unitTypeName = toString(uType.name);
+      const orderQty = toNumber(i.qty_input);
+      const actualQty = toNumber(i.qty_actual);
+      const diffQty = toNumber(i.qty_difference);
+
+      return {
+        code,
+        date,
+        supplier_name,
+        customer_name,
+        unit_type: unitTypeName,
+        order_qty: orderQty,
+        received_qty: type === 'purchase' ? actualQty : undefined,
+        delivered_qty: type === 'sales' ? actualQty : undefined,
+        remaining_qty: diffQty,
+      };
+    });
+  }
+
+  // Fallback: single row from flat fields
+  const unitType = source.unit_type;
   const orderQty = toNumber(source.order_qty);
   const receivedQty = toNumber(source.received_qty);
   const deliveredQty = toNumber(source.delivered_qty);
-
   const remainingQty =
     type === 'purchase' ? orderQty - receivedQty : orderQty - deliveredQty;
 
-  return {
-    code: toString(source.code),
-    date: toString(source.date, ''),
-    supplier_name: toString(source.supplier_name, ''),
-    customer_name: toString(source.customer_name, ''),
-    unit_type:
-      typeof unitType === 'string'
-        ? unitType
-        : toString((unitType as Record<string, unknown> | undefined)?.name),
-    order_qty: orderQty,
-    received_qty: receivedQty,
-    delivered_qty: deliveredQty,
-    remaining_qty: remainingQty,
-  };
+  return [
+    {
+      code,
+      date,
+      supplier_name,
+      customer_name,
+      unit_type:
+        typeof unitType === 'string'
+          ? unitType
+          : toString((unitType as Record<string, unknown> | undefined)?.name),
+      order_qty: orderQty,
+      received_qty: receivedQty,
+      delivered_qty: deliveredQty,
+      remaining_qty: remainingQty,
+    },
+  ];
 };
 
 export const getStockData = async (params: {
@@ -199,9 +248,22 @@ export const getPurchaseOrderOutstanding = async (params: {
     },
   });
 
-  return buildPaginatedResponse(response.data?.data ?? response.data, params.per_page ?? 50, (item) =>
-    mapOrderItem(item, 'purchase'),
-  );
+  const { rows, metaSource } = resolvePaginatedPayload(response.data?.data ?? response.data);
+  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item, 'purchase'));
+  const currentPage = toNumber(metaSource.current_page) || 1;
+  const perPage = toNumber(metaSource.per_page) || (params.per_page ?? 50);
+  const total = toNumber(metaSource.total) || rows.length;
+  const lastPage = toNumber(metaSource.last_page) || (total > 0 ? Math.ceil(total / perPage) : 1);
+
+  return {
+    current_page: currentPage,
+    data: flatRows,
+    last_page: lastPage,
+    per_page: perPage,
+    total,
+    from: toNumber(metaSource.from),
+    to: toNumber(metaSource.to),
+  };
 };
 
 export const getSalesOrderOutstanding = async (params: {
@@ -220,9 +282,22 @@ export const getSalesOrderOutstanding = async (params: {
     },
   });
 
-  return buildPaginatedResponse(response.data?.data ?? response.data, params.per_page ?? 50, (item) =>
-    mapOrderItem(item, 'sales'),
-  );
+  const { rows, metaSource } = resolvePaginatedPayload(response.data?.data ?? response.data);
+  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item, 'sales'));
+  const currentPage = toNumber(metaSource.current_page) || 1;
+  const perPage = toNumber(metaSource.per_page) || (params.per_page ?? 50);
+  const total = toNumber(metaSource.total) || rows.length;
+  const lastPage = toNumber(metaSource.last_page) || (total > 0 ? Math.ceil(total / perPage) : 1);
+
+  return {
+    current_page: currentPage,
+    data: flatRows,
+    last_page: lastPage,
+    per_page: perPage,
+    total,
+    from: toNumber(metaSource.from),
+    to: toNumber(metaSource.to),
+  };
 };
 
 export const getWarehouses = async (): Promise<WarehouseItem[]> => {

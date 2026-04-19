@@ -6,11 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { DealerFormData } from './DealerFormModal';
-
-export interface Dealer extends DealerFormData {
-    id: number;
-}
+import type { Dealer } from '@/@types/dealer.types';
 
 interface DealerTableProps {
     dealers: Dealer[];
@@ -23,8 +19,10 @@ interface DealerTableProps {
     onPerPageChange: (perPage: number) => void;
     onAdd: () => void;
     onImport?: () => void;
+    onExport?: () => void;
     onEdit: (dealer: Dealer) => void;
     onDelete: (dealer: Dealer) => void;
+    isExporting?: boolean;
 }
 
 
@@ -39,8 +37,10 @@ export function DealerTable({
     onPerPageChange,
     onAdd,
     onImport,
+    onExport,
     onEdit,
-    onDelete
+    onDelete,
+    isExporting = false,
 }: DealerTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -78,15 +78,26 @@ export function DealerTable({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    {onExport && (
+                        <Button 
+                            onClick={onExport} 
+                            variant="outline" 
+                            className="w-full sm:w-auto"
+                            disabled={isExporting}
+                        >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {isExporting ? 'Exporting...' : 'Export'}
+                        </Button>
+                    )}
                     {onImport && (
                         <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-                            <Upload className="h-4 w-4" />
+                            <Upload className="h-4 w-4 mr-2" />
                             Import
                         </Button>
                     )}
                     <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-4 w-4 mr-2" />
                         Tambah
                     </Button>
                 </div>
@@ -97,8 +108,9 @@ export function DealerTable({
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[20%] uppercase px-4 py-3">NAMA DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[35%] uppercase px-4 py-3">ALAMAT</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">KODE DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[25%] uppercase px-4 py-3">NAMA DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">ALAMAT</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PIC</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">HANDPHONE</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
@@ -108,17 +120,20 @@ export function DealerTable({
                         {dealers.length > 0 ? (
                             dealers.map((dealer) => (
                                 <TableRow key={dealer.id} className="hover:bg-gray-50/50">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                        {dealer.code || '-'}
+                                    </TableCell>
                                     <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 truncate">
                                         {dealer.namaDealer}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        <span className="line-clamp-2">{dealer.alamat}</span>
+                                        <span className="line-clamp-2">{dealer.alamat || '-'}</span>
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        {dealer.pic}
+                                        {dealer.pic || '-'}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                        {dealer.handphone}
+                                        {dealer.handphone || '-'}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-center">
                                         <DropdownMenu>
@@ -141,7 +156,7 @@ export function DealerTable({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-32 text-center text-gray-500">
+                                <TableCell colSpan={6} className="h-32 text-center text-gray-500">
                                     Tidak ada data dealer ditemukan
                                 </TableCell>
                             </TableRow>

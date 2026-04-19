@@ -1,18 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { DealerTable, Dealer } from '@/components/features/dealer/DealerTable';
+import { DealerTable } from '@/components/features/dealer/DealerTable';
 import { DealerFormModal, DealerFormData } from '@/components/features/dealer/DealerFormModal';
+import { EditDealerModal } from '@/components/features/dealer/EditDealerModal';
 import { DeleteDealerModal } from '@/components/features/dealer/DeleteDealerModal';
-import { DUMMY_DEALERS, setDummyDealers } from '@/components/features/dealer/dealer.data';
 import { toast } from 'sonner';
-import { useImportDealer } from '@/hooks/useDealer';
+import { useDealers, useCreateDealer, useUpdateDealer, useDeleteDealer, useImportDealer, useExportDealer } from '@/hooks/useDealer';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { useCompany } from '@/contexts/CompanyContext';
-
+import type { Dealer } from '@/@types/dealer.types';
 
 export default function DealerPage() {
-  // Data state
-  const [dealers, setDealers] = useState<Dealer[]>(DUMMY_DEALERS);
 
   // Table state
   const [search, setSearch] = useState('');
@@ -20,24 +18,19 @@ export default function DealerPage() {
   const [perPage, setPerPage] = useState(25);
 
   const { companyId } = useCompany();
+  const { data: dealersData, isLoading } = useDealers(companyId, { page, perPage, search });
+  
+  const createMutation = useCreateDealer();
+  const updateMutation = useUpdateDealer();
+  const deleteMutation = useDeleteDealer();
   const importMutation = useImportDealer();
+  const exportMutation = useExportDealer();
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [openImport, setOpenImport] = useState(false);
   const [selectedDealer, setSelectedDealer] = useState<Dealer | null>(null);
-
-
-  // Filter & Pagination logic
-  const filteredDealers = useMemo(() => {
-    return dealers.filter((dealer) => dealer.namaDealer.toLowerCase().includes(search.toLowerCase()) || dealer.pic.toLowerCase().includes(search.toLowerCase()) || dealer.handphone.includes(search));
-  }, [dealers, search]);
-
-  const paginatedDealers = useMemo(() => {
-    const startIndex = (page - 1) * perPage;
-    return filteredDealers.slice(startIndex, startIndex + perPage);
-  }, [filteredDealers, page, perPage]);
 
   // Handlers
   const handleAddClick = () => {
@@ -55,46 +48,58 @@ export default function DealerPage() {
     setIsDeleteOpen(true);
   };
 
-  const handleSaveForm = (data: DealerFormData) => {
-    if (selectedDealer) {
-      // Edit
-      setDealers((prev) => {
-        const updated = prev.map((d) => (d.id === selectedDealer.id ? { ...d, ...data } : d));
-        setDummyDealers(updated);
-        return updated;
-      });
-      toast.success('Data dealer berhasil diubah');
-    } else {
-      // Add
-      setDealers((prev) => {
-        const newId = Math.max(0, ...prev.map((d) => d.id)) + 1;
-        const updated = [{ id: newId, ...data }, ...prev];
-        setDummyDealers(updated);
-        return updated;
-      });
-      toast.success('Data dealer berhasil ditambahkan');
+  const handleSaveForm = async (data: DealerFormData) => {
+    try {
+      if (selectedDealer) {
+        // Edit
+        await updateMutation.mutateAsync({ id: selectedDealer.id, data: { ...data, companyId: Number(companyId) } });
+        toast.success('Data dealer berhasil diubah');
+      } else {
+        // Add
+        await createMutation.mutateAsync({ ...data, companyId: Number(companyId) });
+        toast.success('Data dealer berhasil ditambahkan');
+      }
+      setIsFormOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menyimpan data');
     }
-    setIsFormOpen(false);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedDealer) {
-      setDealers((prev) => {
-        const updated = prev.filter((d) => d.id !== selectedDealer.id);
-        setDummyDealers(updated);
-        return updated;
-      });
-      toast.success('Data dealer berhasil dihapus');
-      setIsDeleteOpen(false);
-      setSelectedDealer(null);
+      try {
+        await deleteMutation.mutateAsync(selectedDealer.id);
+        toast.success('Data dealer berhasil dihapus');
+        setIsDeleteOpen(false);
+        setSelectedDealer(null);
+      } catch (error: any) {
+        toast.error(error.message || 'Gagal menghapus data');
+      }
     }
   };
 
   const handleImport = async (file: File) => {
     if (!companyId) return;
-    await importMutation.mutateAsync({ companyId, file });
+    try {
+      await importMutation.mutateAsync({ companyId, file });
+      toast.success('Import berhasil');
+      setOpenImport(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Import gagal');
+    }
   };
 
+  const handleExport = async () => {
+    try {
+      await exportMutation.mutateAsync();
+      toast.success('Berhasil export data');
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal export data');
+    }
+  };
+
+  const dealersList = (dealersData as any)?.data || [];
+  const totalDealers = (dealersData as any)?.total || 0;
 
   return (
     <DashboardLayout>
@@ -107,7 +112,7 @@ export default function DealerPage() {
 
         {/* Content */}
         <DealerTable
-          dealers={paginatedDealers}
+          dealers={dealersList}
           search={search}
           onSearchChange={(v) => {
             setSearch(v);
@@ -115,7 +120,7 @@ export default function DealerPage() {
           }}
           page={page}
           perPage={perPage}
-          totalData={filteredDealers.length}
+          totalData={totalDealers}
           onPageChange={setPage}
           onPerPageChange={(v) => {
             setPerPage(v);
@@ -123,6 +128,8 @@ export default function DealerPage() {
           }}
           onAdd={handleAddClick}
           onImport={() => setOpenImport(true)}
+          onExport={handleExport}
+          isExporting={exportMutation.isPending}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
@@ -130,7 +137,23 @@ export default function DealerPage() {
       </div>
 
       {/* Modals */}
-      <DealerFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSave={handleSaveForm} initialData={selectedDealer} />
+      <DealerFormModal 
+        isOpen={isFormOpen && !selectedDealer} 
+        onClose={() => setIsFormOpen(false)} 
+        onSave={handleSaveForm} 
+      />
+
+      {selectedDealer && (
+          <EditDealerModal 
+            isOpen={isFormOpen && !!selectedDealer} 
+            onClose={() => {
+                setIsFormOpen(false);
+                setTimeout(() => setSelectedDealer(null), 300);
+            }} 
+            onSave={handleSaveForm}
+            initialData={selectedDealer}
+          />
+      )}
 
       <DeleteDealerModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleConfirmDelete} />
 

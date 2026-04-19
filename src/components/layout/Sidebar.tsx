@@ -66,7 +66,7 @@ export function Sidebar() {
     });
   }, []);
 
-  const { menus } = useCompanyMenu(companies);
+  const { menus, isLoading: isMenuLoading } = useCompanyMenu(companies);
 
   useEffect(() => {
     if (slug && companies.length > 0) {
@@ -108,9 +108,17 @@ export function Sidebar() {
         <div className="mb-4 text-sm font-semibold text-gray-500">Main Menu</div>
 
         <nav className="space-y-1">
-          {menus.map((item, index) => (
-            <SidebarNavItem key={index} item={item} />
-          ))}
+          {isMenuLoading ? (
+            <div className="space-y-2 animate-pulse px-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-8 bg-gray-200 rounded-md w-full"></div>
+              ))}
+            </div>
+          ) : (
+            menus.map((item, index) => (
+              <SidebarNavItem key={index} item={item} />
+            ))
+          )}
         </nav>
       </div>
     </aside>

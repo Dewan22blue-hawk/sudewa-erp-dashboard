@@ -23,31 +23,37 @@ const allStatuses: (StockStatus | 'all')[] = [
 ];
 
 const statusDisplayNames: Record<StockStatus | 'all', string> = {
-  all: 'All',
-  draft: 'Draft',
-  cancel: 'Cancel',
-  rejected: 'Rejected',
-  prepare: 'Prepare',
-  inbound_purcase_order: 'Inbound Purchase Order',
-  inbound_incoming_goods: 'Inbound Incoming Goods',
-  inbound_receipt: 'Inbound Receipt',
-  inbound_return: 'Inbound Return',
-  outbound_reserved: 'Outbound Reserved',
-  outbound_in_transit: 'Outbound In Transit',
-  outbound_delivered: 'Outbound Delivered',
-  outbound_return: 'Outbound Return',
+  all: 'Semua Status',
+  draft: 'draft',
+  cancel: 'cancel',
+  rejected: 'rejected',
+  prepare: 'prepare',
+  inbound_purcase_order: 'purchase order',
+  inbound_incoming_goods: 'in transit',
+  inbound_receipt: 'available',
+  inbound_return: 'refund',
+  outbound_reserved: 'reserved',
+  outbound_in_transit: 'in transit',
+  outbound_delivered: 'delivered',
+  outbound_return: 'return',
 };
 
 export default function StockUnitFilterTabs({ active, onChange }: StockUnitFilterTabsProps) {
   return (
-    <Tabs value={active} onValueChange={(value) => onChange(value as StockStatus | 'all')}>
-      <TabsList className="flex h-auto items-center overflow-x-auto rounded-md bg-muted p-1 text-muted-foreground gap-1">
-        {allStatuses.map((status) => (
-          <TabsTrigger key={status} value={status} className="flex-shrink-0">
-            {statusDisplayNames[status]}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+    <Tabs value={active} onValueChange={(value) => onChange(value as StockStatus | 'all')} className="w-full">
+      <div className="w-full overflow-x-auto pb-1 [scrollbar-width:thin]">
+        <TabsList className="inline-flex h-auto min-w-max items-center gap-1 rounded-xl border border-gray-200 bg-gray-100 p-1">
+          {allStatuses.map((status) => (
+            <TabsTrigger
+              key={status}
+              value={status}
+              className="h-9 flex-shrink-0 rounded-lg px-4 text-l font-semibold capitalize text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+            >
+              {statusDisplayNames[status]}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
     </Tabs>
   );
 }

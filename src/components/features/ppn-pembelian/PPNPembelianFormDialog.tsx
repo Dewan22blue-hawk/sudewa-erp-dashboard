@@ -6,11 +6,10 @@ import { type PPNPembelian, UpdatePPNPembelianSchema, type UpdatePPNPembelianFor
 import { useUpdatePPNPembelian } from '@/hooks/usePPNPembelian';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
-import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -108,117 +107,87 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => (!nextOpen ? onClose() : undefined)}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Ubah Data PPN Pembelian</DialogTitle>
-          <p className="text-sm text-muted-foreground">Perubahan disimpan melalui endpoint finance PPN dengan fallback POST jika PUT tidak diizinkan.</p>
+          <DialogTitle>Edit PPN</DialogTitle>
+          <DialogDescription>Edit detail PPN</DialogDescription>
         </DialogHeader>
 
         {initialData ? (
-          <>
-            <div className="grid gap-3 rounded-lg border bg-slate-50 p-4 text-sm md:grid-cols-2">
-              <div>
-                <div className="text-xs uppercase text-slate-500">Kode Pembelian</div>
-                <div className="font-medium text-slate-900">{initialData.code}</div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-2">
+              <div className="grid gap-2">
+                <FormLabel>Kode Beli</FormLabel>
+                <Input value={initialData.code} readOnly placeholder="Generated XX" />
               </div>
-              <div>
-                <div className="text-xs uppercase text-slate-500">Supplier</div>
-                <div className="font-medium text-slate-900">{initialData.supplier}</div>
+
+              <div className="grid gap-2">
+                <FormLabel>No Mesin</FormLabel>
+                <Input value={initialData.unit_transaction_item_detail?.machine_number || ''} readOnly placeholder="Tambahkan no mesin" />
               </div>
-              <div>
-                <div className="text-xs uppercase text-slate-500">Tipe Unit</div>
-                <div className="font-medium text-slate-900">{initialData.unit_type.name}</div>
+
+              <FormField
+                control={form.control}
+                name="fp_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Tanggal FPM</FormLabel>
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Jan 20, 2025" />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nsfp_age"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Masa FPM</FormLabel>
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Jan 20, 2025" />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nsfp_amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NFP Masukan</FormLabel>
+                    <FormControl>
+                      <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Tambahkan NFP" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Biaya</FormLabel>
+                    <FormControl>
+                      <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Tambahkan biaya" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex flex-col gap-3 pt-4">
+                <Button type="submit" className="w-full bg-[#1e293b] hover:bg-[#0f172a]" disabled={updateMutation.isPending}>
+                  {updateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                </Button>
+                <Button type="button" variant="outline" className="w-full" onClick={onClose} disabled={updateMutation.isPending}>
+                  Batal
+                </Button>
               </div>
-              <div>
-                <div className="text-xs uppercase text-slate-500">Harga Unit</div>
-                <div className="font-medium text-slate-900">{formatCurrency(initialData.unit_price)}</div>
-              </div>
-            </div>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="fp_date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tanggal FP</FormLabel>
-                        <FormControl>
-                          <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal FP" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="nsfp_age"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Usia NSFP</FormLabel>
-                        <FormControl>
-                          <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih usia NSFP" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="nsfp_amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nilai NSFP</FormLabel>
-                        <FormControl>
-                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan nilai NSFP" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Jumlah Pembayaran</FormLabel>
-                        <FormControl>
-                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan jumlah pembayaran" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <FormLabel>Nomor Mesin</FormLabel>
-                    <Input value={initialData.unit_transaction_item_detail.machine_number} readOnly className="bg-slate-50" />
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel>Nomor Rangka</FormLabel>
-                    <Input value={initialData.unit_transaction_item_detail.chassis_number} readOnly className="bg-slate-50" />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3 pt-4 border-t">
-                  <Button type="submit" className="w-full bg-[#1e293b] hover:bg-[#0f172a]" disabled={updateMutation.isPending}>
-                    {updateMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
-                  </Button>
-                  <Button type="button" variant="outline" className="w-full" onClick={onClose} disabled={updateMutation.isPending}>
-                    Batal
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </>
+            </form>
+          </Form>
         ) : null}
       </DialogContent>
     </Dialog>

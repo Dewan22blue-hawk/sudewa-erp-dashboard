@@ -1,0 +1,170 @@
+import React, { useState } from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { RegionTable } from '@/components/features/region/RegionTable';
+import { RegionFormModal, RegionFormData } from '@/components/features/region/RegionFormModal';
+import { EditRegionModal } from '@/components/features/region/EditRegionModal';
+import { DeleteRegionModal } from '@/components/features/region/DeleteRegionModal';
+import { ImportRegionModal } from '@/components/features/region/ImportRegionModal';
+import { toast } from 'sonner';
+import { useRegions, useCreateRegion, useUpdateRegion, useDeleteRegion, useImportRegion, useExportRegion } from '@/hooks/useRegion';
+import type { Region } from '@/@types/region.types';
+
+export default function RegionPage() {
+
+  // Table state
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+
+  const { data: regionsData, isLoading } = useRegions({ page, perPage, search });
+  
+  const createMutation = useCreateRegion();
+  const updateMutation = useUpdateRegion();
+  const deleteMutation = useDeleteRegion();
+  const importMutation = useImportRegion();
+  const exportMutation = useExportRegion();
+
+  // Modals state
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
+
+  // Handlers
+  const handleAddClick = () => {
+    setSelectedRegion(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditClick = (region: Region) => {
+    setSelectedRegion(region);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteClick = (region: Region) => {
+    setSelectedRegion(region);
+    setIsDeleteOpen(true);
+  };
+
+  const handleSaveForm = async (data: RegionFormData) => {
+    try {
+      if (selectedRegion) {
+        // Edit
+        await updateMutation.mutateAsync({ id: selectedRegion.id, data });
+        toast.success('Data wilayah berhasil diubah');
+      } else {
+        // Add
+        await createMutation.mutateAsync(data);
+        toast.success('Data wilayah berhasil ditambahkan');
+      }
+      setIsFormOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menyimpan data');
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedRegion) {
+      try {
+        await deleteMutation.mutateAsync(selectedRegion.id);
+        toast.success('Data wilayah berhasil dihapus');
+        setIsDeleteOpen(false);
+        setSelectedRegion(null);
+      } catch (error: any) {
+        toast.error(error.message || 'Gagal menghapus data');
+      }
+    }
+  };
+
+  const handleImport = async (file: File) => {
+    try {
+      await importMutation.mutateAsync({ file });
+      toast.success('Import data wilayah berhasil');
+      setIsImportOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Import data wilayah gagal');
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportMutation.mutateAsync();
+      toast.success('Berhasil export data wilayah');
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal export data wilayah');
+    }
+  };
+
+  const regionsList = (regionsData as any)?.data || [];
+  const totalRegions = (regionsData as any)?.meta?.total || (regionsData as any)?.total || 0;
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Data Wilayah</h1>
+          <p className="text-sm text-gray-500 mt-1">Kelola data wilayah dengan mudah</p>
+        </div>
+
+        {/* Content */}
+        <RegionTable
+          regions={regionsList}
+          search={search}
+          onSearchChange={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
+          page={page}
+          perPage={perPage}
+          totalData={totalRegions}
+          onPageChange={setPage}
+          onPerPageChange={(v) => {
+            setPerPage(v);
+            setPage(1);
+          }}
+          onAdd={handleAddClick}
+          onImport={() => setIsImportOpen(true)}
+          onExport={handleExport}
+          isExporting={exportMutation.isPending}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+        />
+
+      </div>
+
+      {/* Modals */}
+      <RegionFormModal 
+        isOpen={isFormOpen && !selectedRegion} 
+        onClose={() => setIsFormOpen(false)} 
+        onSave={handleSaveForm} 
+      />
+
+      {selectedRegion && (
+          <EditRegionModal 
+            isOpen={isFormOpen && !!selectedRegion} 
+            onClose={() => {
+                setIsFormOpen(false);
+                setTimeout(() => setSelectedRegion(null), 300);
+            }} 
+            onSave={handleSaveForm}
+            initialData={selectedRegion}
+          />
+      )}
+
+      <DeleteRegionModal 
+        isOpen={isDeleteOpen} 
+        onClose={() => setIsDeleteOpen(false)} 
+        onConfirm={handleConfirmDelete} 
+        isDeleting={deleteMutation.isPending}
+      />
+
+      <ImportRegionModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImport={handleImport}
+        isUploading={importMutation.isPending}
+      />
+    </DashboardLayout>
+  );
+}

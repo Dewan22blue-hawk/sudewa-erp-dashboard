@@ -169,16 +169,16 @@ const extractHistoryRows = (payload: any): UnitBillingHistoryApiModel[] => {
   return [];
 };
 
-const toFormData = (payload: UpsertUnitBillingPayload, asUpdate = false): FormData => {
+/**
+ * Build the minimal FormData for creating a billing record.
+ * New API spec only requires: company_id + unit_transaction_id.
+ * DO NOT send grand_total, bca_payment, cash_payment etc — those fields
+ * no longer exist in the finance_billings table schema.
+ */
+const toBillingCreateData = (companyId: string | number, unitTransactionId: string | number): FormData => {
   const form = new FormData();
-  form.append('company_id', String(payload.company_id));
-  form.append('unit_transaction_id', String(payload.unit_transaction_id));
-  form.append('bca_payment', String(Number(payload.bca_payment ?? 0)));
-  form.append('cash_payment', String(Number(payload.cash_payment ?? 0)));
-  form.append('bca_payment_2', String(Number(payload.bca_payment_2 ?? 0)));
-  form.append('payment_date', payload.payment_date);
-  form.append('is_paid', payload.is_paid ? '1' : '0');
-  if (asUpdate) form.append('_method', 'PUT');
+  form.append('company_id', String(companyId));
+  form.append('unit_transaction_id', String(unitTransactionId));
   return form;
 };
 
@@ -240,15 +240,34 @@ export const unitBillingService = {
     return mapped.filter((item) => String(item.unit_transaction_id) === String(unitTransactionId));
   },
 
-  async createBillingV2(payload: CreateUnitBillingPayloadV2): Promise<UnitBilling> {
-    const form = new FormData();
-    form.append('company_id', String(payload.company_id));
-    form.append('unit_transaction_id', String(payload.unit_transaction_id));
-    if (payload.is_paid !== undefined) {
-      form.append('is_paid', payload.is_paid ? '1' : '0');
-    }
+  /**
+   * Create billing (v1 compat shim — delegates to the new minimal payload).
+   * POST /wapi/transaction/unit-transaction/unit-transaction-billing
+   * Required: company_id, unit_transaction_id
+   */
+  async createBilling(payload: UpsertUnitBillingPayload | CreateUnitBillingPayloadV2): Promise<UnitBilling> {
+    const jsonPayload = {
+      company_id: (payload as any).company_id,
+      unit_transaction_id: (payload as any).unit_transaction_id,
+    };
+    const response = await apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(basePath, jsonPayload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = ensureSuccess(response.data);
+    return mapBilling(data as UnitBillingApiModel);
+  },
 
-    const response = await apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(basePath, form);
+  /**
+   * Create billing V2 (same endpoint, same minimal payload, JSON format).
+   */
+  async createBillingV2(payload: CreateUnitBillingPayloadV2): Promise<UnitBilling> {
+    const jsonPayload = {
+      company_id: payload.company_id,
+      unit_transaction_id: payload.unit_transaction_id,
+    };
+    const response = await apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(basePath, jsonPayload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
     const data = ensureSuccess(response.data);
     return mapBilling(data as UnitBillingApiModel);
   },
@@ -307,28 +326,13 @@ export const unitBillingService = {
     const bcaPaymentAmount = Number(payload.bca_payment_amount ?? 0);
     const cashPaymentAmount = Number(payload.cash_payment_amount ?? 0);
     const bcaPaymentUsdAmount = Number(payload.bca_payment_usd_amount ?? 0);
-    const totalPayment = bcaPaymentAmount + cashPaymentAmount + bcaPaymentUsdAmount;
 
     form.append('unit_transaction_billing_id', String(payload.unit_transaction_billing_id));
-    form.append('bca_payment_amount', String(bcaPaymentAmount));
-    form.append('cash_payment_amount', String(cashPaymentAmount));
-    form.append('bca_payment_usd_amount', String(bcaPaymentUsdAmount));
+    if (bcaPaymentAmount > 0) form.append('bca_payment_amount', String(bcaPaymentAmount));
+    if (cashPaymentAmount > 0) form.append('cash_payment_amount', String(cashPaymentAmount));
+    if (bcaPaymentUsdAmount > 0) form.append('bca_payment_usd_amount', String(bcaPaymentUsdAmount));
 
-    // Compatibility aliases for backend variants.
-    form.append('bca_payment', String(bcaPaymentAmount));
-    form.append('cash_payment', String(cashPaymentAmount));
-    form.append('bca_payment_2', String(bcaPaymentUsdAmount));
-    form.append('bca_usd_payment', String(bcaPaymentUsdAmount));
-
-    form.append('payment', String(totalPayment));
-    form.append('payment_amount', String(totalPayment));
-    form.append('amount', String(totalPayment));
-    form.append('total_payment', String(totalPayment));
-    form.append('total_paid', String(totalPayment));
-    form.append('paid_total', String(totalPayment));
-
-    form.append('payment_at', payload.payment_at);
-    form.append('payment_date', payload.payment_at);
+    if (payload.payment_at) form.append('payment_at', payload.payment_at);
     if (payload.note) form.append('note', payload.note);
 
     const response = await apiClient.post<LaravelApiResponse<UnitBillingHistoryApiModel>>(historyBasePath, form);
@@ -342,14 +346,11 @@ export const unitBillingService = {
     return mapBilling(payload as UnitBillingApiModel);
   },
 
-  async createBilling(payload: UpsertUnitBillingPayload): Promise<UnitBilling> {
-    const response = await apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(basePath, toFormData(payload));
-    const data = ensureSuccess(response.data);
-    return mapBilling(data as UnitBillingApiModel);
-  },
-
   async updateBilling(id: string, payload: UpsertUnitBillingPayload): Promise<UnitBilling> {
-    const response = await apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(`${basePath}/${id}`, toFormData(payload, true));
+    // PUT only accepts company_id + unit_transaction_id (no payment fields in schema)
+    const form = toBillingCreateData(payload.company_id, payload.unit_transaction_id);
+    form.append('_method', 'PUT');
+    const response = await apiClient.post<LaravelApiResponse<UnitBillingApiModel>>(`${basePath}/${id}`, form);
     const data = ensureSuccess(response.data);
     return mapBilling(data as UnitBillingApiModel);
   },

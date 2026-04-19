@@ -54,11 +54,9 @@ export const getStockUnits = async (
     `/wapi/warehouse/warehouse-get-unit-transaction-item-details/${companyId}`,
     {
       params: {
-        ...buildLaravelPaginationQuery(params), // Handles page, perPage, search, stock_state
-        // Explicitly passing common parameters again to ensure they are sent
-        // This might be redundant if buildLaravelPaginationQuery handles all, but ensures coverage.
+        ...buildLaravelPaginationQuery(params),
         page: params.page,
-        perPage: params.perPage, // Explicitly pass per_page
+        per_page: params.perPage,
         search: params.search,
         stock_state: params.stock_state,
         machine_number: params.machine_number,

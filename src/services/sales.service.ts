@@ -179,9 +179,17 @@ export const salesService = {
   },
 
   async getSalesDetail(id: string) {
-    const response = await apiClient.get<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`);
-    const payload = ensureSuccess(response.data);
-    const detail = unwrapDetail(payload);
+    let detail: SalesApiModel | null = null;
+
+    try {
+      const response = await apiClient.get<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`);
+      const payload = ensureSuccess(response.data);
+      detail = unwrapDetail(payload);
+    } catch {
+      const fallbackResponse = await apiClient.get<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${fallbackBasePath}/${id}`);
+      const fallbackPayload = ensureSuccess(fallbackResponse.data);
+      detail = unwrapDetail(fallbackPayload);
+    }
 
     return {
       raw: detail,

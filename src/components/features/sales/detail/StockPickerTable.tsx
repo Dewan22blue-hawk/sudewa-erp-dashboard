@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ interface StockPickerTableProps {
   isError?: boolean;
   searchValue: string;
   onSearchChange: (value: string) => void;
+  searchAction?: ReactNode;
 }
 
 export function StockPickerTable({
@@ -34,6 +35,7 @@ export function StockPickerTable({
   isError,
   searchValue,
   onSearchChange,
+  searchAction,
 }: StockPickerTableProps) {
   const filteredUnits = useMemo(() => {
     const query = searchValue.trim().toLowerCase();
@@ -76,8 +78,11 @@ export function StockPickerTable({
           <span className="text-sm">Page</span>
         </div>
 
-        <div className="w-full md:w-[280px]">
-          <Input value={searchValue} onChange={(event) => onSearchChange(event.target.value)} placeholder="Cari warna/nomor mesin/nomor rangka" />
+        <div className="flex w-full items-center gap-2 md:w-auto">
+          <div className="w-full md:w-[280px]">
+            <Input value={searchValue} onChange={(event) => onSearchChange(event.target.value)} placeholder="Cari warna/nomor mesin/nomor rangka" />
+          </div>
+          {searchAction}
         </div>
       </div>
 

@@ -88,7 +88,7 @@ export default function StockDetailTab({ perPage, machineNumber, onActionsChange
         toCsvLine([
           (pagination.from > 0 ? pagination.from - 1 : 0) + index + 1,
           item.person || '-',
-          item.unit_type.name || '-',
+          item.unit_type?.name || '-',
           item.color || '-',
           item.machine_number || '-',
           item.chassis_number || '-',
@@ -155,7 +155,7 @@ export default function StockDetailTab({ perPage, machineNumber, onActionsChange
                         {(pagination.from > 0 ? pagination.from - 1 : 0) + index + 1}
                       </TableCell>
                       <TableCell>{item.person || '-'}</TableCell>
-                      <TableCell>{item.unit_type.name || '-'}</TableCell>
+                      <TableCell>{item.unit_type?.name || '-'}</TableCell>
                       <TableCell>{item.color || '-'}</TableCell>
                       <TableCell>{item.machine_number || '-'}</TableCell>
                       <TableCell>{item.chassis_number || '-'}</TableCell>
@@ -176,9 +176,9 @@ export default function StockDetailTab({ perPage, machineNumber, onActionsChange
       </div>
 
       {!isLoading && pagination.total > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600 no-print">
           <div>
-            Showing {pagination.from || 0}-{pagination.to || 0} of {pagination.total} data
+            Showing {pagination.from || 0}–{pagination.to || 0} of {pagination.total} data
           </div>
           <div className="flex items-center gap-2">
             <Button

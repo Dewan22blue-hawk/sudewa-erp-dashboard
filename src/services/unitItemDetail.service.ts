@@ -37,7 +37,25 @@ type UnitTransactionItemDetailApiModel = {
   machine_number?: string;
   chassis_number?: string;
   in_stock?: boolean | number | string;
+  is_forecast?: boolean;
+  status?: string;
   created_at?: string;
+  unit_transaction_item?: {
+    id?: string | number;
+    unit_transaction_id?: string | number;
+    unit_type_id?: string | number;
+    price?: string | number;
+    unit_type?: {
+      id?: string | number;
+      name?: string;
+      code?: string;
+    } | null;
+    unit_transaction?: {
+      id?: string | number;
+      code?: string;
+      stock_state?: string;
+    } | null;
+  } | null;
 };
 
 const itemBasePath = '/wapi/transaction/unit-transaction-item';
@@ -91,14 +109,57 @@ const mapUnitTransactionItem = (item: UnitTransactionItemApiModel): UnitTransact
 const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransactionItemDetail => ({
   id: String(item.id ?? ''),
   unit_transaction_item_id: String(item.unit_transaction_item_id ?? ''),
+  unit_type_name: item.unit_transaction_item?.unit_type?.name ?? undefined,
+  price: item.unit_transaction_item?.price !== undefined ? toNumber(item.unit_transaction_item.price) : undefined,
   color: item.color ?? '-',
   machine_number: item.machine_number ?? '-',
   chassis_number: item.chassis_number ?? '-',
   in_stock: toBool(item.in_stock),
+  status: item.status,
   created_at: item.created_at,
 });
 
 export const unitItemDetailService = {
+  /**
+   * Fetch all unit item details for every unit_transaction_item belonging to
+   * the given unit_transaction (purchase) id.
+   *
+   * Strategy: first get the list of unit_transaction_items for the transaction,
+   * then fetch item-details for each item in parallel.
+   */
+  async getDetailsByTransactionId(unitTransactionId: string): Promise<UnitTransactionItemDetail[]> {
+    // Step 1 – get items for this transaction
+    const itemsResponse = await apiClient.get<LaravelApiResponse<any>>(
+      '/wapi/transaction/unit-transaction/unit-transaction-item',
+      { params: { unit_transaction_id: unitTransactionId, per_page: 200 } },
+    );
+    const itemsPayload = ensureSuccess(itemsResponse.data);
+    const itemRows: Array<{ id?: string | number }> = Array.isArray(itemsPayload)
+      ? itemsPayload
+      : Array.isArray(itemsPayload?.data)
+        ? itemsPayload.data
+        : Array.isArray(itemsPayload?.data?.data)
+          ? itemsPayload.data.data
+          : [];
+
+    if (itemRows.length === 0) return [];
+
+    // Step 2 – fetch item-details for each item in parallel
+    const detailGroups = await Promise.all(
+      itemRows.map(async (row) => {
+        const itemId = String(row.id ?? '');
+        if (!itemId) return [] as UnitTransactionItemDetail[];
+        try {
+          const result = await unitItemDetailService.getDetails(itemId);
+          return result.data;
+        } catch {
+          return [] as UnitTransactionItemDetail[];
+        }
+      }),
+    );
+
+    return detailGroups.flat();
+  },
   async getUnitTransactionItemById(id: string): Promise<UnitTransactionItemSummary> {
     const response = await withPathFallback(
       () => apiClient.get<LaravelApiResponse<UnitTransactionItemApiModel>>(`${itemLegacyBasePath}/${id}`),

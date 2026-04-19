@@ -6,16 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { TarifFormData } from './TarifFormModal';
-
-export interface Tarif extends TarifFormData {
-    id: number;
-}
+import type { Tarif } from '@/@types/tarif.types';
 
 interface TarifTableProps {
     tarifs: Tarif[];
     search: string;
     onSearchChange: (value: string) => void;
+    isLoading?: boolean;
     page: number;
     perPage: number;
     totalData: number;
@@ -26,12 +23,13 @@ interface TarifTableProps {
     onDelete: (tarif: Tarif) => void;
 }
 
-const formatRupiah = (amount: number) => {
+const formatCurrency = (amount: number | null | undefined) => {
+    if (amount === null || amount === undefined) return '-';
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        maximumFractionDigits: 0,
     }).format(amount);
 };
 
@@ -39,6 +37,7 @@ export function TarifTable({
     tarifs,
     search,
     onSearchChange,
+    isLoading = false,
     page,
     perPage,
     totalData,
@@ -46,14 +45,61 @@ export function TarifTable({
     onPerPageChange,
     onAdd,
     onEdit,
-    onDelete
+    onDelete,
 }: TarifTableProps) {
     const totalPages = Math.ceil(totalData / perPage);
     const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
     const endData = Math.min(page * perPage, totalData);
 
+    const renderPaginationNumbers = () => {
+        if (totalPages <= 7) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                    key={p}
+                    variant={p === page ? 'outline' : 'ghost'}
+                    size="sm"
+                    onClick={() => onPageChange(p)}
+                    className={p === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+                >
+                    {p}
+                </Button>
+            ));
+        }
+
+        const pages: (number | string)[] = [];
+        if (page <= 3) {
+            for (let i = 1; i <= 4; i++) pages.push(i);
+            pages.push('...');
+            pages.push(totalPages);
+        } else if (page >= totalPages - 2) {
+            pages.push(1);
+            pages.push('...');
+            for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            pages.push('...');
+            pages.push(page - 1, page, page + 1);
+            pages.push('...');
+            pages.push(totalPages);
+        }
+
+        return pages.map((p, idx) => (
+            <Button
+                key={idx}
+                variant={p === page ? 'outline' : 'ghost'}
+                size="sm"
+                disabled={p === '...'}
+                onClick={() => typeof p === 'number' && onPageChange(p)}
+                className={p === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+            >
+                {p}
+            </Button>
+        ));
+    };
+
     return (
         <div className="space-y-4">
+            {/* Toolbar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4 w-full sm:w-auto">
                     <div className="relative w-full sm:w-[300px]">
@@ -70,7 +116,7 @@ export function TarifTable({
                         <span className="text-sm text-gray-500">Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
-                                <SelectValue placeholder="25" />
+                                <SelectValue placeholder="10" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="10">10</SelectItem>
@@ -83,58 +129,92 @@ export function TarifTable({
                     </div>
                 </div>
 
-                <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                    <Plus className="mr-2 h-4 w-4" /> Tambah
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Tambah
+                    </Button>
+                </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200">
+            {/* Table */}
+            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white">
                 <div className="overflow-x-auto">
-                    <Table className="min-w-[1000px]">
+                    <Table className="min-w-[1100px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">NAMA DEALER</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">PROVINSI</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">TUJUAN</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3 whitespace-nowrap">JARAK</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3 whitespace-nowrap">DAY</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">INV CDD</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">INV FUSO</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">UJ CDD</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase py-3 whitespace-nowrap">UJ FUSO</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">ACTION</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    NAMA CUSTOMER
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    LOADING IN
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    LOADING OUT
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                    JARAK (KM)
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    UJ TOWING
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    UJ CDD
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    UJ FUSO
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    INV CDD
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                    INV FUSO
+                                </TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                    ACTION
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tarifs.length > 0 ? (
+                            {isLoading ? (
+                                Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
+                                    <TableRow key={i} className="animate-pulse">
+                                        {Array.from({ length: 10 }).map((_, j) => (
+                                            <TableCell key={j} className="px-4 py-4">
+                                                <div className="h-4 bg-gray-200 rounded w-full" />
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : tarifs.length > 0 ? (
                                 tarifs.map((tarif) => (
                                     <TableRow key={tarif.id} className="hover:bg-gray-50/50">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">
-                                            {tarif.namaDealer}
+                                        <TableCell className="px-4 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                                            {tarif.customer?.name || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                            {tarif.provinsi}
+                                            {tarif.loadingIn || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                            {tarif.tujuan}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
-                                            {tarif.jarak}
+                                            {tarif.loadingOut || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
-                                            {tarif.day}
+                                            {tarif.distance ?? '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                            {formatRupiah(tarif.invCdd)}
+                                            {formatCurrency(tarif.ujTowing)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                            {formatRupiah(tarif.invFuso)}
+                                            {formatCurrency(tarif.ujCdd)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                            {formatRupiah(tarif.ujCdd)}
+                                            {formatCurrency(tarif.ujFuso)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                            {formatRupiah(tarif.ujFuso)}
+                                            {formatCurrency(tarif.invCdd)}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                            {formatCurrency(tarif.invFuso)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-center">
                                             <DropdownMenu>
@@ -144,10 +224,16 @@ export function TarifTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem onClick={() => onEdit(tarif)} className="cursor-pointer">
+                                                    <DropdownMenuItem
+                                                        onClick={() => onEdit(tarif)}
+                                                        className="cursor-pointer text-gray-700"
+                                                    >
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(tarif)} className="text-red-600 cursor-pointer focus:text-red-600">
+                                                    <DropdownMenuItem
+                                                        onClick={() => onDelete(tarif)}
+                                                        className="text-red-600 cursor-pointer focus:text-red-600"
+                                                    >
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -167,49 +253,38 @@ export function TarifTable({
                 </div>
             </Card>
 
-            {totalPages > 0 && (
-                <div className="flex items-center justify-between px-2 pt-2">
-                    <div className="text-sm text-gray-500">
-                        Showing {startData}-{endData} of {totalData} data
-                    </div>
-
-                    {totalPages > 1 && (
-                        <div className="flex items-center gap-1">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onPageChange(page - 1)}
-                                disabled={page === 1}
-                                className="text-gray-500"
-                            >
-                                Previous
-                            </Button>
-
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                                <Button
-                                    key={p}
-                                    variant={p === page ? "outline" : "ghost"}
-                                    size="sm"
-                                    onClick={() => onPageChange(p)}
-                                    className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
-                                >
-                                    {p}
-                                </Button>
-                            ))}
-
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onPageChange(page + 1)}
-                                disabled={page === totalPages}
-                                className="text-gray-500"
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    )}
+            {/* Pagination */}
+            <div className="flex items-center justify-between px-2 pt-2">
+                <div className="text-sm text-gray-500">
+                    Showing {startData}-{endData} of {totalData} data
                 </div>
-            )}
+
+                {totalPages > 1 && (
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onPageChange(page - 1)}
+                            disabled={page === 1}
+                            className="text-gray-500"
+                        >
+                            Previous
+                        </Button>
+
+                        {renderPaginationNumbers()}
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onPageChange(page + 1)}
+                            disabled={page === totalPages}
+                            className="text-gray-500"
+                        >
+                            Next
+                        </Button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

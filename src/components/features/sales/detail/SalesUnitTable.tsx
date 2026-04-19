@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { MoreVertical, Plus } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { SalesLineItem } from '../sales.data';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -223,9 +223,9 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)}>
+                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)}> <Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}> <Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)}> <Trash2 className="mr-2 h-4 w-4" />
                           Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
