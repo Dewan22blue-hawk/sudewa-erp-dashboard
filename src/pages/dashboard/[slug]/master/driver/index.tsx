@@ -1,121 +1,184 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { DriverTable, Driver } from '@/components/features/driver/DriverTable';
-import { DriverFormModal, DriverFormData } from '@/components/features/driver/DriverFormModal';
+import { DriverTable } from '@/components/features/driver/DriverTable';
+import { DriverFormModal } from '@/components/features/driver/DriverFormModal';
 import { DeleteDriverModal } from '@/components/features/driver/DeleteDriverModal';
-import { DUMMY_DRIVERS, setDummyDrivers } from '@/components/features/driver/driver.data';
+import { ImportDriverModal } from '@/components/features/driver/ImportDriverModal';
 import { toast } from 'sonner';
+import {
+    useDrivers,
+    useCreateDriver,
+    useUpdateDriver,
+    useDeleteDriver,
+    useImportDriver,
+    useExportDriver,
+} from '@/hooks/useDriver';
+import { useCompany } from '@/contexts/CompanyContext';
+import type { Driver, DriverPayload } from '@/@types/driver.types';
 
 export default function DriverPage() {
-  // Data state
-  const [drivers, setDrivers] = useState<Driver[]>(DUMMY_DRIVERS);
+    const { companyId: localCompanyId } = useCompany();
 
-  // Table state
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+    // Table state
+    const [searchInput, setSearchInput] = useState('');   // immediate display value
+    const [search, setSearch] = useState('');              // debounced (sent to API)
+    const [page, setPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
 
-  // Modals state
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-
-  // Filter & Pagination logic
-  const filteredDrivers = useMemo(() => {
-    return drivers.filter((driver) => driver.namaDriver.toLowerCase().includes(search.toLowerCase()) || driver.ktp.includes(search) || driver.sim.toLowerCase().includes(search.toLowerCase()) || driver.handphone.includes(search));
-  }, [drivers, search]);
-
-  const paginatedDrivers = useMemo(() => {
-    const startIndex = (page - 1) * perPage;
-    return filteredDrivers.slice(startIndex, startIndex + perPage);
-  }, [filteredDrivers, page, perPage]);
-
-  // Handlers
-  const handleAddClick = () => {
-    setSelectedDriver(null);
-    setIsFormOpen(true);
-  };
-
-  const handleEditClick = (driver: Driver) => {
-    setSelectedDriver(driver);
-    setIsFormOpen(true);
-  };
-
-  const handleDeleteClick = (driver: Driver) => {
-    setSelectedDriver(driver);
-    setIsDeleteOpen(true);
-  };
-
-  const handleSaveForm = (data: DriverFormData) => {
-    if (selectedDriver) {
-      // Edit
-      setDrivers((prev) => {
-        const updated = prev.map((d) => (d.id === selectedDriver.id ? { ...d, ...data } : d));
-        setDummyDrivers(updated);
-        return updated;
-      });
-      toast.success('Data driver berhasil diubah');
-    } else {
-      // Add
-      setDrivers((prev) => {
-        const newId = prev.length > 0 ? Math.max(...prev.map((d) => d.id)) + 1 : 1;
-        const updated = [{ id: newId, ...data }, ...prev];
-        setDummyDrivers(updated);
-        return updated;
-      });
-      toast.success('Data driver berhasil ditambahkan');
-    }
-    setIsFormOpen(false);
-  };
-
-  const handleConfirmDelete = () => {
-    if (selectedDriver) {
-      setDrivers((prev) => {
-        const updated = prev.filter((d) => d.id !== selectedDriver.id);
-        setDummyDrivers(updated);
-        return updated;
-      });
-      toast.success('Data driver berhasil dihapus');
-      setIsDeleteOpen(false);
-      setSelectedDriver(null);
-    }
-  };
-
-  return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Driver</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data driver dengan mudah</p>
-        </div>
-
-        {/* Content */}
-        <DriverTable
-          drivers={paginatedDrivers}
-          search={search}
-          onSearchChange={(v) => {
-            setSearch(v);
+    // Live search debounce — 400ms
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearch(searchInput);
             setPage(1);
-          }}
-          page={page}
-          perPage={perPage}
-          totalData={filteredDrivers.length}
-          onPageChange={setPage}
-          onPerPageChange={(v) => {
-            setPerPage(v);
-            setPage(1);
-          }}
-          onAdd={handleAddClick}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteClick}
-        />
-      </div>
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
 
-      {/* Modals */}
-      <DriverFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSave={handleSaveForm} initialData={selectedDriver} />
+    // Data & mutations
+    const { data: driversData, isLoading } = useDrivers({ page, perPage, search });
+    const createMutation = useCreateDriver();
+    const updateMutation = useUpdateDriver();
+    const deleteMutation = useDeleteDriver();
+    const importMutation = useImportDriver();
+    const exportMutation = useExportDriver();
 
-      <DeleteDriverModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleConfirmDelete} />
-    </DashboardLayout>
-  );
+    // Modals state
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isImportOpen, setIsImportOpen] = useState(false);
+    const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+
+    // ── Handlers ──────────────────────────────────────────────────────────────
+    const handleAddClick = () => {
+        setSelectedDriver(null);
+        setIsFormOpen(true);
+    };
+
+    const handleEditClick = (driver: Driver) => {
+        setSelectedDriver(driver);
+        setIsFormOpen(true);
+    };
+
+    const handleDeleteClick = (driver: Driver) => {
+        setSelectedDriver(driver);
+        setIsDeleteOpen(true);
+    };
+
+    const handleSaveForm = async (data: DriverPayload) => {
+        const companyId = localCompanyId || 1;
+        try {
+            if (selectedDriver) {
+                await updateMutation.mutateAsync({
+                    id: selectedDriver.id,
+                    data: { ...data, company_id: companyId },
+                });
+                toast.success('Data driver berhasil diubah');
+            } else {
+                await createMutation.mutateAsync({ ...data, company_id: companyId });
+                toast.success('Data driver berhasil ditambahkan');
+            }
+            setIsFormOpen(false);
+            setSelectedDriver(null);
+        } catch (error: any) {
+            toast.error(error.message || 'Gagal menyimpan data driver');
+        }
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!selectedDriver) return;
+        try {
+            await deleteMutation.mutateAsync(selectedDriver.id);
+            toast.success('Data driver berhasil dihapus');
+            setIsDeleteOpen(false);
+            setSelectedDriver(null);
+        } catch (error: any) {
+            toast.error(error.message || 'Gagal menghapus data driver');
+        }
+    };
+
+    const handleImport = async (file: File) => {
+        const companyId = localCompanyId || 1;
+        try {
+            await importMutation.mutateAsync({ id: companyId, file });
+            toast.success('Import data driver berhasil');
+            setIsImportOpen(false);
+        } catch (error: any) {
+            toast.error(error.message || 'Import data driver gagal');
+        }
+    };
+
+    const handleExport = async () => {
+        try {
+            await exportMutation.mutateAsync();
+            toast.success('Berhasil export data driver');
+        } catch (error: any) {
+            toast.error(error.message || 'Gagal export data driver');
+        }
+    };
+
+    const driverList = driversData?.data || [];
+    const totalDrivers = driversData?.meta?.total || 0;
+
+    const isSaving = createMutation.isPending || updateMutation.isPending;
+
+    return (
+        <DashboardLayout>
+            <div className="space-y-6">
+                {/* Header */}
+                <div>
+                    <h1 className="text-2xl font-semibold text-gray-900">Driver</h1>
+                    <p className="text-sm text-gray-500 mt-1">Kelola data driver dengan mudah</p>
+                </div>
+
+                {/* Content */}
+                <DriverTable
+                    drivers={driverList}
+                    search={searchInput}
+                    onSearchChange={(v) => setSearchInput(v)}
+                    isLoading={isLoading}
+                    page={page}
+                    perPage={perPage}
+                    totalData={totalDrivers}
+                    onPageChange={setPage}
+                    onPerPageChange={(v) => {
+                        setPerPage(v);
+                        setPage(1);
+                    }}
+                    onAdd={handleAddClick}
+                    onImport={() => setIsImportOpen(true)}
+                    onExport={handleExport}
+                    isExporting={exportMutation.isPending}
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteClick}
+                />
+            </div>
+
+            {/* Modals */}
+            <DriverFormModal
+                isOpen={isFormOpen}
+                onClose={() => {
+                    setIsFormOpen(false);
+                    setTimeout(() => setSelectedDriver(null), 300);
+                }}
+                onSave={handleSaveForm}
+                initialData={selectedDriver}
+                isSubmitting={isSaving}
+                companyId={localCompanyId || 1}
+            />
+
+            <DeleteDriverModal
+                isOpen={isDeleteOpen}
+                onClose={() => setIsDeleteOpen(false)}
+                onConfirm={handleConfirmDelete}
+                isDeleting={deleteMutation.isPending}
+            />
+
+            <ImportDriverModal
+                isOpen={isImportOpen}
+                onClose={() => setIsImportOpen(false)}
+                onImport={handleImport}
+                isUploading={importMutation.isPending}
+            />
+        </DashboardLayout>
+    );
 }

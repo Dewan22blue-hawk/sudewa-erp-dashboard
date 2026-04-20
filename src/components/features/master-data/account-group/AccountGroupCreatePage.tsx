@@ -8,18 +8,19 @@ import { accountGroupSchema, type AccountGroupFormValues } from '@/scheme/accoun
 import { useCreateAccountGroup } from '@/hooks/useAccountGroup';
 import { ApiValidationError } from '@/lib/api/response';
 import { toast } from 'sonner';
+import { useCompany } from '@/contexts/CompanyContext';
 
 export const AccountGroupCreatePage = () => {
   const router = useRouter();
   const form = useForm<AccountGroupFormValues>({
     resolver: zodResolver(accountGroupSchema),
     defaultValues: {
-      code: '',
-      name: '',
+      group_code: '',
       description: '',
-      isActive: true,
     } satisfies Partial<AccountGroupFormValues>,
   });
+
+  const { companyId } = useCompany();
 
   const createMutation = useCreateAccountGroup();
 
@@ -28,7 +29,10 @@ export const AccountGroupCreatePage = () => {
     const backPath = slug ? `/dashboard/${slug}/master/account-group` : '/master-data/account-group';
 
     try {
-      await createMutation.mutateAsync(values);
+      await createMutation.mutateAsync({
+        ...values,
+        company_id: Number(companyId) || 0,
+      });
       toast.success('Grup akun berhasil dibuat');
       router.push(backPath);
     } catch (error) {

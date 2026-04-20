@@ -31,13 +31,13 @@ const mapKas = (payload: KasApiModel): Kas => ({
   updatedAt: payload.updated_at,
 });
 
-const normalizeList = (data: LaravelPagination<KasApiModel> | KasApiModel[]): { list: KasApiModel[]; meta: { current_page: number; per_page: number; total: number; last_page: number } } => {
+const normalizeList = (data: LaravelPagination<KasApiModel> | KasApiModel[]): { list: KasApiModel[]; meta: { current_page: number; perPage: number; total: number; last_page: number } } => {
   if (Array.isArray(data)) {
     return {
       list: data,
       meta: {
         current_page: 1,
-        per_page: data.length || 1,
+        perPage: data.length || 1,
         total: data.length,
         last_page: 1,
       },
@@ -48,7 +48,7 @@ const normalizeList = (data: LaravelPagination<KasApiModel> | KasApiModel[]): { 
     list: data.data ?? [],
     meta: {
       current_page: data.current_page ?? 1,
-      per_page: data.per_page ?? (data.data?.length || 1),
+      perPage: data.per_page ?? (data.data?.length || 1),
       total: data.total ?? data.data?.length ?? 0,
       last_page: data.last_page ?? 1,
     },
@@ -80,7 +80,7 @@ export const getKas = async (companyId?: string | number): Promise<KasListRespon
     data: list.map(mapKas),
     meta: {
       currentPage: meta.current_page,
-      perPage: meta.per_page,
+      perPage: meta.perPage,
       total: meta.total,
       lastPage: meta.last_page,
     },

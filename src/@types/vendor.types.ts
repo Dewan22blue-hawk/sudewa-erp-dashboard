@@ -1,29 +1,35 @@
-import type { PaginatedResult } from './pagination.types';
+import { PaginatedResult } from './pagination.types';
 
 export interface Vendor {
-    id: number | string;
-    uuid?: string;
-    code?: string;
+    id: number;
+    uuid: string;
+    picName: string;
+    code: string;
+    type: string;
     name: string;
-    address?: string | null;
-    phone?: string | null;
-    email?: string | null;
-    pic?: string | null;
-    userId?: number | string;
-    companyId?: number | string;
+    address: string;
+    npwp: string;
+    phone: string;
+    identityNumber?: string | null;
+    driveLicenseIdentityNumber?: string | null;
+    image?: string | null;
+    mapLink?: string | null;
+    socialMedia1Link?: string | null;
+    socialMedia2Link?: string | null;
+    socialMedia3Link?: string | null;
+    socialMedia4Link?: string | null;
+    websiteLink?: string | null;
     createdAt?: string;
     updatedAt?: string;
 }
 
 export interface VendorPayload {
+    companyId: string | number;
     name: string;
-    code?: string;
-    address?: string;
-    phone?: string;
-    email?: string;
-    pic?: string;
-    userId?: number | string;
-    companyId?: number | string;
+    address: string;
+    phone: string;
+    npwp?: string;
+    picName: string;
 }
 
-export interface VendorListResponse extends PaginatedResult<Vendor> { }
+export type VendorListResponse = PaginatedResult<Vendor>;

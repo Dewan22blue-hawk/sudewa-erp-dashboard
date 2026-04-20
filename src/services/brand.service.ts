@@ -27,7 +27,7 @@ const basePath = '/wapi/master-data/brand';
 type PaginatedBrandResponse = LaravelApiResponse<{
   data: BrandApiModel[];
   current_page: number;
-  per_page: number;
+  perPage: number;
   total: number;
   last_page: number;
 }>;
@@ -45,7 +45,7 @@ export const getBrands = async (params: PaginationParams): Promise<BrandListResp
     {
       data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.per_page,
+      per_page: data.perPage,
       total: data.total,
       last_page: data.last_page,
     },

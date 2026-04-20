@@ -6,14 +6,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { PengeluaranUnitDetail } from '@/@types/pengeluaran-unit.types';
+import { DispatchUnitTableRow } from '@/@types/pengeluaran-unit.types';
 import DeletePengeluaranUnitDialog from './DeletePengeluaranUnitDialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
-    data: PengeluaranUnitDetail[];
-    onDelete: (ids: string[]) => Promise<void>;
+    data: DispatchUnitTableRow[];
+    onDelete: (ids: number[]) => Promise<void>;
     onCancel?: () => void;
 }
 
@@ -21,8 +21,8 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
     const [search, setSearch] = useState('');
     const [itemsPerPage, setItemsPerPage] = useState('25');
     const [currentPage, setCurrentPage] = useState(1);
-    const [selected, setSelected] = useState<string[]>([]);
-    const [confirmDeleteIds, setConfirmDeleteIds] = useState<string[]>([]);
+    const [selected, setSelected] = useState<number[]>([]);
+    const [confirmDeleteIds, setConfirmDeleteIds] = useState<number[]>([]);
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
@@ -32,7 +32,7 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
     const filtered = useMemo(() => {
         const q = search.toLowerCase();
         return data.filter((item) =>
-            [item.kodeJual, item.tipeUnit, item.warna, item.noMesin, item.noRangka].some((field) =>
+            [item.salesCode, item.unitTypeName, item.color, item.machineNumber, item.chassisNumber].some((field) =>
                 field.toLowerCase().includes(q)
             )
         );
@@ -53,7 +53,7 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
         setCurrentPage(1);
     }, [itemsPerPage, search]);
 
-    const toggleSelect = (id: string) => {
+    const toggleSelect = (id: number) => {
         setSelected((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
     };
 
@@ -140,19 +140,19 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                                 <SortableHeader title="NO" sortKey="id" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
                             </th>
                             <th className="py-2 text-left">
-                                <SortableHeader title="KODE JUAL" sortKey="kodeJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                                <SortableHeader title="KODE JUAL" sortKey="salesCode" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
                             </th>
                             <th className="py-2 text-left">
-                                <SortableHeader title="TIPE UNIT" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                                <SortableHeader title="TIPE UNIT" sortKey="unitTypeName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
                             </th>
                             <th className="py-2 text-left">
-                                <SortableHeader title="WARNA" sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                                <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
                             </th>
                             <th className="py-2 text-left">
-                                <SortableHeader title="NO MESIN" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                                <SortableHeader title="NO MESIN" sortKey="machineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
                             </th>
                             <th className="py-2 text-left">
-                                <SortableHeader title="NO RANGKA" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
+                                <SortableHeader title="NO RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
                             </th>
                         </tr>
                     </thead>
@@ -165,11 +165,11 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                                         <Checkbox checked={selected.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
                                     </td>
                                     <td className="px-4 py-3">{startIndex + index + 1}</td>
-                                    <td className="px-4 py-3">{item.kodeJual}</td>
-                                    <td className="px-4 py-3">{item.tipeUnit}</td>
-                                    <td className="px-4 py-3">{item.warna}</td>
-                                    <td className="px-4 py-3">{item.noMesin}</td>
-                                    <td className="px-4 py-3">{item.noRangka}</td>
+                                    <td className="px-4 py-3">{item.salesCode}</td>
+                                    <td className="px-4 py-3">{item.unitTypeName}</td>
+                                    <td className="px-4 py-3">{item.color}</td>
+                                    <td className="px-4 py-3">{item.machineNumber}</td>
+                                    <td className="px-4 py-3">{item.chassisNumber}</td>
                                 </tr>
                             ))
                         ) : (

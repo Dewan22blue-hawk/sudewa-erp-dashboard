@@ -20,6 +20,16 @@ export const useUnitItemDetails = (unitItemId?: string) => {
   });
 };
 
+/** Fetch ALL unit item details for every item in a given purchase transaction. */
+export const useUnitItemDetailsByTransactionId = (purchaseId?: string) => {
+  return useQuery({
+    queryKey: ['unit-item-details-by-transaction', purchaseId],
+    queryFn: () => unitItemDetailService.getDetailsByTransactionId(purchaseId as string),
+    enabled: !!purchaseId,
+    staleTime: 1000 * 60,
+  });
+};
+
 export const useCreateUnitItemDetail = () => {
   const queryClient = useQueryClient();
   return useMutation({

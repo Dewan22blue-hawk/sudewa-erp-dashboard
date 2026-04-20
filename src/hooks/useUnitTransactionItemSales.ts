@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
 
-export const useStockUnits = (itemId?: string, options?: { companyId?: string }) => {
+export const useStockUnits = (itemId?: string, options?: { companyId?: string; unitTypeIdFallback?: string }) => {
   const unitItemQuery = useQuery({
     queryKey: ['unit-transaction-item', itemId ?? ''],
     queryFn: () => unitTransactionItemSalesService.getUnitItemById(itemId as string),
@@ -9,10 +9,12 @@ export const useStockUnits = (itemId?: string, options?: { companyId?: string })
     staleTime: 1000 * 60,
   });
 
+  const resolvedUnitTypeId = unitItemQuery.data?.unit_type_id || options?.unitTypeIdFallback || '';
+
   const stockQuery = useQuery({
-    queryKey: ['stock-units', itemId ?? '', unitItemQuery.data?.unit_type_id ?? '', options?.companyId ?? '1'],
-    queryFn: () => unitTransactionItemSalesService.getStockByUnitType(unitItemQuery.data?.unit_type_id as string, options?.companyId ?? '1'),
-    enabled: !!itemId && !!unitItemQuery.data?.unit_type_id,
+    queryKey: ['stock-units', itemId ?? '', resolvedUnitTypeId, options?.companyId ?? '1'],
+    queryFn: () => unitTransactionItemSalesService.getStockByUnitType(resolvedUnitTypeId, options?.companyId ?? '1'),
+    enabled: !!itemId && !!resolvedUnitTypeId,
     staleTime: 1000 * 30,
   });
 

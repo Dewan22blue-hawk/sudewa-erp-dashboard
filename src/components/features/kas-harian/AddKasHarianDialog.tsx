@@ -11,6 +11,7 @@ import { useCreateKasHarian } from '@/hooks/useKasHarian';
 import { useKas } from '@/hooks/useKas';
 import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies } from '@/services/company.service';
+import { useAccounts } from '@/hooks/useAccount';
 import KasHarianForm from './KasHarianForm';
 
 interface Props {
@@ -27,6 +28,7 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
     defaultValues: {
       company_id: selectedCompanyId || 0,
       cash_id: 0,
+      account_id: 0,
       date: new Date(),
       note: '',
       debet: 0,
@@ -41,12 +43,14 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
   });
 
   const cashQuery = useKas();
+  const accountQuery = useAccounts({ perPage: 100 });
 
   useEffect(() => {
     if (open) {
       form.reset({
         company_id: selectedCompanyId || 0,
         cash_id: 0,
+        account_id: 0,
         date: new Date(),
         note: '',
         debet: 0,
@@ -60,11 +64,12 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
       await createKasHarian({
         company_id: data.company_id,
         cash_id: data.cash_id,
+        account_id: data.account_id,
         date: format(data.date, 'yyyy-MM-dd'),
         note: data.note,
         debet: data.debet,
         credit: data.credit,
-      });
+      } as any);
 
       toast.success('Transaksi kas harian berhasil ditambahkan');
       onOpenChange(false);
@@ -89,8 +94,10 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
           id="add-kas-form"
           companies={companyQuery.data ?? []}
           cashOptions={cashQuery.data?.data ?? []}
+          accountOptions={accountQuery.data?.data ?? []}
           isLoadingCompanies={companyQuery.isLoading}
           isLoadingCash={cashQuery.isLoading}
+          isLoadingAccounts={accountQuery.isLoading}
         />
 
         <div className="flex flex-col gap-3 mt-4">

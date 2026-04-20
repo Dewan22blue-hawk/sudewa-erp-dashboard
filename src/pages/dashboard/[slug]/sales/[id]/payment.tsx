@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSalesDetail } from '@/hooks/useSales';
@@ -198,6 +198,7 @@ export default function PaymentPage() {
     bca_usd: 0,
     cash: 0,
     payment_date: '',
+    note: '',
   });
 
   useEffect(() => {
@@ -206,6 +207,7 @@ export default function PaymentPage() {
       bca_usd: Number(existingBilling?.bca_payment_2 ?? 0),
       cash: Number(existingBilling?.cash_payment ?? 0),
       payment_date: existingBilling?.payment_date ? String(existingBilling.payment_date).slice(0, 10) : new Date().toISOString().slice(0, 10),
+      note: '',
     });
   }, [existingBilling?.bca_payment, existingBilling?.bca_payment_2, existingBilling?.cash_payment, existingBilling?.payment_date]);
 
@@ -220,9 +222,9 @@ export default function PaymentPage() {
   );
   const totalPaidFromBilling = Number(
     existingBilling?.total_paid ??
-      Number(existingBilling?.bca_payment ?? 0) +
-      Number(existingBilling?.cash_payment ?? 0) +
-      Number(existingBilling?.bca_payment_2 ?? 0),
+    Number(existingBilling?.bca_payment ?? 0) +
+    Number(existingBilling?.cash_payment ?? 0) +
+    Number(existingBilling?.bca_payment_2 ?? 0),
   );
   const totalPaid = existingBilling?.is_paid ? Math.max(totalPaidFromBilling, totalPaidFromHistory) : totalPaidFromHistory;
 
@@ -390,7 +392,7 @@ export default function PaymentPage() {
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold tracking-tight">Pembayaran Unit</h1>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Beli / Kode Jual</span>
+              <span className="text-muted-foreground">Kode Jual</span>
               <span className="text-blue-600 font-medium">{salesData.kodeJual}</span>
             </div>
           </div>
@@ -398,7 +400,7 @@ export default function PaymentPage() {
 
         <Card className="rounded-xl">
           <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
+            <h2 className="text-2xl font-semibold">Informasi Penjualan</h2>
             <Separator className="my-4" />
             <div className="space-y-6">
               <div className="rounded-lg border">
@@ -451,7 +453,7 @@ export default function PaymentPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">Cash</p>
+                    <p className="text-sm font-medium">CASH IDR</p>
                     <Input
                       type="text"
                       inputMode="numeric"
@@ -487,11 +489,29 @@ export default function PaymentPage() {
                 </div>
               </div>
 
+              {/* ── Section: Catatan ── */}
+              <div className="rounded-lg border">
+                <div className="border-b px-4 py-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground">Catatan</h3>
+                </div>
+                <div className="p-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Note</p>
+                    <Input
+                      placeholder="Catatan pembayaran (opsional)"
+                      value={form.note}
+                      onChange={(e) => setForm((prev) => ({ ...prev, note: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex justify-end gap-3 pt-4">
                 <Button variant="outline" onClick={() => router.back()}>
                   Batal
                 </Button>
                 <Button
+
                   className="bg-green-600 hover:bg-green-700"
                   data-is-paid={isPaid}
                   onClick={() =>
@@ -503,7 +523,14 @@ export default function PaymentPage() {
                   }
                   disabled={isSubmitting || createBilling.isPending || createBillingHistory.isPending}
                 >
-                  {isSubmitting || createBilling.isPending || createBillingHistory.isPending ? 'Menyimpan...' : 'Bayar'}
+                  {isSubmitting || createBilling.isPending || createBillingHistory.isPending ? (
+                    'Menyimpan...'
+                  ) : (
+                    <>
+                      <Wallet className="mr-2 h-4 w-4" />
+                      Bayar
+                    </>
+                  )}
                 </Button>
               </div>
 

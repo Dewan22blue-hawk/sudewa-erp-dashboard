@@ -28,16 +28,16 @@ export default function LaporanPembelianPerTipe({ data, pagination, isLoading, o
         <Table>
           <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead className="text-center w-16">NO</TableHead>
-              <TableHead>NO PEMBELIAN</TableHead>
-              <TableHead>TGL BELI</TableHead>
-              <TableHead>TIPE UNIT</TableHead>
-              <TableHead className="text-right">QTY</TableHead>
-              <TableHead className="text-right">HARGA</TableHead>
-              <TableHead className="text-right">BIAYA BBN</TableHead>
-              <TableHead className="text-right">BIAYA EKSPEDISI</TableHead>
-              <TableHead className="text-right">BIAYA LAIN</TableHead>
-              <TableHead className="text-right">TOTAL BELI</TableHead>
+              <TableHead className="text-center w-16 font-semibold">NO</TableHead>
+              <TableHead className="font-semibold">NO PEMBELIAN</TableHead>
+              <TableHead className="font-semibold">TGL BELI</TableHead>
+              <TableHead className="font-semibold">TIPE UNIT</TableHead>
+              <TableHead className="text-right font-semibold">QTY</TableHead>
+              <TableHead className="text-right font-semibold">HARGA</TableHead>
+              <TableHead className="text-right font-semibold">BIAYA BBN</TableHead>
+              <TableHead className="text-right font-semibold">BIAYA EKSPEDISI</TableHead>
+              <TableHead className="text-right font-semibold">BIAYA LAIN</TableHead>
+              <TableHead className="text-right font-semibold">TOTAL BELI</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

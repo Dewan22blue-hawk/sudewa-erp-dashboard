@@ -35,7 +35,7 @@ const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
 type PaginatedStockUnitResponse = LaravelApiResponse<{
   data: StockUnitApiModel[];
   current_page: number;
-  per_page: number;
+  perPage: number;
   total: number;
   last_page: number;
 }>;
@@ -54,11 +54,9 @@ export const getStockUnits = async (
     `/wapi/warehouse/warehouse-get-unit-transaction-item-details/${companyId}`,
     {
       params: {
-        ...buildLaravelPaginationQuery(params), // Handles page, per_page, search, stock_state
-        // Explicitly passing common parameters again to ensure they are sent
-        // This might be redundant if buildLaravelPaginationQuery handles all, but ensures coverage.
+        ...buildLaravelPaginationQuery(params),
         page: params.page,
-        per_page: params.per_page, // Explicitly pass per_page
+        per_page: params.perPage,
         search: params.search,
         stock_state: params.stock_state,
         machine_number: params.machine_number,
@@ -74,7 +72,7 @@ export const getStockUnits = async (
     {
       data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.per_page,
+      per_page: data.perPage,
       total: data.total,
       last_page: data.last_page,
     },

@@ -25,7 +25,7 @@ type TransactionFlowApiModel = {
 type PaginatedResponse = LaravelApiResponse<{
   current_page: number;
   data: TransactionFlowApiModel[];
-  per_page: number;
+  perPage: number;
   total: number;
 }>;
 
@@ -54,7 +54,7 @@ export const getTransactions = async (companyId: string, page = 1, limit = 10, s
     params: {
       company_id: companyId,
       page,
-      per_page: limit,
+      perPage: limit,
       description: search || undefined,
     },
   });
@@ -66,7 +66,7 @@ export const getTransactions = async (companyId: string, page = 1, limit = 10, s
     data: list.map(mapTransaction),
     total: Number(payload.total ?? list.length),
     page: Number(payload.current_page ?? page),
-    limit: Number(payload.per_page ?? limit),
+    limit: Number(payload.perPage ?? limit),
   };
 };
 

@@ -189,6 +189,15 @@ export default function PurchaseDetailPage() {
               <div className="text-xs text-slate-500 flex items-center gap-2">
                 <span>Kode Beli:</span>
                 <span className="text-blue-600 font-semibold">{purchase.code}</span>
+                {isPaid ? (
+                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
+                    Lunas
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700">
+                    Belum Lunas
+                  </Badge>
+                )}
                 {isRefunded ? (
                   <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
                     Sudah Refund
@@ -219,8 +228,8 @@ export default function PurchaseDetailPage() {
             {isRefunded
               ? 'Transaksi sudah direfund (inbound_return). Proses terima barang dinonaktifkan.'
               : isAlreadyReceived
-              ? 'Stok sudah diterima (inbound_receipt).'
-              : 'Tombol Terima Barang aktif setelah pembayaran lunas.'}
+                ? 'Stok sudah diterima (inbound_receipt).'
+                : 'Tombol Terima Barang aktif setelah pembayaran lunas.'}
           </p>
         )}
 

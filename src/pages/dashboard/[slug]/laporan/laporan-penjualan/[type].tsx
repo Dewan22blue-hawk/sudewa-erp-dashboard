@@ -24,10 +24,9 @@ export default function DetailLaporanPenjualanPage() {
         queryKey: ["laporan-penjualan", type, awal, akhir],
         queryFn: () =>
             getLaporanPenjualan({
-                jenis: type as any,
-                periodeAwal: awal,
-                periodeAkhir: akhir,
-            }),
+                start_date: awal,
+                end_date: akhir,
+            } as any),
     })
 
     const getReportTitle = () => {

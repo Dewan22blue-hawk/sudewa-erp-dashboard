@@ -24,10 +24,9 @@ export default function DetailLaporanPenerimaanPage() {
         queryKey: ["laporan-penerimaan", type, awal, akhir],
         queryFn: () =>
             getLaporanPenerimaan({
-                jenis: type as any,
-                periodeAwal: awal,
-                periodeAkhir: akhir,
-            }),
+                start_date: awal,
+                end_date: akhir,
+            } as any),
     })
 
     const getReportTitle = () => {

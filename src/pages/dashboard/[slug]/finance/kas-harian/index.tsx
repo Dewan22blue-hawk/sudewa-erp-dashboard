@@ -14,8 +14,9 @@ import { KasHarian } from '@/@types/kas-harian.types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function KasHarianPage() {
-  const { data: kasHarianData, isLoading } = useKasHarian();
   const [searchTerm, setSearchTerm] = useState('');
+  const { data: kasHarianData, isLoading } = useKasHarian({ per_page: 25 });
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function KasHarianPage() {
     setIsDeleteOpen(true);
   };
 
-  const filteredData = kasHarianData?.filter((item) => item.keterangan.toLowerCase().includes(searchTerm.toLowerCase()) || item.notaRef.toLowerCase().includes(searchTerm.toLowerCase())) || [];
+  const filteredData = kasHarianData?.data?.filter((item: KasHarian) => item.note?.toLowerCase().includes(searchTerm.toLowerCase()) || (item.code || '').toLowerCase().includes(searchTerm.toLowerCase())) || [];
 
   return (
     <DashboardLayout>
@@ -80,7 +81,7 @@ export default function KasHarianPage() {
           </div>
         </div>
 
-        {isLoading ? <div className="text-center py-10">Loading...</div> : <KasHarianTable data={filteredData} onEdit={handleEdit} onDelete={handleDelete} />}
+        {isLoading ? <div className="text-center py-10">Loading...</div> : <KasHarianTable data={filteredData} onEdit={handleEdit} onDelete={handleDelete} meta={{ currentPage, perPage: 25, total: filteredData.length, lastPage: Math.ceil(filteredData.length / 25) }} hasNextPage={false} onPageChange={setCurrentPage} />}
 
         <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
           <div>Showing 1-25 of 100 data</div>

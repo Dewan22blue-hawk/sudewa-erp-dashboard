@@ -176,9 +176,9 @@ export default function LaporanStockPage() {
                     <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">{activeMeta.title}</h1>
                     <p className="text-[15px] text-gray-500">{activeMeta.subtitle}</p>
                 </div>
-                        <div className="flex flex-wrap items-center gap-3">
-                            {pageFilter}
-                        </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    {pageFilter}
+                </div>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
                     <div className="no-print flex w-full flex-col gap-4">
                         <div className="flex w-full flex-wrap items-center justify-between gap-4">
@@ -187,7 +187,7 @@ export default function LaporanStockPage() {
                                     value="stock"
                                     className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                                 >
-                                    Stock
+                                    Jumlah Stock
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="stock-detail"
@@ -226,11 +226,11 @@ export default function LaporanStockPage() {
 
                     <PrintLetterPage
                         id="laporan-stock-print"
-                        className="laporan-stock-print-area"
+                        className="laporan-stock-print-area laporan-penerimaan-print-area"
                         letterheadSrc={selectedPrintBackground}
                     >
-                        <div className="laporan-stock-print-content">
-                            <div className="flex flex-col items-center justify-center text-center space-y-1 mb-8">
+                        <div className="laporan-penerimaan-print-content laporan-stock-print-content">
+                            <div className="flex flex-col items-center justify-center text-center space-y-0 mb-2">
                                 <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
                                     {activeMeta.title}
                                 </h2>

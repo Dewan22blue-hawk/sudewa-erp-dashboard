@@ -42,19 +42,22 @@ const toCsvLine = (cells: Array<string | number>): string =>
     })
     .join(',');
 
+const ROWS_PER_PAGE = 50;
+
 export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }: PurchaseOrderTabProps) {
   const [rows, setRows] = useState<OrderOutstandingItem[]>([]);
   const [pagination, setPagination] = useState<PaginatedResponse<OrderOutstandingItem>>({
     current_page: 1,
     data: [],
     last_page: 1,
-    per_page: 50,
+    per_page: ROWS_PER_PAGE,
     total: 0,
     from: 0,
     to: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [tablePage, setTablePage] = useState(1);
 
   const appliedStartDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined;
   const appliedEndDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : appliedStartDate;
@@ -70,6 +73,7 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
       });
       setRows(result.data);
       setPagination(result);
+      setTablePage(1);
     } catch {
       toast.error('Gagal memuat data purchase order outstanding');
     } finally {
@@ -80,6 +84,17 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
   useEffect(() => {
     void fetchData();
   }, [fetchData]);
+
+  // Local table pagination (50 rows per page display)
+  const lastTablePage = Math.max(1, Math.ceil(rows.length / ROWS_PER_PAGE));
+  const safeTablePage = Math.min(tablePage, lastTablePage);
+  const pagedRows = useMemo(() => {
+    const start = (safeTablePage - 1) * ROWS_PER_PAGE;
+    return rows.slice(start, start + ROWS_PER_PAGE);
+  }, [rows, safeTablePage]);
+
+  const showingFrom = rows.length === 0 ? 0 : (safeTablePage - 1) * ROWS_PER_PAGE + 1;
+  const showingTo = Math.min(safeTablePage * ROWS_PER_PAGE, rows.length);
 
   const summary = useMemo(
     () =>
@@ -120,7 +135,7 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
     rows.forEach((item, index) => {
       lines.push(
         toCsvLine([
-          (pagination.from > 0 ? pagination.from - 1 : 0) + index + 1,
+          index + 1,
           item.code,
           formatDateLabel(item.date),
           item.supplier_name || '-',
@@ -145,7 +160,7 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
     URL.revokeObjectURL(url);
 
     toast.success('Data purchase order berhasil diunduh');
-  }, [page, pagination.from, rows, summary]);
+  }, [page, rows, summary]);
 
   useEffect(() => {
     onActionsChange?.({ print: handlePrint, download: handleDownload });
@@ -153,19 +168,19 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-gray-100">
+            <TableHeader className="bg-gray-50">
               <TableRow>
-                <TableHead className="w-16 text-center">NO</TableHead>
-                <TableHead>KODE PEMBELIAN</TableHead>
-                <TableHead>TGL PEMBELIAN</TableHead>
-                <TableHead>SUPPLIER</TableHead>
-                <TableHead>TIPE UNIT</TableHead>
-                <TableHead className="text-right">QTY BELI</TableHead>
-                <TableHead className="text-right">QTY TERIMA</TableHead>
-                <TableHead className="text-right">KURANG</TableHead>
+                <TableHead className="w-12 text-center font-semibold">NO</TableHead>
+                <TableHead className="font-semibold whitespace-nowrap">KODE PEMBELIAN</TableHead>
+                <TableHead className="font-semibold whitespace-nowrap">TGL PEMBELIAN</TableHead>
+                <TableHead className="font-semibold">SUPPLIER</TableHead>
+                <TableHead className="font-semibold">TIPE UNIT</TableHead>
+                <TableHead className="text-right font-semibold">QTY BELI</TableHead>
+                <TableHead className="text-right font-semibold">QTY TERIMA</TableHead>
+                <TableHead className="text-right font-semibold">KURANG</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -177,7 +192,7 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : rows.length === 0 ? (
+              ) : pagedRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="py-10 text-center text-gray-500">
                     Data tidak tersedia
@@ -185,21 +200,21 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
                 </TableRow>
               ) : (
                 <>
-                  {rows.map((item, index) => (
-                    <TableRow key={`${item.code}-${index}`}>
+                  {pagedRows.map((item, index) => (
+                    <TableRow key={`${item.code}-${item.unit_type}-${index}`} className="hover:bg-gray-50">
                       <TableCell className="text-center">
-                        {(pagination.from > 0 ? pagination.from - 1 : 0) + index + 1}
+                        {(safeTablePage - 1) * ROWS_PER_PAGE + index + 1}
                       </TableCell>
-                      <TableCell>{item.code}</TableCell>
-                      <TableCell>{formatDateLabel(item.date)}</TableCell>
-                      <TableCell>{item.supplier_name || '-'}</TableCell>
-                      <TableCell>{item.unit_type || '-'}</TableCell>
+                      <TableCell className="whitespace-nowrap font-medium">{item.code}</TableCell>
+                      <TableCell className="whitespace-nowrap">{formatDateLabel(item.date)}</TableCell>
+                      <TableCell className="whitespace-nowrap">{item.supplier_name || '-'}</TableCell>
+                      <TableCell className="whitespace-nowrap">{item.unit_type || '-'}</TableCell>
                       <TableCell className="text-right">{formatNumber(item.order_qty)}</TableCell>
                       <TableCell className="text-right">{formatNumber(item.received_qty ?? 0)}</TableCell>
                       <TableCell className="text-right">{formatNumber(item.remaining_qty)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow className="bg-blue-100/70 font-semibold">
+                  <TableRow className="bg-blue-50 font-semibold print-hide-pagination">
                     <TableCell colSpan={5} className="text-center">
                       GRAND TOTAL
                     </TableCell>
@@ -212,36 +227,66 @@ export default function PurchaseOrderTab({ perPage, dateRange, onActionsChange }
             </TableBody>
           </Table>
         </div>
-      </div>
 
-      {!isLoading && pagination.total > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
-          <div>
-            Showing {pagination.from || 0}-{pagination.to || 0} of {pagination.total} data
+        {/* Pagination */}
+        {!isLoading && rows.length > 0 && (
+          <div className="flex justify-between items-center p-4 border-t no-print">
+            <div className="text-sm text-gray-500">
+              Showing {showingFrom} to {showingTo} of {rows.length} data
+            </div>
+            <div className="flex gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safeTablePage === 1}
+                onClick={() => setTablePage((prev) => Math.max(1, prev - 1))}
+              >
+                Previous
+              </Button>
+              <Button variant="default" size="sm" className="bg-gray-900 pointer-events-none">
+                {safeTablePage}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safeTablePage === lastTablePage}
+                onClick={() => setTablePage((prev) => Math.min(lastTablePage, prev + 1))}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.current_page <= 1}
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            >
-              Previous
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              {pagination.current_page} / {pagination.last_page}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.current_page >= pagination.last_page}
-              onClick={() => setPage((prev) => prev + 1)}
-            >
-              Next
-            </Button>
+        )}
+
+        {/* API pagination (load more pages) */}
+        {!isLoading && pagination.total > 0 && pagination.last_page > 1 && (
+          <div className="flex justify-between items-center px-4 py-2 border-t bg-gray-50 text-xs text-gray-500 no-print">
+            <span>
+              Halaman API: {pagination.current_page} / {pagination.last_page} &nbsp;·&nbsp; Total record: {pagination.total}
+            </span>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                disabled={pagination.current_page <= 1}
+                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              >
+                Prev
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                disabled={pagination.current_page >= pagination.last_page}
+                onClick={() => setPage((prev) => prev + 1)}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

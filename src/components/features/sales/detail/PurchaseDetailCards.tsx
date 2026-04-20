@@ -59,13 +59,19 @@ export function PurchaseDetailCards({ data }: Props) {
               <span className="font-medium text-right">{formatMoney(data.hargaSatuan)}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Biaya BBN</span>
+              <span className="font-medium text-right">{formatMoney(data.biayaBbn)}</span>
+            </div>
+
+            <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Quantity</span>
               <span className="font-medium text-right">{data.qty} PCS</span>
             </div>
 
             <div className="mt-auto pt-4 border-t flex justify-between items-center">
-              <span className="font-medium text-sm">Total Pembelian</span>
-              <span className="font-bold text-lg text-right">{formatMoney(data.totalDpp)}</span>
+              <span className="font-medium text-sm">Total HPP</span>
+              {/* <span className="font-bold text-lg text-right">{formatMoney(data.totalDpp)}</span> */}
+              <span className="font-bold text-lg text-right">{formatMoney(data.totalHpp)}</span>
             </div>
           </div>
         </CardContent>
@@ -82,10 +88,10 @@ export function PurchaseDetailCards({ data }: Props) {
           </div>
 
           <div className="space-y-2 flex-1 text-sm">
-            <div className="flex justify-between items-center">
+            {/* <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Biaya BBN</span>
               <span className="font-medium text-right">{formatMoney(data.biayaBbn)}</span>
-            </div>
+            </div> */}
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Ekspedisi</span>
               <span className="font-medium text-right">{formatMoney(data.biayaEkspedisi)}</span>
@@ -104,7 +110,7 @@ export function PurchaseDetailCards({ data }: Props) {
             </div>
 
             <div className="mt-auto pt-3 border-t flex justify-between items-center">
-              <span className="font-medium text-sm">Total</span>
+              <span className="font-medium text-sm">Total Pembelian</span>
               <span className="font-bold text-lg text-right">{formatMoney(data.totalJual)}</span>
             </div>
           </div>

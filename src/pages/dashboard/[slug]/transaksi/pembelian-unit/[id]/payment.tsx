@@ -124,6 +124,8 @@ export default function PurchasePaymentPage() {
         const purchaseBruto = Number(purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
         const billingGrandTotal = Number(currentBilling?.grand_total ?? 0);
         const totalTagihan = billingGrandTotal > 0 ? billingGrandTotal : purchaseBruto;
+        const totalPpn = Number((purchase as any)?.unit_transaction_item_total_ppn ?? (purchase as any)?.transaction_ppn_total ?? (purchase as any)?.unit_transaction_ppn_total ?? 0);
+
         const historyPaid = (billingHistories ?? []).reduce(
             (acc, item) => acc + Number(item.bca_payment_amount ?? 0) + Number(item.cash_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0),
             0,
@@ -276,6 +278,7 @@ export default function PurchasePaymentPage() {
                         <PurchasePaymentForm
                             purchaseCode={purchase.code}
                             totalTagihan={totalTagihan}
+                            totalPpn={totalPpn}
                             billing={currentBilling ?? null}
                             histories={billingHistories}
                             onSubmitPayment={handleSubmitPayment}

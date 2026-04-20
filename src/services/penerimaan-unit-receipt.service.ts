@@ -37,7 +37,7 @@ type UnitTransactionItemDetailApiModel = {
 type LaravelPaginationLike<T> = {
   data?: T[];
   current_page?: number;
-  per_page?: number;
+  perPage?: number;
   total?: number;
   last_page?: number;
 };
@@ -79,7 +79,7 @@ const toBoolValue = (value: unknown): boolean => {
 
 const extractPaginatedRows = <T>(payload: unknown): LaravelPaginationLike<T> => {
   if (!payload || typeof payload !== 'object') {
-    return { data: [], current_page: 1, per_page: 10, total: 0, last_page: 1 };
+    return { data: [], current_page: 1, perPage: 10, total: 0, last_page: 1 };
   }
 
   const source = payload as LaravelPaginationLike<T> & { data?: unknown };
@@ -94,7 +94,7 @@ const extractPaginatedRows = <T>(payload: unknown): LaravelPaginationLike<T> => 
     }
   }
 
-  return { data: [], current_page: 1, per_page: 10, total: 0, last_page: 1 };
+  return { data: [], current_page: 1, perPage: 10, total: 0, last_page: 1 };
 };
 
 const fetchPurchaseTransactions = async (
@@ -105,7 +105,7 @@ const fetchPurchaseTransactions = async (
       sort_order: 'desc',
       type: 'purchase',
       page: params.page,
-      per_page: params.perPage,
+      perPage: params.perPage,
       search: params.search || undefined,
     },
   });
@@ -117,7 +117,7 @@ const fetchPurchaseTransactions = async (
     rows: normalized.data ?? [],
     meta: {
       currentPage: normalized.current_page ?? 1,
-      perPage: normalized.per_page ?? params.perPage,
+      perPage: normalized.perPage ?? params.perPage,
       total: normalized.total ?? 0,
       lastPage: normalized.last_page ?? 1,
     },
@@ -128,7 +128,7 @@ const fetchItemsByTransaction = async (unitTransactionId: number): Promise<UnitT
   const response = await apiClient.get<LaravelApiResponse<unknown>>(itemBasePath, {
     params: {
       unit_transaction_id: unitTransactionId,
-      per_page: 200,
+      perPage: 200,
     },
   });
 
@@ -152,7 +152,7 @@ const fetchItemDetails = async (unitTransactionItemId: number): Promise<UnitTran
   const response = await apiClient.get<LaravelApiResponse<unknown>>(itemDetailBasePath, {
     params: {
       unit_transaction_item_id: unitTransactionItemId,
-      per_page: 200,
+      perPage: 200,
     },
   });
 

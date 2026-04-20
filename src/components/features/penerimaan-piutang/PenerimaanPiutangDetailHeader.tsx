@@ -10,7 +10,7 @@ interface Props {
 
 export default function PenerimaanPiutangDetailHeader({ data }: Props) {
     const router = useRouter()
-    const percentage = data.totalJual > 0 ? (data.totalTerima / data.totalJual) * 100 : 0
+    const percentage = data.billing_summary.grand_total > 0 ? (data.billing_summary.total_paid / data.billing_summary.grand_total) * 100 : 0
 
     return (
         <div className="space-y-6 mb-6">
@@ -31,7 +31,7 @@ export default function PenerimaanPiutangDetailHeader({ data }: Props) {
                         </h1>
                         <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
                             <span>No Pembelian</span>
-                            <span className="text-blue-600 font-medium">{data.kodeJual}</span>
+                            <span className="text-blue-600 font-medium">{data.code}</span>
                         </div>
                     </div>
                 </div>
@@ -50,14 +50,14 @@ export default function PenerimaanPiutangDetailHeader({ data }: Props) {
                     <div className="space-y-4">
                         <div>
                             <p className="text-sm text-gray-500 mb-1">Nomer Pembelian</p>
-                            <p className="font-medium text-gray-900">{data.kodeJual}</p>
+                            <p className="font-medium text-gray-900">{data.code}</p>
                         </div>
 
                         <div>
                             <p className="text-sm text-gray-500 mb-1">Tanggal</p>
                             <div className="flex items-center gap-2">
                                 <span className="text-gray-400"><CalendarDays size={16} className="text-gray-400" /></span>
-                                <p className="font-medium text-gray-900">{data.tanggal}</p>
+                                <p className="font-medium text-gray-900">{data.date}</p>
                             </div>
                         </div>
 
@@ -65,7 +65,7 @@ export default function PenerimaanPiutangDetailHeader({ data }: Props) {
                             <p className="text-sm text-gray-500 mb-1">Supplier</p>
                             <div className="flex items-center gap-2">
                                 <span className="text-gray-400"><User size={16} className="text-gray-400" /></span>
-                                <p className="font-medium text-gray-900">{data.customer}</p>
+                                <p className="font-medium text-gray-900">{data.person.name}</p>
                             </div>
                         </div>
                     </div>
@@ -83,21 +83,21 @@ export default function PenerimaanPiutangDetailHeader({ data }: Props) {
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500">Total Beli</span>
-                            <span className="font-medium text-gray-900">{formatCurrency(data.totalJual)}</span>
+                            <span className="font-medium text-gray-900">{formatCurrency(data.billing_summary.grand_total)}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500">Total Bayar</span>
-                            <span className="font-medium text-gray-900">{formatCurrency(data.totalTerima)}</span>
+                            <span className="font-medium text-gray-900">{formatCurrency(data.billing_summary.total_paid)}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500">Total Hutang</span>
-                            <span className="font-medium text-gray-900">{formatCurrency(data.totalPiutang)}</span>
+                            <span className="font-medium text-gray-900">{formatCurrency(data.billing_summary.remaining_payment)}</span>
                         </div>
 
                         <div className="pt-4 mt-4 border-t border-gray-50">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="font-medium text-gray-900">Kurang Bayar</span>
-                                <span className="font-bold text-red-500">{formatCurrency(data.totalPiutang)}</span>
+                                <span className="font-bold text-red-500">{formatCurrency(data.billing_summary.remaining_payment)}</span>
                             </div>
 
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
