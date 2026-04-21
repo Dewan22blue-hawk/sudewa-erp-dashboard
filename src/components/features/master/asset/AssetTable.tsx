@@ -173,20 +173,28 @@ export function AssetTable({
                     <Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 w-12">NO</TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">KODE ASET</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">NAMA ASET</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">TIPE</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">TGL PEMBELIAN</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">HARGA</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">TGL BELI</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">NAMA BARANG</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">TIPE ASET</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">SERIAL NUMBER</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">HARGA BELI</TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {assets.length > 0 ? (
-                                assets.map((item) => (
+                                assets.map((item, index) => (
                                     <TableRow key={item.uuid} className="hover:bg-gray-50/50">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-500">
+                                            {(page - 1) * perPage + index + 1}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium uppercase">
                                             {item.code || '-'}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                            {item.purchase_date ? format(new Date(item.purchase_date), 'dd/MM/yyyy') : '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-900">
                                             {item.name || '-'}
@@ -194,8 +202,8 @@ export function AssetTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600">
                                             {formatAssetType(item.type)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                            {item.purchase_date ? format(new Date(item.purchase_date), 'dd/MM/yyyy') : '-'}
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase">
+                                            {item.serial_number || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600">
                                             {formatCurrency(item.price)}
@@ -221,7 +229,7 @@ export function AssetTable({
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                                    <TableCell colSpan={8} className="h-32 text-center text-gray-500">
                                         Tidak ada data aset ditemukan
                                     </TableCell>
                                 </TableRow>

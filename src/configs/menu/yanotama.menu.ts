@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getYanotamaMenus = (slug: string): MenuItem[] => {
@@ -81,6 +81,16 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 {
                     label: 'Stok Material',
                     href: base('/stok-material'),
+                },
+            ],
+        },
+        {
+            label: 'Finance',
+            icon: DollarSign,
+            children: [
+                {
+                    label: 'Aset',
+                    href: base('/finance/asset'),
                 },
             ],
         },

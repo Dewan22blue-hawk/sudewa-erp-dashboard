@@ -15,6 +15,7 @@ export interface AssetFormData {
     purchase_date: string;
     type: AssetType;
     price: string | number;
+    serial_number?: string;
 }
 
 interface AssetFormModalProps {
@@ -32,7 +33,8 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
             code: '',
             purchase_date: '',
             type: 'inventory',
-            price: ''
+            price: '',
+            serial_number: '',
         }
     });
 
@@ -44,7 +46,8 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                 code: '',
                 purchase_date: '',
                 type: 'inventory',
-                price: ''
+                price: '',
+                serial_number: '',
             });
         }
     }, [isOpen, reset, companyId]);
@@ -62,50 +65,55 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         Masukkan detail aset baru
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name" className="text-gray-900 font-medium">Nama Aset</Label>
-                        <Input
-                            id="name"
-                            placeholder="Masukkan nama aset"
-                            {...register('name', { required: 'Nama aset wajib diisi' })}
-                            className={errors.name ? 'border-red-500' : ''}
-                        />
-                        {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
-                    </div>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
 
+                    {/* Kode Aset */}
                     <div className="space-y-2">
                         <Label htmlFor="code" className="text-gray-900 font-medium">Kode Aset</Label>
                         <Input
                             id="code"
-                            placeholder="Masukkan kode aset"
+                            placeholder="Contoh: AST-WJR0001"
                             {...register('code', { required: 'Kode aset wajib diisi' })}
                             className={errors.code ? 'border-red-500' : ''}
                         />
                         {errors.code && <p className="text-red-500 text-xs">{errors.code.message}</p>}
                     </div>
 
+                    {/* Tanggal Beli */}
                     <div className="space-y-2">
-                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Pembelian</Label>
+                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
                         <Input
                             id="purchase_date"
                             type="date"
-                            {...register('purchase_date', { required: 'Tanggal pembelian wajib diisi' })}
+                            {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
                             className={errors.purchase_date ? 'border-red-500' : ''}
                         />
                         {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
                     </div>
 
+                    {/* Nama Barang */}
                     <div className="space-y-2">
-                        <Label htmlFor="type" className="text-gray-900 font-medium">Tipe</Label>
+                        <Label htmlFor="name" className="text-gray-900 font-medium">Nama Barang</Label>
+                        <Input
+                            id="name"
+                            placeholder="Contoh: Sapu"
+                            {...register('name', { required: 'Nama barang wajib diisi' })}
+                            className={errors.name ? 'border-red-500' : ''}
+                        />
+                        {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+                    </div>
+
+                    {/* Tipe Aset */}
+                    <div className="space-y-2">
+                        <Label htmlFor="type" className="text-gray-900 font-medium">Tipe Aset</Label>
                         <Controller
                             control={control}
                             name="type"
-                            rules={{ required: 'Tipe wajib dipilih' }}
+                            rules={{ required: 'Tipe aset wajib dipilih' }}
                             render={({ field }) => (
                                 <Select value={field.value} onValueChange={field.onChange}>
                                     <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
-                                        <SelectValue placeholder="Pilih tipe" />
+                                        <SelectValue placeholder="Select an item" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="inventory">Inventory</SelectItem>
@@ -119,8 +127,9 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
                     </div>
 
+                    {/* Harga Beli */}
                     <div className="space-y-2">
-                        <Label htmlFor="price" className="text-gray-900 font-medium">Harga</Label>
+                        <Label htmlFor="price" className="text-gray-900 font-medium">Harga Beli</Label>
                         <Controller
                             control={control}
                             name="price"
@@ -128,7 +137,7 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                             render={({ field }) => (
                                 <MoneyInput
                                     id="price"
-                                    placeholder="Masukkan harga"
+                                    placeholder="Nominal"
                                     value={Number(field.value)}
                                     onChangeValue={(v) => field.onChange(v)}
                                     className={errors.price ? 'border-red-500' : ''}
@@ -138,7 +147,17 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
                     </div>
 
-                    <div className="flex flex-col space-y-2 pt-4">
+                    {/* Serial Number */}
+                    <div className="space-y-2">
+                        <Label htmlFor="serial_number" className="text-gray-900 font-medium">Serial Number</Label>
+                        <Input
+                            id="serial_number"
+                            placeholder="Contoh: AWS0001"
+                            {...register('serial_number')}
+                        />
+                    </div>
+
+                    <div className="flex flex-col space-y-2 pt-2">
                         <Button type="submit" className="w-full bg-[#1e3a5f] hover:bg-[#152e4d]">Simpan</Button>
                         <Button type="button" variant="outline" className="w-full" onClick={onClose}>Batal</Button>
                     </div>

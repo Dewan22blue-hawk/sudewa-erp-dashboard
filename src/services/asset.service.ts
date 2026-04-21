@@ -6,9 +6,12 @@ import { ApiResponseError, LaravelApiResponse, ensureSuccess, toPaginatedResult,
 
 const basePath = '/wapi/master-data/asset';
 
-export const getAssets = async (params: PaginationParams & { search?: string }): Promise<AssetListResponse> => {
+export const getAssets = async (params: PaginationParams & { search?: string; company_id?: string | number }): Promise<AssetListResponse> => {
     const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-        params: buildLaravelPaginationQuery(params),
+        params: {
+            ...buildLaravelPaginationQuery(params),
+            company_id: params.company_id,
+        },
     });
 
     const data = ensureSuccess(response.data);
@@ -46,6 +49,7 @@ export const createAsset = async (data: Partial<AssetPayload>): Promise<void> =>
     if (data.purchase_date) formData.append('purchase_date', data.purchase_date);
     if (data.type) formData.append('type', data.type);
     if (data.price !== undefined) formData.append('price', String(data.price));
+    if (data.serial_number !== undefined) formData.append('serial_number', data.serial_number ?? '');
 
     try {
         const response = await apiClient.post<LaravelApiResponse<any>>(basePath, formData, {
@@ -73,6 +77,7 @@ export const updateAsset = async (id: string | number, data: Partial<AssetPayloa
     if (data.purchase_date) formData.append('purchase_date', data.purchase_date);
     if (data.type) formData.append('type', data.type);
     if (data.price !== undefined) formData.append('price', String(data.price));
+    if (data.serial_number !== undefined) formData.append('serial_number', data.serial_number ?? '');
 
     try {
         const response = await apiClient.post<LaravelApiResponse<any>>(`${basePath}/${id}`, formData, {

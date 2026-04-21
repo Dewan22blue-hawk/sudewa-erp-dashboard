@@ -89,7 +89,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
                 <SortableHeader title="Tanggal FPM" sortKey="fpm_date" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
               </th>
               <th className="py-2 text-left">
-                <SortableHeader title="Usia NSFPM" sortKey="nsfpm_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
+                <SortableHeader title="MASA NSFPM" sortKey="nsfpm_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
               </th>
               <th className="py-2 text-left">
                 <SortableHeader title="Input NSFPM" sortKey="nsfpm_input" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />

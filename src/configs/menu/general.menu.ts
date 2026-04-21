@@ -140,6 +140,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Data Terima Piutang',
           href: base('/finance/data-penerimaan-piutang'),
         },
+        {
+          label: 'Aset',
+          href: base('/finance/asset'),
+        },
       ],
     },
     {

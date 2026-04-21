@@ -11,6 +11,7 @@ export interface Asset {
     name: string;
     type: AssetType;
     price: number;
+    serial_number?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -22,6 +23,7 @@ export interface AssetPayload {
     purchase_date: string;
     type: AssetType;
     price: number | string;
+    serial_number?: string;
 }
 
 export type AssetListResponse = PaginatedResult<Asset>;

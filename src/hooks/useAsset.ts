@@ -3,10 +3,14 @@ import { getAssets, getAssetById, importAsset, createAsset, updateAsset, deleteA
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { AssetPayload } from '@/@types/asset.types';
 
-export function useAssets(params: PaginationParams & { search?: string } = { page: 1, perPage: 100 }) {
+export function useAssets(companyId: string | number | null, params: PaginationParams & { search?: string } = { page: 1, perPage: 100 }) {
     return useQuery({
-        queryKey: ['assets', params.page, params.perPage, params.search],
-        queryFn: () => getAssets(params),
+        queryKey: ['assets', companyId, params.page, params.perPage, params.search],
+        queryFn: () => getAssets({
+            company_id: companyId || undefined,
+            ...params
+        }),
+        enabled: !!companyId,
     });
 }
 

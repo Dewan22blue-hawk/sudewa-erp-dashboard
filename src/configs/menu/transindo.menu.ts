@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getTransindoMenus = (slug: string): MenuItem[] => {
@@ -69,6 +69,16 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
         {
           label: 'DO Kendaraan',
           href: base('/do-kendaraan'),
+        },
+      ],
+    },
+    {
+      label: 'Finance',
+      icon: DollarSign,
+      children: [
+        {
+          label: 'Aset',
+          href: base('/finance/asset'),
         },
       ],
     },

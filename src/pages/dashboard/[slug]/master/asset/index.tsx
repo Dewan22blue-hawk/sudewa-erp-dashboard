@@ -18,7 +18,7 @@ export default function AssetPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(100);
 
-  const { data: assetsData, isLoading } = useAssets({ page, perPage, search });
+  const { data: assetsData, isLoading } = useAssets(companyId, { page, perPage, search });
   
   const createMutation = useCreateAsset();
   const updateMutation = useUpdateAsset();
