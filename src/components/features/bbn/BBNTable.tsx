@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical } from 'lucide-react';
+import { Search, Plus, MoreVertical, Upload, Download } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,8 +19,11 @@ interface BBNTableProps {
     onPageChange: (page: number) => void;
     onPerPageChange: (perPage: number) => void;
     onAdd: () => void;
+    onImport?: () => void;
+    onExport?: () => void;
     onEdit: (bbn: BBN) => void;
     onDelete: (bbn: BBN) => void;
+    isExporting?: boolean;
 }
 
 export function BBNTable({
@@ -34,8 +37,11 @@ export function BBNTable({
     onPageChange,
     onPerPageChange,
     onAdd,
+    onImport,
+    onExport,
     onEdit,
     onDelete,
+    isExporting = false,
 }: BBNTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -128,7 +134,19 @@ export function BBNTable({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    {onImport ? (
+                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Import
+                        </Button>
+                    ) : null}
+                    {onExport ? (
+                        <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
+                            <Download className="h-4 w-4 mr-2" />
+                            {isExporting ? 'Exporting...' : 'Export'}
+                        </Button>
+                    ) : null}
                     <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                         <Plus className="h-4 w-4 mr-2" />
                         Tambah

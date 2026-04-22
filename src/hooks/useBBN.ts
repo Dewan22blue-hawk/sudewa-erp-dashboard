@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBBNs, getBBNById, createBBN, updateBBN, deleteBBN } from '@/services/bbn.service';
+import { getBBNs, getBBNById, createBBN, updateBBN, deleteBBN, importBBN, exportBBN } from '@/services/bbn.service';
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { BBNPayload } from '@/@types/bbn.types';
 
@@ -49,5 +49,22 @@ export function useDeleteBBN() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['bbns'] });
         },
+    });
+}
+
+export function useImportBBN() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (file: File) => importBBN(file),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['bbns'] });
+            queryClient.invalidateQueries({ queryKey: ['bbns-list'] });
+        },
+    });
+}
+
+export function useExportBBN() {
+    return useMutation({
+        mutationFn: () => exportBBN(),
     });
 }

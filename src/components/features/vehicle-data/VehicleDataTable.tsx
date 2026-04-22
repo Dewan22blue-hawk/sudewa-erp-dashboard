@@ -1,4 +1,4 @@
-import { Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
+import { CheckCircle2, Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,7 @@ interface VehicleDataTableProps {
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
   selectedIds: number[];
+  assignedIds: number[];
   onSelectedIdsChange: (ids: number[]) => void;
   onAdd: () => void;
   onImport: () => void;
@@ -60,6 +61,7 @@ export function VehicleDataTable({
   onPageChange,
   onPerPageChange,
   selectedIds,
+  assignedIds,
   onSelectedIdsChange,
   onAdd,
   onImport,
@@ -81,18 +83,20 @@ export function VehicleDataTable({
   const totalPages = Math.max(1, Math.ceil(totalData / perPage));
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = Math.min(page * perPage, totalData);
-  const currentPageIds = items.map((item) => item.id);
-  const allSelected = currentPageIds.length > 0 && currentPageIds.every((id) => selectedIds.includes(id));
+  const currentPageSelectableIds = items.filter((item) => !assignedIds.includes(item.id)).map((item) => item.id);
+  const allSelected = currentPageSelectableIds.length > 0 && currentPageSelectableIds.every((id) => selectedIds.includes(id));
   const visiblePages = getVisiblePageNumbers(totalPages, page, 5);
+  const assignedCountOnPage = items.filter((item) => assignedIds.includes(item.id)).length;
+  const selectedPendingCount = selectedIds.filter((id) => !assignedIds.includes(id)).length;
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
-      const next = Array.from(new Set([...selectedIds, ...currentPageIds]));
+      const next = Array.from(new Set([...selectedIds, ...currentPageSelectableIds]));
       onSelectedIdsChange(next);
       return;
     }
 
-    onSelectedIdsChange(selectedIds.filter((id) => !currentPageIds.includes(id)));
+    onSelectedIdsChange(selectedIds.filter((id) => !currentPageSelectableIds.includes(id)));
   };
 
   const handleSelectRow = (id: number, checked: boolean | 'indeterminate') => {
@@ -137,7 +141,8 @@ export function VehicleDataTable({
       </Card>
 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative w-full md:w-[325px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-10" />
@@ -157,6 +162,22 @@ export function VehicleDataTable({
             </Select>
             <span>Page</span>
           </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {assignedIds.length} data sudah di-assign
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700">
+              {selectedPendingCount} data siap di-assign
+            </div>
+            {assignedCountOnPage > 0 ? (
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
+                {assignedCountOnPage} data di halaman ini sudah diproses
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 xl:justify-end">
@@ -168,7 +189,7 @@ export function VehicleDataTable({
             <Download className="mr-2 h-4 w-4" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button variant="outline" onClick={onAssign} className="h-11 rounded-xl px-4" disabled={selectedIds.length === 0}>
+          <Button variant="outline" onClick={onAssign} className="h-11 rounded-xl px-4" disabled={selectedPendingCount === 0}>
             Assign Ditlantas
           </Button>
           <Button onClick={onAdd} className="h-11 rounded-xl border border-slate-200 bg-white px-5 text-slate-900 shadow-none hover:bg-slate-50">
@@ -210,12 +231,28 @@ export function VehicleDataTable({
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/60">
+                  <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60' : 'border-slate-200 hover:bg-slate-50/60'}>
                     <TableCell className="px-4 py-4">
-                      <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => handleSelectRow(item.id, checked)} aria-label={`Pilih data kendaraan ${item.invoiceNumber}`} />
+                      <Checkbox
+                        checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
+                        disabled={assignedIds.includes(item.id)}
+                        onCheckedChange={(checked) => handleSelectRow(item.id, checked)}
+                        aria-label={`Pilih data kendaraan ${item.invoiceNumber}`}
+                      />
                     </TableCell>
                     <TableCell className="max-w-[220px] px-4 py-4 text-sm font-medium text-slate-700">
-                      <div className="line-clamp-2 uppercase">{item.dealer?.namaDealer || '-'}</div>
+                      <div className="space-y-2">
+                        <div className="line-clamp-2 uppercase">{item.dealer?.namaDealer || '-'}</div>
+                        {assignedIds.includes(item.id) ? (
+                          <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+                            Sudah assign Ditlantas
+                          </span>
+                        ) : selectedIds.includes(item.id) ? (
+                          <span className="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-semibold text-sky-700">
+                            Siap di-assign
+                          </span>
+                        ) : null}
+                      </div>
                     </TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700">{item.stnkName || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700">{item.region?.name || '-'}</TableCell>

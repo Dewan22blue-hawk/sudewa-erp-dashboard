@@ -3,8 +3,9 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { BBNTable } from '@/components/features/bbn/BBNTable';
 import { DeleteBBNModal } from '@/components/features/bbn/DeleteBBNModal';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { toast } from 'sonner';
-import { useBBNs, useDeleteBBN } from '@/hooks/useBBN';
+import { useBBNs, useDeleteBBN, useImportBBN, useExportBBN } from '@/hooks/useBBN';
 import type { BBN } from '@/@types/bbn.types';
 
 export default function BBNPage() {
@@ -29,9 +30,12 @@ export default function BBNPage() {
   const { data: bbnData, isLoading } = useBBNs({ page, perPage, search });
   
   const deleteMutation = useDeleteBBN();
+  const importMutation = useImportBBN();
+  const exportMutation = useExportBBN();
 
   // Modals state
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedBBN, setSelectedBBN] = useState<BBN | null>(null);
 
   // Handlers
@@ -58,6 +62,25 @@ export default function BBNPage() {
       } catch (error: any) {
         toast.error(error.message || 'Gagal menghapus data');
       }
+    }
+  };
+
+  const handleImport = async (file: File) => {
+    try {
+      await importMutation.mutateAsync(file);
+      toast.success('Data biaya berhasil diimport');
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal import data');
+      throw error;
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportMutation.mutateAsync();
+      toast.success('Data biaya berhasil diexport');
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal export data');
     }
   };
 
@@ -88,8 +111,11 @@ export default function BBNPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
+          onImport={() => setIsImportOpen(true)}
+          onExport={handleExport}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          isExporting={exportMutation.isPending}
         />
 
       </div>
@@ -99,6 +125,15 @@ export default function BBNPage() {
         onClose={() => setIsDeleteOpen(false)} 
         onConfirm={handleConfirmDelete} 
         isDeleting={deleteMutation.isPending}
+      />
+
+      <DataImportModal
+        open={isImportOpen}
+        onOpenChange={setIsImportOpen}
+        title="Import Data BBN"
+        description="Unggah file Excel untuk menambahkan data BBN secara massal."
+        onImport={handleImport}
+        isPending={importMutation.isPending}
       />
     </DashboardLayout>
   );

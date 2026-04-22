@@ -69,6 +69,15 @@ const mapVehicleData = (item: any): VehicleData => ({
   fuelType: toStringValue(item.fuel_type),
   createdAt: item.created_at,
   updatedAt: item.updated_at,
+  vehicleRegistration: item.vehicle_registration
+    ? {
+        id: Number(item.vehicle_registration.id),
+        vendorId: item.vehicle_registration.vendor_id == null ? null : Number(item.vehicle_registration.vendor_id),
+        vehicleDataId: item.vehicle_registration.vehicle_data_id == null ? null : Number(item.vehicle_registration.vehicle_data_id),
+        processDate: item.vehicle_registration.process_date ?? null,
+        isAlreadyProcessed: Boolean(item.vehicle_registration.is_already_processed),
+      }
+    : null,
   dealer: item.dealer
     ? {
         id: Number(item.dealer.id),

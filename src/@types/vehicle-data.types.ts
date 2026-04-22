@@ -43,6 +43,13 @@ export interface VehicleData {
   fuelType: string;
   createdAt?: string;
   updatedAt?: string;
+  vehicleRegistration?: {
+    id: number;
+    vendorId: number | null;
+    vehicleDataId: number | null;
+    processDate: string | null;
+    isAlreadyProcessed: boolean;
+  } | null;
   dealer?: Pick<Dealer, 'id' | 'code' | 'namaDealer'>;
   region?: Pick<Region, 'id' | 'name'>;
 }

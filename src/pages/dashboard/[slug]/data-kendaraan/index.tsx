@@ -40,6 +40,7 @@ export default function VehicleDataPage() {
   const [page, setPage] = React.useState(1);
   const [perPage, setPerPage] = React.useState(25);
   const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
+  const [assignedIds, setAssignedIds] = React.useState<number[]>([]);
   const [deleteTarget, setDeleteTarget] = React.useState<VehicleData | null>(null);
   const [importOpen, setImportOpen] = React.useState(false);
   const [assignOpen, setAssignOpen] = React.useState(false);
@@ -83,8 +84,19 @@ export default function VehicleDataPage() {
   const exportMutation = useExportVehicleData();
   const deleteMutation = useDeleteVehicleData();
 
-  const items = vehicleQuery.data?.data ?? [];
+  const items = React.useMemo(() => vehicleQuery.data?.data ?? [], [vehicleQuery.data?.data]);
   const totalData = vehicleQuery.data?.meta.total ?? 0;
+  const backendAssignedIds = React.useMemo(
+    () =>
+      items
+        .filter((item) => item.vehicleRegistration?.isAlreadyProcessed)
+        .map((item) => item.id),
+    [items],
+  );
+  const mergedAssignedIds = React.useMemo(
+    () => Array.from(new Set([...backendAssignedIds, ...assignedIds])),
+    [assignedIds, backendAssignedIds],
+  );
   const dealerOptions = (dealersQuery.data?.data ?? []).map((item) => ({
     value: String(item.id),
     label: item.namaDealer,
@@ -154,6 +166,7 @@ export default function VehicleDataPage() {
       toast.success('Data kendaraan berhasil dihapus');
       setDeleteTarget(null);
       setSelectedIds((current) => current.filter((id) => id !== deleteTarget.id));
+      setAssignedIds((current) => current.filter((id) => id !== deleteTarget.id));
     } catch (error: any) {
       toast.error(error.message || 'Gagal menghapus data kendaraan');
     }
@@ -181,6 +194,7 @@ export default function VehicleDataPage() {
             setPage(1);
           }}
           selectedIds={selectedIds}
+          assignedIds={mergedAssignedIds}
           onSelectedIdsChange={setSelectedIds}
           onAdd={() => router.push(`/dashboard/${slug}/data-kendaraan/create`)}
           onImport={() => setImportOpen(true)}
@@ -210,7 +224,15 @@ export default function VehicleDataPage() {
         isPending={importMutation.isPending}
       />
 
-      <AssignVehicleDataDialog open={assignOpen} onOpenChange={setAssignOpen} initialVehicleIds={selectedIds} />
+      <AssignVehicleDataDialog
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        initialVehicleIds={selectedIds.filter((id) => !mergedAssignedIds.includes(id))}
+        onAssigned={(newAssignedIds) => {
+          setAssignedIds((current) => Array.from(new Set([...current, ...newAssignedIds])));
+          setSelectedIds((current) => Array.from(new Set([...current, ...newAssignedIds])));
+        }}
+      />
 
       <DeleteVehicleDataDialog
         open={!!deleteTarget}

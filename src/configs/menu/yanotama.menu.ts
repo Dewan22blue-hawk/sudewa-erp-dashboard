@@ -29,10 +29,6 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/master/wilayah'),
                 },
                 {
-                    label: 'BBN',
-                    href: base('/bbn'),
-                },
-                {
                     label: 'Material',
                     href: base('/master/material'),
                 },
@@ -45,7 +41,7 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/master/asset'),
                 },
                 {
-                    label: 'Biaya (BBN)',
+                    label: 'BBN',
                     href: base('/master/bbn'),
                 }
             ],
@@ -63,7 +59,7 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/data-kendaraan'),
                 },
                 {
-                    label: 'STNK / BPKB',
+                    label: 'Input STNK/BPKB',
                     href: base('/stnk-bpkb'),
                 },
                 {

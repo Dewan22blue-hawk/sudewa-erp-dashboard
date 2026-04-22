@@ -15,6 +15,7 @@ interface AssignVehicleDataDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialVehicleIds?: number[];
+  onAssigned?: (assignedIds: number[]) => void;
 }
 
 const formatDateValue = (date?: Date) => {
@@ -25,7 +26,7 @@ const formatDateValue = (date?: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-export function AssignVehicleDataDialog({ open, onOpenChange, initialVehicleIds = [] }: AssignVehicleDataDialogProps) {
+export function AssignVehicleDataDialog({ open, onOpenChange, initialVehicleIds = [], onAssigned }: AssignVehicleDataDialogProps) {
   const [vehicleSearch, setVehicleSearch] = React.useState('');
   const [vendorSearch, setVendorSearch] = React.useState('');
   const [selectedVehicleIds, setSelectedVehicleIds] = React.useState<number[]>(initialVehicleIds);
@@ -90,6 +91,7 @@ export function AssignVehicleDataDialog({ open, onOpenChange, initialVehicleIds 
         processDate: formatDateValue(processDate),
       });
       toast.success('Data kendaraan berhasil di-assign ke ditlantas');
+      onAssigned?.(selectedVehicleIds);
       onOpenChange(false);
     } catch (error: any) {
       toast.error(error.message || 'Gagal assign data kendaraan');
