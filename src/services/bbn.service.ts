@@ -183,3 +183,42 @@ export const deleteBBN = async (id: string | number): Promise<void> => {
         throw new ApiResponseError(payload.message ?? 'Failed to delete bbn');
     }
 };
+
+export const importBBN = async (file: File): Promise<void> => {
+    const body = new FormData();
+    body.append('file', file);
+
+    const response = await apiClient.post<LaravelApiResponse<any>>(`${basePath}/import`, body, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    if (!response.data.status) {
+        throw new ApiResponseError(response.data.message ?? 'Failed to import bbn');
+    }
+};
+
+export const exportBBN = async (): Promise<void> => {
+    const response = await apiClient.get(`${basePath}/export`, {
+        responseType: 'blob',
+    });
+
+    const contentType = response.headers['content-type'];
+    const isJson = contentType && contentType.includes('application/json');
+
+    if (isJson) {
+        const textData = await (response.data as Blob).text();
+        const jsonResponse = JSON.parse(textData);
+        throw new ApiResponseError(jsonResponse.message ?? 'Failed to export data');
+    }
+
+    const url = window.URL.createObjectURL(new Blob([response.data as Blob]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `BBN_${Date.now()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+};

@@ -45,3 +45,14 @@ export interface LoginRequest {
   email?: string; // kept for backward compatibility; mapped to `login` in service
   password?: string;
 }
+
+/**
+ * Response from proactive token validation endpoint
+ * Used in the token check flow to validate if the current token is still valid
+ * before it expires or becomes invalid.
+ */
+export interface CheckTokenResponse {
+  status: boolean;
+  message: string;
+  data: null;
+}

@@ -25,6 +25,7 @@ export function useCreateTarif() {
     return useMutation({
         mutationFn: (data: TarifPayload) => createTarif(data),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tarifs-list'] });
             queryClient.invalidateQueries({ queryKey: ['tarifs'] });
         },
     });
@@ -36,6 +37,7 @@ export function useUpdateTarif() {
         mutationFn: ({ id, data }: { id: string | number; data: TarifPayload }) =>
             updateTarif(id, data),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tarifs-list'] });
             queryClient.invalidateQueries({ queryKey: ['tarifs'] });
         },
     });
@@ -46,6 +48,7 @@ export function useDeleteTarif() {
     return useMutation({
         mutationFn: (id: string | number) => deleteTarif(id),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tarifs-list'] });
             queryClient.invalidateQueries({ queryKey: ['tarifs'] });
         },
     });

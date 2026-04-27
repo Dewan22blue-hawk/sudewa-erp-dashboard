@@ -1,23 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { Plus, RotateCw, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import type { KasHarian } from '@/@types/kas-harian.types';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { useKasHarian } from '@/hooks/useKasHarian';
-import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
-import AddKasHarianDialog from '@/components/features/kas-harian/AddKasHarianDialog';
-import EditKasHarianDialog from '@/components/features/kas-harian/EditKasHarianDialog';
-import DeleteKasHarianDialog from '@/components/features/kas-harian/DeleteKasHarianDialog';
-import type { KasHarian } from '@/@types/kas-harian.types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AddKasHarianDialog from '@/components/features/kas-harian/AddKasHarianDialog';
+import DeleteKasHarianDialog from '@/components/features/kas-harian/DeleteKasHarianDialog';
+import EditKasHarianDialog from '@/components/features/kas-harian/EditKasHarianDialog';
+import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useKasHarian } from '@/hooks/useKasHarian';
 
 export default function KasHarianPage() {
+  const router = useRouter();
+  const { slug } = router.query;
+  const { companyId, isLoading: isCompanyLoading } = useCompany();
+  const companyNumber = Number(companyId || 0);
+
   const [searchInput, setSearchInput] = useState('');
-  const [searchCode, setSearchCode] = useState('');
-  const [perPage, setPerPage] = useState(10);
+  const [searchValue, setSearchValue] = useState('');
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -25,7 +32,7 @@ export default function KasHarianPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      setSearchCode(searchInput.trim());
+      setSearchValue(searchInput.trim());
       setPage(1);
     }, 400);
 
@@ -36,29 +43,31 @@ export default function KasHarianPage() {
     () => ({
       page,
       per_page: perPage,
-      code: searchCode || undefined,
+      search: searchValue || undefined,
+      company_id: companyNumber || undefined,
     }),
-    [page, perPage, searchCode],
+    [companyNumber, page, perPage, searchValue],
   );
 
-  const { data, isLoading, isFetching, isError, error, refetch } = useKasHarian(query);
+  const kasHarianQuery = useKasHarian(query, { enabled: !isCompanyLoading && companyNumber > 0 });
 
   const errorMessage = useMemo(() => {
+    const error = kasHarianQuery.error;
     if (!error || typeof error !== 'object' || !('message' in error)) {
       return 'Gagal memuat data transaksi kas harian';
     }
 
     const message = (error as { message?: unknown }).message;
     return typeof message === 'string' && message.trim().length > 0 ? message : 'Gagal memuat data transaksi kas harian';
-  }, [error]);
+  }, [kasHarianQuery.error]);
 
   useEffect(() => {
-    if (isError) {
+    if (kasHarianQuery.isError) {
       toast.error(errorMessage);
     }
-  }, [errorMessage, isError]);
+  }, [errorMessage, kasHarianQuery.isError]);
 
-  const meta = data?.meta ?? {
+  const meta = kasHarianQuery.data?.meta ?? {
     currentPage: page,
     perPage,
     total: 0,
@@ -81,45 +90,44 @@ export default function KasHarianPage() {
     setIsDeleteOpen(true);
   };
 
+  const pushTo = (path: string) => {
+    if (typeof slug !== 'string') return;
+    void router.push(`/dashboard/${slug}${path}`);
+  };
+
   return (
     <DashboardLayout>
       <Head>
         <title>Transaksi Kas Harian - Wajira Dashboard</title>
       </Head>
 
-      <div className="p-6 space-y-6">
-        <div className="flex justify-between items-start">
+      <div className="space-y-8 p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Arus Transaksi Kas Harian</h1>
-            <p className="text-gray-500">Kelola arus transaksi kas harian dari API finance.</p>
+            <h1 className="text-[40px] font-semibold tracking-tight text-slate-950">Arus Transaksi Kas Harian</h1>
+            <p className="mt-1 text-lg text-slate-500">Kelola arus transaksi kas harian</p>
           </div>
 
-
+          <Button type="button" onClick={() => setIsAddOpen(true)} className="h-12 rounded-2xl bg-[#18385b] px-6 text-base hover:bg-[#102843]">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
+          </Button>
         </div>
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative w-full md:w-[320px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <Input placeholder="Cari kode transaksi" className="pl-10 bg-white" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} />
+            <div className="relative w-full md:w-[332px]">
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search here"
+                className="h-12 rounded-2xl border-slate-200 bg-white pl-11"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
             </div>
 
-            {searchInput ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setSearchInput('');
-                  setSearchCode('');
-                  setPage(1);
-                }}
-              >
-                Reset
-              </Button>
-            ) : null}
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Show</span>
+            <div className="flex items-center gap-3 text-lg text-slate-700">
+              <span>Show</span>
               <Select
                 value={String(perPage)}
                 onValueChange={(value) => {
@@ -127,8 +135,8 @@ export default function KasHarianPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[80px] bg-white">
-                  <SelectValue placeholder="10" />
+                <SelectTrigger className="h-12 w-[92px] rounded-2xl border-slate-200 bg-white">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="10">10</SelectItem>
@@ -137,35 +145,27 @@ export default function KasHarianPage() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-gray-500">Page</span>
+              <span>Page</span>
             </div>
           </div>
 
-          <div className="flex w-full items-center justify-end gap-2 xl:w-auto">
-            <Button type="button" variant="outline" className="w-full xl:w-auto" onClick={() => void refetch()} disabled={isFetching}>
-              <RotateCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setIsAddOpen(true)}
-              className="w-full gap-2 bg-[#1e293b] hover:bg-[#0f172a] xl:w-auto"
-            >
-              <Plus size={18} />
-              Tambah
-            </Button>
-          </div>
+          <Button type="button" variant="outline" className="h-12 rounded-2xl border-slate-200" onClick={() => void kasHarianQuery.refetch()} disabled={kasHarianQuery.isFetching}>
+            <RotateCw className={`mr-2 h-4 w-4 ${kasHarianQuery.isFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
 
         <KasHarianTable
-          data={data?.data ?? []}
+          data={kasHarianQuery.data?.data ?? []}
           meta={meta}
-          hasNextPage={data?.hasNextPage ?? false}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          isError={isError}
+          hasNextPage={kasHarianQuery.data?.hasNextPage ?? false}
+          isLoading={kasHarianQuery.isLoading || isCompanyLoading}
+          isFetching={kasHarianQuery.isFetching}
+          isError={kasHarianQuery.isError}
           errorMessage={errorMessage}
-          onRetry={() => void refetch()}
+          onRetry={() => void kasHarianQuery.refetch()}
+          onView={(item) => pushTo(`/finance/transaksi-kas-harian/${item.id}`)}
+          onPay={(item) => pushTo(`/finance/transaksi-kas-harian/${item.id}/bayar`)}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onPageChange={setPage}

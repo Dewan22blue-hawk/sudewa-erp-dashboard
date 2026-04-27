@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MoneyInput } from '@/components/ui/money-input';
 
 export interface MaterialFormData {
     code?: string;
@@ -19,7 +20,7 @@ interface MaterialFormModalProps {
 }
 
 export function MaterialFormModal({ isOpen, onClose, onSave }: MaterialFormModalProps) {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<MaterialFormData>({
+    const { control, register, handleSubmit, reset, formState: { errors } } = useForm<MaterialFormData>({
         defaultValues: {
             code: '',
             name: '',
@@ -72,12 +73,18 @@ export function MaterialFormModal({ isOpen, onClose, onSave }: MaterialFormModal
 
                         <div className="space-y-2">
                             <Label htmlFor="price" className="text-gray-900 font-medium">Harga</Label>
-                            <Input
-                                id="price"
-                                type="number"
-                                placeholder="Masukkan jumlah"
-                                {...register('price', { required: 'Harga wajib diisi' })}
-                                className={errors.price ? 'border-red-500' : ''}
+                            <Controller
+                                control={control}
+                                name="price"
+                                rules={{ required: 'Harga wajib diisi' }}
+                                render={({ field }) => (
+                                    <MoneyInput
+                                        value={field.value === '' ? null : Number(field.value || 0)}
+                                        onChangeValue={field.onChange}
+                                        placeholder="Masukkan jumlah"
+                                        className={errors.price ? 'border-red-500' : ''}
+                                    />
+                                )}
                             />
                             {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
                         </div>

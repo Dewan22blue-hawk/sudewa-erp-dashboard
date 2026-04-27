@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getTransindoMenus = (slug: string): MenuItem[] => {
@@ -21,6 +21,14 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: Database,
       children: [
         {
+          label: 'Akun',
+          href: base('/master/account'),
+        },
+        {
+          label: 'Grup Akun',
+          href: base('/master/account-group'),
+        },
+        {
           label: 'Dealer',
           href: base('/master/dealer'),
         },
@@ -39,6 +47,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
         {
           label: 'Armada',
           href: base('/master/armada'),
+        },
+        {
+          label: 'Aset',
+          href: base('/master/asset'),
         },
       ],
     },
@@ -65,6 +77,16 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
         {
           label: 'DO Kendaraan',
           href: base('/do-kendaraan'),
+        },
+      ],
+    },
+    {
+      label: 'Finance',
+      icon: DollarSign,
+      children: [
+        {
+          label: 'Aset',
+          href: base('/finance/asset'),
         },
       ],
     },

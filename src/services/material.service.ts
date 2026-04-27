@@ -6,9 +6,13 @@ import { ApiResponseError, LaravelApiResponse, ensureSuccess, toPaginatedResult,
 
 const basePath = '/wapi/master-data/material';
 
-export const getMaterials = async (params: PaginationParams & { search?: string }): Promise<MaterialListResponse> => {
+export const getMaterials = async (params: PaginationParams & { search?: string; has_transaction?: boolean; sort_order?: 'asc' | 'desc' }): Promise<MaterialListResponse> => {
     const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-        params: buildLaravelPaginationQuery(params),
+        params: {
+            ...buildLaravelPaginationQuery(params),
+            has_transaction: params.has_transaction,
+            sort_order: params.sort_order,
+        },
     });
 
     const data = ensureSuccess(response.data);

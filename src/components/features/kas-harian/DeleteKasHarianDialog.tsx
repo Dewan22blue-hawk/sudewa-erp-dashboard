@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { useDeleteKasHarian } from '@/hooks/useKasHarian';
 import type { KasHarian } from '@/@types/kas-harian.types';
 
@@ -26,19 +27,26 @@ export default function DeleteKasHarianDialog({ open, onOpenChange, data }: Prop
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Apakah anda yakin?</AlertDialogTitle>
-          <AlertDialogDescription>Data transaksi {data?.code ?? ''} akan dihapus permanen dan tidak dapat dikembalikan.</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700" disabled={isPending}>
-            {isPending ? 'Menghapus...' : 'Hapus'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[1160px] rounded-[34px] border-0 p-0 shadow-2xl">
+        <div className="rounded-[34px] border border-slate-200 bg-white px-20 py-20">
+          <div className="space-y-10">
+            <div className="space-y-6">
+              <h2 className="text-6xl font-semibold tracking-tight text-slate-950">Hapus Data Ini?</h2>
+              <p className="text-3xl leading-relaxed text-slate-500">Apa anda yakin ingin menghapus data ini?</p>
+            </div>
+
+            <div className="flex justify-end gap-5 pt-4">
+              <Button type="button" variant="outline" className="h-[86px] rounded-[22px] border-slate-300 px-16 text-4xl" onClick={() => onOpenChange(false)} disabled={isPending}>
+                Batal
+              </Button>
+              <Button type="button" className="h-[86px] rounded-[22px] bg-[#ea2626] px-16 text-4xl hover:bg-[#c81f1f]" onClick={handleDelete} disabled={isPending}>
+                {isPending ? 'Menghapus...' : 'Hapus'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

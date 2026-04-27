@@ -4,7 +4,7 @@ import type { PaginationParams } from '@/@types/pagination.types';
 import { createAccountGroup, deleteAccountGroup, getAccountGroupById, getAccountGroups, quickCreateAccountGroup, updateAccountGroup } from '@/services/account-group.service';
 import type { QuickCreateAccountGroupPayload } from '@/services/account-group.service';
 
-export const useAccountGroups = (params: PaginationParams & { search?: string; enabled?: boolean }) => {
+export const useAccountGroups = (params: PaginationParams & { search?: string; company_id?: string | number; enabled?: boolean }) => {
   const { enabled = true, ...rest } = params;
 
   return useQuery({

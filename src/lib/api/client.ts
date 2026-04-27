@@ -39,17 +39,18 @@ apiClient.interceptors.request.use(
 
 /**
  * Response Interceptor
- * Handle errors dan token refresh
+ * Handle API errors and enforce logout when backend rejects the token with 401.
  */
 apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error: AxiosError<ApiError>) => {
-    // Handle 401 Unauthorized
+    // Handle 401 Unauthorized (token rejected by backend)
     if (error.response?.status === 401) {
       // Clear token dan redirect ke login
       if (typeof window !== 'undefined') {
+        console.warn('[API Client] Received 401 - clearing token and redirecting to login');
         removeAccessToken();
         window.location.href = '/login';
       }

@@ -11,7 +11,6 @@ export function useDealers(companyId: string | null, params: PaginationParams & 
                 company_id: companyId || undefined,
                 ...params,
             }),
-        enabled: !!companyId,
     });
 }
 

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getYanotamaMenus = (slug: string): MenuItem[] => {
@@ -21,16 +21,20 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             icon: Database,
             children: [
                 {
+                    label: 'Akun',
+                    href: base('/master/account'),
+                },
+                {
+                    label: 'Grup Akun',
+                    href: base('/master/account-group'),
+                },
+                {
                     label: 'Dealer',
                     href: base('/master/dealer'),
                 },
                 {
                     label: 'Wilayah',
                     href: base('/master/wilayah'),
-                },
-                {
-                    label: 'BBN',
-                    href: base('/bbn'),
                 },
                 {
                     label: 'Material',
@@ -42,10 +46,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 },
                 {
                     label: 'Aset',
-                    href: base('/master/aset'),
+                    href: base('/master/asset'),
                 },
                 {
-                    label: 'Biaya (BBN)',
+                    label: 'BBN',
                     href: base('/master/bbn'),
                 }
             ],
@@ -63,7 +67,15 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/data-kendaraan'),
                 },
                 {
-                    label: 'STNK / BPKB',
+                    label: 'Pembelian Material',
+                    href: base('/pembelian-material'),
+                },
+                {
+                    label: 'Penjualan Material',
+                    href: base('/penjualan-material'),
+                },
+                {
+                    label: 'Input STNK/BPKB',
                     href: base('/stnk-bpkb'),
                 },
                 {
@@ -75,12 +87,18 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/do-pembelian-material'),
                 },
                 {
-                    label: 'Penjualan Material',
-                    href: base('/penjualan-material'),
-                },
-                {
                     label: 'Stok Material',
                     href: base('/stok-material'),
+                },
+            ],
+        },
+        {
+            label: 'Finance',
+            icon: DollarSign,
+            children: [
+                {
+                    label: 'Aset',
+                    href: base('/finance/asset'),
                 },
             ],
         },

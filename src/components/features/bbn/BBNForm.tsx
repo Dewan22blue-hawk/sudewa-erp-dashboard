@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Label } from '@/components/ui/label';
+import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { useDealers } from '@/hooks/useDealer';
@@ -33,10 +34,12 @@ interface BBNFormProps {
 
 export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormProps) {
     const router = useRouter();
+    const [dealerSearch, setDealerSearch] = React.useState('');
+    const [regionSearch, setRegionSearch] = React.useState('');
 
     const { companyId: localCompanyId } = useCompany();
-    const { data: dealersResponse } = useDealers(localCompanyId, { page: 1, perPage: 200 }); // fetch a lot to be safe
-    const { data: regionsResponse } = useRegions({ page: 1, perPage: 200 }); 
+    const { data: dealersResponse } = useDealers(localCompanyId ? String(localCompanyId) : null, { page: 1, perPage: 200, search: dealerSearch });
+    const { data: regionsResponse } = useRegions({ page: 1, perPage: 200, search: regionSearch }); 
     const dealers = (dealersResponse as any)?.data || [];
     const regions = (regionsResponse as any)?.data || [];
 
@@ -109,18 +112,21 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
                                         control={control}
                                         rules={{ required: 'Dealer wajib dipilih' }}
                                         render={({ field }) => (
-                                            <Select onValueChange={field.onChange} value={field.value || undefined}>
-                                                <SelectTrigger className={`bg-white ${errors.dealerId ? 'border-red-500' : ''}`}>
-                                                    <SelectValue placeholder="Masukkan nama dealer" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {dealers.map((dealer: any) => (
-                                                        <SelectItem key={dealer.id} value={String(dealer.id)}>
-                                                            {dealer.namaDealer || dealer.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <SearchableSelect
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                options={dealers.map((dealer: any) => ({
+                                                    value: String(dealer.id),
+                                                    label: dealer.namaDealer || dealer.name,
+                                                    subtitle: dealer.code || undefined,
+                                                }))}
+                                                loading={!dealersResponse}
+                                                onSearchChange={setDealerSearch}
+                                                placeholder="Masukkan nama dealer"
+                                                searchPlaceholder="Cari dealer..."
+                                                emptyText="Dealer tidak ditemukan."
+                                                className={errors.dealerId ? 'border-red-500' : ''}
+                                            />
                                         )}
                                     />
                                     {errors.dealerId && <p className="text-red-500 text-xs">{errors.dealerId.message}</p>}
@@ -144,18 +150,21 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
                                         control={control}
                                         rules={{ required: 'Wilayah wajib dipilih' }}
                                         render={({ field }) => (
-                                            <Select onValueChange={field.onChange} value={field.value || undefined}>
-                                                <SelectTrigger className={`bg-white ${errors.regionId ? 'border-red-500' : ''}`}>
-                                                    <SelectValue placeholder="Masukkan nama wilayah" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {regions.map((region: any) => (
-                                                        <SelectItem key={region.id} value={String(region.id)}>
-                                                            {region.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <SearchableSelect
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                options={regions.map((region: any) => ({
+                                                    value: String(region.id),
+                                                    label: region.name,
+                                                    subtitle: region.code || undefined,
+                                                }))}
+                                                loading={!regionsResponse}
+                                                onSearchChange={setRegionSearch}
+                                                placeholder="Masukkan nama wilayah"
+                                                searchPlaceholder="Cari wilayah..."
+                                                emptyText="Wilayah tidak ditemukan."
+                                                className={errors.regionId ? 'border-red-500' : ''}
+                                            />
                                         )}
                                     />
                                     {errors.regionId && <p className="text-red-500 text-xs">{errors.regionId.message}</p>}

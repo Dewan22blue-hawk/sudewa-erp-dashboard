@@ -1,136 +1,166 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import type { CustomerFormValues } from '@/scheme/customer.schema';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import RequiredMark from '@/components/ui/required-mark';
-
-export interface CustomerFormData {
-    namaDealer: string;
-    namaCustomer: string;
-    pic: string;
-    alamat: string;
-    phone: string;
-    map_link?: string;
-}
+import { Textarea } from '@/components/ui/textarea';
+import type { UseFormReturn } from 'react-hook-form';
 
 interface CustomerFormModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (data: CustomerFormData) => void;
-    initialData?: CustomerFormData | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  form: UseFormReturn<CustomerFormValues>;
+  onSubmit: (values: CustomerFormValues) => void;
+  title: string;
+  description: string;
+  submitLabel?: string;
+  isSubmitting?: boolean;
 }
 
-export function CustomerFormModal({ isOpen, onClose, onSave, initialData }: CustomerFormModalProps) {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<CustomerFormData>({
-        defaultValues: {
-            namaDealer: '',
-            namaCustomer: '',
-            pic: '',
-            alamat: '',
-            phone: '',
-            map_link: ''
-        },
-        values: initialData || { namaDealer: '', namaCustomer: '', pic: '', alamat: '', phone: '', map_link: '' }
-    });
+export function CustomerFormModal({
+  open,
+  onOpenChange,
+  form,
+  onSubmit,
+  title,
+  description,
+  submitLabel = 'Simpan',
+  isSubmitting = false,
+}: CustomerFormModalProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[410px] rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[410px]">
+        <div className="px-6 py-6">
+          <DialogHeader className="space-y-1 text-left">
+            <DialogTitle className="text-[18px] font-semibold text-[#171717]">{title}</DialogTitle>
+            <DialogDescription className="text-[15px] text-[#71717A]">{description}</DialogDescription>
+          </DialogHeader>
 
-    useEffect(() => {
-        if (!isOpen) {
-            reset({ namaDealer: '', namaCustomer: '', pic: '', alamat: '', phone: '', map_link: '' });
-        }
-    }, [isOpen, reset]);
-
-    const onSubmit = (data: CustomerFormData) => {
-        onSave(data);
-    };
-
-    const isEdit = !!initialData;
-
-    return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>{isEdit ? 'Edit Data Customer' : 'Tambah Data Customer'}</DialogTitle>
-                    <DialogDescription>
-                        {isEdit ? 'Edit data customer baru' : 'Masukkan data customer baru'}
-                    </DialogDescription>
-                </DialogHeader>
-                {isOpen && (
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4 max-h-[70vh] overflow-y-auto px-1">
-                        <div className="space-y-2">
-                            <Label htmlFor="namaDealer">Nama Dealer<RequiredMark /></Label>
-                            <Input
-                                id="namaDealer"
-                                placeholder="Tambahkan nama dealer"
-                                {...register('namaDealer', { required: 'Nama Dealer wajib diisi' })}
-                                className={errors.namaDealer ? 'border-red-500' : ''}
-                            />
-                            {errors.namaDealer && <p className="text-red-500 text-xs">{errors.namaDealer.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="namaCustomer">Nama Customer<RequiredMark /></Label>
-                            <Input
-                                id="namaCustomer"
-                                placeholder="Tambahkan nama customer"
-                                {...register('namaCustomer', { required: 'Nama Customer wajib diisi' })}
-                                className={errors.namaCustomer ? 'border-red-500' : ''}
-                            />
-                            {errors.namaCustomer && <p className="text-red-500 text-xs">{errors.namaCustomer.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="pic">PIC<RequiredMark /></Label>
-                            <Input
-                                id="pic"
-                                placeholder="Tambahkan PIC"
-                                {...register('pic', { required: 'PIC wajib diisi' })}
-                                className={errors.pic ? 'border-red-500' : ''}
-                            />
-                            {errors.pic && <p className="text-red-500 text-xs">{errors.pic.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="alamat">Alamat<RequiredMark /></Label>
-                            <Textarea
-                                id="alamat"
-                                placeholder="Tambahkan Alamat"
-                                {...register('alamat', { required: 'Alamat wajib diisi' })}
-                                className={errors.alamat ? 'border-red-500 resize-none' : 'resize-none'}
-                                rows={3}
-                            />
-                            {errors.alamat && <p className="text-red-500 text-xs">{errors.alamat.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone<RequiredMark /></Label>
-                            <Input
-                                id="phone"
-                                placeholder="Tambahkan nomer telepon"
-                                {...register('phone', { required: 'Phone wajib diisi' })}
-                                className={errors.phone ? 'border-red-500' : ''}
-                            />
-                            {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="map_link">Maps</Label>
-                            <Input
-                                id="map_link"
-                                placeholder="Tambahkan link maps"
-                                {...register('map_link')}
-                            />
-                        </div>
-
-                        <div className="flex flex-col space-y-2 pt-4">
-                            <Button type="submit" className="w-full bg-[#1e3a5f] hover:bg-[#152e4d]">Simpan</Button>
-                            <Button type="button" variant="outline" className="w-full" onClick={onClose}>Batal</Button>
-                        </div>
-                    </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">
+                      Nama Customer<RequiredMark />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Tambahkan nama customer"
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-            </DialogContent>
-        </Dialog>
-    );
+              />
+
+              <FormField
+                control={form.control}
+                name="pic"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">PIC</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Tambahkan PIC"
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">Alamat</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Tambahkan Alamat"
+                        className="min-h-[112px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">Phone</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Tambahkan nomer telepon"
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="map_link"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">Maps</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Tambahkan link maps"
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="npwp"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">NPWP</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Tambahkan NPWP"
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex flex-col gap-3 pt-2">
+                <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
+                  {isSubmitting ? 'Menyimpan...' : submitLabel}
+                </Button>
+                <Button type="button" variant="outline" className="h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
+                  Batal
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

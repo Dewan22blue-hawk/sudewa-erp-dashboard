@@ -39,7 +39,7 @@ export default function KasHarianSummary({ data = [] }: KasHarianSummaryProps) {
   });
 
   const accounts = useMemo(() => {
-    const uniques = Array.from(new Set(data.map((item) => item.account?.name).filter(Boolean))) as string[];
+    const uniques = Array.from(new Set(data.map((item) => item.cash?.description).filter(Boolean))) as string[];
     return uniques.length > 0 ? uniques : ['BCA USD', 'BCA IDR'];
   }, [data]);
 
@@ -63,7 +63,7 @@ export default function KasHarianSummary({ data = [] }: KasHarianSummaryProps) {
 
   const analyticsData = useMemo(() => {
     return data.filter((item) => {
-      if (selectedAkun !== 'all' && item.account?.name !== selectedAkun) return false;
+      if (selectedAkun !== 'all' && item.cash?.description !== selectedAkun) return false;
       if (!dateRange?.from || !dateRange.to) return true;
 
       const itemDate = parseDate(item.date);

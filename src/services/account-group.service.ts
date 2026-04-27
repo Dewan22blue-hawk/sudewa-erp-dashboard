@@ -6,6 +6,7 @@ import { ApiResponseError, ApiValidationError, LaravelApiResponse, ensureSuccess
 
 interface AccountGroupApiModel {
   id: number;
+  company_id?: string | number | null;
   uuid?: string;
   group_code?: string;
   code?: string;
@@ -25,6 +26,7 @@ const mapAccountGroup = (payload: AccountGroupApiModel): AccountGroup => {
     id: payload.id,
     code,
     name,
+    companyId: payload.company_id ?? null,
     description: payload.description ?? null,
     isActive: payload.is_active === undefined ? true : payload.is_active === true || payload.is_active === 1,
     createdAt: payload.created_at,
@@ -46,19 +48,25 @@ type AccountGroupItemResponse = LaravelApiResponse<AccountGroupApiModel>;
 
 type DeleteResponse = LaravelApiResponse<null>;
 
-export const getAccountGroups = async (params: PaginationParams): Promise<AccountGroupListResponse> => {
+export const getAccountGroups = async (params: PaginationParams & { company_id?: string | number }): Promise<AccountGroupListResponse> => {
   const response = await apiClient.get<PaginatedAccountGroupResponse>(basePath, {
-    params: buildLaravelPaginationQuery(params),
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      company_id: params.company_id,
+    },
   });
 
   const data = ensureSuccess(response.data);
+  const scopedData = params.company_id
+    ? (data.data ?? []).filter((item) => String(item.company_id) === String(params.company_id))
+    : (data.data ?? []);
 
   return toPaginatedResult(
     {
-      data: data.data ?? [],
+      data: scopedData,
       current_page: data.current_page,
       per_page: data.perPage,
-      total: data.total,
+      total: params.company_id ? scopedData.length : data.total,
       last_page: data.last_page,
     },
     mapAccountGroup,

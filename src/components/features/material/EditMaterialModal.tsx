@@ -1,9 +1,10 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MoneyInput } from '@/components/ui/money-input';
 import { MaterialFormData } from './MaterialFormModal';
 import type { Material } from '@/@types/material.types';
 
@@ -44,7 +45,7 @@ interface InnerProps {
 }
 
 function EditMaterialInnerForm({ initialData, onClose, onSave }: InnerProps) {
-    const { register, handleSubmit, formState: { errors } } = useForm<MaterialFormData>({
+    const { control, register, handleSubmit, formState: { errors } } = useForm<MaterialFormData>({
         defaultValues: {
             code: initialData.code || '',
             name: initialData.name || '',
@@ -83,12 +84,18 @@ function EditMaterialInnerForm({ initialData, onClose, onSave }: InnerProps) {
 
             <div className="space-y-2">
                 <Label htmlFor="edit-price" className="text-gray-900 font-medium">Harga</Label>
-                <Input
-                    id="edit-price"
-                    type="number"
-                    placeholder="Masukkan jumlah"
-                    {...register('price', { required: 'Harga wajib diisi' })}
-                    className={errors.price ? 'border-red-500' : ''}
+                <Controller
+                    control={control}
+                    name="price"
+                    rules={{ required: 'Harga wajib diisi' }}
+                    render={({ field }) => (
+                        <MoneyInput
+                            value={field.value === '' ? null : Number(field.value || 0)}
+                            onChangeValue={field.onChange}
+                            placeholder="Masukkan jumlah"
+                            className={errors.price ? 'border-red-500' : ''}
+                        />
+                    )}
                 />
                 {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
             </div>

@@ -56,7 +56,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
               <FormItem>
                 <FormLabel>Nama Transaksi</FormLabel>
                 <FormControl>
-                  <Input placeholder="Masukkan nama transaksi" {...field} disabled={isBusy} />
+                  <Input className='h-[100px]' placeholder="Masukkan nama transaksi" {...field} disabled={isBusy} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -147,13 +147,13 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
               name="debitCash"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Debet</FormLabel>
+                  <FormLabel>Debet IDR</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
                       <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
-                  </FormControl>
+                  </FormControl> 
                   <FormMessage />
                 </FormItem>
               )}
@@ -163,7 +163,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
               name="creditCash"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kredit</FormLabel>
+                  <FormLabel>Kredit IDR</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
@@ -187,7 +187,9 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
               <FormItem>
                 <FormLabel>Keterangan</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Masukkan Keterangan" className="resize-none h-24" {...field} disabled={isBusy} />
+                  {/* <Textarea placeholder="Masukkan Keterangan" className="resize-none h-24" {...field} disabled={isBusy} /> */}
+                  <Input placeholder="Masukkan Keterangan" {...field} disabled={isBusy} />
+                  {/* <Textarea placeholder="Masukkan Keterangan" className="resize-none h-24" {...field} disabled={isBusy} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
