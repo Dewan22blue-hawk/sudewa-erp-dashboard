@@ -15,9 +15,11 @@ import {
 } from '@/hooks/useDriver';
 import { useCompany } from '@/contexts/CompanyContext';
 import type { Driver, DriverPayload } from '@/@types/driver.types';
+import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 
 export default function DriverPage() {
     const { companyId: localCompanyId } = useCompany();
+    const { data: profile } = useAuthMe();
 
     // Table state
     const [searchInput, setSearchInput] = useState('');   // immediate display value
@@ -35,7 +37,7 @@ export default function DriverPage() {
     }, [searchInput]);
 
     // Data & mutations
-    const { data: driversData, isLoading } = useDrivers({ page, perPage, search });
+    const { data: driversData, isLoading } = useDrivers({ page, perPage, search, company_id: localCompanyId ?? undefined });
     const createMutation = useCreateDriver();
     const updateMutation = useUpdateDriver();
     const deleteMutation = useDeleteDriver();
@@ -66,15 +68,16 @@ export default function DriverPage() {
 
     const handleSaveForm = async (data: DriverPayload) => {
         const companyId = localCompanyId || 1;
+        const userId = profile?.data?.id ? Number(profile.data.id) || profile.data.id : undefined;
         try {
             if (selectedDriver) {
                 await updateMutation.mutateAsync({
                     id: selectedDriver.id,
-                    data: { ...data, company_id: companyId },
+                    data: { ...data, company_id: companyId, user_id: userId },
                 });
                 toast.success('Data driver berhasil diubah');
             } else {
-                await createMutation.mutateAsync({ ...data, company_id: companyId });
+                await createMutation.mutateAsync({ ...data, company_id: companyId, user_id: userId });
                 toast.success('Data driver berhasil ditambahkan');
             }
             setIsFormOpen(false);
@@ -164,6 +167,7 @@ export default function DriverPage() {
                 initialData={selectedDriver}
                 isSubmitting={isSaving}
                 companyId={localCompanyId || 1}
+                userId={profile?.data?.id}
             />
 
             <DeleteDriverModal

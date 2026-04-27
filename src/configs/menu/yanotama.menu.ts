@@ -21,6 +21,14 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             icon: Database,
             children: [
                 {
+                    label: 'Akun',
+                    href: base('/master/account'),
+                },
+                {
+                    label: 'Grup Akun',
+                    href: base('/master/account-group'),
+                },
+                {
                     label: 'Dealer',
                     href: base('/master/dealer'),
                 },
@@ -59,6 +67,14 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/data-kendaraan'),
                 },
                 {
+                    label: 'Pembelian Material',
+                    href: base('/pembelian-material'),
+                },
+                {
+                    label: 'Penjualan Material',
+                    href: base('/penjualan-material'),
+                },
+                {
                     label: 'Input STNK/BPKB',
                     href: base('/stnk-bpkb'),
                 },
@@ -69,10 +85,6 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 {
                     label: 'DO Pembelian Material',
                     href: base('/do-pembelian-material'),
-                },
-                {
-                    label: 'Penjualan Material',
-                    href: base('/penjualan-material'),
                 },
                 {
                     label: 'Stok Material',

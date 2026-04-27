@@ -4,6 +4,7 @@ export interface AccountGroup {
   id: number | string;
   code: string;
   name: string;
+  companyId?: string | number | null;
   description?: string | null;
   isActive: boolean;
   createdAt?: string;

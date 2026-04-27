@@ -11,7 +11,7 @@ import {
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { DriverPayload } from '@/@types/driver.types';
 
-export function useDrivers(params: PaginationParams & { search?: string }) {
+export function useDrivers(params: PaginationParams & { search?: string; company_id?: string | number }) {
     return useQuery({
         queryKey: ['drivers', params.page, params.perPage, params.search],
         queryFn: () => getDrivers(params),

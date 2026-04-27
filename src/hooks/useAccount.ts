@@ -3,7 +3,7 @@ import type { AccountPayload } from '@/@types/account.types';
 import type { PaginationParams } from '@/@types/pagination.types';
 import { createAccount, deleteAccount, getAccountById, getAccountHierarchy, getAccounts, importAccount, updateAccount } from '@/services/account.service';
 
-export const useAccounts = (params: PaginationParams & { search?: string; enabled?: boolean }) => {
+export const useAccounts = (params: PaginationParams & { search?: string; company_id?: string | number; enabled?: boolean }) => {
   const { enabled = true, ...rest } = params;
 
   return useQuery({
@@ -76,4 +76,3 @@ export const useImportAccount = () => {
     },
   });
 };
-

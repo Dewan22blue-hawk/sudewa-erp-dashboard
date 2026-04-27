@@ -3,9 +3,9 @@ import { getMaterials, getMaterialById, importMaterial, createMaterial, updateMa
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { MaterialPayload } from '@/@types/material.types';
 
-export function useMaterials(params: PaginationParams & { search?: string } = { page: 1, perPage: 25 }) {
+export function useMaterials(params: PaginationParams & { search?: string; has_transaction?: boolean; sort_order?: 'asc' | 'desc' } = { page: 1, perPage: 25 }) {
     return useQuery({
-        queryKey: ['materials', params.page, params.perPage, params.search],
+        queryKey: ['materials', params.page, params.perPage, params.search, params.has_transaction, params.sort_order],
         queryFn: () => getMaterials(params),
     });
 }

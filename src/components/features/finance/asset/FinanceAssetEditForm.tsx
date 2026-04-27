@@ -29,6 +29,7 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
     const economicAge = watch('economic_age');
     const depreciation = watch('depreciation');
     const price = initialData.price || 0;
+    const totalMonths = economicAge > 0 ? economicAge * 12 : 0;
 
     // Ref to track first render — skip auto-calculate on initial page load
     // so we don't override saved data from the database.
@@ -40,14 +41,19 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
             isFirstRender.current = false;
             return; // Skip: preserve the saved depreciation & final_value
         }
-        if (economicAge > 0 && price > 0) {
-            const monthlyDepreciation = Math.round(price / (economicAge * 12));
+        if (totalMonths > 0 && price > 0) {
+            const monthlyDepreciation = Math.round(price / totalMonths);
             setValue('depreciation', monthlyDepreciation);
-            // Nilai Akhir = Harga Beli - (Penyusutan/Bulan × Umur Ekonomis × 12 bulan)
-            const finalValue = Math.max(0, price - monthlyDepreciation * economicAge * 12);
+
+            // Nilai akhir buku = harga beli - akumulasi penyusutan.
+            const finalValue = Math.max(0, price - (monthlyDepreciation * totalMonths));
             setValue('final_value', Math.round(finalValue));
+            return;
         }
-    }, [economicAge, price, setValue]);
+
+        setValue('depreciation', 0);
+        setValue('final_value', price > 0 ? Math.round(price) : 0);
+    }, [price, setValue, totalMonths]);
 
     // UX Helper: Recalculate final_value when user manually overrides depreciation
     const isFirstDepreciationRender = useRef(true);
@@ -56,11 +62,16 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
             isFirstDepreciationRender.current = false;
             return;
         }
-        if (economicAge > 0 && depreciation >= 0 && price > 0) {
-            const finalValue = Math.max(0, price - depreciation * economicAge * 12);
+        if (totalMonths > 0 && depreciation >= 0 && price > 0) {
+            const finalValue = Math.max(0, price - (depreciation * totalMonths));
             setValue('final_value', Math.round(finalValue));
+            return;
         }
-    }, [depreciation, economicAge, price, setValue]);
+
+        if (price >= 0) {
+            setValue('final_value', Math.round(price));
+        }
+    }, [depreciation, price, setValue, totalMonths]);
 
     const onSubmit = (data: FinanceAssetPayload) => {
         onSave(data);

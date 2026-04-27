@@ -44,7 +44,7 @@ const basePath = '/wapi/master-data/customer';
 type PaginatedCustomerResponse = LaravelApiResponse<{
   data: CustomerApiModel[];
   current_page: number;
-  perPage: number;
+  per_page: number;
   total: number;
   last_page: number;
 }>;
@@ -83,7 +83,7 @@ export const getCustomers = async (
     {
       data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.perPage,
+      per_page: data.per_page,
       total: data.total,
       last_page: data.last_page,
     },
@@ -99,25 +99,26 @@ export const getCustomerById = async (id: number | string): Promise<Customer> =>
 
 const buildPayload = (payload: CustomerPayload, opts?: { asUpdate?: boolean }) => {
   const body = new FormData();
-  if (opts?.asUpdate) body.append('_method', 'PUT'); // << method override for Laravel PUT
+  if (opts?.asUpdate) body.append('_method', 'PUT');
   if (payload.userId !== undefined) body.append('user_id', String(payload.userId));
   if (payload.companyId !== undefined) body.append('company_id', String(payload.companyId));
   body.append('name', payload.name);
-  if (payload.address) body.append('address', payload.address);
-  if (payload.phone) body.append('phone', payload.phone);
-  if (payload.npwp) body.append('npwp', payload.npwp);
-  if (payload.pic) {
-    body.append('pic', payload.pic);
-    body.append('pic_name', payload.pic);
-  }
-  if (payload.map_link) body.append('map_link', payload.map_link);
+  body.append('address', payload.address ?? '');
+  body.append('phone', payload.phone ?? '');
+  body.append('npwp', payload.npwp ?? '');
+  body.append('pic_name', payload.pic ?? '');
+  body.append('map_link', payload.map_link ?? '');
   return body;
 };
 
 export const createCustomer = async (payload: CustomerPayload): Promise<Customer> => {
   try {
     const body = buildPayload(payload);
-    const response = await apiClient.post<CustomerItemResponse>(basePath, body);
+    const response = await apiClient.post<CustomerItemResponse>(basePath, body, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     const data = ensureSuccess(response.data);
     return mapCustomer(data);
   } catch (error) {
@@ -131,7 +132,11 @@ export const createCustomer = async (payload: CustomerPayload): Promise<Customer
 export const updateCustomer = async (id: number | string, payload: CustomerPayload): Promise<Customer> => {
   try {
     const body = buildPayload(payload, { asUpdate: true });
-    const response = await apiClient.post<CustomerItemResponse>(`${basePath}/${id}`, body);
+    const response = await apiClient.post<CustomerItemResponse>(`${basePath}/${id}`, body, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     const data = ensureSuccess(response.data);
     return mapCustomer(data);
   } catch (error) {
@@ -166,4 +171,28 @@ export const importCustomer = async (file: File, companyId?: string | number): P
   if (!payload.status) {
     throw new ApiResponseError(payload.message ?? 'Failed to import customer');
   }
+};
+
+export const exportCustomer = async (): Promise<void> => {
+  const response = await apiClient.get(`${basePath}/export`, {
+    responseType: 'blob',
+  });
+
+  const contentType = response.headers['content-type'];
+  const isJson = contentType && contentType.includes('application/json');
+
+  if (isJson) {
+    const textData = await (response.data as Blob).text();
+    const jsonResponse = JSON.parse(textData);
+    throw new ApiResponseError(jsonResponse.message ?? 'Failed to export customer');
+  }
+
+  const url = window.URL.createObjectURL(new Blob([response.data as Blob]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `Customer_${Date.now()}.xlsx`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
 };

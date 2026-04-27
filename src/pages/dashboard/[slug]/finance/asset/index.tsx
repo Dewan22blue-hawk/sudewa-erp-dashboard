@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { FinanceAssetTable } from '@/components/features/finance/asset/FinanceAssetTable';
 import { useFinanceAssets, useDeleteFinanceAsset, useExportFinanceAsset } from '@/hooks/useFinanceAsset';
@@ -23,6 +23,28 @@ export default function FinanceAssetPage() {
 
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedAsset, setSelectedAsset] = useState<FinanceAsset | null>(null);
+
+    const filteredAssets = useMemo(() => {
+        const assets = assetsData?.data || [];
+        if (!companyId) return assets;
+
+        return assets.filter((asset) => {
+            if (asset.company_id === undefined || asset.company_id === null) {
+                return true;
+            }
+
+            return String(asset.company_id) === String(companyId);
+        });
+    }, [assetsData?.data, companyId]);
+
+    const totalAssets = useMemo(() => {
+        const apiTotal = assetsData?.meta.total ?? 0;
+        const hasCompanyIdOnEveryRow = filteredAssets.every(
+            (asset) => asset.company_id !== undefined && asset.company_id !== null,
+        );
+
+        return hasCompanyIdOnEveryRow ? filteredAssets.length : apiTotal;
+    }, [assetsData?.meta.total, filteredAssets]);
 
     const handleEdit = (asset: FinanceAsset) => {
         router.push(`/dashboard/${slug}/finance/asset/${asset.id}/edit`);
@@ -62,7 +84,7 @@ export default function FinanceAssetPage() {
                 </div>
 
                 <FinanceAssetTable
-                    assets={assetsData?.data || []}
+                    assets={filteredAssets}
                     search={search}
                     onSearchChange={(v) => {
                         setSearch(v);
@@ -70,7 +92,7 @@ export default function FinanceAssetPage() {
                     }}
                     page={page}
                     perPage={perPage}
-                    totalData={assetsData?.meta.total || 0}
+                    totalData={totalAssets}
                     onPageChange={setPage}
                     onPerPageChange={(v) => {
                         setPerPage(v);

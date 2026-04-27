@@ -1,98 +1,170 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { Customer as ApiCustomer } from '@/@types/customer.types';
+import { CustomerFormModal } from '@/components/features/customer/CustomerFormModal';
+import { DeleteCustomerModal } from '@/components/features/customer/DeleteCustomerModal';
+import { CustomerFormDialog } from '@/components/features/customer/CustomerFormDialog';
+import { CustomerTable } from '@/components/features/customer/CustomerTable';
+import { DeleteCustomerDialog } from '@/components/features/customer/DeleteCustomerDialog';
+import { LegacyCustomerTable } from '@/components/features/customer/LegacyCustomerTable';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
-import { CustomerTable as TransindoCustomerTable, Customer as TransindoCustomer } from '@/components/features/customer/CustomerTable';
-import { CustomerFormModal, CustomerFormData } from '@/components/features/customer/CustomerFormModal';
-import { DeleteCustomerModal } from '@/components/features/customer/DeleteCustomerModal';
-import { LegacyCustomerTable } from '@/components/features/customer/LegacyCustomerTable';
-import { CustomerFormDialog } from '@/components/features/customer/CustomerFormDialog';
-import { DeleteCustomerDialog } from '@/components/features/customer/DeleteCustomerDialog';
-import { DUMMY_TRANSINDO_CUSTOMERS, setDummyTransindoCustomers } from '@/components/features/customer/transindo-customer.data';
-import { toast } from 'sonner';
-import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { useCompany } from '@/contexts/CompanyContext';
-import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer, useImportCustomer } from '@/hooks/useCustomer';
+import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
+import { useCreateCustomer, useCustomers, useDeleteCustomer, useExportCustomer, useImportCustomer, useUpdateCustomer } from '@/hooks/useCustomer';
+import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { customerSchema, type CustomerFormValues } from '@/scheme/customer.schema';
-import type { Customer as ApiCustomer } from '@/@types/customer.types';
-import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
+import { getCustomerById } from '@/services/customer.service';
+import { toast } from 'sonner';
+
+const defaultCustomerValues: CustomerFormValues = {
+  name: '',
+  address: '',
+  npwp: '',
+  pic: '',
+  phone: '',
+  map_link: '',
+};
+
+const applyValidationErrors = (
+  error: ApiValidationError,
+  form: ReturnType<typeof useForm<CustomerFormValues>>,
+) => {
+  Object.entries(error.fieldErrors).forEach(([field, messages]) => {
+    const mappedField = field === 'pic_name' ? 'pic' : field;
+    form.setError(mappedField as keyof CustomerFormValues, { message: messages?.[0] || 'Validasi gagal' });
+  });
+};
 
 function TransindoCustomerContent() {
-  const [customers, setCustomers] = useState<TransindoCustomer[]>(DUMMY_TRANSINDO_CUSTOMERS);
+  const { companyId, isLoading: isLoadingCompany } = useCompany();
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const deferredSearch = useDeferredValue(search);
 
-  // Table state
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const { data, isLoading, isFetching, isError } = useCustomers({
+    page,
+    perPage,
+    search: deferredSearch || undefined,
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId,
+  });
 
-  // Modals state
+  const createCustomer = useCreateCustomer();
+  const updateCustomer = useUpdateCustomer();
+  const deleteCustomer = useDeleteCustomer();
+  const importCustomer = useImportCustomer();
+  const exportCustomer = useExportCustomer();
+
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<TransindoCustomer | null>(null);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<ApiCustomer | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ApiCustomer | null>(null);
+  const [loadingDetailId, setLoadingDetailId] = useState<string | number | null>(null);
 
-  // Filter & Pagination logic
-  const filteredCustomers = useMemo(() => {
-    return customers.filter(
-      (customer) =>
-        customer.namaDealer.toLowerCase().includes(search.toLowerCase()) || customer.namaCustomer.toLowerCase().includes(search.toLowerCase()) || customer.pic.toLowerCase().includes(search.toLowerCase()) || customer.phone.includes(search) || (customer.map_link ?? '').toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [customers, search]);
+  const form = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: defaultCustomerValues,
+  });
 
-  const paginatedCustomers = useMemo(() => {
-    const startIndex = (page - 1) * perPage;
-    return filteredCustomers.slice(startIndex, startIndex + perPage);
-  }, [filteredCustomers, page, perPage]);
-
-  // Handlers
-  const handleAddClick = () => {
-    setSelectedCustomer(null);
-    setIsFormOpen(true);
-  };
-
-  const handleEditClick = (customer: TransindoCustomer) => {
-    setSelectedCustomer(customer);
-    setIsFormOpen(true);
-  };
-
-  const handleDeleteClick = (customer: TransindoCustomer) => {
-    setSelectedCustomer(customer);
-    setIsDeleteOpen(true);
-  };
-
-  const handleSaveForm = (data: CustomerFormData) => {
-    if (selectedCustomer) {
-      // Edit
-      setCustomers((prev) => {
-        const updated = prev.map((c) => (c.id === selectedCustomer.id ? { ...c, ...data } : c));
-        setDummyTransindoCustomers(updated);
-        return updated;
-      });
-      toast.success('Data customer berhasil diubah');
-    } else {
-      // Add
-      setCustomers((prev) => {
-        const newId = prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1;
-        const updated = [{ id: newId, ...data }, ...prev];
-        setDummyTransindoCustomers(updated);
-        return updated;
-      });
-      toast.success('Data customer berhasil ditambahkan');
-    }
+  const handleCloseForm = () => {
     setIsFormOpen(false);
+    setEditingCustomer(null);
+    form.reset(defaultCustomerValues);
   };
 
-  const handleConfirmDelete = () => {
-    if (selectedCustomer) {
-      setCustomers((prev) => {
-        const updated = prev.filter((c) => c.id !== selectedCustomer.id);
-        setDummyTransindoCustomers(updated);
-        return updated;
+  const handleAdd = () => {
+    setEditingCustomer(null);
+    form.reset(defaultCustomerValues);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = async (customer: ApiCustomer) => {
+    setLoadingDetailId(customer.id);
+
+    try {
+      const detail = await getCustomerById(customer.id);
+      setEditingCustomer(detail);
+      form.reset({
+        name: detail.name,
+        address: detail.address ?? '',
+        npwp: detail.npwp ?? '',
+        pic: detail.pic ?? '',
+        phone: detail.phone ?? '',
+        map_link: detail.map_link ?? '',
       });
+      setIsFormOpen(true);
+    } catch (error) {
+      const message = error instanceof ApiResponseError ? error.message : 'Gagal memuat detail customer';
+      toast.error(message);
+    } finally {
+      setLoadingDetailId(null);
+    }
+  };
+
+  const handleSubmit = async (values: CustomerFormValues) => {
+    if (!companyId) {
+      toast.error('Company ID tidak ditemukan');
+      return;
+    }
+
+    const payload = {
+      ...values,
+      companyId: Number(companyId) || companyId,
+    };
+
+    try {
+      if (editingCustomer) {
+        await updateCustomer.mutateAsync({ id: editingCustomer.id, payload });
+        toast.success('Data customer berhasil diperbarui');
+      } else {
+        await createCustomer.mutateAsync(payload);
+        toast.success('Data customer berhasil ditambahkan');
+      }
+
+      handleCloseForm();
+    } catch (error) {
+      if (error instanceof ApiValidationError) {
+        applyValidationErrors(error, form);
+        toast.error(error.message || 'Validasi gagal');
+        return;
+      }
+
+      const message = error instanceof ApiResponseError ? error.message : 'Gagal menyimpan data customer';
+      toast.error(message);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await deleteCustomer.mutateAsync(deleteTarget.id);
       toast.success('Data customer berhasil dihapus');
-      setIsDeleteOpen(false);
-      setSelectedCustomer(null);
+      setDeleteTarget(null);
+    } catch (error) {
+      const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus data customer';
+      toast.error(message);
+    }
+  };
+
+  const handleImport = async (file: File) => {
+    if (!companyId) {
+      throw new Error('Company ID tidak ditemukan');
+    }
+
+    await importCustomer.mutateAsync({ companyId, file });
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportCustomer.mutateAsync();
+      toast.success('File customer berhasil didownload');
+    } catch (error) {
+      const message = error instanceof ApiResponseError ? error.message : 'Gagal mengexport data customer';
+      toast.error(message);
     }
   };
 
@@ -100,42 +172,87 @@ function TransindoCustomerContent() {
     <>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Customer</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data customer dengan mudah</p>
+          <h1 className="text-[40px] font-semibold leading-tight tracking-[-0.02em] text-[#171717]">Customer</h1>
+          <p className="mt-1 text-[24px] text-[#71717A]">Kelola data customer dengan mudah</p>
         </div>
 
-        <TransindoCustomerTable
-          customers={paginatedCustomers}
-          search={search}
-          onSearchChange={(v) => {
-            setSearch(v);
-            setPage(1);
-          }}
-          page={page}
-          perPage={perPage}
-          totalData={filteredCustomers.length}
-          onPageChange={setPage}
-          onPerPageChange={(v) => {
-            setPerPage(v);
-            setPage(1);
-          }}
-          onAdd={handleAddClick}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteClick}
-        />
+        {isError ? (
+          <Card className="rounded-xl border border-[#E4E4E7] p-6 shadow-none">
+            <div className="text-center text-[15px] text-[#DC2626]">Gagal memuat data customer</div>
+          </Card>
+        ) : (
+          <CustomerTable
+            customers={data?.data ?? []}
+            isLoading={isLoading || isFetching || !!loadingDetailId}
+            search={search}
+            page={page}
+            perPage={perPage}
+            totalData={data?.meta.total ?? 0}
+            totalPages={data?.meta.lastPage ?? 1}
+            onSearchChange={setSearch}
+            onPageChange={setPage}
+            onPerPageChange={setPerPage}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={setDeleteTarget}
+            onImport={() => setIsImportOpen(true)}
+            onExport={handleExport}
+            isExporting={exportCustomer.isPending}
+          />
+        )}
       </div>
 
-      <CustomerFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSave={handleSaveForm} initialData={selectedCustomer} />
+      <CustomerFormModal
+        open={isFormOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleCloseForm();
+            return;
+          }
 
-      <DeleteCustomerModal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleConfirmDelete} />
+          setIsFormOpen(open);
+        }}
+        form={form}
+        onSubmit={handleSubmit}
+        title={editingCustomer ? 'Edit Data Customer' : 'Tambah Data Customer'}
+        description={editingCustomer ? 'Edit detail customer baru' : 'Masukkan detail customer baru'}
+        submitLabel="Simpan"
+        isSubmitting={createCustomer.isPending || updateCustomer.isPending}
+      />
+
+      <DeleteCustomerModal
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
+          }
+        }}
+        customerName={deleteTarget?.name ?? null}
+        onConfirm={handleConfirmDelete}
+        isDeleting={deleteCustomer.isPending}
+      />
+
+      <DataImportModal
+        open={isImportOpen}
+        onOpenChange={setIsImportOpen}
+        title="Import Data Customer"
+        description="Unggah file .xlsx, .xls, atau .csv untuk mengimport data customer."
+        onImport={handleImport}
+        isPending={importCustomer.isPending}
+        accept=".xlsx,.xls,.csv,text/csv"
+      />
     </>
   );
 }
 
 function GeneralCustomerContent() {
   const { companyId } = useCompany();
-  const { data: profile } = useAuthMe();
-  const { data, isLoading, isError } = useCustomers(companyId);
+  const { data, isLoading, isError } = useCustomers({
+    company_id: companyId ?? undefined,
+    perPage: 100,
+    page: 1,
+    enabled: !!companyId,
+  });
   const createCustomer = useCreateCustomer();
   const updateCustomer = useUpdateCustomer();
   const deleteCustomer = useDeleteCustomer();
@@ -150,26 +267,12 @@ function GeneralCustomerContent() {
 
   const createForm = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: '',
-      address: '',
-      npwp: '',
-      pic: '',
-      phone: '',
-      map_link: '',
-    },
+    defaultValues: defaultCustomerValues,
   });
 
   const editForm = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: '',
-      address: '',
-      npwp: '',
-      pic: '',
-      phone: '',
-      map_link: '',
-    },
+    defaultValues: defaultCustomerValues,
   });
 
   useEffect(() => {
@@ -187,13 +290,13 @@ function GeneralCustomerContent() {
 
   const handleCloseCreateModal = () => {
     setCreateModalOpen(false);
-    createForm.reset();
+    createForm.reset(defaultCustomerValues);
   };
 
   const handleCloseEditModal = () => {
     setEditModalOpen(false);
     setCustomerToEdit(null);
-    editForm.reset();
+    editForm.reset(defaultCustomerValues);
   };
 
   const onSubmitCreate = async (values: CustomerFormValues) => {
@@ -202,21 +305,20 @@ function GeneralCustomerContent() {
       return;
     }
 
-    if (!profile?.data?.id) {
-      toast.error('User belum dimuat, silakan coba lagi');
-      return;
-    }
-
     try {
       await createCustomer.mutateAsync({
         ...values,
         companyId: Number(companyId) || companyId,
-        userId: profile.data.id,
       });
       handleCloseCreateModal();
       toast.success('Data berhasil ditambahkan');
     } catch (error) {
-      console.error('Failed to create customer:', error);
+      if (error instanceof ApiValidationError) {
+        applyValidationErrors(error, createForm);
+        toast.error(error.message || 'Validasi gagal');
+        return;
+      }
+
       toast.error('Gagal menambahkan data customer');
     }
   };
@@ -224,24 +326,23 @@ function GeneralCustomerContent() {
   const onSubmitEdit = async (values: CustomerFormValues) => {
     if (!customerToEdit) return;
 
-    if (!profile?.data?.id) {
-      toast.error('User belum dimuat, silakan coba lagi');
-      return;
-    }
-
     try {
       await updateCustomer.mutateAsync({
         id: customerToEdit.id,
         payload: {
           ...values,
           companyId: Number(customerToEdit.companyId) || customerToEdit.companyId,
-          userId: profile.data.id,
         },
       });
       handleCloseEditModal();
       toast.success('Data berhasil diperbarui');
     } catch (error) {
-      console.error('Failed to update customer:', error);
+      if (error instanceof ApiValidationError) {
+        applyValidationErrors(error, editForm);
+        toast.error(error.message || 'Validasi gagal');
+        return;
+      }
+
       toast.error('Gagal memperbarui data customer');
     }
   };
@@ -264,8 +365,7 @@ function GeneralCustomerContent() {
       setDeleteDialogOpen(false);
       setCustomerToDelete(null);
       toast.success('Data berhasil dihapus');
-    } catch (error) {
-      console.error('Failed to delete customer:', error);
+    } catch {
       toast.error('Gagal menghapus data customer');
     }
   };
@@ -275,51 +375,40 @@ function GeneralCustomerContent() {
     await importCustomer.mutateAsync({ companyId, file });
   };
 
-
   if (isLoading) {
     return (
-      <>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Customer</h1>
-              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-            </div>
-          </div>
-          <Card className="rounded-xl p-6">
-            <div className="text-center text-muted-foreground">Loading...</div>
-          </Card>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold">Customer</h1>
+          <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
         </div>
-      </>
+        <Card className="rounded-xl p-6">
+          <div className="text-center text-muted-foreground">Loading...</div>
+        </Card>
+      </div>
     );
   }
 
   if (isError) {
     return (
-      <>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Customer</h1>
-              <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-            </div>
-          </div>
-          <Card className="rounded-xl p-6">
-            <div className="text-center text-destructive">Gagal memuat data</div>
-          </Card>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold">Customer</h1>
+          <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
         </div>
-      </>
+        <Card className="rounded-xl p-6">
+          <div className="text-center text-destructive">Gagal memuat data</div>
+        </Card>
+      </div>
     );
   }
 
   return (
     <>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Customer</h1>
-            <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold">Customer</h1>
+          <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
         </div>
 
         <LegacyCustomerTable
@@ -330,7 +419,6 @@ function GeneralCustomerContent() {
           onImport={() => setOpenImport(true)}
         />
       </div>
-
 
       <CustomerFormDialog
         open={createModalOpen}
@@ -359,13 +447,13 @@ function GeneralCustomerContent() {
         open={openImport}
         onOpenChange={setOpenImport}
         title="Import Data Customer"
-        description="Unggah file .xlsx untuk mengimport data customer."
+        description="Unggah file .xlsx, .xls, atau .csv untuk mengimport data customer."
         onImport={handleImport}
         isPending={importCustomer.isPending}
         templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
+        accept=".xlsx,.xls,.csv,text/csv"
       />
     </>
-
   );
 }
 

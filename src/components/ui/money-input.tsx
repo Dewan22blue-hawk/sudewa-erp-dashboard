@@ -3,12 +3,12 @@ import { Input } from '@/components/ui/input';
 import { formatMoneyInput, parseMoneyInput } from '@/lib/utils/money-input';
 
 type MoneyInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  value: number;
+  value?: number | null;
   onChangeValue: (value: number) => void;
 };
 
 export function MoneyInput({ value, onChangeValue, onChange, ...rest }: MoneyInputProps) {
-  const display = value ? formatMoneyInput(value.toString()) : '';
+  const display = value === null || value === undefined ? '' : formatMoneyInput(value.toString());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatMoneyInput(e.target.value);
@@ -19,4 +19,3 @@ export function MoneyInput({ value, onChangeValue, onChange, ...rest }: MoneyInp
 
   return <Input type="text" inputMode="numeric" value={display} onChange={handleChange} {...rest} />;
 }
-

@@ -6,14 +6,12 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { kasHarianSchema, type KasHarianFormValues } from '@/scheme/kas-harian.schema';
-import { useUpdateKasHarian } from '@/hooks/useKasHarian';
-import { useKas } from '@/hooks/useKas';
-import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies } from '@/services/company.service';
-import { useAccounts } from '@/hooks/useAccount';
-import KasHarianForm from './KasHarianForm';
+import { useKas } from '@/hooks/useKas';
+import { useUpdateKasHarian } from '@/hooks/useKasHarian';
+import { kasHarianSchema, type KasHarianFormValues } from '@/scheme/kas-harian.schema';
 import type { KasHarian } from '@/@types/kas-harian.types';
+import KasHarianForm from './KasHarianForm';
 
 interface Props {
   open: boolean;
@@ -28,7 +26,6 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
     defaultValues: {
       company_id: 0,
       cash_id: 0,
-      account_id: 0,
       date: new Date(),
       note: '',
       debet: 0,
@@ -42,16 +39,14 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
     staleTime: 10 * 60 * 1000,
   });
 
-  const cashQuery = useKas();
-  const accountQuery = useAccounts({ perPage: 100 });
+  const cashQuery = useKas(data?.company_id);
 
   useEffect(() => {
     if (data && open) {
       form.reset({
-        company_id: data.company.id,
-        cash_id: data.cash.id,
-        account_id: data.account?.id || 0,
-        date: new Date(data.date),
+        company_id: data.company_id,
+        cash_id: data.cash_id,
+        date: data.date ? new Date(data.date) : new Date(),
         note: data.note,
         debet: data.debet,
         credit: data.credit,
@@ -68,12 +63,11 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
         payload: {
           company_id: values.company_id,
           cash_id: values.cash_id,
-          account_id: values.account_id,
           date: format(values.date, 'yyyy-MM-dd'),
           note: values.note,
           debet: values.debet,
           credit: values.credit,
-        } as any,
+        },
       });
 
       toast.success('Transaksi kas harian berhasil diperbarui');
@@ -87,31 +81,32 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>Ubah Transaksi KAS</DialogTitle>
-          <p className="text-sm text-gray-500">Perbarui detail transaksi kas harian</p>
-        </DialogHeader>
+      <DialogContent className="max-w-[520px] rounded-[28px] border-0 p-0 shadow-2xl">
+        <div className="rounded-[28px] border border-slate-200 bg-white p-8">
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="text-[24px] font-semibold text-slate-950">Edit Transasaksi KAS</DialogTitle>
+            <p className="text-lg text-slate-500">Perbarui detail transaksi kas harian</p>
+          </DialogHeader>
 
-        <KasHarianForm
-          form={form}
-          onSubmit={onSubmit}
-          id="edit-kas-form"
-          companies={companyQuery.data ?? []}
-          cashOptions={cashQuery.data?.data ?? []}
-          accountOptions={accountQuery.data?.data ?? []}
-          isLoadingCompanies={companyQuery.isLoading}
-          isLoadingCash={cashQuery.isLoading}
-          isLoadingAccounts={accountQuery.isLoading}
-        />
+          <div className="mt-7">
+            <KasHarianForm
+              form={form}
+              onSubmit={onSubmit}
+              id="edit-kas-form"
+              companies={companyQuery.data ?? []}
+              cashOptions={cashQuery.data?.data ?? []}
+              isLoadingCash={cashQuery.isLoading}
+            />
+          </div>
 
-        <div className="flex flex-col gap-3 mt-4">
-          <Button type="submit" className="w-full bg-[#1e293b] hover:bg-[#0f172a]" form="edit-kas-form" disabled={isPending}>
-            {isPending ? 'Menyimpan...' : 'Simpan'}
-          </Button>
-          <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)} disabled={isPending}>
-            Batal
-          </Button>
+          <div className="mt-8 flex flex-col gap-4">
+            <Button type="submit" className="h-12 rounded-2xl bg-[#18385b] text-base hover:bg-[#102843]" form="edit-kas-form" disabled={isPending}>
+              {isPending ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+            <Button type="button" variant="outline" className="h-12 rounded-2xl border-slate-200 text-base" onClick={() => onOpenChange(false)} disabled={isPending}>
+              Batal
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

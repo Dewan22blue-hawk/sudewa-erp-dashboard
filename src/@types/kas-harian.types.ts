@@ -2,36 +2,37 @@ import type { LaravelPagination, PaginationMeta } from '@/@types/pagination.type
 
 export interface KasHarianCash {
   id: number;
+  uuid?: string;
+  code: string;
   description: string;
   type: string;
 }
 
 export interface KasHarianCompany {
   id: number;
-  name: string;
-}
-
-export interface KasHarianAccount {
-  id: number;
+  uuid?: string;
   name: string;
 }
 
 export interface KasHarian {
   id: number;
+  uuid?: string;
+  company_id: number;
+  cash_id: number;
   code: string;
   date: string;
   note: string;
   debet: number;
   credit: number;
+  created_at?: string;
+  updated_at?: string;
   cash: KasHarianCash;
   company: KasHarianCompany;
-  account?: KasHarianAccount;
 }
 
 export interface CashFlowPayload {
   company_id: number;
   cash_id: number;
-  account_id: number;
   date: string;
   note: string;
   debet: number;
@@ -41,8 +42,9 @@ export interface CashFlowPayload {
 export interface CashFlowFilterParams {
   page?: number;
   per_page?: number;
+  search?: string;
   code?: string;
-  supplier?: string;
+  company_id?: number;
   start_date?: string;
   end_date?: string;
 }

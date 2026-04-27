@@ -10,6 +10,7 @@ interface AccountApiModel {
   account_group_name?: string;
   account_group?: {
     id: number;
+    company_id?: string | number | null;
     name: string;
   };
   code: string;
@@ -34,6 +35,7 @@ const mapAccount = (payload: AccountApiModel): Account => ({
   isActive: payload.is_active === undefined ? true : payload.is_active === true || payload.is_active === 1,
   createdAt: payload.created_at,
   updatedAt: payload.updated_at,
+  companyId: payload.account_group?.company_id ? String(payload.account_group.company_id) : undefined,
 });
 
 const basePath = '/wapi/master-data/account';
@@ -50,19 +52,25 @@ type AccountItemResponse = LaravelApiResponse<AccountApiModel>;
 
 type DeleteResponse = LaravelApiResponse<null>;
 
-export const getAccounts = async (params: PaginationParams & { search?: string }): Promise<AccountListResponse> => {
+export const getAccounts = async (params: PaginationParams & { search?: string; company_id?: string | number }): Promise<AccountListResponse> => {
   const response = await apiClient.get<PaginatedAccountResponse>(basePath, {
-    params: buildLaravelPaginationQuery(params),
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      company_id: params.company_id,
+    },
   });
 
   const data = ensureSuccess(response.data);
+  const scopedData = params.company_id
+    ? (data.data ?? []).filter((item) => String(item.account_group?.company_id) === String(params.company_id))
+    : (data.data ?? []);
 
   return toPaginatedResult(
     {
-      data: data.data ?? [],
+      data: scopedData,
       current_page: data.current_page,
       per_page: data.perPage,
-      total: data.total,
+      total: params.company_id ? scopedData.length : data.total,
       last_page: data.last_page,
     },
     mapAccount,

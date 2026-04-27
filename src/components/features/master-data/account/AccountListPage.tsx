@@ -20,11 +20,23 @@ import { AccountImportModal } from '@/components/features/account/AccountImportM
 
 
 export const AccountListPage = () => {
+  const { companyId, isLoading: isLoadingCompany } = useCompany();
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
 
-  const { data, isLoading, isError, isFetching } = useAccounts({ page, perPage, search, enabled: true });
-  // Fetch account groups for modal dropdown (no company scope)
-  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({ page: 1, perPage: 100, search: '', enabled: true });
+  const { data, isLoading, isError, isFetching } = useAccounts({
+    page,
+    perPage,
+    search,
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId,
+  });
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
+    page: 1,
+    perPage: 100,
+    search: '',
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId,
+  });
 
   const createMutation = useCreateAccount();
   const updateMutation = useUpdateAccount();
@@ -34,9 +46,6 @@ export const AccountListPage = () => {
   const [openForm, setOpenForm] = useState(false);
   const [openImport, setOpenImport] = useState(false);
   const [editing, setEditing] = useState<Account | null>(null);
-
-  const { companyId } = useCompany();
-
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),

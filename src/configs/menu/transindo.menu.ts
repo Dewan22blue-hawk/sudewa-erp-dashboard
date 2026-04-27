@@ -21,6 +21,14 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: Database,
       children: [
         {
+          label: 'Akun',
+          href: base('/master/account'),
+        },
+        {
+          label: 'Grup Akun',
+          href: base('/master/account-group'),
+        },
+        {
           label: 'Dealer',
           href: base('/master/dealer'),
         },
