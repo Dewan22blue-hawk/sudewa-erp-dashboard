@@ -6,9 +6,10 @@ interface DeleteArmadaModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
+    isDeleting?: boolean;
 }
 
-export function DeleteArmadaModal({ isOpen, onClose, onConfirm }: DeleteArmadaModalProps) {
+export function DeleteArmadaModal({ isOpen, onClose, onConfirm, isDeleting = false }: DeleteArmadaModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[400px]">
@@ -22,8 +23,8 @@ export function DeleteArmadaModal({ isOpen, onClose, onConfirm }: DeleteArmadaMo
                     <Button type="button" variant="outline" onClick={onClose}>
                         Batal
                     </Button>
-                    <Button type="button" className="bg-red-600 hover:bg-red-700 text-white" onClick={onConfirm}>
-                        Hapus
+                    <Button type="button" className="bg-red-600 hover:bg-red-700 text-white" onClick={onConfirm} disabled={isDeleting}>
+                        {isDeleting ? 'Menghapus...' : 'Hapus'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

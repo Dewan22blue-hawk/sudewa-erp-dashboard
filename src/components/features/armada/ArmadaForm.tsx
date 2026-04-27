@@ -1,173 +1,177 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Armada, ArmadaEquipment } from './armada.data';
-import { useRouter } from 'next/router';
+import { Textarea } from '@/components/ui/textarea';
+import type { Armada, ArmadaPayload } from '@/@types/armada.types';
 
-export type ArmadaFormData = Omit<Armada, 'id'>;
-
-interface ArmadaFormProps {
-    initialData?: Armada;
-    title: string;
-    onSubmit: (data: ArmadaFormData) => void;
+export interface ArmadaFormData {
+  registrationNumber: string;
+  type: string;
+  machineNumber: string;
+  chassisNumber: string;
+  stnkAge: string;
+  kirAge: string;
+  stnkNumber: string;
+  kirBook: string;
+  equipmentText: string;
 }
 
-export function ArmadaForm({ initialData, title, onSubmit }: ArmadaFormProps) {
-    const router = useRouter();
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ArmadaFormData>({
-        defaultValues: initialData || {
-            noPolisi: '',
-            noMesin: '',
-            noRangka: '',
-            nomorSTNK: '',
-            masaSTNK: '',
-            bukuKIR: '',
-            masaKIR: '',
-            type: '',
-            perlengkapan: {
-                radioTape: 0, toolkit: 0, kotakP3K: 0, dongkrak: 0, pipaDongkrak: 0, pemantikRokok: 0, banSerep: 0, pipaPress1: 0, pipaPress2: 0,
-                pelanaJok: 0, taliIkatBesar: 0, taliIkatKecil: 0, selangStang: 0, spion: 0, gembokToolBox: 0, tabungAPAR: 0, sponATI: 0, bukuService: 0
-            }
+interface ArmadaFormProps {
+  initialData?: Armada;
+  title: string;
+  onSubmit: (data: ArmadaPayload) => void | Promise<void>;
+  isSubmitting?: boolean;
+}
+
+const toInputDate = (value?: string | null) => (value ? value.substring(0, 10) : '');
+
+const defaultValues: ArmadaFormData = {
+  registrationNumber: '',
+  type: '',
+  machineNumber: '',
+  chassisNumber: '',
+  stnkAge: '',
+  kirAge: '',
+  stnkNumber: '',
+  kirBook: '',
+  equipmentText: '',
+};
+
+export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false }: ArmadaFormProps) {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ArmadaFormData>({
+    defaultValues: initialData
+      ? {
+          registrationNumber: initialData.registrationNumber,
+          type: initialData.type,
+          machineNumber: initialData.machineNumber,
+          chassisNumber: initialData.chassisNumber,
+          stnkAge: toInputDate(initialData.stnkAge),
+          kirAge: toInputDate(initialData.kirAge),
+          stnkNumber: initialData.stnkNumber ?? '',
+          kirBook: initialData.kirBook ?? '',
+          equipmentText: initialData.equipment.join(', '),
         }
+      : defaultValues,
+  });
+
+  const submitForm = (data: ArmadaFormData) => {
+    const equipment = data.equipmentText
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    onSubmit({
+      registration_number: data.registrationNumber,
+      type: data.type,
+      machine_number: data.machineNumber,
+      chassis_number: data.chassisNumber,
+      stnk_age: data.stnkAge || null,
+      kir_age: data.kirAge || null,
+      stnk_number: data.stnkNumber || null,
+      kir_book: data.kirBook || null,
+      equipment,
     });
+  };
 
-    const typeValue = watch("type");
+  return (
+    <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
+        <h3 className="mb-6 border-b pb-4 text-lg font-semibold text-gray-900">{title}</h3>
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Header Content can be overridden but standard structure applies */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="registrationNumber">Nomor Polisi</Label>
+            <Input
+              id="registrationNumber"
+              placeholder="Tambah nomor polisi"
+              {...register('registrationNumber', { required: 'Nomor polisi wajib diisi', maxLength: { value: 249, message: 'Maks 249 karakter' } })}
+              className={errors.registrationNumber ? 'border-red-500' : ''}
+            />
+            {errors.registrationNumber && <p className="text-xs text-red-500">{errors.registrationNumber.message}</p>}
+          </div>
 
-            {/* Data Kendaraan */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 border-b pb-4">Data Kendaraan</h3>
+          <div className="space-y-2">
+            <Label htmlFor="type">Tipe</Label>
+            <Input
+              id="type"
+              placeholder="Tambah tipe armada"
+              {...register('type', { required: 'Tipe wajib diisi', maxLength: { value: 249, message: 'Maks 249 karakter' } })}
+              className={errors.type ? 'border-red-500' : ''}
+            />
+            {errors.type && <p className="text-xs text-red-500">{errors.type.message}</p>}
+          </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="noPolisi">Nomor Polisi</Label>
-                        <Input id="noPolisi" placeholder="Tambah nomor polisi" {...register('noPolisi', { required: 'Wajib diisi' })} className={errors.noPolisi ? 'border-red-500' : ''} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="noMesin">Nomor Mesin</Label>
-                        <Input id="noMesin" placeholder="Tambah nomor mesin" {...register('noMesin', { required: 'Wajib diisi' })} className={errors.noMesin ? 'border-red-500' : ''} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="noRangka">Nomor Rangka</Label>
-                        <Input id="noRangka" placeholder="Tambah nomor rangka" {...register('noRangka', { required: 'Wajib diisi' })} className={errors.noRangka ? 'border-red-500' : ''} />
-                    </div>
+          <div className="space-y-2">
+            <Label htmlFor="machineNumber">Nomor Mesin</Label>
+            <Input
+              id="machineNumber"
+              placeholder="Tambah nomor mesin"
+              {...register('machineNumber', { required: 'Nomor mesin wajib diisi', maxLength: { value: 249, message: 'Maks 249 karakter' } })}
+              className={errors.machineNumber ? 'border-red-500' : ''}
+            />
+            {errors.machineNumber && <p className="text-xs text-red-500">{errors.machineNumber.message}</p>}
+          </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="nomorSTNK">Nomor STNK</Label>
-                        <Input id="nomorSTNK" placeholder="Tambah nomor STNK" {...register('nomorSTNK', { required: 'Wajib diisi' })} className={errors.nomorSTNK ? 'border-red-500' : ''} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="masaSTNK">Masa STNK</Label>
-                        <Input id="masaSTNK" placeholder="Tambah masa STNK" {...register('masaSTNK', { required: 'Wajib diisi' })} className={errors.masaSTNK ? 'border-red-500' : ''} />
-                    </div>
-                    <div className="hidden md:block"></div> {/* Empty column */}
+          <div className="space-y-2">
+            <Label htmlFor="chassisNumber">Nomor Rangka</Label>
+            <Input
+              id="chassisNumber"
+              placeholder="Tambah nomor rangka"
+              {...register('chassisNumber', { required: 'Nomor rangka wajib diisi', maxLength: { value: 249, message: 'Maks 249 karakter' } })}
+              className={errors.chassisNumber ? 'border-red-500' : ''}
+            />
+            {errors.chassisNumber && <p className="text-xs text-red-500">{errors.chassisNumber.message}</p>}
+          </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="bukuKIR">Buku KIR</Label>
-                        <Input id="bukuKIR" placeholder="Tambah buku KIR" {...register('bukuKIR', { required: 'Wajib diisi' })} className={errors.bukuKIR ? 'border-red-500' : ''} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="masaKIR">Masa KIR</Label>
-                        <Input id="masaKIR" placeholder="Tambah masa KIR" {...register('masaKIR', { required: 'Wajib diisi' })} className={errors.masaKIR ? 'border-red-500' : ''} />
-                    </div>
-                    <div className="hidden md:block"></div> {/* Empty column */}
+          <div className="space-y-2">
+            <Label htmlFor="stnkAge">Masa STNK</Label>
+            <Input id="stnkAge" type="date" {...register('stnkAge')} />
+          </div>
 
-                    <div className="space-y-2">
-                        <Label>Type</Label>
-                        <Select value={typeValue} onValueChange={(val) => setValue('type', val, { shouldValidate: true })}>
-                            <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
-                                <SelectValue placeholder="Pilih tipe kendaraan" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="CDD">CDD</SelectItem>
-                                <SelectItem value="Fuso">Fuso</SelectItem>
-                                <SelectItem value="Tronton">Tronton</SelectItem>
-                                <SelectItem value="Trailer">Trailer</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type.message}</p>}
-                    </div>
-                </div>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="kirAge">Masa KIR</Label>
+            <Input id="kirAge" type="date" {...register('kirAge')} />
+          </div>
 
-            {/* Perlengkapan Opsional */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 border-b pb-4">Perlengkapan Opsional</h3>
+          <div className="space-y-2">
+            <Label htmlFor="stnkNumber">Nomor STNK</Label>
+            <Input id="stnkNumber" placeholder="Tambah nomor STNK" {...register('stnkNumber', { maxLength: { value: 249, message: 'Maks 249 karakter' } })} />
+          </div>
 
-                {/* Kategori 1 */}
-                <div className="mb-8 p-4 bg-gray-50/50 rounded-lg border border-gray-100">
-                    <h4 className="text-sm font-medium text-gray-500 mb-4">Kategori 1</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-                        {[
-                            { name: 'radioTape', label: 'Radio tape' },
-                            { name: 'toolkit', label: 'Toolkit' },
-                            { name: 'kotakP3K', label: 'Kotak P3K' },
-                            { name: 'dongkrak', label: 'Dongkrak' },
-                            { name: 'pipaDongkrak', label: 'Pipa Dongkrak' },
-                            { name: 'pemantikRokok', label: 'Pemantik Rokok' },
-                            { name: 'banSerep', label: 'Ban Serep' },
-                            { name: 'pipaPress1', label: 'Pipa Press 1' },
-                            { name: 'pipaPress2', label: 'Pipa Press 2' },
-                        ].map((field) => (
-                            <div key={field.name} className="space-y-2">
-                                <Label htmlFor={`cat1-${field.name}`}>{field.label}</Label>
-                                <Input
-                                    id={`cat1-${field.name}`}
-                                    type="number"
-                                    min="0"
-                                    placeholder="0"
-                                    {...register(`perlengkapan.${field.name as keyof ArmadaEquipment}`, { valueAsNumber: true })}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
+          <div className="space-y-2">
+            <Label htmlFor="kirBook">Buku KIR</Label>
+            <Input id="kirBook" placeholder="Tambah buku KIR" {...register('kirBook', { maxLength: { value: 249, message: 'Maks 249 karakter' } })} />
+          </div>
+        </div>
 
-                {/* Kategori 2 */}
-                <div className="p-4 bg-gray-50/50 rounded-lg border border-gray-100">
-                    <h4 className="text-sm font-medium text-gray-500 mb-4">Kategori 2</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-                        {[
-                            { name: 'pelanaJok', label: 'Pelana Jok' },
-                            { name: 'taliIkatBesar', label: 'Tali Ikat Besar' },
-                            { name: 'taliIkatKecil', label: 'Tali Ikat Kecil' },
-                            { name: 'selangStang', label: 'Selang Stang' },
-                            { name: 'spion', label: 'Spion' },
-                            { name: 'gembokToolBox', label: 'Gembok Tool Box' },
-                            { name: 'tabungAPAR', label: 'Tabung APAR' },
-                            { name: 'sponATI', label: 'Spon ATI' },
-                            { name: 'bukuService', label: 'Buku Service' },
-                        ].map((field) => (
-                            <div key={field.name} className="space-y-2">
-                                <Label htmlFor={`cat2-${field.name}`}>{field.label}</Label>
-                                <Input
-                                    id={`cat2-${field.name}`}
-                                    type="number"
-                                    min="0"
-                                    placeholder="0"
-                                    {...register(`perlengkapan.${field.name as keyof ArmadaEquipment}`, { valueAsNumber: true })}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+        <div className="mt-6 space-y-2">
+          <Label htmlFor="equipmentText">Perlengkapan</Label>
+          <Textarea
+            id="equipmentText"
+            rows={4}
+            placeholder="Pisahkan tiap perlengkapan dengan koma. Contoh: dongkrak, toolkit, ban serep"
+            {...register('equipmentText')}
+            className="resize-none"
+          />
+        </div>
+      </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-center items-center gap-4 pt-4 pb-8">
-                <Button type="button" variant="outline" className="w-[120px]" onClick={() => router.back()}>
-                    Batal
-                </Button>
-                <Button type="submit" className="w-[120px] bg-[#1e3a5f] hover:bg-[#152e4d]">
-                    Simpan
-                </Button>
-            </div>
-        </form>
-    );
+      <div className="flex items-center justify-center gap-4 pb-8 pt-2">
+        <Button type="button" variant="outline" className="w-[120px]" onClick={() => router.back()} disabled={isSubmitting}>
+          Batal
+        </Button>
+        <Button type="submit" className="w-[120px] bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={isSubmitting}>
+          {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+        </Button>
+      </div>
+    </form>
+  );
 }
