@@ -39,9 +39,10 @@ interface Props {
   onCancel?: () => void;
   companyId?: string | null;
   excludedTypeUnitIds?: string[];
+  prependFields?: React.ReactNode;
 }
 
-export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel, companyId, excludedTypeUnitIds = [] }: Props) {
+export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel, companyId, excludedTypeUnitIds = [], prependFields }: Props) {
   void companyId;
   const queryClient = useQueryClient();
   const { data: typeUnitData, isLoading: typeUnitLoading, isError: typeUnitError, refetch: refetchTypeUnits } = useTypeUnits();
@@ -153,6 +154,8 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {prependFields}
+
           <div>
             <h2 className="text-lg font-semibold text-foreground">Unit</h2>
             <div className="my-4 h-px bg-border" />
