@@ -11,6 +11,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -216,50 +217,66 @@ export default function CreatePurchasePage() {
         </div>
 
         <div className="rounded-xl border bg-white p-6 md:p-8">
-          <div className="grid grid-cols-1 gap-6 mb-8">
-            <div className="space-y-2">
-              <Label>Supplier</Label>
-              <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    role="combobox"
-                    aria-expanded={supplierOpen}
-                    aria-controls="supplier-combobox-list"
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                  >
-                    <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : 'Pilih supplier'}</span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                  <Command>
-                    <CommandInput placeholder="Cari supplier..." />
-                    <CommandList id="supplier-combobox-list">
-                      <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
-                      <CommandGroup>
-                        {personOptions.map((person) => (
-                          <CommandItem
-                            key={String(person.id)}
-                            value={`${person.name} ${person.code ?? ''} ${person.id}`}
-                            onSelect={() => {
-                              setPersonId(String(person.id));
-                              setSupplierOpen(false);
-                            }}
-                          >
-                            <Check className={cn('mr-2 h-4 w-4', personId === String(person.id) ? 'opacity-100' : 'opacity-0')} />
-                            {person.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
+          <PurchaseUnitForm
+            onSubmit={handleSubmit}
+            loading={mutation.isPending}
+            onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+            companyId={companyId}
+            prependFields={
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>Supplier</Label>
+                  <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        role="combobox"
+                        aria-expanded={supplierOpen}
+                        aria-controls="supplier-combobox-list"
+                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                      >
+                        <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : 'Pilih supplier'}</span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="Cari supplier..." />
+                        <CommandList id="supplier-combobox-list">
+                          <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
+                          <CommandGroup>
+                            {personOptions.map((person) => (
+                              <CommandItem
+                                key={String(person.id)}
+                                value={`${person.name} ${person.code ?? ''} ${person.id}`}
+                                onSelect={() => {
+                                  setPersonId(String(person.id));
+                                  setSupplierOpen(false);
+                                }}
+                              >
+                                <Check className={cn('mr-2 h-4 w-4', personId === String(person.id) ? 'opacity-100' : 'opacity-0')} />
+                                {person.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-          <PurchaseUnitForm onSubmit={handleSubmit} loading={mutation.isPending} onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} companyId={companyId} />
+                <div className="space-y-2">
+                  <Label>Alamat</Label>
+                  <Input value={selectedPerson?.address ?? ''} readOnly className="bg-transparent" placeholder="Alamat supplier" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>NPWP</Label>
+                  <Input value={selectedPerson?.npwp ?? ''} readOnly className="bg-transparent" placeholder="NPWP supplier" />
+                </div>
+              </div>
+            }
+          />
         </div>
       </div>
     </DashboardLayout>
