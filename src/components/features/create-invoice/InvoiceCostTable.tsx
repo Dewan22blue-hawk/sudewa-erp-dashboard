@@ -87,7 +87,7 @@ export function InvoiceCostTable({ items, onItemsChange }: InvoiceCostTableProps
       </div>
 
       {items.length > 0 && (
-        <div className="flex justify-end gap-8 rounded-lg bg-gray-900 px-6 py-3 text-white">
+        <div className="flex justify-end gap-8 rounded-lg bg-primary px-6 py-3 text-white">
           <div className="text-sm">
             <span className="text-gray-400">Total Invoice Ekspedisi: </span>
             <span className="font-semibold">{formatCurrency(items.reduce((sum, item) => sum + item.invoiceEkspedisi, 0))}</span>

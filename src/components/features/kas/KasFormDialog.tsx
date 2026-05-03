@@ -146,7 +146,7 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId, title, descr
             />
 
             <div className="space-y-2 pt-4">
-              <Button type="submit" className="w-full bg-black hover:bg-black/90" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
                 {isLoading ? 'Menyimpan...' : 'Simpan'}
               </Button>
               <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)} disabled={isLoading}>

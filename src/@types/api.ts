@@ -21,7 +21,7 @@ export interface ApiResponse<T> {
 export interface ApiError {
     code: string
     message: string
-    details?: Record<string, unknown>
+    details?: Record<string, unknown> | string
     statusCode?: number
 }
 

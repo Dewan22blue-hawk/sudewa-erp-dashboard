@@ -13,7 +13,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       closeButton
       toastOptions={{
         classNames: {
-          toast: 'group toast rounded-2xl border shadow-2xl backdrop-blur-xl bg-white/70 dark:bg-black/70 border-white/20 dark:border-white/10 z-[1000] p-4 flex items-center gap-4',
+          toast: 'group toast rounded-2xl border shadow-2xl backdrop-blur-xl bg-white/70 dark:bg-primary/70 border-white/20 dark:border-white/10 z-[1000] p-4 flex items-center gap-4',
           title: 'text-sm font-semibold',
           description: 'group-[.toast]:text-muted-foreground text-xs',
           actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground font-medium',

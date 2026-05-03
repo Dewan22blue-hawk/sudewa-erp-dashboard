@@ -8,20 +8,19 @@ import { DashboardApiResponse } from '@/@types/dashboard';
 import { dashboardService } from '@/lib/api/dashboard.service';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
-
-export const dashboardKeys = {
-    all: ['dashboard'] as const,
-    data: () => [...dashboardKeys.all, 'data'] as const,
-};
+import { useCompany } from '@/contexts/CompanyContext';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 export function useDashboardData(): UseQueryResult<DashboardApiResponse, Error> {
+    const { companyId } = useCompany();
     const query = useQuery({
-        queryKey: dashboardKeys.data(),
-        queryFn: dashboardService.getDashboardData,
+        queryKey: companyId ? companyQueryKeys.list(companyId, 'dashboard-overview') : ['company', 'unselected', 'dashboard-overview'],
+        queryFn: () => dashboardService.getDashboardData(companyId as string),
+        enabled: Boolean(companyId),
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,
-        refetchOnWindowFocus: true,
-        refetchOnMount: true,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
         retry: 1, // Retry once
     });
 

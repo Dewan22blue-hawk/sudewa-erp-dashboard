@@ -1,36 +1,48 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unitTransactionService } from '@/services/unitTransaction.service';
+import { useCompany } from '@/contexts/CompanyContext';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 export const useUnitTransactions = (options: { page?: number; perPage?: number; search?: string } = {}) => {
+  const { companyId } = useCompany();
+
   return useQuery({
-    queryKey: ['unit-transactions', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
-    queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search }),
+    queryKey: companyId
+      ? companyQueryKeys.list(companyId, 'unit-transactions', { page: options.page, perPage: options.perPage, search: options.search })
+      : ['unit-transactions', 'unscoped', options],
+    queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search, company_id: companyId ?? undefined }),
     placeholderData: (previousData) => previousData,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
+    enabled: Boolean(companyId),
   });
 };
 
 export const useUnitTransactionDetail = (id?: string) => {
+  const { companyId } = useCompany();
+
   return useQuery({
-    queryKey: ['unit-transaction', id],
-    queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string),
-    enabled: !!id,
+    queryKey: companyId ? companyQueryKeys.detail(companyId, 'unit-transactions', id ?? '') : ['unit-transaction', 'unscoped', id],
+    queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string, companyId ?? undefined),
+    enabled: !!id && Boolean(companyId),
     staleTime: 1000 * 60 * 5,
   });
 };
 
 export const usePurchaseById = (id?: string) => {
+  const { companyId } = useCompany();
+
   return useQuery({
-    queryKey: ['purchase-by-id', id],
-    queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string),
-    enabled: !!id,
+    queryKey: companyId ? companyQueryKeys.detail(companyId, 'purchase-by-id', id ?? '') : ['purchase-by-id', 'unscoped', id],
+    queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string, companyId ?? undefined),
+    enabled: !!id && Boolean(companyId),
     staleTime: 1000 * 60 * 5,
   });
 };
 
 export const useUpdateUnitTransactionState = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
 
   return useMutation({
     mutationFn: ({
@@ -53,12 +65,10 @@ export const useUpdateUnitTransactionState = () => {
         description,
       }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
       queryClient.invalidateQueries({ queryKey: ['unit-billings', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['sales-transaction', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.id] });
     },
   });
@@ -66,26 +76,28 @@ export const useUpdateUnitTransactionState = () => {
 
 export const useSubmitTransactionAdjustment = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
 
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: { cashId: string; amount: number; description: string; itemDetailIds: string[] } }) =>
       unitTransactionService.submitTransactionAdjustment(id, payload),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['sales-transaction', variables.id] });
-      queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
       queryClient.invalidateQueries({ queryKey: ['transaction-adjustments', variables.id] });
     },
   });
 };
 
 export const useTransactionAdjustments = (transactionId?: string) => {
+  const { companyId } = useCompany();
+
   return useQuery({
-    queryKey: ['transaction-adjustments', transactionId],
-    queryFn: () => unitTransactionService.getTransactionAdjustments(transactionId as string),
-    enabled: !!transactionId,
+    queryKey: companyId ? companyQueryKeys.detail(companyId, 'transaction-adjustments', transactionId ?? '') : ['transaction-adjustments', 'unscoped', transactionId],
+    queryFn: () => unitTransactionService.getTransactionAdjustments(transactionId as string, companyId ?? undefined),
+    enabled: !!transactionId && Boolean(companyId),
     staleTime: 1000 * 60 * 2,
   });
 };

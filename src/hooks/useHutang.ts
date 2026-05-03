@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import * as service from "@/services/hutang.service"
+import { companyQueryKeys } from '@/lib/query/company-key';
 
-export const useHutang = () => {
+export const useHutang = (companyId?: string | number | null) => {
     return useQuery({
-        queryKey: ["hutang"],
-        queryFn: service.getHutang,
+        queryKey: companyId ? companyQueryKeys.list(companyId, 'hutang') : ['company', 'unselected', 'hutang'],
+        queryFn: () => service.getHutang(companyId),
+        enabled: Boolean(companyId),
     })
 }
 

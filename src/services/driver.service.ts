@@ -145,8 +145,9 @@ export const importDriver = async (id: string | number, file: File): Promise<voi
   }
 };
 
-export const exportDriver = async (): Promise<void> => {
+export const exportDriver = async (companyId: string | number): Promise<void> => {
   const response = await apiClient.get(`${basePath}/export`, {
+    params: { company_id: companyId },
     responseType: 'blob',
   });
 

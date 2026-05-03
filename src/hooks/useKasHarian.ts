@@ -10,7 +10,12 @@ export const cashFlowKeys = {
   detail: (id: number | string | undefined) => [CASH_FLOW_KEY, 'detail', id] as const,
 };
 
-export function useKasHarian(params: CashFlowFilterParams, options?: { enabled?: boolean }) {
+interface CashFlowQueryOptions {
+  enabled?: boolean;
+  refetchInterval?: number | false;
+}
+
+export function useKasHarian(params: CashFlowFilterParams, options?: CashFlowQueryOptions) {
   return useQuery({
     queryKey: cashFlowKeys.list(params),
     queryFn: () => fetchCashFlow(params),
@@ -19,19 +24,26 @@ export function useKasHarian(params: CashFlowFilterParams, options?: { enabled?:
     retry: 2,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
+    refetchInterval: options?.refetchInterval ?? false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
   });
 }
 
-export function useKasHarianDetail(id?: number, options?: { enabled?: boolean }) {
+export function useKasHarianDetail(id?: number, options?: CashFlowQueryOptions) {
   return useQuery({
     queryKey: cashFlowKeys.detail(id),
     queryFn: () => fetchCashFlowDetail(id as number),
     enabled: (options?.enabled ?? true) && typeof id === 'number' && Number.isFinite(id),
     retry: 1,
     staleTime: 5 * 60 * 1000,
+    refetchInterval: options?.refetchInterval ?? false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
   });
 }
 

@@ -257,7 +257,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
             />
 
             <div className="space-y-2 pt-4">
-              <Button type="submit" className="w-full bg-black hover:bg-black/90" disabled={isBusy}>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isBusy}>
                 {isBusy ? 'Menyimpan...' : 'Simpan'}
               </Button>
               <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)} disabled={isBusy}>

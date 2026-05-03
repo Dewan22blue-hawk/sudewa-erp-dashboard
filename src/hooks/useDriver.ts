@@ -10,11 +10,19 @@ import {
 } from '@/services/driver.service';
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { DriverPayload } from '@/@types/driver.types';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 export function useDrivers(params: PaginationParams & { search?: string; company_id?: string | number }) {
     return useQuery({
-        queryKey: ['drivers', params.page, params.perPage, params.search],
+        queryKey: params.company_id
+            ? companyQueryKeys.list(params.company_id, 'drivers', {
+                page: params.page,
+                perPage: params.perPage,
+                search: params.search ?? '',
+            })
+            : ['company', 'unselected', 'drivers'],
         queryFn: () => getDrivers(params),
+        enabled: Boolean(params.company_id),
         placeholderData: (prev) => prev,
         staleTime: 30_000,
     });
@@ -32,8 +40,9 @@ export function useCreateDriver() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: DriverPayload) => createDriver(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['drivers'] });
+        onSuccess: (_data, variables) => {
+            if (!variables.company_id) return;
+            queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.company_id) });
         },
     });
 }
@@ -43,8 +52,9 @@ export function useUpdateDriver() {
     return useMutation({
         mutationFn: ({ id, data }: { id: string | number; data: DriverPayload }) =>
             updateDriver(id, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['drivers'] });
+        onSuccess: (_data, variables) => {
+            if (!variables.data.company_id) return;
+            queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.data.company_id) });
         },
     });
 }
@@ -54,7 +64,9 @@ export function useDeleteDriver() {
     return useMutation({
         mutationFn: (id: string | number) => deleteDriver(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['drivers'] });
+            queryClient.invalidateQueries({
+                predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('drivers'),
+            });
         },
     });
 }
@@ -63,14 +75,14 @@ export function useImportDriver() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, file }: { id: string | number; file: File }) => importDriver(id, file),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['drivers'] });
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.id) });
         },
     });
 }
 
 export function useExportDriver() {
     return useMutation({
-        mutationFn: () => exportDriver(),
+        mutationFn: (companyId: string | number) => exportDriver(companyId),
     });
 }

@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PaginationParams } from '@/@types/pagination.types';
-import type { ArmadaPayload } from '@/@types/armada.types';
-import { createArmada, deleteArmada, getArmadaById, getArmadas, updateArmada } from '@/services/armada.service';
+import type { ArmadaListParams, ArmadaPayload } from '@/@types/armada.types';
+import { createArmada, deleteArmada, getArmadaById, getArmadas, importArmada, updateArmada } from '@/services/armada.service';
 
-export function useArmadas(params: PaginationParams & { search?: string; enabled?: boolean }) {
+export function useArmadas(params: PaginationParams & ArmadaListParams & { enabled?: boolean }) {
   const { enabled = true, ...rest } = params;
 
   return useQuery({
@@ -48,6 +48,16 @@ export function useDeleteArmada() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string | number) => deleteArmada(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['armadas'] });
+    },
+  });
+}
+
+export function useImportArmada() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => importArmada(file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['armadas'] });
     },

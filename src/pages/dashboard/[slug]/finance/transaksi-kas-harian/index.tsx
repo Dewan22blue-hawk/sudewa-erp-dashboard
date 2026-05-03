@@ -3,7 +3,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Plus, RotateCw, Search } from 'lucide-react';
 import { toast } from 'sonner';
-import type { KasHarian } from '@/@types/kas-harian.types';
+import type { FinanceBillingListItem } from '@/@types/finance-billing.types';
+import type { KasHarian, KasHarianListItem } from '@/@types/kas-harian.types';
+import type { PaginationMeta } from '@/@types/pagination.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +15,34 @@ import DeleteKasHarianDialog from '@/components/features/kas-harian/DeleteKasHar
 import EditKasHarianDialog from '@/components/features/kas-harian/EditKasHarianDialog';
 import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useFinanceBilling } from '@/hooks/useFinanceBilling';
 import { useKasHarian } from '@/hooks/useKasHarian';
+
+const LIVE_UPDATE_INTERVAL = 5000;
+
+const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
+  id: item.id,
+  source: 'manual',
+  date: item.date,
+  code: item.code,
+  note: item.note || 'Transaksi kas harian manual',
+  debet: Number(item.debet || 0),
+  credit: Number(item.credit || 0),
+  accountName: item.account?.name ?? item.cash.description ?? '-',
+  cashFlowId: item.id,
+});
+
+const mapFinanceBilling = (item: FinanceBillingListItem): KasHarianListItem => ({
+  id: item.id,
+  source: 'billing',
+  date: item.last_payment_at,
+  code: item.unit_transaction_billing.unit_transaction.code,
+  note: `Pembayaran invoice ${item.unit_transaction_billing.unit_transaction.code}`,
+  debet: 0,
+  credit: Number(item.unit_transaction_billing.grand_total || 0),
+  accountName: 'Fractal Pembayaran',
+  financeBillingId: item.id,
+});
 
 export default function KasHarianPage() {
   const router = useRouter();
@@ -39,40 +68,77 @@ export default function KasHarianPage() {
     return () => window.clearTimeout(timeout);
   }, [searchInput]);
 
-  const query = useMemo(
-    () => ({
-      page,
-      per_page: perPage,
-      search: searchValue || undefined,
+  const kasHarianQuery = useKasHarian(
+    {
+      page: 1,
+      per_page: 1000,
       company_id: companyNumber || undefined,
-    }),
-    [companyNumber, page, perPage, searchValue],
+    },
+    {
+      enabled: !isCompanyLoading && companyNumber > 0,
+      refetchInterval: !isAddOpen && !isEditOpen && !isDeleteOpen ? LIVE_UPDATE_INTERVAL : false,
+    },
   );
 
-  const kasHarianQuery = useKasHarian(query, { enabled: !isCompanyLoading && companyNumber > 0 });
+  const financeBillingQuery = useFinanceBilling(
+    {
+      page: 1,
+      per_page: 1000,
+    },
+    {
+      enabled: !isCompanyLoading && companyNumber > 0,
+      refetchInterval: !isAddOpen && !isEditOpen && !isDeleteOpen ? LIVE_UPDATE_INTERVAL : false,
+    },
+  );
+
+  const queryError = kasHarianQuery.error ?? financeBillingQuery.error;
 
   const errorMessage = useMemo(() => {
-    const error = kasHarianQuery.error;
+    const error = queryError;
     if (!error || typeof error !== 'object' || !('message' in error)) {
       return 'Gagal memuat data transaksi kas harian';
     }
 
     const message = (error as { message?: unknown }).message;
     return typeof message === 'string' && message.trim().length > 0 ? message : 'Gagal memuat data transaksi kas harian';
-  }, [kasHarianQuery.error]);
+  }, [queryError]);
 
   useEffect(() => {
-    if (kasHarianQuery.isError) {
+    if (kasHarianQuery.isError || financeBillingQuery.isError) {
       toast.error(errorMessage);
     }
-  }, [errorMessage, kasHarianQuery.isError]);
+  }, [errorMessage, financeBillingQuery.isError, kasHarianQuery.isError]);
 
-  const meta = kasHarianQuery.data?.meta ?? {
-    currentPage: page,
-    perPage,
-    total: 0,
-    lastPage: 1,
-  };
+  const mergedData = useMemo(() => {
+    const manualItems = (kasHarianQuery.data?.data ?? [])
+      .filter((item) => !item.finance_billing?.id)
+      .map(mapManualCashFlow);
+    const billingItems = (financeBillingQuery.data?.data ?? []).map(mapFinanceBilling);
+
+    return [...billingItems, ...manualItems]
+      .filter((item) => {
+        if (!searchValue) return true;
+        const query = searchValue.toLowerCase();
+        return [item.code, item.note, item.accountName].some((value) => value.toLowerCase().includes(query));
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [financeBillingQuery.data?.data, kasHarianQuery.data?.data, searchValue]);
+
+  const paginatedData = useMemo(() => {
+    const start = (page - 1) * perPage;
+    return mergedData.slice(start, start + perPage);
+  }, [mergedData, page, perPage]);
+
+  const meta: PaginationMeta = useMemo(() => {
+    const total = mergedData.length;
+    const lastPage = Math.max(1, Math.ceil(total / perPage));
+    return {
+      currentPage: Math.min(page, lastPage),
+      perPage,
+      total,
+      lastPage,
+    };
+  }, [mergedData.length, page, perPage]);
 
   useEffect(() => {
     if (page > meta.lastPage) {
@@ -80,19 +146,30 @@ export default function KasHarianPage() {
     }
   }, [meta.lastPage, page]);
 
-  const handleEdit = (item: KasHarian) => {
-    setSelectedItem(item);
+  const isFetching = kasHarianQuery.isFetching || financeBillingQuery.isFetching;
+  const isLoading = (kasHarianQuery.isLoading || financeBillingQuery.isLoading) || isCompanyLoading;
+  const isError = kasHarianQuery.isError || financeBillingQuery.isError;
+
+  const handleEdit = (item: KasHarianListItem) => {
+    const manualItem = (kasHarianQuery.data?.data ?? []).find((cashFlow) => cashFlow.id === item.cashFlowId);
+    if (!manualItem) return;
+    setSelectedItem(manualItem);
     setIsEditOpen(true);
   };
 
-  const handleDelete = (item: KasHarian) => {
-    setSelectedItem(item);
+  const handleDelete = (item: KasHarianListItem) => {
+    const manualItem = (kasHarianQuery.data?.data ?? []).find((cashFlow) => cashFlow.id === item.cashFlowId);
+    if (!manualItem) return;
+    setSelectedItem(manualItem);
     setIsDeleteOpen(true);
   };
 
-  const pushTo = (path: string) => {
+  const pushTo = (item: KasHarianListItem, path?: 'bayar') => {
     if (typeof slug !== 'string') return;
-    void router.push(`/dashboard/${slug}${path}`);
+    const targetId = item.source === 'billing' ? item.financeBillingId : item.cashFlowId;
+    if (!targetId) return;
+    const suffix = path === 'bayar' ? '/bayar' : '';
+    void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${targetId}${suffix}?source=${item.source}`);
   };
 
   return (
@@ -149,23 +226,36 @@ export default function KasHarianPage() {
             </div>
           </div>
 
-          <Button type="button" variant="outline" className="h-12 rounded-2xl border-slate-200" onClick={() => void kasHarianQuery.refetch()} disabled={kasHarianQuery.isFetching}>
-            <RotateCw className={`mr-2 h-4 w-4 ${kasHarianQuery.isFetching ? 'animate-spin' : ''}`} />
-            Refresh
+          <Button
+            type="button"
+            variant="outline"
+            className="h-12 rounded-2xl border-slate-200"
+            onClick={() => {
+              void kasHarianQuery.refetch();
+              void financeBillingQuery.refetch();
+            }}
+            disabled={isFetching}
+          >
+            <span className={`mr-3 inline-block h-2.5 w-2.5 rounded-full ${isFetching ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-400'}`} />
+            <RotateCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            Live Update
           </Button>
         </div>
 
         <KasHarianTable
-          data={kasHarianQuery.data?.data ?? []}
+          data={paginatedData}
           meta={meta}
-          hasNextPage={kasHarianQuery.data?.hasNextPage ?? false}
-          isLoading={kasHarianQuery.isLoading || isCompanyLoading}
-          isFetching={kasHarianQuery.isFetching}
-          isError={kasHarianQuery.isError}
+          hasNextPage={page < meta.lastPage}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          isError={isError}
           errorMessage={errorMessage}
-          onRetry={() => void kasHarianQuery.refetch()}
-          onView={(item) => pushTo(`/finance/transaksi-kas-harian/${item.id}`)}
-          onPay={(item) => pushTo(`/finance/transaksi-kas-harian/${item.id}/bayar`)}
+          onRetry={() => {
+            void kasHarianQuery.refetch();
+            void financeBillingQuery.refetch();
+          }}
+          onView={(item) => pushTo(item)}
+          onPay={(item) => pushTo(item, 'bayar')}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onPageChange={setPage}

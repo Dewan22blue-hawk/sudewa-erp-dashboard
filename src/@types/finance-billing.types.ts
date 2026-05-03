@@ -99,6 +99,7 @@ export interface FinanceBillingListResult {
 }
 
 export interface FinanceBillingItemPayload {
+  finance_billing_id: number;
   bca_payment_amount?: number;
   bca_payment_usd_amount?: number;
   cash_payment_amount?: number;

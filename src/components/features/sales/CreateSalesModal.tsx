@@ -19,7 +19,12 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
     const router = useRouter();
     const { companyId } = useCompany();
     const createSalesMutation = useCreateSales();
-    const { data: customerData } = useCustomers(companyId || null);
+    const { data: customerData } = useCustomers({
+        page: 1,
+        perPage: 100,
+        company_id: companyId ?? undefined,
+        enabled: Boolean(companyId),
+    });
     const generatedCode = generateSalesCode(router.query.slug);
 
     const handleSubmit = async (data: EditUnitFormData) => {

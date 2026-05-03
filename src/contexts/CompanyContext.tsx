@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react"
+import { clearStoredCompanyId, getStoredCompanyId, setStoredCompanyId } from "@/lib/session/storage"
 
 interface CompanyContextValue {
     companyId: string | null
     isLoading: boolean
     setCompanyId: (id: string) => void
+    clearCompanyId: () => void
 }
 
 const CompanyContext = createContext<CompanyContextValue | undefined>(undefined)
@@ -13,7 +15,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        const stored = localStorage.getItem("company_id")
+        const stored = getStoredCompanyId()
         if (stored) {
             setCompanyIdState(stored)
         }
@@ -21,12 +23,17 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     function setCompanyId(id: string) {
-        localStorage.setItem("company_id", id)
+        setStoredCompanyId(id)
         setCompanyIdState(id)
     }
 
+    function clearCompanyId() {
+        clearStoredCompanyId()
+        setCompanyIdState(null)
+    }
+
     return (
-        <CompanyContext.Provider value={{ companyId, isLoading, setCompanyId }}>
+        <CompanyContext.Provider value={{ companyId, isLoading, setCompanyId, clearCompanyId }}>
             {children}
         </CompanyContext.Provider>
     )

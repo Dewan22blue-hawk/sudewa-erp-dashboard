@@ -395,8 +395,9 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
 };
 
 export const unitTransactionService = {
-  async getUnitTransactions(params: PaginationParams = {}): Promise<UnitTransactionResponse> {
+  async getUnitTransactions(params: PaginationParams & { company_id?: string | number } = {}): Promise<UnitTransactionResponse> {
     const requestParams = {
+      company_id: params.company_id,
       page: params.page ?? 1,
       per_page: params.perPage ?? 10,
       search: params.search || undefined,
@@ -441,8 +442,10 @@ export const unitTransactionService = {
     };
   },
 
-  async getUnitTransactionDetail(id: string): Promise<UnitTransactionDetail> {
-    const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${strictBasePath}/${id}`);
+  async getUnitTransactionDetail(id: string, companyId?: string | number): Promise<UnitTransactionDetail> {
+    const response = await apiClient.get<LaravelApiResponse<UnitTransactionApiModel>>(`${strictBasePath}/${id}`, {
+      params: companyId ? { company_id: companyId } : undefined,
+    });
     const payload = ensureSuccess(response.data);
 
     const detailPayload = ((payload as any)?.data ? ((payload as any).data as UnitTransactionApiModel) : (payload as UnitTransactionApiModel)) ?? ({} as UnitTransactionApiModel);
@@ -523,9 +526,11 @@ export const unitTransactionService = {
    * GET transaction-adjustment list (History Refund)
    * Endpoint: GET /wapi/transaction/unit-transaction/unit-transaction/{id}/transaction-adjustment
    */
-  async getTransactionAdjustments(id: string): Promise<TransactionAdjustmentApiItem[]> {
+  async getTransactionAdjustments(id: string, companyId?: string | number): Promise<TransactionAdjustmentApiItem[]> {
     try {
-      const response = await apiClient.get<LaravelApiResponse<any>>(`${strictBasePath}/${id}/transaction-adjustment`);
+      const response = await apiClient.get<LaravelApiResponse<any>>(`${strictBasePath}/${id}/transaction-adjustment`, {
+        params: companyId ? { company_id: companyId } : undefined,
+      });
       const payload = ensureSuccess(response.data);
       const rows: any[] = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
       return rows.map((row: any) => ({
@@ -552,4 +557,3 @@ export type TransactionAdjustmentApiItem = {
   date?: string;
   created_at?: string;
 };
-

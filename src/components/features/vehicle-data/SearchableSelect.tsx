@@ -37,7 +37,34 @@ export function SearchableSelect({
   className,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
-  const selectedOption = options.find((option) => option.value === value);
+  const [query, setQuery] = React.useState('');
+  const [persistedSelectedOption, setPersistedSelectedOption] = React.useState<SearchableSelectOption | null>(null);
+  const selectedOption = options.find((option) => option.value === value)
+    ?? (persistedSelectedOption?.value === value ? persistedSelectedOption : undefined);
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredOptions = normalizedQuery
+    ? options.filter((option) => `${option.label} ${option.subtitle ?? ''}`.toLowerCase().includes(normalizedQuery))
+    : options;
+
+  React.useEffect(() => {
+    const matchedOption = options.find((option) => option.value === value);
+    if (matchedOption) {
+      setPersistedSelectedOption(matchedOption);
+    }
+  }, [options, value]);
+
+  React.useEffect(() => {
+    if (!open) {
+      setQuery('');
+      onSearchChange?.('');
+    }
+  }, [open, onSearchChange]);
+
+  const selectOption = React.useCallback((option: SearchableSelectOption) => {
+    setPersistedSelectedOption(option);
+    onChange(option.value);
+    setOpen(false);
+  }, [onChange]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,18 +83,28 @@ export function SearchableSelect({
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>
-          <CommandInput placeholder={searchPlaceholder} onValueChange={onSearchChange} />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={query}
+            onValueChange={(nextValue) => {
+              setQuery(nextValue);
+              onSearchChange?.(nextValue);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && filteredOptions.length > 0) {
+                event.preventDefault();
+                selectOption(filteredOptions[0]);
+              }
+            }}
+          />
           <CommandList>
             <CommandEmpty>{loading ? 'Memuat...' : emptyText}</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
+              {filteredOptions.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={`${option.label} ${option.subtitle ?? ''}`}
-                  onSelect={() => {
-                    onChange(option.value);
-                    setOpen(false);
-                  }}
+                  onSelect={() => selectOption(option)}
                   className="flex items-start gap-2"
                 >
                   <Check className={cn('mt-0.5 h-4 w-4', value === option.value ? 'opacity-100' : 'opacity-0')} />

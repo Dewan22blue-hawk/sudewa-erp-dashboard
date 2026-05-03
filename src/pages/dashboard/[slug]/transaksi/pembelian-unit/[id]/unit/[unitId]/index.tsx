@@ -301,7 +301,7 @@ export default function UnitPurchaseDetailPage() {
                   <Upload className="h-4 w-4 mr-2" />
                   Import
                 </Button>
-                <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white" onClick={openCreateForm}>
+                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreateForm}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Unit
                 </Button>
@@ -399,7 +399,7 @@ export default function UnitPurchaseDetailPage() {
             <Button variant="ghost" onClick={() => setOpenForm(false)}>
               Batal
             </Button>
-            <Button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} className="bg-slate-900 hover:bg-slate-800 text-white">
+            <Button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
               {createMutation.isPending || updateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>

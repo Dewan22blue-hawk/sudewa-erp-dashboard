@@ -7,13 +7,22 @@ import { DashboardApiResponse, BillingStatsRaw, CustomerStatsRaw, ProductStatsRa
 import { apiClient } from './client';
 
 export const dashboardService = {
-  async getDashboardData(): Promise<DashboardApiResponse> {
+  async getDashboardData(companyId: string): Promise<DashboardApiResponse> {
     // Fetch real data dari API secara paralel
     const [statsResponse, customerResponse, productResponse, transactionResponse] = await Promise.all([
-      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats'),
-      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats'),
-      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats'),
-      apiClient.get<{ status: boolean; data: TransactionStatsRaw }>('/wapi/transaction/unit-transaction/unit-transaction?sort_order=desc&per_page=5&type=purchase&page=1&is_paid=true')
+      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: { company_id: companyId } }),
+      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: { company_id: companyId } }),
+      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: { company_id: companyId } }),
+      apiClient.get<{ status: boolean; data: TransactionStatsRaw }>('/wapi/transaction/unit-transaction/unit-transaction', {
+        params: {
+          sort_order: 'desc',
+          per_page: 5,
+          type: 'purchase',
+          page: 1,
+          is_paid: true,
+          company_id: companyId,
+        },
+      })
     ]);
 
     const stats = statsResponse.data.data;
@@ -206,7 +215,7 @@ export const dashboardService = {
     return series;
   },
 
-  async refreshDashboard(): Promise<DashboardApiResponse> {
-    return dashboardService.getDashboardData();
+  async refreshDashboard(companyId: string): Promise<DashboardApiResponse> {
+    return dashboardService.getDashboardData(companyId);
   },
 };

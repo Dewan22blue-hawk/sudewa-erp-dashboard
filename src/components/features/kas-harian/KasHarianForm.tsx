@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Upload } from 'lucide-react';
 import type { Company } from '@/services/company.service';
+import type { Account } from '@/@types/account.types';
 import type { Kas } from '@/@types/kas.types';
-import type { KasHarianFormValues } from '@/scheme/kas-harian.schema';
+import type { KasHarianFormInput, KasHarianFormValues } from '@/scheme/kas-harian.schema';
 import { cn } from '@/lib/utils';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
@@ -13,20 +14,27 @@ import { Textarea } from '@/components/ui/textarea';
 import { MoneyInput } from '@/components/ui/money-input';
 
 interface Props {
-  form: UseFormReturn<KasHarianFormValues>;
+  form: UseFormReturn<KasHarianFormInput, unknown, KasHarianFormValues>;
   onSubmit: (data: KasHarianFormValues) => void;
   companies: Company[];
   cashOptions: Kas[];
+  accountOptions: Account[];
   isLoadingCash?: boolean;
+  isLoadingAccount?: boolean;
   id?: string;
 }
 
-export default function KasHarianForm({ form, onSubmit, companies, cashOptions, isLoadingCash, id }: Props) {
+export default function KasHarianForm({ form, onSubmit, companies, cashOptions, accountOptions, isLoadingCash, isLoadingAccount, id }: Props) {
   const [cashOpen, setCashOpen] = useState(false);
   const [cashSearch, setCashSearch] = useState('');
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountSearch, setAccountSearch] = useState('');
   const cashDropdownRef = useRef<HTMLDivElement | null>(null);
+  const accountDropdownRef = useRef<HTMLDivElement | null>(null);
   const selectedCompanyId = form.watch('company_id');
   const selectedCashId = form.watch('cash_id');
+  const selectedAccountId = form.watch('account_id');
+  const paymentProof = form.watch('payment_proof');
 
   const selectedCompany = useMemo(
     () => companies.find((company) => Number(company.id) === Number(selectedCompanyId)),
@@ -38,6 +46,11 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
     [cashOptions, selectedCashId],
   );
 
+  const selectedAccount = useMemo(
+    () => accountOptions.find((account) => Number(account.id) === Number(selectedAccountId)),
+    [accountOptions, selectedAccountId],
+  );
+
   const filteredCashOptions = useMemo(() => {
     const query = cashSearch.trim().toLowerCase();
     if (!query) return cashOptions;
@@ -47,22 +60,36 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
     );
   }, [cashOptions, cashSearch]);
 
+  const filteredAccountOptions = useMemo(() => {
+    const query = accountSearch.trim().toLowerCase();
+    if (!query) return accountOptions;
+
+    return accountOptions.filter((account) =>
+      [account.code, account.name, account.description].some((value) => String(value ?? '').toLowerCase().includes(query)),
+    );
+  }, [accountOptions, accountSearch]);
+
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
       if (!cashDropdownRef.current?.contains(event.target as Node)) {
         setCashOpen(false);
         setCashSearch('');
       }
+
+      if (!accountDropdownRef.current?.contains(event.target as Node)) {
+        setAccountOpen(false);
+        setAccountSearch('');
+      }
     };
 
-    if (cashOpen) {
+    if (cashOpen || accountOpen) {
       document.addEventListener('mousedown', handlePointerDown);
     }
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
     };
-  }, [cashOpen]);
+  }, [accountOpen, cashOpen]);
 
   return (
     <Form {...form}>
@@ -84,7 +111,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
               <FormControl>
                 <div className="rounded-2xl border border-slate-200 bg-white">
                   <DatePicker
-                    value={field.value}
+                    value={field.value instanceof Date ? field.value : null}
                     onChange={(date) => {
                       form.setValue('date', date ?? new Date(''), {
                         shouldDirty: true,
@@ -103,7 +130,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
         />
 
         <div className="space-y-2">
-          <FormLabel className="text-base font-medium text-slate-900">Akun Terkait</FormLabel>
+          <FormLabel className="text-base font-medium text-slate-900">Perusahaan</FormLabel>
           <div className="flex min-h-12 items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700">
             {selectedCompany?.name ?? 'Perusahaan belum dipilih'}
           </div>
@@ -114,7 +141,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
           name="cash_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-base font-medium text-slate-900">Nama Akun</FormLabel>
+              <FormLabel className="text-base font-medium text-slate-900">Kas Terkait</FormLabel>
               <div ref={cashDropdownRef} className="relative">
                 <FormControl>
                   <Button
@@ -143,7 +170,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                 {cashOpen ? (
                   <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
                     <div className="border-b border-slate-100 p-2">
-                      <Input placeholder="Cari akun kas..." value={cashSearch} onChange={(event) => setCashSearch(event.target.value)} autoFocus />
+                      <Input data-no-enter-submit="true" placeholder="Cari akun kas..." value={cashSearch} onChange={(event) => setCashSearch(event.target.value)} autoFocus />
                     </div>
                     <div className="max-h-64 overflow-y-auto p-2">
                       {filteredCashOptions.length === 0 ? (
@@ -165,6 +192,77 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                               <p className="font-medium text-slate-900">{cash.description}</p>
                               <p className="text-xs text-slate-500">
                                 {cash.code} • {cash.type}
+                              </p>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="account_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-medium text-slate-900">Nama Akun</FormLabel>
+              <div ref={accountDropdownRef} className="relative">
+                <FormControl>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      'h-12 w-full justify-between rounded-2xl border-slate-200 bg-white px-4 text-left font-normal hover:bg-white',
+                      !field.value && 'text-slate-400',
+                    )}
+                    disabled={isLoadingAccount}
+                    onClick={() => {
+                      if (isLoadingAccount) return;
+                      setAccountOpen((previous) => !previous);
+                    }}
+                  >
+                    {isLoadingAccount
+                      ? 'Memuat akun...'
+                      : selectedAccount
+                        ? `${selectedAccount.code} - ${selectedAccount.name}`
+                        : 'Select an item'}
+                    <ChevronsUpDown className="h-4 w-4 shrink-0 text-slate-400" />
+                  </Button>
+                </FormControl>
+
+                {accountOpen ? (
+                  <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    <div className="border-b border-slate-100 p-2">
+                      <Input data-no-enter-submit="true" placeholder="Cari akun..." value={accountSearch} onChange={(event) => setAccountSearch(event.target.value)} autoFocus />
+                    </div>
+                    <div className="max-h-64 overflow-y-auto p-2">
+                      {filteredAccountOptions.length === 0 ? (
+                        <div className="px-3 py-6 text-center text-sm text-slate-500">Data akun tidak ditemukan.</div>
+                      ) : (
+                        filteredAccountOptions.map((account) => (
+                          <button
+                            key={account.id}
+                            type="button"
+                            className="flex w-full items-start gap-2 rounded-xl px-3 py-3 text-left text-sm hover:bg-slate-50"
+                            onClick={() => {
+                              field.onChange(Number(account.id));
+                              setAccountSearch('');
+                              setAccountOpen(false);
+                            }}
+                          >
+                            <Check className={cn('mt-0.5 h-4 w-4', Number(account.id) === Number(field.value) ? 'opacity-100' : 'opacity-0')} />
+                            <div className="space-y-1">
+                              <p className="font-medium text-slate-900">{account.name}</p>
+                              <p className="text-xs text-slate-500">
+                                {account.code}
+                                {account.description ? ` • ${account.description}` : ''}
                               </p>
                             </div>
                           </button>
@@ -239,6 +337,36 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                   placeholder="Tambahkan nominal"
                   className="h-12 rounded-2xl border-slate-200 px-4"
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="payment_proof"
+          render={() => (
+            <FormItem>
+              <FormLabel className="text-base font-medium text-slate-900">Bukti Pembayaran (opsional)</FormLabel>
+              <FormControl>
+                <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center">
+                  <Upload className="mb-3 h-7 w-7 text-slate-500" />
+                  <span className="text-sm font-medium text-slate-700">{paymentProof ? paymentProof.name : 'Klik untuk upload dokumen'}</span>
+                  <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={(event) => {
+                      form.setValue('payment_proof', event.target.files?.[0] ?? null, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                  />
+                </label>
               </FormControl>
               <FormMessage />
             </FormItem>

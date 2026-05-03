@@ -357,12 +357,13 @@ export const purchaseService = {
      UNIT ITEM DETAIL CRUD
   ===================================== */
 
-  async getUnitTransactionItems(params: PaginationParams = {}): Promise<PurchaseUnitItemPaginatedResponse> {
+  async getUnitTransactionItems(params: PaginationParams & { company_id?: string | null } = {}): Promise<PurchaseUnitItemPaginatedResponse> {
     const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}-item`, {
       params: {
         page: params.page ?? 1,
         per_page: params.perPage ?? 10,
         search: params.search || undefined,
+        company_id: params.company_id || undefined,
       },
     });
     const payload = ensureSuccess(response.data);

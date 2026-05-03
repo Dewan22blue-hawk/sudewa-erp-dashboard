@@ -45,7 +45,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
           </div>
         </div>
 
-        <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="bg-black text-white hover:bg-black/90">
+        <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90">
           Tambah Pembayaran
         </Button>
       </div>

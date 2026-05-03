@@ -6,9 +6,12 @@ import { ApiResponseError, LaravelApiResponse, ensureSuccess, toPaginatedResult,
 
 const basePath = '/wapi/master-data/vendor';
 
-export const getVendors = async (params: PaginationParams & { search?: string }): Promise<VendorListResponse> => {
+export const getVendors = async (params: PaginationParams & { search?: string; company_id?: string | number }): Promise<VendorListResponse> => {
     const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-        params: buildLaravelPaginationQuery(params),
+        params: {
+            ...buildLaravelPaginationQuery(params),
+            company_id: params.company_id,
+        },
     });
 
     const data = ensureSuccess(response.data);
@@ -152,8 +155,9 @@ export const importVendor = async (companyId: string | number, file: File): Prom
     }
 };
 
-export const exportVendor = async (): Promise<void> => {
+export const exportVendor = async (companyId: string | number): Promise<void> => {
     const response = await apiClient.get(`${basePath}/export`, {
+        params: { company_id: companyId },
         responseType: 'blob',
     });
 

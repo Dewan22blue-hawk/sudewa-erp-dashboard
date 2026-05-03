@@ -18,7 +18,7 @@ export default function VendorPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const { data: vendorsData, isLoading } = useVendors({ page, perPage, search });
+  const { data: vendorsData } = useVendors({ page, perPage, search, company_id: localCompanyId ?? undefined });
   
   const createMutation = useCreateVendor();
   const updateMutation = useUpdateVendor();
@@ -50,7 +50,11 @@ export default function VendorPage() {
 
   const handleSaveForm = async (data: VendorFormData) => {
     try {
-      const companyId = localCompanyId || 1; // Fallback to 1 if no company
+      if (!localCompanyId) {
+        toast.error('Company belum dipilih');
+        return;
+      }
+      const companyId = localCompanyId;
       if (selectedVendor) {
         // Edit
         await updateMutation.mutateAsync({ id: selectedVendor.id, data: { ...data, companyId }});
@@ -81,7 +85,11 @@ export default function VendorPage() {
 
   const handleImport = async (file: File) => {
     try {
-      const companyId = localCompanyId || 1;
+      if (!localCompanyId) {
+        toast.error('Company belum dipilih');
+        return;
+      }
+      const companyId = localCompanyId;
       await importMutation.mutateAsync({ companyId, file });
       toast.success('Import data vendor berhasil');
       setIsImportOpen(false);
@@ -92,7 +100,11 @@ export default function VendorPage() {
 
   const handleExport = async () => {
     try {
-      await exportMutation.mutateAsync();
+      if (!localCompanyId) {
+        toast.error('Company belum dipilih');
+        return;
+      }
+      await exportMutation.mutateAsync(localCompanyId);
       toast.success('Berhasil export data vendor');
     } catch (error: any) {
       toast.error(error.message || 'Gagal export data vendor');

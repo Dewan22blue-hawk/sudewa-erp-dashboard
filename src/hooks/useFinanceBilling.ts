@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FinanceBillingItemPayload } from '@/@types/finance-billing.types';
-import { createFinanceBillingItem, fetchFinanceBilling, fetchFinanceBillingDetail } from '@/services/financeBilling.service';
+import { createFinanceBillingItem, deleteFinanceBillingItem, fetchFinanceBilling, fetchFinanceBillingDetail, updateFinanceBillingItem } from '@/services/financeBilling.service';
 
 const FINANCE_BILLING_KEY = 'finance-billing';
 
@@ -10,7 +10,12 @@ export const financeBillingKeys = {
   detail: (id: number | string | undefined) => [FINANCE_BILLING_KEY, 'detail', id] as const,
 };
 
-export function useFinanceBilling(params: { page?: number; per_page?: number; search?: string }, options?: { enabled?: boolean }) {
+interface FinanceBillingQueryOptions {
+  enabled?: boolean;
+  refetchInterval?: number | false;
+}
+
+export function useFinanceBilling(params: { page?: number; per_page?: number; search?: string }, options?: FinanceBillingQueryOptions) {
   return useQuery({
     queryKey: financeBillingKeys.list(params),
     queryFn: () => fetchFinanceBilling(params),
@@ -18,16 +23,24 @@ export function useFinanceBilling(params: { page?: number; per_page?: number; se
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    refetchInterval: options?.refetchInterval ?? false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 
-export function useFinanceBillingDetail(id?: number, options?: { enabled?: boolean }) {
+export function useFinanceBillingDetail(id?: number, options?: FinanceBillingQueryOptions) {
   return useQuery({
     queryKey: financeBillingKeys.detail(id),
     queryFn: () => fetchFinanceBillingDetail(id as number),
     enabled: (options?.enabled ?? true) && typeof id === 'number' && Number.isFinite(id),
     retry: 1,
     staleTime: 5 * 60 * 1000,
+    refetchInterval: options?.refetchInterval ?? false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 
@@ -38,6 +51,31 @@ export function useCreateFinanceBillingItem(id?: number | string) {
     mutationFn: (payload: FinanceBillingItemPayload) => createFinanceBillingItem(id as number, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['cash-flow'] });
+    },
+  });
+}
+
+export function useUpdateFinanceBillingItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number | string; payload: FinanceBillingItemPayload }) => updateFinanceBillingItem(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['cash-flow'] });
+    },
+  });
+}
+
+export function useDeleteFinanceBillingItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => deleteFinanceBillingItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['cash-flow'] });
     },
   });
 }

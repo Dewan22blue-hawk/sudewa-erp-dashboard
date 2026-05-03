@@ -4,8 +4,8 @@ import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import type { Armada, ArmadaPayload } from '@/@types/armada.types';
+import { ARMADA_EQUIPMENT_FIELDS } from '@/@types/armada.types';
+import type { Armada, ArmadaEquipmentField, ArmadaPayload } from '@/@types/armada.types';
 
 export interface ArmadaFormData {
   registrationNumber: string;
@@ -16,7 +16,24 @@ export interface ArmadaFormData {
   kirAge: string;
   stnkNumber: string;
   kirBook: string;
-  equipmentText: string;
+  radio_tape: string;
+  jack: string;
+  spare_tire: string;
+  toolkit: string;
+  jack_handle: string;
+  pressure_pipe_1: string;
+  first_aid_kit: string;
+  cigarette_lighter: string;
+  pressure_pipe_2: string;
+  seat_saddle: string;
+  handlebar_hose: string;
+  fire_extinguisher: string;
+  large_tie_down_strap: string;
+  rearview_mirror: string;
+  ati_foam: string;
+  small_tie_down_strap: string;
+  toolbox_lock: string;
+  service_book: string;
 }
 
 interface ArmadaFormProps {
@@ -37,7 +54,52 @@ const defaultValues: ArmadaFormData = {
   kirAge: '',
   stnkNumber: '',
   kirBook: '',
-  equipmentText: '',
+  radio_tape: '',
+  jack: '',
+  spare_tire: '',
+  toolkit: '',
+  jack_handle: '',
+  pressure_pipe_1: '',
+  first_aid_kit: '',
+  cigarette_lighter: '',
+  pressure_pipe_2: '',
+  seat_saddle: '',
+  handlebar_hose: '',
+  fire_extinguisher: '',
+  large_tie_down_strap: '',
+  rearview_mirror: '',
+  ati_foam: '',
+  small_tie_down_strap: '',
+  toolbox_lock: '',
+  service_book: '',
+};
+
+const equipmentLabels: Record<ArmadaEquipmentField, string> = {
+  radio_tape: 'Radio Tape',
+  jack: 'Dongkrak',
+  spare_tire: 'Ban Serep',
+  toolkit: 'Toolkit',
+  jack_handle: 'Handle Dongkrak',
+  pressure_pipe_1: 'Pipa Tekan 1',
+  first_aid_kit: 'Kotak P3K',
+  cigarette_lighter: 'Pemantik Rokok',
+  pressure_pipe_2: 'Pipa Tekan 2',
+  seat_saddle: 'Pelana Jok',
+  handlebar_hose: 'Selang Stang',
+  fire_extinguisher: 'APAR',
+  large_tie_down_strap: 'Tali Ikat Besar',
+  rearview_mirror: 'Spion',
+  ati_foam: 'Busa ATI',
+  small_tie_down_strap: 'Tali Ikat Kecil',
+  toolbox_lock: 'Gembok Toolbox',
+  service_book: 'Buku Service',
+};
+
+const toEquipmentInput = (value?: number | null) => (value == null ? '' : String(value));
+const toNullableNumber = (value: string) => {
+  if (!value.trim()) return undefined;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? undefined : parsed;
 };
 
 export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false }: ArmadaFormProps) {
@@ -57,16 +119,33 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
           kirAge: toInputDate(initialData.kirAge),
           stnkNumber: initialData.stnkNumber ?? '',
           kirBook: initialData.kirBook ?? '',
-          equipmentText: initialData.equipment.join(', '),
+          radio_tape: toEquipmentInput(initialData.equipment.radio_tape),
+          jack: toEquipmentInput(initialData.equipment.jack),
+          spare_tire: toEquipmentInput(initialData.equipment.spare_tire),
+          toolkit: toEquipmentInput(initialData.equipment.toolkit),
+          jack_handle: toEquipmentInput(initialData.equipment.jack_handle),
+          pressure_pipe_1: toEquipmentInput(initialData.equipment.pressure_pipe_1),
+          first_aid_kit: toEquipmentInput(initialData.equipment.first_aid_kit),
+          cigarette_lighter: toEquipmentInput(initialData.equipment.cigarette_lighter),
+          pressure_pipe_2: toEquipmentInput(initialData.equipment.pressure_pipe_2),
+          seat_saddle: toEquipmentInput(initialData.equipment.seat_saddle),
+          handlebar_hose: toEquipmentInput(initialData.equipment.handlebar_hose),
+          fire_extinguisher: toEquipmentInput(initialData.equipment.fire_extinguisher),
+          large_tie_down_strap: toEquipmentInput(initialData.equipment.large_tie_down_strap),
+          rearview_mirror: toEquipmentInput(initialData.equipment.rearview_mirror),
+          ati_foam: toEquipmentInput(initialData.equipment.ati_foam),
+          small_tie_down_strap: toEquipmentInput(initialData.equipment.small_tie_down_strap),
+          toolbox_lock: toEquipmentInput(initialData.equipment.toolbox_lock),
+          service_book: toEquipmentInput(initialData.equipment.service_book),
         }
       : defaultValues,
   });
 
   const submitForm = (data: ArmadaFormData) => {
-    const equipment = data.equipmentText
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
+    const equipmentValues = ARMADA_EQUIPMENT_FIELDS.reduce<Partial<Record<ArmadaEquipmentField, number | undefined>>>((accumulator, field) => {
+      accumulator[field] = toNullableNumber(data[field]);
+      return accumulator;
+    }, {});
 
     onSubmit({
       registration_number: data.registrationNumber,
@@ -77,7 +156,8 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
       kir_age: data.kirAge || null,
       stnk_number: data.stnkNumber || null,
       kir_book: data.kirBook || null,
-      equipment,
+      vehicle_fleet_id: initialData?.id,
+      ...equipmentValues,
     });
   };
 
@@ -152,15 +232,29 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
           </div>
         </div>
 
-        <div className="mt-6 space-y-2">
-          <Label htmlFor="equipmentText">Perlengkapan</Label>
-          <Textarea
-            id="equipmentText"
-            rows={4}
-            placeholder="Pisahkan tiap perlengkapan dengan koma. Contoh: dongkrak, toolkit, ban serep"
-            {...register('equipmentText')}
-            className="resize-none"
-          />
+        <div className="mt-8 space-y-4">
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">Perlengkapan Armada</h4>
+            <p className="mt-1 text-xs text-gray-500">Isi jumlah perlengkapan bila tersedia. Kosongkan jika belum ada data.</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {ARMADA_EQUIPMENT_FIELDS.map((field) => (
+              <div key={field} className="space-y-2">
+                <Label htmlFor={field}>{equipmentLabels[field]}</Label>
+                <Input
+                  id={field}
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  {...register(field, {
+                    validate: (value) => !value || Number(value) >= 0 || 'Nilai tidak boleh kurang dari 0',
+                  })}
+                />
+                {errors[field] && <p className="text-xs text-red-500">{errors[field]?.message}</p>}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

@@ -144,12 +144,13 @@ const buildFormData = (payload: CreateLiabilityPaymentPayload): FormData => {
 };
 
 export const liabilityService = {
-  async getAllReceivables(params: { page?: number; per_page?: number; search?: string } = {}): Promise<{
+  async getAllReceivables(params: { company_id?: string | number; page?: number; per_page?: number; search?: string } = {}): Promise<{
     data: LiabilityListItem[];
     meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
   }> {
     const response = await apiClient.get<LaravelApiResponse<LiabilityListResponse>>(basePath, {
       params: {
+        company_id: params.company_id,
         type: 'sales',
         page: params.page ?? 1,
         per_page: params.per_page ?? 10,
@@ -173,12 +174,13 @@ export const liabilityService = {
     };
   },
 
-  async getAllLiabilities(params: { page?: number; per_page?: number; search?: string } = {}): Promise<{
+  async getAllLiabilities(params: { company_id?: string | number; page?: number; per_page?: number; search?: string } = {}): Promise<{
     data: LiabilityListItem[];
     meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
   }> {
     const response = await apiClient.get<LaravelApiResponse<LiabilityListResponse>>(basePath, {
       params: {
+        company_id: params.company_id,
         type: 'purchase',
         page: params.page ?? 1,
         per_page: params.per_page ?? 10,
@@ -202,12 +204,13 @@ export const liabilityService = {
     };
   },
 
-  async getList(params: { type?: 'purchase' | 'sales'; page?: number; per_page?: number; search?: string } = {}): Promise<{
+  async getList(params: { type?: 'purchase' | 'sales'; company_id?: string | number; page?: number; per_page?: number; search?: string } = {}): Promise<{
     data: LiabilityListItem[];
     meta: { currentPage: number; perPage: number; total: number; lastPage: number; from: number | null; to: number | null };
   }> {
     const response = await apiClient.get<LaravelApiResponse<LiabilityListResponse>>(basePath, {
       params: {
+        company_id: params.company_id,
         liability_status: 'unpaid',
         type: params.type ?? 'purchase',
         page: params.page ?? 1,

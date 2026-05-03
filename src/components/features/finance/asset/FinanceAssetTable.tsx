@@ -137,8 +137,8 @@ export function FinanceAssetTable({
                                         <TableCell className="text-gray-600 uppercase">{asset.serial_number || '-'}</TableCell>
                                         <TableCell className="text-gray-600">{formatMoney(asset.price, 'IDR')}</TableCell>
                                         <TableCell className="text-gray-600">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
-                                        <TableCell className="text-gray-600">{formatMoney(asset.depreciation, 'IDR')}</TableCell>
-                                        <TableCell className="text-gray-600">{formatMoney(asset.final_value, 'IDR')}</TableCell>
+                                        <TableCell className="text-gray-600">{formatMoney(asset.depreciation ?? 0, 'IDR')}</TableCell>
+                                        <TableCell className="text-gray-600">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
                                         <TableCell>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

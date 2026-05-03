@@ -503,7 +503,7 @@ export default function SalesUnitDetailPage() {
               searchAction={(
                 <Button
                   size="sm"
-                  className="bg-slate-900 text-white hover:bg-slate-800"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending}
                   onClick={handleAssignStock}
                 >

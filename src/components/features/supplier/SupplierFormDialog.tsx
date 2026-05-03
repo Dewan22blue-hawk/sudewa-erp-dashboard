@@ -103,7 +103,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
             />
 
             <div className="flex flex-col gap-2 pt-2">
-              <Button type="submit" className="w-full bg-black hover:bg-black/90" disabled={isSubmitting}>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isSubmitting}>
                 {isSubmitting ? 'Menyimpan...' : submitLabel}
               </Button>
               <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)}>

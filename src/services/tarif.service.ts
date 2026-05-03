@@ -6,8 +6,10 @@ import { ApiResponseError, LaravelApiResponse, ensureSuccess, ApiValidationError
 const basePath = '/wapi/master-data/tarif';
 
 // ─── Internal: fetch raw list (no pagination/search params) ────────────────────
-const getAllTarifsRaw = async (): Promise<any[]> => {
-    const response = await apiClient.get<LaravelApiResponse<any>>(basePath);
+const getAllTarifsRaw = async (companyId?: string | number): Promise<any[]> => {
+    const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
+        params: companyId ? { company_id: companyId } : undefined,
+    });
     const raw = response.data;
     if (!raw.status) {
         throw new ApiResponseError(raw.message ?? 'Failed to fetch tarif list');
@@ -44,9 +46,9 @@ const mapTarifItem = (item: any): Tarif => ({
 });
 
 export const getTarifs = async (
-    params: PaginationParams & { search?: string },
+    params: PaginationParams & { search?: string; company_id?: string | number },
 ): Promise<TarifListResponse> => {
-    const allRaw = await getAllTarifsRaw();
+    const allRaw = await getAllTarifsRaw(params.company_id);
     const allItems: Tarif[] = allRaw.map(mapTarifItem);
 
     // ── Client-side search across multiple fields ──────────────────────────────

@@ -29,6 +29,7 @@
 import { useCallback, useEffect } from 'react';
 import { NextRouter } from 'next/router';
 import { getAccessToken, checkTokenValidity, isTokenCheckThrottled, markTokenCheckAttempt, removeAccessToken } from '@/lib/auth/token';
+import { clearStoredCompanyId, clearStoredPermissions } from '@/lib/session/storage';
 
 /**
  * Public/non-authenticated pages that should skip token validation
@@ -96,6 +97,8 @@ export const useAuthCheck = (router: NextRouter) => {
       } else if (status === 'invalid') {
         console.warn('[useAuthCheck] Token validation failed - token is no longer valid');
         removeAccessToken();
+        clearStoredCompanyId();
+        clearStoredPermissions();
         if (router.pathname !== '/login') {
           await router.push('/login');
         }

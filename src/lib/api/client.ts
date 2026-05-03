@@ -6,6 +6,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { ApiError } from '@/@types/api';
 import { getAccessToken, removeAccessToken } from '@/lib/auth/token';
+import { clearStoredCompanyId, clearStoredPermissions } from '@/lib/session/storage';
 
 // Default to hawk-dev backend to match master-data environment; override via NEXT_PUBLIC_API_URL when needed.
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://wajirabackend.hawk-dev.com';
@@ -52,6 +53,8 @@ apiClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         console.warn('[API Client] Received 401 - clearing token and redirecting to login');
         removeAccessToken();
+        clearStoredCompanyId();
+        clearStoredPermissions();
         window.location.href = '/login';
       }
     }

@@ -1,0 +1,161 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type {
+  DoEkspedisiItemListParams,
+  DoEkspedisiItemPayload,
+  DoEkspedisiListParams,
+  DoEkspedisiPayload,
+} from '@/@types/do-ekspedisi.types';
+import type { PaginationParams } from '@/@types/pagination.types';
+import {
+  createDoEkspedisi,
+  createDoEkspedisiItem,
+  deleteDoEkspedisi,
+  deleteDoEkspedisiItem,
+  getDoEkspedisiById,
+  getDoEkspedisiItemById,
+  getDoEkspedisiItems,
+  getDoEkspedisis,
+  lookupDoEkspedisiCustomers,
+  lookupDoEkspedisiDrivers,
+  lookupDoEkspedisiVehicles,
+  updateDoEkspedisi,
+  updateDoEkspedisiItem,
+} from '@/services/do-ekspedisi.service';
+
+export function useDoEkspedisis(params: PaginationParams & DoEkspedisiListParams & { enabled?: boolean }) {
+  const { enabled = true, ...rest } = params;
+
+  return useQuery({
+    queryKey: ['do-ekspedisi', rest],
+    queryFn: () => getDoEkspedisis(rest),
+    enabled,
+    placeholderData: (previous) => previous,
+  });
+}
+
+export function useDoEkspedisiDetail(id: string | number | null) {
+  return useQuery({
+    queryKey: ['do-ekspedisi', 'detail', id],
+    queryFn: () => getDoEkspedisiById(id as string | number),
+    enabled: !!id,
+    retry: false,
+  });
+}
+
+export function useDoEkspedisiItems(params: PaginationParams & DoEkspedisiItemListParams & { enabled?: boolean }) {
+  const { enabled = true, ...rest } = params;
+
+  return useQuery({
+    queryKey: ['do-ekspedisi-item', rest],
+    queryFn: () => getDoEkspedisiItems(rest),
+    enabled,
+    placeholderData: (previous) => previous,
+  });
+}
+
+export function useDoEkspedisiItemDetail(id: string | number | null) {
+  return useQuery({
+    queryKey: ['do-ekspedisi-item', 'detail', id],
+    queryFn: () => getDoEkspedisiItemById(id as string | number),
+    enabled: !!id,
+    retry: false,
+  });
+}
+
+export function useCreateDoEkspedisi() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: DoEkspedisiPayload) => createDoEkspedisi(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi'] });
+    },
+  });
+}
+
+export function useUpdateDoEkspedisi() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string | number; payload: DoEkspedisiPayload }) => updateDoEkspedisi(id, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi'] });
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi', 'detail', variables.id] });
+    },
+  });
+}
+
+export function useDeleteDoEkspedisi() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string | number) => deleteDoEkspedisi(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi'] });
+    },
+  });
+}
+
+export function useCreateDoEkspedisiItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: DoEkspedisiItemPayload) => createDoEkspedisiItem(payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi-item'] });
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi', 'detail', String(variables.do_expedition_id)] });
+    },
+  });
+}
+
+export function useUpdateDoEkspedisiItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string | number; payload: DoEkspedisiItemPayload }) => updateDoEkspedisiItem(id, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi-item'] });
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi-item', 'detail', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi', 'detail', String(variables.payload.do_expedition_id)] });
+    },
+  });
+}
+
+export function useDeleteDoEkspedisiItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id }: { id: string | number; doExpeditionId: string | number }) => deleteDoEkspedisiItem(id),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi-item'] });
+      queryClient.invalidateQueries({ queryKey: ['do-ekspedisi', 'detail', String(variables.doExpeditionId)] });
+    },
+  });
+}
+
+export function useDoEkspedisiCustomerLookup(search: string, enabled = true) {
+  return useQuery({
+    queryKey: ['do-ekspedisi', 'lookup', 'customer', search],
+    queryFn: () => lookupDoEkspedisiCustomers(search),
+    enabled,
+    staleTime: 30_000,
+  });
+}
+
+export function useDoEkspedisiVehicleLookup(search: string, enabled = true) {
+  return useQuery({
+    queryKey: ['do-ekspedisi', 'lookup', 'vehicle', search],
+    queryFn: () => lookupDoEkspedisiVehicles(search),
+    enabled,
+    staleTime: 30_000,
+  });
+}
+
+export function useDoEkspedisiDriverLookup(search: string, enabled = true) {
+  return useQuery({
+    queryKey: ['do-ekspedisi', 'lookup', 'driver', search],
+    queryFn: () => lookupDoEkspedisiDrivers(search),
+    enabled,
+    staleTime: 30_000,
+  });
+}

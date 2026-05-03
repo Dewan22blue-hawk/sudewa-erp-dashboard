@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { Transaction } from '@/@types/transaction.types';
 
 // This page implements the List view
 export default function TransactionListPage() {
+  const LIVE_REFRESH_SECONDS = 10;
   const router = useRouter();
   const { slug } = router.query;
   const { companyId } = useCompany();
@@ -28,12 +29,21 @@ export default function TransactionListPage() {
   const [localSearch, setLocalSearch] = useState('');
 
   // Query Hooks
-  const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);
-  const { data: summary, isLoading: isSummaryLoading } = useTransactionSummary(safeCompanyId);
+  const { data, isLoading: isListLoading, isFetching: isListFetching, dataUpdatedAt } = useTransactions(safeCompanyId, page, limit, localSearch);
+  const { data: summary, isLoading: isSummaryLoading, isFetching: isSummaryFetching } = useTransactionSummary(safeCompanyId);
 
   // Dialog State
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
+
+  const lastUpdatedLabel = useMemo(() => {
+    if (!dataUpdatedAt) return 'Menunggu sinkronisasi data terbaru...';
+
+    return new Intl.DateTimeFormat('id-ID', {
+      dateStyle: 'medium',
+      timeStyle: 'medium',
+    }).format(new Date(dataUpdatedAt));
+  }, [dataUpdatedAt]);
 
   // Handlers
   const handleEdit = (trx: Transaction) => {
@@ -52,10 +62,21 @@ export default function TransactionListPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Arus Transaksi Operasional</h1>
           <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Data diperbarui otomatis setiap {LIVE_REFRESH_SECONDS} detik dan akan sinkron lagi saat tab aktif kembali.
+            {' '}
+            <span className={isListFetching || isSummaryFetching ? 'text-emerald-600 font-medium' : 'font-medium'}>
+              {isListFetching || isSummaryFetching ? 'Menyinkronkan data...' : `Update terakhir ${lastUpdatedLabel}`}
+            </span>
+          </p>
         </div>
 
-        {/* SUMMARY CARDS */}
-        {/* {/* <TransactionSummaryCards totalBcaUsd={summary?.totalBcaUsd || 0} totalBcaIdr={summary?.totalBcaIdr || 0} totalCashIdr={summary?.totalCashIdr || 0} isLoading={isSummaryLoading} /> */}
+        <TransactionSummaryCards
+          totalBcaUsd={summary?.totalBcaUsd || 0}
+          totalBcaIdr={summary?.totalBcaIdr || 0}
+          totalCashIdr={summary?.totalCashIdr || 0}
+          isLoading={isSummaryLoading}
+        />
 
         {/* FILTERS & ACTIONS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
