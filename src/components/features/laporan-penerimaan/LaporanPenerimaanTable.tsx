@@ -91,7 +91,7 @@ export default function LaporanPenerimaanTable({
             >
               Previous
             </Button>
-            <Button variant="default" size="sm" className="bg-gray-900">
+            <Button variant="default" size="sm" className="bg-primary">
               {pagination.currentPage}
             </Button>
             <Button

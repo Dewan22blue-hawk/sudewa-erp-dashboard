@@ -145,7 +145,12 @@ export function TarifForm({ initialData, onSubmit, isSubmitting, title }: TarifF
     const router = useRouter();
     const { companyId: localCompanyId } = useCompany();
 
-    const { data: customersResponse } = useCustomers(localCompanyId);
+    const { data: customersResponse } = useCustomers({
+        page: 1,
+        perPage: 100,
+        company_id: localCompanyId ?? undefined,
+        enabled: Boolean(localCompanyId),
+    });
     const customers = (customersResponse as any)?.data || [];
 
     const { register, handleSubmit, control, reset, formState: { errors } } = useForm<TarifFormData>({

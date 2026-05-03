@@ -16,11 +16,21 @@ const toNumber = (value: unknown): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const toBoolean = (value: unknown): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+  return false;
+};
+
 const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
   id: toNumber(payload.id),
   uuid: payload.uuid,
   company_id: toNumber(payload.company_id),
   cash_id: toNumber(payload.cash_id),
+  account_id: payload.account_id == null ? null : toNumber(payload.account_id),
+  unit_transaction_billing_history_id:
+    payload.unit_transaction_billing_history_id == null ? null : toNumber(payload.unit_transaction_billing_history_id),
   code: payload.code ?? '-',
   date: payload.date ?? '',
   note: payload.note ?? '',
@@ -35,11 +45,45 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
     description: payload.cash?.description ?? '-',
     type: payload.cash?.type ?? '-',
   },
+  account: payload.account
+    ? {
+        id: toNumber(payload.account.id),
+        uuid: payload.account.uuid,
+        code: payload.account.code ?? '-',
+        name: payload.account.name ?? '-',
+        description: payload.account.description ?? null,
+      }
+    : null,
   company: {
     id: toNumber(payload.company?.id),
     uuid: payload.company?.uuid,
     name: payload.company?.name ?? '-',
   },
+  finance_billing: payload.finance_billing
+    ? {
+        id: toNumber(payload.finance_billing.id),
+        uuid: payload.finance_billing.uuid,
+        cash_flow_id: toNumber(payload.finance_billing.cash_flow_id),
+        unit_transaction_billing_id: toNumber(payload.finance_billing.unit_transaction_billing_id),
+        last_payment_at: payload.finance_billing.last_payment_at ?? '',
+        grand_total: toNumber(payload.finance_billing.grand_total),
+        is_valid: toBoolean(payload.finance_billing.is_valid),
+        created_at: payload.finance_billing.created_at ?? '',
+        updated_at: payload.finance_billing.updated_at ?? '',
+        finance_billing_items: (payload.finance_billing.finance_billing_items ?? []).map((item) => ({
+          id: toNumber(item.id),
+          finance_billing_id: toNumber(item.finance_billing_id),
+          bca_payment_amount: toNumber(item.bca_payment_amount),
+          bca_payment_usd_amount: toNumber(item.bca_payment_usd_amount),
+          cash_payment_amount: toNumber(item.cash_payment_amount),
+          payment_proof: item.payment_proof ?? null,
+          payment_at: item.payment_at ?? '',
+          note: item.note ?? '',
+          created_at: item.created_at ?? '',
+          updated_at: item.updated_at ?? '',
+        })),
+      }
+    : null,
 });
 
 const toSuccessPayload = <T>(payload: { status: boolean; message?: string; errors: Record<string, string[]> | null; data: T }) =>
@@ -52,10 +96,18 @@ const buildCashFlowFormData = (payload: CashFlowPayload) => {
   const formData = new FormData();
   formData.append('company_id', String(payload.company_id));
   formData.append('cash_id', String(payload.cash_id));
+  formData.append('account_id', String(payload.account_id));
   formData.append('date', payload.date);
   formData.append('note', payload.note);
-  formData.append('debet', String(payload.debet));
-  formData.append('credit', String(payload.credit));
+  if ((payload.debet ?? 0) > 0) {
+    formData.append('debet', String(payload.debet));
+  }
+  if ((payload.credit ?? 0) > 0) {
+    formData.append('credit', String(payload.credit));
+  }
+  if (payload.payment_proof) {
+    formData.append('payment_proof', payload.payment_proof);
+  }
   return formData;
 };
 
@@ -95,9 +147,7 @@ export async function createCashFlow(payload: CashFlowPayload) {
 
 export async function updateCashFlow(id: number | string, payload: CashFlowPayload) {
   const formData = buildCashFlowFormData(payload);
-  formData.append('_method', 'PUT');
-
-  const response = await apiClient.post<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
+  const response = await apiClient.put<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
   const item = ensureSuccess(toSuccessPayload(response.data));
   return normalizeCashFlow(item);
 }

@@ -162,7 +162,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
           </Button>
 
           {onAddUnit && (
-            <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white" onClick={onAddUnit}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={onAddUnit}>
               <Plus className="mr-2 h-4 w-4" />
               Add Unit
             </Button>

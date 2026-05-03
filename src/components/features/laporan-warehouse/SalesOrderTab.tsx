@@ -243,7 +243,7 @@ export default function SalesOrderTab({ perPage, dateRange, onActionsChange }: S
               >
                 Previous
               </Button>
-              <Button variant="default" size="sm" className="bg-gray-900 pointer-events-none">
+              <Button variant="default" size="sm" className="bg-primary pointer-events-none">
                 {safeTablePage}
               </Button>
               <Button

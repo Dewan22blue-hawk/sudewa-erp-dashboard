@@ -79,7 +79,7 @@ export function MaterialFormModal({ isOpen, onClose, onSave }: MaterialFormModal
                                 rules={{ required: 'Harga wajib diisi' }}
                                 render={({ field }) => (
                                     <MoneyInput
-                                        value={field.value === '' ? null : Number(field.value || 0)}
+                                        value={field.value === '' ? undefined : Number(field.value || 0)}
                                         onChangeValue={field.onChange}
                                         placeholder="Masukkan jumlah"
                                         className={errors.price ? 'border-red-500' : ''}

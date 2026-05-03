@@ -8,7 +8,10 @@ const basePath = '/wapi/master-data/dealer';
 
 export const getDealers = async (params: PaginationParams & { search?: string; company_id?: string | number }): Promise<DealerListResponse> => {
     const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-        params: buildLaravelPaginationQuery(params),
+        params: {
+            ...buildLaravelPaginationQuery(params),
+            company_id: params.company_id,
+        },
     });
 
     const data = ensureSuccess(response.data);
@@ -141,8 +144,9 @@ export const deleteDealer = async (id: string | number): Promise<void> => {
     }
 };
 
-export const exportDealer = async (): Promise<void> => {
+export const exportDealer = async (companyId?: string | number): Promise<void> => {
     const response = await apiClient.get(`${basePath}/export`, {
+        params: companyId ? { company_id: companyId } : undefined,
         responseType: 'blob',
     });
 
@@ -167,4 +171,3 @@ export const exportDealer = async (): Promise<void> => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 };
-

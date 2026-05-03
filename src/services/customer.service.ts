@@ -173,8 +173,9 @@ export const importCustomer = async (file: File, companyId?: string | number): P
   }
 };
 
-export const exportCustomer = async (): Promise<void> => {
+export const exportCustomer = async (companyId?: string | number): Promise<void> => {
   const response = await apiClient.get(`${basePath}/export`, {
+    params: companyId ? { company_id: companyId } : undefined,
     responseType: 'blob',
   });
 

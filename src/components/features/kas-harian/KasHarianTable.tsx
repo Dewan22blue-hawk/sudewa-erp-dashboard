@@ -1,4 +1,4 @@
-import type { KasHarian } from '@/@types/kas-harian.types';
+import type { KasHarianListItem } from '@/@types/kas-harian.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { ArrowUpDown, MoreVertical } from 'lucide-react';
 
 interface Props {
-  data: KasHarian[];
+  data: KasHarianListItem[];
   meta: PaginationMeta;
   hasNextPage: boolean;
   isLoading?: boolean;
@@ -16,10 +16,10 @@ interface Props {
   isError?: boolean;
   errorMessage?: string;
   onRetry?: () => void;
-  onView: (item: KasHarian) => void;
-  onPay: (item: KasHarian) => void;
-  onEdit: (item: KasHarian) => void;
-  onDelete: (item: KasHarian) => void;
+  onView: (item: KasHarianListItem) => void;
+  onPay: (item: KasHarianListItem) => void;
+  onEdit: (item: KasHarianListItem) => void;
+  onDelete: (item: KasHarianListItem) => void;
   onPageChange: (page: number) => void;
 }
 
@@ -69,12 +69,12 @@ export default function KasHarianTable({
 
   return (
     <div className="space-y-5">
-      <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white">
+      <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
         {isFetching && !isLoading ? (
           <div className="border-b border-slate-200 bg-slate-50 px-6 py-3 text-xs text-slate-600">Memperbarui data...</div>
         ) : null}
 
-        <table className="min-w-[1120px] w-full text-sm">
+        <table className="w-full min-w-[1120px] text-sm">
           <thead className="bg-[#f3f6fb] text-[13px] font-semibold uppercase text-slate-800">
             <tr>
               <th className="px-6 py-4 text-left">
@@ -115,13 +115,13 @@ export default function KasHarianTable({
               </tr>
             ) : (
               data.map((item) => (
-                <tr key={item.id} className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/60">
+                <tr key={`${item.source}-${item.id}`} className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/60">
                   <td className="px-6 py-4 text-slate-700">{formatDate(item.date)}</td>
                   <td className="px-6 py-4 text-slate-800">{item.code}</td>
                   <td className="px-6 py-4 text-slate-700">{item.note || '-'}</td>
                   <td className="px-6 py-4 font-medium text-emerald-500">{formatCurrency(item.debet)}</td>
                   <td className="px-6 py-4 font-medium text-red-500">{formatCurrency(item.credit)}</td>
-                  <td className="px-6 py-4 text-slate-700">{item.cash.description}</td>
+                  <td className="px-6 py-4 text-slate-700">{item.accountName}</td>
                   <td className="px-6 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -130,18 +130,24 @@ export default function KasHarianTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="min-w-[170px] rounded-2xl p-2">
-                        <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
-                          Bayar
-                        </DropdownMenuItem>
+                        {item.source === 'billing' ? (
+                          <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                            Bayar
+                          </DropdownMenuItem>
+                        ) : null}
                         <DropdownMenuItem onClick={() => onView(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
                           Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-700">
-                          Hapus
-                        </DropdownMenuItem>
+                        {item.source === 'manual' ? (
+                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                            Edit
+                          </DropdownMenuItem>
+                        ) : null}
+                        {item.source === 'manual' ? (
+                          <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-700">
+                            Hapus
+                          </DropdownMenuItem>
+                        ) : null}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>

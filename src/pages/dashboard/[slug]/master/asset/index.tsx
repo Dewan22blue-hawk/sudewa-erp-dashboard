@@ -18,7 +18,7 @@ export default function AssetPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(100);
 
-  const { data: assetsData, isLoading } = useAssets(companyId, { page, perPage, search });
+  const { data: assetsData } = useAssets(companyId, { page, perPage, search });
   
   const createMutation = useCreateAsset();
   const updateMutation = useUpdateAsset();
@@ -90,7 +90,7 @@ export default function AssetPage() {
 
   const handleExport = async () => {
     try {
-      await exportMutation.mutateAsync();
+      await exportMutation.mutateAsync(companyId ? Number(companyId) : undefined);
       toast.success('Berhasil export data aset');
     } catch (error: any) {
       toast.error(error.message || 'Gagal export data aset');
@@ -98,7 +98,7 @@ export default function AssetPage() {
   };
 
   const assetsList = assetsData?.data || [];
-  const totalAssets = assetsData?.total || 0;
+  const totalAssets = assetsData?.meta?.total || 0;
 
   return (
     <DashboardLayout>

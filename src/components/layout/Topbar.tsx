@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Search, Bell, Clock, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
@@ -11,7 +12,7 @@ import {
 import { LogOut } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
-import { removeAccessToken } from '@/lib/auth/token';
+import { performClientLogout } from '@/lib/session/logout';
 
 const RECENT_STORAGE_KEY = 'global-search-recent';
 
@@ -21,6 +22,7 @@ export function Topbar() {
   const [recentItems, setRecentItems] = useState<string[]>([]);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { data: profile, isLoading: isProfileLoading } = useAuthMe();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const params = useParams();
   const slug = params?.slug as string;
@@ -29,7 +31,6 @@ export function Topbar() {
 
   const displayName = user?.name || [user?.firstname, user?.lastname].filter(Boolean).join(' ') || '-';
   const userId = user?.username || user?.email || String(user?.id ?? '-');
-  const role = user?.role || '-';
   const initials =
     displayName
       .split(' ')
@@ -62,7 +63,7 @@ export function Topbar() {
   };
 
   const handleLogout = () => {
-    removeAccessToken();
+    performClientLogout(queryClient);
     router.replace('/login');
   };
 

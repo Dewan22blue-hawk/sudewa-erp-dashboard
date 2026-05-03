@@ -152,7 +152,7 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
             </Button>
             <Button
               size="sm"
-              className="bg-slate-900 hover:bg-slate-800 text-white"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)}
             >
               <Plus className="h-4 w-4 mr-2" />

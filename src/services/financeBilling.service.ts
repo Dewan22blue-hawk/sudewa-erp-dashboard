@@ -135,6 +135,7 @@ export async function fetchFinanceBillingDetail(id: number | string): Promise<Fi
 
 export async function createFinanceBillingItem(id: number | string, payload: FinanceBillingItemPayload) {
   const formData = new FormData();
+  formData.append('finance_billing_id', String(payload.finance_billing_id));
 
   if ((payload.bca_payment_amount ?? 0) > 0) {
     formData.append('bca_payment_amount', String(payload.bca_payment_amount ?? 0));
@@ -165,4 +166,43 @@ export async function createFinanceBillingItem(id: number | string, payload: Fin
 
   const data = ensureSuccess(toSuccessPayload(response.data));
   return normalizeFinanceBillingItem(data);
+}
+
+export async function updateFinanceBillingItem(id: number | string, payload: FinanceBillingItemPayload) {
+  const formData = new FormData();
+  formData.append('finance_billing_id', String(payload.finance_billing_id));
+
+  if ((payload.bca_payment_amount ?? 0) > 0) {
+    formData.append('bca_payment_amount', String(payload.bca_payment_amount ?? 0));
+  }
+
+  if ((payload.bca_payment_usd_amount ?? 0) > 0) {
+    formData.append('bca_payment_usd_amount', String(payload.bca_payment_usd_amount ?? 0));
+  }
+
+  if ((payload.cash_payment_amount ?? 0) > 0) {
+    formData.append('cash_payment_amount', String(payload.cash_payment_amount ?? 0));
+  }
+
+  formData.append('payment_at', payload.payment_at);
+
+  if (payload.note) {
+    formData.append('note', payload.note);
+  }
+
+  if (payload.payment_proof) {
+    formData.append('payment_proof', payload.payment_proof);
+  }
+
+  const response = await apiClient.put<{ status: boolean; message?: string; errors: Record<string, string[]> | null; data: FinanceBillingItem }>(
+    `${BILLING_ITEM_PATH}/${id}`,
+    formData,
+  );
+
+  const data = ensureSuccess(toSuccessPayload(response.data));
+  return normalizeFinanceBillingItem(data);
+}
+
+export async function deleteFinanceBillingItem(id: number | string) {
+  await apiClient.delete(`${BILLING_ITEM_PATH}/${id}`);
 }

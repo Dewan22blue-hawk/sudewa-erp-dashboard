@@ -18,7 +18,7 @@ export default function DealerPage() {
   const [perPage, setPerPage] = useState(25);
 
   const { companyId } = useCompany();
-  const { data: dealersData, isLoading } = useDealers(companyId, { page, perPage, search });
+  const { data: dealersData } = useDealers(companyId, { page, perPage, search });
   
   const createMutation = useCreateDealer();
   const updateMutation = useUpdateDealer();
@@ -91,7 +91,7 @@ export default function DealerPage() {
 
   const handleExport = async () => {
     try {
-      await exportMutation.mutateAsync();
+      await exportMutation.mutateAsync(companyId ? Number(companyId) : undefined);
       toast.success('Berhasil export data');
     } catch (error: any) {
       toast.error(error.message || 'Gagal export data');

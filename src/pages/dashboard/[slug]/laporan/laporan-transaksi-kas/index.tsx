@@ -174,7 +174,7 @@ export default function LaporanTransaksiKasPage() {
                           variant={pagination.currentPage === page ? "default" : "outline"}
                           size="sm"
                           onClick={() => setPage(page)}
-                          className={pagination.currentPage === page ? "bg-gray-900" : ""}
+                          className={pagination.currentPage === page ? "bg-primary" : ""}
                         >
                           {page}
                         </Button>

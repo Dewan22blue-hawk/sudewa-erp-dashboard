@@ -67,7 +67,12 @@ export default function DriverPage() {
     };
 
     const handleSaveForm = async (data: DriverPayload) => {
-        const companyId = localCompanyId || 1;
+        if (!localCompanyId) {
+            toast.error('Company belum dipilih');
+            return;
+        }
+
+        const companyId = localCompanyId;
         const userId = profile?.data?.id ? Number(profile.data.id) || profile.data.id : undefined;
         try {
             if (selectedDriver) {
@@ -100,7 +105,12 @@ export default function DriverPage() {
     };
 
     const handleImport = async (file: File) => {
-        const companyId = localCompanyId || 1;
+        if (!localCompanyId) {
+            toast.error('Company belum dipilih');
+            return;
+        }
+
+        const companyId = localCompanyId;
         try {
             await importMutation.mutateAsync({ id: companyId, file });
             toast.success('Import data driver berhasil');
@@ -112,7 +122,12 @@ export default function DriverPage() {
 
     const handleExport = async () => {
         try {
-            await exportMutation.mutateAsync();
+            if (!localCompanyId) {
+                toast.error('Company belum dipilih');
+                return;
+            }
+
+            await exportMutation.mutateAsync(localCompanyId);
             toast.success('Berhasil export data driver');
         } catch (error: any) {
             toast.error(error.message || 'Gagal export data driver');
@@ -166,7 +181,7 @@ export default function DriverPage() {
                 onSave={handleSaveForm}
                 initialData={selectedDriver}
                 isSubmitting={isSaving}
-                companyId={localCompanyId || 1}
+                companyId={localCompanyId ? Number(localCompanyId) : 0}
                 userId={profile?.data?.id}
             />
 

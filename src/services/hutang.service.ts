@@ -39,7 +39,7 @@ let paymentDB: HutangPayment[] = [];
 
 const generateId = () => uuidv4();
 
-export const getHutang = async (): Promise<Hutang[]> => {
+export const getHutang = async (_companyId?: string | number | null): Promise<Hutang[]> => {
   return hutangDB;
 };
 

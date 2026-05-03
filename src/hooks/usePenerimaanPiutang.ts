@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { liabilityService } from '@/services/liability.service';
 import type { CreatePenerimaanPiutangPaymentPayload } from '@/@types/penerimaan-piutang.types';
+import { useCompany } from '@/contexts/CompanyContext';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 type PenerimaanPiutangListOptions = {
     page?: number;
@@ -9,34 +11,51 @@ type PenerimaanPiutangListOptions = {
 };
 
 export const usePenerimaanPiutang = (options: PenerimaanPiutangListOptions = {}) => {
+    const { companyId } = useCompany();
+
     return useQuery({
-        queryKey: ['sales-liability-list', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
-        queryFn: () => liabilityService.getList({ type: 'sales', page: options.page, per_page: options.perPage, search: options.search }),
+        queryKey: companyId ? companyQueryKeys.list(companyId, 'sales-liability-list', options) : ['sales-liability-list', 'unscoped', options],
+        queryFn: () => liabilityService.getList({ type: 'sales', company_id: companyId ?? undefined, page: options.page, per_page: options.perPage, search: options.search }),
         staleTime: 1000 * 60 * 5,
         placeholderData: (previous) => previous,
+        enabled: Boolean(companyId),
     });
 };
 
 export const useDeletePenerimaanPiutang = () => {
     const queryClient = useQueryClient();
+    const { companyId } = useCompany();
 
     return useMutation({
         mutationFn: (id: number) => liabilityService.delete(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['sales-liability-list'] });
-            queryClient.invalidateQueries({ queryKey: ['sales-liability-detail'] });
+            if (companyId) {
+                queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+                return;
+            }
+
+            queryClient.invalidateQueries({
+                predicate: (query) => Array.isArray(query.queryKey) && (query.queryKey.includes('sales-liability-list') || query.queryKey.includes('sales-liability-detail')),
+            });
         },
     });
 };
 
 export const useCreatePenerimaanPiutangPayment = () => {
     const queryClient = useQueryClient();
+    const { companyId } = useCompany();
 
     return useMutation({
         mutationFn: (payload: CreatePenerimaanPiutangPaymentPayload | FormData) => liabilityService.createPayment(payload),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['sales-liability-list'] });
-            queryClient.invalidateQueries({ queryKey: ['sales-liability-detail'] });
+            if (companyId) {
+                queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+                return;
+            }
+
+            queryClient.invalidateQueries({
+                predicate: (query) => Array.isArray(query.queryKey) && (query.queryKey.includes('sales-liability-list') || query.queryKey.includes('sales-liability-detail')),
+            });
         },
     });
 };

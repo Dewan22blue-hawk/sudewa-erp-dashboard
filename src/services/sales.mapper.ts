@@ -82,6 +82,12 @@ export type SalesApiModel = {
       unit_transaction_item_detail_id?: number | string;
     }>;
   }>;
+  unit_transaction_adjustments?: Array<{
+    id?: number | string;
+    amount?: number | string;
+    description?: string;
+    created_at?: string;
+  }>;
 };
 
 export type SalesListUI = {

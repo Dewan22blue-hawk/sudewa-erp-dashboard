@@ -8,6 +8,14 @@ export interface KasHarianCash {
   type: string;
 }
 
+export interface KasHarianAccount {
+  id: number;
+  uuid?: string;
+  code: string;
+  name: string;
+  description?: string | null;
+}
+
 export interface KasHarianCompany {
   id: number;
   uuid?: string;
@@ -19,6 +27,8 @@ export interface KasHarian {
   uuid?: string;
   company_id: number;
   cash_id: number;
+  account_id?: number | null;
+  unit_transaction_billing_history_id?: number | null;
   code: string;
   date: string;
   note: string;
@@ -27,16 +37,42 @@ export interface KasHarian {
   created_at?: string;
   updated_at?: string;
   cash: KasHarianCash;
+  account?: KasHarianAccount | null;
   company: KasHarianCompany;
+  finance_billing?: {
+    id: number;
+    uuid?: string;
+    cash_flow_id?: number;
+    unit_transaction_billing_id?: number;
+    last_payment_at?: string;
+    grand_total?: number;
+    is_valid?: boolean;
+    created_at?: string;
+    updated_at?: string;
+    finance_billing_items?: Array<{
+      id: number;
+      finance_billing_id: number;
+      bca_payment_amount: number;
+      bca_payment_usd_amount: number;
+      cash_payment_amount: number;
+      payment_proof: string | null;
+      payment_at: string;
+      note: string;
+      created_at?: string;
+      updated_at?: string;
+    }>;
+  } | null;
 }
 
 export interface CashFlowPayload {
   company_id: number;
   cash_id: number;
+  account_id: number;
   date: string;
   note: string;
   debet: number;
   credit: number;
+  payment_proof?: File | null;
 }
 
 export interface CashFlowFilterParams {
@@ -67,4 +103,19 @@ export interface CashFlowListResult {
   data: KasHarian[];
   meta: PaginationMeta;
   hasNextPage: boolean;
+}
+
+export type KasHarianSource = 'billing' | 'manual';
+
+export interface KasHarianListItem {
+  id: number;
+  source: KasHarianSource;
+  date: string;
+  code: string;
+  note: string;
+  debet: number;
+  credit: number;
+  accountName: string;
+  cashFlowId?: number;
+  financeBillingId?: number;
 }

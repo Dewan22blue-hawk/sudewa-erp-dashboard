@@ -1,0 +1,107 @@
+import type { PaginatedResult } from './pagination.types';
+
+export interface DoEkspedisiVehicle {
+  id: number;
+  uuid?: string;
+  registrationNumber: string;
+  type: string;
+}
+
+export interface DoEkspedisiDriver {
+  id: number;
+  uuid?: string;
+  name: string;
+  phone?: string | null;
+}
+
+export interface DoEkspedisiCustomer {
+  id: number;
+  uuid?: string;
+  name: string;
+}
+
+export interface DoEkspedisiItem {
+  id: number;
+  uuid?: string;
+  doExpeditionId: number;
+  customerId: number;
+  customerName: string;
+  loadingIn: string;
+  loadingOut: string;
+  destination: string;
+  invoiceFee: number;
+  additionalCostFee: number;
+  otherFee: number;
+  driverFee: number;
+  ppnFee: number;
+  serviceFee: number;
+  pphFee: number;
+  customer?: DoEkspedisiCustomer;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DoEkspedisi {
+  id: number;
+  uuid?: string;
+  doCode: string;
+  date: string;
+  vehicleId: number | null;
+  driverId: number | null;
+  itemsCount: number;
+  bruttoValue: number;
+  totalPpn: number;
+  totalPph: number;
+  totalServiceFee: number;
+  totalAdditionalCost: number;
+  totalOtherFee: number;
+  totalDriverFee: number;
+  vehicle?: DoEkspedisiVehicle | null;
+  driver?: DoEkspedisiDriver | null;
+  items?: DoEkspedisiItem[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DoEkspedisiListParams {
+  search?: string;
+  order_by?: string;
+  order_sort?: 'asc' | 'desc';
+}
+
+export interface DoEkspedisiItemListParams {
+  order_by?: string;
+  order_sort?: 'asc' | 'desc';
+  loading_in?: string;
+  loading_out?: string;
+  destination?: string;
+  do_expedition_id?: number | string;
+  customer_id?: number | string;
+}
+
+export interface DoEkspedisiPayload {
+  date: string;
+  vehicle_id: string | number;
+  driver_id: string | number;
+}
+
+export interface DoEkspedisiItemPayload {
+  do_expedition_id: string | number;
+  customer_id: string | number;
+  loading_in: string;
+  loading_out: string;
+  destination: string;
+  invoice_fee: number | string;
+  additional_cost_fee: number | string;
+  other_fee: number | string;
+  driver_fee: number | string;
+}
+
+export interface LookupOption {
+  id: number;
+  label: string;
+  subtitle?: string;
+}
+
+export type DoEkspedisiListResponse = PaginatedResult<DoEkspedisi>;
+export type DoEkspedisiItemListResponse = PaginatedResult<DoEkspedisiItem>;

@@ -1,15 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { purchaseService } from '@/services/purchase.service';
 import { CreatePurchaseRequest, UpdatePurchaseRequest, CreatePurchaseUnitRequest } from '@/@types/purchase.types';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 /* =====================================
    GET LIST
 ===================================== */
 
-export const usePurchases = (_companyId?: string | null, options: { page?: number; perPage?: number; search?: string } = {}) => {
+export const usePurchases = (companyId?: string | null, options: { page?: number; perPage?: number; search?: string } = {}) => {
   return useQuery({
-    queryKey: ['purchase-items', options.page ?? 1, options.perPage ?? 10, options.search ?? ''],
-    queryFn: () => purchaseService.getUnitTransactionItems({ page: options.page, perPage: options.perPage, search: options.search }),
+    queryKey: companyId
+      ? companyQueryKeys.list(companyId, 'purchase-items', {
+          page: options.page ?? 1,
+          perPage: options.perPage ?? 10,
+          search: options.search ?? '',
+        })
+      : ['company', 'unselected', 'purchase-items'],
+    queryFn: () => purchaseService.getUnitTransactionItems({ company_id: companyId, page: options.page, perPage: options.perPage, search: options.search }),
+    enabled: Boolean(companyId),
     staleTime: 1000 * 60 * 5, // 5 minutes,
   });
 };
@@ -38,9 +46,7 @@ export const useCreatePurchase = () => {
     mutationFn: (payload: CreatePurchaseRequest) => purchaseService.createPurchase(payload),
 
     onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ['purchases', data.companyId],
-      });
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(data.companyId) });
 
       queryClient.invalidateQueries({
         queryKey: ['unit-transactions'],
@@ -58,9 +64,7 @@ export const useUpdatePurchase = () => {
     mutationFn: ({ id, payload }: { id: string; payload: UpdatePurchaseRequest }) => purchaseService.updatePurchase(id, payload),
 
     onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ['purchases', data.companyId],
-      });
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(data.companyId) });
 
       queryClient.invalidateQueries({
         queryKey: ['purchase', data.id],
@@ -81,7 +85,7 @@ export const useDeletePurchase = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['purchases'],
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('purchase-items'),
       });
     },
   });
@@ -94,7 +98,9 @@ export const useDeletePurchaseUnitItem = () => {
     mutationFn: (id: string) => purchaseService.deleteUnitTransactionItem(id),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['purchase-items'] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('purchase-items'),
+      });
     },
   });
 };
@@ -110,12 +116,9 @@ export const useAddPurchaseUnit = () => {
     mutationFn: (payload: CreatePurchaseUnitRequest) => purchaseService.addUnit(payload),
 
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(data.companyId) });
       queryClient.invalidateQueries({
         queryKey: ['purchase', data.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['purchases', data.companyId],
       });
     },
   });
@@ -128,11 +131,9 @@ export const useUpdatePayment = () => {
     mutationFn: ({ id, payload }: { id: string; payload: { bca: number; bcaUsd: number; cash: number } }) => purchaseService.updatePayment(id, payload),
 
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(data.companyId) });
       queryClient.invalidateQueries({
         queryKey: ['purchase', data.id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['purchases', data.companyId],
       });
     },
   });
@@ -145,11 +146,9 @@ export const useDeletePurchaseUnit = () => {
     mutationFn: ({ purchaseId, unitId }: { purchaseId: string; unitId: string }) => purchaseService.deleteUnit(purchaseId, unitId),
 
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(data.companyId) });
       queryClient.invalidateQueries({
         queryKey: ['purchase', data.id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['purchases', data.companyId],
       });
     },
   });

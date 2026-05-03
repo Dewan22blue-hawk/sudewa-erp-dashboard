@@ -1,64 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { DOEkspedisiDetailForm, DOEkspedisiDetailFormData } from '@/components/features/do-ekspedisi/DOEkspedisiDetailForm';
-import { DOEkspedisi, DUMMY_DO_EKSPEDISI, DUMMY_DO_DETAILS, setDummyDODetails } from '@/components/features/do-ekspedisi/do-ekspedisi.data';
-import { toast } from 'sonner';
-import { useRouter } from 'next/router';
+import React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { toast } from 'sonner';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { DOEkspedisiDetailForm, type DOEkspedisiDetailFormData } from '@/components/features/do-ekspedisi/DOEkspedisiDetailForm';
+import { useCreateDoEkspedisiItem, useDoEkspedisiCustomerLookup, useDoEkspedisiDetail } from '@/hooks/useDoEkspedisi';
 
 export default function CreateDOEkspedisiDetailPage() {
-    const router = useRouter();
-    const { slug, id } = router.query;
+  const router = useRouter();
+  const { slug, id } = router.query;
 
-    const [doData, setDoData] = useState<DOEkspedisi | null>(null);
+  const [customerSearch, setCustomerSearch] = React.useState('');
+  const detailQuery = useDoEkspedisiDetail(id ? String(id) : null);
+  const customerLookup = useDoEkspedisiCustomerLookup(customerSearch);
+  const createMutation = useCreateDoEkspedisiItem();
 
-    useEffect(() => {
-        if (id) {
-            const numId = Number(id);
-            const foundDO = DUMMY_DO_EKSPEDISI.find(d => d.id === numId);
-            if (foundDO) {
-                setDoData(foundDO);
-            } else {
-                router.push(`/dashboard/${slug}/do-ekspedisi`);
-            }
-        }
-    }, [id, slug, router]);
+  const handleSave = async (values: DOEkspedisiDetailFormData) => {
+    if (!id) return;
 
-    const handleSave = (data: DOEkspedisiDetailFormData) => {
-        if (!id) return;
+    try {
+      await createMutation.mutateAsync({
+        do_expedition_id: String(id),
+        customer_id: values.customerId,
+        loading_in: values.loadingIn,
+        loading_out: values.loadingOut,
+        destination: values.destination,
+        invoice_fee: values.invoiceFee || 0,
+        additional_cost_fee: values.additionalCostFee || 0,
+        other_fee: values.otherFee || 0,
+        driver_fee: values.driverFee || 0,
+      });
 
-        const newDetailId = DUMMY_DO_DETAILS.length > 0 ? Math.max(...DUMMY_DO_DETAILS.map(d => d.id)) + 1 : 1;
-        const newEntry = { id: newDetailId, doId: Number(id), ...data };
+      toast.success('Item DO Ekspedisi berhasil ditambahkan');
+      if (slug) {
+        router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}`);
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menambahkan item DO Ekspedisi');
+    }
+  };
 
-        setDummyDODetails([newEntry, ...DUMMY_DO_DETAILS]);
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-start gap-3">
+          <button onClick={() => router.back()} className="rounded-md p-1 transition-colors hover:bg-slate-100">
+            <ChevronLeft className="h-5 w-5 text-slate-500" />
+          </button>
+          <div>
+            <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">Detail DO</h1>
+            <p className="text-sm text-slate-500">Nomor Polisi <span className="font-medium text-[#2563EB]">{detailQuery.data?.vehicle?.registrationNumber || '-'}</span></p>
+          </div>
+        </div>
 
-        toast.success('Informasi Muatan DO Ekspedisi berhasil ditambahkan');
-        if (slug && id) {
-            router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}`);
-        }
-    };
-
-    if (!doData) return null;
-
-    return (
-        <DashboardLayout>
-            <div className="space-y-6">
-                <div className="flex items-center space-x-2">
-                    <button
-                        onClick={() => router.back()}
-                        className="p-1 hover:bg-gray-100 rounded-md transition-colors"
-                    >
-                        <ChevronLeft className="h-5 w-5 text-gray-500" />
-                    </button>
-                    <div>
-                        <h1 className="text-xl font-semibold text-gray-900">Detail DO</h1>
-                        <p className="text-sm text-gray-500">Nomor Polisi <span className="text-blue-600">{doData.noPolisi}</span></p>
-                    </div>
-                </div>
-
-                <h3 className="text-lg font-medium">Form Detail DO</h3>
-                <DOEkspedisiDetailForm onSubmit={handleSave} />
-            </div>
-        </DashboardLayout>
-    );
+        <div className="space-y-5">
+          <h2 className="border-b border-[#E5E7EB] pb-4 text-[18px] font-semibold text-slate-900">Form Detail DO</h2>
+          <DOEkspedisiDetailForm
+            customerOptions={(customerLookup.data ?? []).map((item) => ({ value: String(item.id), label: item.label, subtitle: item.subtitle }))}
+            onCustomerSearch={setCustomerSearch}
+            onSubmit={handleSave}
+            isSubmitting={createMutation.isPending}
+          />
+        </div>
+      </div>
+    </DashboardLayout>
+  );
 }

@@ -85,7 +85,7 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
             <Button variant="outline" size="sm" disabled={pagination.currentPage === 1} onClick={() => onPageChange(pagination.currentPage - 1)}>
               Previous
             </Button>
-            <Button variant="default" size="sm" className="bg-gray-900 pointer-events-none">
+            <Button variant="default" size="sm" className="bg-primary pointer-events-none">
               {pagination.currentPage}
             </Button>
             <Button variant="outline" size="sm" disabled={pagination.currentPage === pagination.lastPage} onClick={() => onPageChange(pagination.currentPage + 1)}>

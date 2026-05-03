@@ -257,7 +257,7 @@ export default function PembayaranHutangPaymentDialog({ open, onOpenChange, bill
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isBusy}>
               Batal
             </Button>
-            <Button type="submit" disabled={isBusy || !billingId} className="bg-black text-white hover:bg-black/90">
+            <Button type="submit" disabled={isBusy || !billingId} className="bg-primary text-primary-foreground hover:bg-primary/90">
               {isBusy ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />

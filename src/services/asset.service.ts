@@ -123,8 +123,9 @@ export const importAsset = async (file: File, companyId?: string | number): Prom
     }
 };
 
-export const exportAsset = async (): Promise<void> => {
+export const exportAsset = async (companyId?: string | number): Promise<void> => {
     const response = await apiClient.get(`${basePath}/export`, {
+        params: companyId ? { company_id: companyId } : undefined,
         responseType: 'blob',
     });
 

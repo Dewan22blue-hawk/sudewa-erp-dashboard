@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ArmadaTable } from '@/components/features/armada/ArmadaTable';
 import { DeleteArmadaModal } from '@/components/features/armada/DeleteArmadaModal';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { toast } from 'sonner';
 import { useRouter } from 'next/router';
-import { useArmadas, useDeleteArmada } from '@/hooks/useArmada';
+import { useArmadas, useDeleteArmada, useImportArmada } from '@/hooks/useArmada';
 
 export default function ArmadaPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function ArmadaPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedArmadaId, setSelectedArmadaId] = useState<string | number | null>(null);
 
   useEffect(() => {
@@ -27,6 +29,7 @@ export default function ArmadaPage() {
 
   const { data, isLoading } = useArmadas({ page, perPage, search });
   const deleteMutation = useDeleteArmada();
+  const importMutation = useImportArmada();
 
   const handleAddClick = () => {
     if (slug) {
@@ -58,6 +61,10 @@ export default function ArmadaPage() {
     }
   };
 
+  const handleImport = async (file: File) => {
+    await importMutation.mutateAsync(file);
+  };
+
   const armadas = data?.data ?? [];
   const totalData = data?.meta.total ?? 0;
   const totalPages = data?.meta.lastPage ?? 1;
@@ -85,6 +92,7 @@ export default function ArmadaPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
+          onImport={() => setIsImportOpen(true)}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
@@ -95,6 +103,16 @@ export default function ArmadaPage() {
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
         isDeleting={deleteMutation.isPending}
+      />
+
+      <DataImportModal
+        open={isImportOpen}
+        onOpenChange={setIsImportOpen}
+        title="Import Data Armada"
+        description="Unggah file Excel untuk menambahkan data armada secara massal."
+        onImport={handleImport}
+        isPending={importMutation.isPending}
+        templateUrl="https://docs.google.com/spreadsheets/d/1cdvmtF4S7LrDJoyWmNDR9dd-CQz2OPj7B7EAbUwQSU4/edit?usp=sharing"
       />
     </DashboardLayout>
   );

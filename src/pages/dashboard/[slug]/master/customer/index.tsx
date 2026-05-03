@@ -160,7 +160,11 @@ function TransindoCustomerContent() {
 
   const handleExport = async () => {
     try {
-      await exportCustomer.mutateAsync();
+      if (!companyId) {
+        throw new Error('Company ID tidak ditemukan');
+      }
+
+      await exportCustomer.mutateAsync(companyId);
       toast.success('File customer berhasil didownload');
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal mengexport data customer';

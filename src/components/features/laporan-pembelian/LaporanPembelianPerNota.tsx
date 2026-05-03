@@ -175,7 +175,7 @@ export default function LaporanPembelianPerNota({ data, pagination, isLoading, o
             <Button variant="outline" size="sm" disabled={safePage === 1} onClick={() => setTablePage((prev) => Math.max(1, prev - 1))}>
               Previous
             </Button>
-            <Button variant="default" size="sm" className="bg-gray-900 pointer-events-none">
+            <Button variant="default" size="sm" className="bg-primary pointer-events-none">
               {safePage}
             </Button>
             <Button variant="outline" size="sm" disabled={safePage === lastTablePage} onClick={() => setTablePage((prev) => Math.min(lastTablePage, prev + 1))}>

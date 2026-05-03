@@ -20,6 +20,7 @@ interface ArmadaTableProps {
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
   onAdd: () => void;
+  onImport: () => void;
   onEdit: (armada: Armada) => void;
   onDelete: (armada: Armada) => void;
 }
@@ -70,6 +71,7 @@ export function ArmadaTable({
   onPageChange,
   onPerPageChange,
   onAdd,
+  onImport,
   onEdit,
   onDelete,
 }: ArmadaTableProps) {
@@ -103,9 +105,9 @@ export function ArmadaTable({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="gap-2" disabled>
-            <Upload className="h-4 w-4 rotate-180" />
-            Export
+          <Button variant="outline" className="gap-2" onClick={onImport}>
+            <Upload className="h-4 w-4" />
+            Import
           </Button>
           <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />

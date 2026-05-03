@@ -1,5 +1,6 @@
 import { ChevronDown, Check, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies, Company } from '@/services/company.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -8,13 +9,21 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useCompanyMenu } from '@/hooks/use-company-menu';
 import { MenuItem } from '@/types/menu.types';
+import { clearCompanyScopedQueries } from '@/lib/session/query-cache';
 
 function CompanySelector({ companies, companyId, setCompanyId }: { companies: Company[], companyId: string | null, setCompanyId: (id: string) => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const selectedCompany = companies.find((c) => String(c.id) === String(companyId));
 
   const handleSelectCompany = (company: Company) => {
+    if (String(company.id) === String(companyId)) {
+      setIsOpen(false);
+      return;
+    }
+
+    clearCompanyScopedQueries(queryClient);
     setCompanyId(String(company.id));
     setIsOpen(false);
     const targetSlug = company.slug || company.id;
@@ -140,7 +149,7 @@ export function Sidebar() {
 
       {isMobileOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
+          className="md:hidden fixed inset-0 z-40 bg-primary/40 backdrop-blur-sm transition-opacity"
           onClick={() => setIsMobileOpen(false)}
           aria-hidden="true"
         />

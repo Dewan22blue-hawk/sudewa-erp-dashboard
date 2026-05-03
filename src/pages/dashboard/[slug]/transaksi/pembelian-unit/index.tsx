@@ -10,10 +10,13 @@ import { useDeletePurchase } from '@/hooks/usePurchase';
 import { useUnitTransactions } from '@/hooks/useUnitTransaction';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
+import { useCompany } from '@/contexts/CompanyContext';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 export default function PurchasePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
   const { slug } = router.query;
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -25,7 +28,11 @@ export default function PurchasePage() {
     if (!selectedId) return;
     try {
       await deleteMutation.mutateAsync(selectedId);
-      await queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      if (companyId) {
+        await queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      }
       toast.success('Data berhasil dihapus');
       setSelectedId(null);
       // Refresh list after deletion

@@ -1,123 +1,100 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiTable } from '@/components/features/do-ekspedisi/DOEkspedisiTable';
 import { DeleteDOEkspedisiModal } from '@/components/features/do-ekspedisi/DeleteDOEkspedisiModal';
-import { CreateDOEkspedisiModal } from '@/components/features/do-ekspedisi/CreateDOEkspedisiModal';
-import { EditDOEkspedisiModal } from '@/components/features/do-ekspedisi/EditDOEkspedisiModal';
-import { DOEkspedisi, DUMMY_DO_EKSPEDISI, setDummyDOs } from '@/components/features/do-ekspedisi/do-ekspedisi.data';
-import { toast } from 'sonner';
-import { useRouter } from 'next/router';
+import type { DoEkspedisi } from '@/@types/do-ekspedisi.types';
+import { useDeleteDoEkspedisi, useDoEkspedisis } from '@/hooks/useDoEkspedisi';
 
 export default function DOEkspedisiPage() {
-    const router = useRouter();
-    const { slug } = router.query;
+  const router = useRouter();
+  const { slug } = router.query;
 
-    const [dos, setDos] = useState<DOEkspedisi[]>(DUMMY_DO_EKSPEDISI);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<DoEkspedisi | null>(null);
 
-    const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
 
-    const [isAddOpen, setIsAddOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
-    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-    const [selectedDO, setSelectedDO] = useState<DOEkspedisi | null>(null);
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
 
-    const filteredDOs = useMemo(() => {
-        return dos.filter(item =>
-            item.kodeDO.toLowerCase().includes(search.toLowerCase()) ||
-            item.noPolisi.toLowerCase().includes(search.toLowerCase()) ||
-            item.driver.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [dos, search]);
+  const listQuery = useDoEkspedisis({
+    page,
+    perPage,
+    search,
+    order_by: 'created_at',
+    order_sort: 'desc',
+  });
+  const deleteMutation = useDeleteDoEkspedisi();
 
-    const paginatedDOs = useMemo(() => {
-        const startIndex = (page - 1) * perPage;
-        return filteredDOs.slice(startIndex, startIndex + perPage);
-    }, [filteredDOs, page, perPage]);
+  const handleDelete = (item: DoEkspedisi) => {
+    setSelectedItem(item);
+    setIsDeleteOpen(true);
+  };
 
-    const handleAddClick = () => {
-        setIsAddOpen(true);
-    };
+  const handleConfirmDelete = async () => {
+    if (!selectedItem) return;
 
-    const handleEditClick = (item: DOEkspedisi) => {
-        setSelectedDO(item);
-        setIsEditOpen(true);
-    };
+    try {
+      await deleteMutation.mutateAsync(selectedItem.id);
+      toast.success('Data DO Ekspedisi berhasil dihapus');
+      setIsDeleteOpen(false);
+      setSelectedItem(null);
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menghapus data DO Ekspedisi');
+    }
+  };
 
-    const handleDetailClick = (item: DOEkspedisi) => {
-        if (slug) {
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">Delivery Order Ekspedisi</h1>
+          <p className="mt-1 text-sm text-slate-500">Kelola data data delivery order ekspedisi dengan mudah</p>
+        </div>
+
+        <DOEkspedisiTable
+          data={listQuery.data?.data ?? []}
+          search={searchInput}
+          page={page}
+          perPage={perPage}
+          totalData={listQuery.data?.meta.total ?? 0}
+          totalPages={listQuery.data?.meta.lastPage ?? 1}
+          isLoading={listQuery.isLoading}
+          onSearchChange={setSearchInput}
+          onPageChange={setPage}
+          onPerPageChange={(value) => {
+            setPerPage(value);
+            setPage(1);
+          }}
+          onAdd={() => slug && router.push(`/dashboard/${slug}/do-ekspedisi/create`)}
+          onEdit={(item) => slug && router.push(`/dashboard/${slug}/do-ekspedisi/${item.id}/edit`)}
+          onDetail={(item) => slug && router.push(`/dashboard/${slug}/do-ekspedisi/detail/${item.id}`)}
+          onDelete={handleDelete}
+          onPrint={(item) => {
+            if (!slug) return;
+            toast.info(`Buka detail untuk print DO ${item.doCode}`);
             router.push(`/dashboard/${slug}/do-ekspedisi/detail/${item.id}`);
-        }
-    };
+          }}
+        />
+      </div>
 
-    const handleDeleteClick = (item: DOEkspedisi) => {
-        setSelectedDO(item);
-        setIsDeleteOpen(true);
-    };
-
-    const handlePrintClick = (item: DOEkspedisi) => {
-        toast.success(`Mencetak riwayat untuk DO: ${item.kodeDO}`);
-    };
-
-    const handleConfirmDelete = () => {
-        if (selectedDO) {
-            const updated = dos.filter(a => a.id !== selectedDO.id);
-            setDos(updated);
-            setDummyDOs(updated);
-            toast.success('Data DO berhasil dihapus');
-            setIsDeleteOpen(false);
-            setSelectedDO(null);
-        }
-    };
-
-    const handleRefreshList = () => {
-        setDos([...DUMMY_DO_EKSPEDISI]); // Refresh list from dummy data source
-    };
-
-    return (
-        <DashboardLayout>
-            <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Data Operasional Ekspedisi</h1>
-                    <p className="text-sm text-gray-500 mt-1">Kelola data data operasional ekspedisi dengan mudah</p>
-                </div>
-
-                <DOEkspedisiTable
-                    data={paginatedDOs}
-                    search={search}
-                    onSearchChange={(v) => { setSearch(v); setPage(1); }}
-                    page={page}
-                    perPage={perPage}
-                    totalData={filteredDOs.length}
-                    onPageChange={setPage}
-                    onPerPageChange={(v) => { setPerPage(v); setPage(1); }}
-                    onAdd={handleAddClick}
-                    onEdit={handleEditClick}
-                    onDetail={handleDetailClick}
-                    onDelete={handleDeleteClick}
-                    onPrint={handlePrintClick}
-                />
-            </div>
-
-            <DeleteDOEkspedisiModal
-                isOpen={isDeleteOpen}
-                onClose={() => setIsDeleteOpen(false)}
-                onConfirm={handleConfirmDelete}
-            />
-
-            <CreateDOEkspedisiModal
-                isOpen={isAddOpen}
-                onClose={() => setIsAddOpen(false)}
-                onSuccess={handleRefreshList}
-            />
-
-            <EditDOEkspedisiModal
-                isOpen={isEditOpen}
-                onClose={() => { setIsEditOpen(false); setSelectedDO(null); }}
-                initialData={selectedDO}
-                onSuccess={handleRefreshList}
-            />
-        </DashboardLayout>
-    );
+      <DeleteDOEkspedisiModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isDeleting={deleteMutation.isPending}
+        itemName={selectedItem?.doCode}
+      />
+    </DashboardLayout>
+  );
 }

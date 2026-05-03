@@ -51,7 +51,7 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-md bg-black px-3 py-2 text-xs text-white shadow-lg">
+    <div className="rounded-md bg-primary px-3 py-2 text-xs text-white shadow-lg">
       <div className="space-y-1">
         {payload.map((item: any) => (
           <div key={item.name} className="flex items-center gap-2">
