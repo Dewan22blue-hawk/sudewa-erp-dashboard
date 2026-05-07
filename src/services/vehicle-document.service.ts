@@ -5,8 +5,10 @@ import type {
   VehicleDocumentItem,
   VehicleDocumentListResponse,
   VehicleDocumentPayload,
+  VehicleRegistrationFilters,
   VehicleDocumentSummary,
   VehicleRegistrationDetail,
+  VehicleRegistrationListResponse,
   VehicleRegistrationPayload,
 } from '@/@types/vehicle-document.types';
 import { apiClient } from '@/lib/api/client';
@@ -189,6 +191,31 @@ export const getVehicleDocuments = async (
       last_page: data.last_page,
     },
     mapVehicleDocumentSummary,
+  );
+};
+
+export const getVehicleRegistrations = async (
+  params: PaginationParams & VehicleRegistrationFilters = { page: 1, perPage: 25 },
+): Promise<VehicleRegistrationListResponse> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(registrationBasePath, {
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      vendor_id: params.vendorId ?? undefined,
+      vehicle_document_id: params.vehicleDocumentId ?? undefined,
+      is_already_processed: params.isAlreadyProcessed == null ? undefined : String(params.isAlreadyProcessed),
+    },
+  });
+  const data = ensureSuccess(response.data);
+
+  return toPaginatedResult(
+    {
+      data: data.data ?? [],
+      current_page: data.current_page,
+      per_page: data.per_page,
+      total: data.total,
+      last_page: data.last_page,
+    },
+    (item) => mapVehicleRegistrationDetail(item),
   );
 };
 

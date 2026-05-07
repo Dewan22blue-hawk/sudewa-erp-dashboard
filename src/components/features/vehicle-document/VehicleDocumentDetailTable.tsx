@@ -9,6 +9,7 @@ import type { VehicleDocumentItem } from '@/@types/vehicle-document.types';
 interface Props {
   items: VehicleDocumentItem[];
   search: string;
+  isLoading?: boolean;
   page: number;
   perPage: number;
   totalData: number;
@@ -25,7 +26,7 @@ const formatDate = (value?: string) => {
   return format(date, 'dd/MM/yy');
 };
 
-export function VehicleDocumentDetailTable({ items, search, page, perPage, totalData, onSearchChange, onPageChange, onPerPageChange, onEdit }: Props) {
+export function VehicleDocumentDetailTable({ items, search, isLoading = false, page, perPage, totalData, onSearchChange, onPageChange, onPerPageChange, onEdit }: Props) {
   const totalPages = Math.max(1, Math.ceil(totalData / perPage));
   const visiblePages = getVisiblePageNumbers(totalPages, page, 5);
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
@@ -79,7 +80,17 @@ export function VehicleDocumentDetailTable({ items, search, page, perPage, total
               </tr>
             </thead>
             <tbody>
-              {items.length ? (
+              {isLoading ? (
+                Array.from({ length: Math.min(perPage, 6) }).map((_, rowIndex) => (
+                  <tr key={rowIndex} className="animate-pulse border-b border-slate-100 text-slate-700">
+                    {Array.from({ length: 16 }).map((__, cellIndex) => (
+                      <td key={cellIndex} className="px-3 py-4">
+                        <div className="h-4 rounded bg-slate-100" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : items.length ? (
                 items.map((item) => (
                   <tr key={`${item.id}-${item.registrationId}`} className="border-b border-slate-100 text-slate-700 hover:bg-slate-50/60">
                     <td className="px-3 py-4">{item.dealerName || '-'}</td>

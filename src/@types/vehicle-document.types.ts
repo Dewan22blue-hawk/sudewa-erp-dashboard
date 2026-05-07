@@ -132,3 +132,12 @@ export interface VehicleDocumentFilters {
 }
 
 export type VehicleDocumentListResponse = PaginatedResult<VehicleDocumentSummary>;
+
+export interface VehicleRegistrationFilters {
+  search?: string;
+  vendorId?: number | null;
+  vehicleDocumentId?: number | null;
+  isAlreadyProcessed?: boolean | null;
+}
+
+export type VehicleRegistrationListResponse = PaginatedResult<VehicleRegistrationDetail>;

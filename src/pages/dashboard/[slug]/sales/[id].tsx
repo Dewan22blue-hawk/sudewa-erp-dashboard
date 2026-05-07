@@ -8,6 +8,7 @@ import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTabl
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
+import { useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
 import { mapSalesDetailCard } from '@/services/sales.mapper';
 
 /**
@@ -22,6 +23,9 @@ export default function SalesDetailPage() {
   const { slug } = router.query;
   const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
   const salesData = data?.ui ?? null;
+  const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(salesId ?? ''));
+  const billingId = String(currentBilling?.id ?? '');
+  const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(salesId ?? ''));
   const stockState = String(data?.raw?.stock_state ?? salesData?.stockState ?? '').toLowerCase();
   const isRefunded = stockState === 'outbound_return';
   
@@ -65,7 +69,7 @@ export default function SalesDetailPage() {
     router.push(`${basePath}/${id}/payment`);
   };
 
-  if (isLoading || !salesData) {
+  if (isLoading || billingLoading || historyLoading || !salesData) {
     return (
       <DashboardLayout>
         <div className="p-6">Loading data...</div>
@@ -141,6 +145,69 @@ export default function SalesDetailPage() {
 
         {/* Detail Unit Table */}
         <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} />
+
+        {/* PAYMENT HISTORY TABLE */}
+        {billingHistories && billingHistories.length > 0 && (
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>
+              <p className="text-xs text-muted-foreground">Rincian lengkap unit yang terjual</p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
+                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash BCA</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran USD BCA</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {billingHistories.map((history, index) => {
+                    const paymentDate = history.payment_at
+                      ? new Date(history.payment_at).toLocaleDateString('id-ID', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })
+                      : '-';
+
+                    const bcaPayment = Number(history.bca_payment_amount ?? 0);
+                    const usdPayment = Number(history.bca_payment_usd_amount ?? 0);
+                    const cashPayment = Number(history.cash_payment_amount ?? 0);
+
+                    return (
+                      <tr key={history.id ?? index} className="border-b border-slate-200 hover:bg-slate-50">
+                        <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
+                        <td className="px-4 py-3 text-slate-900">
+                          {history.note ? (
+                            <a href="#" className="text-blue-600 hover:underline text-xs font-medium">
+                              Lihat
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">
+                          {bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">
+                          {usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">
+                          {cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
