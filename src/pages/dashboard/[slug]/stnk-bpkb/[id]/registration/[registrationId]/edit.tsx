@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { VehicleRegistrationForm } from '@/components/features/vehicle-document/VehicleRegistrationForm';
+import type { VehicleDataPayload } from '@/@types/vehicle-data.types';
 import { useUpdateVehicleRegistration, useVehicleDocumentDetail, useVehicleRegistrations } from '@/hooks/useVehicleDocument';
+import { useUpdateVehicleData } from '@/hooks/useVehicleData';
 import type { VehicleRegistrationPayload } from '@/@types/vehicle-document.types';
 
 export default function EditVehicleRegistrationPage() {
@@ -14,6 +16,7 @@ export default function EditVehicleRegistrationPage() {
 
   const detailQuery = useVehicleDocumentDetail(documentId);
   const updateMutation = useUpdateVehicleRegistration();
+  const updateVehicleDataMutation = useUpdateVehicleData();
   const registrationsQuery = useVehicleRegistrations(
     {
       page: 1,
@@ -41,11 +44,36 @@ export default function EditVehicleRegistrationPage() {
     );
   }, [detailQuery.data?.id, detailQuery.data?.vendorId, registrationId, registrationsQuery.data?.data]);
 
-  const handleSubmit = async (payload: VehicleRegistrationPayload) => {
+  const handleSubmit = async ({ registrationPayload, vehicleDataPayload }: { registrationPayload: VehicleRegistrationPayload; vehicleDataPayload: Partial<VehicleDataPayload> }) => {
     if (!registrationId || !documentId) return;
 
     try {
-      await updateMutation.mutateAsync({ id: registrationId, payload });
+      if (typeof window !== 'undefined') {
+        console.group('[VehicleRegistrationPage][Submit]');
+        console.log('registrationId', registrationId);
+        console.log('documentId', documentId);
+        console.log('vehicleDataId', registration?.vehicleDataId ?? null);
+        console.log('registrationPayload', registrationPayload);
+        console.log('vehicleDataPayload', vehicleDataPayload);
+        console.groupEnd();
+      }
+
+      await updateMutation.mutateAsync({ id: registrationId, payload: registrationPayload });
+
+      if (registration?.vehicleDataId) {
+        if (typeof window !== 'undefined') {
+          console.group('[VehicleData][Update]');
+          console.log('vehicleDataId', registration.vehicleDataId);
+          console.log('payload', vehicleDataPayload);
+          console.groupEnd();
+        }
+
+        await updateVehicleDataMutation.mutateAsync({
+          id: registration.vehicleDataId,
+          data: vehicleDataPayload,
+        });
+      }
+
       toast.success('Detail STNK/BPKB berhasil diperbarui');
       router.push(`/dashboard/${slug}/stnk-bpkb/${documentId}/edit`);
     } catch (error: any) {
@@ -63,7 +91,7 @@ export default function EditVehicleRegistrationPage() {
           <button onClick={() => router.back()} className="text-sm text-blue-600 underline">Kembali</button>
         </div>
       ) : (
-        <VehicleRegistrationForm initialData={registration} onSubmit={handleSubmit} isSubmitting={updateMutation.isPending} />
+        <VehicleRegistrationForm initialData={registration} onSubmit={handleSubmit} isSubmitting={updateMutation.isPending || updateVehicleDataMutation.isPending} />
       )}
     </DashboardLayout>
   );

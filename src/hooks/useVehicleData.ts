@@ -62,6 +62,8 @@ export function useUpdateVehicleData() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['vehicle-data'] });
       queryClient.invalidateQueries({ queryKey: ['vehicle-data', 'detail', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['vehicle-registration'] });
+      queryClient.invalidateQueries({ queryKey: ['vehicle-document'] });
     },
   });
 }

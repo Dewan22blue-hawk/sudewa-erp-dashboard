@@ -87,6 +87,7 @@ export function useUpdateVehicleRegistration() {
     mutationFn: ({ id, payload }: { id: string | number; payload: Partial<VehicleRegistrationPayload> }) => updateVehicleRegistration(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicle-document'] });
+      queryClient.invalidateQueries({ queryKey: ['vehicle-registration'] });
     },
   });
 }

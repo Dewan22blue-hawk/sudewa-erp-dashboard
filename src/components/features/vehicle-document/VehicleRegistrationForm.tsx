@@ -13,15 +13,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDealers } from '@/hooks/useDealer';
 import { useRegions } from '@/hooks/useRegion';
 import { useVendorLookup } from '@/hooks/useVehicleData';
+import type { VehicleDataPayload } from '@/@types/vehicle-data.types';
 import type { VehicleRegistrationDetail, VehicleRegistrationPayload } from '@/@types/vehicle-document.types';
 
 interface Props {
   initialData: VehicleRegistrationDetail;
-  onSubmit: (payload: VehicleRegistrationPayload) => Promise<void> | void;
+  onSubmit: (payload: { registrationPayload: VehicleRegistrationPayload; vehicleDataPayload: Partial<VehicleDataPayload> }) => Promise<void> | void;
   isSubmitting?: boolean;
 }
 
 interface FormValues {
+  processDate?: Date;
   bpkbNumber: string;
   bpkbRegistrationDate?: Date;
   bpkbReceivedDate?: Date;
@@ -47,6 +49,8 @@ interface FormValues {
   plateRecommendationFee: number;
   serviceFee: number;
   skpdFee: number;
+  stampFee: number;
+  pnbpBpkb: number;
   customerDeliveryDate?: Date;
 }
 
@@ -129,11 +133,12 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
   const [regionValue, setRegionValue] = React.useState(initialData.regionId != null ? String(initialData.regionId) : '');
   const [vendorValue, setVendorValue] = React.useState(initialData.vendorId != null ? String(initialData.vendorId) : '');
   const [vehicleTypeValue, setVehicleTypeValue] = React.useState(initialData.vehicleType || '');
-  const dealersQuery = useDealers(null, { page: 1, perPage: 10, search: dealerSearch, sort_order: 'asc' });
+  const dealersQuery = useDealers(null, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' }, { enabled: true });
   const regionsQuery = useRegions({ page: 1, perPage: 10, search: regionSearch, sort_order: 'asc' });
   const vendorLookup = useVendorLookup(vendorSearch);
   const { control, register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
+      processDate: toDateValue(initialData.processDate),
       bpkbNumber: initialData.bpkbNumber || '',
       bpkbRegistrationDate: toDateValue(initialData.bpkbRegistrationDate),
       bpkbReceivedDate: toDateValue(initialData.bpkbReceivedDate),
@@ -159,6 +164,8 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
       plateRecommendationFee: initialData.plateRecommendationFee || 0,
       serviceFee: initialData.serviceFee || 0,
       skpdFee: initialData.skpdFee || 0,
+      stampFee: initialData.stampFee || 0,
+      pnbpBpkb: initialData.pnbpBpkb || 0,
       customerDeliveryDate: toDateValue(initialData.customerDeliveryDate),
     },
   });
@@ -213,32 +220,46 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
         <form
           onSubmit={handleSubmit(async (values) => {
             await onSubmit({
-              bpkbNumber: values.bpkbNumber.trim(),
-              bpkbRegistrationDate: toPayloadDate(values.bpkbRegistrationDate),
-              bpkbReceivedDate: toPayloadDate(values.bpkbReceivedDate),
-              bpkbPhysicalStatus: values.bpkbPhysicalStatus === 'true',
-              stnkRegistrationDate: toPayloadDate(values.stnkRegistrationDate),
-              stnkReceivedDate: toPayloadDate(values.stnkReceivedDate),
-              stnkPhysicalStatus: values.stnkPhysicalStatus === 'true',
-              skpdPaymentDate: toPayloadDate(values.skpdPaymentDate),
-              skpdReceivedDate: toPayloadDate(values.skpdReceivedDate),
-              skpdPhysicalStatus: values.skpdPhysicalStatus === 'true',
-              tnkbReceivedDate: toPayloadDate(values.tnkbReceivedDate),
-              tnkbNumber: values.tnkbNumber.trim(),
-              tnkbPhysicalStatus: values.tnkbPhysicalStatus === 'true',
-              stckFee: String(values.stckFee || 0),
-              bbnRegistrationFee: String(values.bbnRegistrationFee || 0),
-              noticeFee: String(values.noticeFee || 0),
-              pmiFee: String(values.pmiFee || 0),
-              physicalCheckFee: String(values.physicalCheckFee || 0),
-              nikValidationFee: String(values.nikValidationFee || 0),
-              garwilFee: String(values.garwilFee || 0),
-              builtUpFee: String(values.builtUpFee || 0),
-              accelerationFee: String(values.accelerationFee || 0),
-              plateRecommendationFee: String(values.plateRecommendationFee || 0),
-              serviceFee: String(values.serviceFee || 0),
-              skpdFee: String(values.skpdFee || 0),
-              customerDeliveryDate: toPayloadDate(values.customerDeliveryDate),
+              registrationPayload: {
+                vendorId: vendorValue ? Number(vendorValue) : null,
+                dealerId: dealerValue ? Number(dealerValue) : null,
+                regionId: regionValue ? Number(regionValue) : null,
+                vehicleType: vehicleTypeValue || undefined,
+                processDate: toPayloadDate(values.processDate),
+                bpkbNumber: values.bpkbNumber.trim(),
+                bpkbRegistrationDate: toPayloadDate(values.bpkbRegistrationDate),
+                bpkbReceivedDate: toPayloadDate(values.bpkbReceivedDate),
+                bpkbPhysicalStatus: values.bpkbPhysicalStatus === 'true',
+                stnkRegistrationDate: toPayloadDate(values.stnkRegistrationDate),
+                stnkReceivedDate: toPayloadDate(values.stnkReceivedDate),
+                stnkPhysicalStatus: values.stnkPhysicalStatus === 'true',
+                skpdPaymentDate: toPayloadDate(values.skpdPaymentDate),
+                skpdReceivedDate: toPayloadDate(values.skpdReceivedDate),
+                skpdPhysicalStatus: values.skpdPhysicalStatus === 'true',
+                tnkbReceivedDate: toPayloadDate(values.tnkbReceivedDate),
+                tnkbNumber: values.tnkbNumber.trim(),
+                tnkbPhysicalStatus: values.tnkbPhysicalStatus === 'true',
+                stckFee: String(values.stckFee || 0),
+                bbnRegistrationFee: String(values.bbnRegistrationFee || 0),
+                noticeFee: String(values.noticeFee || 0),
+                pmiFee: String(values.pmiFee || 0),
+                physicalCheckFee: String(values.physicalCheckFee || 0),
+                nikValidationFee: String(values.nikValidationFee || 0),
+                garwilFee: String(values.garwilFee || 0),
+                builtUpFee: String(values.builtUpFee || 0),
+                accelerationFee: String(values.accelerationFee || 0),
+                plateRecommendationFee: String(values.plateRecommendationFee || 0),
+                serviceFee: String(values.serviceFee || 0),
+                skpdFee: String(values.skpdFee || 0),
+                stampFee: String(values.stampFee || 0),
+                pnbpBpkb: String(values.pnbpBpkb || 0),
+                customerDeliveryDate: toPayloadDate(values.customerDeliveryDate),
+              },
+              vehicleDataPayload: {
+                dealerId: dealerValue ? Number(dealerValue) : undefined,
+                regionId: regionValue ? Number(regionValue) : undefined,
+                vehicleType: vehicleTypeValue || undefined,
+              },
             });
           })}
           className="space-y-5"
@@ -307,6 +328,10 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
               <div className="space-y-2"><Label className="text-xs font-semibold text-slate-700">Tanggal Faktur</Label><Input value={initialData.invoiceDate || ''} readOnly className="bg-slate-50" /></div>
               <div className="space-y-2"><Label className="text-xs font-semibold text-slate-700">Tanggal Terima Faktur</Label><Input value={initialData.invoiceReceiveDate || ''} readOnly className="bg-slate-50" /></div>
               <div className="space-y-2 md:col-span-2 xl:col-span-1">
+                <Label className="text-xs font-semibold text-slate-700">Tanggal Proses</Label>
+                <Controller name="processDate" control={control} render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="bg-white" />} />
+              </div>
+              <div className="space-y-2 md:col-span-2 xl:col-span-1">
                 <Label className="text-xs font-semibold text-slate-700">Tanggal Penyerahan Customer</Label>
                 <Controller name="customerDeliveryDate" control={control} render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="bg-white" />} />
               </div>
@@ -348,6 +373,8 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
               <MoneyField name="plateRecommendationFee" label="Recome NOPOL" control={control} />
               <MoneyField name="serviceFee" label="Jasa" control={control} />
               <MoneyField name="skpdFee" label="SKPD" control={control} />
+              <MoneyField name="stampFee" label="Materai" control={control} />
+              <MoneyField name="pnbpBpkb" label="PNBP BPKB" control={control} />
             </div>
           </Section>
 

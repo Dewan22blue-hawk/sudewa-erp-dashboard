@@ -50,7 +50,7 @@ export default function EditVehicleDocumentPage() {
 
   const [vendorSearch, setVendorSearch] = React.useState('');
   const vendorLookup = useVendorLookup(vendorSearch);
-  const dealersQuery = useDealers(null, { page: 1, perPage: 10, sort_order: 'asc' });
+  const dealersQuery = useDealers(null, { page: 1, perPage: 100, sort_order: 'asc' }, { enabled: true });
   const regionsQuery = useRegions({ page: 1, perPage: 10, sort_order: 'asc' });
 
   const [vendorId, setVendorId] = React.useState('');
