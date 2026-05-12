@@ -1,12 +1,14 @@
 import type { Kas } from './kas.types';
 import type { Material } from './material.types';
 import type { PaginatedResult } from './pagination.types';
+import type { WarehouseOption } from './pengeluaran-unit.types';
 
 export type MaterialTransactionType = 'purchase' | 'sales';
 
 export interface MaterialTransactionDetailItem {
   id: number;
   uuid?: string;
+  orderCode?: string;
   materialTransactionId: number;
   materialId: number;
   qty: number;
@@ -38,6 +40,9 @@ export interface MaterialTransaction {
   uuid?: string;
   code: string;
   type: MaterialTransactionType;
+  warehouseId: number;
+  warehouse?: WarehouseOption | null;
+  stockState?: string;
   supplierName: string;
   isPaid: boolean;
   transactionDate: string;
@@ -55,12 +60,14 @@ export interface MaterialTransactionDetail extends MaterialTransaction {
 
 export interface MaterialTransactionPayload {
   type: MaterialTransactionType;
+  warehouseId: number;
   supplierName: string;
   transactionDate: string;
   description?: string | null;
 }
 
 export interface MaterialTransactionItemPayload {
+  orderCode: string;
   materialTransactionId: number;
   materialId: number;
   qty: number;

@@ -8,7 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
+import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import type { MaterialTransaction } from '@/@types/material-transaction.types';
+import type { WarehouseOption } from '@/@types/pengeluaran-unit.types';
 import { materialTransactionSchema, type MaterialTransactionFormValues } from '@/scheme/material-transaction.schema';
 
 interface PurchaseMaterialFormModalProps {
@@ -17,9 +19,12 @@ interface PurchaseMaterialFormModalProps {
   onSubmit: (values: MaterialTransactionFormValues) => Promise<void> | void;
   isSubmitting?: boolean;
   initialData?: MaterialTransaction | null;
+  warehouses: WarehouseOption[];
+  isLoadingWarehouses?: boolean;
   addTitle?: string;
   editTitle?: string;
   codeLabel?: string;
+  warehouseLabel?: string;
   counterpartyLabel?: string;
   counterpartyPlaceholder?: string;
   dateLabel?: string;
@@ -40,9 +45,12 @@ export function PurchaseMaterialFormModal({
   onSubmit,
   isSubmitting = false,
   initialData,
+  warehouses,
+  isLoadingWarehouses = false,
   addTitle = 'Tambah Data Beli',
   editTitle = 'Edit Data Beli',
   codeLabel = 'Kode Pembelian',
+  warehouseLabel = 'Warehouse',
   counterpartyLabel = 'Nama Supplier',
   counterpartyPlaceholder = 'Masukkan supplier',
   dateLabel = 'Tanggal Pembelian',
@@ -53,6 +61,7 @@ export function PurchaseMaterialFormModal({
   const form = useForm<MaterialTransactionFormValues>({
     resolver: zodResolver(materialTransactionSchema),
     defaultValues: {
+      warehouseId: 0,
       supplierName: '',
       transactionDate: '',
       description: '',
@@ -62,6 +71,7 @@ export function PurchaseMaterialFormModal({
   useEffect(() => {
     if (!open) return;
     form.reset({
+      warehouseId: initialData?.warehouseId ?? 0,
       supplierName: initialData?.supplierName ?? '',
       transactionDate: initialData?.transactionDate ?? '',
       description: initialData?.description ?? '',
@@ -89,6 +99,27 @@ export function PurchaseMaterialFormModal({
               />
             </div>
           ) : null}
+
+          <div className="space-y-3">
+            <Label className="text-[18px] font-medium text-slate-900">{warehouseLabel}</Label>
+            <Controller
+              control={form.control}
+              name="warehouseId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value ? String(field.value) : ''}
+                  onChange={(value) => field.onChange(Number(value))}
+                  options={warehouses.map((warehouse) => ({ value: String(warehouse.id), label: warehouse.name }))}
+                  placeholder={isLoadingWarehouses ? 'Memuat warehouse...' : 'Pilih warehouse'}
+                  searchPlaceholder="Cari warehouse..."
+                  emptyText="Warehouse tidak ditemukan."
+                  loading={isLoadingWarehouses}
+                  className="h-14 rounded-2xl border-slate-200 px-5 text-[18px] shadow-sm"
+                />
+              )}
+            />
+            {form.formState.errors.warehouseId ? <p className="text-sm text-red-600">{form.formState.errors.warehouseId.message}</p> : null}
+          </div>
 
           <div className="space-y-3">
             <Label className="text-[18px] font-medium text-slate-900">{counterpartyLabel}</Label>

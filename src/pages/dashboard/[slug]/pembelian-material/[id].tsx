@@ -103,6 +103,7 @@ export default function PurchaseMaterialDetailPage() {
         await updateItemMutation.mutateAsync({
           id: editingItem.id,
           payload: {
+            orderCode: values.orderCode,
             materialTransactionId: transactionId,
             materialId: values.materialId,
             qty: values.qty,
@@ -113,6 +114,7 @@ export default function PurchaseMaterialDetailPage() {
         toast.success('Detail pembelian material berhasil diperbarui');
       } else {
         await createItemMutation.mutateAsync({
+          orderCode: values.orderCode,
           materialTransactionId: transactionId,
           materialId: values.materialId,
           qty: values.qty,

@@ -103,6 +103,18 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           label: 'Pengeluaran Unit',
           href: base('/warehouse/pengeluaran-unit'),
         },
+        {
+          label: 'Perlengkapan Masuk',
+          href: base('/warehouse/perlengkapan-masuk'),
+        },
+        {
+          label: 'Perlengkapan Keluar',
+          href: base('/warehouse/perlengkapan-keluar'),
+        },
+        {
+          label: 'Stock Perlengkapan',
+          href: base('/warehouse/stock-perlengkapan'),
+        },
       ], // Siap untuk di-expand dengan sub-items
     },
     {

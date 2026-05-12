@@ -55,6 +55,7 @@ export function PurchaseMaterialDetailItemModal({
   const form = useForm<MaterialTransactionItemFormValues>({
     resolver: zodResolver(materialTransactionItemSchema),
     defaultValues: {
+      orderCode: '',
       materialId: 0,
       qty: 0,
       price: 0,
@@ -65,6 +66,7 @@ export function PurchaseMaterialDetailItemModal({
   useEffect(() => {
     if (!open) return;
     form.reset({
+      orderCode: initialData?.orderCode ?? '',
       materialId: initialData?.materialId ?? 0,
       qty: initialData?.qty ?? 0,
       price: initialData?.price ?? 0,
@@ -99,6 +101,16 @@ export function PurchaseMaterialDetailItemModal({
           <div className="space-y-2.5">
             <Label className="text-[16px] font-medium text-slate-900">{codeLabel}</Label>
             <Input value={transaction.code} readOnly className="h-12 rounded-xl border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm" />
+          </div>
+
+          <div className="space-y-2.5">
+            <Label className="text-[16px] font-medium text-slate-900">Nomor Pembelian</Label>
+            <Input
+              {...form.register('orderCode')}
+              placeholder="Masukkan nomor pembelian"
+              className="h-12 rounded-xl border-slate-200 px-4 text-[16px] shadow-sm"
+            />
+            {form.formState.errors.orderCode ? <p className="text-sm text-red-600">{form.formState.errors.orderCode.message}</p> : null}
           </div>
 
           <div className="space-y-2.5">

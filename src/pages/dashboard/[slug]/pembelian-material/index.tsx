@@ -7,6 +7,7 @@ import { PurchaseMaterialFormModal } from '@/components/features/material-purcha
 import { PurchaseMaterialTable } from '@/components/features/material-purchase/PurchaseMaterialTable';
 import type { MaterialTransaction } from '@/@types/material-transaction.types';
 import { useCreateMaterialTransaction, useDeleteMaterialTransaction, useMaterialTransactions, useUpdateMaterialTransaction } from '@/hooks/useMaterialTransaction';
+import { useWarehouseOptions } from '@/hooks/usePengeluaranUnit';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import type { MaterialTransactionFormValues } from '@/scheme/material-transaction.schema';
@@ -17,6 +18,7 @@ export default function PurchaseMaterialPage() {
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const query = useMaterialTransactions({ page, perPage, search, type: 'purchase' });
+  const warehousesQuery = useWarehouseOptions();
   const createMutation = useCreateMaterialTransaction();
   const updateMutation = useUpdateMaterialTransaction();
   const deleteMutation = useDeleteMaterialTransaction();
@@ -99,6 +101,8 @@ export default function PurchaseMaterialPage() {
         initialData={editing}
         onSubmit={handleSubmit}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
+        warehouses={warehousesQuery.data ?? []}
+        isLoadingWarehouses={warehousesQuery.isLoading}
       />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
