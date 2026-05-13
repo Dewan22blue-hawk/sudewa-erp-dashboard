@@ -12,6 +12,7 @@ import type {
   MaterialTransactionType,
 } from '@/@types/material-transaction.types';
 import type { PaginationParams } from '@/@types/pagination.types';
+import type { WarehouseOption } from '@/@types/pengeluaran-unit.types';
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError, type LaravelApiResponse, ensureSuccess, toPaginatedResult } from '@/lib/api/response';
@@ -43,6 +44,12 @@ interface MaterialTransactionApiModel {
   uuid?: string;
   code: string;
   type: MaterialTransactionType;
+  warehouse_id?: number | string;
+  warehouse?: {
+    id?: number | string;
+    name?: string;
+  } | null;
+  stock_state?: string;
   supplier_name: string;
   is_paid: boolean | number;
   transaction_date: string;
@@ -56,6 +63,7 @@ interface MaterialTransactionApiModel {
 interface MaterialTransactionDetailApiModel {
   id: number;
   uuid?: string;
+  order_code?: string;
   material_transaction_id: number;
   material_id: number;
   qty: number | string;
@@ -106,12 +114,22 @@ const billingBasePath = '/wapi/transaction/material-transaction-billing';
 
 const toNumber = (value: string | number | undefined | null) => Number(value ?? 0) || 0;
 const toBoolean = (value: boolean | number | undefined | null) => value === true || value === 1;
+const mapWarehouseOption = (payload?: { id?: number | string; name?: string } | null): WarehouseOption | null =>
+  payload?.id
+    ? {
+        id: toNumber(payload.id),
+        name: payload.name ?? `Warehouse #${payload.id}`,
+      }
+    : null;
 
 const mapTransaction = (payload: MaterialTransactionApiModel): MaterialTransaction => ({
   id: payload.id,
   uuid: payload.uuid,
   code: payload.code,
   type: payload.type,
+  warehouseId: toNumber(payload.warehouse_id),
+  warehouse: mapWarehouseOption(payload.warehouse),
+  stockState: payload.stock_state,
   supplierName: payload.supplier_name,
   isPaid: toBoolean(payload.is_paid),
   transactionDate: payload.transaction_date,
@@ -125,6 +143,7 @@ const mapTransaction = (payload: MaterialTransactionApiModel): MaterialTransacti
 const mapTransactionItem = (payload: MaterialTransactionDetailApiModel): MaterialTransactionDetailItem => ({
   id: payload.id,
   uuid: payload.uuid,
+  orderCode: payload.order_code,
   materialTransactionId: payload.material_transaction_id,
   materialId: payload.material_id,
   qty: toNumber(payload.qty),
@@ -189,12 +208,14 @@ const normalizePagination = <T>(payload: {
 });
 
 export const getMaterialTransactions = async (
-  params: PaginationParams & { search?: string; type?: MaterialTransactionType },
+  params: PaginationParams & { search?: string; type?: MaterialTransactionType; supplier_name?: string; code?: string },
 ): Promise<MaterialTransactionListResponse> => {
   const response = await apiClient.get<PaginationApiResponse<MaterialTransactionApiModel>>(transactionBasePath, {
     params: {
       ...buildLaravelPaginationQuery(params),
       type: params.type ?? 'purchase',
+      supplier_name: params.supplier_name,
+      code: params.code,
     },
   });
 
@@ -215,14 +236,15 @@ export const getMaterialTransactionById = async (id: number | string): Promise<M
 
 export const createMaterialTransaction = async (payload: MaterialTransactionPayload): Promise<MaterialTransaction> => {
   try {
-    const body = new URLSearchParams();
+    const body = new FormData();
     body.append('type', payload.type);
+    body.append('warehouse_id', String(payload.warehouseId));
     body.append('supplier_name', payload.supplierName);
     body.append('transaction_date', payload.transactionDate);
     if (payload.description) body.append('description', payload.description);
 
     const response = await apiClient.post<ItemApiResponse<MaterialTransactionApiModel>>(transactionBasePath, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     return mapTransaction(ensureSuccess(response.data));
@@ -234,13 +256,14 @@ export const createMaterialTransaction = async (payload: MaterialTransactionPayl
 
 export const updateMaterialTransaction = async (id: number | string, payload: Omit<MaterialTransactionPayload, 'type'>): Promise<MaterialTransaction> => {
   try {
-    const body = new URLSearchParams();
+    const body = new FormData();
+    body.append('warehouse_id', String(payload.warehouseId));
     body.append('supplier_name', payload.supplierName);
     body.append('transaction_date', payload.transactionDate);
     if (payload.description) body.append('description', payload.description);
 
     const response = await apiClient.put<ItemApiResponse<MaterialTransactionApiModel>>(`${transactionBasePath}/${id}`, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     return mapTransaction(ensureSuccess(response.data));
@@ -256,12 +279,23 @@ export const deleteMaterialTransaction = async (id: number | string): Promise<vo
 };
 
 export const getMaterialTransactionItems = async (
-  params: PaginationParams & { search?: string; type?: MaterialTransactionType },
+  params: PaginationParams & {
+    search?: string;
+    type?: MaterialTransactionType;
+    materialTransactionId?: number | string;
+    materialId?: number | string;
+    inStock?: boolean;
+    isForecast?: boolean;
+  },
 ): Promise<MaterialTransactionItemListResponse> => {
   const response = await apiClient.get<PaginationApiResponse<MaterialTransactionDetailApiModel>>(detailBasePath, {
     params: {
       ...buildLaravelPaginationQuery(params),
       type: params.type ?? 'purchase',
+      material_transaction_id: params.materialTransactionId,
+      material_id: params.materialId,
+      in_stock: typeof params.inStock === 'boolean' ? params.inStock : undefined,
+      is_forecast: typeof params.isForecast === 'boolean' ? params.isForecast : undefined,
     },
   });
 
@@ -276,7 +310,8 @@ export const getMaterialTransactionItemById = async (id: number | string): Promi
 
 export const createMaterialTransactionItem = async (payload: MaterialTransactionItemPayload): Promise<MaterialTransactionDetailItem> => {
   try {
-    const body = new URLSearchParams();
+    const body = new FormData();
+    body.append('order_code', payload.orderCode);
     body.append('material_transaction_id', String(payload.materialTransactionId));
     body.append('material_id', String(payload.materialId));
     body.append('qty', String(payload.qty));
@@ -284,7 +319,7 @@ export const createMaterialTransactionItem = async (payload: MaterialTransaction
     if (payload.description) body.append('description', payload.description);
 
     const response = await apiClient.post<ItemApiResponse<MaterialTransactionDetailApiModel>>(detailBasePath, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     return mapTransactionItem(ensureSuccess(response.data));
@@ -296,7 +331,8 @@ export const createMaterialTransactionItem = async (payload: MaterialTransaction
 
 export const updateMaterialTransactionItem = async (id: number | string, payload: MaterialTransactionItemPayload): Promise<MaterialTransactionDetailItem> => {
   try {
-    const body = new URLSearchParams();
+    const body = new FormData();
+    body.append('order_code', payload.orderCode);
     body.append('material_transaction_id', String(payload.materialTransactionId));
     body.append('material_id', String(payload.materialId));
     body.append('qty', String(payload.qty));
@@ -304,7 +340,7 @@ export const updateMaterialTransactionItem = async (id: number | string, payload
     if (payload.description) body.append('description', payload.description);
 
     const response = await apiClient.put<ItemApiResponse<MaterialTransactionDetailApiModel>>(`${detailBasePath}/${id}`, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     return mapTransactionItem(ensureSuccess(response.data));
@@ -357,6 +393,22 @@ export const createMaterialTransactionBilling = async (payload: MaterialTransact
     });
 
     return mapBilling(ensureSuccess(response.data));
+  } catch (error) {
+    if (error instanceof ApiValidationError) throw error;
+    throw error;
+  }
+};
+
+export const uploadMaterialTransactionInvoice = async (id: number | string, file: File): Promise<void> => {
+  try {
+    const body = new FormData();
+    body.append('invoice_file', file);
+
+    const response = await apiClient.post<DeleteApiResponse>(`${transactionBasePath}/${id}/upload-invoice`, body, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    ensureSuccess(response.data);
   } catch (error) {
     if (error instanceof ApiValidationError) throw error;
     throw error;

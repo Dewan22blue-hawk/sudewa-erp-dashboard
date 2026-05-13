@@ -89,7 +89,7 @@ export default function VehicleDataPage() {
   const backendAssignedIds = React.useMemo(
     () =>
       items
-        .filter((item) => item.vehicleRegistration?.isAlreadyProcessed)
+        .filter((item) => item.vehicleRegistration?.id != null)
         .map((item) => item.id),
     [items],
   );

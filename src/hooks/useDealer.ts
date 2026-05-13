@@ -4,7 +4,13 @@ import type { PaginationParams } from '@/@types/pagination.types';
 import type { DealerPayload } from '@/@types/dealer.types';
 import { companyQueryKeys } from '@/lib/query/company-key';
 
-export function useDealers(companyId: string | null, params: PaginationParams & { search?: string } = { page: 1, perPage: 25 }) {
+export function useDealers(
+    companyId: string | null,
+    params: PaginationParams & { search?: string } = { page: 1, perPage: 25 },
+    options?: { enabled?: boolean },
+) {
+    const isEnabled = options?.enabled ?? Boolean(companyId);
+
     return useQuery({
         queryKey: companyId
             ? companyQueryKeys.list(companyId, 'dealers', {
@@ -20,7 +26,7 @@ export function useDealers(companyId: string | null, params: PaginationParams & 
                 company_id: companyId || undefined,
                 ...params,
             }),
-        enabled: Boolean(companyId),
+        enabled: isEnabled,
     });
 }
 

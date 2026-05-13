@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
 import PurchaseUnitTable from '@/components/features/purchase/PurchaseUnitTable';
 import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
-import { useUnitBillings } from '@/hooks/useUnitBilling';
+import { useUnitBillings, useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
 import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
@@ -39,6 +39,9 @@ export default function PurchaseDetailPage() {
   const { slug, id } = router.query;
   const { data: purchase, isLoading, isError } = usePurchaseById(id as string);
   const { data: billings = [] } = useUnitBillings(purchase?.id);
+  const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(purchase?.id ?? ''));
+  const billingId = String(currentBilling?.id ?? '');
+  const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(purchase?.id ?? ''));
   const { data: unitItemsResponse, isLoading: unitItemsLoading } = usePurchaseUnitItems(purchase?.id);
   const updateState = useUpdateUnitTransactionState();
 
@@ -154,7 +157,7 @@ export default function PurchaseDetailPage() {
     }
   };
 
-  if (isLoading || unitItemsLoading) {
+  if (isLoading || unitItemsLoading || billingLoading || historyLoading) {
     return (
       <DashboardLayout>
         <div className="flex h-[50vh] items-center justify-center">
@@ -244,6 +247,69 @@ export default function PurchaseDetailPage() {
 
         {/* UNIT TABLE */}
         <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} />
+
+        {/* PAYMENT HISTORY TABLE */}
+        {billingHistories && billingHistories.length > 0 && (
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>
+              <p className="text-xs text-muted-foreground">Rincian lengkap unit yang dibeli</p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-green-100 border-b border-slate-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
+                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash BCA</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran USD BCA</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {billingHistories.map((history, index) => {
+                    const paymentDate = history.payment_at
+                      ? new Date(history.payment_at).toLocaleDateString('id-ID', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })
+                      : '-';
+
+                    const bcaPayment = Number(history.bca_payment_amount ?? 0);
+                    const usdPayment = Number(history.bca_payment_usd_amount ?? 0);
+                    const cashPayment = Number(history.cash_payment_amount ?? 0);
+
+                    return (
+                      <tr key={history.id ?? index} className="border-b border-slate-200 hover:bg-slate-50">
+                        <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
+                        <td className="px-4 py-3 text-slate-900">
+                          {history.note ? (
+                            <a href="#" className="text-blue-600 hover:underline text-xs font-medium">
+                              Lihat
+                            </a>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">
+                          {bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">
+                          {usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">
+                          {cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

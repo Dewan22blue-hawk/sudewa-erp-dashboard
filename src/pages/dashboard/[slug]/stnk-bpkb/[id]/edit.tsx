@@ -14,7 +14,7 @@ import { VehicleDocumentDetailTable } from '@/components/features/vehicle-docume
 import { useDealers } from '@/hooks/useDealer';
 import { useRegions } from '@/hooks/useRegion';
 import { useVendorLookup } from '@/hooks/useVehicleData';
-import { useUpdateVehicleDocument, useVehicleDocumentDetail } from '@/hooks/useVehicleDocument';
+import { useUpdateVehicleDocument, useVehicleDocumentDetail, useVehicleRegistrations } from '@/hooks/useVehicleDocument';
 import type { VehicleDocumentItem, VehicleDocumentPayload } from '@/@types/vehicle-document.types';
 
 const toDateValue = (value?: string) => {
@@ -38,10 +38,19 @@ export default function EditVehicleDocumentPage() {
 
   const detailQuery = useVehicleDocumentDetail(id);
   const updateMutation = useUpdateVehicleDocument();
+  const registrationsQuery = useVehicleRegistrations(
+    {
+      page: 1,
+      perPage: 1000,
+      vendorId: detailQuery.data?.vendorId ?? null,
+      vehicleDocumentId: detailQuery.data?.id ?? null,
+    },
+    !!detailQuery.data?.vendorId,
+  );
 
   const [vendorSearch, setVendorSearch] = React.useState('');
   const vendorLookup = useVendorLookup(vendorSearch);
-  const dealersQuery = useDealers(null, { page: 1, perPage: 10, sort_order: 'asc' });
+  const dealersQuery = useDealers(null, { page: 1, perPage: 100, sort_order: 'asc' }, { enabled: true });
   const regionsQuery = useRegions({ page: 1, perPage: 10, sort_order: 'asc' });
 
   const [vendorId, setVendorId] = React.useState('');
@@ -89,14 +98,56 @@ export default function EditVehicleDocumentPage() {
     [regionsQuery.data?.data],
   );
 
+  const registrationItems = React.useMemo<VehicleDocumentItem[]>(() => {
+    const registrations = registrationsQuery.data?.data ?? [];
+    const documentId = detailQuery.data?.id ?? null;
+    const vendorId = detailQuery.data?.vendorId ?? null;
+
+    const filteredRegistrations = registrations.filter((item) => {
+      if (vendorId != null && item.vendorId != null && Number(item.vendorId) !== Number(vendorId)) {
+        return false;
+      }
+
+      if (documentId != null && item.vehicleDocumentId != null) {
+        return Number(item.vehicleDocumentId) === Number(documentId);
+      }
+
+      return true;
+    });
+
+    return filteredRegistrations.map((item) => ({
+      id: item.id,
+      registrationId: item.id,
+      vehicleDataId: null,
+      dealerId: item.dealerId ?? null,
+      regionId: item.regionId ?? null,
+      dealerName: item.dealerName,
+      stnkName: item.stnkName,
+      regionName: item.regionName,
+      machineNumber: item.machineNumber,
+      invoiceReceiveDate: item.invoiceReceiveDate,
+      bpkbRegistrationDate: item.bpkbRegistrationDate,
+      stnkRegistrationDate: item.stnkRegistrationDate,
+      skpdPaymentDate: item.skpdPaymentDate,
+      bpkbReceivedDate: item.bpkbReceivedDate,
+      stnkReceivedDate: item.stnkReceivedDate,
+      skpdReceivedDate: item.skpdReceivedDate,
+      tnkbReceivedDate: item.tnkbReceivedDate,
+      tnkbNumber: item.tnkbNumber,
+      noticeFee: item.noticeFee,
+      vendorEmployee: item.vendorName,
+      vehicleType: item.vehicleType,
+    }));
+  }, [detailQuery.data?.id, detailQuery.data?.vendorId, registrationsQuery.data?.data]);
+
   const enrichedItems = React.useMemo<VehicleDocumentItem[]>(() => {
-    const items = detailQuery.data?.vehicleDocumentItems ?? [];
+    const items = registrationItems;
     return items.map((item) => ({
       ...item,
       dealerName: item.dealerId != null ? dealerMap.get(Number(item.dealerId)) || item.dealerName : item.dealerName,
       regionName: item.regionId != null ? regionMap.get(Number(item.regionId)) || item.regionName : item.regionName,
     }));
-  }, [dealerMap, detailQuery.data?.vehicleDocumentItems, regionMap]);
+  }, [dealerMap, registrationItems, regionMap]);
 
   const filteredItems = React.useMemo(() => {
     const items = enrichedItems;
@@ -187,6 +238,7 @@ export default function EditVehicleDocumentPage() {
           <VehicleDocumentDetailTable
             items={pagedItems}
             search={searchInput}
+            isLoading={registrationsQuery.isLoading}
             page={page}
             perPage={perPage}
             totalData={filteredItems.length}

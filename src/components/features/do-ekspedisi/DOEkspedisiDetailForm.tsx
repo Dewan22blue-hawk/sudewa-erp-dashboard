@@ -1,15 +1,25 @@
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
+import { Textarea } from '@/components/ui/textarea';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
 import type { DoEkspedisiItem } from '@/@types/do-ekspedisi.types';
 import { formatCurrency } from '@/lib/utils/currency';
 
+interface DOEkspedisiDestinationFormData {
+  id?: string;
+  destination: string;
+  driverNote: string;
+  mapsUrl: string;
+}
+
 export interface DOEkspedisiDetailFormData {
+  primaryDestinationId?: string;
   customerId: string;
   loadingIn: string;
   loadingOut: string;
@@ -18,6 +28,9 @@ export interface DOEkspedisiDetailFormData {
   additionalCostFee: string;
   otherFee: string;
   driverFee: string;
+  driverNote: string;
+  mapsUrl: string;
+  destinationStops: DOEkspedisiDestinationFormData[];
 }
 
 interface DOEkspedisiDetailFormProps {
@@ -44,6 +57,8 @@ export function DOEkspedisiDetailForm({
   readOnly = false,
 }: DOEkspedisiDetailFormProps) {
   const router = useRouter();
+  const primaryDestination = initialData?.destinations?.[0];
+  const secondaryDestinations = initialData?.destinations?.slice(1) ?? [];
   const {
     control,
     register,
@@ -52,15 +67,28 @@ export function DOEkspedisiDetailForm({
     formState: { errors },
   } = useForm<DOEkspedisiDetailFormData>({
     defaultValues: {
+      primaryDestinationId: primaryDestination?.id ? String(primaryDestination.id) : undefined,
       customerId: initialData?.customerId ? String(initialData.customerId) : '',
       loadingIn: initialData?.loadingIn ?? '',
       loadingOut: initialData?.loadingOut ?? '',
-      destination: initialData?.destination ?? '',
+      destination: primaryDestination?.destination ?? initialData?.destination ?? '',
       invoiceFee: toInputValue(initialData?.invoiceFee),
       additionalCostFee: toInputValue(initialData?.additionalCostFee),
       otherFee: toInputValue(initialData?.otherFee),
       driverFee: toInputValue(initialData?.driverFee),
+      driverNote: primaryDestination?.driverNote ?? initialData?.driverNote ?? '',
+      mapsUrl: primaryDestination?.mapsUrl ?? initialData?.mapsUrl ?? '',
+      destinationStops: secondaryDestinations.map((destination) => ({
+        id: String(destination.id),
+        destination: destination.destination,
+        driverNote: destination.driverNote,
+        mapsUrl: destination.mapsUrl,
+      })),
     },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'destinationStops',
   });
 
   const mergedCustomerOptions = React.useMemo(() => {
@@ -139,7 +167,7 @@ export function DOEkspedisiDetailForm({
               render={({ field }) => (
                 <MoneyInput
                   id="invoiceFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
@@ -158,7 +186,7 @@ export function DOEkspedisiDetailForm({
               render={({ field }) => (
                 <MoneyInput
                   id="additionalCostFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
@@ -187,7 +215,7 @@ export function DOEkspedisiDetailForm({
               render={({ field }) => (
                 <MoneyInput
                   id="driverFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
@@ -206,7 +234,7 @@ export function DOEkspedisiDetailForm({
               render={({ field }) => (
                 <MoneyInput
                   id="otherFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
@@ -214,6 +242,117 @@ export function DOEkspedisiDetailForm({
                 />
               )}
             />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="driverNote">Catatan Driver</Label>
+            <Textarea
+              id="driverNote"
+              rows={3}
+              placeholder="Masukkan atensi atau catatan untuk driver"
+              disabled={readOnly}
+              className="resize-none rounded-xl border-[#E5E7EB]"
+              {...register('driverNote', { required: readOnly ? false : 'Catatan driver wajib diisi' })}
+            />
+            {errors.driverNote && <p className="text-xs text-red-500">{errors.driverNote.message}</p>}
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="mapsUrl">Maps URL</Label>
+            <Input
+              id="mapsUrl"
+              placeholder="https://maps.google.com/..."
+              disabled={readOnly}
+              className="h-12 rounded-xl border-[#E5E7EB]"
+              {...register('mapsUrl', { required: readOnly ? false : 'Maps URL wajib diisi' })}
+            />
+            {errors.mapsUrl && <p className="text-xs text-red-500">{errors.mapsUrl.message}</p>}
+          </div>
+
+          <div className="space-y-4 md:col-span-2">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <Label>Destinasi Tambahan</Label>
+                <p className="text-xs text-slate-500">Tambahkan tujuan lanjutan untuk item DO ini bila ada lebih dari satu tujuan.</p>
+              </div>
+              {!readOnly ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={() => append({ destination: '', driverNote: '', mapsUrl: '' })}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Tambah Tujuan
+                </Button>
+              ) : null}
+            </div>
+
+            {fields.length > 0 ? (
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="rounded-2xl border border-[#E5E7EB] bg-[#F8FAFC] p-4">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-slate-800">Tujuan #{index + 2}</p>
+                      {!readOnly ? (
+                        <Button type="button" variant="ghost" className="h-8 px-2 text-red-600 hover:text-red-700" onClick={() => remove(index)}>
+                          <Trash2 className="mr-1 h-4 w-4" />
+                          Hapus
+                        </Button>
+                      ) : null}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                      <input type="hidden" {...register(`destinationStops.${index}.id` as const)} />
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`destinationStops.${index}.destination`}>Tujuan</Label>
+                        <Input
+                          id={`destinationStops.${index}.destination`}
+                          placeholder="Masukkan tujuan kirim"
+                          disabled={readOnly}
+                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          {...register(`destinationStops.${index}.destination` as const, {
+                            required: readOnly ? false : 'Tujuan tambahan wajib diisi',
+                          })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`destinationStops.${index}.driverNote`}>Catatan Driver</Label>
+                        <Textarea
+                          id={`destinationStops.${index}.driverNote`}
+                          rows={3}
+                          placeholder="Masukkan atensi atau catatan untuk driver"
+                          disabled={readOnly}
+                          className="resize-none rounded-xl border-[#E5E7EB]"
+                          {...register(`destinationStops.${index}.driverNote` as const, {
+                            required: readOnly ? false : 'Catatan driver tambahan wajib diisi',
+                          })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`destinationStops.${index}.mapsUrl`}>Maps URL</Label>
+                        <Input
+                          id={`destinationStops.${index}.mapsUrl`}
+                          placeholder="https://maps.google.com/..."
+                          disabled={readOnly}
+                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          {...register(`destinationStops.${index}.mapsUrl` as const, {
+                            required: readOnly ? false : 'Maps URL tambahan wajib diisi',
+                          })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-[#D7DEE7] bg-[#F8FAFC] px-4 py-5 text-sm text-slate-500">
+                Belum ada destinasi tambahan.
+              </div>
+            )}
           </div>
 
           <div className="space-y-2 md:col-span-2">

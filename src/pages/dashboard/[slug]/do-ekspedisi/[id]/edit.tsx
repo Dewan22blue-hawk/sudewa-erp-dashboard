@@ -13,6 +13,7 @@ import {
   useUpdateDoEkspedisi,
   useUpdateDoEkspedisiItem,
 } from '@/hooks/useDoEkspedisi';
+import { syncDoEkspedisiItemDestinations } from '@/lib/do-ekspedisi/item-destination-sync';
 
 const toApiDate = (value?: Date) => {
   if (!value) return '';
@@ -63,15 +64,39 @@ export default function EditDOEkspedisiPage() {
         additional_cost_fee: values.additionalCostFee || 0,
         other_fee: values.otherFee || 0,
         driver_fee: values.driverFee || 0,
+        driver_note: values.driverNote,
+        maps_url: values.mapsUrl,
       };
 
       if (firstItem) {
-        await updateItemMutation.mutateAsync({
+        const item = await updateItemMutation.mutateAsync({
           id: firstItem.id,
           payload: itemPayload,
         });
+
+        await syncDoEkspedisiItemDestinations({
+          doExpeditionItemId: item.id,
+          primaryDestinationId: values.primaryDestinationId,
+          primaryDestination: {
+            destination: values.destination,
+            driverNote: values.driverNote,
+            mapsUrl: values.mapsUrl,
+          },
+          additionalDestinations: values.destinationStops,
+          existingDestinations: firstItem.destinations ?? [],
+        });
       } else {
-        await createItemMutation.mutateAsync(itemPayload);
+        const item = await createItemMutation.mutateAsync(itemPayload);
+
+        await syncDoEkspedisiItemDestinations({
+          doExpeditionItemId: item.id,
+          primaryDestination: {
+            destination: values.destination,
+            driverNote: values.driverNote,
+            mapsUrl: values.mapsUrl,
+          },
+          additionalDestinations: values.destinationStops,
+        });
       }
 
       toast.success('Data DO Ekspedisi berhasil diperbarui');

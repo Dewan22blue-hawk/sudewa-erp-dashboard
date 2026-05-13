@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PaginationParams } from '@/@types/pagination.types';
-import type { VehicleDocumentFilters, VehicleDocumentPayload, VehicleRegistrationPayload } from '@/@types/vehicle-document.types';
+import type { VehicleDocumentFilters, VehicleDocumentPayload, VehicleRegistrationFilters, VehicleRegistrationPayload } from '@/@types/vehicle-document.types';
 import {
   createVehicleDocument,
   deleteVehicleDocument,
   exportVehicleDocument,
   getVehicleDocumentDetail,
   getVehicleDocuments,
+  getVehicleRegistrations,
   importVehicleDocument,
   updateVehicleDocument,
   updateVehicleRegistration,
@@ -24,6 +25,14 @@ export function useVehicleDocumentDetail(id: string | number | null) {
     queryKey: ['vehicle-document', 'detail', id],
     queryFn: () => getVehicleDocumentDetail(id as string | number),
     enabled: !!id,
+  });
+}
+
+export function useVehicleRegistrations(params: PaginationParams & VehicleRegistrationFilters, enabled = true) {
+  return useQuery({
+    queryKey: ['vehicle-registration', params],
+    queryFn: () => getVehicleRegistrations(params),
+    enabled,
   });
 }
 
@@ -78,6 +87,7 @@ export function useUpdateVehicleRegistration() {
     mutationFn: ({ id, payload }: { id: string | number; payload: Partial<VehicleRegistrationPayload> }) => updateVehicleRegistration(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicle-document'] });
+      queryClient.invalidateQueries({ queryKey: ['vehicle-registration'] });
     },
   });
 }

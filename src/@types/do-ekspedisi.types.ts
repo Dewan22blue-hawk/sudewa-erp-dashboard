@@ -18,6 +18,19 @@ export interface DoEkspedisiCustomer {
   id: number;
   uuid?: string;
   name: string;
+  pic?: string | null;
+}
+
+export interface DoEkspedisiItemDestination {
+  id: number;
+  uuid?: string;
+  doExpeditionItemId: number;
+  destination: string;
+  driverNote: string;
+  orderNumber: number;
+  mapsUrl: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface DoEkspedisiItem {
@@ -33,9 +46,12 @@ export interface DoEkspedisiItem {
   additionalCostFee: number;
   otherFee: number;
   driverFee: number;
+  driverNote: string;
+  mapsUrl: string;
   ppnFee: number;
   serviceFee: number;
   pphFee: number;
+  destinations?: DoEkspedisiItemDestination[];
   customer?: DoEkspedisiCustomer;
   createdAt?: string;
   updatedAt?: string;
@@ -79,6 +95,13 @@ export interface DoEkspedisiItemListParams {
   customer_id?: number | string;
 }
 
+export interface DoEkspedisiItemDestinationListParams {
+  order_by?: string;
+  order_sort?: 'asc' | 'desc';
+  destination?: string;
+  do_expedition_item_id?: number | string;
+}
+
 export interface DoEkspedisiPayload {
   date: string;
   vehicle_id: string | number;
@@ -95,6 +118,16 @@ export interface DoEkspedisiItemPayload {
   additional_cost_fee: number | string;
   other_fee: number | string;
   driver_fee: number | string;
+  driver_note: string;
+  maps_url: string;
+}
+
+export interface DoEkspedisiItemDestinationPayload {
+  destination: string;
+  driver_note: string;
+  order_number: number | string;
+  do_expedition_item_id: number | string;
+  maps_url: string;
 }
 
 export interface LookupOption {
@@ -105,3 +138,4 @@ export interface LookupOption {
 
 export type DoEkspedisiListResponse = PaginatedResult<DoEkspedisi>;
 export type DoEkspedisiItemListResponse = PaginatedResult<DoEkspedisiItem>;
+export type DoEkspedisiItemDestinationListResponse = PaginatedResult<DoEkspedisiItemDestination>;

@@ -18,6 +18,7 @@ import {
   getMaterialTransactions,
   updateMaterialTransaction,
   updateMaterialTransactionItem,
+  uploadMaterialTransactionInvoice,
 } from '@/services/material-transaction.service';
 
 export const materialTransactionKeys = {
@@ -27,9 +28,18 @@ export const materialTransactionKeys = {
   items: (params: unknown) => [...materialTransactionKeys.all, 'items', params] as const,
   item: (id: number | string | undefined) => [...materialTransactionKeys.all, 'item', id] as const,
   billings: (params: unknown) => [...materialTransactionKeys.all, 'billings', params] as const,
+  invoice: (id: number | string | undefined) => [...materialTransactionKeys.all, 'invoice', id] as const,
 };
 
-export const useMaterialTransactions = (params: PaginationParams & { search?: string; type?: 'purchase' | 'sales'; enabled?: boolean }) => {
+export const useMaterialTransactions = (
+  params: PaginationParams & {
+    search?: string;
+    type?: 'purchase' | 'sales';
+    supplier_name?: string;
+    code?: string;
+    enabled?: boolean;
+  },
+) => {
   const { enabled = true, ...rest } = params;
 
   return useQuery({
@@ -78,7 +88,17 @@ export const useDeleteMaterialTransaction = () => {
   });
 };
 
-export const useMaterialTransactionItems = (params: PaginationParams & { search?: string; type?: 'purchase' | 'sales'; enabled?: boolean }) => {
+export const useMaterialTransactionItems = (
+  params: PaginationParams & {
+    search?: string;
+    type?: 'purchase' | 'sales';
+    materialTransactionId?: number | string;
+    materialId?: number | string;
+    inStock?: boolean;
+    isForecast?: boolean;
+    enabled?: boolean;
+  },
+) => {
   const { enabled = true, ...rest } = params;
 
   return useQuery({
@@ -151,6 +171,17 @@ export const useCreateMaterialTransactionBilling = () => {
       qc.invalidateQueries({ queryKey: materialTransactionKeys.all });
       qc.invalidateQueries({ queryKey: materialTransactionKeys.detail(variables.materialTransactionId) });
       qc.invalidateQueries({ queryKey: materialTransactionKeys.billings({ materialTransactionId: variables.materialTransactionId }) });
+    },
+  });
+};
+
+export const useUploadMaterialTransactionInvoice = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number | string; file: File }) => uploadMaterialTransactionInvoice(id, file),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: materialTransactionKeys.all });
+      qc.invalidateQueries({ queryKey: materialTransactionKeys.detail(variables.id) });
     },
   });
 };

@@ -5,8 +5,10 @@ import type {
   VehicleDocumentItem,
   VehicleDocumentListResponse,
   VehicleDocumentPayload,
+  VehicleRegistrationFilters,
   VehicleDocumentSummary,
   VehicleRegistrationDetail,
+  VehicleRegistrationListResponse,
   VehicleRegistrationPayload,
 } from '@/@types/vehicle-document.types';
 import { apiClient } from '@/lib/api/client';
@@ -21,6 +23,10 @@ const numberValue = (value: unknown) => {
   if (value == null || value === '') return 0;
   const parsed = Number(value);
   return Number.isNaN(parsed) ? 0 : parsed;
+};
+const nullableTextValue = (value: unknown): string | null => {
+  const normalized = text(value);
+  return normalized ? normalized : null;
 };
 const boolValue = (value: unknown): boolean | null => {
   if (value === null || value === undefined || value === '') return null;
@@ -98,6 +104,8 @@ const mapVehicleRegistrationDetail = (item: any, parentVendorName?: string): Veh
     uuid: text(item.uuid),
     vehicleDocumentId: item.vehicle_document_id == null ? null : Number(item.vehicle_document_id),
     vendorId: item.vendor_id == null ? null : Number(item.vendor_id),
+    isAlreadyProcessed: item.is_already_processed == null ? null : Boolean(item.is_already_processed),
+    isUpdateAdditionalData: item.is_update_additional_data == null ? null : Boolean(item.is_update_additional_data),
     dealerId: vehicle?.dealer_id == null ? null : Number(vehicle.dealer_id),
     regionId: vehicle?.region_id == null ? null : Number(vehicle.region_id),
     dealerName: getDealerLabel(vehicle, item),
@@ -106,6 +114,7 @@ const mapVehicleRegistrationDetail = (item: any, parentVendorName?: string): Veh
     vehicleType: coalesceText(vehicle?.vehicle_type, item.vehicle_type),
     stnkName: coalesceText(vehicle?.stnk_name, item.stnk_name),
     machineNumber: coalesceText(vehicle?.machine_number, item.machine_number),
+    processDate: text(item.process_date),
     invoiceDate: coalesceText(vehicle?.invoice_date, item.invoice_date),
     invoiceReceiveDate: coalesceText(vehicle?.invoice_receive_date, item.invoice_receive_date),
     customerDeliveryDate: text(item.customer_delivery_date),
@@ -134,6 +143,8 @@ const mapVehicleRegistrationDetail = (item: any, parentVendorName?: string): Veh
     plateRecommendationFee: numberValue(item.plate_recommendation_fee),
     serviceFee: numberValue(item.service_fee),
     skpdFee: numberValue(item.skpd_fee),
+    stampFee: numberValue(item.stamp_fee),
+    pnbpBpkb: numberValue(item.pnbp_bpkb),
   };
 };
 
@@ -189,6 +200,31 @@ export const getVehicleDocuments = async (
       last_page: data.last_page,
     },
     mapVehicleDocumentSummary,
+  );
+};
+
+export const getVehicleRegistrations = async (
+  params: PaginationParams & VehicleRegistrationFilters = { page: 1, perPage: 25 },
+): Promise<VehicleRegistrationListResponse> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(registrationBasePath, {
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      vendor_id: params.vendorId ?? undefined,
+      vehicle_document_id: params.vehicleDocumentId ?? undefined,
+      is_already_processed: params.isAlreadyProcessed == null ? undefined : String(params.isAlreadyProcessed),
+    },
+  });
+  const data = ensureSuccess(response.data);
+
+  return toPaginatedResult(
+    {
+      data: data.data ?? [],
+      current_page: data.current_page,
+      per_page: data.per_page,
+      total: data.total,
+      last_page: data.last_page,
+    },
+    (item) => mapVehicleRegistrationDetail(item),
   );
 };
 
@@ -302,46 +338,72 @@ export const exportVehicleDocument = async (): Promise<void> => {
 };
 
 const buildVehicleRegistrationPayload = (payload: Partial<VehicleRegistrationPayload>) => {
-  const body = new URLSearchParams();
-  body.append('_method', 'PUT');
-  if (payload.bpkbNumber != null) body.append('bpkb_number', payload.bpkbNumber);
-  if (payload.bpkbRegistrationDate) body.append('bpkb_registration_date', payload.bpkbRegistrationDate);
-  if (payload.bpkbReceivedDate) body.append('bpkb_received_date', payload.bpkbReceivedDate);
-  if (payload.bpkbPhysicalStatus != null) body.append('bpkb_physical_status', String(payload.bpkbPhysicalStatus));
-  if (payload.stnkRegistrationDate) body.append('stnk_registration_date', payload.stnkRegistrationDate);
-  if (payload.stnkReceivedDate) body.append('stnk_received_date', payload.stnkReceivedDate);
-  if (payload.stnkPhysicalStatus != null) body.append('stnk_physical_status', String(payload.stnkPhysicalStatus));
-  if (payload.skpdPaymentDate) body.append('skpd_payment_date', payload.skpdPaymentDate);
-  if (payload.skpdReceivedDate) body.append('skpd_received_date', payload.skpdReceivedDate);
-  if (payload.skpdPhysicalStatus != null) body.append('skpd_physical_status', String(payload.skpdPhysicalStatus));
-  if (payload.tnkbReceivedDate) body.append('tnkb_received_date', payload.tnkbReceivedDate);
-  if (payload.tnkbNumber != null) body.append('tnkb_number', payload.tnkbNumber);
-  if (payload.tnkbPhysicalStatus != null) body.append('tnkb_physical_status', String(payload.tnkbPhysicalStatus));
-  if (payload.stckFee != null) body.append('stck_fee', payload.stckFee);
-  if (payload.bbnRegistrationFee != null) body.append('bbn_registration_fee', payload.bbnRegistrationFee);
-  if (payload.noticeFee != null) body.append('notice_fee', payload.noticeFee);
-  if (payload.pmiFee != null) body.append('pmi_fee', payload.pmiFee);
-  if (payload.physicalCheckFee != null) body.append('physical_check_fee', payload.physicalCheckFee);
-  if (payload.nikValidationFee != null) body.append('nik_validation_fee', payload.nikValidationFee);
-  if (payload.garwilFee != null) body.append('garwil_fee', payload.garwilFee);
-  if (payload.builtUpFee != null) body.append('built_up_fee', payload.builtUpFee);
-  if (payload.accelerationFee != null) body.append('acceleration_fee', payload.accelerationFee);
-  if (payload.plateRecommendationFee != null) body.append('plate_recommendation_fee', payload.plateRecommendationFee);
-  if (payload.serviceFee != null) body.append('service_fee', payload.serviceFee);
-  if (payload.skpdFee != null) body.append('skpd_fee', payload.skpdFee);
-  if (payload.customerDeliveryDate) body.append('customer_delivery_date', payload.customerDeliveryDate);
-  return body;
+  return {
+    vendor_id: payload.vendorId ?? null,
+    process_date: nullableTextValue(payload.processDate),
+    bpkb_number: nullableTextValue(payload.bpkbNumber),
+    bpkb_registration_date: nullableTextValue(payload.bpkbRegistrationDate),
+    bpkb_received_date: nullableTextValue(payload.bpkbReceivedDate),
+    bpkb_physical_status: Boolean(payload.bpkbPhysicalStatus),
+    stnk_registration_date: nullableTextValue(payload.stnkRegistrationDate),
+    stnk_received_date: nullableTextValue(payload.stnkReceivedDate),
+    stnk_physical_status: Boolean(payload.stnkPhysicalStatus),
+    skpd_payment_date: nullableTextValue(payload.skpdPaymentDate),
+    skpd_received_date: nullableTextValue(payload.skpdReceivedDate),
+    skpd_physical_status: Boolean(payload.skpdPhysicalStatus),
+    tnkb_received_date: nullableTextValue(payload.tnkbReceivedDate),
+    tnkb_number: nullableTextValue(payload.tnkbNumber),
+    tnkb_physical_status: Boolean(payload.tnkbPhysicalStatus),
+    stck_fee: numberValue(payload.stckFee),
+    bbn_registration_fee: numberValue(payload.bbnRegistrationFee),
+    notice_fee: numberValue(payload.noticeFee),
+    pmi_fee: numberValue(payload.pmiFee),
+    physical_check_fee: numberValue(payload.physicalCheckFee),
+    nik_validation_fee: numberValue(payload.nikValidationFee),
+    garwil_fee: numberValue(payload.garwilFee),
+    built_up_fee: numberValue(payload.builtUpFee),
+    acceleration_fee: numberValue(payload.accelerationFee),
+    plate_recommendation_fee: numberValue(payload.plateRecommendationFee),
+    service_fee: numberValue(payload.serviceFee),
+    skpd_fee: numberValue(payload.skpdFee),
+    stamp_fee: numberValue(payload.stampFee),
+    pnbp_bpkb: numberValue(payload.pnbpBpkb),
+    customer_delivery_date: nullableTextValue(payload.customerDeliveryDate),
+  };
 };
 
-export const updateVehicleRegistration = async (id: string | number, payload: Partial<VehicleRegistrationPayload>): Promise<void> => {
+export const updateVehicleRegistration = async (id: string | number, payload: Partial<VehicleRegistrationPayload>): Promise<VehicleRegistrationDetail> => {
   try {
-    const response = await apiClient.post<LaravelApiResponse<any>>(`${registrationBasePath}/${id}`, buildVehicleRegistrationPayload(payload), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    const requestPayload = buildVehicleRegistrationPayload(payload);
+
+    if (typeof window !== 'undefined') {
+      console.group('[VehicleRegistration][PUT]');
+      console.log('endpoint', `${registrationBasePath}/${id}`);
+      console.log('payload', requestPayload);
+      console.groupEnd();
+    }
+
+    const response = await apiClient.put<LaravelApiResponse<any>>(`${registrationBasePath}/${id}`, requestPayload, {
+      headers: { 'Content-Type': 'application/json' },
     });
     if (!response.data.status) {
       throw new ApiResponseError(response.data.message ?? 'Failed to update vehicle registration');
     }
+    if (typeof window !== 'undefined') {
+      console.group('[VehicleRegistration][PUT][Response]');
+      console.log('endpoint', `${registrationBasePath}/${id}`);
+      console.log('response', response.data);
+      console.groupEnd();
+    }
+    return mapVehicleRegistrationDetail(ensureSuccess(response.data));
   } catch (error) {
+    if (typeof window !== 'undefined') {
+      console.group('[VehicleRegistration][PUT][Error]');
+      console.log('endpoint', `${registrationBasePath}/${id}`);
+      console.log('payload', buildVehicleRegistrationPayload(payload));
+      console.error('error', error);
+      console.groupEnd();
+    }
     if (error instanceof ApiValidationError) throw error;
     throw error;
   }

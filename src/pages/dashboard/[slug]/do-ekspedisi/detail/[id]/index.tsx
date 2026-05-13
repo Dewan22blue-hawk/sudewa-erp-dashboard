@@ -85,6 +85,23 @@ export default function DetailDOEkspedisiPage() {
     );
   }
 
+  const detailItemMap = new Map((detailQuery.data.items ?? []).map((item) => [item.id, item]));
+  const tableData = (itemQuery.data?.data ?? []).map((item) => {
+    const detailItem = detailItemMap.get(item.id);
+
+    if (!detailItem) {
+      return item;
+    }
+
+    return {
+      ...item,
+      destination: item.destination || detailItem.destination,
+      driverNote: item.driverNote || detailItem.driverNote,
+      mapsUrl: item.mapsUrl || detailItem.mapsUrl,
+      destinations: item.destinations?.length ? item.destinations : detailItem.destinations,
+    };
+  });
+
   const totalData = itemQuery.data?.meta.total ?? 0;
   const totalPages = itemQuery.data?.meta.lastPage ?? 1;
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
@@ -144,7 +161,7 @@ export default function DetailDOEkspedisiPage() {
         </div>
 
         <DOEkspedisiDetailTable
-          data={itemQuery.data?.data ?? []}
+          data={tableData}
           page={page}
           perPage={perPage}
           isLoading={itemQuery.isLoading}

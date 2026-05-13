@@ -26,6 +26,14 @@ export function DOEkspedisiDetailTable({
   onEdit,
   onDelete,
 }: DOEkspedisiDetailTableProps) {
+  const getDestinationSummary = (item: DoEkspedisiItem) => {
+    if (item.destinations && item.destinations.length > 0) {
+      return item.destinations.map((destination) => destination.destination).filter(Boolean).join(', ');
+    }
+
+    return item.destination || '-';
+  };
+
   return (
     <Card className="overflow-hidden rounded-[20px] border border-[#D7DEE7] bg-white shadow-sm">
       <div className="overflow-x-auto">
@@ -62,9 +70,9 @@ export function DOEkspedisiDetailTable({
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{(page - 1) * perPage + index + 1}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.customerName || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.loadingIn || '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.destination || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{getDestinationSummary(item)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.loadingOut || '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">-</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.driverNote || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.driverFee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.otherFee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.invoiceFee)}</TableCell>

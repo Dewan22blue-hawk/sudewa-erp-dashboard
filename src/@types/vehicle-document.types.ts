@@ -1,3 +1,4 @@
+import type { VehicleType } from './vehicle-data.types';
 import type { PaginatedResult } from './pagination.types';
 import type { Vendor } from './vendor.types';
 
@@ -48,6 +49,8 @@ export interface VehicleRegistrationDetail {
   uuid?: string;
   vehicleDocumentId?: number | null;
   vendorId?: number | null;
+  isAlreadyProcessed?: boolean | null;
+  isUpdateAdditionalData?: boolean | null;
   dealerId?: number | null;
   regionId?: number | null;
   dealerName: string;
@@ -56,6 +59,7 @@ export interface VehicleRegistrationDetail {
   vehicleType: string;
   stnkName: string;
   machineNumber: string;
+  processDate: string;
   invoiceDate: string;
   invoiceReceiveDate: string;
   customerDeliveryDate: string;
@@ -84,6 +88,8 @@ export interface VehicleRegistrationDetail {
   plateRecommendationFee: number;
   serviceFee: number;
   skpdFee: number;
+  stampFee: number;
+  pnbpBpkb: number;
 }
 
 export interface VehicleDocumentDetail extends VehicleDocumentSummary {
@@ -99,6 +105,11 @@ export interface VehicleDocumentPayload {
 }
 
 export interface VehicleRegistrationPayload {
+  vendorId?: number | null;
+  dealerId?: number | null;
+  regionId?: number | null;
+  vehicleType?: VehicleType;
+  processDate: string;
   bpkbNumber: string;
   bpkbRegistrationDate: string;
   bpkbReceivedDate: string;
@@ -124,6 +135,8 @@ export interface VehicleRegistrationPayload {
   plateRecommendationFee: string;
   serviceFee: string;
   skpdFee: string;
+  stampFee: string;
+  pnbpBpkb: string;
   customerDeliveryDate: string;
 }
 
@@ -132,3 +145,12 @@ export interface VehicleDocumentFilters {
 }
 
 export type VehicleDocumentListResponse = PaginatedResult<VehicleDocumentSummary>;
+
+export interface VehicleRegistrationFilters {
+  search?: string;
+  vendorId?: number | null;
+  vehicleDocumentId?: number | null;
+  isAlreadyProcessed?: boolean | null;
+}
+
+export type VehicleRegistrationListResponse = PaginatedResult<VehicleRegistrationDetail>;

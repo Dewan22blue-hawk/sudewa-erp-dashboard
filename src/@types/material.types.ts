@@ -7,6 +7,10 @@ export interface Material {
     name: string;
     price: number;
     type: string;
+    averagePrice?: number;
+    stock?: number;
+    totalPurchased?: number;
+    totalSold?: number;
     createdAt?: string;
     updatedAt?: string;
 }
