@@ -216,6 +216,7 @@ export function InvoicePrintView({ invoice }: InvoicePrintViewProps) {
                       <th style={{ border: '1px solid #ccc', padding: '3px 4px', textAlign: 'center', width: '5%' }}>QTY</th>
                       <th style={{ border: '1px solid #ccc', padding: '3px 4px', textAlign: 'center', width: '11%' }}>INV EKSPEDISI</th>
                       <th style={{ border: '1px solid #ccc', padding: '3px 4px', textAlign: 'center', width: '11%' }}>BIAYA TAMBAHAN</th>
+                      <th style={{ border: '1px solid #ccc', padding: '3px 4px', textAlign: 'center', width: '11%' }}>TOTAL PAYMENT</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -233,6 +234,7 @@ export function InvoicePrintView({ invoice }: InvoicePrintViewProps) {
                         <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'center' }}>{item.qty}</td>
                         <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'right' }}>{formatCurrency(item.invoiceEkspedisi)}</td>
                         <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'right' }}>{formatCurrency(item.biayaTambahan)}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'right', fontWeight: 'bold' }}>{formatCurrency(item.invoiceEkspedisi + item.biayaTambahan)}</td>
                       </tr>
                     ))}
                     {/* Total Row */}
@@ -242,6 +244,7 @@ export function InvoicePrintView({ invoice }: InvoicePrintViewProps) {
                       </td>
                       <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'right' }}>{formatCurrency(totalInvoice)}</td>
                       <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'right' }}>{formatCurrency(totalBiayaTambahan)}</td>
+                      <td style={{ border: '1px solid #ddd', padding: '3px 4px', textAlign: 'right' }}>{formatCurrency(totalInvoice + totalBiayaTambahan)}</td>
                     </tr>
                   </tbody>
                 </table>

@@ -1,47 +1,164 @@
+import * as React from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import type { CreateInvoiceTableRow } from '@/@types/create-invoice.types';
+import { CreateInvoiceDeleteDialog } from '@/components/features/create-invoice/CreateInvoiceDeleteDialog';
+import { CreateInvoiceModal } from '@/components/features/create-invoice/CreateInvoiceModal';
+import { CreateInvoiceTable } from '@/components/features/create-invoice/CreateInvoiceTable';
+import { matchesCreateInvoiceSearch, toCreateInvoiceRow } from '@/components/features/create-invoice/create-invoice.utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { InvoiceForm } from '@/components/features/create-invoice/InvoiceForm';
-import { addInvoiceRecord, toInvoiceRecord, generateInvoiceId, type InvoiceFormValues } from '@/components/features/create-invoice/create-invoice.data';
+import { useCreateInvoice, useCreateInvoiceList, useDeleteCreateInvoice } from '@/hooks/useCreateInvoice';
+import { useDoEkspedisis } from '@/hooks/useDoEkspedisi';
 
-export default function CreateInvoicePage() {
+export default function CreateInvoiceListPage() {
   const router = useRouter();
-  const { slug } = router.query;
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
-  const handleSubmit = (values: InvoiceFormValues) => {
-    const newId = generateInvoiceId();
-    const record = toInvoiceRecord(newId, values);
+  const [searchInput, setSearchInput] = React.useState('');
+  const [search, setSearch] = React.useState('');
+  const [page, setPage] = React.useState(1);
+  const [perPage, setPerPage] = React.useState(25);
+  const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [doSearch, setDoSearch] = React.useState('');
+  const [selectedDoCode, setSelectedDoCode] = React.useState('');
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [selectedRow, setSelectedRow] = React.useState<CreateInvoiceTableRow | null>(null);
 
-    // Persist to localStorage so the print page can read it
-    addInvoiceRecord(record);
-    toast.success('Invoice berhasil dibuat');
+  React.useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 350);
 
-    // Navigate to print view
-    router.push(`/dashboard/${slug}/administrasi/create-invoice/print/${newId}`);
+    return () => window.clearTimeout(timeout);
+  }, [searchInput]);
+
+  const listQuery = useCreateInvoiceList({
+    page,
+    perPage,
+    search,
+    order_by: 'created_at',
+    order_sort: 'desc',
+  });
+  const doLookupQuery = useDoEkspedisis({
+    page: 1,
+    perPage: 25,
+    search: doSearch,
+    order_by: 'created_at',
+    order_sort: 'desc',
+    enabled: createOpen,
+  });
+  const createMutation = useCreateInvoice();
+  const deleteMutation = useDeleteCreateInvoice();
+
+  const tableRows = React.useMemo(() => (listQuery.data?.data ?? []).map(toCreateInvoiceRow), [listQuery.data?.data]);
+  const filteredRows = React.useMemo(() => tableRows.filter((row) => matchesCreateInvoiceSearch(row, searchInput)), [tableRows, searchInput]);
+  const doOptions = React.useMemo(
+    () =>
+      (doLookupQuery.data?.data ?? []).map((item) => ({
+        value: item.doCode,
+        label: item.doCode,
+        subtitle: [item.driver?.name, item.vehicle?.registrationNumber].filter(Boolean).join(' • ') || undefined,
+      })),
+    [doLookupQuery.data?.data],
+  );
+
+  const handleCreate = async () => {
+    if (!selectedDoCode) {
+      toast.error('Kode DO wajib dipilih');
+      return;
+    }
+
+    try {
+      await createMutation.mutateAsync({ do_code: selectedDoCode });
+      toast.success('Create invoice berhasil ditambahkan');
+      setCreateOpen(false);
+      setSelectedDoCode('');
+      setDoSearch('');
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menambahkan create invoice');
+    }
   };
 
-  const handleCancel = () => {
-    router.back();
+  const handleDelete = async () => {
+    if (!selectedRow) return;
+
+    try {
+      await deleteMutation.mutateAsync(selectedRow.invoice.id);
+      toast.success('Create invoice berhasil dihapus');
+      setDeleteOpen(false);
+      setSelectedRow(null);
+      setSelectedIds((current) => current.filter((item) => item !== selectedRow.invoice.id));
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menghapus create invoice');
+    }
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={() => router.back()} className="rounded-md p-1 transition-colors hover:bg-gray-100">
-            <ChevronLeft className="h-5 w-5 text-gray-500" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 leading-none">Form Input Invoice</h1>
-            <p className="text-sm text-gray-500 mt-1">Buat invoice untuk pelanggan ekspedisi</p>
-          </div>
-        </div>
+      <CreateInvoiceTable
+        rows={filteredRows}
+        search={searchInput}
+        isLoading={listQuery.isLoading}
+        page={page}
+        perPage={perPage}
+        totalData={listQuery.data?.meta.total ?? 0}
+        selectedIds={selectedIds}
+        onSearchChange={setSearchInput}
+        onPageChange={setPage}
+        onPerPageChange={(value) => {
+          setPerPage(value);
+          setPage(1);
+        }}
+        onToggleSelect={(id, checked) =>
+          setSelectedIds((current) => (checked ? Array.from(new Set([...current, id])) : current.filter((item) => item !== id)))
+        }
+        onToggleSelectAll={(checked) =>
+          setSelectedIds((current) =>
+            checked
+              ? Array.from(new Set([...current, ...filteredRows.map((row) => row.invoice.id)]))
+              : current.filter((item) => !filteredRows.some((row) => row.invoice.id === item)),
+          )
+        }
+        onAdd={() => setCreateOpen(true)}
+        onProcess={() => {
+          if (!selectedIds.length) return;
+          router.push(`/dashboard/${slug}/administrasi/create-invoice/process?ids=${selectedIds.join(',')}`);
+        }}
+        onDetail={(row) => router.push(`/dashboard/${slug}/administrasi/create-invoice/detail/${row.invoice.id}`)}
+        onEdit={(row) => router.push(`/dashboard/${slug}/administrasi/create-invoice/edit/${row.invoice.id}`)}
+        onDelete={(row) => {
+          setSelectedRow(row);
+          setDeleteOpen(true);
+        }}
+      />
 
-        {/* Invoice Form */}
-        <InvoiceForm onSubmit={handleSubmit} onCancel={handleCancel} />
-      </div>
+      <CreateInvoiceModal
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open);
+          if (!open) {
+            setSelectedDoCode('');
+            setDoSearch('');
+          }
+        }}
+        doCode={selectedDoCode}
+        onDoCodeChange={setSelectedDoCode}
+        onSearchChange={setDoSearch}
+        options={doOptions}
+        onSubmit={handleCreate}
+        isSubmitting={createMutation.isPending}
+        isLoadingOptions={doLookupQuery.isLoading}
+      />
+
+      <CreateInvoiceDeleteDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onConfirm={handleDelete}
+        isDeleting={deleteMutation.isPending}
+        itemName={selectedRow?.doCode}
+      />
     </DashboardLayout>
   );
 }

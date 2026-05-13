@@ -3,6 +3,10 @@ import type {
   DoEkspedisiCustomer,
   DoEkspedisiDriver,
   DoEkspedisiItem,
+  DoEkspedisiItemDestination,
+  DoEkspedisiItemDestinationListParams,
+  DoEkspedisiItemDestinationListResponse,
+  DoEkspedisiItemDestinationPayload,
   DoEkspedisiItemListParams,
   DoEkspedisiItemListResponse,
   DoEkspedisiItemPayload,
@@ -18,6 +22,7 @@ import { ApiResponseError, ApiValidationError, ensureSuccess, type LaravelApiRes
 
 const expeditionBasePath = '/wapi/transaction/do-expedition';
 const expeditionItemBasePath = '/wapi/transaction/do-expedition-item';
+const expeditionItemDestinationBasePath = '/wapi/transaction/do-expedition-item-destination';
 const customerLookupPath = '/wapi/master-data/customer';
 const vehicleLookupPath = '/wapi/master-data/vehicle-fleet';
 const driverLookupPath = '/wapi/master-data/driver';
@@ -81,28 +86,55 @@ const mapCustomer = (item: any): DoEkspedisiCustomer => ({
   id: Number(item?.id ?? 0),
   uuid: item?.uuid,
   name: item?.name ?? '',
+  pic: item?.pic ?? item?.pic_name ?? null,
 });
 
-const mapDoEkspedisiItem = (item: any): DoEkspedisiItem => ({
+const mapDoEkspedisiItemDestination = (item: any): DoEkspedisiItemDestination => ({
   id: Number(item?.id ?? 0),
   uuid: item?.uuid,
-  doExpeditionId: Number(item?.do_expedition_id ?? item?.expedition?.id ?? 0),
-  customerId: Number(item?.customer_id ?? item?.customer?.id ?? 0),
-  customerName: item?.customer?.name ?? '',
-  loadingIn: item?.loading_in ?? '',
-  loadingOut: item?.loading_out ?? '',
+  doExpeditionItemId: Number(item?.do_expedition_item_id ?? item?.do_expedition_item?.id ?? 0),
   destination: item?.destination ?? '',
-  invoiceFee: toNumber(item?.invoice_fee),
-  additionalCostFee: toNumber(item?.additional_cost_fee),
-  otherFee: toNumber(item?.other_fee),
-  driverFee: toNumber(item?.driver_fee),
-  ppnFee: toNumber(item?.ppn_fee),
-  serviceFee: toNumber(item?.service_fee),
-  pphFee: toNumber(item?.pph_fee),
-  customer: item?.customer ? mapCustomer(item.customer) : undefined,
+  driverNote: item?.driver_note ?? '',
+  orderNumber: Number(item?.order_number ?? 0),
+  mapsUrl: item?.maps_url ?? '',
   createdAt: item?.created_at,
   updatedAt: item?.updated_at,
 });
+
+const mapDoEkspedisiItem = (item: any): DoEkspedisiItem => {
+  const destinations = Array.isArray(item?.destinations)
+    ? item.destinations.map(mapDoEkspedisiItemDestination)
+    : Array.isArray(item?.do_expedition_item_destinations)
+      ? item.do_expedition_item_destinations.map(mapDoEkspedisiItemDestination)
+      : Array.isArray(item?.expedition_destinations)
+        ? item.expedition_destinations.map(mapDoEkspedisiItemDestination)
+        : [];
+  const primaryDestination = destinations.find((destination: DoEkspedisiItemDestination) => destination.orderNumber === 1) ?? destinations[0];
+
+  return {
+    id: Number(item?.id ?? 0),
+    uuid: item?.uuid,
+    doExpeditionId: Number(item?.do_expedition_id ?? item?.expedition?.id ?? 0),
+    customerId: Number(item?.customer_id ?? item?.customer?.id ?? 0),
+    customerName: item?.customer?.name ?? '',
+    loadingIn: item?.loading_in ?? '',
+    loadingOut: item?.loading_out ?? '',
+    destination: item?.destination ?? primaryDestination?.destination ?? '',
+    invoiceFee: toNumber(item?.invoice_fee),
+    additionalCostFee: toNumber(item?.additional_cost_fee),
+    otherFee: toNumber(item?.other_fee),
+    driverFee: toNumber(item?.driver_fee),
+    driverNote: item?.driver_note ?? primaryDestination?.driverNote ?? '',
+    mapsUrl: item?.maps_url ?? primaryDestination?.mapsUrl ?? '',
+    ppnFee: toNumber(item?.ppn_fee),
+    serviceFee: toNumber(item?.service_fee),
+    pphFee: toNumber(item?.pph_fee),
+    destinations: destinations.length > 0 ? destinations : undefined,
+    customer: item?.customer ? mapCustomer(item.customer) : undefined,
+    createdAt: item?.created_at,
+    updatedAt: item?.updated_at,
+  };
+};
 
 const mapDoEkspedisi = (item: any): DoEkspedisi => ({
   id: Number(item?.id ?? 0),
@@ -197,6 +229,8 @@ const buildItemPayload = (payload: DoEkspedisiItemPayload, asUpdate = false) => 
     formData.append('additional_cost_fee', String(payload.additional_cost_fee));
     formData.append('other_fee', String(payload.other_fee));
     formData.append('driver_fee', String(payload.driver_fee));
+    formData.append('driver_note', payload.driver_note);
+    formData.append('maps_url', payload.maps_url);
     return formData;
   }
 
@@ -210,6 +244,28 @@ const buildItemPayload = (payload: DoEkspedisiItemPayload, asUpdate = false) => 
   params.append('additional_cost_fee', String(payload.additional_cost_fee));
   params.append('other_fee', String(payload.other_fee));
   params.append('driver_fee', String(payload.driver_fee));
+  params.append('driver_note', payload.driver_note);
+  params.append('maps_url', payload.maps_url);
+  return params;
+};
+
+const buildDestinationPayload = (payload: DoEkspedisiItemDestinationPayload, asUpdate = false) => {
+  if (!asUpdate) {
+    const formData = new FormData();
+    formData.append('destination', payload.destination);
+    formData.append('driver_note', payload.driver_note);
+    formData.append('order_number', String(payload.order_number));
+    formData.append('do_expedition_item_id', String(payload.do_expedition_item_id));
+    formData.append('maps_url', payload.maps_url);
+    return formData;
+  }
+
+  const params = new URLSearchParams();
+  params.append('destination', payload.destination);
+  params.append('driver_note', payload.driver_note);
+  params.append('order_number', String(payload.order_number));
+  params.append('do_expedition_item_id', String(payload.do_expedition_item_id));
+  params.append('maps_url', payload.maps_url);
   return params;
 };
 
@@ -313,6 +369,31 @@ export const getDoEkspedisiItemById = async (id: string | number): Promise<DoEks
   }
 };
 
+export const getDoEkspedisiItemDestinations = async (
+  params: PaginationParams & DoEkspedisiItemDestinationListParams,
+): Promise<DoEkspedisiItemDestinationListResponse> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(expeditionItemDestinationBasePath, {
+    params: {
+      order_by: params.order_by ?? 'order_number',
+      order_sort: params.order_sort ?? 'asc',
+      page: params.page ?? 1,
+      per_page: params.perPage ?? 50,
+      destination: params.destination?.trim() || undefined,
+      do_expedition_item_id: params.do_expedition_item_id,
+    },
+  });
+
+  const payload = ensureSuccess(response.data);
+  const normalized = normalizePagination(payload);
+
+  return toPaginatedResult(normalized, mapDoEkspedisiItemDestination);
+};
+
+export const getDoEkspedisiItemDestinationById = async (id: string | number): Promise<DoEkspedisiItemDestination> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(`${expeditionItemDestinationBasePath}/${id}`);
+  return mapDoEkspedisiItemDestination(ensureSuccess(response.data));
+};
+
 export const createDoEkspedisiItem = async (payload: DoEkspedisiItemPayload): Promise<DoEkspedisiItem> => {
   try {
     const body = buildItemPayload(payload);
@@ -321,6 +402,20 @@ export const createDoEkspedisiItem = async (payload: DoEkspedisiItemPayload): Pr
     });
 
     return mapDoEkspedisiItem(ensureSuccess(response.data));
+  } catch (error) {
+    if (error instanceof ApiValidationError) throw error;
+    throw error;
+  }
+};
+
+export const createDoEkspedisiItemDestination = async (payload: DoEkspedisiItemDestinationPayload): Promise<DoEkspedisiItemDestination> => {
+  try {
+    const body = buildDestinationPayload(payload);
+    const response = await apiClient.post<LaravelApiResponse<any>>(expeditionItemDestinationBasePath, body, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return mapDoEkspedisiItemDestination(ensureSuccess(response.data));
   } catch (error) {
     if (error instanceof ApiValidationError) throw error;
     throw error;
@@ -341,10 +436,34 @@ export const updateDoEkspedisiItem = async (id: string | number, payload: DoEksp
   }
 };
 
+export const updateDoEkspedisiItemDestination = async (
+  id: string | number,
+  payload: DoEkspedisiItemDestinationPayload,
+): Promise<DoEkspedisiItemDestination> => {
+  try {
+    const body = buildDestinationPayload(payload, true);
+    const response = await apiClient.put<LaravelApiResponse<any>>(`${expeditionItemDestinationBasePath}/${id}`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    return mapDoEkspedisiItemDestination(ensureSuccess(response.data));
+  } catch (error) {
+    if (error instanceof ApiValidationError) throw error;
+    throw error;
+  }
+};
+
 export const deleteDoEkspedisiItem = async (id: string | number): Promise<void> => {
   const response = await apiClient.delete<LaravelApiResponse<null>>(`${expeditionItemBasePath}/${id}`);
   if (!response.data.status) {
     throw new ApiResponseError(response.data.message ?? 'Failed to delete DO expedition item');
+  }
+};
+
+export const deleteDoEkspedisiItemDestination = async (id: string | number): Promise<void> => {
+  const response = await apiClient.delete<LaravelApiResponse<null>>(`${expeditionItemDestinationBasePath}/${id}`);
+  if (!response.data.status) {
+    throw new ApiResponseError(response.data.message ?? 'Failed to delete DO expedition item destination');
   }
 };
 

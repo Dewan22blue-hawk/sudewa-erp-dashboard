@@ -3,7 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiDetailForm } from '@/components/features/do-ekspedisi/DOEkspedisiDetailForm';
-import { useDoEkspedisiCustomerLookup, useDoEkspedisiDetail, useDoEkspedisiItemDetail } from '@/hooks/useDoEkspedisi';
+import { useDoEkspedisiCustomerLookup, useDoEkspedisiDetail, useDoEkspedisiItemDetail, useDoEkspedisiItemDestinations } from '@/hooks/useDoEkspedisi';
 
 export default function DetailDOEkspedisiItemPage() {
   const router = useRouter();
@@ -11,10 +11,24 @@ export default function DetailDOEkspedisiItemPage() {
 
   const [customerSearch, setCustomerSearch] = React.useState('');
   const detailQuery = useDoEkspedisiItemDetail(itemId ? String(itemId) : null);
+  const destinationQuery = useDoEkspedisiItemDestinations({
+    page: 1,
+    perPage: 50,
+    do_expedition_item_id: itemId ? String(itemId) : undefined,
+    order_by: 'order_number',
+    order_sort: 'asc',
+    enabled: !!itemId,
+  });
   const expeditionQuery = useDoEkspedisiDetail(detailQuery.data?.doExpeditionId ? String(detailQuery.data.doExpeditionId) : null);
   const customerLookup = useDoEkspedisiCustomerLookup(customerSearch);
+  const detailData = detailQuery.data
+    ? {
+        ...detailQuery.data,
+        destinations: destinationQuery.data?.data ?? detailQuery.data.destinations,
+      }
+    : null;
 
-  if (detailQuery.isLoading) {
+  if (detailQuery.isLoading || destinationQuery.isLoading) {
     return (
       <DashboardLayout>
         <div className="flex h-64 items-center justify-center text-slate-500">Memuat detail item DO...</div>
@@ -22,7 +36,7 @@ export default function DetailDOEkspedisiItemPage() {
     );
   }
 
-  if (!detailQuery.data) {
+  if (!detailData) {
     return (
       <DashboardLayout>
         <div className="flex h-64 items-center justify-center text-red-500">Gagal memuat detail item DO</div>
@@ -46,7 +60,7 @@ export default function DetailDOEkspedisiItemPage() {
         <div className="space-y-5">
           <h2 className="border-b border-[#E5E7EB] pb-4 text-[18px] font-semibold text-slate-900">Form Detail DO</h2>
           <DOEkspedisiDetailForm
-            initialData={detailQuery.data}
+            initialData={detailData}
             customerOptions={(customerLookup.data ?? []).map((item) => ({ value: String(item.id), label: item.label, subtitle: item.subtitle }))}
             onCustomerSearch={setCustomerSearch}
             readOnly

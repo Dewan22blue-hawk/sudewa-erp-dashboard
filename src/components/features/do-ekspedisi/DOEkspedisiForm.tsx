@@ -1,17 +1,27 @@
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/date-picker';
 import { MoneyInput } from '@/components/ui/money-input';
+import { Textarea } from '@/components/ui/textarea';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
 import { useRouter } from 'next/router';
 import type { DoEkspedisi, DoEkspedisiItem } from '@/@types/do-ekspedisi.types';
 import { formatCurrency } from '@/lib/utils/currency';
 
+interface DOEkspedisiDestinationFormData {
+  id?: string;
+  destination: string;
+  driverNote: string;
+  mapsUrl: string;
+}
+
 export interface DOEkspedisiFormData {
   date: Date | undefined;
+  primaryDestinationId?: string;
   vehicleId: string;
   driverId: string;
   customerId: string;
@@ -22,6 +32,9 @@ export interface DOEkspedisiFormData {
   additionalCostFee: string;
   otherFee: string;
   driverFee: string;
+  driverNote: string;
+  mapsUrl: string;
+  destinationStops: DOEkspedisiDestinationFormData[];
 }
 
 interface DOEkspedisiFormProps {
@@ -74,6 +87,8 @@ export function DOEkspedisiForm({
   isSubmitting = false,
 }: DOEkspedisiFormProps) {
   const router = useRouter();
+  const primaryDestination = initialItem?.destinations?.[0];
+  const secondaryDestinations = initialItem?.destinations?.slice(1) ?? [];
   const {
     control,
     register,
@@ -83,17 +98,30 @@ export function DOEkspedisiForm({
   } = useForm<DOEkspedisiFormData>({
     defaultValues: {
       date: initialExpedition?.date ? new Date(initialExpedition.date) : undefined,
+      primaryDestinationId: primaryDestination?.id ? String(primaryDestination.id) : undefined,
       vehicleId: initialExpedition?.vehicleId ? String(initialExpedition.vehicleId) : '',
       driverId: initialExpedition?.driverId ? String(initialExpedition.driverId) : '',
       customerId: initialItem?.customerId ? String(initialItem.customerId) : '',
       loadingIn: initialItem?.loadingIn ?? '',
       loadingOut: initialItem?.loadingOut ?? '',
-      destination: initialItem?.destination ?? '',
+      destination: primaryDestination?.destination ?? initialItem?.destination ?? '',
       invoiceFee: toInputCurrency(initialItem?.invoiceFee),
       additionalCostFee: toInputCurrency(initialItem?.additionalCostFee),
       otherFee: toInputCurrency(initialItem?.otherFee),
       driverFee: toInputCurrency(initialItem?.driverFee),
+      driverNote: primaryDestination?.driverNote ?? initialItem?.driverNote ?? '',
+      mapsUrl: primaryDestination?.mapsUrl ?? initialItem?.mapsUrl ?? '',
+      destinationStops: secondaryDestinations.map((destination) => ({
+        id: String(destination.id),
+        destination: destination.destination,
+        driverNote: destination.driverNote,
+        mapsUrl: destination.mapsUrl,
+      })),
     },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'destinationStops',
   });
 
   const mergedVehicleOptions = React.useMemo(() => {
@@ -288,7 +316,7 @@ export function DOEkspedisiForm({
               render={({ field }) => (
                 <MoneyInput
                   id="driverFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Uang jalan driver"
                   className={`h-12 rounded-xl border-[#E5E7EB] ${errors.driverFee ? 'border-red-500' : ''}`}
@@ -306,13 +334,109 @@ export function DOEkspedisiForm({
               render={({ field }) => (
                 <MoneyInput
                   id="otherFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Uang jalan tambahan"
                   className={`h-12 rounded-xl border-[#E5E7EB] ${errors.otherFee ? 'border-red-500' : ''}`}
                 />
               )}
             />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="driverNote">Catatan Driver</Label>
+            <Textarea
+              id="driverNote"
+              rows={3}
+              placeholder="Masukkan atensi atau catatan untuk driver"
+              className={`resize-none rounded-xl border-[#E5E7EB] ${errors.driverNote ? 'border-red-500' : ''}`}
+              {...register('driverNote', { required: 'Catatan driver wajib diisi' })}
+            />
+            {errors.driverNote && <p className="text-xs text-red-500">{errors.driverNote.message}</p>}
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="mapsUrl">Maps URL</Label>
+            <Input
+              id="mapsUrl"
+              placeholder="https://maps.google.com/..."
+              className={`h-12 rounded-xl border-[#E5E7EB] ${errors.mapsUrl ? 'border-red-500' : ''}`}
+              {...register('mapsUrl', { required: 'Maps URL wajib diisi' })}
+            />
+            {errors.mapsUrl && <p className="text-xs text-red-500">{errors.mapsUrl.message}</p>}
+          </div>
+
+          <div className="space-y-4 md:col-span-2">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <Label>Destinasi Tambahan</Label>
+                <p className="text-xs text-slate-500">Tambahkan tujuan berikutnya jika satu item DO memiliki lebih dari satu destinasi.</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => append({ destination: '', driverNote: '', mapsUrl: '' })}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah Tujuan
+              </Button>
+            </div>
+
+            {fields.length > 0 ? (
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="rounded-2xl border border-[#E5E7EB] bg-[#F8FAFC] p-4">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-slate-800">Tujuan #{index + 2}</p>
+                      <Button type="button" variant="ghost" className="h-8 px-2 text-red-600 hover:text-red-700" onClick={() => remove(index)}>
+                        <Trash2 className="mr-1 h-4 w-4" />
+                        Hapus
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                      <input type="hidden" {...register(`destinationStops.${index}.id` as const)} />
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`destinationStops.${index}.destination`}>Tujuan</Label>
+                        <Input
+                          id={`destinationStops.${index}.destination`}
+                          placeholder="Masukkan tujuan kirim"
+                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          {...register(`destinationStops.${index}.destination` as const, { required: 'Tujuan tambahan wajib diisi' })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`destinationStops.${index}.driverNote`}>Catatan Driver</Label>
+                        <Textarea
+                          id={`destinationStops.${index}.driverNote`}
+                          rows={3}
+                          placeholder="Masukkan atensi atau catatan untuk driver"
+                          className="resize-none rounded-xl border-[#E5E7EB]"
+                          {...register(`destinationStops.${index}.driverNote` as const, { required: 'Catatan driver tambahan wajib diisi' })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`destinationStops.${index}.mapsUrl`}>Maps URL</Label>
+                        <Input
+                          id={`destinationStops.${index}.mapsUrl`}
+                          placeholder="https://maps.google.com/..."
+                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          {...register(`destinationStops.${index}.mapsUrl` as const, { required: 'Maps URL tambahan wajib diisi' })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-[#D7DEE7] bg-[#F8FAFC] px-4 py-5 text-sm text-slate-500">
+                Belum ada destinasi tambahan.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -328,7 +452,7 @@ export function DOEkspedisiForm({
               render={({ field }) => (
                 <MoneyInput
                   id="invoiceFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Masukkan nominal invoice"
                   className={`h-12 rounded-xl border-[#E5E7EB] ${errors.invoiceFee ? 'border-red-500' : ''}`}
@@ -346,7 +470,7 @@ export function DOEkspedisiForm({
               render={({ field }) => (
                 <MoneyInput
                   id="additionalCostFee"
-                  value={field.value ? toNumericValue(field.value) : null}
+                  value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Masukkan biaya tambahan"
                   className="h-12 rounded-xl border-[#E5E7EB]"

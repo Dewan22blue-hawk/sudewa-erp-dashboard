@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiDetailForm, type DOEkspedisiDetailFormData } from '@/components/features/do-ekspedisi/DOEkspedisiDetailForm';
 import { useCreateDoEkspedisiItem, useDoEkspedisiCustomerLookup, useDoEkspedisiDetail } from '@/hooks/useDoEkspedisi';
+import { syncDoEkspedisiItemDestinations } from '@/lib/do-ekspedisi/item-destination-sync';
+import { deleteDoEkspedisiItem } from '@/services/do-ekspedisi.service';
 
 export default function CreateDOEkspedisiDetailPage() {
   const router = useRouter();
@@ -17,9 +19,10 @@ export default function CreateDOEkspedisiDetailPage() {
 
   const handleSave = async (values: DOEkspedisiDetailFormData) => {
     if (!id) return;
+    let createdItemId: number | null = null;
 
     try {
-      await createMutation.mutateAsync({
+      const item = await createMutation.mutateAsync({
         do_expedition_id: String(id),
         customer_id: values.customerId,
         loading_in: values.loadingIn,
@@ -29,6 +32,19 @@ export default function CreateDOEkspedisiDetailPage() {
         additional_cost_fee: values.additionalCostFee || 0,
         other_fee: values.otherFee || 0,
         driver_fee: values.driverFee || 0,
+        driver_note: values.driverNote,
+        maps_url: values.mapsUrl,
+      });
+      createdItemId = item.id;
+
+      await syncDoEkspedisiItemDestinations({
+        doExpeditionItemId: item.id,
+        primaryDestination: {
+          destination: values.destination,
+          driverNote: values.driverNote,
+          mapsUrl: values.mapsUrl,
+        },
+        additionalDestinations: values.destinationStops,
       });
 
       toast.success('Item DO Ekspedisi berhasil ditambahkan');
@@ -36,6 +52,14 @@ export default function CreateDOEkspedisiDetailPage() {
         router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}`);
       }
     } catch (error: any) {
+      if (createdItemId != null) {
+        try {
+          await deleteDoEkspedisiItem(createdItemId);
+        } catch {
+          // Keep the original error visible; rollback best effort only.
+        }
+      }
+
       toast.error(error.message || 'Gagal menambahkan item DO Ekspedisi');
     }
   };

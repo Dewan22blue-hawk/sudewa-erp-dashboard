@@ -11,6 +11,8 @@ import {
   useDoEkspedisiDriverLookup,
   useDoEkspedisiVehicleLookup,
 } from '@/hooks/useDoEkspedisi';
+import { syncDoEkspedisiItemDestinations } from '@/lib/do-ekspedisi/item-destination-sync';
+import { deleteDoEkspedisi } from '@/services/do-ekspedisi.service';
 
 const toApiDate = (value?: Date) => {
   if (!value) return '';
@@ -36,14 +38,17 @@ export default function CreateDOEkspedisiPage() {
   const createItemMutation = useCreateDoEkspedisiItem();
 
   const handleSave = async (values: DOEkspedisiFormData) => {
+    let createdExpeditionId: number | null = null;
+
     try {
       const expedition = await createExpeditionMutation.mutateAsync({
         date: toApiDate(values.date),
         vehicle_id: values.vehicleId,
         driver_id: values.driverId,
       });
+      createdExpeditionId = expedition.id;
 
-      await createItemMutation.mutateAsync({
+      const item = await createItemMutation.mutateAsync({
         do_expedition_id: expedition.id,
         customer_id: values.customerId,
         loading_in: values.loadingIn,
@@ -53,6 +58,18 @@ export default function CreateDOEkspedisiPage() {
         additional_cost_fee: values.additionalCostFee || 0,
         other_fee: values.otherFee || 0,
         driver_fee: values.driverFee || 0,
+        driver_note: values.driverNote,
+        maps_url: values.mapsUrl,
+      });
+
+      await syncDoEkspedisiItemDestinations({
+        doExpeditionItemId: item.id,
+        primaryDestination: {
+          destination: values.destination,
+          driverNote: values.driverNote,
+          mapsUrl: values.mapsUrl,
+        },
+        additionalDestinations: values.destinationStops,
       });
 
       toast.success('Data DO Ekspedisi berhasil ditambahkan');
@@ -60,6 +77,14 @@ export default function CreateDOEkspedisiPage() {
         router.push(`/dashboard/${slug}/do-ekspedisi`);
       }
     } catch (error: any) {
+      if (createdExpeditionId != null) {
+        try {
+          await deleteDoEkspedisi(createdExpeditionId);
+        } catch {
+          // Keep the original error visible; rollback best effort only.
+        }
+      }
+
       toast.error(error.message || 'Gagal menyimpan data DO Ekspedisi');
     }
   };
