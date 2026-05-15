@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDealers } from '@/hooks/useDealer';
 import { useRegions } from '@/hooks/useRegion';
 import { useVendorLookup } from '@/hooks/useVehicleData';
-import type { VehicleDataPayload } from '@/@types/vehicle-data.types';
+import type { VehicleDataPayload, VehicleType } from '@/@types/vehicle-data.types';
 import type { VehicleRegistrationDetail, VehicleRegistrationPayload } from '@/@types/vehicle-document.types';
 
 interface Props {
@@ -132,7 +132,10 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
   const [dealerValue, setDealerValue] = React.useState(initialData.dealerId != null ? String(initialData.dealerId) : '');
   const [regionValue, setRegionValue] = React.useState(initialData.regionId != null ? String(initialData.regionId) : '');
   const [vendorValue, setVendorValue] = React.useState(initialData.vendorId != null ? String(initialData.vendorId) : '');
-  const [vehicleTypeValue, setVehicleTypeValue] = React.useState(initialData.vehicleType || '');
+  const [vehicleTypeValue, setVehicleTypeValue] = React.useState<VehicleType | ''>(initialData.vehicleType || '');
+  const handleVehicleTypeChange = (value: string) => {
+    setVehicleTypeValue(value as VehicleType);
+  };
   const dealersQuery = useDealers(null, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' }, { enabled: true });
   const regionsQuery = useRegions({ page: 1, perPage: 10, search: regionSearch, sort_order: 'asc' });
   const vendorLookup = useVendorLookup(vendorSearch);
@@ -307,7 +310,7 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
               </div>
               <div className="space-y-2">
                 <Label className="text-xs font-semibold text-slate-700">Jenis</Label>
-                <Select value={vehicleTypeValue || undefined} onValueChange={setVehicleTypeValue}>
+                <Select value={vehicleTypeValue || undefined} onValueChange={handleVehicleTypeChange}>
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>

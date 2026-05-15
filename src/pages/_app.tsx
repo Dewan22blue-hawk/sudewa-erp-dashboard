@@ -4,15 +4,9 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { Toaster } from "@/components/ui/sonner"
 import { useAuthCheck } from "@/features/auth/hooks/use-auth-check"
-import { Inter } from "next/font/google"
 
 import "@/styles/globals.css"
 import { CompanyProvider } from "@/contexts/CompanyContext"
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-})
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient({
@@ -86,7 +80,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <CompanyProvider>
-        <main className={`${inter.variable} font-sans`}>
+        <main className="font-sans">
           <Component {...pageProps} />
           <Toaster position="bottom-center" />
         </main>
