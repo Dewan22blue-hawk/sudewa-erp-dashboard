@@ -48,6 +48,7 @@ export interface VehicleRegistrationDetail {
   id: number;
   uuid?: string;
   vehicleDocumentId?: number | null;
+  vehicleDataId?: number | null;
   vendorId?: number | null;
   isAlreadyProcessed?: boolean | null;
   isUpdateAdditionalData?: boolean | null;
@@ -56,7 +57,7 @@ export interface VehicleRegistrationDetail {
   dealerName: string;
   regionName: string;
   vendorName: string;
-  vehicleType: string;
+  vehicleType: VehicleType;
   stnkName: string;
   machineNumber: string;
   processDate: string;

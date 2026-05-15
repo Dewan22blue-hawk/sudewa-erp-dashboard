@@ -51,7 +51,7 @@ export default function MaterialReceiptDetailPage() {
   const endData = Math.min(page * perPage, totalData);
 
   const handleUploadInvoice = async (file: File | null) => {
-    if (!transactionId) return;
+    if (!transactionId || !transaction) return;
     if (!file) {
       toast.error('Silakan pilih file invoice terlebih dahulu');
       return;

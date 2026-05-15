@@ -1,4 +1,5 @@
 import type { PaginationParams } from '@/@types/pagination.types';
+import type { VehicleType } from '@/@types/vehicle-data.types';
 import type {
   VehicleDocumentDetail,
   VehicleDocumentFilters,
@@ -44,6 +45,12 @@ const coalesceText = (...values: unknown[]) => {
     if (normalized) return normalized;
   }
   return '';
+};
+const toVehicleType = (...values: unknown[]): VehicleType => {
+  const normalized = coalesceText(...values).toLowerCase();
+  if (normalized === 'r3') return 'r3';
+  if (normalized === 'r4') return 'r4';
+  return 'r2';
 };
 
 const getVehicleDataNode = (item: any) => item?.vehicle_data ?? item?.vehicleDocumentItem?.vehicle_data ?? item?.vehicle_document_item?.vehicle_data ?? item?.vehicle_document_item ?? item;
@@ -111,7 +118,8 @@ const mapVehicleRegistrationDetail = (item: any, parentVendorName?: string): Veh
     dealerName: getDealerLabel(vehicle, item),
     regionName: getRegionLabel(vehicle, item),
     vendorName: coalesceText(vendor?.name, parentVendorName),
-    vehicleType: coalesceText(vehicle?.vehicle_type, item.vehicle_type),
+    vehicleDataId: vehicle?.id == null ? null : Number(vehicle.id),
+    vehicleType: toVehicleType(vehicle?.vehicle_type, item.vehicle_type),
     stnkName: coalesceText(vehicle?.stnk_name, item.stnk_name),
     machineNumber: coalesceText(vehicle?.machine_number, item.machine_number),
     processDate: text(item.process_date),
