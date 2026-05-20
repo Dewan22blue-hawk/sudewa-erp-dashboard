@@ -21,6 +21,7 @@ import {
   getDoEkspedisiItemDestinations,
   getDoEkspedisiItems,
   getDoEkspedisis,
+  getNextDoEkspedisiCode,
   lookupDoEkspedisiCustomers,
   lookupDoEkspedisiDrivers,
   lookupDoEkspedisiVehicles,
@@ -46,6 +47,15 @@ export function useDoEkspedisiDetail(id: string | number | null) {
     queryFn: () => getDoEkspedisiById(id as string | number),
     enabled: !!id,
     retry: false,
+  });
+}
+
+export function useNextDoEkspedisiCode(enabled = true) {
+  return useQuery({
+    queryKey: ['do-ekspedisi', 'next-code'],
+    queryFn: getNextDoEkspedisiCode,
+    enabled,
+    staleTime: 10_000,
   });
 }
 

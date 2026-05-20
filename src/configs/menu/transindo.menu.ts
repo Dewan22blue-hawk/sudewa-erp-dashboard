@@ -71,6 +71,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/administrasi/create-invoice'),
         },
         {
+          label: 'Order List',
+          href: base('/administrasi/order-list'),
+        },
+        {
           label: 'LPJ Perjalanan',
           href: base('/lpj-perjalanan'),
         },

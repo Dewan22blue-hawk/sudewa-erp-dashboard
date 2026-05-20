@@ -29,10 +29,12 @@ export const useQueryParamsTable = (options?: QueryStateOptions) => {
 
   const updateQuery = useCallback(
     (next: Record<string, string | number | undefined>) => {
+      if (!router.isReady) return;
+
       const query: Record<string, string | string[]> = {};
 
       Object.entries(router.query).forEach(([key, value]) => {
-        if (value !== undefined) {
+        if (value !== undefined && key !== 'slug') {
           query[key] = value;
         }
       });
@@ -45,7 +47,8 @@ export const useQueryParamsTable = (options?: QueryStateOptions) => {
         }
       });
 
-      router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
+      const pathname = router.asPath.split('?')[0];
+      router.replace({ pathname, query }, undefined, { shallow: true });
     },
     [router],
   );

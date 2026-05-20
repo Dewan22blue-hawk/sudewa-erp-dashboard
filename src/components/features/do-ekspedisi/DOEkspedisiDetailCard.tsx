@@ -1,46 +1,60 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { Calendar } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { DoEkspedisi } from '@/@types/do-ekspedisi.types';
 
 interface DOEkspedisiDetailCardProps {
   data: DoEkspedisi;
 }
 
-export function DOEkspedisiDetailCard({ data }: DOEkspedisiDetailCardProps) {
+function DetailField({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <Card className="rounded-[20px] border border-[#E5E7EB] px-5 py-6 shadow-sm">
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <div className="space-y-2">
-          <Label>Tanggal</Label>
-          <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              readOnly
-              value={data.date ? format(new Date(data.date), 'dd MMMM yyyy') : '-'}
-              className="h-11 rounded-xl border-[#E5E7EB] bg-white pl-10 text-slate-700"
-            />
-          </div>
-        </div>
+    <div className="space-y-1">
+      <p className="text-xs text-slate-700">{label}</p>
+      <div className="text-[16px] font-semibold text-slate-950">{value || '-'}</div>
+    </div>
+  );
+}
 
-        <div className="space-y-2">
-          <Label>Nomor Polisi</Label>
-          <Input readOnly value={data.vehicle?.registrationNumber || '-'} className="h-11 rounded-xl border-[#E5E7EB] bg-white text-slate-700" />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Driver</Label>
-          <Input readOnly value={data.driver?.name || '-'} className="h-11 rounded-xl border-[#E5E7EB] bg-white text-slate-700" />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Jenis Kendaraan</Label>
-          <Input readOnly value={data.vehicle?.type || '-'} className="h-11 rounded-xl border-[#E5E7EB] bg-white text-slate-700" />
-        </div>
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="bg-[#eef3f8] px-6 py-4">
+        <h2 className="text-[18px] font-semibold text-slate-950">{title}</h2>
       </div>
-    </Card>
+      <div className="px-6 py-6">{children}</div>
+    </section>
+  );
+}
+
+export function DOEkspedisiDetailCard({ data }: DOEkspedisiDetailCardProps) {
+  const firstItem = data.items?.[0];
+  const order = data.orderList;
+
+  return (
+    <div className="space-y-6">
+      <Section title="Detail Driver">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-3">
+          <DetailField label="Tanggal Pengiriman" value={data.date ? format(new Date(data.date), 'dd/MM/yyyy') : '-'} />
+          <DetailField label="Kode DO" value={data.doCode || '-'} />
+          <div />
+          <DetailField label="Nama Driver" value={data.driver?.name || '-'} />
+          <DetailField label="Tipe Armada" value={data.vehicle?.type || '-'} />
+          <DetailField label="Nomor Polisi" value={data.vehicle?.registrationNumber || '-'} />
+        </div>
+      </Section>
+
+      <Section title="Detail Order Customer">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-3">
+          <DetailField label="Nama Customer" value={order?.customerName || firstItem?.customerName || firstItem?.customer?.name || '-'} />
+          <DetailField label="Kode Order" value={data.orderCode || order?.code || '-'} />
+          <div />
+          <DetailField label="Loading In" value={order?.loadingIn || firstItem?.loadingIn || '-'} />
+          <DetailField label="Loading Out" value={order?.loadingOut || firstItem?.loadingOut || '-'} />
+          <DetailField label="Tujuan Kirim" value={order?.destination || firstItem?.destination || '-'} />
+          <DetailField label="Muatan" value={order?.loadContent || '-'} />
+          <DetailField label="QTY" value={order?.qty || '-'} />
+        </div>
+      </Section>
+    </div>
   );
 }

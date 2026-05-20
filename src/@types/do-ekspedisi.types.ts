@@ -14,6 +14,18 @@ export interface DoEkspedisiDriver {
   phone?: string | null;
 }
 
+export interface DoEkspedisiOrderList {
+  id: number;
+  uuid?: string;
+  code: string;
+  customerName: string;
+  loadingIn: string;
+  loadingOut: string;
+  destination: string;
+  loadContent: string;
+  qty: number;
+}
+
 export interface DoEkspedisiCustomer {
   id: number;
   uuid?: string;
@@ -61,9 +73,11 @@ export interface DoEkspedisi {
   id: number;
   uuid?: string;
   doCode: string;
+  orderCode: string;
   date: string;
   vehicleId: number | null;
   driverId: number | null;
+  driverNote: string;
   itemsCount: number;
   bruttoValue: number;
   totalPpn: number;
@@ -74,6 +88,7 @@ export interface DoEkspedisi {
   totalDriverFee: number;
   vehicle?: DoEkspedisiVehicle | null;
   driver?: DoEkspedisiDriver | null;
+  orderList?: DoEkspedisiOrderList | null;
   items?: DoEkspedisiItem[];
   createdAt?: string;
   updatedAt?: string;
@@ -83,6 +98,7 @@ export interface DoEkspedisiListParams {
   search?: string;
   order_by?: string;
   order_sort?: 'asc' | 'desc';
+  do_order_list_id?: number | string;
 }
 
 export interface DoEkspedisiItemListParams {
@@ -106,6 +122,7 @@ export interface DoEkspedisiPayload {
   date: string;
   vehicle_id: string | number;
   driver_id: string | number;
+  driver_note?: string;
 }
 
 export interface DoEkspedisiItemPayload {

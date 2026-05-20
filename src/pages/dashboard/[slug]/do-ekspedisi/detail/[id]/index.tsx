@@ -115,8 +115,7 @@ export default function DetailDOEkspedisiPage() {
             <ChevronLeft className="h-5 w-5 text-slate-500" />
           </button>
           <div>
-            <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">Detail DO Expedisi</h1>
-            <p className="text-sm text-slate-500">Kode DO <span className="font-medium text-[#2563EB]">{detailQuery.data.doCode}</span></p>
+            <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
           </div>
         </div>
 

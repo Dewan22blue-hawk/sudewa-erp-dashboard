@@ -59,10 +59,12 @@ const mapInvoice = (item: any): DoExpeditionInvoice => ({
     ? {
         id: Number(item.do_expedition.id ?? 0),
         uuid: item.do_expedition.uuid,
-        doCode: item.do_expedition.do_code ?? '',
+        doCode: item.do_expedition.do_code ?? item.do_expedition.code ?? '',
+        orderCode: item.do_expedition.do_order_list?.code ?? item.do_expedition.do_orderlist?.code ?? '',
         date: item.do_expedition.date ?? '',
         vehicleId: item.do_expedition.vehicle_id == null ? null : Number(item.do_expedition.vehicle_id),
         driverId: item.do_expedition.driver_id == null ? null : Number(item.do_expedition.driver_id),
+        driverNote: item.do_expedition.driver_note ?? '',
         itemsCount: Array.isArray(item.do_expedition.items) ? item.do_expedition.items.length : 0,
         bruttoValue: 0,
         totalPpn: 0,
