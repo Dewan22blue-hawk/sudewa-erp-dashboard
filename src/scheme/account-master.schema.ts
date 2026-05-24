@@ -5,9 +5,7 @@ export const accountSchema = z.object({
   code: z.string().min(1, 'Kode akun wajib diisi'),
   name: z.string().min(1, 'Nama akun wajib diisi'),
   description: z.string().optional(),
-  // Backend expects "debet"; allow both spellings for compatibility
-  type: z.enum(['debet', 'debit', 'credit'], { required_error: 'Kategori wajib dipilih' }),
-  category: z.enum(['DEBET', 'KREDIT']).optional(),
+  category: z.enum(['general_administration', 'current_assets', 'liabilities'], { required_error: 'Kategori laporan wajib dipilih' }),
   isActive: z.boolean(),
 });
 

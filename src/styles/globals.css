@@ -373,6 +373,19 @@ body {
       margin-bottom: 1mm !important;
     }
 
+    /* Specific print layout for DO Ekspedisi to reduce top padding and center content */
+    #do-ekspedisi-print.print-letter-content {
+      padding-top: 12mm !important;
+      padding-right: 10mm !important;
+      padding-bottom: 12mm !important;
+      padding-left: 10mm !important;
+      align-items: flex-start !important;
+      max-width: 194mm !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
     .laporan-pembelian-print-area .overflow-x-auto,
     .laporan-penjualan-print-area .overflow-x-auto,
     .laporan-penerimaan-print-area .overflow-x-auto,

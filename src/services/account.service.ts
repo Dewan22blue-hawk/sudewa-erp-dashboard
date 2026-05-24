@@ -6,17 +6,20 @@ import { ApiResponseError, ApiValidationError, LaravelApiResponse, ensureSuccess
 
 interface AccountApiModel {
   id: number;
+  uuid?: string;
   account_group_id: number;
   account_group_name?: string;
   account_group?: {
     id: number;
     company_id?: string | number | null;
+    group_code?: string;
     name: string;
   };
   code: string;
   name: string;
   description?: string | null;
   type?: 'credit' | 'debet' | 'debit';
+  category?: string;
   is_active?: boolean | number;
   created_at?: string;
   updated_at?: string;
@@ -24,11 +27,13 @@ interface AccountApiModel {
 
 const mapAccount = (payload: AccountApiModel): Account => ({
   id: payload.id,
+  uuid: payload.uuid,
   code: payload.code,
   name: payload.name,
   accountGroupId: payload.account_group_id,
-  accountGroupName: payload.account_group_name ?? payload.account_group?.name,
-  group: payload.account_group_name ?? payload.account_group?.name,
+  accountGroupCode: payload.account_group?.group_code ?? payload.account_group_name ?? undefined,
+  group: payload.account_group?.group_code ?? payload.account_group_name ?? payload.account_group?.name,
+  category: payload.category ?? undefined,
   type: payload.type === 'debit' ? 'debet' : payload.type, // normalize to debet
   cashFlow: undefined,
   description: payload.description ?? null,
@@ -43,7 +48,8 @@ const basePath = '/wapi/master-data/account';
 type PaginatedAccountResponse = LaravelApiResponse<{
   data: AccountApiModel[];
   current_page: number;
-  perPage: number;
+  per_page?: number;
+  perPage?: number;
   total: number;
   last_page: number;
 }>;
@@ -69,7 +75,7 @@ export const getAccounts = async (params: PaginationParams & { search?: string; 
     {
       data: scopedData,
       current_page: data.current_page,
-      per_page: data.perPage,
+      per_page: data.per_page ?? data.perPage ?? params.perPage ?? 10,
       total: params.company_id ? scopedData.length : data.total,
       last_page: data.last_page,
     },
@@ -86,17 +92,15 @@ export const getAccountById = async (id: number | string): Promise<AccountDetail
 export const createAccount = async (payload: AccountPayload): Promise<Account> => {
   try {
     const type = payload.type === 'debit' ? 'debet' : (payload.type ?? 'debet');
-    // Use x-www-form-urlencoded to match backend expectation
-    const body = new URLSearchParams();
+    const body = new FormData();
     body.append('account_group_id', String(payload.accountGroupId));
     body.append('code', payload.code);
     body.append('name', payload.name);
     if (payload.description !== undefined && payload.description !== null) body.append('description', payload.description);
     body.append('type', type);
+    if (payload.category) body.append('category', payload.category);
 
-    const response = await apiClient.post<AccountItemResponse>(basePath, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    const response = await apiClient.post<AccountItemResponse>(basePath, body);
 
     const data = ensureSuccess(response.data);
     return mapAccount(data);
@@ -118,6 +122,7 @@ export const updateAccount = async (id: number | string, payload: AccountPayload
     body.append('name', payload.name);
     if (payload.description !== undefined && payload.description !== null) body.append('description', payload.description);
     body.append('type', type);
+    if (payload.category) body.append('category', payload.category);
 
     const response = await apiClient.put<AccountItemResponse>(`${basePath}/${id}`, body, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

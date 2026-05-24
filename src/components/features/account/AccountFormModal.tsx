@@ -9,7 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormValues } from '@/scheme/account-master.schema';
 import type { AccountGroup } from '@/@types/account-group.types';
+import { ACCOUNT_CATEGORY_OPTIONS } from '@/lib/account';
+import { cn } from '@/lib/utils';
+import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { CreateAccountGroupDialog } from './CreateAccountGroupDialog';
+import { Plus } from 'lucide-react';
 
 interface AccountFormModalProps {
   open: boolean;
@@ -29,80 +33,85 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">{description}</DialogDescription>
+      <DialogContent className="max-w-[calc(100%-2rem)] rounded-[24px] border-0 p-0 shadow-2xl sm:max-w-[540px]" showCloseButton={false}>
+        <DialogHeader className="space-y-1 border-b border-slate-100 px-5 pb-0 pt-5 text-left sm:px-6">
+          <DialogTitle className="text-[1.55rem] font-semibold tracking-[-0.03em] text-slate-950">{title}</DialogTitle>
+          <DialogDescription className="pb-5 text-sm text-slate-500">{description}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Kode Akun */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-5 pb-5 pt-5 sm:px-6">
             <FormField
               control={form.control}
               name="code"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kode Akun<RequiredMark /></FormLabel>
+                <FormItem className="space-y-2.5">
+                  <FormLabel className="text-sm font-semibold text-slate-900">Kode Akun<RequiredMark /></FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan kode akun" {...field} />
+                    <Input placeholder="Masukkan kode akun" className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus-visible:ring-slate-300" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+                )}
+              />
 
-            {/* Grup Akun */}
-            <FormField
-              control={form.control}
-              name="accountGroupId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Grup Akun<RequiredMark /></FormLabel>
+              <FormField
+                control={form.control}
+                name="accountGroupId"
+                render={({ field }) => (
+                <FormItem className="space-y-2.5">
+                  <FormLabel className="text-sm font-semibold text-slate-900">Grup Akun<RequiredMark /></FormLabel>
                   <FormControl>
-                    <div className="flex items-center gap-2">
-                      <Select value={field.value ? String(field.value) : ''} onValueChange={(val) => field.onChange(Number(val))}>
-                        <SelectTrigger className="flex-1">
-                          <SelectValue placeholder={isLoadingGroups ? 'Memuat...' : 'Masukkan grup akun'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accountGroups.length === 0 && (
-                            <SelectItem value="__no_account_group__" disabled>
-                              Tidak ada grup akun
-                            </SelectItem>
-                          )}
-                          {accountGroups.map((group) => (
-                            <SelectItem key={group.id} value={String(group.id)}>
-                              {group.code || group.id}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenCreateGroup(true)}>
-                        +
-                      </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                    <SearchableSelect
+                      value={field.value ? String(field.value) : ''}
+                      onChange={(value) => field.onChange(Number(value))}
+                      options={accountGroups.map((group) => ({
+                      value: String(group.id),
+                      label: group.code || String(group.id),
+                      subtitle: group.description ?? undefined,
+                      }))}
+                      placeholder={isLoadingGroups ? 'Memuat...' : 'Select an item'}
+                      searchPlaceholder="Cari grup akun..."
+                      emptyText="Grup akun tidak ditemukan."
+                      loading={isLoadingGroups}
+                      className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus-visible:ring-slate-300"
+                    />
                     </div>
+                    <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-12 w-12 flex-shrink-0 rounded-xl border-slate-200 text-slate-900 shadow-none hover:bg-slate-50"
+                    onClick={() => setOpenCreateGroup(true)}
+                    >
+                    <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+                )}
+              />
 
-            {/* Kategori (type) */}
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kategori<RequiredMark /></FormLabel>
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                <FormItem className="space-y-2.5">
+                  <FormLabel className="text-sm font-semibold text-slate-900">Kategori Laporan<RequiredMark /></FormLabel>
                   <FormControl>
-                    <Select value={field.value ?? 'debet'} onValueChange={(val) => field.onChange(val)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih kategori" />
+                    <Select value={field.value ?? ''} onValueChange={(val) => field.onChange(val)}>
+                      <SelectTrigger className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus:ring-slate-300">
+                        <SelectValue placeholder="Select an item" />
                       </SelectTrigger>
-                      <SelectContent id="account-type-select">
-                        <SelectItem value="debet">Debet</SelectItem>
-                        <SelectItem value="credit">Kredit</SelectItem>
+                      <SelectContent>
+                        {ACCOUNT_CATEGORY_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -111,42 +120,39 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               )}
             />
 
-            {/* Nama */}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nama Akun<RequiredMark /></FormLabel>
+                <FormItem className="space-y-2.5">
+                  <FormLabel className="text-sm font-semibold text-slate-900">Nama Akun<RequiredMark /></FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan nama akun" {...field} />
+                    <Input placeholder="Masukkan nama akun" className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus-visible:ring-slate-300" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Deskripsi */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
+                <FormItem className="space-y-2.5">
+                  <FormLabel className="text-sm font-semibold text-slate-900">Deskripsi</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Tulis deskripsi di sini" className="resize-none" rows={3} {...field} />
+                    <Textarea placeholder="Tulis deskripsi di sini" className="min-h-[92px] resize-none rounded-xl border-slate-200 px-4 py-3 text-sm shadow-none focus-visible:ring-slate-300" rows={4} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Buttons */}
-            <div className="flex flex-col gap-2 pt-2">
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <div className="flex flex-col gap-3 pt-2">
+              <Button type="submit" className={cn('h-12 w-full rounded-xl bg-[#1F3B5B] text-sm font-semibold text-white hover:bg-[#1B3450]')} disabled={isSubmitting}>
                 {isSubmitting ? 'Menyimpan...' : submitLabel}
               </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" className="h-12 w-full rounded-xl border-slate-200 text-sm font-semibold text-slate-900 shadow-none hover:bg-slate-50" onClick={() => onOpenChange(false)}>
                 Batal
               </Button>
             </div>
@@ -154,7 +160,16 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
         </Form>
       </DialogContent>
 
-      <CreateAccountGroupDialog open={openCreateGroup} onOpenChange={setOpenCreateGroup} onCreated={(id) => form.setValue('accountGroupId', Number(id), { shouldValidate: true, shouldDirty: true })} />
+      <CreateAccountGroupDialog
+        open={openCreateGroup}
+        onOpenChange={setOpenCreateGroup}
+        onCreated={(id) => {
+          form.setValue('accountGroupId', Number(id), {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+      />
     </Dialog>
   );
 }

@@ -1,101 +1,44 @@
 import * as React from 'react';
-import { useQueries } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { fetchUserCompanies } from '@/services/company.service';
-import { getDoExpeditionInvoiceById } from '@/services/create-invoice.service';
 import { CreateInvoicePrintDocument } from '@/components/features/create-invoice/CreateInvoicePrintDocument';
-import {
-  buildDetailRows,
-  buildPrintPayload,
-  buildProcessDefaults,
-  createProcessDraftPayload,
-  getDefaultRecipientAttention,
-  getInvoiceProcessDraft,
-} from '@/components/features/create-invoice/create-invoice.utils';
+import { buildDetailRows, buildPrintPayload, buildProcessDefaults, createProcessDraftPayload, getInvoiceProcessDraft } from '@/components/features/create-invoice/create-invoice.utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
 import { getLetterheadByCompanyId, resolveCompanyId } from '@/lib/print-letterhead';
-
-const isDefined = <T,>(value: T | undefined | null): value is T => value != null;
+import { useDoInvoiceDetail } from '@/hooks/useDoInvoice';
 
 export default function CreateInvoicePrintPage() {
   const router = useRouter();
   const { companyId } = useCompany();
   const id = router.isReady && typeof router.query.id === 'string' ? Number(router.query.id) : 0;
+  const expeditionId = router.isReady && typeof router.query.expeditionId === 'string' ? Number(router.query.expeditionId) : 0;
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
-
-  const draft = React.useMemo(() => (router.isReady && id ? getInvoiceProcessDraft(id) : null), [router.isReady, id]);
-  const invoiceIds = React.useMemo(() => {
-    if (draft?.invoiceIds?.length) return draft.invoiceIds;
-    return id ? [id] : [];
-  }, [draft, id]);
-
-  const invoiceQueries = useQueries({
-    queries: invoiceIds.map((invoiceId) => ({
-      queryKey: ['create-invoice', 'detail', invoiceId],
-      queryFn: () => getDoExpeditionInvoiceById(invoiceId),
-      enabled: invoiceId > 0,
-    })),
-  });
+  const detailQuery = useDoInvoiceDetail(router.isReady && id > 0 ? id : null);
 
   React.useEffect(() => {
     fetchUserCompanies()
       .then((companies) => {
         const resolvedId = resolveCompanyId(slug, companyId);
         const found = companies.find((company) => company.id === resolvedId || company.slug === slug);
-        if (found?.name) {
-          setCompanyName(found.name.toUpperCase());
-        }
+        if (found?.name) setCompanyName(found.name.toUpperCase());
       })
-      .catch(() => {
-        // ignore company lookup failure
-      });
+      .catch(() => undefined);
   }, [companyId, slug]);
 
-  const isLoading = invoiceQueries.some((query) => query.isLoading);
-  const invoices = invoiceQueries.map((query) => query.data).filter(isDefined);
-
-  if (!router.isReady || isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat invoice...</div>
-      </DashboardLayout>
-    );
+  if (!router.isReady || detailQuery.isLoading) {
+    return <DashboardLayout><div className="py-20 text-center text-sm text-slate-500">Memuat invoice...</div></DashboardLayout>;
   }
 
-  if (!id) {
-    return (
-      <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">ID invoice tidak valid.</div>
-      </DashboardLayout>
-    );
+  if (!detailQuery.data) {
+    return <DashboardLayout><div className="py-20 text-center text-sm text-slate-500">Data invoice tidak ditemukan.</div></DashboardLayout>;
   }
 
-  if (!invoices.length) {
-    return (
-      <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Data invoice tidak ditemukan.</div>
-      </DashboardLayout>
-    );
-  }
-
-  const fallbackDefaults = buildProcessDefaults(invoices);
-  const activeDraft =
-    draft ??
-    createProcessDraftPayload(id, invoiceIds, {
-      date: fallbackDefaults.date,
-      subject: fallbackDefaults.subject,
-      attachment: fallbackDefaults.attachment,
-      letterContent: fallbackDefaults.letterContent,
-      customerName: fallbackDefaults.customerName,
-    });
-  const rows = buildDetailRows(invoices);
-  const firstInvoice = invoices[0]!;
-  const recipientAttention = getDefaultRecipientAttention(invoices);
-  const payload = buildPrintPayload(firstInvoice.doExpedition?.doCode || `INV-${id}`, companyName, activeDraft, rows, recipientAttention);
-
+  const draft = getInvoiceProcessDraft(detailQuery.data.id) ?? createProcessDraftPayload(detailQuery.data, buildProcessDefaults(detailQuery.data), expeditionId ? [expeditionId] : undefined);
+  const rows = buildDetailRows([detailQuery.data], expeditionId ? [expeditionId] : draft.selectedExpeditionIds);
+  const payload = buildPrintPayload(detailQuery.data, rows, companyName, draft);
   const resolvedCompanyId = resolveCompanyId(router.query.slug, companyId);
   const letterheadUrl = getLetterheadByCompanyId(resolvedCompanyId) || '/invoice-letter/4-jagrataratransindo-letter.jpeg';
 
@@ -107,8 +50,8 @@ export default function CreateInvoicePrintPage() {
             <ChevronLeft className="h-5 w-5 text-slate-500" />
           </button>
           <div>
-            <h1 className="text-[18px] font-semibold text-slate-900">Invoice {payload.invoiceNumber}</h1>
-            <p className="text-sm text-slate-500">Dibuat: {activeDraft.date}</p>
+            <h1 className="text-[18px] font-semibold text-slate-900">Invoice {payload.invoiceCode}</h1>
+            <p className="text-sm text-slate-500">Dibuat: {payload.draft.date}</p>
           </div>
         </div>
 

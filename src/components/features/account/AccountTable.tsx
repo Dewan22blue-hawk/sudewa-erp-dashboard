@@ -1,201 +1,160 @@
-import { useState } from 'react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical } from 'lucide-react';
-import { Account } from '@/@types/account.types';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
+import { cn } from '@/lib/utils';
+import { getVisiblePageNumbers } from '@/lib/api/pagination';
+import { getAccountCategoryLabel } from '@/lib/account';
+import type { Account } from '@/@types/account.types';
+import { MoreVertical } from 'lucide-react';
 
 interface AccountTableProps {
-  data: Account[] | undefined;
-  total: number | undefined;
+  data: Account[];
+  total: number;
   isLoading: boolean;
+  page: number;
+  perPage: number;
+  selectedIds: Set<string>;
+  onToggleAll: (checked: boolean) => void;
+  onToggleRow: (id: string, checked: boolean) => void;
   onEdit: (account: Account) => void;
   onDelete: (account: Account) => void;
-  page?: number;
-  perPage?: number;
-  onPageChange?: (page: number) => void;
-  onPerPageChange?: (perPage: number) => void;
+  onPageChange: (page: number) => void;
 }
 
-export function AccountTable({ data, total, isLoading, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange }: AccountTableProps) {
-  const isControlled = !!page && !!perPage;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
-
-  const handleItemsPerPageChange = (val: string) => {
-    const next = Number(val);
-    if (isControlled) {
-      onPerPageChange?.(next);
-      onPageChange?.(1);
-    } else {
-      setItemsPerPage(next);
-      setCurrentPage(1);
-    }
-  };
-
-  // Safe defaults
-  const safeData = data || [];
-
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: safeData,
-  });
-
-  const activePage = isControlled ? page! : currentPage;
-  const activePerPage = isControlled ? perPage! : itemsPerPage;
-  const safeTotal = total ?? sortedData.length;
-
-  const totalPages = Math.max(1, Math.ceil(safeTotal / activePerPage));
-  const startIndex = (activePage - 1) * activePerPage;
-  const endIndex = startIndex + activePerPage;
-  const currentData = isControlled ? sortedData : sortedData.slice(startIndex, endIndex);
+export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange }: AccountTableProps) {
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const pageIds = data.map((item) => String(item.id));
+  const allChecked = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+  const someChecked = pageIds.some((id) => selectedIds.has(id));
+  const start = total === 0 ? 0 : (page - 1) * perPage + 1;
+  const end = total === 0 ? 0 : Math.min(page * perPage, total);
+  const visiblePages = getVisiblePageNumbers(totalPages, page);
+  const showLastPageShortcut = visiblePages[visiblePages.length - 1] !== totalPages;
 
   return (
-    <div className="space-y-4">
-      {/* SHOW ENTRIES */}
-      <div className="flex items-center gap-2 text-sm">
-        <span>Show</span>
-        <Select value={String(activePerPage)} onValueChange={handleItemsPerPageChange}>
-          <SelectTrigger className="h-9 w-20 bg-white">
-            <SelectValue placeholder="10" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="25">25</SelectItem>
-            <SelectItem value="50">50</SelectItem>
-            <SelectItem value="100">100</SelectItem>
-          </SelectContent>
-        </Select>
-        <span>Entries</span>
-      </div>
-
-      <div className="rounded-xl border overflow-hidden">
+    <div className="space-y-7">
+      <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.05)]">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted hover:bg-muted">
-              <TableHead>
-                <SortableHeader title="KODE AKUN" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+            <TableRow className="border-b border-slate-200 bg-[#EFF3F8] hover:bg-[#EFF3F8]">
+              <TableHead className="w-[72px] px-4 py-5">
+                <Checkbox
+                  checked={allChecked ? true : (someChecked ? 'indeterminate' : false)}
+                  onCheckedChange={(checked) => onToggleAll(Boolean(checked))}
+                  className="size-6 rounded-[8px] border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
+                  aria-label="Pilih semua akun"
+                />
               </TableHead>
-              <TableHead>
-                <SortableHeader title="GRUP AKUN" sortKey="accountGroupName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="DESKRIPSI" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead>
-                <SortableHeader title="KATEGORI" sortKey="type" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
-              </TableHead>
-              <TableHead className="text-right font-semibold">ACTION</TableHead>
+              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Kode Akun</TableHead>
+              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Nama Akun</TableHead>
+              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Grup Akun</TableHead>
+              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Kategori Akun</TableHead>
+              <TableHead className="w-[110px] py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Action</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
-              [...Array(itemsPerPage)].map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <Skeleton className="h-4 w-20" />
+              Array.from({ length: perPage }).map((_, index) => (
+                <TableRow key={index} className="border-b border-slate-200">
+                  <TableCell className="px-4 py-5">
+                    <Skeleton className="h-6 w-6 rounded-[8px]" />
                   </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-32" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-48" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-24" />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Skeleton className="h-8 w-8 ml-auto" />
-                  </TableCell>
+                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-16" /></TableCell>
+                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-40" /></TableCell>
+                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-14" /></TableCell>
+                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-36" /></TableCell>
+                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-8 w-8" /></TableCell>
                 </TableRow>
               ))
-            ) : currentData.length === 0 ? (
+            ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                  Tidak ada data
+                <TableCell colSpan={6} className="py-14 text-center text-base text-slate-500">
+                  Tidak ada data akun.
                 </TableCell>
               </TableRow>
             ) : (
-              currentData.map((account) => (
-                <TableRow key={account.id} className="hover:bg-muted/50">
-                  <TableCell>{account.code}</TableCell>
-                  <TableCell>{account.accountGroupName || account.name || '-'}</TableCell>
-                  <TableCell>{account.description}</TableCell>
-                  <TableCell className="capitalize">{account.type ?? '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(account)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(account)} className="text-destructive focus:text-destructive">
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
+              data.map((account) => {
+                const checked = selectedIds.has(String(account.id));
+
+                return (
+                  <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="border-b border-slate-200 bg-white hover:bg-slate-50/60">
+                    <TableCell className="px-4 py-4">
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(value) => onToggleRow(String(account.id), Boolean(value))}
+                        className="size-6 rounded-[8px] border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
+                        aria-label={`Pilih akun ${account.name}`}
+                      />
+                    </TableCell>
+                    <TableCell className="py-4 text-center text-[1.05rem] font-medium text-slate-900">{account.code}</TableCell>
+                    <TableCell className="py-4 text-center text-[1.05rem] font-medium uppercase text-slate-900">{account.name}</TableCell>
+                    <TableCell className="py-4 text-center text-[1.05rem] text-slate-800">{account.accountGroupCode ?? '-'}</TableCell>
+                    <TableCell className="py-4 text-center text-[1.05rem] text-slate-800">{getAccountCategoryLabel(account.category)}</TableCell>
+                    <TableCell className="py-4 text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-slate-900 hover:bg-slate-100">
+                            <MoreVertical className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[180px] rounded-2xl border-slate-200 p-2 shadow-xl">
+                          <DropdownMenuItem className="rounded-xl px-4 py-3 text-base text-slate-900 focus:bg-slate-50" onClick={() => onEdit(account)}>
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="rounded-xl px-4 py-3 text-base text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => onDelete(account)}>
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
       </div>
 
-      {/* PAGINATION */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          Showing {safeData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, safeTotal)} of {safeTotal} entries
-        </span>
+      <div className="flex flex-col gap-4 text-[15px] text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+        <p>
+          Showing {start}-{end} of {total} data
+        </p>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => (isControlled ? onPageChange?.(Math.max(1, activePage - 1)) : setCurrentPage((prev) => Math.max(1, prev - 1)))} disabled={activePage === 1}>
+        <div className="flex flex-wrap items-center justify-end gap-2 text-slate-800">
+          <Button variant="ghost" size="sm" className="h-11 rounded-2xl px-2 text-[1rem] font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
             Previous
           </Button>
 
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            let pageNum: number;
-            if (totalPages <= 5) {
-              pageNum = i + 1;
-            } else if (activePage <= 3) {
-              pageNum = i + 1;
-            } else if (activePage >= totalPages - 2) {
-              pageNum = totalPages - 4 + i;
-            } else {
-              pageNum = activePage - 2 + i;
-            }
+          {visiblePages.map((pageNumber) => (
+            <Button
+              key={pageNumber}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                'h-12 min-w-12 rounded-2xl border px-4 text-[1rem] font-medium shadow-none',
+                pageNumber === page
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-[0_8px_20px_rgba(15,23,42,0.08)]'
+                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+              )}
+              onClick={() => onPageChange(pageNumber)}
+            >
+              {pageNumber}
+            </Button>
+          ))}
 
-            const changePage = () => {
-              if (isControlled) {
-                onPageChange?.(pageNum);
-              } else {
-                setCurrentPage(pageNum);
-              }
-            };
-
-            return (
-              <Button key={pageNum} variant={activePage === pageNum ? 'default' : 'outline'} size="sm" onClick={changePage} className="w-10">
-                {pageNum}
-              </Button>
-            );
-          })}
-
-          {totalPages > 5 && (
+          {showLastPageShortcut && (
             <>
-              <span className="text-muted-foreground">...</span>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} className="w-10">
+              <span className="px-2 text-[1.15rem] text-slate-500">...</span>
+              <Button variant="ghost" size="sm" className="h-12 min-w-12 rounded-2xl border border-transparent px-4 text-[1rem] font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
                 {totalPages}
               </Button>
             </>
           )}
 
-          <Button variant="outline" size="sm" onClick={() => (isControlled ? onPageChange?.(Math.min(totalPages, activePage + 1)) : setCurrentPage((prev) => Math.min(totalPages, prev + 1)))} disabled={activePage === totalPages}>
+          <Button variant="ghost" size="sm" className="h-11 rounded-2xl px-2 text-[1rem] font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
             Next
           </Button>
         </div>

@@ -1,0 +1,57 @@
+import type { OrderList, OrderListStatus, OrderListTarifItem, OrderListVehicleType } from '@/@types/order-list.types';
+import { formatCurrency } from '@/lib/utils/currency';
+
+export const ORDER_LIST_STATUS_OPTIONS: Array<{ value: OrderListStatus; label: string }> = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'process', label: 'Process' },
+  { value: 'deliver', label: 'Delivered' },
+  { value: 'reject', label: 'Reject' },
+];
+
+export const ORDER_LIST_EDIT_STATUS_OPTIONS: Array<{ value: OrderListStatus; label: string }> = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'process', label: 'Process' },
+  { value: 'deliver', label: 'Delivered' },
+];
+
+export const ORDER_LIST_VEHICLE_OPTIONS: Array<{ value: OrderListVehicleType; label: string }> = [
+  { value: 'towing', label: 'Towing' },
+  { value: 'cdd', label: 'CDD' },
+  { value: 'fuso', label: 'Fuso' },
+];
+
+export const getVehicleTypeLabel = (value?: OrderListVehicleType | null) =>
+  ORDER_LIST_VEHICLE_OPTIONS.find((option) => option.value === value)?.label ?? '-';
+
+export const getOrderVehicleTypeLabel = (order: OrderList, item?: OrderListTarifItem) => {
+  const orderType = getVehicleTypeLabel(order.vehicleType);
+  if (orderType !== '-') return orderType;
+
+  const tarifType = getVehicleTypeLabel(item?.vehicleType);
+  if (tarifType !== '-') return tarifType;
+
+  const vehicleTypes = Array.from(
+    new Set(order.vehicles.map((vehicle) => vehicle.type).filter((type): type is string => Boolean(type))),
+  );
+  return vehicleTypes.length ? vehicleTypes.join(', ') : '-';
+};
+
+export const getOrderStatusLabel = (status?: OrderListStatus | null) =>
+  ORDER_LIST_STATUS_OPTIONS.find((option) => option.value === status)?.label ?? '-';
+
+export const getOrderStatusBadgeClassName = (status?: OrderListStatus | null) => {
+  switch (status) {
+    case 'deliver':
+      return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+    case 'process':
+      return 'border-amber-200 bg-amber-50 text-amber-700';
+    case 'reject':
+      return 'border-rose-200 bg-rose-50 text-rose-700';
+    default:
+      return 'border-slate-200 bg-slate-50 text-slate-700';
+  }
+};
+
+export const getPrimaryTarifItem = (order: OrderList): OrderListTarifItem | undefined => order.tarifs[0];
+
+export const formatOrderCurrency = (value?: number | null) => formatCurrency(Number(value ?? 0));

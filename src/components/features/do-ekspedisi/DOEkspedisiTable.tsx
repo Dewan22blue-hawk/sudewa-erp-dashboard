@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Printer } from 'lucide-react';
+import { Search, MoreVertical, Printer, Edit, FileText, FilePlus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,11 @@ interface DOEkspedisiTableProps {
   onSearchChange: (value: string) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
-  onAdd: () => void;
   onEdit: (item: DoEkspedisi) => void;
   onDetail: (item: DoEkspedisi) => void;
   onDelete: (item: DoEkspedisi) => void;
   onPrint: (item: DoEkspedisi) => void;
+  onUpload: (item: DoEkspedisi) => void;
 }
 
 const renderPagination = (page: number, totalPages: number): Array<number | string> => {
@@ -34,7 +34,7 @@ const renderPagination = (page: number, totalPages: number): Array<number | stri
   return [1, '...', page - 1, page, page + 1, '...', totalPages];
 };
 
-export function DOEkspedisiTable({
+export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
   data,
   search,
   page,
@@ -45,11 +45,11 @@ export function DOEkspedisiTable({
   onSearchChange,
   onPageChange,
   onPerPageChange,
-  onAdd,
   onEdit,
   onDetail,
   onDelete,
   onPrint,
+  onUpload,
 }: DOEkspedisiTableProps) {
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
@@ -85,10 +85,7 @@ export function DOEkspedisiTable({
           </div>
         </div>
 
-        <Button onClick={onAdd} className="h-12 rounded-xl bg-[#1E3A5F] px-5 hover:bg-[#18314F]">
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah
-        </Button>
+        {/* Add button removed: creation of DO is not supported by API */}
       </div>
 
       <Card className="overflow-hidden rounded-2xl border border-[#D7DEE7] bg-white shadow-sm">
@@ -97,10 +94,11 @@ export function DOEkspedisiTable({
             <TableHeader className="bg-[#EEF3F8]">
               <TableRow className="border-b border-[#D7DEE7]">
                 <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Kode DO</TableHead>
+                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Kode Order</TableHead>
                 <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Tanggal</TableHead>
+                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Nama Driver</TableHead>
                 <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">No Polisi</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Tipe Kendaraan</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Driver</TableHead>
+                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Tipe</TableHead>
                 <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -108,7 +106,7 @@ export function DOEkspedisiTable({
               {isLoading ? (
                 Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
                   <TableRow key={index}>
-                    <TableCell colSpan={6} className="px-4 py-4">
+                    <TableCell colSpan={7} className="px-4 py-4">
                       <div className="h-5 animate-pulse rounded bg-slate-200" />
                     </TableCell>
                   </TableRow>
@@ -117,12 +115,13 @@ export function DOEkspedisiTable({
                 data.map((item) => (
                   <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-slate-50/80">
                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-800">{item.doCode || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.orderCode || item.orderList?.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">
                       {item.date ? format(new Date(item.date), 'dd/MM/yyyy') : '-'}
                     </TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.driver?.name || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.vehicle?.registrationNumber || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.vehicle?.type || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.driver?.name || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -132,16 +131,23 @@ export function DOEkspedisiTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[170px]">
                           <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
+                            <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">
+                            <FileText className="mr-2 h-4 w-4" />
                             Detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onUpload(item)} className="cursor-pointer">
+                            <FilePlus className="mr-2 h-4 w-4" />
+                            Upload Surat Jalan
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer">
                             <Printer className="mr-2 h-4 w-4" />
                             Print
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -151,7 +157,7 @@ export function DOEkspedisiTable({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-slate-500">
+                  <TableCell colSpan={7} className="h-32 text-center text-slate-500">
                     Tidak ada data DO Ekspedisi ditemukan
                   </TableCell>
                 </TableRow>
@@ -191,4 +197,4 @@ export function DOEkspedisiTable({
       </div>
     </div>
   );
-}
+});

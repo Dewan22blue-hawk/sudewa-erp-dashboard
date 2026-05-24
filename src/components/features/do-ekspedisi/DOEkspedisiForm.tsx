@@ -125,8 +125,17 @@ export function DOEkspedisiForm({
   });
 
   const mergedVehicleOptions = React.useMemo(() => {
-    if (!initialExpedition?.vehicle || vehicleOptions.some((item) => item.value === String(initialExpedition.vehicleId))) {
-      return vehicleOptions;
+    const selectedVehicleType = initialExpedition?.vehicle?.type?.trim().toLowerCase() ?? '';
+    const filteredVehicleOptions = selectedVehicleType
+      ? vehicleOptions.filter((item) => String(item.subtitle ?? '').trim().toLowerCase() === selectedVehicleType)
+      : vehicleOptions;
+
+    if (!initialExpedition?.vehicle) {
+      return filteredVehicleOptions;
+    }
+
+    if (filteredVehicleOptions.some((item) => item.value === String(initialExpedition.vehicleId))) {
+      return filteredVehicleOptions;
     }
 
     return [
@@ -135,7 +144,7 @@ export function DOEkspedisiForm({
         label: initialExpedition.vehicle.registrationNumber,
         subtitle: initialExpedition.vehicle.type,
       },
-      ...vehicleOptions,
+      ...filteredVehicleOptions,
     ];
   }, [initialExpedition?.vehicle, initialExpedition?.vehicleId, vehicleOptions]);
 

@@ -39,9 +39,9 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
         cell: ({ row }) => <span className="text-sm text-foreground">{row.original.name}</span>,
       },
       {
-        accessorKey: 'accountGroupName',
+        accessorKey: 'accountGroupCode',
         header: 'Grup',
-        cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.accountGroupName ?? '-'}</span>,
+        cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.accountGroupCode ?? '-'}</span>,
       },
       {
         accessorKey: 'description',

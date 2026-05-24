@@ -13,6 +13,7 @@ import type {
   DoEkspedisiListParams,
   DoEkspedisiListResponse,
   DoEkspedisiPayload,
+  DoEkspedisiOrderTarifLoadItem,
   DoEkspedisiVehicle,
   LookupOption,
 } from '@/@types/do-ekspedisi.types';
@@ -31,6 +32,13 @@ const toNumber = (value: unknown) => {
   if (value == null || value === '') return 0;
   const parsed = Number(value);
   return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const toText = (...values: unknown[]) => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return '';
 };
 
 const normalizePagination = <T>(payload: any, fallbackMapper?: (item: any) => T) => {
@@ -89,6 +97,62 @@ const mapCustomer = (item: any): DoEkspedisiCustomer => ({
   pic: item?.pic ?? item?.pic_name ?? null,
 });
 
+const mapDoOrderTarifItem = (entry: any, parent?: any) => {
+  const pivot = entry?.pivot ?? entry;
+  const tarifItems = Array.isArray(entry?.do_order_list_tarif_items)
+    ? entry.do_order_list_tarif_items.map((item: any): DoEkspedisiOrderTarifLoadItem => ({
+        id: Number(item?.id ?? 0),
+        uuid: item?.uuid,
+        loadContent: toText(item?.load_content, item?.muatan, item?.loadContent),
+        qty: toNumber(item?.qty),
+      }))
+    : [];
+  const primaryTarifItem = tarifItems[0];
+
+  return {
+    id: Number(pivot?.id ?? entry?.id ?? 0),
+    uuid: pivot?.uuid ?? entry?.uuid,
+    loadingIn: toText(pivot?.loading_in, entry?.loading_in, entry?.tarif?.loading_in, parent?.loading_in),
+    loadingOut: toText(pivot?.loading_out, entry?.loading_out, entry?.tarif?.loading_out, parent?.loading_out),
+    deliveryDestination: toText(
+      pivot?.delivery_destination,
+      pivot?.destination,
+      entry?.delivery_destination,
+      entry?.destination,
+    ),
+    loadContent: toText(pivot?.load_content, pivot?.muatan, entry?.load_content, entry?.muatan, primaryTarifItem?.loadContent),
+    qty: toNumber(pivot?.qty ?? entry?.qty ?? primaryTarifItem?.qty),
+    tarifItems: tarifItems.length ? tarifItems : undefined,
+  };
+};
+
+const mapDoOrderList = (item: any) => {
+  if (!item || typeof item !== 'object') return null;
+
+  const tarifSource = Array.isArray(item.tarifs)
+    ? item.tarifs
+    : Array.isArray(item.do_order_list_tarifs)
+      ? item.do_order_list_tarifs
+      : Array.isArray(item.do_orderlist_tarifs)
+        ? item.do_orderlist_tarifs
+        : [];
+  const tarifs = tarifSource.map((entry: any) => mapDoOrderTarifItem(entry, item));
+  const firstTarif = tarifs[0];
+
+  return {
+    id: Number(item.id ?? 0),
+    uuid: item.uuid,
+    code: toText(item.code),
+    customerName: toText(item.customer?.name, item.customer_name),
+    loadingIn: toText(item.loading_in, firstTarif?.loadingIn),
+    loadingOut: toText(item.loading_out, firstTarif?.loadingOut),
+    destination: toText(firstTarif?.deliveryDestination),
+    loadContent: toText(firstTarif?.loadContent),
+    qty: toNumber(firstTarif?.qty),
+    tarifs,
+  };
+};
+
 const mapDoEkspedisiItemDestination = (item: any): DoEkspedisiItemDestination => ({
   id: Number(item?.id ?? 0),
   uuid: item?.uuid,
@@ -139,10 +203,12 @@ const mapDoEkspedisiItem = (item: any): DoEkspedisiItem => {
 const mapDoEkspedisi = (item: any): DoEkspedisi => ({
   id: Number(item?.id ?? 0),
   uuid: item?.uuid,
-  doCode: item?.do_code ?? '',
+  doCode: toText(item?.do_code, item?.code),
+  orderCode: toText(item?.do_order_list?.code, item?.do_orderlist?.code, item?.order_list?.code, item?.order_code),
   date: item?.date ?? '',
   vehicleId: item?.vehicle_id == null ? null : Number(item.vehicle_id),
   driverId: item?.driver_id == null ? null : Number(item.driver_id),
+  driverNote: toText(item?.driver_note, item?.note),
   itemsCount: Number(item?.items_count ?? item?.items?.length ?? 0),
   bruttoValue: toNumber(item?.brutto_value),
   totalPpn: toNumber(item?.total_ppn),
@@ -153,6 +219,7 @@ const mapDoEkspedisi = (item: any): DoEkspedisi => ({
   totalDriverFee: toNumber(item?.total_driver_fee),
   vehicle: item?.vehicle ? mapVehicle(item.vehicle) : null,
   driver: item?.driver ? mapDriver(item.driver) : null,
+  orderList: mapDoOrderList(item?.do_order_list ?? item?.do_orderlist ?? item?.order_list),
   items: Array.isArray(item?.items) ? item.items.map(mapDoEkspedisiItem) : undefined,
   createdAt: item?.created_at,
   updatedAt: item?.updated_at,
@@ -207,6 +274,7 @@ const buildMainPayload = (payload: DoEkspedisiPayload, asUpdate = false) => {
     formData.append('date', payload.date);
     formData.append('vehicle_id', String(payload.vehicle_id));
     formData.append('driver_id', String(payload.driver_id));
+    if (payload.driver_note != null) formData.append('driver_note', payload.driver_note);
     return formData;
   }
 
@@ -214,6 +282,7 @@ const buildMainPayload = (payload: DoEkspedisiPayload, asUpdate = false) => {
   params.append('date', payload.date);
   params.append('vehicle_id', String(payload.vehicle_id));
   params.append('driver_id', String(payload.driver_id));
+  if (payload.driver_note != null) params.append('driver_note', payload.driver_note);
   return params;
 };
 
@@ -279,6 +348,7 @@ export const getDoEkspedisis = async (
       order_sort: params.order_sort ?? 'desc',
       page: params.page ?? 1,
       per_page: params.perPage ?? 10,
+      do_order_list_id: params.do_order_list_id,
     },
   });
 
@@ -334,6 +404,12 @@ export const deleteDoEkspedisi = async (id: string | number): Promise<void> => {
   if (!response.data.status) {
     throw new ApiResponseError(response.data.message ?? 'Failed to delete DO expedition');
   }
+};
+
+export const getNextDoEkspedisiCode = async (): Promise<string> => {
+  const response = await apiClient.get<LaravelApiResponse<{ next_code?: string }>>('/wapi/transaction/check-do-expedition-code');
+  const payload = ensureSuccess(response.data);
+  return payload.next_code ?? '';
 };
 
 export const getDoEkspedisiItems = async (
