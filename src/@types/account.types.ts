@@ -1,7 +1,8 @@
 import type { AccountGroup } from './account-group.types';
 import type { PaginatedResult } from './pagination.types';
+import type { AccountCategoryValue } from '@/lib/account';
 
-export type AccountCategory = 'DEBET' | 'KREDIT';
+export type AccountCategory = AccountCategoryValue | string;
 // Backend may spell "debet"; keep both for compatibility but prefer "debet" when sending
 export type AccountTypeValue = 'credit' | 'debet' | 'debit';
 export type AccountType = 'AKTIVA' | 'PASIVA';
@@ -13,10 +14,11 @@ export type AccountType = 'AKTIVA' | 'PASIVA';
  */
 export interface Account {
   id: string | number;
+  uuid?: string;
   code: string;
   name: string;
   accountGroupId: number;
-  accountGroupName?: string;
+  accountGroupCode?: string;
   description?: string | null;
   isActive: boolean;
   createdAt?: string;
@@ -44,6 +46,7 @@ export interface AccountPayload {
   name: string;
   description?: string | null;
   type?: AccountTypeValue;
+  category?: AccountCategory;
 }
 
 export interface AccountListResponse extends PaginatedResult<Account> {}

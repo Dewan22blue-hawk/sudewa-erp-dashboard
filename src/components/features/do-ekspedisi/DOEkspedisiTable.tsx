@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Printer } from 'lucide-react';
+import { Search, MoreVertical, Printer, Edit, FileText, FilePlus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,6 @@ interface DOEkspedisiTableProps {
   onSearchChange: (value: string) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
-  onAdd: () => void;
   onEdit: (item: DoEkspedisi) => void;
   onDetail: (item: DoEkspedisi) => void;
   onDelete: (item: DoEkspedisi) => void;
@@ -35,7 +34,7 @@ const renderPagination = (page: number, totalPages: number): Array<number | stri
   return [1, '...', page - 1, page, page + 1, '...', totalPages];
 };
 
-export function DOEkspedisiTable({
+export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
   data,
   search,
   page,
@@ -46,7 +45,6 @@ export function DOEkspedisiTable({
   onSearchChange,
   onPageChange,
   onPerPageChange,
-  onAdd,
   onEdit,
   onDetail,
   onDelete,
@@ -87,10 +85,7 @@ export function DOEkspedisiTable({
           </div>
         </div>
 
-        <Button onClick={onAdd} className="h-12 rounded-xl bg-[#1E3A5F] px-5 hover:bg-[#18314F]">
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah
-        </Button>
+        {/* Add button removed: creation of DO is not supported by API */}
       </div>
 
       <Card className="overflow-hidden rounded-2xl border border-[#D7DEE7] bg-white shadow-sm">
@@ -136,12 +131,15 @@ export function DOEkspedisiTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[170px]">
                           <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
+                            <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">
+                            <FileText className="mr-2 h-4 w-4" />
                             Detail
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onUpload(item)} className="cursor-pointer">
+                            <FilePlus className="mr-2 h-4 w-4" />
                             Upload Surat Jalan
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer">
@@ -149,6 +147,7 @@ export function DOEkspedisiTable({
                             Print
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -198,4 +197,4 @@ export function DOEkspedisiTable({
       </div>
     </div>
   );
-}
+});

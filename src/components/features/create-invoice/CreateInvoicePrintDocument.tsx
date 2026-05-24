@@ -11,70 +11,31 @@ interface Props {
   letterheadUrl: string;
 }
 
-const BANK_ACCOUNT_NUMBER = '456-631-1313';
-const BANK_ACCOUNT_NAME = 'PT. WAJIRA JAGRATARA TRANSINDO';
-const CONFIRMATION_WHATSAPP = '0878-8353-1313';
-const PAYMENT_DUE_NOTE = 'Due date pembayaran 14 (Empat Belas) hari kerja setelah tanggal invoice dibuat';
-const DEFAULT_PAYMENT_INTRO = 'Mohon pembayaran dapat dilakukan ke :';
-const INVOICE_HEADER_BLUE = '#1f4163';
-const INVOICE_HEADER_RGB = { r: 31, g: 65, b: 99 };
-
-const formatPrintMoney = (value?: number | null) => formatMoney(value, 0);
-const formatPdfMoney = (value?: number | null) => formatMoney(value, 0).replace(/\s+/g, '');
-
-const TABLE_COLUMNS = [
-  { key: 'no', label: 'NO', width: 6, align: 'center' as const },
-  { key: 'tanggal', label: 'TANGGAL', width: 10, align: 'center' as const },
-  { key: 'kodeDo', label: 'KODE DO', width: 14, align: 'left' as const },
-  { key: 'noPolisi', label: 'NO POLISI', width: 11, align: 'left' as const },
-  { key: 'type', label: 'TYPE', width: 7, align: 'left' as const },
-  { key: 'driver', label: 'DRIVER', width: 13, align: 'left' as const },
-  { key: 'loadingIn', label: 'LOADING IN', width: 10, align: 'left' as const },
-  { key: 'tujuan', label: 'TUJUAN KIRIM', width: 12, align: 'left' as const },
-  { key: 'loadingOut', label: 'LOADING OUT', width: 10, align: 'left' as const },
-  { key: 'suratDo', label: 'NO SURAT DO', width: 9, align: 'left' as const },
-  { key: 'qty', label: 'QTY', width: 5, align: 'center' as const },
-  { key: 'suratJalan', label: 'NO SURAT JALAN', width: 10, align: 'left' as const },
-  { key: 'invoice', label: 'INV', width: 18, align: 'right' as const },
-  { key: 'tambahan', label: 'B. TAMBAHAN', width: 18, align: 'right' as const },
-  { key: 'total', label: 'TOTAL', width: 18, align: 'right' as const },
-];
-
-const PDF_TABLE_COLUMNS = [
-  { key: 'no', label: 'NO', width: 5, align: 'center' as const },
-  { key: 'tanggal', label: 'TGL', width: 9, align: 'center' as const },
-  { key: 'kodeDo', label: 'KODE DO', width: 12, align: 'left' as const },
-  { key: 'noPolisi', label: 'NOPOL', width: 10, align: 'left' as const },
-  { key: 'type', label: 'TYPE', width: 6, align: 'left' as const },
-  { key: 'driver', label: 'DRIVER', width: 11, align: 'left' as const },
-  { key: 'loadingIn', label: 'MUAT', width: 9, align: 'left' as const },
-  { key: 'tujuan', label: 'TUJUAN', width: 10, align: 'left' as const },
-  { key: 'loadingOut', label: 'BONGKAR', width: 9, align: 'left' as const },
-  { key: 'suratDo', label: 'NO DO', width: 7, align: 'left' as const },
-  { key: 'qty', label: 'QTY', width: 4, align: 'center' as const },
-  { key: 'suratJalan', label: 'NO SJ', width: 7, align: 'left' as const },
-  { key: 'invoice', label: 'INV', width: 18, align: 'right' as const },
-  { key: 'tambahan', label: 'B.TAM', width: 18, align: 'right' as const },
-  { key: 'total', label: 'TOTAL', width: 18, align: 'right' as const },
-];
-
-const TABLE_TOTAL_WIDTH = TABLE_COLUMNS.reduce((sum, column) => sum + column.width, 0);
-const TABLE_START_X = (210 - TABLE_TOTAL_WIDTH) / 2;
-const PDF_TABLE_TOTAL_WIDTH = PDF_TABLE_COLUMNS.reduce((sum, column) => sum + column.width, 0);
-const PDF_TABLE_START_X = (210 - PDF_TABLE_TOTAL_WIDTH) / 2;
+const COMPANY_BANK_NAME = 'PT. WAJIRA JAGRATARA TRANSINDO';
+const COMPANY_BANK_ACCOUNT = '456-631-1313';
+const COMPANY_CONFIRMATION_NUMBER = '0878-8353-1313';
 
 export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
   const printRef = useRef<HTMLDivElement>(null);
   const totalInvoice = useMemo(() => payload.rows.reduce((sum, row) => sum + row.invoiceExpedition, 0), [payload.rows]);
-  const totalAdditional = useMemo(() => payload.rows.reduce((sum, row) => sum + row.additionalCost, 0), [payload.rows]);
-  const totalPayment = useMemo(() => totalInvoice + totalAdditional, [totalAdditional, totalInvoice]);
-  const paymentIntro = payload.draft.letterContent?.trim() || DEFAULT_PAYMENT_INTRO;
-  const recipientAttentionLine = payload.recipientAttention?.trim() ? `u.p ${payload.recipientAttention.trim()}` : '';
+  const totalPpn = useMemo(() => payload.rows.reduce((sum, row) => sum + row.ppn, 0), [payload.rows]);
+  const totalAmount = useMemo(() => payload.rows.reduce((sum, row) => sum + row.totalAmount, 0), [payload.rows]);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Invoice-${payload.invoiceCode}`,
+    pageStyle: `
+      @page { size: A4; margin: 0; }
+      @media print {
+        html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; }
+        .no-print { display: none !important; }
+      }
+    `,
+  });
 
   const loadImageAsDataUrl = async (url: string) => {
     const response = await fetch(url);
     const blob = await response.blob();
-
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(String(reader.result));
@@ -83,80 +44,50 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
     });
   };
 
-  const handlePrint = useReactToPrint({
-    contentRef: printRef,
-    documentTitle: `Invoice-${payload.invoiceNumber}`,
-    pageStyle: `
-      @page {
-        size: A4;
-        margin: 0;
-      }
-      @media print {
-        html, body {
-          width: 210mm;
-          height: 297mm;
-          margin: 0;
-          padding: 0;
-        }
-        .no-print {
-          display: none !important;
-        }
-      }
-    `,
-  });
-
   const handleDownload = async () => {
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-    });
-
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const marginX = 20;
 
     const drawLetterhead = async () => {
       if (!letterheadUrl) return;
-      const imageData = await loadImageAsDataUrl(letterheadUrl);
-      pdf.addImage(imageData, 'JPEG', 0, 0, pageWidth, pageHeight);
+      const image = await loadImageAsDataUrl(letterheadUrl);
+      pdf.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
     };
 
     const drawTableHeader = (y: number) => {
-      let currentX = PDF_TABLE_START_X;
+      const columns = [
+        { label: 'NO', width: 6, align: 'center' as const },
+        { label: 'TGL', width: 12, align: 'center' as const },
+        { label: 'NOPOL', width: 14, align: 'left' as const },
+        { label: 'TYPE', width: 10, align: 'left' as const },
+        { label: 'DRIVER', width: 18, align: 'left' as const },
+        { label: 'MUAT', width: 14, align: 'left' as const },
+        { label: 'TUJUAN', width: 18, align: 'left' as const },
+        { label: 'BONGKAR', width: 14, align: 'left' as const },
+        { label: 'NO DO', width: 14, align: 'left' as const },
+        { label: 'DESKRIPSI', width: 18, align: 'left' as const },
+        { label: 'QTY', width: 8, align: 'center' as const },
+        { label: 'INV', width: 18, align: 'right' as const },
+        { label: 'PPN', width: 14, align: 'right' as const },
+        { label: 'TOTAL', width: 18, align: 'right' as const },
+      ];
+
+      let x = 8;
+      pdf.setFillColor(31, 65, 99);
       pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(5.1);
       pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(6);
 
-      PDF_TABLE_COLUMNS.forEach((column) => {
-        pdf.setFillColor(INVOICE_HEADER_RGB.r, INVOICE_HEADER_RGB.g, INVOICE_HEADER_RGB.b);
-        pdf.setDrawColor(255, 255, 255);
-        pdf.rect(currentX, y, column.width, 8, 'FD');
-        pdf.text(column.label, currentX + column.width / 2, y + 5, { align: 'center' });
-        currentX += column.width;
+      columns.forEach((column) => {
+        pdf.rect(x, y, column.width, 8, 'F');
+        pdf.rect(x, y, column.width, 8);
+        pdf.text(column.label, x + column.width / 2, y + 5, { align: 'center' });
+        x += column.width;
       });
 
-      pdf.setDrawColor(0, 0, 0);
       pdf.setTextColor(0, 0, 0);
-      return PDF_TABLE_COLUMNS;
-    };
-
-    const drawWrappedCell = (
-      lines: string[],
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-      align: 'left' | 'center' | 'right' = 'left',
-    ) => {
-      const baseY = y + 3.2;
-
-      lines.forEach((line: string, index: number) => {
-        const textX = align === 'center' ? x + width / 2 : align === 'right' ? x + width - 0.8 : x + 0.8;
-        pdf.text(line, textX, baseY + index * 2.8, { align });
-      });
-
-      pdf.rect(x, y, width, height);
+      return columns;
     };
 
     try {
@@ -164,147 +95,102 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
 
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(9);
-      pdf.text('Nomor', marginX, 52);
-      pdf.text(':', marginX + 20, 52);
+      pdf.text('Nomor', 20, 52);
+      pdf.text(':', 40, 52);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(payload.invoiceNumber, marginX + 24, 52);
+      pdf.text(payload.invoiceCode, 44, 52);
 
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Lampiran', marginX, 57);
-      pdf.text(':', marginX + 20, 57);
-      pdf.text(payload.draft.attachment || '-', marginX + 24, 57);
+      pdf.text('Lampiran', 20, 57);
+      pdf.text(':', 40, 57);
+      pdf.text(payload.draft.attachmentLabel || '-', 44, 57);
 
-      pdf.text('Perihal', marginX, 62);
-      pdf.text(':', marginX + 20, 62);
-      pdf.setFont('helvetica', 'italic');
-      pdf.text(payload.draft.subject || 'Invoice Ekspedisi', marginX + 24, 62);
+      pdf.text('Perihal', 20, 62);
+      pdf.text(':', 40, 62);
+      pdf.text(payload.draft.subject, 44, 62);
+      pdf.text(`Yogyakarta, ${formatLongDate(payload.draft.date)}`, 145, 52);
 
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Yogyakarta, ${formatLongDate(payload.draft.date)}`, 146, 52);
-
-      pdf.text('Kepada', 146, 64);
-      pdf.text('Yth.', 146, 69);
+      pdf.text('Kepada', 145, 64);
+      pdf.text('Yth.', 145, 69);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(payload.draft.customerName || '-', 156, 69, { maxWidth: 38 });
-      pdf.setFont('helvetica', 'normal');
-      const placeLineY = recipientAttentionLine ? 79 : 74;
-      if (recipientAttentionLine) {
-        pdf.text(recipientAttentionLine, 156, 74, { maxWidth: 38 });
-      }
-      pdf.text('Di Tempat', 156, placeLineY);
+      pdf.text(payload.customerName, 155, 69, { maxWidth: 38 });
 
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
-      pdf.text('INVOICE', pageWidth / 2, 96, { align: 'center' });
-      pdf.line(pageWidth / 2 - 10, 97, pageWidth / 2 + 10, 97);
+      pdf.text('INVOICE', pageWidth / 2, 95, { align: 'center' });
+      pdf.line(pageWidth / 2 - 9, 96.5, pageWidth / 2 + 9, 96.5);
 
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8.2);
-      let cursorY = 108;
-      pdf.text('1.', marginX, cursorY);
-      pdf.text(paymentIntro, marginX + 6, cursorY);
-      cursorY += 5;
-      pdf.text('No. REK BCA', marginX + 6, cursorY);
-      pdf.text(':', marginX + 34, cursorY);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(BANK_ACCOUNT_NUMBER, marginX + 37, cursorY);
-      pdf.setFont('helvetica', 'normal');
-      cursorY += 5;
-      pdf.text('Nama', marginX + 6, cursorY);
-      pdf.text(':', marginX + 34, cursorY);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(BANK_ACCOUNT_NAME, marginX + 37, cursorY);
-      pdf.setFont('helvetica', 'normal');
-      cursorY += 5;
-      pdf.text('2.', marginX, cursorY);
-      pdf.text(`Konfirmasi transfer dapat dilakukan ke no WA : ${CONFIRMATION_WHATSAPP}`, marginX + 6, cursorY);
-      cursorY += 5;
-      pdf.text('3.', marginX, cursorY);
-      pdf.text(PAYMENT_DUE_NOTE, marginX + 6, cursorY, { maxWidth: 150 });
+      const letterLines = pdf.splitTextToSize(payload.draft.letterContent, 165);
+      let y = 106;
+      letterLines.forEach((line: string) => {
+        pdf.text(line, 20, y);
+        y += 4.5;
+      });
 
-      pdf.setFont('helvetica', 'italic');
-      pdf.text('*Terlampir', marginX, cursorY + 8);
-      pdf.setFont('helvetica', 'normal');
+      pdf.text(`No. REK BCA : ${COMPANY_BANK_ACCOUNT}`, 26, y + 3);
+      pdf.text(`Nama : ${COMPANY_BANK_NAME}`, 26, y + 8);
+      pdf.text(`Konfirmasi transfer : ${COMPANY_CONFIRMATION_NUMBER}`, 26, y + 13);
 
-      let tableY = cursorY + 14;
+      let tableY = y + 20;
       let columns = drawTableHeader(tableY);
       tableY += 8;
+      pdf.setFontSize(5.8);
+      pdf.setFont('helvetica', 'normal');
 
-      pdf.setFontSize(5.2);
       for (let index = 0; index < payload.rows.length; index += 1) {
         const row = payload.rows[index];
         const values = [
           String(index + 1),
           formatDisplayDate(row.date),
-          row.doCode,
           row.noPolisi,
           row.type,
           row.driver,
           row.loadingIn,
           row.destination,
           row.loadingOut,
-          row.doLetterCode,
+          row.noSuratDo,
+          row.description,
           String(row.qty),
-          row.doAssignmentCode,
-          formatPdfMoney(row.invoiceExpedition),
-          formatPdfMoney(row.additionalCost),
-          formatPdfMoney(row.invoiceExpedition + row.additionalCost),
+          formatMoney(row.invoiceExpedition),
+          formatMoney(row.ppn),
+          formatMoney(row.totalAmount),
         ];
-        const renderedLines = values.map((value, columnIndex) => {
-          const column = columns[columnIndex];
-          const safeText = value || '-';
-          if (column.align === 'right') {
-            return [safeText];
-          }
 
-          return pdf.splitTextToSize(safeText, Math.max(column.width - 1.5, 3)).slice(0, 2);
-        });
-        const maxLines = Math.max(...renderedLines.map((lines) => lines.length));
-        const rowHeight = Math.max(8, 3 + maxLines * 2.8);
-
-        if (tableY + rowHeight > 268) {
+        const rowHeight = 8;
+        if (tableY + rowHeight > 270) {
           pdf.addPage();
           await drawLetterhead();
-          tableY = 48;
+          tableY = 44;
           columns = drawTableHeader(tableY);
           tableY += 8;
         }
 
-        let currentX = PDF_TABLE_START_X;
+        let x = 8;
         columns.forEach((column, columnIndex) => {
-          drawWrappedCell(renderedLines[columnIndex], currentX, tableY, column.width, rowHeight, column.align);
-          currentX += column.width;
+          pdf.rect(x, tableY, column.width, rowHeight);
+          const align = column.align;
+          const textX = align === 'center' ? x + column.width / 2 : align === 'right' ? x + column.width - 1 : x + 1;
+          pdf.text(String(values[columnIndex] || '-'), textX, tableY + 5, { align });
+          x += column.width;
         });
         tableY += rowHeight;
       }
 
-      if (tableY + 10 <= 280) {
-        const summaryBoxX = PDF_TABLE_START_X + PDF_TABLE_TOTAL_WIDTH - 58;
-        const summaryLabelWidth = 24;
-        const summaryValueWidth = 34;
-        const summaryRowHeight = 7;
+      pdf.setFont('helvetica', 'bold');
+      pdf.rect(152, tableY + 2, 48, 7);
+      pdf.text('TOTAL INVOICE', 174, tableY + 6.5, { align: 'center' });
+      pdf.rect(152, tableY + 9, 48, 7);
+      pdf.text(formatMoney(totalInvoice), 198, tableY + 13.5, { align: 'right' });
+      pdf.rect(152, tableY + 16, 48, 7);
+      pdf.text(formatMoney(totalPpn), 198, tableY + 20.5, { align: 'right' });
+      pdf.rect(152, tableY + 23, 48, 7);
+      pdf.text(formatMoney(totalAmount), 198, tableY + 27.5, { align: 'right' });
 
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(6);
-
-        [
-          ['INV EKSPEDISI', formatPdfMoney(totalInvoice)],
-          ['BIAYA TAMBAHAN', formatPdfMoney(totalAdditional)],
-          ['TOTAL PAYMENT', formatPdfMoney(totalPayment)],
-        ].forEach(([label, value], index) => {
-          const y = tableY + index * summaryRowHeight;
-          pdf.setFillColor(index === 2 ? 225 : 245, index === 2 ? 244 : 248, index === 2 ? 234 : 250);
-          pdf.rect(summaryBoxX, y, summaryLabelWidth, summaryRowHeight, 'F');
-          pdf.rect(summaryBoxX + summaryLabelWidth, y, summaryValueWidth, summaryRowHeight, 'F');
-          pdf.rect(summaryBoxX, y, summaryLabelWidth + summaryValueWidth, summaryRowHeight);
-          pdf.text(label, summaryBoxX + summaryLabelWidth - 1.5, y + 4.5, { align: 'right' });
-          pdf.text(value, summaryBoxX + summaryLabelWidth + summaryValueWidth - 1.5, y + 4.5, { align: 'right' });
-        });
-      }
-
-      pdf.save(`Invoice-${payload.invoiceNumber}.pdf`);
+      pdf.save(`Invoice-${payload.invoiceCode}.pdf`);
     } catch (error) {
-      console.error('Gagal membuat PDF invoice', error);
+      console.error('Failed to download invoice PDF', error);
     }
   };
 
@@ -321,120 +207,74 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
         </Button>
       </div>
 
-      <div ref={printRef} className="relative mx-auto bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
+      <div ref={printRef} className="relative mx-auto overflow-hidden bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={letterheadUrl} alt="Letterhead" className="absolute inset-0 h-full w-full object-cover" />
 
-        <div className="relative min-h-[297mm]" style={{ paddingTop: '42mm', paddingLeft: '20mm', paddingRight: '20mm' }}>
+        <div className="relative min-h-[297mm] px-[20mm] pt-[42mm]">
           <div className="flex justify-between text-[10pt] text-slate-900">
             <div className="space-y-1">
-              <div><span className="inline-block w-[24mm]">Nomor</span>: <strong>{payload.invoiceNumber}</strong></div>
-              <div><span className="inline-block w-[24mm]">Lampiran</span>: {payload.draft.attachment || '1 berkas.'}</div>
-              <div><span className="inline-block w-[24mm]">Perihal</span>: <em>{payload.draft.subject || 'Invoice Ekspedisi'}</em></div>
+              <div><span className="inline-block w-[24mm]">Nomor</span>: <strong>{payload.invoiceCode}</strong></div>
+              <div><span className="inline-block w-[24mm]">Lampiran</span>: {payload.draft.attachmentLabel || '-'}</div>
+              <div><span className="inline-block w-[24mm]">Perihal</span>: {payload.draft.subject}</div>
             </div>
             <div>Yogyakarta, {formatLongDate(payload.draft.date)}</div>
           </div>
 
-          <div className="mt-8 flex justify-between text-[10pt] text-slate-900">
-            <div className="space-y-1">
-              <div>Kepada</div>
-              <div>Yth. <strong>{payload.draft.customerName || '-'}</strong></div>
-              {recipientAttentionLine ? <div>{recipientAttentionLine}</div> : null}
-              <div>Di Tempat</div>
-            </div>
+          <div className="mt-7 text-[10pt] text-slate-900">
+            <div>Kepada</div>
+            <div>Yth. <strong>{payload.customerName}</strong></div>
+            <div>Di Tempat</div>
           </div>
 
-          <div className="mt-10 text-center text-[12pt] font-semibold tracking-[0.18em] text-slate-900">
+          <div className="mt-7 text-center text-[12pt] font-semibold tracking-[0.18em] text-slate-900">
             <span className="border-b border-slate-900">INVOICE</span>
           </div>
 
-          <div className="mx-auto mt-8 max-w-[170mm] text-[9pt] leading-5 text-slate-900">
-            <div className="flex gap-2">
-              <div className="w-4 shrink-0">1.</div>
-              <div>
-                <div>{paymentIntro}</div>
-                <div className="flex gap-2">
-                  <span className="inline-block w-[25mm]">No. REK BCA</span>
-                  <span>:</span>
-                  <strong>{BANK_ACCOUNT_NUMBER}</strong>
-                </div>
-                <div className="flex gap-2">
-                  <span className="inline-block w-[25mm]">Nama</span>
-                  <span>:</span>
-                  <strong>{BANK_ACCOUNT_NAME}</strong>
-                </div>
-              </div>
-            </div>
-            <div className="mt-1 flex gap-2">
-              <div className="w-4 shrink-0">2.</div>
-              <div>Konfirmasi transfer dapat dilakukan ke no WA : {CONFIRMATION_WHATSAPP}</div>
-            </div>
-            <div className="mt-1 flex gap-2">
-              <div className="w-4 shrink-0">3.</div>
-              <div>{PAYMENT_DUE_NOTE}</div>
-            </div>
+          <div className="mt-7 whitespace-pre-line text-[9pt] leading-6 text-slate-900">{payload.draft.letterContent}</div>
+
+          <div className="mt-5 text-[9pt] leading-6 text-slate-900">
+            <div>No. REK BCA : {COMPANY_BANK_ACCOUNT}</div>
+            <div>Nama : {COMPANY_BANK_NAME}</div>
+            <div>Konfirmasi transfer : {COMPANY_CONFIRMATION_NUMBER}</div>
           </div>
 
-          <div className="mt-5 text-[9pt] italic text-slate-900">*Terlampir</div>
-
-          <div className="mx-auto mt-5" style={{ width: '176mm' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '5.8pt' }}>
-              <colgroup>
-                {TABLE_COLUMNS.map((column) => (
-                  <col key={column.key} style={{ width: `${(column.width / TABLE_TOTAL_WIDTH) * 100}%` }} />
-                ))}
-              </colgroup>
+          <div className="mt-5 overflow-hidden rounded-[16px] border border-slate-200">
+            <table className="w-full border-collapse text-[7.2pt]">
               <thead>
-                <tr style={{ backgroundColor: INVOICE_HEADER_BLUE, color: '#ffffff' }}>
-                  {TABLE_COLUMNS.map((column) => (
-                    <th
-                      key={column.key}
-                      style={{ border: '1px solid #d9e1ea', padding: '4px 2px', textAlign: 'center', wordBreak: 'break-word', lineHeight: 1.15 }}
-                    >
-                      {column.label}
-                    </th>
+                <tr className="bg-[#1f4163] text-white">
+                  {['NO', 'TANGGAL', 'NO POLISI', 'TYPE', 'DRIVER', 'LOADING IN', 'TUJUAN KIRIM', 'LOADING OUT', 'NO SURAT DO', 'DESKRIPSI', 'QTY', 'INV EKSPEDISI', 'PPN', 'TOTAL'].map((header) => (
+                    <th key={header} className="border border-white/20 px-1 py-2 text-center font-semibold">{header}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {payload.rows.map((row, index) => (
-                  <tr key={`${row.invoiceId}-${index}`}>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', textAlign: 'center', wordBreak: 'break-word' }}>{index + 1}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', textAlign: 'center', wordBreak: 'break-word' }}>{formatDisplayDate(row.date)}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.doCode}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.noPolisi}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.type}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.driver}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.loadingIn}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.destination}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.loadingOut}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.doLetterCode}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', textAlign: 'center', wordBreak: 'break-word' }}>{row.qty}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 3px', wordBreak: 'break-word' }}>{row.doAssignmentCode}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 2px', textAlign: 'right', whiteSpace: 'nowrap', fontSize: '5.5pt' }}>{formatPrintMoney(row.invoiceExpedition)}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 2px', textAlign: 'right', whiteSpace: 'nowrap', fontSize: '5.5pt' }}>{formatPrintMoney(row.additionalCost)}</td>
-                    <td style={{ border: '1px solid #d9e1ea', padding: '4px 2px', textAlign: 'right', fontWeight: 700, whiteSpace: 'nowrap', fontSize: '5.5pt' }}>{formatPrintMoney(row.invoiceExpedition + row.additionalCost)}</td>
+                  <tr key={`${row.invoiceId}-${row.expeditionId}-${index}`} className="border-slate-200">
+                    <td className="border border-slate-200 px-1 py-2 text-center">{index + 1}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-center">{formatDisplayDate(row.date)}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.noPolisi}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.type}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.driver}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.loadingIn}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.destination}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.loadingOut}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.noSuratDo}</td>
+                    <td className="border border-slate-200 px-1 py-2">{row.description}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-center">{row.qty}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-right">{formatMoney(row.invoiceExpedition)}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-right">{formatMoney(row.ppn)}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-right">{formatMoney(row.totalAmount)}</td>
                   </tr>
                 ))}
+                <tr className="bg-[#effaf3] font-semibold text-slate-900">
+                  <td colSpan={11} className="border border-slate-200 px-2 py-3 text-center">TOTAL PAYMENT</td>
+                  <td className="border border-slate-200 px-2 py-3 text-right">{formatMoney(totalInvoice)}</td>
+                  <td className="border border-slate-200 px-2 py-3 text-right">{formatMoney(totalPpn)}</td>
+                  <td className="border border-slate-200 px-2 py-3 text-right">{formatMoney(totalAmount)}</td>
+                </tr>
               </tbody>
             </table>
-
-            <div className="mt-3 flex justify-end">
-              <table style={{ width: '68mm', borderCollapse: 'collapse', fontSize: '6.1pt' }}>
-                <tbody>
-                  {[
-                    ['INV EKSPEDISI', formatPrintMoney(totalInvoice)],
-                    ['BIAYA TAMBAHAN', formatPrintMoney(totalAdditional)],
-                    ['TOTAL PAYMENT', formatPrintMoney(totalPayment)],
-                  ].map(([label, value], index) => (
-                    <tr key={label} style={{ backgroundColor: index === 2 ? '#e1f4ea' : '#f8fafc', fontWeight: index === 2 ? 700 : 600 }}>
-                      <td style={{ border: '1px solid #d9e1ea', padding: '4px 5px', textAlign: 'left', whiteSpace: 'nowrap' }}>{label}</td>
-                      <td style={{ border: '1px solid #d9e1ea', padding: '4px 5px', textAlign: 'right', whiteSpace: 'nowrap' }}>{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
         </div>
       </div>

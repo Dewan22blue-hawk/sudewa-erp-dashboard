@@ -77,8 +77,17 @@ export function DOEkspedisiEditDialog({
   }, [item, reset]);
 
   const mergedVehicleOptions = React.useMemo(() => {
-    if (!item?.vehicle || vehicleOptions.some((option) => option.value === String(item.vehicleId))) return vehicleOptions;
-    return [{ value: String(item.vehicleId), label: item.vehicle.registrationNumber, subtitle: item.vehicle.type }, ...vehicleOptions];
+    const selectedVehicleType = item?.vehicle?.type?.trim().toLowerCase() ?? '';
+    const filteredVehicleOptions = selectedVehicleType
+      ? vehicleOptions.filter((option) => String(option.subtitle ?? '').trim().toLowerCase() === selectedVehicleType)
+      : vehicleOptions;
+
+    if (!item?.vehicle) return filteredVehicleOptions;
+
+    const currentVehicleOption = { value: String(item.vehicleId), label: item.vehicle.registrationNumber, subtitle: item.vehicle.type };
+    if (filteredVehicleOptions.some((option) => option.value === String(item.vehicleId))) return filteredVehicleOptions;
+
+    return [currentVehicleOption, ...filteredVehicleOptions];
   }, [item?.vehicle, item?.vehicleId, vehicleOptions]);
 
   const mergedDriverOptions = React.useMemo(() => {

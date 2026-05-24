@@ -1,16 +1,21 @@
 import type {
   CreateOrderListPayload,
   CreateOrderListTarifPayload,
+  CreateOrderListTarifItemPayload,
   OrderList,
   OrderListCustomer,
   OrderListListParams,
   OrderListListResponse,
+  OrderListTarifItemListParams,
+  OrderListTarifItemListResponse,
   OrderListTarifItem,
+  OrderListTarifLoadItem,
   OrderListTarifListParams,
   OrderListTarifListResponse,
   OrderListTarifReference,
   OrderListVehicle,
   OrderListVehicleType,
+  UpdateOrderListTarifItemPayload,
   UpdateOrderListPayload,
   UpdateOrderListTarifPayload,
 } from '@/@types/order-list.types';
@@ -20,6 +25,7 @@ import { ApiResponseError, ApiValidationError, ensureSuccess, type LaravelApiRes
 
 const orderListBasePath = '/wapi/transaction/do-order-list';
 const orderListTarifBasePath = '/wapi/transaction/do-order-list-tarif';
+const orderListTarifItemBasePath = '/wapi/transaction/do-order-list-tarif-item';
 
 const toNumber = (value: unknown): number => {
   if (value == null || value === '') return 0;
@@ -64,6 +70,57 @@ const mapOrderListVehicle = (item: any): OrderListVehicle => ({
   type: toStringValue(item?.type, item?.vehicle_type, item?.vehicleType),
 });
 
+const createTarifLoadItemMap = (items: OrderListTarifLoadItem[]) => {
+  const map = new Map<number, OrderListTarifLoadItem[]>();
+
+  items.forEach((item) => {
+    const current = map.get(item.doOrderListTarifId) ?? [];
+    current.push(item);
+    map.set(item.doOrderListTarifId, current);
+  });
+
+  return map;
+};
+
+const buildDisplayTarifItem = (
+  item: OrderListTarifItem,
+  tarifItems?: OrderListTarifLoadItem[],
+  fallbackVehicleType?: OrderListVehicleType | null,
+): OrderListTarifItem => {
+  const items = tarifItems?.length ? tarifItems : item.tarifItems ?? [];
+  const primaryItem = items[0];
+  const vehicleType = item.vehicleType ?? fallbackVehicleType ?? null;
+
+  return {
+    ...item,
+    vehicleType,
+    loadContent: item.loadContent ?? primaryItem?.loadContent,
+    qty: item.qty ?? primaryItem?.qty,
+    driverFee: item.driverFee ?? resolveDriverFee(vehicleType, item.tarif),
+    expeditionInvoice: item.expeditionInvoice ?? resolveInvoiceFee(vehicleType, item.tarif),
+    tarifItems: items.length ? items : undefined,
+  };
+};
+
+export const composeOrderListTarifs = (tarifs: OrderListTarifItem[], tarifItems: OrderListTarifLoadItem[] = []) => {
+  const tarifLoadItemMap = createTarifLoadItemMap(tarifItems);
+
+  return tarifs.map((item) => buildDisplayTarifItem(item, tarifLoadItemMap.get(item.id), item.vehicleType));
+};
+
+export const composeOrderListWithTarifs = (
+  order: OrderList,
+  tarifs: OrderListTarifItem[] = [],
+  tarifItems: OrderListTarifLoadItem[] = [],
+): OrderList => {
+  const tarifLoadItemMap = createTarifLoadItemMap(tarifItems);
+
+  return {
+    ...order,
+    tarifs: tarifs.map((item) => buildDisplayTarifItem(item, tarifLoadItemMap.get(item.id), order.vehicleType)),
+  };
+};
+
 const mapTarifReference = (item: any): OrderListTarifReference | undefined => {
   if (!item || typeof item !== 'object') return undefined;
 
@@ -100,7 +157,7 @@ const resolveInvoiceFee = (vehicleType: OrderListVehicleType | null, tarif?: Ord
 };
 
 const mapOrderListTarifItem = (item: any, parent?: any): OrderListTarifItem => {
-  const tarif = mapTarifReference(item.tarif ?? item.tariff ?? item.master_tarif);
+  const tarif = mapTarifReference(item.tarif ?? item.tariff ?? item.master_tarif ?? item.do_order_list_tarif?.tarif);
   const vehicleType = normalizeVehicleType(
     item.vehicle_type ??
       item.vehicleType ??
@@ -109,31 +166,55 @@ const mapOrderListTarifItem = (item: any, parent?: any): OrderListTarifItem => {
       item.vehicle_armada_type ??
       item.tipe_armada ??
       item.type_armada ??
-      item.armada,
+      item.armada ??
+      parent?.vehicle_type ??
+      parent?.vehicleType,
   );
+
+  const tarifItems = Array.isArray(item?.do_order_list_tarif_items)
+    ? item.do_order_list_tarif_items.map((entry: any) => mapOrderListTarifLoadItem(entry, item))
+    : Array.isArray(item?.items)
+      ? item.items.map((entry: any) => mapOrderListTarifLoadItem(entry, item))
+      : [];
 
   return {
     id: Number(item.id ?? 0),
     uuid: item.uuid,
-    doOrderListId: Number(item.do_orderlist_id ?? item.do_order_list_id ?? parent?.id ?? 0),
-    tarifId: Number(item.tarif_id ?? item.tarif?.id ?? item.tariff?.id ?? 0),
-    qty: toNumber(item.qty),
-    loadContent: toStringValue(item.load_content, item.muatan, item.loadContent),
+    doOrderListId: Number(item.do_orderlist_id ?? item.do_order_list_id ?? parent?.id ?? parent?.do_orderlist_id ?? 0),
+    tarifId: Number(item.tarif_id ?? item.tarif?.id ?? item.tariff?.id ?? item.do_order_list_tarif?.tarif_id ?? 0),
     deliveryDestination: toStringValue(
       item.delivery_destination,
       item.deliveryDestination,
       item.destination,
       item.tujuan_kirim,
       item.delivery_address,
+      item.do_order_list_tarif?.delivery_destination,
     ),
     vehicleType,
     loadingIn: toStringValue(item.loading_in, item.loadingIn, tarif?.loadingIn, parent?.loading_in, parent?.loadingIn),
     loadingOut: toStringValue(item.loading_out, item.loadingOut, tarif?.loadingOut, parent?.loading_out, parent?.loadingOut),
+    loadContent: toStringValue(item.load_content, item.muatan, item.loadContent),
+    qty: item.qty != null ? toNumber(item.qty) : undefined,
     driverFee: resolveDriverFee(vehicleType, tarif, item.uj_driver ?? item.driver_fee),
     expeditionInvoice: resolveInvoiceFee(vehicleType, tarif, item.bill_invoice ?? item.invoice_bill ?? item.invoice_fee),
+    tarifItems: tarifItems.length ? tarifItems : undefined,
     tarif,
     createdAt: item.created_at,
     updatedAt: item.updated_at,
+  };
+};
+
+const mapOrderListTarifLoadItem = (item: any, parentTarif?: any): OrderListTarifLoadItem => {
+  const parent = item?.do_order_list_tarif ?? parentTarif;
+  return {
+    id: Number(item?.id ?? 0),
+    uuid: item?.uuid,
+    doOrderListTarifId: Number(item?.do_order_list_tarif_id ?? parent?.id ?? 0),
+    doOrderListId: Number(parent?.do_orderlist_id ?? parent?.do_order_list_id ?? 0) || undefined,
+    loadContent: toStringValue(item?.load_content, item?.muatan, item?.loadContent),
+    qty: toNumber(item?.qty),
+    createdAt: item?.created_at,
+    updatedAt: item?.updated_at,
   };
 };
 
@@ -145,7 +226,12 @@ const mapOrderList = (item: any): OrderList => {
       : Array.isArray(item?.do_orderlist_tarifs)
         ? item.do_orderlist_tarifs
         : [];
-  const tarifs = tarifSource.map((entry: any) => mapOrderListTarifItem(entry, item));
+  const tarifItemSource = Array.isArray(item?.do_order_list_tarif_items)
+    ? item.do_order_list_tarif_items
+    : Array.isArray(item?.order_list_tarif_items)
+      ? item.order_list_tarif_items
+      : [];
+  const tarifs = composeOrderListTarifs(tarifSource.map((entry: any) => mapOrderListTarifItem(entry, item)), tarifItemSource.map((entry: any) => mapOrderListTarifLoadItem(entry)));
   const firstTarif = tarifs[0];
 
   return {
@@ -154,6 +240,7 @@ const mapOrderList = (item: any): OrderList => {
     code: item?.code ?? '-',
     customerId: Number(item?.customer_id ?? item?.customer?.id ?? 0),
     status: (item?.status ?? 'pending') as OrderList['status'],
+    vehicleType: normalizeVehicleType(item?.vehicle_type ?? item?.vehicleType ?? firstTarif?.vehicleType),
     billInvoice: toNumber(item?.bill_invoice ?? item?.invoice_bill),
     ppn: toNumber(item?.ppn),
     note: toStringValue(item?.note, item?.notes, item?.keterangan, item?.description, item?.remark),
@@ -174,6 +261,7 @@ const buildCreateOrderListBody = (payload: CreateOrderListPayload) => {
   body.append('customer_id', String(payload.customer_id));
   body.append('status', payload.status);
   body.append('bill_invoice', String(payload.bill_invoice));
+  if (payload.vehicle_type) body.append('vehicle_type', payload.vehicle_type);
   if (payload.note != null) body.append('note', payload.note);
   if (payload.ppn != null) body.append('ppn', String(payload.ppn));
   if (payload.uj_driver != null) body.append('uj_driver', String(payload.uj_driver));
@@ -188,6 +276,7 @@ const buildUpdateOrderListBody = (payload: UpdateOrderListPayload) => {
   body.append('status', payload.status);
   body.append('invoice_bill', String(payload.invoice_bill));
   body.append('bill_invoice', String(payload.bill_invoice ?? payload.invoice_bill));
+  if (payload.vehicle_type) body.append('vehicle_type', payload.vehicle_type);
   if (payload.note != null) body.append('note', payload.note);
   if (payload.ppn != null) body.append('ppn', String(payload.ppn));
   if (payload.uj_driver != null) body.append('uj_driver', String(payload.uj_driver));
@@ -200,19 +289,29 @@ const buildCreateOrderListTarifBody = (payload: CreateOrderListTarifPayload) => 
   const body = new FormData();
   body.append('do_orderlist_id', String(payload.do_orderlist_id));
   body.append('tarif_id', String(payload.tarif_id));
-  body.append('qty', String(payload.qty));
-  body.append('load_content', payload.load_content);
   body.append('delivery_destination', payload.delivery_destination);
-  if (payload.vehicle_type) body.append('vehicle_type', payload.vehicle_type);
   return body;
 };
 
 const buildUpdateOrderListTarifBody = (payload: UpdateOrderListTarifPayload) => {
   const body = new URLSearchParams();
-  body.append('qty', String(payload.qty));
-  body.append('vehicle_type', payload.vehicle_type);
-  body.append('load_content', payload.load_content);
   body.append('delivery_destination', payload.delivery_destination);
+  return body;
+};
+
+const buildCreateOrderListTarifItemBody = (payload: CreateOrderListTarifItemPayload) => {
+  const body = new FormData();
+  body.append('do_order_list_tarif_id', String(payload.do_order_list_tarif_id));
+  body.append('load_content', payload.load_content);
+  body.append('qty', String(payload.qty));
+  return body;
+};
+
+const buildUpdateOrderListTarifItemBody = (payload: UpdateOrderListTarifItemPayload) => {
+  const body = new URLSearchParams();
+  body.append('do_order_list_tarif_id', String(payload.do_order_list_tarif_id));
+  body.append('load_content', payload.load_content);
+  body.append('qty', String(payload.qty));
   return body;
 };
 
@@ -312,5 +411,57 @@ export const deleteOrderListTarif = async (id: string | number): Promise<void> =
   const response = await apiClient.delete<LaravelApiResponse<null>>(`${orderListTarifBasePath}/${id}`);
   if (!response.data.status) {
     throw new ApiResponseError(response.data.message ?? 'Failed to delete order list tarif');
+  }
+};
+
+export const getOrderListTarifItems = async (params: OrderListTarifItemListParams): Promise<OrderListTarifItemListResponse> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(orderListTarifItemBasePath, {
+    params: {
+      ...buildLaravelPaginationQuery(params),
+      search: params.search,
+      order_by: params.order_by ?? 'created_at',
+      order_sort: params.order_sort ?? 'desc',
+      do_order_list_tarif_id: params.do_order_list_tarif_id,
+      do_orderlist_id: params.do_orderlist_id,
+    },
+  });
+
+  const payload = ensureSuccess(response.data);
+  return toPaginatedResult(payload, (item) => mapOrderListTarifLoadItem(item));
+};
+
+export const getOrderListTarifItemById = async (id: string | number): Promise<OrderListTarifLoadItem> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(`${orderListTarifItemBasePath}/${id}`);
+  return mapOrderListTarifLoadItem(ensureSuccess(response.data));
+};
+
+export const createOrderListTarifItem = async (payload: CreateOrderListTarifItemPayload): Promise<OrderListTarifLoadItem> => {
+  try {
+    const response = await apiClient.post<LaravelApiResponse<any>>(orderListTarifItemBasePath, buildCreateOrderListTarifItemBody(payload), {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return mapOrderListTarifLoadItem(ensureSuccess(response.data));
+  } catch (error) {
+    if (error instanceof ApiValidationError) throw error;
+    throw error;
+  }
+};
+
+export const updateOrderListTarifItem = async (id: string | number, payload: UpdateOrderListTarifItemPayload): Promise<OrderListTarifLoadItem> => {
+  try {
+    const response = await apiClient.put<LaravelApiResponse<any>>(`${orderListTarifItemBasePath}/${id}`, buildUpdateOrderListTarifItemBody(payload), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+    return mapOrderListTarifLoadItem(ensureSuccess(response.data));
+  } catch (error) {
+    if (error instanceof ApiValidationError) throw error;
+    throw error;
+  }
+};
+
+export const deleteOrderListTarifItem = async (id: string | number): Promise<void> => {
+  const response = await apiClient.delete<LaravelApiResponse<null>>(`${orderListTarifItemBasePath}/${id}`);
+  if (!response.data.status) {
+    throw new ApiResponseError(response.data.message ?? 'Failed to delete order list tarif item');
   }
 };

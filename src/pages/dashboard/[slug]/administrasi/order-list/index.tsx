@@ -5,8 +5,9 @@ import type { OrderList } from '@/@types/order-list.types';
 import { OrderListDeleteDialog } from '@/components/features/order-list/OrderListDeleteDialog';
 import { OrderListTable } from '@/components/features/order-list/OrderListTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { useOrderLists, useDeleteOrderList, useOrderListTarifs } from '@/hooks/useOrderList';
+import { useOrderLists, useDeleteOrderList, useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
+import { composeOrderListWithTarifs } from '@/services/order-list.service';
 
 export default function OrderListPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function OrderListPage() {
   const [searchInput, setSearchInput] = React.useState(search);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<OrderList | null>(null);
+  const navigationLockRef = React.useRef(false);
 
   React.useEffect(() => {
     setSearchInput(search);
@@ -28,44 +30,60 @@ export default function OrderListPage() {
     return () => window.clearTimeout(timeout);
   }, [searchInput, setSearch]);
 
-  const listQuery = useOrderLists({
-    page,
-    perPage,
-    search,
-    order_by: 'created_at',
-    order_sort: 'desc',
-  });
-  const tarifItemQuery = useOrderListTarifs({
-    page: 1,
-    perPage: 500,
-    order_by: 'created_at',
-    order_sort: 'desc',
-    enabled: true,
-  });
+  const listQueryParams = React.useMemo(
+    () => ({
+      page,
+      perPage,
+      search,
+      order_by: 'created_at' as const,
+      order_sort: 'desc' as const,
+    }),
+    [page, perPage, search],
+  );
+
+  const tarifItemQueryParams = React.useMemo(
+    () => ({
+      page: 1,
+      perPage: 500,
+      order_by: 'created_at' as const,
+      order_sort: 'desc' as const,
+    }),
+    [],
+  );
+
+  const tarifLoadItemQueryParams = React.useMemo(
+    () => ({
+      page: 1,
+      perPage: 1000,
+      order_by: 'created_at' as const,
+      order_sort: 'desc' as const,
+    }),
+    [],
+  );
+
+  const listQuery = useOrderLists(listQueryParams);
+  const tarifItemQuery = useOrderListTarifs(tarifItemQueryParams);
+  const tarifLoadItemQuery = useOrderListTarifItems(tarifLoadItemQueryParams);
   const deleteMutation = useDeleteOrderList();
 
   const tableData = React.useMemo(() => {
     const orders = listQuery.data?.data ?? [];
-    const tarifItems = tarifItemQuery.data?.data ?? [];
+    const tarifHeaders = tarifItemQuery.data?.data ?? [];
+    const tarifLoadItems = tarifLoadItemQuery.data?.data ?? [];
 
-    if (!orders.length || !tarifItems.length) {
+    if (!orders.length) {
       return orders;
     }
 
-    const tarifMap = new Map<number, typeof tarifItems>();
-    tarifItems.forEach((item) => {
-      const current = tarifMap.get(item.doOrderListId) ?? [];
-      current.push(item);
-      tarifMap.set(item.doOrderListId, current);
+    return orders.map((order) => {
+      const orderTarifs = tarifHeaders.filter((item) => item.doOrderListId === order.id);
+      const orderTarifItems = tarifLoadItems.filter((item) => item.doOrderListId === order.id);
+
+      return composeOrderListWithTarifs(order, orderTarifs.length ? orderTarifs : order.tarifs, orderTarifItems);
     });
+  }, [listQuery.data?.data, tarifItemQuery.data?.data, tarifLoadItemQuery.data?.data]);
 
-    return orders.map((order) => ({
-      ...order,
-      tarifs: tarifMap.get(order.id) ?? order.tarifs,
-    }));
-  }, [listQuery.data?.data, tarifItemQuery.data?.data]);
-
-  const handleDelete = async () => {
+  const handleDelete = React.useCallback(async () => {
     if (!selectedItem) return;
 
     try {
@@ -76,7 +94,50 @@ export default function OrderListPage() {
     } catch (error: any) {
       toast.error(error.message || 'Gagal menghapus order list');
     }
-  };
+  }, [selectedItem, deleteMutation]);
+
+  const handleAdd = React.useCallback(() => {
+    if (!slug || navigationLockRef.current) return;
+
+    navigationLockRef.current = true;
+    void router.push(`/dashboard/${slug}/administrasi/order-list/create`).finally(() => {
+      navigationLockRef.current = false;
+    });
+  }, [slug, router]);
+
+  const navigateTo = React.useCallback(
+    (path: string) => {
+      if (!slug || navigationLockRef.current) return;
+
+      navigationLockRef.current = true;
+      void router.push(path).finally(() => {
+        navigationLockRef.current = false;
+      });
+    },
+    [slug, router],
+  );
+
+  const handleDetail = React.useCallback(
+    (item: OrderList) => {
+      navigateTo(`/dashboard/${slug}/administrasi/order-list/detail/${item.id}`);
+    },
+    [navigateTo, slug],
+  );
+
+  const handleEdit = React.useCallback(
+    (item: OrderList) => {
+      navigateTo(`/dashboard/${slug}/administrasi/order-list/edit/${item.id}`);
+    },
+    [navigateTo, slug],
+  );
+
+  const handleDeleteClick = React.useCallback(
+    (item: OrderList) => {
+      setSelectedItem(item);
+      setDeleteOpen(true);
+    },
+    [],
+  );
 
   return (
     <DashboardLayout>
@@ -86,17 +147,14 @@ export default function OrderListPage() {
         page={page}
         perPage={perPage}
         totalData={listQuery.data?.meta.total ?? 0}
-        isLoading={listQuery.isLoading || tarifItemQuery.isLoading}
+        isLoading={listQuery.isLoading || tarifItemQuery.isLoading || tarifLoadItemQuery.isLoading}
         onSearchChange={setSearchInput}
         onPageChange={setPage}
         onPerPageChange={setPerPage}
-        onAdd={() => router.push(`/dashboard/${slug}/administrasi/order-list/create`)}
-        onDetail={(item) => router.push(`/dashboard/${slug}/administrasi/order-list/detail/${item.id}`)}
-        onEdit={(item) => router.push(`/dashboard/${slug}/administrasi/order-list/edit/${item.id}`)}
-        onDelete={(item) => {
-          setSelectedItem(item);
-          setDeleteOpen(true);
-        }}
+        onAdd={handleAdd}
+        onDetail={handleDetail}
+        onEdit={handleEdit}
+        onDelete={handleDeleteClick}
       />
 
       <OrderListDeleteDialog

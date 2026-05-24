@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
+import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tarif } from '@/@types/tarif.types';
 import type { SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
@@ -9,17 +10,25 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useCustomers } from '@/hooks/useCustomer';
 import {
   useCreateOrderListTarif,
+  useCreateOrderListTarifItem,
+  useDeleteOrderListTarifItem,
   useDeleteOrderListTarif,
   useOrderListDetail,
+  useOrderListTarifItems,
   useOrderListTarifs,
   useUpdateOrderList,
+  useUpdateOrderListTarifItem,
   useUpdateOrderListTarif,
 } from '@/hooks/useOrderList';
 import { useTarifs } from '@/hooks/useTarif';
 import { ApiValidationError } from '@/lib/api/response';
+import { composeOrderListWithTarifs } from '@/services/order-list.service';
 
 const isItemChangedTarif = (initialItem: any, currentItem: OrderListFormItemValue) =>
   Number(initialItem?.tarifId ?? 0) !== Number(currentItem.tarifId || 0);
+
+const isCargoItemChanged = (initialItem: any, currentItem: any) =>
+  Number(initialItem?.qty ?? 0) !== Number(currentItem?.qty ?? 0) || String(initialItem?.loadContent ?? '') !== String(currentItem?.loadContent ?? '');
 
 export default function EditOrderListPage() {
   const router = useRouter();
@@ -33,6 +42,14 @@ export default function EditOrderListPage() {
   const tarifItemQuery = useOrderListTarifs({
     page: 1,
     perPage: 100,
+    do_orderlist_id: id ?? undefined,
+    order_by: 'created_at',
+    order_sort: 'desc',
+    enabled: Boolean(id),
+  });
+  const tarifLoadItemQuery = useOrderListTarifItems({
+    page: 1,
+    perPage: 500,
     do_orderlist_id: id ?? undefined,
     order_by: 'created_at',
     order_sort: 'desc',
@@ -53,14 +70,18 @@ export default function EditOrderListPage() {
   const updateOrderMutation = useUpdateOrderList();
   const updateTarifMutation = useUpdateOrderListTarif();
   const createTarifMutation = useCreateOrderListTarif();
+  const createTarifItemMutation = useCreateOrderListTarifItem();
   const deleteTarifMutation = useDeleteOrderListTarif();
+  const updateTarifItemMutation = useUpdateOrderListTarifItem();
+  const deleteTarifItemMutation = useDeleteOrderListTarifItem();
   const effectiveOrderData = React.useMemo(() => {
     if (!detailQuery.data) return null;
-    return {
-      ...detailQuery.data,
-      tarifs: tarifItemQuery.data?.data?.length ? tarifItemQuery.data.data : detailQuery.data.tarifs,
-    };
-  }, [detailQuery.data, tarifItemQuery.data?.data]);
+
+    const tarifEntries = tarifItemQuery.data?.data?.length ? tarifItemQuery.data.data : detailQuery.data.tarifs;
+    const tarifLoadItems = (tarifLoadItemQuery.data?.data ?? []).filter((item) => !id || Number(item.doOrderListId ?? 0) === Number(id));
+
+    return composeOrderListWithTarifs(detailQuery.data, tarifEntries, tarifLoadItems);
+  }, [detailQuery.data, id, tarifItemQuery.data?.data, tarifLoadItemQuery.data?.data]);
 
   const tarifRecords = React.useMemo(() => {
     const map = new Map<number, Tarif>();
@@ -106,11 +127,23 @@ export default function EditOrderListPage() {
     [tarifRecords],
   );
 
+  // Handle error notifications
+  React.useEffect(() => {
+    if (detailQuery.isError) {
+      const errorMsg =
+        detailQuery.error instanceof Error
+          ? detailQuery.error.message
+          : 'Gagal memuat detail order list';
+      toast.error(errorMsg);
+    }
+  }, [detailQuery.isError, detailQuery.error]);
+
   const handleSubmit = async (values: OrderListFormValues) => {
     if (!effectiveOrderData || !id) return;
 
     try {
       const firstItem = values.items[0];
+      const ujDriver = values.items.reduce((sum, item) => sum + Number(item.driverFee ?? 0), 0);
       await updateOrderMutation.mutateAsync({
         id,
         payload: {
@@ -118,9 +151,10 @@ export default function EditOrderListPage() {
           status: values.status,
           invoice_bill: Number(values.invoiceBill),
           bill_invoice: Number(values.invoiceBill),
+          vehicle_type: firstItem?.vehicleType ?? effectiveOrderData.vehicleType ?? 'fuso',
           note: values.note,
           ppn: Number(values.ppn),
-          uj_driver: Number(values.ujDriver),
+          uj_driver: ujDriver,
           loading_in: firstItem?.loadingIn ?? '',
           loading_out: firstItem?.loadingOut ?? '',
         },
@@ -140,34 +174,73 @@ export default function EditOrderListPage() {
         if (item.id && initialItem) {
           if (isItemChangedTarif(initialItem, item)) {
             await deleteTarifMutation.mutateAsync({ id: item.id, orderListId: id });
-            await createTarifMutation.mutateAsync({
+
+            const createdTarif = await createTarifMutation.mutateAsync({
               do_orderlist_id: id,
               tarif_id: Number(item.tarifId),
-              qty: Number(item.qty),
-              load_content: item.loadContent,
               delivery_destination: item.deliveryDestination,
-              vehicle_type: item.vehicleType,
             });
+
+            for (const cargoItem of item.cargoItems) {
+              await createTarifItemMutation.mutateAsync({
+                do_order_list_tarif_id: createdTarif.id,
+                load_content: cargoItem.loadContent,
+                qty: Number(cargoItem.qty),
+              });
+            }
           } else {
             await updateTarifMutation.mutateAsync({
               id: item.id,
               payload: {
-                qty: Number(item.qty),
-                vehicle_type: item.vehicleType,
-                load_content: item.loadContent,
                 delivery_destination: item.deliveryDestination,
               },
             });
+
+            const initialCargoItems = initialItem.tarifItems ?? [];
+            const currentExistingCargoIds = new Set(item.cargoItems.filter((cargoItem) => cargoItem.id).map((cargoItem) => Number(cargoItem.id)));
+            const removedCargoItems = initialCargoItems.filter((cargoItem) => cargoItem.id && !currentExistingCargoIds.has(cargoItem.id));
+
+            for (const removedCargoItem of removedCargoItems) {
+              await deleteTarifItemMutation.mutateAsync({ id: removedCargoItem.id, orderListTarifId: item.id });
+            }
+
+            for (const cargoItem of item.cargoItems) {
+              const initialCargoItem = initialCargoItems.find((entry) => entry.id === cargoItem.id);
+
+              if (cargoItem.id && initialCargoItem) {
+                if (!isCargoItemChanged(initialCargoItem, cargoItem)) continue;
+
+                await updateTarifItemMutation.mutateAsync({
+                  id: cargoItem.id,
+                  payload: {
+                    do_order_list_tarif_id: item.id,
+                    load_content: cargoItem.loadContent,
+                    qty: Number(cargoItem.qty),
+                  },
+                });
+              } else {
+                await createTarifItemMutation.mutateAsync({
+                  do_order_list_tarif_id: item.id,
+                  load_content: cargoItem.loadContent,
+                  qty: Number(cargoItem.qty),
+                });
+              }
+            }
           }
         } else {
-          await createTarifMutation.mutateAsync({
+          const createdTarif = await createTarifMutation.mutateAsync({
             do_orderlist_id: id,
             tarif_id: Number(item.tarifId),
-            qty: Number(item.qty),
-            load_content: item.loadContent,
             delivery_destination: item.deliveryDestination,
-            vehicle_type: item.vehicleType,
           });
+
+          for (const cargoItem of item.cargoItems) {
+            await createTarifItemMutation.mutateAsync({
+              do_order_list_tarif_id: createdTarif.id,
+              load_content: cargoItem.loadContent,
+              qty: Number(cargoItem.qty),
+            });
+          }
         }
       }
 
@@ -182,7 +255,7 @@ export default function EditOrderListPage() {
     }
   };
 
-  if (!router.isReady || detailQuery.isLoading || tarifItemQuery.isLoading) {
+  if (!router.isReady || detailQuery.isLoading || tarifItemQuery.isLoading || tarifLoadItemQuery.isLoading) {
     return (
       <DashboardLayout>
         <div className="py-20 text-center text-sm text-slate-500">Memuat data order list...</div>
@@ -190,10 +263,67 @@ export default function EditOrderListPage() {
     );
   }
 
+  if (detailQuery.isError) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <button
+              onClick={() => router.push(`/dashboard/${slug}/administrasi/order-list`)}
+              className="rounded-md p-1 transition-colors hover:bg-slate-100"
+            >
+              <ChevronLeft className="h-5 w-5 text-slate-500" />
+            </button>
+            <div>
+              <h1 className="text-[24px] font-semibold text-slate-950">Edit Order List</h1>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+            <p className="mb-4 text-red-700">
+              {detailQuery.error instanceof Error
+                ? detailQuery.error.message
+                : 'Gagal memuat detail order list'}
+            </p>
+            <button
+              onClick={() => detailQuery.refetch()}
+              disabled={detailQuery.isFetching}
+              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+            >
+              {detailQuery.isFetching ? 'Memuat ulang...' : 'Coba Lagi'}
+            </button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   if (!id || !effectiveOrderData) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Data order list tidak ditemukan.</div>
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <button
+              onClick={() => router.push(`/dashboard/${slug}/administrasi/order-list`)}
+              className="rounded-md p-1 transition-colors hover:bg-slate-100"
+            >
+              <ChevronLeft className="h-5 w-5 text-slate-500" />
+            </button>
+            <div>
+              <h1 className="text-[24px] font-semibold text-slate-950">Edit Order List</h1>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 text-center">
+            <p className="mb-4 text-yellow-700">Data order list tidak ditemukan.</p>
+            <button
+              onClick={() => router.push(`/dashboard/${slug}/administrasi/order-list`)}
+              className="inline-flex items-center gap-2 rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700"
+            >
+              Kembali ke Daftar
+            </button>
+          </div>
+        </div>
       </DashboardLayout>
     );
   }
@@ -215,8 +345,11 @@ export default function EditOrderListPage() {
         isSubmitting={
           updateOrderMutation.isPending ||
           updateTarifMutation.isPending ||
+          updateTarifItemMutation.isPending ||
           createTarifMutation.isPending ||
-          deleteTarifMutation.isPending
+          createTarifItemMutation.isPending ||
+          deleteTarifMutation.isPending ||
+          deleteTarifItemMutation.isPending
         }
       />
     </DashboardLayout>

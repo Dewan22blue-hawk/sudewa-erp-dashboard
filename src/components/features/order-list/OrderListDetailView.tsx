@@ -9,7 +9,6 @@ import {
   getOrderVehicleTypeLabel,
   getOrderStatusBadgeClassName,
   getOrderStatusLabel,
-  getPrimaryTarifItem,
 } from './order-list.utils';
 
 interface DetailFieldProps {
@@ -43,7 +42,7 @@ interface OrderListDetailViewProps {
 }
 
 export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) {
-  const primaryTarif = getPrimaryTarifItem(data);
+  const orderTarifs = data.tarifs.length ? data.tarifs : [];
 
   return (
     <div className="space-y-6">
@@ -58,30 +57,58 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         <div className="grid gap-6 md:grid-cols-2">
           <DetailField label="Nama Customer" value={data.customer?.name || '-'} />
           <DetailField label="Kode Order" value={data.code || '-'} />
-          <DetailField label="Muatan" value={primaryTarif?.loadContent || '-'} />
-          <DetailField label="QTY" value={primaryTarif?.qty ? `${primaryTarif.qty} PCS` : '-'} />
+          <DetailField
+            label="Muatan"
+            value={
+              orderTarifs.length ? (
+                <div className="space-y-3">
+                  {orderTarifs.map((item, index) => {
+                    const cargoItems = item.tarifItems?.length
+                      ? item.tarifItems
+                      : item.loadContent
+                        ? [{ id: `${item.id}-fallback`, loadContent: item.loadContent, qty: Number(item.qty ?? 0) }]
+                        : [];
+
+                    const cargoLabel = cargoItems.length
+                      ? cargoItems.map((cargoItem) => cargoItem.loadContent).filter(Boolean).join(', ')
+                      : '-';
+
+                    return (
+                      <div key={`${item.id}-${index}`} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                        <div className="font-semibold text-slate-900">#{index + 1}</div>
+                        <div>Muatan: {cargoLabel}</div>
+                        <div>QTY: {cargoItems.length ? cargoItems.map((cargoItem) => cargoItem.qty).filter((qty) => qty > 0).join(', ') || item.qty || '-' : item.qty || '-'}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                '-'
+              )
+            }
+          />
+          <DetailField label="QTY" value={orderTarifs[0]?.qty ? `${orderTarifs[0].qty} PCS` : '-'} />
         </div>
       </SectionCard>
 
       <SectionCard title="Detail Order">
         <div className="grid gap-6 md:grid-cols-2">
-          <DetailField label="Loading In" value={primaryTarif?.loadingIn || data.loadingIn || '-'} />
-          <DetailField label="Tujuan Kirim" value={primaryTarif?.deliveryDestination || '-'} />
-          <DetailField label="Loading Out" value={primaryTarif?.loadingOut || data.loadingOut || '-'} />
-          <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, primaryTarif)} />
+          <DetailField label="Loading In" value={orderTarifs[0]?.loadingIn || data.loadingIn || '-'} />
+          <DetailField label="Tujuan Kirim" value={orderTarifs[0]?.deliveryDestination || '-'} />
+          <DetailField label="Loading Out" value={orderTarifs[0]?.loadingOut || data.loadingOut || '-'} />
+          <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, orderTarifs[0])} />
         </div>
       </SectionCard>
 
       <SectionCard title="Keuangan">
-        <div className="grid gap-6 md:grid-cols-3">
-          <DetailField label="UJ Driver" value={formatOrderCurrency(primaryTarif?.driverFee || data.ujDriver)} />
-          <DetailField label="Invoice Ekspedisi" value={formatOrderCurrency(primaryTarif?.expeditionInvoice || data.billInvoice)} />
-          <DetailField label="PPN" value={formatOrderCurrency(data.ppn)} />
+        <div className="grid gap-6 md:grid-cols-2">
+          <DetailField label="UJ Driver" value={formatOrderCurrency(orderTarifs[0]?.driverFee || data.ujDriver)} />
+          <DetailField label="Invoice Ekspedisi" value={formatOrderCurrency(orderTarifs[0]?.expeditionInvoice || data.billInvoice)} />
         </div>
       </SectionCard>
 
       <SectionCard title="Status Order">
-        <div className="flex flex-col gap-3">
+        <div className="space-y-1">
           <DetailField
             label="Status pengiriman"
             value={
@@ -90,31 +117,8 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
               </Badge>
             }
           />
-          <DetailField label="Catatan" value={data.note || '-'} />
         </div>
       </SectionCard>
-
-      {data.tarifs.length > 1 ? (
-        <SectionCard title="Order List Tarif">
-          <div className="space-y-4">
-            {data.tarifs.map((item, index) => (
-              <div key={item.id || `${item.tarifId}-${index}`} className="rounded-2xl border border-slate-200 px-4 py-4">
-                <div className="mb-4 text-sm font-semibold text-slate-900">Item Tarif #{index + 1}</div>
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  <DetailField label="Loading In" value={item.loadingIn || '-'} />
-                  <DetailField label="Loading Out" value={item.loadingOut || '-'} />
-                  <DetailField label="Tujuan Kirim" value={item.deliveryDestination || '-'} />
-                  <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, item)} />
-                  <DetailField label="Muatan" value={item.loadContent || '-'} />
-                  <DetailField label="QTY" value={item.qty || '-'} />
-                  <DetailField label="UJ Driver" value={formatOrderCurrency(item.driverFee)} />
-                  <DetailField label="Invoice" value={formatOrderCurrency(item.expeditionInvoice)} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-      ) : null}
     </div>
   );
 }

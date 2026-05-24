@@ -19,10 +19,6 @@ const nextConfig: NextConfig = {
         source: '/dashboard/:slug/administrasi/create-invoice/:id',
         destination: '/dashboard/:slug/administrasi/create-invoice/detail/:id',
       },
-      {
-        source: '/dashboard/:slug/administrasi/create-invoice/:id/edit',
-        destination: '/dashboard/:slug/administrasi/create-invoice/edit/:id',
-      },
     ];
   },
   async headers() {

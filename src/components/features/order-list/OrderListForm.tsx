@@ -25,10 +25,16 @@ export interface OrderListFormItemValue {
   loadingIn: string;
   loadingOut: string;
   deliveryDestination: string;
-  loadContent: string;
-  qty: number;
+  cargoItems: OrderListFormCargoItemValue[];
   driverFee: number;
   expeditionInvoice: number;
+}
+
+export interface OrderListFormCargoItemValue {
+  localId: string;
+  id?: number;
+  loadContent: string;
+  qty: number;
 }
 
 export interface OrderListFormValues {
@@ -57,6 +63,13 @@ interface OrderListFormProps {
 }
 
 const createItemId = () => Math.random().toString(36).slice(2, 11);
+
+const createCargoItem = (overrides?: Partial<OrderListFormCargoItemValue>): OrderListFormCargoItemValue => ({
+  localId: createItemId(),
+  id: overrides?.id,
+  loadContent: overrides?.loadContent ?? '',
+  qty: Number(overrides?.qty ?? 0),
+});
 
 const getVehicleFee = (tarif: Tarif | undefined, vehicleType: OrderListVehicleType) => {
   if (!tarif) return { driverFee: 0, invoice: 0 };
@@ -88,8 +101,7 @@ const toItemDefaults = (order?: OrderList | null): OrderListFormItemValue[] => {
         loadingIn: '',
         loadingOut: '',
         deliveryDestination: '',
-        loadContent: '',
-        qty: 0,
+        cargoItems: [createCargoItem()],
         driverFee: 0,
         expeditionInvoice: 0,
       },
@@ -104,8 +116,21 @@ const toItemDefaults = (order?: OrderList | null): OrderListFormItemValue[] => {
     loadingIn: item.loadingIn ?? '',
     loadingOut: item.loadingOut ?? '',
     deliveryDestination: item.deliveryDestination ?? '',
-    loadContent: item.loadContent ?? '',
-    qty: Number(item.qty ?? 0),
+    cargoItems:
+      item.tarifItems?.length
+        ? item.tarifItems.map((tarifItem) =>
+            createCargoItem({
+              id: tarifItem.id,
+              loadContent: tarifItem.loadContent,
+              qty: Number(tarifItem.qty ?? 0),
+            }),
+          )
+        : [
+            createCargoItem({
+              loadContent: item.loadContent ?? '',
+              qty: Number(item.qty ?? 0),
+            }),
+          ],
     driverFee: Number(item.driverFee ?? 0),
     expeditionInvoice: Number(item.expeditionInvoice ?? order.billInvoice ?? 0),
   }));
@@ -167,6 +192,7 @@ export function OrderListForm({
     control,
     register,
     handleSubmit,
+    getValues,
     reset,
     setValue,
     formState: { errors },
@@ -206,6 +232,24 @@ export function OrderListForm({
   const watchedUjDriver = useWatch({ control, name: 'ujDriver' });
 
   const selectedCustomer = mergedCustomerOptions.find((item) => item.value === customerId);
+
+  const appendCargoItem = React.useCallback(
+    (itemIndex: number) => {
+      const current = getValues(`items.${itemIndex}.cargoItems`) ?? [];
+      setValue(`items.${itemIndex}.cargoItems`, [...current, createCargoItem()], { shouldDirty: true, shouldTouch: true });
+    },
+    [getValues, setValue],
+  );
+
+  const removeCargoItem = React.useCallback(
+    (itemIndex: number, cargoIndex: number) => {
+      const current = getValues(`items.${itemIndex}.cargoItems`) ?? [];
+      if (current.length <= 1) return;
+      const next = current.filter((_, index) => index !== cargoIndex);
+      setValue(`items.${itemIndex}.cargoItems`, next, { shouldDirty: true, shouldTouch: true });
+    },
+    [getValues, setValue],
+  );
 
   const getTarifById = React.useCallback(
     (tarifId: string): Tarif | undefined => {
@@ -365,8 +409,7 @@ export function OrderListForm({
                           loadingIn: '',
                           loadingOut: '',
                           deliveryDestination: '',
-                          loadContent: '',
-                          qty: 0,
+                          cargoItems: [createCargoItem()],
                           driverFee: 0,
                           expeditionInvoice: 0,
                         })
@@ -441,25 +484,38 @@ export function OrderListForm({
 
                 <div className="space-y-2 lg:col-span-4">
                   <Label>Tipe Armada</Label>
-                  <Controller
-                    control={control}
-                    name={`items.${index}.vehicleType`}
-                    rules={{ required: 'Tipe armada wajib dipilih' }}
-                    render={({ field: controllerField }) => (
-                      <Select value={controllerField.value} onValueChange={(value: OrderListVehicleType) => handleVehicleTypeChange(index, value)}>
-                        <SelectTrigger className="h-12 rounded-xl border-[#E5E7EB]">
-                          <SelectValue placeholder="Pilih armada" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ORDER_LIST_VEHICLE_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <Controller
+                        control={control}
+                        name={`items.${index}.vehicleType`}
+                        rules={{ required: 'Tipe armada wajib dipilih' }}
+                        render={({ field: controllerField }) => (
+                          <Select value={controllerField.value} onValueChange={(value: OrderListVehicleType) => handleVehicleTypeChange(index, value)}>
+                            <SelectTrigger className="h-12 rounded-xl border-[#E5E7EB]">
+                              <SelectValue placeholder="Pilih armada" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ORDER_LIST_VEHICLE_OPTIONS.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => appendCargoItem(index)}
+                      className="h-12 w-12 rounded-xl border-slate-200"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 {tarif ? (
@@ -467,6 +523,59 @@ export function OrderListForm({
                     Tarif terpilih: {tarif.loadingIn || '-'} ke {tarif.loadingOut || '-'}
                   </div>
                 ) : null}
+
+                <div className="space-y-3 lg:col-span-12">
+                  <div className="text-sm font-semibold text-slate-900">Muatan</div>
+                  {(item?.cargoItems ?? []).map((cargoItem, cargoIndex) => (
+                    <div key={cargoItem.localId || `${field.id}-cargo-${cargoIndex}`} className="grid grid-cols-1 gap-3 rounded-xl border border-slate-100 p-3 lg:grid-cols-12">
+                      <div className="space-y-2 lg:col-span-6">
+                        <Label>{cargoIndex === 0 ? 'Muatan' : `Muatan #${cargoIndex + 1}`}</Label>
+                        <Input
+                          placeholder="Contoh: Motor vario"
+                          className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
+                          {...register(`items.${index}.cargoItems.${cargoIndex}.loadContent`, { required: 'Muatan wajib diisi' })}
+                        />
+                        {errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? (
+                          <p className="text-xs text-red-500">{errors.items[index]?.cargoItems?.[cargoIndex]?.loadContent?.message}</p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2 lg:col-span-5">
+                        <Label>{cargoIndex === 0 ? 'QTY' : `QTY #${cargoIndex + 1}`}</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          placeholder="0"
+                          className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
+                          {...register(`items.${index}.cargoItems.${cargoIndex}.qty`, {
+                            valueAsNumber: true,
+                            required: 'Qty wajib diisi',
+                            min: { value: 1, message: 'Qty minimal 1' },
+                          })}
+                        />
+                        {errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? (
+                          <p className="text-xs text-red-500">{errors.items[index]?.cargoItems?.[cargoIndex]?.qty?.message}</p>
+                        ) : null}
+                      </div>
+
+                      <div className="flex items-end lg:col-span-1">
+                        {(item?.cargoItems?.length ?? 0) > 1 ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeCargoItem(index, cargoIndex)}
+                            className="h-12 w-12 rounded-xl border-slate-200"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        ) : (
+                          <div className="h-12 w-12" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
           );
@@ -474,62 +583,6 @@ export function OrderListForm({
 
         <section className="rounded-[20px] border border-[#E5E7EB] bg-white px-5 py-6 shadow-sm">
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-            <div className="space-y-2 lg:col-span-6">
-              <Label>Muatan</Label>
-              <Input
-                placeholder="Contoh: Motor vario"
-                className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[0]?.loadContent ? 'border-red-500' : ''}`}
-                {...register('items.0.loadContent', { required: 'Muatan wajib diisi' })}
-              />
-              {errors.items?.[0]?.loadContent ? <p className="text-xs text-red-500">{errors.items[0]?.loadContent?.message}</p> : null}
-            </div>
-
-            <div className="space-y-2 lg:col-span-6">
-              <Label>QTY</Label>
-              <Input
-                type="number"
-                min={0}
-                placeholder="0"
-                className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[0]?.qty ? 'border-red-500' : ''}`}
-                {...register('items.0.qty', {
-                  valueAsNumber: true,
-                  required: 'Qty wajib diisi',
-                  min: { value: 1, message: 'Qty minimal 1' },
-                })}
-              />
-              {errors.items?.[0]?.qty ? <p className="text-xs text-red-500">{errors.items[0]?.qty?.message}</p> : null}
-            </div>
-
-            {fields.slice(1).map((field, index) => {
-              const actualIndex = index + 1;
-              return (
-                <React.Fragment key={field.id}>
-                  <div className="space-y-2 lg:col-span-6">
-                    <Label>Muatan Tambahan #{actualIndex + 1}</Label>
-                    <Input
-                      placeholder="Contoh: Motor vario"
-                      className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[actualIndex]?.loadContent ? 'border-red-500' : ''}`}
-                      {...register(`items.${actualIndex}.loadContent`, { required: 'Muatan wajib diisi' })}
-                    />
-                  </div>
-                  <div className="space-y-2 lg:col-span-6">
-                    <Label>QTY Tambahan #{actualIndex + 1}</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      placeholder="0"
-                      className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[actualIndex]?.qty ? 'border-red-500' : ''}`}
-                      {...register(`items.${actualIndex}.qty`, {
-                        valueAsNumber: true,
-                        required: 'Qty wajib diisi',
-                        min: { value: 1, message: 'Qty minimal 1' },
-                      })}
-                    />
-                  </div>
-                </React.Fragment>
-              );
-            })}
-
             <div className="space-y-2 lg:col-span-12">
               <Label>UJ Driver</Label>
               <Controller

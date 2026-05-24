@@ -39,7 +39,8 @@ const basePath = '/wapi/master-data/account-group';
 type PaginatedAccountGroupResponse = LaravelApiResponse<{
   data: AccountGroupApiModel[];
   current_page: number;
-  perPage: number;
+  per_page?: number;
+  perPage?: number;
   total: number;
   last_page: number;
 }>;
@@ -52,21 +53,17 @@ export const getAccountGroups = async (params: PaginationParams & { company_id?:
   const response = await apiClient.get<PaginatedAccountGroupResponse>(basePath, {
     params: {
       ...buildLaravelPaginationQuery(params),
-      company_id: params.company_id,
     },
   });
 
   const data = ensureSuccess(response.data);
-  const scopedData = params.company_id
-    ? (data.data ?? []).filter((item) => String(item.company_id) === String(params.company_id))
-    : (data.data ?? []);
 
   return toPaginatedResult(
     {
-      data: scopedData,
+      data: data.data ?? [],
       current_page: data.current_page,
-      per_page: data.perPage,
-      total: params.company_id ? scopedData.length : data.total,
+      per_page: data.per_page ?? data.perPage ?? params.perPage ?? 10,
+      total: data.total,
       last_page: data.last_page,
     },
     mapAccountGroup,

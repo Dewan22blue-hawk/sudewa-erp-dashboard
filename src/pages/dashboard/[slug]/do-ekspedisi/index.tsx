@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -106,6 +106,57 @@ export default function DOEkspedisiPage() {
     setSelectedItem(null);
   };
 
+  // Memoized callbacks untuk mencegah infinite re-renders
+  const handleEditClick = useCallback(
+    (item: DoEkspedisi) => {
+      setSelectedItem(item);
+      setIsEditOpen(true);
+    },
+    [],
+  );
+
+  const handleDetailClick = useCallback(
+    (item: DoEkspedisi) => {
+      if (!slug) return;
+      router.push(`/dashboard/${slug}/do-ekspedisi/detail/${item.id}`);
+    },
+    [slug, router],
+  );
+
+  const handleUploadClick = useCallback(
+    (item: DoEkspedisi) => {
+      setSelectedItem(item);
+      setIsUploadOpen(true);
+    },
+    [],
+  );
+
+  const handlePrintClick = useCallback(
+    (item: DoEkspedisi) => {
+      if (!slug) return;
+      const url = `/dashboard/${slug}/do-ekspedisi/detail/${item.id}?print=1`;
+      toast.info(`Membuka tampilan cetak DO ${item.doCode}`);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    },
+    [slug],
+  );
+
+  const handlePerPageChange = useCallback((value: number) => {
+    setPerPage(value);
+    setPage(1);
+  }, []);
+
+  // Memoized options untuk dialog
+  const vehicleOptions = useMemo(
+    () => (vehicleLookup.data ?? []).map((item) => ({ value: String(item.id), label: item.label, subtitle: item.subtitle })),
+    [vehicleLookup.data],
+  );
+
+  const driverOptions = useMemo(
+    () => (driverLookup.data ?? []).map((item) => ({ value: String(item.id), label: item.label, subtitle: item.subtitle })),
+    [driverLookup.data],
+  );
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -124,26 +175,12 @@ export default function DOEkspedisiPage() {
           isLoading={listQuery.isLoading}
           onSearchChange={setSearchInput}
           onPageChange={setPage}
-          onPerPageChange={(value) => {
-            setPerPage(value);
-            setPage(1);
-          }}
-          onAdd={() => slug && router.push(`/dashboard/${slug}/do-ekspedisi/create`)}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setIsEditOpen(true);
-          }}
-          onDetail={(item) => slug && router.push(`/dashboard/${slug}/do-ekspedisi/detail/${item.id}`)}
+          onPerPageChange={handlePerPageChange}
+          onEdit={handleEditClick}
+          onDetail={handleDetailClick}
           onDelete={handleDelete}
-          onUpload={(item) => {
-            setSelectedItem(item);
-            setIsUploadOpen(true);
-          }}
-          onPrint={(item) => {
-            if (!slug) return;
-            toast.info(`Buka detail untuk print DO ${item.doCode}`);
-            router.push(`/dashboard/${slug}/do-ekspedisi/detail/${item.id}`);
-          }}
+          onUpload={handleUploadClick}
+          onPrint={handlePrintClick}
         />
       </div>
 
@@ -163,8 +200,8 @@ export default function DOEkspedisiPage() {
         }}
         item={selectedItem}
         nextCode={nextCodeQuery.data}
-        vehicleOptions={(vehicleLookup.data ?? []).map((item) => ({ value: String(item.id), label: item.label, subtitle: item.subtitle }))}
-        driverOptions={(driverLookup.data ?? []).map((item) => ({ value: String(item.id), label: item.label, subtitle: item.subtitle }))}
+        vehicleOptions={vehicleOptions}
+        driverOptions={driverOptions}
         vehicleLoading={vehicleLookup.isLoading}
         driverLoading={driverLookup.isLoading}
         onVehicleSearch={setVehicleSearch}

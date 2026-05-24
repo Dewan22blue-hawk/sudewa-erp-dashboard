@@ -24,6 +24,9 @@ export const getVehicleTypeLabel = (value?: OrderListVehicleType | null) =>
   ORDER_LIST_VEHICLE_OPTIONS.find((option) => option.value === value)?.label ?? '-';
 
 export const getOrderVehicleTypeLabel = (order: OrderList, item?: OrderListTarifItem) => {
+  const orderType = getVehicleTypeLabel(order.vehicleType);
+  if (orderType !== '-') return orderType;
+
   const tarifType = getVehicleTypeLabel(item?.vehicleType);
   if (tarifType !== '-') return tarifType;
 

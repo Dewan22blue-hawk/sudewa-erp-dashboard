@@ -13,6 +13,7 @@ import type {
   DoEkspedisiListParams,
   DoEkspedisiListResponse,
   DoEkspedisiPayload,
+  DoEkspedisiOrderTarifLoadItem,
   DoEkspedisiVehicle,
   LookupOption,
 } from '@/@types/do-ekspedisi.types';
@@ -96,27 +97,59 @@ const mapCustomer = (item: any): DoEkspedisiCustomer => ({
   pic: item?.pic ?? item?.pic_name ?? null,
 });
 
+const mapDoOrderTarifItem = (entry: any, parent?: any) => {
+  const pivot = entry?.pivot ?? entry;
+  const tarifItems = Array.isArray(entry?.do_order_list_tarif_items)
+    ? entry.do_order_list_tarif_items.map((item: any): DoEkspedisiOrderTarifLoadItem => ({
+        id: Number(item?.id ?? 0),
+        uuid: item?.uuid,
+        loadContent: toText(item?.load_content, item?.muatan, item?.loadContent),
+        qty: toNumber(item?.qty),
+      }))
+    : [];
+  const primaryTarifItem = tarifItems[0];
+
+  return {
+    id: Number(pivot?.id ?? entry?.id ?? 0),
+    uuid: pivot?.uuid ?? entry?.uuid,
+    loadingIn: toText(pivot?.loading_in, entry?.loading_in, entry?.tarif?.loading_in, parent?.loading_in),
+    loadingOut: toText(pivot?.loading_out, entry?.loading_out, entry?.tarif?.loading_out, parent?.loading_out),
+    deliveryDestination: toText(
+      pivot?.delivery_destination,
+      pivot?.destination,
+      entry?.delivery_destination,
+      entry?.destination,
+    ),
+    loadContent: toText(pivot?.load_content, pivot?.muatan, entry?.load_content, entry?.muatan, primaryTarifItem?.loadContent),
+    qty: toNumber(pivot?.qty ?? entry?.qty ?? primaryTarifItem?.qty),
+    tarifItems: tarifItems.length ? tarifItems : undefined,
+  };
+};
+
 const mapDoOrderList = (item: any) => {
   if (!item || typeof item !== 'object') return null;
 
-  const firstTarif = Array.isArray(item.tarifs)
-    ? item.tarifs[0]
+  const tarifSource = Array.isArray(item.tarifs)
+    ? item.tarifs
     : Array.isArray(item.do_order_list_tarifs)
-      ? item.do_order_list_tarifs[0]
+      ? item.do_order_list_tarifs
       : Array.isArray(item.do_orderlist_tarifs)
-        ? item.do_orderlist_tarifs[0]
-        : null;
+        ? item.do_orderlist_tarifs
+        : [];
+  const tarifs = tarifSource.map((entry: any) => mapDoOrderTarifItem(entry, item));
+  const firstTarif = tarifs[0];
 
   return {
     id: Number(item.id ?? 0),
     uuid: item.uuid,
     code: toText(item.code),
     customerName: toText(item.customer?.name, item.customer_name),
-    loadingIn: toText(item.loading_in, firstTarif?.loading_in, firstTarif?.tarif?.loading_in),
-    loadingOut: toText(item.loading_out, firstTarif?.loading_out, firstTarif?.tarif?.loading_out),
-    destination: toText(firstTarif?.delivery_destination, firstTarif?.destination),
-    loadContent: toText(firstTarif?.load_content, firstTarif?.muatan),
+    loadingIn: toText(item.loading_in, firstTarif?.loadingIn),
+    loadingOut: toText(item.loading_out, firstTarif?.loadingOut),
+    destination: toText(firstTarif?.deliveryDestination),
+    loadContent: toText(firstTarif?.loadContent),
     qty: toNumber(firstTarif?.qty),
+    tarifs,
   };
 };
 

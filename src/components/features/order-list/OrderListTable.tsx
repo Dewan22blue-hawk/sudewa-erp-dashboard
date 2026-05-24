@@ -53,7 +53,7 @@ const headers = [
   'ACTION',
 ];
 
-export function OrderListTable({
+export const OrderListTable = React.memo(function OrderListTable({
   data,
   search,
   page,
@@ -180,16 +180,34 @@ export function OrderListTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-[190px] rounded-xl">
-                              <DropdownMenuItem onSelect={() => onDetail(item)} className="cursor-pointer">
+                              <DropdownMenuItem
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  onDetail(item);
+                                }}
+                                className="cursor-pointer"
+                              >
                                 <Eye className="mr-2 h-4 w-4" />
                                 Detail
                               </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => onEdit(item)} className="cursor-pointer">
+                              <DropdownMenuItem
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  onEdit(item);
+                                }}
+                                className="cursor-pointer"
+                              >
                                 <FilePenLine className="mr-2 h-4 w-4" />
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onSelect={() => onDelete(item)}
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  onDelete(item);
+                                }}
                                 className="cursor-pointer text-red-600 focus:text-red-600"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -233,4 +251,4 @@ export function OrderListTable({
       </div>
     </div>
   );
-}
+});

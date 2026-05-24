@@ -24,6 +24,25 @@ export interface DoEkspedisiOrderList {
   destination: string;
   loadContent: string;
   qty: number;
+  tarifs: DoEkspedisiOrderTarifItem[];
+}
+
+export interface DoEkspedisiOrderTarifItem {
+  id: number;
+  uuid?: string;
+  loadingIn: string;
+  loadingOut: string;
+  deliveryDestination: string;
+  loadContent: string;
+  qty: number;
+  tarifItems?: DoEkspedisiOrderTarifLoadItem[];
+}
+
+export interface DoEkspedisiOrderTarifLoadItem {
+  id: number;
+  uuid?: string;
+  loadContent: string;
+  qty: number;
 }
 
 export interface DoEkspedisiCustomer {

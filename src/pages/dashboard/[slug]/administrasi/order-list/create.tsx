@@ -6,7 +6,7 @@ import { OrderListForm, type OrderListFormValues } from '@/components/features/o
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useCustomers } from '@/hooks/useCustomer';
-import { useCreateOrderList, useCreateOrderListTarif } from '@/hooks/useOrderList';
+import { useCreateOrderList, useCreateOrderListTarif, useCreateOrderListTarifItem } from '@/hooks/useOrderList';
 import { useTarifs } from '@/hooks/useTarif';
 import { ApiValidationError } from '@/lib/api/response';
 
@@ -30,6 +30,7 @@ export default function CreateOrderListPage() {
   });
   const createOrderMutation = useCreateOrderList();
   const createTarifMutation = useCreateOrderListTarif();
+  const createTarifItemMutation = useCreateOrderListTarifItem();
 
   const tarifRecords = React.useMemo(() => tarifQuery.data?.data ?? [], [tarifQuery.data?.data]);
   const customerOptions = React.useMemo<SearchableSelectOption[]>(
@@ -58,6 +59,7 @@ export default function CreateOrderListPage() {
         customer_id: Number(values.customerId),
         status: values.status,
         bill_invoice: Number(values.invoiceBill),
+        vehicle_type: firstItem?.vehicleType ?? 'fuso',
         note: values.note,
         ppn: Number(values.ppn),
         uj_driver: Number(values.ujDriver),
@@ -65,18 +67,21 @@ export default function CreateOrderListPage() {
         loading_out: firstItem?.loadingOut ?? '',
       });
 
-      await Promise.all(
-        values.items.map((item) =>
-          createTarifMutation.mutateAsync({
+      for (const item of values.items) {
+        const createdTarif = await createTarifMutation.mutateAsync({
             do_orderlist_id: created.id,
             tarif_id: Number(item.tarifId),
-            qty: Number(item.qty),
-            load_content: item.loadContent,
             delivery_destination: item.deliveryDestination,
-            vehicle_type: item.vehicleType,
-          }),
-        ),
-      );
+          });
+
+        for (const cargoItem of item.cargoItems) {
+          await createTarifItemMutation.mutateAsync({
+            do_order_list_tarif_id: createdTarif.id,
+            load_content: cargoItem.loadContent,
+            qty: Number(cargoItem.qty),
+          });
+        }
+      }
 
       toast.success('Order list berhasil ditambahkan');
       await router.push(`/dashboard/${slug}/administrasi/order-list`);
@@ -102,7 +107,7 @@ export default function CreateOrderListPage() {
         onTarifSearch={setTarifSearch}
         onCancel={() => router.push(`/dashboard/${slug}/administrasi/order-list`)}
         onSubmit={handleSubmit}
-        isSubmitting={createOrderMutation.isPending || createTarifMutation.isPending}
+        isSubmitting={createOrderMutation.isPending || createTarifMutation.isPending || createTarifItemMutation.isPending}
       />
     </DashboardLayout>
   );
