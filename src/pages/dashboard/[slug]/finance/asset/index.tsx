@@ -50,6 +50,10 @@ export default function FinanceAssetPage() {
         router.push(`/dashboard/${slug}/finance/asset/${asset.id}/edit`);
     };
 
+    const handleDetail = (asset: FinanceAsset) => {
+        router.push(`/dashboard/${slug}/finance/asset/${asset.id}`);
+    };
+
     const handleDelete = (asset: FinanceAsset) => {
         setSelectedAsset(asset);
         setIsDeleteOpen(true);
@@ -102,6 +106,7 @@ export default function FinanceAssetPage() {
                     isExporting={exportMutation.isPending}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onDetail={handleDetail}
                     isLoading={isLoading}
                 />
             </div>

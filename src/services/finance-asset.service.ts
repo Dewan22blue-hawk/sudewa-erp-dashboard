@@ -32,7 +32,7 @@ export const getFinanceAssets = async (params: PaginationParams & { search?: str
             type: item.asset?.type || item.type || '',
             price: Number(item.asset?.price || item.price) || 0,
             serial_number: item.serial_number || item.asset?.serial_number || '',
-            depreciation: Number(item.depreciation) || 0,
+            depreciation: Number(item.depreciation) || Number(item.depreciation_per_month) || 0,
             depreciation_per_month: Number(item.depreciation_per_month) || Number(item.depreciation) || 0,
             final_value: Number(item.final_value || item.nilai_akhir) || 0,
             economic_age: Number(item.economic_age) || 0,
@@ -61,14 +61,25 @@ export const getFinanceAssetById = async (id: string | number): Promise<FinanceA
 
 export const updateFinanceAsset = async (id: string | number, data: Partial<FinanceAssetPayload>): Promise<void> => {
     try {
-        const payload = {
-            serial_number: data.serial_number,
-            economic_age: data.economic_age,
-            depreciation: data.depreciation,
-            final_value: data.final_value,
-            description: data.description,
-        };
-        const response = await apiClient.put<LaravelApiResponse<any>>(`${basePath}/${id}`, payload);
+        const params = new URLSearchParams();
+        if (data.economic_age !== undefined && data.economic_age !== null) {
+            params.append('economic_age', String(data.economic_age));
+        }
+        if (data.depreciation !== undefined && data.depreciation !== null) {
+            params.append('depreciation', String(data.depreciation));
+        }
+        if (data.final_value !== undefined && data.final_value !== null) {
+            params.append('final_value', String(data.final_value));
+        }
+        if (data.description !== undefined && data.description !== null) {
+            params.append('description', data.description);
+        }
+
+        const response = await apiClient.put<LaravelApiResponse<any>>(`${basePath}/${id}`, params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
 
         const result = response.data;
         if (!result.status) {
