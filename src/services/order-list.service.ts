@@ -289,6 +289,8 @@ const buildCreateOrderListTarifBody = (payload: CreateOrderListTarifPayload) => 
   const body = new FormData();
   body.append('do_orderlist_id', String(payload.do_orderlist_id));
   body.append('tarif_id', String(payload.tarif_id));
+  body.append('qty', String(payload.qty));
+  body.append('load_content', payload.load_content);
   body.append('delivery_destination', payload.delivery_destination);
   return body;
 };
@@ -296,6 +298,8 @@ const buildCreateOrderListTarifBody = (payload: CreateOrderListTarifPayload) => 
 const buildUpdateOrderListTarifBody = (payload: UpdateOrderListTarifPayload) => {
   const body = new URLSearchParams();
   body.append('delivery_destination', payload.delivery_destination);
+  if (payload.qty != null) body.append('qty', String(payload.qty));
+  if (payload.load_content != null) body.append('load_content', payload.load_content);
   return body;
 };
 

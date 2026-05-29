@@ -81,6 +81,8 @@ export async function getPPNPembelianList(params: PPNPembelianFilterParams = {})
       page,
       per_page: perPage,
       search: params.search || undefined,
+      start_date: params.start_date || undefined,
+      end_date: params.end_date || undefined,
       sort_by: params.sort_by ?? 'buy_date',
       sort_direction: params.sort_direction ?? 'desc',
     },
@@ -97,7 +99,7 @@ export async function getPPNPembelianList(params: PPNPembelianFilterParams = {})
 }
 
 export async function updatePPNPembelian({ id, payload }: UpdatePPNPembelianMutationPayload) {
-  const requestParams = {
+  const requestBody = {
     fp_date: payload.fp_date || undefined,
     nsfp_age: payload.nsfp_age || undefined,
     nsfp_amount: payload.nsfp_amount ?? undefined,
@@ -105,16 +107,14 @@ export async function updatePPNPembelian({ id, payload }: UpdatePPNPembelianMuta
   };
 
   try {
-    const response = await apiClient.put<PPNPembelianUpdateResponse>(`${BASE_PATH}/${id}`, undefined, {
-      params: requestParams,
-    });
-
+    const response = await apiClient.put<PPNPembelianUpdateResponse>(`${BASE_PATH}/${id}`, requestBody);
     return ensureSuccess(toSuccessPayload(response.data));
   } catch (error) {
     if (!isMethodNotAllowed(error)) throw error;
 
-    const response = await apiClient.post<PPNPembelianUpdateResponse>(`${BASE_PATH}/${id}`, undefined, {
-      params: requestParams,
+    const response = await apiClient.post<PPNPembelianUpdateResponse>(`${BASE_PATH}/${id}`, {
+      ...requestBody,
+      _method: 'PUT',
     });
 
     return ensureSuccess(toSuccessPayload(response.data));

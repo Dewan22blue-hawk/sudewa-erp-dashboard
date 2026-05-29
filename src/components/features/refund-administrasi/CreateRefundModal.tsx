@@ -1,0 +1,224 @@
+import { useEffect, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, PackageSearch } from 'lucide-react';
+import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
+import { useCreateRefund, useRefundSelectableItems } from '@/hooks/useRefundAdministrasi';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatCurrency } from '@/lib/utils/currency';
+import { toast } from 'sonner';
+
+interface CreateRefundModalProps {
+  open: boolean;
+  onClose: () => void;
+  transactionId: string;
+}
+
+export default function CreateRefundModal({ open, onClose, transactionId }: CreateRefundModalProps) {
+  const { transactionQuery, itemDetailsQuery, items } = useRefundSelectableItems(transactionId);
+  const createRefundMutation = useCreateRefund();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<CreateRefundFormValues>({
+    resolver: zodResolver(createRefundSchema),
+    defaultValues: {
+      unit_transaction_id: transactionId,
+      refund_date: new Date().toISOString().split('T')[0],
+      refund_amount: 0,
+      note: '',
+      unit_transaction_item_detail_ids: [],
+    },
+  });
+
+  const selectedIds = watch('unit_transaction_item_detail_ids');
+  const selectedItems = useMemo(
+    () => items.filter((item) => selectedIds.includes(String(item.id))),
+    [items, selectedIds],
+  );
+  const selectedTotal = useMemo(
+    () => selectedItems.reduce((total, item) => total + Number(item.price ?? 0), 0),
+    [selectedItems],
+  );
+
+  useEffect(() => {
+    if (!open) return;
+
+    reset({
+      unit_transaction_id: transactionId,
+      refund_date: new Date().toISOString().split('T')[0],
+      refund_amount: 0,
+      note: '',
+      unit_transaction_item_detail_ids: [],
+    });
+  }, [open, reset, transactionId]);
+
+  useEffect(() => {
+    setValue('refund_amount', selectedTotal, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [selectedTotal, setValue]);
+
+  const transaction = transactionQuery.data;
+  const personName = transaction?.person?.name ?? '-';
+  const transactionCode = transaction?.code ?? '-';
+
+  const toggleItem = (itemId: string, checked: boolean) => {
+    const next = checked ? [...selectedIds, itemId] : selectedIds.filter((id) => id !== itemId);
+    setValue('unit_transaction_item_detail_ids', next, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const onSubmit = async (values: CreateRefundFormValues) => {
+    try {
+      await createRefundMutation.mutateAsync(values);
+      toast.success('Refund berhasil dibuat');
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || 'Gagal membuat refund');
+    }
+  };
+
+  const isLoading = transactionQuery.isLoading || itemDetailsQuery.isLoading;
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl overflow-hidden p-0">
+        <DialogHeader className="border-b border-slate-200 bg-slate-50 px-6 py-5">
+          <DialogTitle>Buat Refund Baru</DialogTitle>
+          <DialogDescription>
+            Pilih unit yang akan direfund dari transaksi <span className="font-medium text-slate-900">{transactionCode}</span>.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-6 py-6">
+          <div className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-3">
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Kode Transaksi</p>
+              <p className="text-sm font-semibold text-slate-900">{transactionCode}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Relasi</p>
+              <p className="text-sm font-semibold text-slate-900">{personName}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total Pilihan</p>
+              <p className="text-sm font-semibold text-emerald-700">{formatCurrency(selectedTotal)}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="refund_date">Tanggal Refund</Label>
+              <Input id="refund_date" type="date" {...register('refund_date')} />
+              {errors.refund_date ? <p className="text-sm text-red-600">{errors.refund_date.message}</p> : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="refund_amount">Nominal Refund</Label>
+              <Input id="refund_amount" type="number" min={0} {...register('refund_amount')} />
+              {errors.refund_amount ? <p className="text-sm text-red-600">{errors.refund_amount.message}</p> : null}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="note">Catatan Refund</Label>
+            <Input id="note" placeholder="Contoh: refund karena terdapat kecacatan" {...register('note')} />
+            {errors.note ? <p className="text-sm text-red-600">{errors.note.message}</p> : null}
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-slate-200">
+            <div className="border-b border-slate-200 bg-white px-4 py-3">
+              <h3 className="text-sm font-semibold text-slate-900">Pilih Unit Transaksi</h3>
+              <p className="text-xs text-slate-500">Hanya unit milik transaksi ini yang bisa dipilih.</p>
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50 hover:bg-slate-50">
+                  <TableHead className="w-14">Pilih</TableHead>
+                  <TableHead>Tipe Unit</TableHead>
+                  <TableHead>Warna</TableHead>
+                  <TableHead>No. Mesin</TableHead>
+                  <TableHead>No. Rangka</TableHead>
+                  <TableHead className="text-right">Nilai Refund</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-36">
+                      <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Memuat item transaksi...
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : items.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-36">
+                      <div className="flex flex-col items-center justify-center gap-2 text-center text-sm text-slate-500">
+                        <PackageSearch className="h-5 w-5" />
+                        Tidak ada unit transaksi yang tersedia untuk direfund.
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  items.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-slate-50">
+                      <TableCell>
+                        <Controller
+                          control={control}
+                          name="unit_transaction_item_detail_ids"
+                          render={() => (
+                            <Checkbox
+                              checked={selectedIds.includes(String(item.id))}
+                              onCheckedChange={(checked) => toggleItem(String(item.id), Boolean(checked))}
+                            />
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium text-slate-900">{item.unit_type_name || '-'}</TableCell>
+                      <TableCell>{item.color || '-'}</TableCell>
+                      <TableCell>{item.machine_number || '-'}</TableCell>
+                      <TableCell>{item.chassis_number || '-'}</TableCell>
+                      <TableCell className="text-right font-medium text-slate-900">{formatCurrency(Number(item.price ?? 0))}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {errors.unit_transaction_item_detail_ids ? (
+            <p className="text-sm text-red-600">{errors.unit_transaction_item_detail_ids.message}</p>
+          ) : null}
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={createRefundMutation.isPending}>
+              Batal
+            </Button>
+            <Button type="submit" className="min-w-36" disabled={createRefundMutation.isPending || isLoading}>
+              {createRefundMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Simpan Refund
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -3,6 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SortableHeader } from '@/components/ui/sortable-header';
 import type { SortOrder } from '@/hooks/useTableSort';
+import { MoreVertical } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useState } from 'react';
+import FinanceRefundApprovalModal from '../refund-beli/FinanceRefundApprovalModal';
 
 interface Props {
   data: RefundJual[];
@@ -57,6 +61,7 @@ const getPaginationItems = (currentPage: number, lastPage: number): Array<number
 };
 
 export default function RefundJualTable({ data, pagination, sortKey, sortOrder, isLoading, isFetching, error, onRetry, onSort, onPageChange }: Props) {
+  const [selectedRefundId, setSelectedRefundId] = useState<number | null>(null);
   const canGoPrevious = pagination.currentPage > 1;
   const canGoNext = pagination.currentPage < pagination.lastPage;
   const paginationItems = getPaginationItems(pagination.currentPage, pagination.lastPage);
@@ -95,6 +100,7 @@ export default function RefundJualTable({ data, pagination, sortKey, sortOrder, 
               <th className="py-2 text-left">
                 <SortableHeader title="Keterangan" sortKey="keterangan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
               </th>
+              <th className="py-2 text-right px-4">ACTION</th>
             </tr>
           </thead>
 
@@ -116,7 +122,7 @@ export default function RefundJualTable({ data, pagination, sortKey, sortOrder, 
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                   Tidak ada data
                 </td>
               </tr>
@@ -130,12 +136,38 @@ export default function RefundJualTable({ data, pagination, sortKey, sortOrder, 
                   <td className="px-4 py-3 text-right font-medium text-red-600">{formatCurrency(item.totalRefund)}</td>
                   <td className="px-4 py-3">{item.kasKeluar}</td>
                   <td className="px-4 py-3 text-gray-500">{item.keterangan}</td>
+                  <td className="px-4 py-3 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-32">
+                        <DropdownMenuItem onClick={() => setSelectedRefundId(item.id)}>
+                          Approval
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      {selectedRefundId !== null && (
+        <FinanceRefundApprovalModal 
+          open={true} 
+          onClose={() => setSelectedRefundId(null)} 
+          refundId={selectedRefundId}
+          onSuccess={() => {
+            setSelectedRefundId(null);
+            if (onRetry) onRetry();
+          }}
+        />
+      )}
 
       <div className="flex flex-col gap-3 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
         <div>

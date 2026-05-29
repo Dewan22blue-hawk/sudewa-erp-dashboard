@@ -5,6 +5,7 @@ export interface FinanceAsset extends Asset {
     serial_number?: string;
     economic_age?: number;
     depreciation?: number;
+    depreciation_per_month?: number;
     final_value?: number;
     description?: string;
 }

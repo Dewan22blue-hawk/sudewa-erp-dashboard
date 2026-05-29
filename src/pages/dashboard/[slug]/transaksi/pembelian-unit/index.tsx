@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseTable from '@/components/features/purchase/PurchaseTable';
 import DeletePurchaseDialog from '@/components/features/purchase/DeletePurchaseDialog';
@@ -20,9 +21,49 @@ export default function PurchasePage() {
   const { slug } = router.query;
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage });
+  const [mainTab, setMainTab] = useState('common');
+  const [subTab, setSubTab] = useState('all');
+
+  // Reset subtab when maintab changes
+  useEffect(() => {
+    setSubTab('all');
+    setPage(1);
+  }, [mainTab]);
+
+  const activeStatus = subTab === 'all' ? undefined : subTab;
+  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, status: activeStatus });
   const deleteMutation = useDeletePurchase();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const TABS = [
+    { id: 'common', label: 'Common' },
+    { id: 'inbound', label: 'Inbound' },
+    { id: 'outbound', label: 'Outbound' },
+  ];
+
+  const SUBTABS = {
+    common: [
+      { id: 'all', label: 'All' },
+      { id: 'draft', label: 'Draft' },
+      { id: 'cancel', label: 'Cancel' },
+      { id: 'rejected', label: 'Rejected' },
+      { id: 'prepare', label: 'Prepare' },
+    ],
+    inbound: [
+      { id: 'all', label: 'All' },
+      { id: 'inbound_purcase_order', label: 'Purchase Order' },
+      { id: 'inbound_incoming_goods', label: 'Incoming Goods' },
+      { id: 'inbound_receipt', label: 'Receipt' },
+      { id: 'inbound_return', label: 'Return' },
+    ],
+    outbound: [
+      { id: 'all', label: 'All' },
+      { id: 'outbound_reserved', label: 'Reserved' },
+      { id: 'outbound_in_transit', label: 'In Transit' },
+      { id: 'outbound_delivered', label: 'Delivered' },
+      { id: 'outbound_return', label: 'Return' },
+    ]
+  };
 
   const handleDelete = async () => {
     if (!selectedId) return;
@@ -50,6 +91,27 @@ export default function PurchasePage() {
           <div className="flex gap-2"></div>
         </div>
 
+        {/* Main Tabs — baris 1 sesuai desain */}
+        <div className="flex items-center gap-4 py-3 border-b border-slate-200">
+          <span className="font-bold text-sm text-slate-900">Status</span>
+          <div className="flex items-center gap-1">
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setMainTab(tab.id)}
+                className={cn(
+                  "px-4 py-1.5 text-sm font-medium rounded-md transition-colors",
+                  mainTab === tab.id
+                    ? "bg-slate-100 text-slate-900 font-semibold"
+                    : "text-slate-500 hover:text-slate-900"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {isLoading ? (
           <div>Loading...</div>
         ) : (
@@ -65,6 +127,9 @@ export default function PurchasePage() {
               setPage(1);
             }}
             loading={isLoading && isFetching}
+            subTabs={(SUBTABS as any)[mainTab]}
+            activeSubTab={subTab}
+            onSubTabChange={(id) => { setSubTab(id); setPage(1); }}
           />
         )}
         <DeletePurchaseDialog open={!!selectedId} onClose={() => setSelectedId(null)} onConfirm={handleDelete} loading={deleteMutation.isPending} />

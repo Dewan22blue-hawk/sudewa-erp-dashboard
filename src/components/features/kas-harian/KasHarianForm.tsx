@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { MoneyInput } from '@/components/ui/money-input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Props {
   form: UseFormReturn<KasHarianFormInput, unknown, KasHarianFormValues>;
@@ -272,6 +273,32 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                   </div>
                 ) : null}
               </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="transaction_category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-medium text-slate-900">Kategori Transaksi</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="h-12 w-full rounded-2xl border-slate-200 bg-white px-4">
+                    <SelectValue placeholder="Pilih kategori transaksi" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="rounded-2xl">
+                  <SelectItem value="general" className="rounded-xl">Umum (General)</SelectItem>
+                  <SelectItem value="operational" className="rounded-xl">Operasional (Operational)</SelectItem>
+                  <SelectItem value="director_receivable" className="rounded-xl">Piutang Direktur (Director Receivable)</SelectItem>
+                  <SelectItem value="shareholder_receivable" className="rounded-xl">Piutang Pemegang Saham (Shareholder Receivable)</SelectItem>
+                  <SelectItem value="receivable" className="rounded-xl">Piutang Usaha (Receivable)</SelectItem>
+                  <SelectItem value="inventory" className="rounded-xl">Persediaan (Inventory)</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

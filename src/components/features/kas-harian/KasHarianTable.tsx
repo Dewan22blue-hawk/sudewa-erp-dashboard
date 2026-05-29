@@ -30,7 +30,7 @@ const formatDate = (value: string) => {
 
 const SkeletonRow = () => (
   <tr className="border-b border-slate-200">
-    {Array.from({ length: 7 }).map((_, index) => (
+    {Array.from({ length: 8 }).map((_, index) => (
       <td key={index} className="px-6 py-5">
         <Skeleton className="h-4 w-full max-w-[120px]" />
       </td>
@@ -88,6 +88,7 @@ export default function KasHarianTable({
               <th className="px-6 py-4 text-left">DEBET</th>
               <th className="px-6 py-4 text-left">KREDIT</th>
               <th className="px-6 py-4 text-left">AKUN</th>
+              <th className="px-6 py-4 text-left">KAS</th>
               <th className="px-6 py-4 text-center">ACTION</th>
             </tr>
           </thead>
@@ -96,7 +97,7 @@ export default function KasHarianTable({
               Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
             ) : isError ? (
               <tr>
-                <td colSpan={7} className="px-6 py-14 text-center">
+                <td colSpan={8} className="px-6 py-14 text-center">
                   <div className="space-y-3">
                     <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data transaksi kas harian'}</p>
                     {onRetry ? (
@@ -109,7 +110,7 @@ export default function KasHarianTable({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-14 text-center text-slate-500">
+                <td colSpan={8} className="px-6 py-14 text-center text-slate-500">
                   Belum ada data transaksi kas harian.
                 </td>
               </tr>
@@ -122,6 +123,7 @@ export default function KasHarianTable({
                   <td className="px-6 py-4 font-medium text-emerald-500">{formatCurrency(item.debet)}</td>
                   <td className="px-6 py-4 font-medium text-red-500">{formatCurrency(item.credit)}</td>
                   <td className="px-6 py-4 text-slate-700">{item.accountName}</td>
+                  <td className="px-6 py-4 text-slate-700">{item.cashName || '-'}</td>
                   <td className="px-6 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

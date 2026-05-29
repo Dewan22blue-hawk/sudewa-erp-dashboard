@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MoreVertical, Printer, Edit, FileText, FilePlus, Trash2 } from 'lucide-react';
+import { Search, MoreVertical, Printer, Edit, FileText, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ interface DOEkspedisiTableProps {
   onDetail: (item: DoEkspedisi) => void;
   onDelete: (item: DoEkspedisi) => void;
   onPrint: (item: DoEkspedisi) => void;
-  onUpload: (item: DoEkspedisi) => void;
 }
 
 const renderPagination = (page: number, totalPages: number): Array<number | string> => {
@@ -49,7 +48,6 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
   onDetail,
   onDelete,
   onPrint,
-  onUpload,
 }: DOEkspedisiTableProps) {
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
@@ -137,10 +135,6 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                           <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">
                             <FileText className="mr-2 h-4 w-4" />
                             Detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onUpload(item)} className="cursor-pointer">
-                            <FilePlus className="mr-2 h-4 w-4" />
-                            Upload Surat Jalan
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer">
                             <Printer className="mr-2 h-4 w-4" />

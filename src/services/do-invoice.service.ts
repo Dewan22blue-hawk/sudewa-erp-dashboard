@@ -253,7 +253,7 @@ export const deleteDoInvoice = async (
 
 export const processInvoiceById = async (
   id: string | number,
-  payload: DoInvoiceProcessPayload,
+  payload: DoInvoiceProcessPayload = {},
 ): Promise<DoInvoiceProcessResponse> => {
   const body = new FormData();
   appendFormData(body, 'date', payload.date);
@@ -272,7 +272,7 @@ export const processInvoiceById = async (
 
 export const processExpeditionById = async (
   id: string | number,
-  payload: DoInvoiceProcessPayload,
+  payload: DoInvoiceProcessPayload = {},
 ): Promise<DoInvoiceProcessResponse> => {
   const body = new FormData();
   appendFormData(body, 'date', payload.date);

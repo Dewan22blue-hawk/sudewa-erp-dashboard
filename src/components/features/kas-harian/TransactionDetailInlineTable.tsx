@@ -20,6 +20,7 @@ interface DraftRow {
 interface Props {
   items: FinanceBillingItem[];
   financeBillingId?: number;
+  unitTransactionId?: number;
   paymentAt?: string;
   disabled?: boolean;
 }
@@ -74,12 +75,12 @@ const getErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
-export default function TransactionDetailInlineTable({ items, financeBillingId, paymentAt, disabled }: Props) {
+export default function TransactionDetailInlineTable({ items, financeBillingId, unitTransactionId, paymentAt, disabled }: Props) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [editingId, setEditingId] = useState<EditableRowId | null>(null);
   const [draft, setDraft] = useState<DraftRow>(defaultDraft);
 
-  const createMutation = useCreateFinanceBillingItem(financeBillingId);
+  const createMutation = useCreateFinanceBillingItem();
   const updateMutation = useUpdateFinanceBillingItem();
   const deleteMutation = useDeleteFinanceBillingItem();
 
@@ -161,7 +162,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
   };
 
   const handleSave = async (rowId: EditableRowId) => {
-    if (!financeBillingId || !paymentAt) {
+    if (!financeBillingId || !paymentAt || !unitTransactionId) {
       toast.error('Data finance billing belum lengkap');
       return;
     }
@@ -179,10 +180,13 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
     try {
       if (rowId === 'new') {
         await createMutation.mutateAsync({
-          finance_billing_id: financeBillingId,
-          cash_payment_amount: draft.amount,
-          payment_at: paymentAt,
-          note: draft.note.trim(),
+          id: unitTransactionId,
+          payload: {
+            finance_billing_id: financeBillingId,
+            cash_payment_amount: draft.amount,
+            payment_at: paymentAt,
+            note: draft.note.trim(),
+          },
         });
         toast.success('Rincian transaksi berhasil ditambahkan');
       } else {

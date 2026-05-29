@@ -8,6 +8,7 @@ import { TypeUnitTable } from '@/components/features/type-unit/TypeUnitTable';
 import { DeleteTypeUnitDialog } from '@/components/features/type-unit/DeleteTypeUnitDialog';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import type { TypeUnit } from '@/@types/type-unit.types';
+import { useCompany } from '@/contexts/CompanyContext';
 
 export default function TypeUnitPage() {
   const router = useRouter();
@@ -42,8 +43,9 @@ export default function TypeUnitPage() {
       setPage(manualMeta.lastPage);
     }
   }, [page, manualMeta.lastPage, setPage]);
+  const { companyId } = useCompany();
   const deleteTypeUnit = useDeleteTypeUnit();
-  const importMutation = useImportTypeUnit();
+  const importMutation = useImportTypeUnit(companyId ?? undefined);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [openImport, setOpenImport] = useState(false);

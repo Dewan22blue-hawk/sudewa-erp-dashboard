@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -19,16 +18,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { getCustomers } from '@/services/customer.service';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { createInvoiceSchema, type CreateInvoiceSchema } from '@/schemas/create-invoice.schema';
 
-const schema = z.object({
-  customerId: z.string().min(1, 'Customer wajib dipilih'),
-  date: z.string().min(1, 'Tanggal wajib diisi'),
-  subject: z.string().min(1, 'Perihal wajib diisi'),
-  letterContent: z.string().min(1, 'Isi surat wajib diisi'),
-  description: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = CreateInvoiceSchema;
 
 interface Props {
   open: boolean;
@@ -46,9 +39,10 @@ interface Props {
 export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting = false }: Props) {
   const { companyId } = useCompany();
   const [search, setSearch] = React.useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createInvoiceSchema),
     defaultValues: {
       customerId: '',
       date: new Date().toISOString().slice(0, 10),
@@ -72,8 +66,8 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
   }, [form, open]);
 
   const customerQuery = useQuery({
-    queryKey: ['create-invoice-customer-lookup', companyId, search],
-    queryFn: () => getCustomers({ page: 1, perPage: 25, search, company_id: companyId || undefined }),
+    queryKey: ['create-invoice-customer-lookup', companyId, debouncedSearch],
+    queryFn: () => getCustomers({ page: 1, perPage: 25, search: debouncedSearch, company_id: companyId || undefined }),
     enabled: open && !!companyId,
   });
 

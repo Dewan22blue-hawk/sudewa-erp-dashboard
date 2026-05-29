@@ -10,10 +10,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getStockDetailData, PaginatedResponse, StockItem } from '@/services/laporan-warehouse.service';
+import { useGetWarehouseStockDetail } from '@/hooks/useLaporanWarehouse';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 type StockDetailTabProps = {
   perPage: number;
@@ -29,41 +39,43 @@ const toCsvLine = (cells: Array<string | number>): string =>
     })
     .join(',');
 
-export default function StockDetailTab({ perPage, machineNumber, onActionsChange }: StockDetailTabProps) {
-  const [rows, setRows] = useState<StockItem[]>([]);
-  const [pagination, setPagination] = useState<PaginatedResponse<StockItem>>({
+export default function StockDetailTab({ perPage, machineNumber: initialMachineNumber, onActionsChange }: StockDetailTabProps) {
+  const [page, setPage] = useState(1);
+  const [machineNumber, setMachineNumber] = useState(initialMachineNumber || '');
+  const [chassisNumber, setChassisNumber] = useState('');
+  const [color, setColor] = useState('');
+  const [stockState, setStockState] = useState('');
+  const [inStock, setInStock] = useState('true');
+
+  const debouncedMachineNumber = useDebouncedValue(machineNumber, 500);
+  const debouncedChassisNumber = useDebouncedValue(chassisNumber, 500);
+  const debouncedColor = useDebouncedValue(color, 500);
+
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useGetWarehouseStockDetail({
+    warehouse_id: 1,
+    page,
+    per_page: perPage,
+    machine_number: debouncedMachineNumber || undefined,
+    chassis_number: debouncedChassisNumber || undefined,
+    color: debouncedColor || undefined,
+    stock_state: stockState === 'all' ? undefined : stockState || undefined,
+    in_stock: inStock === 'all' ? undefined : inStock,
+  });
+
+  const rows = response?.data || [];
+  const pagination = response || {
     current_page: 1,
     data: [],
     last_page: 1,
-    per_page: 50,
+    per_page: perPage,
     total: 0,
     from: 0,
     to: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const result = await getStockDetailData({
-        warehouse_id: 1,
-        page,
-        per_page: perPage,
-        machine_number: machineNumber || undefined,
-      });
-      setRows(result.data);
-      setPagination(result);
-    } catch {
-      toast.error('Gagal memuat data stock detail');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [machineNumber, page, perPage]);
-
-  useEffect(() => {
-    void fetchData();
-  }, [fetchData]);
+  };
 
   const grandTotalPurchase = useMemo(
     () => rows.reduce((total, item) => total + item.purchase_price, 0),
@@ -118,6 +130,56 @@ export default function StockDetailTab({ perPage, machineNumber, onActionsChange
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3 no-print">
+        <Input
+          placeholder="Cari No Mesin..."
+          value={machineNumber}
+          onChange={(e) => {
+            setMachineNumber(e.target.value);
+            setPage(1);
+          }}
+          className="w-40"
+        />
+        <Input
+          placeholder="Cari No Rangka..."
+          value={chassisNumber}
+          onChange={(e) => {
+            setChassisNumber(e.target.value);
+            setPage(1);
+          }}
+          className="w-40"
+        />
+        <Input
+          placeholder="Warna..."
+          value={color}
+          onChange={(e) => {
+            setColor(e.target.value);
+            setPage(1);
+          }}
+          className="w-32"
+        />
+        <Select value={stockState || 'all'} onValueChange={(val) => { setStockState(val); setPage(1); }}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Stock State" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua State</SelectItem>
+            <SelectItem value="good">Good</SelectItem>
+            <SelectItem value="bad">Bad</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={inStock || 'all'} onValueChange={(val) => { setInStock(val); setPage(1); }}>
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="In Stock" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua</SelectItem>
+            <SelectItem value="true">In Stock</SelectItem>
+            <SelectItem value="false">Out of Stock</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="overflow-x-auto">
           <Table>
@@ -134,10 +196,23 @@ export default function StockDetailTab({ perPage, machineNumber, onActionsChange
             </TableHeader>
             <TableBody>
               {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                  </TableRow>
+                ))
+              ) : isError ? (
                 <TableRow>
                   <TableCell colSpan={7} className="py-16">
-                    <div className="flex items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    <div className="flex flex-col items-center justify-center text-red-500">
+                      <AlertCircle className="h-8 w-8 mb-2" />
+                      <p>Gagal memuat data stock detail</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -175,7 +250,7 @@ export default function StockDetailTab({ perPage, machineNumber, onActionsChange
         </div>
       </div>
 
-      {!isLoading && pagination.total > 0 && (
+      {!isLoading && !isError && pagination.total > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600 no-print">
           <div>
             Showing {pagination.from || 0}–{pagination.to || 0} of {pagination.total} data

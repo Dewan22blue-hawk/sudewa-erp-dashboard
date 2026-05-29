@@ -61,7 +61,7 @@ export function useProcessDoInvoice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string | number; payload: DoInvoiceProcessPayload }) => processInvoiceById(id, payload),
+    mutationFn: ({ id, payload }: { id: string | number; payload?: DoInvoiceProcessPayload }) => processInvoiceById(id, payload),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['do-invoice'] });
       queryClient.invalidateQueries({ queryKey: ['do-invoice', 'detail', variables.id] });
@@ -73,7 +73,7 @@ export function useProcessDoExpedition() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string | number; payload: DoInvoiceProcessPayload }) => processExpeditionById(id, payload),
+    mutationFn: ({ id, payload }: { id: string | number; payload?: DoInvoiceProcessPayload }) => processExpeditionById(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['do-invoice'] });
     },

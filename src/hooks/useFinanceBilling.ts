@@ -44,11 +44,11 @@ export function useFinanceBillingDetail(id?: number, options?: FinanceBillingQue
   });
 }
 
-export function useCreateFinanceBillingItem(id?: number | string) {
+export function useCreateFinanceBillingItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: FinanceBillingItemPayload) => createFinanceBillingItem(id as number, payload),
+    mutationFn: ({ id, payload }: { id: number | string; payload: FinanceBillingItemPayload }) => createFinanceBillingItem(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
       queryClient.invalidateQueries({ queryKey: ['cash-flow'] });

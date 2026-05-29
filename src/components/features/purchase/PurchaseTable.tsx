@@ -21,9 +21,12 @@ export interface PurchaseTableProps {
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
   loading?: boolean;
+  subTabs?: { id: string; label: string }[];
+  activeSubTab?: string;
+  onSubTabChange?: (id: string) => void;
 }
 
-export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, loading }: PurchaseTableProps) {
+export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, loading, subTabs, activeSubTab, onSubTabChange }: PurchaseTableProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
@@ -170,17 +173,40 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
 
   return (
     <div className="space-y-4">
-      {/* Header Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-[250px]">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input type="text" placeholder="Search here..." className="pl-8 bg-white" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
-          </div>
+      {/* Controls Bar — semua dalam SATU BARIS sejajar (sesuai Figma) */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
+        {/* LEFT: Sub-tabs + Show + Page */}
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {/* Sub-tabs */}
+          {subTabs && subTabs.length > 0 && (
+            <div className="flex items-center gap-1">
+              {subTabs.map((sub) => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => onSubTabChange?.(sub.id)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
+                    activeSubTab === sub.id
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Divider */}
+          {subTabs && subTabs.length > 0 && (
+            <div className="h-5 w-px bg-slate-200" />
+          )}
+
+          {/* Show + Page */}
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-sm font-medium">Show</span>
+            <span className="text-sm font-medium text-slate-700">Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-[70px] bg-white">
+              <SelectTrigger className="w-[70px] bg-white h-9">
                 <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
@@ -190,27 +216,18 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm font-medium">Page</span>
-          </div>
-
-          <div className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-sm font-medium">Billing</span>
-            <Select value={billingFilter} onValueChange={(value: 'all' | 'paid' | 'unpaid') => setBillingFilter(value)}>
-              <SelectTrigger className="w-[150px] bg-white">
-                <SelectValue placeholder="Semua" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="paid">Lunas</SelectItem>
-                <SelectItem value="unpaid">Belum Lunas</SelectItem>
-              </SelectContent>
-            </Select>
+            <span className="text-sm font-medium text-slate-700">Page</span>
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto items-center gap-2 justify-end">
+        {/* RIGHT: Search + Add */}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[280px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <Input type="text" placeholder="Search here..." className="pl-8 bg-white h-9" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
+          </div>
           {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
+            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9">
               <Plus className="mr-2 h-4 w-4" />
               Tambah
             </Button>

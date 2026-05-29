@@ -30,6 +30,7 @@ interface OrderListTableProps {
   perPage: number;
   totalData: number;
   isLoading?: boolean;
+  isRefetching?: boolean;
   onSearchChange: (value: string) => void;
   onPageChange: (value: number) => void;
   onPerPageChange: (value: number) => void;
@@ -60,6 +61,7 @@ export const OrderListTable = React.memo(function OrderListTable({
   perPage,
   totalData,
   isLoading = false,
+  isRefetching = false,
   onSearchChange,
   onPageChange,
   onPerPageChange,
@@ -91,6 +93,7 @@ export const OrderListTable = React.memo(function OrderListTable({
               className="h-11 rounded-xl border-slate-200 bg-white pl-11 text-sm"
             />
           </div>
+          {isRefetching ? <span className="text-xs font-medium text-slate-500">Memperbarui data...</span> : null}
 
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-700">Show</span>
@@ -109,7 +112,7 @@ export const OrderListTable = React.memo(function OrderListTable({
           </div>
         </div>
 
-        <Button onClick={onAdd} className="h-11 rounded-xl bg-[#1f4163] px-5 text-sm font-medium hover:bg-[#183552]">
+        <Button type="button" onClick={onAdd} className="h-11 cursor-pointer rounded-xl bg-[#1f4163] px-5 text-sm font-medium hover:bg-[#183552]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah
         </Button>
@@ -153,7 +156,7 @@ export const OrderListTable = React.memo(function OrderListTable({
                     const primaryTarif = getPrimaryTarifItem(item);
 
                     return (
-                      <TableRow key={item.id} className="border-slate-100">
+                      <TableRow key={item.id} className="border-slate-100 transition-colors hover:bg-slate-50/70">
                         <TableCell className="px-4 py-4 text-sm text-slate-700">{item.code || '-'}</TableCell>
                         <TableCell className="min-w-[180px] px-4 py-4 text-center text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
                         <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{primaryTarif?.loadingIn || item.loadingIn || '-'}</TableCell>
@@ -175,15 +178,14 @@ export const OrderListTable = React.memo(function OrderListTable({
                         <TableCell className="px-4 py-4 text-center">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                              <Button type="button" variant="ghost" size="icon" className="h-9 w-9 cursor-pointer rounded-full">
                                 <MoreVertical className="h-4 w-4 text-slate-600" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-[190px] rounded-xl">
                               <DropdownMenuItem
-                                onClick={(event) => {
+                                onSelect={(event) => {
                                   event.preventDefault();
-                                  event.stopPropagation();
                                   onDetail(item);
                                 }}
                                 className="cursor-pointer"
@@ -192,9 +194,8 @@ export const OrderListTable = React.memo(function OrderListTable({
                                 Detail
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={(event) => {
+                                onSelect={(event) => {
                                   event.preventDefault();
-                                  event.stopPropagation();
                                   onEdit(item);
                                 }}
                                 className="cursor-pointer"
@@ -203,9 +204,8 @@ export const OrderListTable = React.memo(function OrderListTable({
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={(event) => {
+                                onSelect={(event) => {
                                   event.preventDefault();
-                                  event.stopPropagation();
                                   onDelete(item);
                                 }}
                                 className="cursor-pointer text-red-600 focus:text-red-600"
@@ -228,7 +228,7 @@ export const OrderListTable = React.memo(function OrderListTable({
       <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-500">Showing {startData}-{endData} of {totalData} data</p>
         <div className="flex flex-wrap items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="text-slate-600">
+          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="cursor-pointer text-slate-600">
             Previous
           </Button>
           {visiblePages[0] > 1 ? <span className="px-2 text-sm text-slate-500">1 ...</span> : null}
@@ -238,13 +238,13 @@ export const OrderListTable = React.memo(function OrderListTable({
               variant={value === page ? 'outline' : 'ghost'}
               size="sm"
               onClick={() => onPageChange(value)}
-              className={cn(value === page ? 'rounded-xl border-slate-200 bg-white' : 'text-slate-600')}
+              className={cn('cursor-pointer', value === page ? 'rounded-xl border-slate-200 bg-white' : 'text-slate-600')}
             >
               {value}
             </Button>
           ))}
           {visiblePages[visiblePages.length - 1] < totalPages ? <span className="px-2 text-sm text-slate-500">... {totalPages}</span> : null}
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="text-slate-600">
+          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="cursor-pointer text-slate-600">
             Next
           </Button>
         </div>

@@ -12,12 +12,12 @@ export const typeUnitSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi'),
   unitType: z.string().optional(),
   unitModel: z.string().optional(),
-  brutoWeight: z.coerce.number().optional().nullable(),
-  nettoWeight: z.coerce.number().optional().nullable(),
-  capacity: z.coerce.number().optional().nullable(),
+  brutoWeight: z.number().optional().nullable(),
+  nettoWeight: z.number().optional().nullable(),
+  capacity: z.number().optional().nullable(),
   image: z.any().optional().nullable(),
-  sellPrice: z.coerce.number().optional().nullable(),
-  buyPrice: z.coerce.number().optional().nullable(),
+  sellPrice: z.number().optional().nullable(),
+  buyPrice: z.number().optional().nullable(),
 });
 
 export type TypeUnitFormValues = z.infer<typeof typeUnitSchema>;

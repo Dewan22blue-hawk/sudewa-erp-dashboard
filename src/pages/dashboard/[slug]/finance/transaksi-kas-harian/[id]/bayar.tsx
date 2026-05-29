@@ -85,9 +85,9 @@ export default function BayarKasHarianPage() {
   const financeBillingQuery = useFinanceBillingDetail(financeBillingId, {
     enabled: isBillingSource && typeof financeBillingId === 'number' && Number.isFinite(financeBillingId),
   });
-  const mutation = useCreateFinanceBillingItem(financeBillingId);
-
   const financeBillingDetail = financeBillingQuery.data;
+  const unitTransactionId = financeBillingDetail?.unit_transaction_billing?.unit_transaction?.id;
+  const mutation = useCreateFinanceBillingItem();
   const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [bcaIdr, setBcaIdr] = useState('');
   const [bcaUsd, setBcaUsd] = useState('');
@@ -137,7 +137,7 @@ export default function BayarKasHarianPage() {
     }
 
     try {
-      await mutation.mutateAsync(payload);
+      await mutation.mutateAsync({ id: unitTransactionId as number, payload });
       toast.success('Pembayaran berhasil disimpan');
 
       if (typeof slug === 'string') {

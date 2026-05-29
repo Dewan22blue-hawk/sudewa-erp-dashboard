@@ -53,6 +53,14 @@ export const useQueryParamsTable = (options?: QueryStateOptions) => {
     [router],
   );
 
+  const getParam = useCallback(
+    (key: string, fallback = '') => {
+      const value = router.query[key];
+      return typeof value === 'string' ? value : fallback;
+    },
+    [router.query],
+  );
+
   const setPage = useCallback((value: number) => updateQuery({ page: value }), [updateQuery]);
   const setPerPage = useCallback((value: number) => updateQuery({ perPage: value, page: 1 }), [updateQuery]);
   const setSearch = useCallback((value: string) => updateQuery({ search: value, page: 1 }), [updateQuery]);
@@ -61,6 +69,8 @@ export const useQueryParamsTable = (options?: QueryStateOptions) => {
     page,
     perPage,
     search,
+    getParam,
+    updateQuery,
     setPage,
     setPerPage,
     setSearch,

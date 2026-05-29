@@ -5,30 +5,32 @@ import type { OrderList } from '@/@types/order-list.types';
 import { OrderListDeleteDialog } from '@/components/features/order-list/OrderListDeleteDialog';
 import { OrderListTable } from '@/components/features/order-list/OrderListTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useOrderLists, useDeleteOrderList, useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
-import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { composeOrderListWithTarifs } from '@/services/order-list.service';
 
 export default function OrderListPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPage: 1, defaultPerPage: 10, defaultSearch: '' });
-  const [searchInput, setSearchInput] = React.useState(search);
+  const initialPage = typeof router.query.page === 'string' ? Number(router.query.page) : 1;
+  const initialPerPage = typeof router.query.perPage === 'string'
+    ? Number(router.query.perPage)
+    : typeof router.query.per_page === 'string'
+      ? Number(router.query.per_page)
+      : 10;
+  const initialSearch = typeof router.query.search === 'string' ? router.query.search : '';
+  const [page, setPage] = React.useState(Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1);
+  const [perPage, setPerPage] = React.useState(Number.isFinite(initialPerPage) && initialPerPage > 0 ? initialPerPage : 10);
+  const [searchInput, setSearchInput] = React.useState(initialSearch);
+  const [search, setSearch] = React.useState(initialSearch);
+  const debouncedSearch = useDebouncedValue(searchInput, 350);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<OrderList | null>(null);
-  const navigationLockRef = React.useRef(false);
 
   React.useEffect(() => {
-    setSearchInput(search);
-  }, [search]);
-
-  React.useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setSearch(searchInput.trim());
-    }, 350);
-
-    return () => window.clearTimeout(timeout);
-  }, [searchInput, setSearch]);
+    setSearch(debouncedSearch.trim());
+    setPage(1);
+  }, [debouncedSearch]);
 
   const listQueryParams = React.useMemo(
     () => ({
@@ -75,9 +77,26 @@ export default function OrderListPage() {
       return orders;
     }
 
+    const tarifMap = new Map<number, typeof tarifHeaders>();
+    const tarifItemMap = new Map<number, typeof tarifLoadItems>();
+
+    tarifHeaders.forEach((item) => {
+      const current = tarifMap.get(item.doOrderListId) ?? [];
+      current.push(item);
+      tarifMap.set(item.doOrderListId, current);
+    });
+
+    tarifLoadItems.forEach((item) => {
+      const orderId = Number(item.doOrderListId ?? 0);
+      if (!orderId) return;
+      const current = tarifItemMap.get(orderId) ?? [];
+      current.push(item);
+      tarifItemMap.set(orderId, current);
+    });
+
     return orders.map((order) => {
-      const orderTarifs = tarifHeaders.filter((item) => item.doOrderListId === order.id);
-      const orderTarifItems = tarifLoadItems.filter((item) => item.doOrderListId === order.id);
+      const orderTarifs = tarifMap.get(order.id) ?? [];
+      const orderTarifItems = tarifItemMap.get(order.id) ?? [];
 
       return composeOrderListWithTarifs(order, orderTarifs.length ? orderTarifs : order.tarifs, orderTarifItems);
     });
@@ -97,22 +116,14 @@ export default function OrderListPage() {
   }, [selectedItem, deleteMutation]);
 
   const handleAdd = React.useCallback(() => {
-    if (!slug || navigationLockRef.current) return;
-
-    navigationLockRef.current = true;
-    void router.push(`/dashboard/${slug}/administrasi/order-list/create`).finally(() => {
-      navigationLockRef.current = false;
-    });
+    if (!slug) return;
+    void router.push(`/dashboard/${slug}/administrasi/order-list/create`);
   }, [slug, router]);
 
   const navigateTo = React.useCallback(
     (path: string) => {
-      if (!slug || navigationLockRef.current) return;
-
-      navigationLockRef.current = true;
-      void router.push(path).finally(() => {
-        navigationLockRef.current = false;
-      });
+      if (!slug) return;
+      void router.push(path);
     },
     [slug, router],
   );
@@ -139,6 +150,8 @@ export default function OrderListPage() {
     [],
   );
 
+  const showTableSkeleton = !listQuery.data && !tarifItemQuery.data && !tarifLoadItemQuery.data;
+
   return (
     <DashboardLayout>
       <OrderListTable
@@ -147,10 +160,14 @@ export default function OrderListPage() {
         page={page}
         perPage={perPage}
         totalData={listQuery.data?.meta.total ?? 0}
-        isLoading={listQuery.isLoading || tarifItemQuery.isLoading || tarifLoadItemQuery.isLoading}
+        isLoading={showTableSkeleton}
+        isRefetching={listQuery.isFetching || tarifItemQuery.isFetching || tarifLoadItemQuery.isFetching}
         onSearchChange={setSearchInput}
         onPageChange={setPage}
-        onPerPageChange={setPerPage}
+        onPerPageChange={(value) => {
+          setPerPage(value);
+          setPage(1);
+        }}
         onAdd={handleAdd}
         onDetail={handleDetail}
         onEdit={handleEdit}

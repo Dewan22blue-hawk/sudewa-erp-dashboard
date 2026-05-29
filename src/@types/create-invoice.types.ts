@@ -98,11 +98,11 @@ export interface DoInvoiceDeletePayload {
 }
 
 export interface DoInvoiceProcessPayload {
-  date: string;
-  subject: string;
+  date?: string;
+  subject?: string;
   attachment?: File | string | null;
-  letter_content: string;
-  do_expedition_invoice_ids: Array<number | string>;
+  letter_content?: string;
+  do_expedition_invoice_ids?: Array<number | string>;
   customer_name?: string;
 }
 

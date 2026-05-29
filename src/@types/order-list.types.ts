@@ -131,11 +131,15 @@ export interface UpdateOrderListPayload {
 export interface CreateOrderListTarifPayload {
   do_orderlist_id: number;
   tarif_id: number;
+  qty: number;
+  load_content: string;
   delivery_destination: string;
 }
 
 export interface UpdateOrderListTarifPayload {
   delivery_destination: string;
+  qty?: number;
+  load_content?: string;
 }
 
 export interface CreateOrderListTarifItemPayload {

@@ -3,14 +3,14 @@ import { unitTransactionService } from '@/services/unitTransaction.service';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
 
-export const useUnitTransactions = (options: { page?: number; perPage?: number; search?: string } = {}) => {
+export const useUnitTransactions = (options: { page?: number; perPage?: number; search?: string; status?: string } = {}) => {
   const { companyId } = useCompany();
 
   return useQuery({
     queryKey: companyId
-      ? companyQueryKeys.list(companyId, 'unit-transactions', { page: options.page, perPage: options.perPage, search: options.search })
+      ? companyQueryKeys.list(companyId, 'unit-transactions', { page: options.page, perPage: options.perPage, search: options.search, status: options.status })
       : ['unit-transactions', 'unscoped', options],
-    queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search, company_id: companyId ?? undefined }),
+    queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search, status: options.status, company_id: companyId ?? undefined }),
     placeholderData: (previousData) => previousData,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,

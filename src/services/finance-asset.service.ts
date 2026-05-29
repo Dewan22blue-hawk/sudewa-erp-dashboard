@@ -33,6 +33,7 @@ export const getFinanceAssets = async (params: PaginationParams & { search?: str
             price: Number(item.asset?.price || item.price) || 0,
             serial_number: item.serial_number || item.asset?.serial_number || '',
             depreciation: Number(item.depreciation) || 0,
+            depreciation_per_month: Number(item.depreciation_per_month) || Number(item.depreciation) || 0,
             final_value: Number(item.final_value || item.nilai_akhir) || 0,
             economic_age: Number(item.economic_age) || 0,
         }),
@@ -52,6 +53,7 @@ export const getFinanceAssetById = async (id: string | number): Promise<FinanceA
         price: Number(data.asset?.price || data.price) || 0,
         serial_number: data.serial_number || data.asset?.serial_number || '',
         depreciation: Number(data.depreciation) || 0,
+        depreciation_per_month: Number(data.depreciation_per_month) || Number(data.depreciation) || 0,
         final_value: Number(data.final_value || data.nilai_akhir) || 0,
         economic_age: Number(data.economic_age) || 0,
     };

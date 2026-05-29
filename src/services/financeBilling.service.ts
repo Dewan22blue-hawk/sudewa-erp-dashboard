@@ -170,6 +170,7 @@ export async function createFinanceBillingItem(id: number | string, payload: Fin
 
 export async function updateFinanceBillingItem(id: number | string, payload: FinanceBillingItemPayload) {
   const formData = new FormData();
+  formData.append('_method', 'PUT');
   formData.append('finance_billing_id', String(payload.finance_billing_id));
 
   if ((payload.bca_payment_amount ?? 0) > 0) {
@@ -194,7 +195,7 @@ export async function updateFinanceBillingItem(id: number | string, payload: Fin
     formData.append('payment_proof', payload.payment_proof);
   }
 
-  const response = await apiClient.put<{ status: boolean; message?: string; errors: Record<string, string[]> | null; data: FinanceBillingItem }>(
+  const response = await apiClient.post<{ status: boolean; message?: string; errors: Record<string, string[]> | null; data: FinanceBillingItem }>(
     `${BILLING_ITEM_PATH}/${id}`,
     formData,
   );

@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePPNPembelian } from '@/hooks/usePPNPembelian';
+import { DatePicker } from '@/components/ui/date-picker';
+import { format } from 'date-fns';
 
 export default function DataPPNPembelianPage() {
   const [searchInput, setSearchInput] = useState('');
@@ -20,6 +22,8 @@ export default function DataPPNPembelianPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [selected, setSelected] = useState<PPNPembelian | null>(null);
   const [openForm, setOpenForm] = useState(false);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -35,10 +39,12 @@ export default function DataPPNPembelianPage() {
       page,
       per_page: perPage,
       search: search || undefined,
+      start_date: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
+      end_date: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
       sort_by: sortBy,
       sort_direction: sortDirection,
     }),
-    [page, perPage, search, sortBy, sortDirection],
+    [page, perPage, search, startDate, endDate, sortBy, sortDirection],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } = usePPNPembelian(query);
@@ -84,19 +90,31 @@ export default function DataPPNPembelianPage() {
         </div>
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative w-full md:w-[320px]">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap">
+            <div className="relative w-full md:w-[280px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <Input placeholder="Cari kode pembelian, supplier, atau tipe unit" className="pl-10 bg-white" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} />
             </div>
 
-            {searchInput ? (
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="w-[150px]">
+                <DatePicker value={startDate} onChange={(date) => { setStartDate(date ?? null); setPage(1); }} placeholder="Mulai Tanggal" />
+              </div>
+              <span className="text-gray-500 text-sm">s/d</span>
+              <div className="w-[150px]">
+                <DatePicker value={endDate} onChange={(date) => { setEndDate(date ?? null); setPage(1); }} placeholder="Sampai Tanggal" />
+              </div>
+            </div>
+
+            {searchInput || startDate || endDate ? (
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => {
                   setSearchInput('');
                   setSearch('');
+                  setStartDate(null);
+                  setEndDate(null);
                   setPage(1);
                 }}
               >

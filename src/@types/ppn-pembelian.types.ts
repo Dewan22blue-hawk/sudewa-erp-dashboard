@@ -79,6 +79,8 @@ export interface PPNPembelianFilterParams {
   page?: number;
   per_page?: number;
   search?: string;
+  start_date?: string;
+  end_date?: string;
   sort_by?: string;
   sort_direction?: 'asc' | 'desc';
 }

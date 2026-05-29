@@ -55,3 +55,17 @@ export const getOrderStatusBadgeClassName = (status?: OrderListStatus | null) =>
 export const getPrimaryTarifItem = (order: OrderList): OrderListTarifItem | undefined => order.tarifs[0];
 
 export const formatOrderCurrency = (value?: number | null) => formatCurrency(Number(value ?? 0));
+
+export const summarizeTarifCargoItems = (items: Array<{ loadContent: string; qty: number }>) => {
+  const normalizedItems = items
+    .map((item) => ({
+      loadContent: String(item.loadContent ?? '').trim(),
+      qty: Number(item.qty ?? 0),
+    }))
+    .filter((item) => item.loadContent || item.qty > 0);
+
+  return {
+    qty: normalizedItems.reduce((sum, item) => sum + item.qty, 0),
+    loadContent: Array.from(new Set(normalizedItems.map((item) => item.loadContent).filter(Boolean))).join(', '),
+  };
+};

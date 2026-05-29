@@ -29,20 +29,25 @@ const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   debet: Number(item.debet || 0),
   credit: Number(item.credit || 0),
   accountName: item.account?.name ?? item.cash.description ?? '-',
+  cashName: item.cash?.description || item.cash?.code || '-',
   cashFlowId: item.id,
 });
 
-const mapFinanceBilling = (item: FinanceBillingListItem): KasHarianListItem => ({
-  id: item.id,
-  source: 'billing',
-  date: item.last_payment_at,
-  code: item.unit_transaction_billing.unit_transaction.code,
-  note: `Pembayaran invoice ${item.unit_transaction_billing.unit_transaction.code}`,
-  debet: 0,
-  credit: Number(item.unit_transaction_billing.grand_total || 0),
-  accountName: 'Fractal Pembayaran',
-  financeBillingId: item.id,
-});
+const mapFinanceBilling = (item: FinanceBillingListItem): KasHarianListItem => {
+  const transactionCode = item.unit_transaction_billing?.unit_transaction?.code ?? '-';
+  return {
+    id: item.id,
+    source: 'billing',
+    date: item.last_payment_at,
+    code: transactionCode,
+    note: transactionCode !== '-' ? `Pembayaran invoice ${transactionCode}` : 'Pembayaran invoice',
+    debet: 0,
+    credit: Number(item.unit_transaction_billing?.grand_total || 0),
+    accountName: 'Fractal Pembayaran',
+    cashName: '-',
+    financeBillingId: item.id,
+  };
+};
 
 export default function KasHarianPage() {
   const router = useRouter();

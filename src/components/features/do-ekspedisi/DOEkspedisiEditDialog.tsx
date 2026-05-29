@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import type { DoEkspedisi } from '@/@types/do-ekspedisi.types';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
@@ -14,13 +15,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { doEkspedisiEditSchema, type DoEkspedisiEditSchema } from '@/schemas/do-ekspedisi.schema';
 
-export interface DOEkspedisiEditValues {
-  date?: Date;
-  vehicleId: string;
-  driverId: string;
-  driverNote: string;
-}
+export interface DOEkspedisiEditValues extends DoEkspedisiEditSchema {}
 
 interface DOEkspedisiEditDialogProps {
   open: boolean;
@@ -59,6 +56,7 @@ export function DOEkspedisiEditDialog({
     watch,
     formState: { errors },
   } = useForm<DOEkspedisiEditValues>({
+    resolver: zodResolver(doEkspedisiEditSchema),
     defaultValues: {
       date: item?.date ? new Date(item.date) : undefined,
       vehicleId: item?.vehicleId ? String(item.vehicleId) : '',
@@ -101,8 +99,8 @@ export function DOEkspedisiEditDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] max-w-[384px] overflow-y-auto rounded-lg p-6" showCloseButton={false}>
         <DialogHeader className="gap-1 text-left">
-          <DialogTitle className="text-base font-semibold text-slate-950">Data DO Ekspedisi</DialogTitle>
-          <DialogDescription>Masukkan detail data ekspedisi baru</DialogDescription>
+          <DialogTitle className="text-base font-semibold text-slate-950">Lengkapi DO Ekspedisi</DialogTitle>
+          <DialogDescription>DO dibuat otomatis dari item order. Lengkapi armada, driver, dan tanggal keberangkatan.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

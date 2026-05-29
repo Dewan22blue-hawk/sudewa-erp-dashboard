@@ -8,6 +8,7 @@ import { OrderListForm, type OrderListFormItemValue, type OrderListFormValues } 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useCustomers } from '@/hooks/useCustomer';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   useCreateOrderListTarif,
   useCreateOrderListTarifItem,
@@ -23,6 +24,7 @@ import {
 import { useTarifs } from '@/hooks/useTarif';
 import { ApiValidationError } from '@/lib/api/response';
 import { composeOrderListWithTarifs } from '@/services/order-list.service';
+import { summarizeTarifCargoItems } from '@/components/features/order-list/order-list.utils';
 
 const isItemChangedTarif = (initialItem: any, currentItem: OrderListFormItemValue) =>
   Number(initialItem?.tarifId ?? 0) !== Number(currentItem.tarifId || 0);
@@ -37,6 +39,8 @@ export default function EditOrderListPage() {
   const { companyId } = useCompany();
   const [customerSearch, setCustomerSearch] = React.useState('');
   const [tarifSearch, setTarifSearch] = React.useState('');
+  const debouncedCustomerSearch = useDebouncedValue(customerSearch, 350);
+  const debouncedTarifSearch = useDebouncedValue(tarifSearch, 350);
 
   const detailQuery = useOrderListDetail(id);
   const tarifItemQuery = useOrderListTarifs({
@@ -58,14 +62,14 @@ export default function EditOrderListPage() {
   const customerQuery = useCustomers({
     page: 1,
     perPage: 25,
-    search: customerSearch,
+    search: debouncedCustomerSearch,
     company_id: companyId ?? undefined,
     enabled: Boolean(companyId),
   });
   const tarifQuery = useTarifs({
     page: 1,
     perPage: 100,
-    search: tarifSearch,
+    search: debouncedTarifSearch,
   });
   const updateOrderMutation = useUpdateOrderList();
   const updateTarifMutation = useUpdateOrderListTarif();
@@ -172,12 +176,15 @@ export default function EditOrderListPage() {
         const initialItem = initialTarifs.find((entry) => entry.id === item.id);
 
         if (item.id && initialItem) {
+          const tarifSummary = summarizeTarifCargoItems(item.cargoItems);
           if (isItemChangedTarif(initialItem, item)) {
             await deleteTarifMutation.mutateAsync({ id: item.id, orderListId: id });
 
             const createdTarif = await createTarifMutation.mutateAsync({
               do_orderlist_id: id,
               tarif_id: Number(item.tarifId),
+              qty: tarifSummary.qty,
+              load_content: tarifSummary.loadContent,
               delivery_destination: item.deliveryDestination,
             });
 
@@ -193,6 +200,8 @@ export default function EditOrderListPage() {
               id: item.id,
               payload: {
                 delivery_destination: item.deliveryDestination,
+                qty: tarifSummary.qty,
+                load_content: tarifSummary.loadContent,
               },
             });
 
@@ -228,9 +237,12 @@ export default function EditOrderListPage() {
             }
           }
         } else {
+          const tarifSummary = summarizeTarifCargoItems(item.cargoItems);
           const createdTarif = await createTarifMutation.mutateAsync({
             do_orderlist_id: id,
             tarif_id: Number(item.tarifId),
+            qty: tarifSummary.qty,
+            load_content: tarifSummary.loadContent,
             delivery_destination: item.deliveryDestination,
           });
 

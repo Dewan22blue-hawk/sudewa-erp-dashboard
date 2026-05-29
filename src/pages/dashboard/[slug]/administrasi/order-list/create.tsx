@@ -6,9 +6,11 @@ import { OrderListForm, type OrderListFormValues } from '@/components/features/o
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useCustomers } from '@/hooks/useCustomer';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useCreateOrderList, useCreateOrderListTarif, useCreateOrderListTarifItem } from '@/hooks/useOrderList';
 import { useTarifs } from '@/hooks/useTarif';
 import { ApiValidationError } from '@/lib/api/response';
+import { summarizeTarifCargoItems } from '@/components/features/order-list/order-list.utils';
 
 export default function CreateOrderListPage() {
   const router = useRouter();
@@ -16,17 +18,19 @@ export default function CreateOrderListPage() {
   const { companyId } = useCompany();
   const [customerSearch, setCustomerSearch] = React.useState('');
   const [tarifSearch, setTarifSearch] = React.useState('');
+  const debouncedCustomerSearch = useDebouncedValue(customerSearch, 350);
+  const debouncedTarifSearch = useDebouncedValue(tarifSearch, 350);
 
   const customerQuery = useCustomers({
     page: 1,
     perPage: 25,
-    search: customerSearch,
+    search: debouncedCustomerSearch,
     company_id: companyId ?? undefined,
   });
   const tarifQuery = useTarifs({
     page: 1,
     perPage: 100,
-    search: tarifSearch,
+    search: debouncedTarifSearch,
   });
   const createOrderMutation = useCreateOrderList();
   const createTarifMutation = useCreateOrderListTarif();
@@ -68,11 +72,14 @@ export default function CreateOrderListPage() {
       });
 
       for (const item of values.items) {
+        const tarifSummary = summarizeTarifCargoItems(item.cargoItems);
         const createdTarif = await createTarifMutation.mutateAsync({
-            do_orderlist_id: created.id,
-            tarif_id: Number(item.tarifId),
-            delivery_destination: item.deliveryDestination,
-          });
+          do_orderlist_id: created.id,
+          tarif_id: Number(item.tarifId),
+          qty: tarifSummary.qty,
+          load_content: tarifSummary.loadContent,
+          delivery_destination: item.deliveryDestination,
+        });
 
         for (const cargoItem of item.cargoItems) {
           await createTarifItemMutation.mutateAsync({
