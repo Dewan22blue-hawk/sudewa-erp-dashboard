@@ -24,6 +24,7 @@ interface FinanceAssetTableProps {
     isExporting?: boolean;
     onEdit: (asset: FinanceAsset) => void;
     onDelete: (asset: FinanceAsset) => void;
+    onDetail?: (asset: FinanceAsset) => void;
     isLoading?: boolean;
 }
 
@@ -40,6 +41,7 @@ export function FinanceAssetTable({
     isExporting = false,
     onEdit,
     onDelete,
+    onDetail,
     isLoading = false,
 }: FinanceAssetTableProps) {
     const totalPages = Math.ceil(totalData / perPage);
@@ -137,7 +139,7 @@ export function FinanceAssetTable({
                                         <TableCell className="text-gray-600 uppercase">{asset.serial_number || '-'}</TableCell>
                                         <TableCell className="text-gray-600">{formatMoney(asset.price, 'IDR')}</TableCell>
                                         <TableCell className="text-gray-600">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
-                                        <TableCell className="text-gray-600">{formatMoney(asset.depreciation ?? 0, 'IDR')}</TableCell>
+                                        <TableCell className="text-gray-600">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
                                         <TableCell className="text-gray-600">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
                                         <TableCell>
                                             <DropdownMenu>
@@ -147,6 +149,9 @@ export function FinanceAssetTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-32">
+                                                    <DropdownMenuItem className="cursor-pointer" onClick={() => onDetail?.(asset)}>
+                                                        Detail
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(asset)}>
                                                         Edit
                                                     </DropdownMenuItem>

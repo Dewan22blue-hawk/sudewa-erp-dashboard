@@ -25,6 +25,7 @@ export const kasHarianSchema = z
     note: z.string().trim().min(3, 'Keterangan minimal 3 karakter'),
     debet: z.number().min(0, 'Debet tidak valid'),
     credit: z.number().min(0, 'Kredit tidak valid'),
+    transaction_category: z.string({ required_error: 'Kategori transaksi wajib dipilih' }).min(1, 'Kategori transaksi wajib dipilih'),
     payment_proof: fileField,
   })
   .superRefine((value, ctx) => {

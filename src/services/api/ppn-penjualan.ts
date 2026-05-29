@@ -73,6 +73,8 @@ export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {})
       page,
       per_page: perPage,
       search: params.search || undefined,
+      start_date: params.start_date || undefined,
+      end_date: params.end_date || undefined,
       sort_by: params.sort_by ?? 'buy_date',
       sort_direction: params.sort_direction ?? 'desc',
     },

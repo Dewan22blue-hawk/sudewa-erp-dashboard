@@ -5,8 +5,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiTable } from '@/components/features/do-ekspedisi/DOEkspedisiTable';
 import { DeleteDOEkspedisiModal } from '@/components/features/do-ekspedisi/DeleteDOEkspedisiModal';
 import { DOEkspedisiEditDialog, type DOEkspedisiEditValues } from '@/components/features/do-ekspedisi/DOEkspedisiEditDialog';
-import { DOEkspedisiUploadDialog } from '@/components/features/do-ekspedisi/DOEkspedisiUploadDialog';
 import type { DoEkspedisi } from '@/@types/do-ekspedisi.types';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   useDeleteDoEkspedisi,
   useDoEkspedisiDriverLookup,
@@ -15,6 +15,7 @@ import {
   useNextDoEkspedisiCode,
   useUpdateDoEkspedisi,
 } from '@/hooks/useDoEkspedisi';
+import { useProcessDoExpedition } from '@/hooks/useDoInvoice';
 
 const toApiDate = (value?: Date) => {
   if (!value) return '';
@@ -34,19 +35,17 @@ export default function DOEkspedisiPage() {
   const [perPage, setPerPage] = useState(10);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<DoEkspedisi | null>(null);
   const [vehicleSearch, setVehicleSearch] = useState('');
   const [driverSearch, setDriverSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 400);
+  const debouncedVehicleSearch = useDebouncedValue(vehicleSearch, 300);
+  const debouncedDriverSearch = useDebouncedValue(driverSearch, 300);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setSearch(searchInput);
-      setPage(1);
-    }, 400);
-
-    return () => window.clearTimeout(timer);
-  }, [searchInput]);
+    setSearch(debouncedSearch);
+    setPage(1);
+  }, [debouncedSearch, setPage, setSearch]);
 
   const listQuery = useDoEkspedisis({
     page,
@@ -57,9 +56,10 @@ export default function DOEkspedisiPage() {
   });
   const deleteMutation = useDeleteDoEkspedisi();
   const updateMutation = useUpdateDoEkspedisi();
+  const processExpeditionMutation = useProcessDoExpedition();
   const nextCodeQuery = useNextDoEkspedisiCode(isEditOpen);
-  const vehicleLookup = useDoEkspedisiVehicleLookup(vehicleSearch, isEditOpen);
-  const driverLookup = useDoEkspedisiDriverLookup(driverSearch, isEditOpen);
+  const vehicleLookup = useDoEkspedisiVehicleLookup(debouncedVehicleSearch, isEditOpen);
+  const driverLookup = useDoEkspedisiDriverLookup(debouncedDriverSearch, isEditOpen);
 
   const handleDelete = (item: DoEkspedisi) => {
     setSelectedItem(item);
@@ -100,12 +100,6 @@ export default function DOEkspedisiPage() {
     }
   };
 
-  const handleUpload = async () => {
-    toast.info('Endpoint upload SJ/Invoice belum tersedia di dokumentasi API.');
-    setIsUploadOpen(false);
-    setSelectedItem(null);
-  };
-
   // Memoized callbacks untuk mencegah infinite re-renders
   const handleEditClick = useCallback(
     (item: DoEkspedisi) => {
@@ -123,22 +117,20 @@ export default function DOEkspedisiPage() {
     [slug, router],
   );
 
-  const handleUploadClick = useCallback(
-    (item: DoEkspedisi) => {
-      setSelectedItem(item);
-      setIsUploadOpen(true);
-    },
-    [],
-  );
-
   const handlePrintClick = useCallback(
-    (item: DoEkspedisi) => {
+    async (item: DoEkspedisi) => {
       if (!slug) return;
+      try {
+        await processExpeditionMutation.mutateAsync({ id: item.id });
+      } catch (error: any) {
+        toast.error(error.message || `Gagal memproses print DO ${item.doCode}`);
+        return;
+      }
       const url = `/dashboard/${slug}/do-ekspedisi/detail/${item.id}?print=1`;
       toast.info(`Membuka tampilan cetak DO ${item.doCode}`);
       window.open(url, '_blank', 'noopener,noreferrer');
     },
-    [slug],
+    [processExpeditionMutation, slug],
   );
 
   const handlePerPageChange = useCallback((value: number) => {
@@ -179,8 +171,9 @@ export default function DOEkspedisiPage() {
           onEdit={handleEditClick}
           onDetail={handleDetailClick}
           onDelete={handleDelete}
-          onUpload={handleUploadClick}
-          onPrint={handlePrintClick}
+          onPrint={(item) => {
+            void handlePrintClick(item);
+          }}
         />
       </div>
 
@@ -208,15 +201,6 @@ export default function DOEkspedisiPage() {
         onDriverSearch={setDriverSearch}
         onSubmit={handleEditSubmit}
         isSubmitting={updateMutation.isPending}
-      />
-
-      <DOEkspedisiUploadDialog
-        open={isUploadOpen}
-        onOpenChange={(open) => {
-          setIsUploadOpen(open);
-          if (!open) setSelectedItem(null);
-        }}
-        onSubmit={handleUpload}
       />
     </DashboardLayout>
   );

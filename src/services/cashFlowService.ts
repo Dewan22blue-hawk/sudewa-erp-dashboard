@@ -99,6 +99,7 @@ const buildCashFlowFormData = (payload: CashFlowPayload) => {
   formData.append('account_id', String(payload.account_id));
   formData.append('date', payload.date);
   formData.append('note', payload.note);
+  formData.append('transaction_category', payload.transaction_category);
   if ((payload.debet ?? 0) > 0) {
     formData.append('debet', String(payload.debet));
   }
@@ -147,7 +148,8 @@ export async function createCashFlow(payload: CashFlowPayload) {
 
 export async function updateCashFlow(id: number | string, payload: CashFlowPayload) {
   const formData = buildCashFlowFormData(payload);
-  const response = await apiClient.put<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
+  formData.append('_method', 'PUT');
+  const response = await apiClient.post<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
   const item = ensureSuccess(toSuccessPayload(response.data));
   return normalizeCashFlow(item);
 }

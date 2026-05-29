@@ -1,0 +1,122 @@
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CalendarDays, Loader2 } from 'lucide-react';
+import type { UnitTransactionRefund, UnitTransactionRefundPayment } from '@/@types/refund.type';
+import { useCreateRefundPayment, useUpdateRefundPayment } from '@/hooks/useRefundAdministrasi';
+import { createRefundPaymentSchema, type CreateRefundPaymentFormValues } from '@/schemas/refund.schema';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import { refundInputClassName, refundLabelClassName, refundPrimaryButtonClassName, refundSecondaryButtonClassName } from './purchase-refund.styles';
+
+interface PurchaseRefundPaymentDetailModalProps {
+  open: boolean;
+  onClose: () => void;
+  refund: UnitTransactionRefund;
+  payment?: UnitTransactionRefundPayment | null;
+  entityLabel?: 'Pembelian' | 'Penjualan';
+}
+
+const displayDate = (value?: string) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toISOString().split('T')[0] || '';
+};
+
+export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund, payment, entityLabel = 'Pembelian' }: PurchaseRefundPaymentDetailModalProps) {
+  const isEdit = Boolean(payment);
+  const createMutation = useCreateRefundPayment();
+  const updateMutation = useUpdateRefundPayment();
+
+  const form = useForm<CreateRefundPaymentFormValues>({
+    resolver: zodResolver(createRefundPaymentSchema),
+    defaultValues: {
+      unit_transaction_refund_id: refund.id,
+      payment_date: displayDate(payment?.payment_date || refund.refund_date) || new Date().toISOString().split('T')[0],
+      amount: Number(payment?.amount || refund.refund_amount || 0),
+      note: payment?.note || '',
+    },
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    form.reset({
+      unit_transaction_refund_id: refund.id,
+      payment_date: displayDate(payment?.payment_date || refund.refund_date) || new Date().toISOString().split('T')[0],
+      amount: Number(payment?.amount || refund.refund_amount || 0),
+      note: payment?.note || '',
+    });
+  }, [form, open, payment, refund.id, refund.refund_amount, refund.refund_date]);
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
+  const onSubmit = form.handleSubmit(async (values) => {
+    try {
+      if (payment) {
+        await updateMutation.mutateAsync({
+          id: payment.id,
+          payload: {
+            payment_date: values.payment_date,
+            amount: values.amount,
+            note: values.note,
+          },
+        });
+        toast.success(`Detail refund ${entityLabel.toLowerCase()} berhasil diperbarui`);
+      } else {
+        await createMutation.mutateAsync(values);
+        toast.success(`Detail refund ${entityLabel.toLowerCase()} berhasil ditambahkan`);
+      }
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || `Gagal menyimpan detail refund ${entityLabel.toLowerCase()}`);
+    }
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-[430px] rounded-[14px] border-none p-0 shadow-[0_20px_50px_rgba(15,23,42,0.25)] sm:max-w-[430px]">
+        <DialogHeader className="px-6 pb-0 pt-7 text-left">
+          <DialogTitle className="text-[18px] font-semibold text-[#111827]">
+            {isEdit ? `Edit Detail Refund ${entityLabel}` : `Tambah Detail Refund ${entityLabel}`}
+          </DialogTitle>
+          <p className="mt-2 text-sm text-[#6B7280]">{isEdit ? 'Edit detail refund' : 'Tambah detail refund'}</p>
+        </DialogHeader>
+
+        <form onSubmit={onSubmit} className="space-y-5 px-6 pb-7 pt-6">
+          <div>
+            <Label className={refundLabelClassName}>Tanggal Refund</Label>
+            <div className="relative">
+              <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#6B7280]" />
+              <Input type="date" className={`${refundInputClassName} pl-12`} {...form.register('payment_date')} />
+            </div>
+          </div>
+
+          <div>
+            <Label className={refundLabelClassName}>Nominal Refund</Label>
+            <Input type="number" className={refundInputClassName} {...form.register('amount')} />
+          </div>
+
+          <div>
+            <Label className={refundLabelClassName}>Keterangan</Label>
+            <Textarea className="min-h-[112px] rounded-[12px] border border-[#D9DEE8] px-4 py-3 text-sm shadow-none focus-visible:ring-0" placeholder="Type your message here." {...form.register('note')} />
+          </div>
+
+          <div className="space-y-3 pt-1">
+            <Button type="submit" className={`w-full ${refundPrimaryButtonClassName}`} disabled={isPending}>
+              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Simpan
+            </Button>
+            <Button type="button" variant="outline" className={`w-full ${refundSecondaryButtonClassName}`} onClick={onClose} disabled={isPending}>
+              Batal
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

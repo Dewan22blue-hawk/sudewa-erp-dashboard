@@ -160,6 +160,15 @@ const buildPayload = (payload: TypeUnitPayload, opts?: { asUpdate?: boolean }) =
   if (payload.unitModel) body.append('unit_model', payload.unitModel);
   if (payload.brutoWeight !== undefined && payload.brutoWeight !== null) body.append('bruto_weight', String(payload.brutoWeight));
   if (payload.nettoWeight !== undefined && payload.nettoWeight !== null) body.append('netto_weight', String(payload.nettoWeight));
+  
+  if (opts?.asUpdate) {
+    // Backend expects 'price' on Update (PUT)
+    if (payload.sellPrice !== undefined && payload.sellPrice !== null) {
+      body.append('price', String(payload.sellPrice));
+    }
+  }
+
+  // Preserve 'buy_price' and 'sell_price' for create and as fallback for update
   if (payload.sellPrice !== undefined && payload.sellPrice !== null) body.append('sell_price', String(payload.sellPrice));
   if (payload.buyPrice !== undefined && payload.buyPrice !== null) body.append('buy_price', String(payload.buyPrice));
   if (payload.image) body.append('image', payload.image);

@@ -32,6 +32,7 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
       note: '',
       debet: 0,
       credit: 0,
+      transaction_category: 'general',
       payment_proof: null,
     },
   });
@@ -61,6 +62,7 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
         note: data.note,
         debet: data.debet,
         credit: data.credit,
+        transaction_category: data.transaction_category || 'general',
         payment_proof: null,
       });
     }
@@ -80,6 +82,7 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
           note: values.note,
           debet: values.debet,
           credit: values.credit,
+          transaction_category: values.transaction_category,
           payment_proof: values.payment_proof,
         },
       });

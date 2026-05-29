@@ -395,12 +395,13 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
 };
 
 export const unitTransactionService = {
-  async getUnitTransactions(params: PaginationParams & { company_id?: string | number } = {}): Promise<UnitTransactionResponse> {
+  async getUnitTransactions(params: PaginationParams & { company_id?: string | number; status?: string } = {}): Promise<UnitTransactionResponse> {
     const requestParams = {
       company_id: params.company_id,
       page: params.page ?? 1,
       per_page: params.perPage ?? 10,
       search: params.search || undefined,
+      status: params.status || undefined,
       sort_order: 'desc',
       type: 'purchase',
     };
@@ -418,14 +419,24 @@ export const unitTransactionService = {
             perPage: params.perPage,
             search: params.search,
           });
-          const enrichedData = await enrichTransactionsFromDetail(normalized.data);
+          // Locally filter by status if using fallback, because API might not have filtered it
+          let dataToEnrich = normalized.data;
+          if (params.status && params.status !== 'All') {
+            dataToEnrich = dataToEnrich.filter(item => item.stock_state === params.status);
+          }
+          const enrichedData = await enrichTransactionsFromDetail(dataToEnrich);
           return {
             ...normalized,
             data: enrichedData,
           };
         }
 
-        return toPaginatedResult(payload, mapUnitTransaction);
+        let paginatedResult = toPaginatedResult(payload, mapUnitTransaction);
+        if (params.status && params.status !== 'All') {
+           const filteredData = paginatedResult.data.filter(item => item.stock_state === params.status);
+           paginatedResult = { ...paginatedResult, data: filteredData };
+        }
+        return paginatedResult;
       } catch (error) {
         if (!shouldFallback(error)) throw error;
       }

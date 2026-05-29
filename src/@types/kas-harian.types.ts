@@ -34,6 +34,7 @@ export interface KasHarian {
   note: string;
   debet: number;
   credit: number;
+  transaction_category?: string;
   created_at?: string;
   updated_at?: string;
   cash: KasHarianCash;
@@ -72,6 +73,7 @@ export interface CashFlowPayload {
   note: string;
   debet: number;
   credit: number;
+  transaction_category: string;
   payment_proof?: File | null;
 }
 
@@ -116,6 +118,8 @@ export interface KasHarianListItem {
   debet: number;
   credit: number;
   accountName: string;
+  cashName?: string;
   cashFlowId?: number;
   financeBillingId?: number;
+  transaction_category?: string;
 }

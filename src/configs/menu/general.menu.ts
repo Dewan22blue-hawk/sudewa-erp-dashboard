@@ -190,6 +190,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Laporan Warehouse',
           href: base('/laporan/laporan-stock'),
         },
+        {
+          label: 'Laporan Aset',
+          href: base('/laporan/laporan-aset'),
+        },
       ],
     },
     {

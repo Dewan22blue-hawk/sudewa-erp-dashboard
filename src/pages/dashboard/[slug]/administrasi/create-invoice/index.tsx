@@ -7,6 +7,7 @@ import { CreateInvoiceModal } from '@/components/features/create-invoice/CreateI
 import { CreateInvoiceTable } from '@/components/features/create-invoice/CreateInvoiceTable';
 import { matchesInvoiceSearch, toDoInvoiceTableRow } from '@/components/features/create-invoice/create-invoice.utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useCreateDoInvoice, useDeleteDoInvoice, useDoInvoices } from '@/hooks/useDoInvoice';
 import { ApiValidationError } from '@/lib/api/response';
 import type { ApiError } from '@/@types/api';
@@ -59,6 +60,7 @@ export default function CreateInvoiceListPage() {
 
   const [searchInput, setSearchInput] = React.useState('');
   const [search, setSearch] = React.useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 350);
   const [page, setPage] = React.useState(1);
   const [perPage, setPerPage] = React.useState(10);
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
@@ -70,12 +72,9 @@ export default function CreateInvoiceListPage() {
   const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
 
   React.useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setSearch(searchInput.trim());
-      setPage(1);
-    }, 350);
-    return () => window.clearTimeout(timeout);
-  }, [searchInput]);
+    setSearch(debouncedSearch.trim());
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   const listQuery = useDoInvoices({
     page,

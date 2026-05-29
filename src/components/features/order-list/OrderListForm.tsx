@@ -1,15 +1,18 @@
 import * as React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { ChevronLeft, Plus, Save, Trash2 } from 'lucide-react';
-import type { OrderList, OrderListStatus, OrderListVehicleType } from '@/@types/order-list.types';
+import type { OrderList, OrderListVehicleType } from '@/@types/order-list.types';
 import type { Tarif } from '@/@types/tarif.types';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { orderListFormSchema, type OrderListFormSchema } from '@/schemas/order-list.schema';
 import {
   ORDER_LIST_EDIT_STATUS_OPTIONS,
   ORDER_LIST_STATUS_OPTIONS,
@@ -37,15 +40,7 @@ export interface OrderListFormCargoItemValue {
   qty: number;
 }
 
-export interface OrderListFormValues {
-  customerId: string;
-  status: OrderListStatus;
-  invoiceBill: number;
-  ppn: number;
-  ujDriver: number;
-  note: string;
-  items: OrderListFormItemValue[];
-}
+export interface OrderListFormValues extends OrderListFormSchema {}
 
 interface OrderListFormProps {
   mode: 'create' | 'edit';
@@ -197,6 +192,7 @@ export function OrderListForm({
     setValue,
     formState: { errors },
   } = useForm<OrderListFormValues>({
+    resolver: zodResolver(orderListFormSchema),
     defaultValues: {
       customerId: initialData?.customerId ? String(initialData.customerId) : '',
       status: initialData?.status ?? 'pending',
@@ -230,6 +226,12 @@ export function OrderListForm({
   const invoiceBill = useWatch({ control, name: 'invoiceBill' });
   const watchedPpn = useWatch({ control, name: 'ppn' });
   const watchedUjDriver = useWatch({ control, name: 'ujDriver' });
+  const totalTarifGroups = watchedItems?.length ?? 0;
+  const totalCargoItems = (watchedItems ?? []).reduce((sum, item) => sum + (item?.cargoItems?.length ?? 0), 0);
+  const totalCargoQty = (watchedItems ?? []).reduce(
+    (sum, item) => sum + (item?.cargoItems ?? []).reduce((cargoSum, cargoItem) => cargoSum + Number(cargoItem?.qty ?? 0), 0),
+    0,
+  );
 
   const selectedCustomer = mergedCustomerOptions.find((item) => item.value === customerId);
 
@@ -313,6 +315,11 @@ export function OrderListForm({
   }, [setValue, watchedItems]);
 
   React.useEffect(() => {
+    const totalInvoice = (watchedItems ?? []).reduce((sum, item) => sum + Number(item?.expeditionInvoice ?? 0), 0);
+    setValue('invoiceBill', totalInvoice, { shouldDirty: true });
+  }, [setValue, watchedItems]);
+
+  React.useEffect(() => {
     const calculatedPpn = Math.round(Number(invoiceBill || 0) * 0.011);
     setValue('ppn', calculatedPpn, { shouldDirty: true });
   }, [invoiceBill, setValue]);
@@ -333,6 +340,21 @@ export function OrderListForm({
       <div>
         <h2 className="text-[18px] font-semibold text-slate-950">{mode === 'create' ? 'Form Detail Order' : 'Edit Detail Order'}</h2>
         <div className="mt-4 h-px bg-slate-200" />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="rounded-[20px] border border-slate-200 p-5 shadow-sm">
+          <p className="text-sm text-slate-500">Grup Tarif</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-950">{totalTarifGroups}</p>
+        </Card>
+        <Card className="rounded-[20px] border border-slate-200 p-5 shadow-sm">
+          <p className="text-sm text-slate-500">Item Muatan</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-950">{totalCargoItems}</p>
+        </Card>
+        <Card className="rounded-[20px] border border-slate-200 p-5 shadow-sm">
+          <p className="text-sm text-slate-500">Total Qty</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-950">{totalCargoQty}</p>
+        </Card>
       </div>
 
       <div className="space-y-5">
@@ -605,13 +627,13 @@ export function OrderListForm({
               <Controller
                 control={control}
                 name="invoiceBill"
-                rules={{ required: 'Invoice ekspedisi wajib diisi' }}
                 render={({ field }) => (
                   <MoneyInput
                     value={field.value}
                     onChangeValue={field.onChange}
-                    placeholder="Masukkan nominal invoice"
-                    className={`h-12 rounded-xl border-[#E5E7EB] ${errors.invoiceBill ? 'border-red-500' : ''}`}
+                    disabled
+                    placeholder="Terisi otomatis dari total tarif"
+                    className={`h-12 rounded-xl border-[#E5E7EB] bg-slate-50 ${errors.invoiceBill ? 'border-red-500' : ''}`}
                   />
                 )}
               />

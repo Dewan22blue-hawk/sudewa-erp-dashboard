@@ -10,9 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getStockData, PaginatedResponse, StockItem } from '@/services/laporan-warehouse.service';
+import { useGetWarehouseStock } from '@/hooks/useLaporanWarehouse';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface GroupedStockRow {
   brand: string;
@@ -36,35 +44,30 @@ type StockTabProps = {
 };
 
 export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
-  const [rows, setRows] = useState<StockItem[]>([]);
-  const [pagination, setPagination] = useState<PaginatedResponse<StockItem>>({
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState<string>('unprocessed');
+
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useGetWarehouseStock({
+    company_id: 1,
+    page,
+    per_page: perPage,
+    status,
+  });
+
+  const rows = response?.data || [];
+  const pagination = response || {
     current_page: 1,
     data: [],
     last_page: 1,
-    per_page: 50,
+    per_page: perPage,
     total: 0,
     from: 0,
     to: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const result = await getStockData({ page, per_page: perPage, warehouse_id: 1 });
-      setRows(result.data);
-      setPagination(result);
-    } catch {
-      toast.error('Gagal memuat data stock');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, perPage]);
-
-  useEffect(() => {
-    void fetchData();
-  }, [fetchData]);
+  };
 
   const groupedRows = useMemo(() => {
     const grouped = rows.reduce<Record<string, GroupedStockRow>>((accumulator, item) => {
@@ -129,6 +132,22 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end mb-4 no-print">
+        <Select value={status} onValueChange={(val) => {
+          setStatus(val);
+          setPage(1);
+        }}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Pilih Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unprocessed">Unprocessed</SelectItem>
+            <SelectItem value="processed">Processed</SelectItem>
+            <SelectItem value="all">Semua</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="overflow-hidden border border-gray-200 bg-white">
         <div className="overflow-x-auto">
           <Table className="border-collapse">
@@ -142,10 +161,20 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
             </TableHeader>
             <TableBody>
               {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                  </TableRow>
+                ))
+              ) : isError ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-16">
-                    <div className="flex items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    <div className="flex flex-col items-center justify-center text-red-500">
+                      <AlertCircle className="h-8 w-8 mb-2" />
+                      <p>Gagal memuat data stock</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -178,8 +207,8 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
         </div>
       </div>
 
-      {!isLoading && pagination.total > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
+      {!isLoading && !isError && pagination.total > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600 no-print">
           <div>
             Showing {pagination.from || 0}-{pagination.to || 0} of {pagination.total} data
           </div>

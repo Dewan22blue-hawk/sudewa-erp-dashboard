@@ -209,10 +209,37 @@ const mapOrderItemToRows = (item: unknown, type: 'purchase' | 'sales'): OrderOut
 };
 
 export const getStockData = async (params: {
+  company_id?: number;
+  page?: number;
+  per_page?: number;
+  status?: string;
+}): Promise<PaginatedResponse<StockItem>> => {
+  const companyId = params.company_id ?? 1;
+
+  const response = await apiClient.get(
+    `/wapi/warehouse/warehouse-get-stock/${companyId}`,
+    {
+      params: {
+        page: params.page ?? 1,
+        per_page: params.per_page ?? 50,
+        ...(params.status ? { status: params.status } : {}),
+      },
+    },
+  );
+
+  return buildPaginatedResponse(response.data?.data ?? response.data, params.per_page ?? 50, mapStockItem);
+};
+
+export const getStockDetailData = async (params: {
   warehouse_id?: number;
   page?: number;
   per_page?: number;
   machine_number?: string;
+  chassis_number?: string;
+  color?: string;
+  stock_state?: string;
+  in_stock?: boolean | string;
+  unit_transaction_item_id?: string;
 }): Promise<PaginatedResponse<StockItem>> => {
   const warehouseId = params.warehouse_id ?? 1;
 
@@ -223,6 +250,11 @@ export const getStockData = async (params: {
         page: params.page ?? 1,
         per_page: params.per_page ?? 50,
         ...(params.machine_number ? { machine_number: params.machine_number } : {}),
+        ...(params.chassis_number ? { chassis_number: params.chassis_number } : {}),
+        ...(params.color ? { color: params.color } : {}),
+        ...(params.stock_state ? { stock_state: params.stock_state } : {}),
+        ...(params.in_stock !== undefined ? { in_stock: params.in_stock } : {}),
+        ...(params.unit_transaction_item_id ? { unit_transaction_item_id: params.unit_transaction_item_id } : {}),
       },
     },
   );
@@ -230,26 +262,29 @@ export const getStockData = async (params: {
   return buildPaginatedResponse(response.data?.data ?? response.data, params.per_page ?? 50, mapStockItem);
 };
 
-export const getStockDetailData = getStockData;
-
-export const getPurchaseOrderOutstanding = async (params: {
-  start_date?: string;
-  end_date?: string;
+export const getOrderOutstanding = async (params: {
+  warehouse_id?: number;
+  type: 'purchase' | 'sales';
   page?: number;
   per_page?: number;
+  qty_outstanding?: boolean | string;
+  order_by?: string;
+  order_sort?: 'asc' | 'desc';
 }): Promise<PaginatedResponse<OrderOutstandingItem>> => {
-  const response = await apiClient.get('/wapi/report/unit-type-detail-stock', {
+  const warehouseId = params.warehouse_id ?? 1;
+  const response = await apiClient.get(`/wapi/warehouse/warehouse-unit-transaction-outstanding/${warehouseId}`, {
     params: {
-      type: 'purchase',
+      type: params.type,
       page: params.page ?? 1,
       per_page: params.per_page ?? 50,
-      ...(params.start_date ? { start_date: params.start_date } : {}),
-      ...(params.end_date ? { end_date: params.end_date } : {}),
+      ...(params.qty_outstanding !== undefined ? { qty_outstanding: params.qty_outstanding } : { qty_outstanding: true }),
+      ...(params.order_by ? { order_by: params.order_by } : {}),
+      ...(params.order_sort ? { order_sort: params.order_sort } : {}),
     },
   });
 
   const { rows, metaSource } = resolvePaginatedPayload(response.data?.data ?? response.data);
-  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item, 'purchase'));
+  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item, params.type));
   const currentPage = toNumber(metaSource.current_page) || 1;
   const perPage = toNumber(metaSource.per_page) || (params.per_page ?? 50);
   const total = toNumber(metaSource.total) || rows.length;
@@ -266,38 +301,20 @@ export const getPurchaseOrderOutstanding = async (params: {
   };
 };
 
-export const getSalesOrderOutstanding = async (params: {
-  start_date?: string;
-  end_date?: string;
+export const getPurchaseOrderOutstanding = async (params: {
+  warehouse_id?: number;
   page?: number;
   per_page?: number;
 }): Promise<PaginatedResponse<OrderOutstandingItem>> => {
-  const response = await apiClient.get('/wapi/report/unit-type-detail-stock', {
-    params: {
-      type: 'sales',
-      page: params.page ?? 1,
-      per_page: params.per_page ?? 50,
-      ...(params.start_date ? { start_date: params.start_date } : {}),
-      ...(params.end_date ? { end_date: params.end_date } : {}),
-    },
-  });
+  return getOrderOutstanding({ ...params, type: 'purchase' });
+};
 
-  const { rows, metaSource } = resolvePaginatedPayload(response.data?.data ?? response.data);
-  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item, 'sales'));
-  const currentPage = toNumber(metaSource.current_page) || 1;
-  const perPage = toNumber(metaSource.per_page) || (params.per_page ?? 50);
-  const total = toNumber(metaSource.total) || rows.length;
-  const lastPage = toNumber(metaSource.last_page) || (total > 0 ? Math.ceil(total / perPage) : 1);
-
-  return {
-    current_page: currentPage,
-    data: flatRows,
-    last_page: lastPage,
-    per_page: perPage,
-    total,
-    from: toNumber(metaSource.from),
-    to: toNumber(metaSource.to),
-  };
+export const getSalesOrderOutstanding = async (params: {
+  warehouse_id?: number;
+  page?: number;
+  per_page?: number;
+}): Promise<PaginatedResponse<OrderOutstandingItem>> => {
+  return getOrderOutstanding({ ...params, type: 'sales' });
 };
 
 export const getWarehouses = async (): Promise<WarehouseItem[]> => {

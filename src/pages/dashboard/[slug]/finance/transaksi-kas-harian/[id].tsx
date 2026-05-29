@@ -61,10 +61,10 @@ export default function KasHarianDetailPage() {
   const pageSubtitle = source === 'billing' ? 'Detail fractal pembayaran dan histori pelunasan' : 'Detail transaksi terkait';
   const paymentDate = source === 'billing' ? billingDetail?.last_payment_at : manualDetail?.date;
   const cashAccount = source === 'billing' ? 'Fractal Pembayaran' : manualDetail?.cash?.description ?? '-';
-  const accountName = source === 'billing' ? billingDetail?.unit_transaction_billing.unit_transaction.code ?? '-' : manualDetail?.account?.name ?? manualDetail?.cash?.description ?? '-';
+  const accountName = source === 'billing' ? billingDetail?.unit_transaction_billing?.unit_transaction?.code ?? '-' : manualDetail?.account?.name ?? manualDetail?.cash?.description ?? '-';
   const totalNominal =
     source === 'billing'
-      ? Number(billingDetail?.unit_transaction_billing.grand_total || 0)
+      ? Number(billingDetail?.unit_transaction_billing?.grand_total || 0)
       : Number(manualDetail?.debet || 0) + Number(manualDetail?.credit || 0);
   const totalRincian =
     source === 'billing'
@@ -72,11 +72,11 @@ export default function KasHarianDetailPage() {
       : Number(manualDetail?.debet || 0) + Number(manualDetail?.credit || 0);
   const note =
     source === 'billing'
-      ? billingDetail?.unit_transaction_billing.unit_transaction_billing_histories?.[0]?.note || ''
+      ? billingDetail?.unit_transaction_billing?.unit_transaction_billing_histories?.[0]?.note || ''
       : manualDetail?.note || '';
   const proofUrl = buildProofUrl(
     source === 'billing'
-      ? billingDetail?.unit_transaction_billing.unit_transaction_billing_histories?.[0]?.payment_proof
+      ? billingDetail?.unit_transaction_billing?.unit_transaction_billing_histories?.[0]?.payment_proof
       : manualDetail?.finance_billing?.finance_billing_items?.[0]?.payment_proof,
   );
 
@@ -139,6 +139,7 @@ export default function KasHarianDetailPage() {
               <TransactionDetailInlineTable
                 items={billingDetail?.finance_billing_items ?? []}
                 financeBillingId={source === 'billing' ? billingDetail?.id : undefined}
+                unitTransactionId={source === 'billing' ? billingDetail?.unit_transaction_billing?.unit_transaction?.id : undefined}
                 paymentAt={
                   source === 'billing'
                     ? billingDetail?.last_payment_at?.slice(0, 10)
@@ -169,6 +170,19 @@ export default function KasHarianDetailPage() {
                 <Button type="button" variant="ghost" onClick={() => router.back()}>
                   Batal
                 </Button>
+                {source === 'billing' ? (
+                  <Button
+                    type="button"
+                    className="h-11 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843]"
+                    onClick={() => {
+                      if (typeof slug === 'string' && id) {
+                        void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${id}/bayar?source=billing`);
+                      }
+                    }}
+                  >
+                    Bayar
+                  </Button>
+                ) : null}
               </div>
             </div>
           </div>
