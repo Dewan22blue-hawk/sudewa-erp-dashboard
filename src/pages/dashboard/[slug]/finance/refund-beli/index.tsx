@@ -4,7 +4,7 @@ export default function RefundBeliPage() {
   return (
     <FinanceRefundPage
       title="Data Refund Pembelian"
-      description="Review refund pembelian yang dibuat dari modul Administrasi, lalu lakukan approval dan pilih cash account yang tepat."
+      description="Kelola arus transaksi refund pembelian"
       transactionType="purchase"
     />
   );

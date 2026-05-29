@@ -32,6 +32,7 @@ const mapFinanceRefund = (item: any): FinanceRefundRecord => {
     refundCode: item.refund_number || item.code || '-',
     refundDate: item.refund_date || item.date || '',
     refundAmount: toNumber(item.refund_amount ?? item.total_refund),
+    totalTransaction: toNumber(transaction?.grand_total ?? transaction?.total_amount ?? transaction?.total_price ?? item.total_transaction ?? item.total_price ?? item.refund_amount ?? item.total_refund),
     note: item.note || '',
     status: normalizeRefundStatus(item.status),
     cashId: item.cash_id ? toString(item.cash_id) : undefined,
@@ -47,30 +48,31 @@ const mapFinanceRefund = (item: any): FinanceRefundRecord => {
 
 export const financeRefundService = {
   async getRefundList(params: FinanceRefundQueryParams = {}): Promise<FinanceRefundListResponse> {
-    const response = await apiClient.get<LaravelApiResponse<any>>(BASE_PATH, {
+    const isSales = params.transactionType === 'sales';
+    const urlPath = isSales ? '/wapi/finance/refund' : '/wapi/finance/finance-refund';
+
+    const response = await apiClient.get<LaravelApiResponse<any>>(urlPath, {
       params: {
         page: params.page ?? 1,
         per_page: params.per_page ?? 10,
         search: params.search || undefined,
         status: params.status && params.status !== 'all' ? params.status : undefined,
+        refund_type: params.transactionType || undefined,
       },
     });
 
     const payload = ensureSuccess(response.data);
     const rows = Array.isArray(payload?.data) ? payload.data.map(mapFinanceRefund) : [];
-    const filteredRows = params.transactionType
-      ? rows.filter((item: FinanceRefundRecord) => item.transactionType === params.transactionType)
-      : rows;
 
     return {
-      data: filteredRows,
+      data: rows,
       meta: {
         currentPage: payload?.current_page ?? params.page ?? 1,
         perPage: payload?.per_page ?? params.per_page ?? 10,
-        total: params.transactionType ? filteredRows.length : payload?.total ?? filteredRows.length,
+        total: payload?.total ?? rows.length,
         lastPage: payload?.last_page ?? 1,
-        from: filteredRows.length === 0 ? 0 : payload?.from ?? 1,
-        to: filteredRows.length === 0 ? 0 : payload?.to ?? filteredRows.length,
+        from: rows.length === 0 ? 0 : payload?.from ?? 1,
+        to: rows.length === 0 ? 0 : payload?.to ?? rows.length,
       },
     };
   },

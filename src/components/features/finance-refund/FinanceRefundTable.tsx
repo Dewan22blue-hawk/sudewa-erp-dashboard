@@ -33,58 +33,51 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   const columns = useMemo<ColumnDef<FinanceRefundRecord>[]>(
     () => [
       {
-        accessorKey: 'transactionCode',
-        header: 'Transaksi',
-        cell: ({ row }) => (
-          <div className="space-y-1">
-            <p className="font-medium text-slate-900">{row.original.transactionCode}</p>
-            <p className="text-xs text-slate-500">{row.original.partnerName}</p>
-          </div>
-        ),
+        accessorKey: 'refundCode',
+        header: 'KODE REFUND',
+        cell: ({ row }) => <span className="text-slate-800 font-normal">{row.original.refundCode}</span>,
       },
       {
-        accessorKey: 'refundCode',
-        header: 'Kode Refund',
-        cell: ({ row }) => <span className="font-medium text-slate-900">{row.original.refundCode}</span>,
+        accessorKey: 'transactionCode',
+        header: transactionType === 'sales' ? 'NO PENJUALAN' : 'NO PEMBELIAN',
+        cell: ({ row }) => <span className="text-slate-800 font-normal">{row.original.transactionCode}</span>,
       },
       {
         accessorKey: 'refundDate',
-        header: 'Tanggal',
-        cell: ({ row }) => <span>{formatDate(row.original.refundDate)}</span>,
+        header: 'TANGGAL',
+        cell: ({ row }) => <span className="text-slate-800 font-normal">{formatDate(row.original.refundDate)}</span>,
+      },
+      {
+        accessorKey: 'partnerName',
+        header: transactionType === 'sales' ? 'NAMA CUSTOMER' : 'NAMA SUPPLIER',
+        cell: ({ row }) => <span className="text-slate-800 font-normal">{row.original.partnerName}</span>,
+      },
+      {
+        accessorKey: 'totalTransaction',
+        header: transactionType === 'sales' ? 'TOTAL PENJUALAN' : 'TOTAL PEMBELIAN',
+        cell: ({ row }) => (
+          <span className="text-slate-800 font-normal">
+            {formatCurrency(row.original.totalTransaction ?? 0)}
+          </span>
+        ),
       },
       {
         accessorKey: 'refundAmount',
-        header: 'Nominal Refund',
-        cell: ({ row }) => <span className="font-medium text-slate-900">{formatCurrency(row.original.refundAmount)}</span>,
+        header: 'TOTAL REFUND',
+        cell: ({ row }) => <span className="text-slate-800 font-normal">{formatCurrency(row.original.refundAmount)}</span>,
       },
       {
-        id: 'paidAmount',
-        header: 'Histori Bayar',
-        accessorFn: (row) => row.payments.reduce((total, payment) => total + Number(payment.amount), 0),
-        cell: ({ row }) => {
-          const paidAmount = row.original.payments.reduce((total, payment) => total + Number(payment.amount), 0);
-          return <span>{formatCurrency(paidAmount)}</span>;
-        },
+        accessorKey: 'cashName',
+        header: 'KAS KELUAR',
+        cell: ({ row }) => <span className="text-slate-800 font-normal">{row.original.cashName || '-'}</span>,
       },
       {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => <RefundStatusBadge status={row.original.status} />,
-      },
-      {
-        id: 'actions',
-        header: () => <div className="text-right">Aksi</div>,
-        cell: ({ row }) => (
-          <div className="flex justify-end">
-            <Button size="sm" className="gap-2" onClick={() => setSelectedRefund(row.original)}>
-              <CheckCircle2 className="h-4 w-4" />
-              Approval
-            </Button>
-          </div>
-        ),
+        accessorKey: 'note',
+        header: 'KETERANGAN',
+        cell: ({ row }) => <span className="text-slate-500 font-normal text-xs line-clamp-2 max-w-xs">{row.original.note || '-'}</span>,
       },
     ],
-    [],
+    [transactionType],
   );
 
   const table = useReactTable({
@@ -110,18 +103,20 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="bg-slate-50 hover:bg-slate-50">
+                <TableRow key={headerGroup.id} className="bg-[#F1F5F9]/50 hover:bg-[#F1F5F9]/50">
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <TableHead key={header.id} className="text-[11px] font-semibold text-slate-800 py-3.5 px-4">
                       {header.isPlaceholder ? null : (
                         <button
                           type="button"
-                          className={`flex items-center gap-2 ${header.id === 'actions' ? 'ml-auto' : ''}`}
+                          className="flex items-center gap-1 font-semibold text-slate-800 cursor-pointer disabled:cursor-default"
                           onClick={header.column.getToggleSortingHandler()}
-                          disabled={header.id === 'actions'}
+                          disabled={header.id !== 'refundDate'}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
-                          {header.id !== 'actions' ? <ArrowUpDown className="h-3.5 w-3.5 text-slate-300" /> : null}
+                          {header.id === 'refundDate' ? (
+                            <span className="text-slate-400 font-normal text-[13px] ml-0.5">⇅</span>
+                          ) : null}
                         </button>
                       )}
                     </TableHead>
@@ -138,9 +133,13 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 </TableRow>
               ) : table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} className="hover:bg-slate-50">
+                  <TableRow
+                    key={row.id}
+                    className="hover:bg-slate-50/80 cursor-pointer transition-all duration-150 active:bg-slate-100"
+                    onClick={() => setSelectedRefund(row.original)}
+                  >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      <TableCell key={cell.id} className="py-4 px-4">{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                     ))}
                   </TableRow>
                 ))
@@ -155,13 +154,13 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
           </Table>
         </div>
 
-        <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between py-2">
           <div>
-            Menampilkan {start}-{end} dari {total} data
+            Showing {start}-{end} of {total} data
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-              Sebelumnya
+            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="font-semibold text-slate-600">
+              Previous
             </Button>
             {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
               <Button
@@ -174,8 +173,8 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 {pageNumber}
               </Button>
             ))}
-            <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)}>
-              Selanjutnya
+            <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)} className="font-semibold text-slate-600">
+              Next
             </Button>
           </div>
         </div>

@@ -4,7 +4,7 @@ export default function RefundJualPage() {
   return (
     <FinanceRefundPage
       title="Data Refund Penjualan"
-      description="Pantau refund penjualan dari modul Administrasi, cek histori pembayarannya, lalu lakukan approval dari satu tempat."
+      description="Kelola arus transaksi refund penjualan"
       transactionType="sales"
     />
   );

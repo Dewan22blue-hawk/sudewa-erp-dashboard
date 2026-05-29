@@ -41,52 +41,48 @@ export function FinanceRefundPage({ title, description, transactionType }: Finan
         <title>{title} - Wajira Dashboard</title>
       </Head>
 
-      <div className="space-y-6 p-4 md:p-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-          <p className="mt-1 text-sm text-slate-500">{description}</p>
+      <div className="space-y-6 p-6">
+        <div className="space-y-1.5">
+          <h1 className="text-[28px] font-bold tracking-tight text-slate-950 font-sans">{title}</h1>
+          <p className="text-sm font-normal text-slate-500 font-sans">{description}</p>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-center">
-            <div className="relative w-full max-w-md">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Cari refund, transaksi, atau relasi" className="pl-10" />
-            </div>
-
-            <Select value={status} onValueChange={(value) => updateQuery({ status: value, page: 1 })}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Filter status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="waiting">Menunggu</SelectItem>
-                <SelectItem value="approve">Approve</SelectItem>
-                <SelectItem value="reject">Reject</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <span>Tampilkan</span>
-              <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="w-20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[10, 25, 50, 100].map((option) => (
-                    <SelectItem key={option} value={String(option)}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <span>data</span>
-            </div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center py-1">
+          <div className="relative w-full max-w-[280px]">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search here"
+              className="pl-9 h-[38px] bg-white border border-slate-200 rounded-lg shadow-sm focus-visible:ring-1 focus-visible:ring-slate-400 focus-visible:border-slate-400 font-sans"
+            />
           </div>
 
-          {(search || status !== 'all') ? (
-            <Button variant="outline" onClick={() => updateQuery({ search: undefined, status: undefined, page: 1 })}>
-              Reset Filter
+          <div className="flex items-center gap-2 text-sm text-slate-700 font-sans">
+            <span>Show</span>
+            <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
+              <SelectTrigger className="w-[70px] h-[38px] bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-1 focus:ring-slate-400 font-semibold text-slate-700">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 25, 50, 100].map((option) => (
+                  <SelectItem key={option} value={String(option)}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span>Page</span>
+          </div>
+
+          {search ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => updateQuery({ search: undefined, page: 1 })}
+              className="h-[38px] text-xs font-semibold px-3 text-slate-600 font-sans"
+            >
+              Reset
             </Button>
           ) : null}
         </div>

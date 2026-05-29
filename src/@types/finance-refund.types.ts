@@ -22,6 +22,7 @@ export interface FinanceRefundRecord {
   refundCode: string;
   refundDate: string;
   refundAmount: number;
+  totalTransaction?: number;
   note: string;
   status: RefundApprovalStatus;
   cashId?: string;
