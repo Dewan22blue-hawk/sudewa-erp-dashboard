@@ -52,11 +52,11 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
   const pageNumbers =
     pagination.lastPage > 0
       ? Array.from({ length: Math.min(5, pagination.lastPage) }, (_, index) => {
-          if (pagination.lastPage <= 5) return index + 1;
-          if (pagination.currentPage <= 3) return index + 1;
-          if (pagination.currentPage >= pagination.lastPage - 2) return pagination.lastPage - 4 + index;
-          return pagination.currentPage - 2 + index;
-        })
+        if (pagination.lastPage <= 5) return index + 1;
+        if (pagination.currentPage <= 3) return index + 1;
+        if (pagination.currentPage >= pagination.lastPage - 2) return pagination.lastPage - 4 + index;
+        return pagination.currentPage - 2 + index;
+      })
       : [];
 
   return (
@@ -148,9 +148,9 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
       </div>
 
       {selectedRefundId !== null && (
-        <FinanceRefundApprovalModal 
-          open={true} 
-          onClose={() => setSelectedRefundId(null)} 
+        <FinanceRefundApprovalModal
+          open={true}
+          onClose={() => setSelectedRefundId(null)}
           refundId={selectedRefundId}
           onSuccess={() => {
             setSelectedRefundId(null);

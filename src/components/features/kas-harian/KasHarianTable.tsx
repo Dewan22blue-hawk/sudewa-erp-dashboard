@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import type { KasHarianListItem } from '@/@types/kas-harian.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
-import { ArrowUpDown, MoreVertical } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
 
 interface Props {
   data: KasHarianListItem[];
@@ -60,12 +61,63 @@ export default function KasHarianTable({
   const canGoPrevious = page > 1;
   const canGoNext = hasNextPage || page < meta.lastPage;
 
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortBy) return data;
+    return [...data].sort((a, b) => {
+      let aVal = (a as any)[sortBy];
+      let bVal = (b as any)[sortBy];
+
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [data, sortBy, sortDirection]);
+
   const pageNumbers = (() => {
     if (meta.lastPage <= 5) return Array.from({ length: meta.lastPage }, (_, index) => index + 1);
     if (page <= 3) return [1, 2, 3, 4, '...', meta.lastPage];
     if (page >= meta.lastPage - 2) return [1, '...', meta.lastPage - 3, meta.lastPage - 2, meta.lastPage - 1, meta.lastPage];
     return [1, '...', page - 1, page, page + 1, '...', meta.lastPage];
   })();
+
+  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' = 'left') => {
+    const isSorted = sortBy === sortKey;
+    return (
+      <button
+        type="button"
+        className={`flex items-center gap-1.5 font-semibold text-gray-900 cursor-pointer ${align === 'right' ? 'justify-end w-full' : 'justify-start'}`}
+        onClick={() => handleSort(sortKey)}
+      >
+        <span>{title}</span>
+        {isSorted ? (
+          sortDirection === 'asc' ? (
+            <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+          ) : (
+            <ArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3.5 w-3.5 opacity-50 text-slate-400" />
+        )}
+      </button>
+    );
+  };
 
   return (
     <div className="space-y-5">
@@ -75,20 +127,15 @@ export default function KasHarianTable({
         ) : null}
 
         <table className="w-full min-w-[1120px] text-sm">
-          <thead className="bg-[#f3f6fb] text-[13px] font-semibold uppercase text-slate-800">
+          <thead className="bg-[#f3f6fb] uppercase text-sm font-semibold text-gray-900 leading-normal border-b border-slate-200 bg-gray-50/50">
             <tr>
-              <th className="px-6 py-4 text-left">
-                <div className="flex items-center gap-2">
-                  TANGGAL
-                  <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
-                </div>
-              </th>
-              <th className="px-6 py-4 text-left">NOTA REFF</th>
-              <th className="px-6 py-4 text-left">KETERANGAN</th>
-              <th className="px-6 py-4 text-left">DEBET</th>
-              <th className="px-6 py-4 text-left">KREDIT</th>
-              <th className="px-6 py-4 text-left">AKUN</th>
-              <th className="px-6 py-4 text-left">KAS</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('TANGGAL', 'date')}</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('NOTA REFF', 'code')}</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('KETERANGAN', 'note')}</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('DEBET', 'debet')}</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('KREDIT', 'credit')}</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('AKUN', 'accountName')}</th>
+              <th className="px-6 py-4 text-left">{renderSortHeader('KAS', 'cashName')}</th>
               <th className="px-6 py-4 text-center">ACTION</th>
             </tr>
           </thead>
@@ -115,7 +162,7 @@ export default function KasHarianTable({
                 </td>
               </tr>
             ) : (
-              data.map((item) => (
+              sortedData.map((item) => (
                 <tr key={`${item.source}-${item.id}`} className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/60">
                   <td className="px-6 py-4 text-slate-700">{formatDate(item.date)}</td>
                   <td className="px-6 py-4 text-slate-800">{item.code}</td>

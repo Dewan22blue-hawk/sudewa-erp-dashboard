@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ChevronLeft, ChevronRight, Loader2, MoreVertical, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, MoreVertical, Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -34,6 +34,35 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortBy) return data;
+    return [...data].sort((a, b) => {
+      let aVal = (a as any)[sortBy];
+      let bVal = (b as any)[sortBy];
+
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [data, sortBy, sortDirection]);
+
   const totalPages = meta?.lastPage ?? 1;
   const pages = useMemo(() => {
     if (totalPages <= 5) {
@@ -54,6 +83,28 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
   const startIndex = meta?.from ?? (data.length > 0 ? (currentPage - 1) * perPage + 1 : 0);
   const endIndex = meta?.to ?? (data.length > 0 ? startIndex + data.length - 1 : 0);
   const totalItems = meta?.total ?? 0;
+
+  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' = 'left') => {
+    const isSorted = sortBy === sortKey;
+    return (
+      <button
+        type="button"
+        className={`flex items-center gap-1.5 font-semibold text-gray-900 cursor-pointer ${align === 'right' ? 'justify-end w-full' : 'justify-start'}`}
+        onClick={() => handleSort(sortKey)}
+      >
+        <span>{title}</span>
+        {isSorted ? (
+          sortDirection === 'asc' ? (
+            <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+          ) : (
+            <ArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3.5 w-3.5 opacity-50 text-slate-400" />
+        )}
+      </button>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -107,15 +158,15 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
-            <tr className="border-b border-gray-200">
+          <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal border-b border-gray-200">
+            <tr>
               <th className="px-4 py-3 text-left">NO</th>
-              <th className="py-2 text-left">NO PENJUALAN</th>
-              <th className="py-2 text-left">TANGGAL</th>
-              <th className="py-2 text-left">NAMA CUSTOMER</th>
-              <th className="py-2 text-right">TOTAL JUAL</th>
-              <th className="py-2 text-right">TOTAL BAYAR</th>
-              <th className="py-2 text-right">AMOUNT PIUTANG</th>
+              <th className="py-2.5 px-4 text-left">{renderSortHeader('NO PENJUALAN', 'code')}</th>
+              <th className="py-2.5 px-4 text-left">{renderSortHeader('TANGGAL', 'date')}</th>
+              <th className="py-2.5 px-4 text-left">{renderSortHeader('NAMA CUSTOMER', 'supplier_name')}</th>
+              <th className="py-2.5 px-4 text-right">{renderSortHeader('TOTAL JUAL', 'grand_total', 'right')}</th>
+              <th className="py-2.5 px-4 text-right">{renderSortHeader('TOTAL BAYAR', 'total_paid', 'right')}</th>
+              <th className="py-2.5 px-4 text-right">{renderSortHeader('AMOUNT PIUTANG', 'remaining_payment', 'right')}</th>
               <th className="px-4 py-3 text-center">ACTION</th>
             </tr>
           </thead>
@@ -129,8 +180,8 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
                   </span>
                 </td>
               </tr>
-            ) : data.length > 0 ? (
-              data.map((item, i) => (
+            ) : sortedData.length > 0 ? (
+              sortedData.map((item, i) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">{startIndex + i}</td>
                   <td className="px-4 py-3 font-medium">{item.code}</td>
