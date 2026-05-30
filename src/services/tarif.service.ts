@@ -1,29 +1,14 @@
 import type { Tarif, TarifListResponse, TarifPayload } from '@/@types/tarif.types';
 import type { PaginationParams } from '@/@types/pagination.types';
 import { apiClient } from '@/lib/api/client';
-import { ApiResponseError, LaravelApiResponse, ensureSuccess, ApiValidationError } from '@/lib/api/response';
+import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
+import { ApiResponseError, LaravelApiResponse, ensureSuccess, toPaginatedResult, ApiValidationError } from '@/lib/api/response';
 
 const basePath = '/wapi/master-data/tarif';
-
-// ─── Internal: fetch raw list (no pagination/search params) ────────────────────
-const getAllTarifsRaw = async (companyId?: string | number): Promise<any[]> => {
-    const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
-        params: companyId ? { company_id: companyId } : undefined,
-    });
-    const raw = response.data;
-    if (!raw.status) {
-        throw new ApiResponseError(raw.message ?? 'Failed to fetch tarif list');
-    }
-    const payload = raw.data;
-    if (Array.isArray(payload)) return payload;
-    if (payload && Array.isArray(payload.data)) return payload.data;
-    return [];
-};
 
 const mapTarifItem = (item: any): Tarif => ({
     id: item.id,
     uuid: item.uuid,
-    customerId: item.customer_id,
     loadingIn: item.loading_in || '',
     loadingOut: item.loading_out || '',
     distance: Number(item.distance) || 0,
@@ -32,52 +17,22 @@ const mapTarifItem = (item: any): Tarif => ({
     ujFuso: item.uj_fuso !== null && item.uj_fuso !== undefined ? Number(item.uj_fuso) : null,
     invCdd: item.inv_cdd !== null && item.inv_cdd !== undefined ? Number(item.inv_cdd) : null,
     invFuso: item.inv_fuso !== null && item.inv_fuso !== undefined ? Number(item.inv_fuso) : null,
-    isActive: item.is_active ?? true,
+    isActive: item.is_active === 1 || item.is_active === true || String(item.is_active) === '1',
     createdAt: item.created_at,
     updatedAt: item.updated_at,
-    customer: item.customer
-        ? {
-              id: item.customer.id,
-              uuid: item.customer.uuid,
-              name: item.customer.name,
-              code: item.customer.code,
-          }
-        : undefined,
 });
 
 export const getTarifs = async (
     params: PaginationParams & { search?: string; company_id?: string | number },
 ): Promise<TarifListResponse> => {
-    const allRaw = await getAllTarifsRaw(params.company_id);
-    const allItems: Tarif[] = allRaw.map(mapTarifItem);
-
-    // ── Client-side search across multiple fields ──────────────────────────────
-    const keyword = (params.search ?? '').toLowerCase().trim();
-    const filtered = keyword
-        ? allItems.filter((item) => {
-              const customerName = (item.customer?.name ?? '').toLowerCase();
-              const loadingIn = item.loadingIn.toLowerCase();
-              const loadingOut = item.loadingOut.toLowerCase();
-              return (
-                  customerName.includes(keyword) ||
-                  loadingIn.includes(keyword) ||
-                  loadingOut.includes(keyword)
-              );
-          })
-        : allItems;
-
-    // ── Client-side pagination ─────────────────────────────────────────────────
-    const page = params.page ?? 1;
-    const perPage = params.perPage ?? 10;
-    const total = filtered.length;
-    const lastPage = Math.max(1, Math.ceil(total / perPage));
-    const start = (page - 1) * perPage;
-    const paged = filtered.slice(start, start + perPage);
-
-    return {
-        data: paged,
-        meta: { currentPage: page, perPage, total, lastPage },
-    };
+    const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
+        params: {
+            ...buildLaravelPaginationQuery(params),
+            company_id: params.company_id,
+        },
+    });
+    const data = ensureSuccess(response.data);
+    return toPaginatedResult(data, mapTarifItem);
 };
 
 export const getTarifById = async (id: string | number): Promise<Tarif> => {
@@ -86,14 +41,25 @@ export const getTarifById = async (id: string | number): Promise<Tarif> => {
     return mapTarifItem(data);
 };
 
+const serializePayload = (data: TarifPayload): URLSearchParams => {
+    const params = new URLSearchParams();
+    Object.entries(data).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+            params.append(key, String(val));
+        }
+    });
+    return params;
+};
+
 export const createTarif = async (data: TarifPayload): Promise<void> => {
     try {
-        const response = await apiClient.post<LaravelApiResponse<any>>(basePath, data, {
-            headers: { 'Content-Type': 'application/json' },
+        const payload = serializePayload(data);
+        const response = await apiClient.post<LaravelApiResponse<any>>(basePath, payload, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
-        const payload = response.data;
-        if (!payload.status) {
-            throw new ApiResponseError(payload.message ?? 'Failed to create tarif');
+        const result = response.data;
+        if (!result.status) {
+            throw new ApiResponseError(result.message ?? 'Failed to create tarif');
         }
     } catch (error) {
         if (error instanceof ApiValidationError) throw error;
@@ -103,12 +69,13 @@ export const createTarif = async (data: TarifPayload): Promise<void> => {
 
 export const updateTarif = async (id: string | number, data: TarifPayload): Promise<void> => {
     try {
-        const response = await apiClient.put<LaravelApiResponse<any>>(`${basePath}/${id}`, data, {
-            headers: { 'Content-Type': 'application/json' },
+        const payload = serializePayload(data);
+        const response = await apiClient.put<LaravelApiResponse<any>>(`${basePath}/${id}`, payload, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
-        const payload = response.data;
-        if (!payload.status) {
-            throw new ApiResponseError(payload.message ?? 'Failed to update tarif');
+        const result = response.data;
+        if (!result.status) {
+            throw new ApiResponseError(result.message ?? 'Failed to update tarif');
         }
     } catch (error) {
         if (error instanceof ApiValidationError) throw error;
@@ -123,3 +90,4 @@ export const deleteTarif = async (id: string | number): Promise<void> => {
         throw new ApiResponseError(payload.message ?? 'Failed to delete tarif');
     }
 };
+

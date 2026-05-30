@@ -144,9 +144,6 @@ export function TarifTable({
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
-                                    NAMA CUSTOMER
-                                </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
                                     LOADING IN
                                 </TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
@@ -179,7 +176,7 @@ export function TarifTable({
                             {isLoading ? (
                                 Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
                                     <TableRow key={i} className="animate-pulse">
-                                        {Array.from({ length: 10 }).map((_, j) => (
+                                        {Array.from({ length: 9 }).map((_, j) => (
                                             <TableCell key={j} className="px-4 py-4">
                                                 <div className="h-4 bg-gray-200 rounded w-full" />
                                             </TableCell>
@@ -189,9 +186,6 @@ export function TarifTable({
                             ) : tarifs.length > 0 ? (
                                 tarifs.map((tarif) => (
                                     <TableRow key={tarif.id} className="hover:bg-gray-50/50">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
-                                            {tarif.customer?.name || '-'}
-                                        </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
                                             {tarif.loadingIn || '-'}
                                         </TableCell>
@@ -221,7 +215,7 @@ export function TarifTable({
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
                                                         <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                    </Button>
+                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-[160px]">
                                                     <DropdownMenuItem
@@ -243,7 +237,7 @@ export function TarifTable({
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={10} className="h-32 text-center text-gray-500">
+                                    <TableCell colSpan={9} className="h-32 text-center text-gray-500">
                                         Tidak ada data tarif ditemukan
                                     </TableCell>
                                 </TableRow>

@@ -47,7 +47,8 @@ export const AccountListPage = () => {
     page: 1,
     perPage: 100,
     search: '',
-    enabled: !isLoadingCompany,
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId,
   });
 
   const createMutation = useCreateAccount();
@@ -150,13 +151,17 @@ export const AccountListPage = () => {
       setEditing(null);
       resetForm();
     } catch (error) {
+      console.error('[Create/Update Account Error]:', error);
       if (error instanceof ApiValidationError) {
         mapValidationErrors(error);
         toast.error(error.message || 'Validasi gagal');
         return;
       }
 
-      const message = error instanceof ApiResponseError ? error.message : 'Gagal menyimpan akun';
+      const apiErrorMessage = (error as any)?.message || (error as any)?.details;
+      const message = error instanceof ApiResponseError 
+        ? error.message 
+        : (typeof apiErrorMessage === 'string' ? apiErrorMessage : 'Gagal menyimpan akun');
       toast.error(message);
     }
   };
@@ -313,23 +318,23 @@ export const AccountListPage = () => {
         <div className="space-y-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center">
-              <div className="relative w-full max-w-[420px]">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <div className="relative w-full max-w-[320px]">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <Input
-                  placeholder="Search here"
+                  placeholder="Cari akun..."
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  className="h-12 rounded-xl border-gray-200 bg-white pl-12 text-base text-gray-900 shadow-none focus-visible:ring-slate-300"
+                  className="h-10 rounded-xl border-gray-200 bg-white pl-9 text-sm text-gray-900 shadow-none focus-visible:ring-slate-300"
                 />
               </div>
 
-              <div className="flex items-center gap-3 text-sm text-slate-900">
+              <div className="flex items-center gap-2.5 text-sm text-slate-500">
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(value) => {
                   setPerPage(Number(value));
                   setPage(1);
                 }}>
-                  <SelectTrigger className="h-12 w-[88px] rounded-xl border-gray-200 bg-white px-4 text-base shadow-none focus:ring-slate-300">
+                  <SelectTrigger className="h-10 w-[80px] rounded-xl border-gray-200 bg-white px-3 text-sm text-slate-900 shadow-none focus:ring-slate-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -340,35 +345,35 @@ export const AccountListPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <span>Page</span>
+                <span>entries</span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <Button variant="ghost" className="h-12 rounded-xl px-4 text-base font-medium text-slate-800 hover:bg-slate-100" onClick={handleExport}>
-                <Upload className="mr-1 h-4 w-4" />
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="ghost" className="h-10 rounded-xl px-3.5 text-sm font-medium text-slate-700 hover:bg-slate-100" onClick={handleExport}>
+                <Upload className="mr-1.5 h-4 w-4" />
                 Export
               </Button>
-              <Button variant="outline" className="h-12 rounded-xl border-gray-200 px-5 text-base font-medium text-slate-900 shadow-none hover:bg-slate-50" onClick={() => setOpenImport(true)}>
-                <Download className="mr-1 h-4 w-4" />
+              <Button variant="outline" className="h-10 rounded-xl border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50" onClick={() => setOpenImport(true)}>
+                <Download className="mr-1.5 h-4 w-4" />
                 Import
               </Button>
-              <Button className="h-12 rounded-xl bg-[#1F3B5B] px-5 text-base font-medium text-white hover:bg-[#1B3450]" onClick={handleAdd}>
-                <Plus className="mr-1 h-4 w-4" />
+              <Button className="h-10 rounded-xl bg-[#1F3B5B] px-4 text-sm font-medium text-white hover:bg-[#1B3450]" onClick={handleAdd}>
+                <Plus className="mr-1.5 h-4 w-4" />
                 Tambah
               </Button>
             </div>
           </div>
 
           {selectedIds.size > 0 && (
-            <div className="flex flex-wrap items-center gap-4">
-              <Button variant="outline" className="h-12 rounded-xl border-gray-200 px-5 text-base font-medium text-slate-900 shadow-none hover:bg-slate-50" onClick={handleOpenBulkUpdate}>
-                <PencilLine className="mr-1 h-4 w-4" />
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" className="h-10 rounded-xl border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50" onClick={handleOpenBulkUpdate}>
+                <PencilLine className="mr-1.5 h-4 w-4" />
                 Update
               </Button>
-              <div className="flex items-center gap-3 text-base text-slate-500">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
                 <span>{selectedIds.size} Akun Terpilih</span>
-                <span className="text-xl text-emerald-500">✓</span>
+                <span className="text-base text-emerald-500">✓</span>
               </div>
             </div>
           )}

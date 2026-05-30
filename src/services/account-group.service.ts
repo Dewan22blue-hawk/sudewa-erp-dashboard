@@ -53,17 +53,24 @@ export const getAccountGroups = async (params: PaginationParams & { company_id?:
   const response = await apiClient.get<PaginatedAccountGroupResponse>(basePath, {
     params: {
       ...buildLaravelPaginationQuery(params),
+      company_id: params.company_id,
     },
   });
 
   const data = ensureSuccess(response.data);
+  const scopedData = params.company_id
+    ? (data.data ?? []).filter((item) => {
+        if (item.company_id === undefined || item.company_id === null) return true;
+        return String(item.company_id) === String(params.company_id);
+      })
+    : (data.data ?? []);
 
   return toPaginatedResult(
     {
-      data: data.data ?? [],
+      data: scopedData,
       current_page: data.current_page,
       per_page: data.per_page ?? data.perPage ?? params.perPage ?? 10,
-      total: data.total,
+      total: params.company_id ? scopedData.length : data.total,
       last_page: data.last_page,
     },
     mapAccountGroup,

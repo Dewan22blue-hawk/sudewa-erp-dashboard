@@ -34,24 +34,24 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
   const showLastPageShortcut = visiblePages[visiblePages.length - 1] !== totalPages;
 
   return (
-    <div className="space-y-7">
-      <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.05)]">
+    <div className="space-y-4">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-slate-200 bg-[#EFF3F8] hover:bg-[#EFF3F8]">
-              <TableHead className="w-[72px] px-4 py-5">
+              <TableHead className="w-[60px] px-4 py-4 text-center">
                 <Checkbox
                   checked={allChecked ? true : (someChecked ? 'indeterminate' : false)}
                   onCheckedChange={(checked) => onToggleAll(Boolean(checked))}
-                  className="size-6 rounded-[8px] border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
+                  className="size-5 rounded-[6px] border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
                   aria-label="Pilih semua akun"
                 />
               </TableHead>
-              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Kode Akun</TableHead>
-              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Nama Akun</TableHead>
-              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Grup Akun</TableHead>
-              <TableHead className="py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Kategori Akun</TableHead>
-              <TableHead className="w-[110px] py-5 text-center text-[1.05rem] font-semibold uppercase tracking-[-0.01em] text-slate-950">Action</TableHead>
+              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kode Akun</TableHead>
+              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Nama Akun</TableHead>
+              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Grup Akun</TableHead>
+              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori Akun</TableHead>
+              <TableHead className="w-[90px] py-4 px-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Action</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -59,19 +59,19 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
             {isLoading ? (
               Array.from({ length: perPage }).map((_, index) => (
                 <TableRow key={index} className="border-b border-slate-200">
-                  <TableCell className="px-4 py-5">
-                    <Skeleton className="h-6 w-6 rounded-[8px]" />
+                  <TableCell className="px-4 py-4 text-center">
+                    <Skeleton className="mx-auto h-5 w-5 rounded-[6px]" />
                   </TableCell>
-                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-16" /></TableCell>
-                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-40" /></TableCell>
-                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-14" /></TableCell>
-                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-5 w-36" /></TableCell>
-                  <TableCell className="py-5 text-center"><Skeleton className="mx-auto h-8 w-8" /></TableCell>
+                  <TableCell className="py-4 px-4"><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell className="py-4 px-4"><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell className="py-4 px-4"><Skeleton className="h-4 w-14" /></TableCell>
+                  <TableCell className="py-4 px-4"><Skeleton className="h-4 w-36" /></TableCell>
+                  <TableCell className="py-4 text-center"><Skeleton className="mx-auto h-7 w-7 rounded-full" /></TableCell>
                 </TableRow>
               ))
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-14 text-center text-base text-slate-500">
+                <TableCell colSpan={6} className="py-10 text-center text-sm text-slate-500">
                   Tidak ada data akun.
                 </TableCell>
               </TableRow>
@@ -81,30 +81,30 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
 
                 return (
                   <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="border-b border-slate-200 bg-white hover:bg-slate-50/60">
-                    <TableCell className="px-4 py-4">
+                    <TableCell className="px-4 py-3 text-center">
                       <Checkbox
                         checked={checked}
                         onCheckedChange={(value) => onToggleRow(String(account.id), Boolean(value))}
-                        className="size-6 rounded-[8px] border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
+                        className="size-5 rounded-[6px] border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
                         aria-label={`Pilih akun ${account.name}`}
                       />
                     </TableCell>
-                    <TableCell className="py-4 text-center text-[1.05rem] font-medium text-slate-900">{account.code}</TableCell>
-                    <TableCell className="py-4 text-center text-[1.05rem] font-medium uppercase text-slate-900">{account.name}</TableCell>
-                    <TableCell className="py-4 text-center text-[1.05rem] text-slate-800">{account.accountGroupCode ?? '-'}</TableCell>
-                    <TableCell className="py-4 text-center text-[1.05rem] text-slate-800">{getAccountCategoryLabel(account.category)}</TableCell>
-                    <TableCell className="py-4 text-center">
+                    <TableCell className="py-3 px-4 text-sm font-medium text-slate-900">{account.code}</TableCell>
+                    <TableCell className="py-3 px-4 text-sm font-medium uppercase text-slate-900">{account.name}</TableCell>
+                    <TableCell className="py-3 px-4 text-sm text-slate-600">{account.accountGroupCode ?? '-'}</TableCell>
+                    <TableCell className="py-3 px-4 text-sm text-slate-600">{getAccountCategoryLabel(account.category)}</TableCell>
+                    <TableCell className="py-3 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-slate-900 hover:bg-slate-100">
-                            <MoreVertical className="h-5 w-5" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                            <MoreVertical className="h-4.5 w-4.5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[180px] rounded-2xl border-slate-200 p-2 shadow-xl">
-                          <DropdownMenuItem className="rounded-xl px-4 py-3 text-base text-slate-900 focus:bg-slate-50" onClick={() => onEdit(account)}>
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => onEdit(account)}>
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-xl px-4 py-3 text-base text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => onDelete(account)}>
+                          <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer" onClick={() => onDelete(account)}>
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -118,13 +118,13 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
         </Table>
       </div>
 
-      <div className="flex flex-col gap-4 text-[15px] text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
         <p>
           Showing {start}-{end} of {total} data
         </p>
 
-        <div className="flex flex-wrap items-center justify-end gap-2 text-slate-800">
-          <Button variant="ghost" size="sm" className="h-11 rounded-2xl px-2 text-[1rem] font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
             Previous
           </Button>
 
@@ -134,9 +134,9 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
               variant="ghost"
               size="sm"
               className={cn(
-                'h-12 min-w-12 rounded-2xl border px-4 text-[1rem] font-medium shadow-none',
+                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
                 pageNumber === page
-                  ? 'border-slate-200 bg-white text-slate-950 shadow-[0_8px_20px_rgba(15,23,42,0.08)]'
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                   : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
               )}
               onClick={() => onPageChange(pageNumber)}
@@ -147,14 +147,14 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
 
           {showLastPageShortcut && (
             <>
-              <span className="px-2 text-[1.15rem] text-slate-500">...</span>
-              <Button variant="ghost" size="sm" className="h-12 min-w-12 rounded-2xl border border-transparent px-4 text-[1rem] font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
+              <span className="px-1 text-sm text-slate-500">...</span>
+              <Button variant="ghost" size="sm" className="h-9 min-w-9 rounded-xl border border-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
                 {totalPages}
               </Button>
             </>
           )}
 
-          <Button variant="ghost" size="sm" className="h-11 rounded-2xl px-2 text-[1rem] font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
+          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
             Next
           </Button>
         </div>
