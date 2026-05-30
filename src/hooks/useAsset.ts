@@ -6,7 +6,13 @@ import { companyQueryKeys } from '@/lib/query/company-key';
 
 export function useAssets(companyId: string | number | null, params: PaginationParams & { search?: string } = { page: 1, perPage: 100 }) {
     return useQuery({
-        queryKey: ['assets', companyId, params.page, params.perPage, params.search],
+        queryKey: companyId
+            ? companyQueryKeys.list(companyId, 'assets', {
+                page: params.page,
+                perPage: params.perPage,
+                search: params.search ?? '',
+            })
+            : ['company', 'unselected', 'assets'],
         queryFn: () => getAssets({
             company_id: companyId || undefined,
             ...params
@@ -30,7 +36,6 @@ export function useImportAsset() {
         onSuccess: (_data, variables) => {
             if (variables.companyId !== undefined && variables.companyId !== null) {
                 queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.companyId) });
-                return;
             }
 
             queryClient.invalidateQueries({
@@ -47,7 +52,6 @@ export function useCreateAsset() {
         onSuccess: (_data, variables) => {
             if (variables.company_id !== undefined && variables.company_id !== null) {
                 queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.company_id) });
-                return;
             }
 
             queryClient.invalidateQueries({
@@ -64,7 +68,6 @@ export function useUpdateAsset() {
         onSuccess: (_data, variables) => {
             if (variables.data.company_id !== undefined && variables.data.company_id !== null) {
                 queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.data.company_id) });
-                return;
             }
 
             queryClient.invalidateQueries({
