@@ -1,29 +1,44 @@
-import * as React from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { VehicleDataForm } from '@/components/features/vehicle-data/VehicleDataForm';
-import { useCreateVehicleData } from '@/hooks/useVehicleData';
-import type { VehicleDataPayload } from '@/@types/vehicle-data.types';
+import { ArmadaForm } from '@/components/features/armada/ArmadaForm';
 import { toast } from 'sonner';
+import { useRouter } from 'next/router';
+import { ChevronLeft } from 'lucide-react';
+import { useCreateArmada } from '@/hooks/useArmada';
+import type { ArmadaPayload } from '@/@types/armada.types';
 
-export default function CreateVehicleDataPage() {
+export default function CreateVehicleFleetPage() {
   const router = useRouter();
-  const slug = String(router.query.slug || '');
-  const createMutation = useCreateVehicleData();
+  const { slug } = router.query;
+  const createMutation = useCreateArmada();
 
-  const handleSubmit = async (payload: VehicleDataPayload) => {
+  const handleSave = async (payload: ArmadaPayload) => {
     try {
-      const created = await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync(payload);
       toast.success('Data kendaraan berhasil ditambahkan');
-      router.push(`/dashboard/${slug}/data-kendaraan/${created.id}`);
+      if (slug) {
+        router.push(`/dashboard/${slug}/data-kendaraan`);
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Gagal menambahkan data kendaraan');
+      toast.error(error.message || 'Gagal menyimpan data kendaraan');
     }
   };
 
   return (
     <DashboardLayout>
-      <VehicleDataForm title="Input Data Kendaraan" onSubmit={handleSubmit} isSubmitting={createMutation.isPending} />
+      <div className="space-y-6">
+        <div className="flex items-center space-x-2">
+          <button onClick={() => router.back()} className="rounded-md p-1 transition-colors hover:bg-gray-100">
+            <ChevronLeft className="h-5 w-5 text-gray-500" />
+          </button>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Detail Kendaraan</h1>
+            <p className="text-sm text-gray-500">Tambah kendaraan baru</p>
+          </div>
+        </div>
+
+        <ArmadaForm title="Tambah Kendaraan" onSubmit={handleSave} isSubmitting={createMutation.isPending} />
+      </div>
     </DashboardLayout>
   );
 }

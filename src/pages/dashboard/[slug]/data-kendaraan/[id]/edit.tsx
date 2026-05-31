@@ -1,49 +1,69 @@
-import * as React from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { VehicleDataForm } from '@/components/features/vehicle-data/VehicleDataForm';
-import { useUpdateVehicleData, useVehicleDataDetail } from '@/hooks/useVehicleData';
-import type { VehicleDataPayload } from '@/@types/vehicle-data.types';
+import { ArmadaForm } from '@/components/features/armada/ArmadaForm';
 import { toast } from 'sonner';
+import { useRouter } from 'next/router';
+import { ChevronLeft } from 'lucide-react';
+import { useArmadaDetail, useUpdateArmada } from '@/hooks/useArmada';
+import type { ArmadaPayload } from '@/@types/armada.types';
 
-export default function EditVehicleDataPage() {
+export default function EditVehicleFleetPage() {
   const router = useRouter();
-  const slug = String(router.query.slug || '');
-  const id = String(router.query.id || '');
-  const detailQuery = useVehicleDataDetail(id || null);
-  const updateMutation = useUpdateVehicleData();
+  const { slug, id } = router.query;
+  const { data: initialData, isLoading, isError } = useArmadaDetail(id ? String(id) : null);
+  const updateMutation = useUpdateArmada();
 
-  const handleSubmit = async (payload: VehicleDataPayload) => {
+  const handleSave = async (payload: ArmadaPayload) => {
     if (!id) return;
 
     try {
-      await updateMutation.mutateAsync({ id, data: payload });
-      toast.success('Data kendaraan berhasil diperbarui');
-      router.push(`/dashboard/${slug}/data-kendaraan/${id}`);
+      await updateMutation.mutateAsync({ id: String(id), payload });
+      toast.success('Data kendaraan berhasil diubah');
+      if (slug) {
+        router.push(`/dashboard/${slug}/data-kendaraan`);
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Gagal memperbarui data kendaraan');
+      toast.error(error.message || 'Gagal menyimpan data kendaraan');
     }
   };
 
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-gray-500">Memuat data...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (isError || !initialData) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-red-500">Gagal memuat data kendaraan</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
-      {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat data kendaraan...</div>
-      ) : detailQuery.isError || !detailQuery.data ? (
-        <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
-          <p className="text-red-500">Gagal memuat data kendaraan.</p>
-          <button onClick={() => router.back()} className="text-sm text-blue-600 underline">
-            Kembali
+      <div className="space-y-6">
+        <div className="flex items-center space-x-2">
+          <button onClick={() => router.back()} className="rounded-md p-1 transition-colors hover:bg-gray-100">
+            <ChevronLeft className="h-5 w-5 text-gray-500" />
           </button>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Detail Kendaraan</h1>
+            <p className="text-sm text-gray-500">
+              Nomor Polisi <span className="font-medium text-[#1e3a5f]">{initialData.registrationNumber}</span>
+            </p>
+          </div>
         </div>
-      ) : (
-        <VehicleDataForm
-          title="Edit Data Kendaraan"
-          initialData={detailQuery.data}
-          onSubmit={handleSubmit}
-          isSubmitting={updateMutation.isPending}
-        />
-      )}
+
+        <ArmadaForm title="Edit Kendaraan" initialData={initialData} onSubmit={handleSave} isSubmitting={updateMutation.isPending} />
+      </div>
     </DashboardLayout>
   );
 }

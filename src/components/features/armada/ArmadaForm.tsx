@@ -180,12 +180,18 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
 
           <div className="space-y-2">
             <Label htmlFor="type">Tipe</Label>
-            <Input
+            <select
               id="type"
-              placeholder="Tambah tipe armada"
-              {...register('type', { required: 'Tipe wajib diisi', maxLength: { value: 249, message: 'Maks 249 karakter' } })}
-              className={errors.type ? 'border-red-500' : ''}
-            />
+              {...register('type', { required: 'Tipe wajib diisi' })}
+              className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${
+                errors.type ? 'border-red-500' : 'border-slate-200'
+              }`}
+            >
+              <option value="" disabled>Pilih tipe armada</option>
+              <option value="towing">Towing</option>
+              <option value="cdd">CDD</option>
+              <option value="fuso">Fuso</option>
+            </select>
             {errors.type && <p className="text-xs text-red-500">{errors.type.message}</p>}
           </div>
 
