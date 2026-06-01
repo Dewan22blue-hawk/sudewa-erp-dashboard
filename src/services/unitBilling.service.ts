@@ -43,6 +43,9 @@ type UnitBillingApiModel = {
   bca_payment_usd_liability?: string | number;
   created_at?: string;
   updated_at?: string;
+  unit_transaction?: {
+    id?: string | number;
+  };
   data?: UnitBillingApiModel;
 };
 
@@ -61,6 +64,29 @@ type UnitBillingHistoryApiModel = {
     unit_transaction_id?: string | number;
   };
   data?: UnitBillingHistoryApiModel;
+};
+
+type UnitTransactionBillingSnapshotApiModel = {
+  id?: string | number;
+  unit_transaction_id?: string | number;
+  grand_total?: string | number;
+  total_paid?: string | number;
+  remaining_payment?: string | number;
+  payment_at?: string | null;
+  payment_date?: string;
+  is_paid?: boolean | number | string;
+  unit_transaction_billing_histories?: UnitBillingHistoryApiModel[];
+};
+
+type UnitTransactionDetailBillingApiModel = {
+  id?: string | number;
+  billing_summary?: {
+    grand_total?: string | number;
+    total_paid?: string | number;
+    remaining_payment?: string | number;
+    is_paid?: boolean | number | string;
+  } | null;
+  unit_transaction_billing?: UnitTransactionBillingSnapshotApiModel | null;
 };
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction-billing';
@@ -120,7 +146,7 @@ const mapBilling = (raw: UnitBillingApiModel): UnitBilling => {
   return {
     id: String(item.id ?? ''),
     company_id: String(item.company_id ?? ''),
-    unit_transaction_id: String(item.unit_transaction_id ?? item.unitTransactionId ?? ''),
+    unit_transaction_id: String(item.unit_transaction_id ?? item.unitTransactionId ?? item.unit_transaction?.id ?? ''),
     grand_total: grandTotal,
     total_paid: totalPaid,
     remaining_payment: remainingPayment,
@@ -162,6 +188,43 @@ const mapBillingHistory = (raw: UnitBillingHistoryApiModel): UnitBillingHistory 
   };
 };
 
+const mapBillingFromTransactionDetail = (
+  transactionId: string,
+  detail: UnitTransactionDetailBillingApiModel | null | undefined,
+): UnitBilling | null => {
+  const billing = detail?.unit_transaction_billing;
+  const summary = detail?.billing_summary;
+
+  if (!billing && !summary) return null;
+
+  return {
+    id: String(billing?.id ?? ''),
+    company_id: '',
+    unit_transaction_id: String(billing?.unit_transaction_id ?? detail?.id ?? transactionId),
+    grand_total: toSafeNumber(billing?.grand_total ?? summary?.grand_total),
+    total_paid: toSafeNumber(billing?.total_paid ?? summary?.total_paid),
+    remaining_payment: toSafeNumber(billing?.remaining_payment ?? summary?.remaining_payment),
+    last_payment_at: undefined,
+    bca_payment: 0,
+    cash_payment: 0,
+    bca_payment_2: 0,
+    bca_payment_liability: 0,
+    cash_payment_liability: 0,
+    bca_payment_usd_liability: 0,
+    payment_date: String(billing?.payment_date ?? billing?.payment_at ?? ''),
+    is_paid: toBool(billing?.is_paid ?? summary?.is_paid),
+    created_at: undefined,
+    updated_at: undefined,
+  };
+};
+
+const extractBillingHistoriesFromTransactionDetail = (
+  billing: UnitTransactionBillingSnapshotApiModel | null | undefined,
+): UnitBillingHistory[] => {
+  const rows = Array.isArray(billing?.unit_transaction_billing_histories) ? billing.unit_transaction_billing_histories : [];
+  return rows.map(mapBillingHistory).filter((item) => Boolean(item.id || item.payment_at));
+};
+
 const extractHistoryRows = (payload: any): UnitBillingHistoryApiModel[] => {
   if (Array.isArray(payload)) return payload as UnitBillingHistoryApiModel[];
   if (Array.isArray(payload?.data)) return payload.data as UnitBillingHistoryApiModel[];
@@ -182,6 +245,20 @@ const toBillingCreateData = (companyId: string | number, unitTransactionId: stri
   return form;
 };
 
+const getBillingSnapshotFromTransaction = async (unitTransactionId: string): Promise<UnitTransactionDetailBillingApiModel | null> => {
+  try {
+    const response = await apiClient.get<LaravelApiResponse<UnitTransactionDetailBillingApiModel>>(`/wapi/transaction/unit-transaction/unit-transaction/${unitTransactionId}`);
+    return ensureSuccess(response.data) as UnitTransactionDetailBillingApiModel;
+  } catch {
+    try {
+      const response = await apiClient.get<LaravelApiResponse<UnitTransactionDetailBillingApiModel>>(`/wapi/transaction/unit-transaction/${unitTransactionId}`);
+      return ensureSuccess(response.data) as UnitTransactionDetailBillingApiModel;
+    } catch {
+      return null;
+    }
+  }
+};
+
 export const unitBillingService = {
   async checkRightAmount(companyId: string, unitTransactionId: string): Promise<void> {
     const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/check-right-amount`, {
@@ -196,7 +273,10 @@ export const unitBillingService = {
 
   async getCurrentBilling(unitTransactionId: string): Promise<UnitBilling | null> {
     const billings = await this.getBillings(unitTransactionId);
-    if (billings.length === 0) return null;
+    if (billings.length === 0) {
+      const snapshot = await getBillingSnapshotFromTransaction(unitTransactionId);
+      return mapBillingFromTransactionDetail(unitTransactionId, snapshot);
+    }
 
     const sorted = [...billings].sort((a, b) => {
       const idA = Number(a.id ?? 0);
@@ -237,7 +317,20 @@ export const unitBillingService = {
       mapped = toPaginatedResult(payload.data, mapBilling).data;
     }
 
-    return mapped.filter((item) => String(item.unit_transaction_id) === String(unitTransactionId));
+    const filtered = mapped
+      .map((item) => ({
+        ...item,
+        unit_transaction_id: item.unit_transaction_id || String(unitTransactionId),
+      }))
+      .filter((item) => String(item.unit_transaction_id) === String(unitTransactionId));
+
+    if (filtered.length > 0) {
+      return filtered;
+    }
+
+    const snapshot = await getBillingSnapshotFromTransaction(unitTransactionId);
+    const detailBilling = mapBillingFromTransactionDetail(unitTransactionId, snapshot);
+    return detailBilling ? [detailBilling] : [];
   },
 
   /**
@@ -314,11 +407,18 @@ export const unitBillingService = {
       filtered = mapped.filter((item) => relatedBillingIds.has(String(item.unit_transaction_billing_id)));
     }
 
-    return Array.from(new Map(filtered.map((item) => [item.id, item])).values()).sort((a, b) => {
+    const deduped = Array.from(new Map(filtered.map((item) => [`${item.id}:${item.payment_at}:${item.note ?? ''}`, item])).values()).sort((a, b) => {
       const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
       const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
       return timeB - timeA;
     });
+
+    if (deduped.length > 0 || !unitTransactionId) {
+      return deduped;
+    }
+
+    const snapshot = await getBillingSnapshotFromTransaction(unitTransactionId);
+    return extractBillingHistoriesFromTransactionDetail(snapshot?.unit_transaction_billing);
   },
 
   async createBillingHistory(payload: CreateUnitBillingHistoryPayload): Promise<UnitBillingHistory> {

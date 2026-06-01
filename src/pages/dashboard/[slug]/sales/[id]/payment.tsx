@@ -342,6 +342,11 @@ export default function PaymentPage() {
       }
 
       if (!billing?.id) {
+        const createdSnapshot = await refetchCurrentBilling();
+        billing = createdSnapshot.data ?? billing ?? null;
+      }
+
+      if (!billing?.id) {
         throw new Error('Billing utama tidak ditemukan.');
       }
 

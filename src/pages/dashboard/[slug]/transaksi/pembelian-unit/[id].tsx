@@ -57,6 +57,21 @@ export default function PurchaseDetailPage() {
   const isAlreadyReceived = PURCHASE_RECEIVED_STATE_SET.has(currentStockState);
   const canReceive = isPaid && !isAlreadyReceived && !isRefunded;
   const unitItems = unitItemsResponse?.data ?? [];
+  const resolvedBillingHistories =
+    billingHistories.length > 0
+      ? billingHistories
+      : (purchase?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
+          id: String(history.id ?? ''),
+          unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? purchase?.unit_transaction_billing?.id ?? ''),
+          unit_transaction_id: purchase?.id,
+          bca_payment_amount: Number(history.bca_payment_amount ?? 0),
+          cash_payment_amount: Number(history.cash_payment_amount ?? 0),
+          bca_payment_usd_amount: Number(history.bca_payment_usd_amount ?? 0),
+          payment_at: String(history.payment_at ?? ''),
+          note: history.note,
+          created_at: history.created_at,
+          updated_at: history.updated_at,
+        }));
 
   useEffect(() => {
     if (router.query.print === 'true' && !isLoading && purchase) {
@@ -249,7 +264,7 @@ export default function PurchaseDetailPage() {
         <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} />
 
         {/* PAYMENT HISTORY TABLE */}
-        {billingHistories && billingHistories.length > 0 && (
+        {resolvedBillingHistories.length > 0 && (
           <div className="space-y-3">
             <div>
               <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>
@@ -268,7 +283,7 @@ export default function PurchaseDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {billingHistories.map((history, index) => {
+                  {resolvedBillingHistories.map((history, index) => {
                     const paymentDate = history.payment_at
                       ? new Date(history.payment_at).toLocaleDateString('id-ID', {
                           day: '2-digit',

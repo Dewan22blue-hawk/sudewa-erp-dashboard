@@ -3,6 +3,8 @@ import {
   CreateUnitTransactionItemPayload,
   UpdateUnitTransactionItemPayload,
 } from '@/@types/unit-transaction.types';
+import { useCompany } from '@/contexts/CompanyContext';
+import { companyQueryKeys } from '@/lib/query/company-key';
 import { unitTransactionItemService } from '@/services/unitTransactionItem.service';
 
 export const usePurchaseUnitItems = (purchaseId?: string) => {
@@ -25,9 +27,13 @@ export const useSalesItemsByWarehouse = (warehouseId?: string | number) => {
 
 export const useCreateUnitItem = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
   return useMutation({
     mutationFn: (payload: CreateUnitTransactionItemPayload) => unitTransactionItemService.createItem(payload),
     onSuccess: (data) => {
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
@@ -39,12 +45,16 @@ export const useCreateUnitItem = () => {
 
 export const useUpdateUnitItem = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateUnitTransactionItemPayload }) => unitTransactionItemService.updateItem(id, payload),
     onSuccess: (data, variables) => {
       const transactionId = String(data.unit_transaction_id ?? variables.payload.unit_transaction_id ?? '');
 
       if (transactionId) {
+        if (companyId) {
+          queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+        }
         queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', transactionId] });
         queryClient.invalidateQueries({ queryKey: ['purchase-by-id', transactionId] });
         queryClient.invalidateQueries({ queryKey: ['unit-transaction', transactionId] });
@@ -58,9 +68,13 @@ export const useUpdateUnitItem = () => {
 
 export const useDeleteUnitItem = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
   return useMutation({
     mutationFn: ({ id, purchaseId }: { id: string; purchaseId: string }) => unitTransactionItemService.deleteItem(id).then(() => ({ purchaseId })),
     onSuccess: ({ purchaseId }) => {
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
@@ -72,9 +86,13 @@ export const useDeleteUnitItem = () => {
 
 export const useBulkDeleteUnitItem = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
   return useMutation({
     mutationFn: ({ ids, purchaseId }: { ids: string[]; purchaseId: string }) => unitTransactionItemService.bulkDelete(ids).then(() => ({ purchaseId })),
     onSuccess: ({ purchaseId }) => {
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
