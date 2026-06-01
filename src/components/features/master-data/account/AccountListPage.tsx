@@ -102,10 +102,33 @@ export const AccountListPage = () => {
     setBulkForm(initialBulkFormValues);
   };
 
+  const translateValidationMessage = (message: string, field: string): string => {
+    const msg = message.toLowerCase();
+    if (msg.includes('already been taken')) {
+      if (field === 'code') return 'Kode akun sudah digunakan.';
+      return 'Nilai ini sudah digunakan.';
+    }
+    if (msg.includes('required')) {
+      if (field === 'code') return 'Kode akun wajib diisi.';
+      if (field === 'name') return 'Nama akun wajib diisi.';
+      if (field === 'account_group_id' || field === 'accountGroupId') return 'Grup akun wajib dipilih.';
+      if (field === 'category') return 'Kategori laporan wajib dipilih.';
+      return 'Kolom ini wajib diisi.';
+    }
+    if (msg.includes('invalid') || msg.includes('must be')) {
+      if (field === 'category') return 'Kategori laporan yang dipilih tidak valid.';
+      if (field === 'account_group_id' || field === 'accountGroupId') return 'Grup akun yang dipilih tidak valid.';
+      return 'Nilai yang dimasukkan tidak valid.';
+    }
+    return message;
+  };
+
   const mapValidationErrors = (error: ApiValidationError) => {
     Object.entries(error.fieldErrors).forEach(([field, messages]) => {
       const mappedField = field === 'account_group_id' ? 'accountGroupId' : field;
-      form.setError(mappedField as keyof AccountFormValues, { message: messages?.[0] || 'Validasi gagal' });
+      const originalMessage = messages?.[0] || 'Validasi gagal';
+      const translatedMessage = translateValidationMessage(originalMessage, field);
+      form.setError(mappedField as keyof AccountFormValues, { message: translatedMessage });
     });
   };
 
@@ -154,7 +177,11 @@ export const AccountListPage = () => {
       console.error('[Create/Update Account Error]:', error);
       if (error instanceof ApiValidationError) {
         mapValidationErrors(error);
-        toast.error(error.message || 'Validasi gagal');
+        let mainMessage = error.message;
+        if (mainMessage.toLowerCase().includes('validation') || mainMessage.toLowerCase().includes('given data was invalid')) {
+          mainMessage = 'Gagal menyimpan data karena validasi tidak terpenuhi.';
+        }
+        toast.error(mainMessage);
         return;
       }
 

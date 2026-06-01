@@ -29,7 +29,7 @@ export interface Account {
 
   // Legacy fields (soft-deprecated)
   group?: string;
-  category?: AccountCategory;
+  category?: AccountCategory | null;
   cashFlow?: AccountCategory;
   accountType?: AccountType; // Klasifikasi Aktiva/Pasiva
   parentId?: string | null; // Hierarchy support
@@ -46,7 +46,7 @@ export interface AccountPayload {
   name: string;
   description?: string | null;
   type?: AccountTypeValue;
-  category?: AccountCategory;
+  category?: AccountCategory | null;
 }
 
 export interface AccountListResponse extends PaginatedResult<Account> {}

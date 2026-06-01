@@ -100,13 +100,14 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                 name="category"
                 render={({ field }) => (
                 <FormItem className="space-y-1.5">
-                  <FormLabel className="text-xs font-semibold text-slate-700">Kategori Laporan<RequiredMark /></FormLabel>
+                  <FormLabel className="text-xs font-semibold text-slate-700">Kategori Laporan</FormLabel>
                   <FormControl>
-                    <Select value={field.value ?? ''} onValueChange={(val) => field.onChange(val)}>
+                    <Select value={field.value ?? ''} onValueChange={(val) => field.onChange(val === 'none' ? undefined : val)}>
                       <SelectTrigger className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus:ring-slate-300 bg-white">
-                        <SelectValue placeholder="Select an item" />
+                        <SelectValue placeholder="Pilih Kategori Laporan (Opsional)" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none" className="text-sm text-slate-500">Pilih Kategori Laporan (Opsional)</SelectItem>
                         {ACCOUNT_CATEGORY_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value} className="text-sm">
                             {option.label}
