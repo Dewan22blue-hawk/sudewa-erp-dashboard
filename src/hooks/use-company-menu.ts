@@ -56,15 +56,35 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
 
         // Normalize name/slug to match key in map
         const compSlug = (currentCompany.slug || currentCompany.name || '').toLowerCase();
+        const isTransindo = compSlug.includes('transindo');
 
         // Mapping logik
         let baseMenus: MenuItem[] = [];
-        if (compSlug.includes('transindo')) {
+        if (isTransindo) {
             baseMenus = companyMenuMap['transindo'](slug);
         } else if (compSlug.includes('yanotama')) {
             baseMenus = companyMenuMap['yanotama'](slug);
         } else {
             baseMenus = companyMenuMap.default(slug);
+        }
+
+        // Filter out 'Perlengkapan Masuk', 'Perlengkapan Keluar', and 'Stock/Stok Perlengkapan' submenus from Warehouse if not Wajira Transindo
+        if (!isTransindo) {
+            baseMenus = baseMenus.map((menu) => {
+                if (menu.label === 'Warehouse' && menu.children) {
+                    return {
+                        ...menu,
+                        children: menu.children.filter(
+                            (child) =>
+                                child.label.toLowerCase() !== 'perlengkapan masuk' &&
+                                child.label.toLowerCase() !== 'perlengkapan keluar' &&
+                                child.label.toLowerCase() !== 'stock perlengkapan' &&
+                                child.label.toLowerCase() !== 'stok perlengkapan'
+                        ),
+                    };
+                }
+                return menu;
+            });
         }
 
         // Fallback if no specific menu
