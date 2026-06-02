@@ -64,6 +64,7 @@ export default function PurchaseDetailPage() {
           id: String(history.id ?? ''),
           unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? purchase?.unit_transaction_billing?.id ?? ''),
           unit_transaction_id: purchase?.id,
+          payment_proof: history.payment_proof ?? null,
           bca_payment_amount: Number(history.bca_payment_amount ?? 0),
           cash_payment_amount: Number(history.cash_payment_amount ?? 0),
           bca_payment_usd_amount: Number(history.bca_payment_usd_amount ?? 0),
@@ -300,8 +301,8 @@ export default function PurchaseDetailPage() {
                       <tr key={history.id ?? index} className="border-b border-slate-200 hover:bg-slate-50">
                         <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
                         <td className="px-4 py-3 text-slate-900">
-                          {history.note ? (
-                            <a href="#" className="text-blue-600 hover:underline text-xs font-medium">
+                          {history.payment_proof ? (
+                            <a href={history.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs font-medium">
                               Lihat
                             </a>
                           ) : (

@@ -50,6 +50,7 @@ type UnitTransactionApiModel = {
     unit_transaction_billing_histories?: Array<{
       id?: number | string;
       unit_transaction_billing_id?: number | string;
+      payment_proof?: string | null;
       bca_payment_amount?: number | string;
       cash_payment_amount?: number | string;
       bca_payment_usd_amount?: number | string;
@@ -125,6 +126,7 @@ const toNumber = (value: string | number | undefined): number => Number(value ??
 const mapBillingHistoryRow = (row: NonNullable<NonNullable<UnitTransactionApiModel['unit_transaction_billing']>['unit_transaction_billing_histories']>[number]) => ({
   id: String(row.id ?? ''),
   unit_transaction_billing_id: String(row.unit_transaction_billing_id ?? ''),
+  payment_proof: row.payment_proof ?? null,
   bca_payment_amount: toNumber(row.bca_payment_amount),
   cash_payment_amount: toNumber(row.cash_payment_amount),
   bca_payment_usd_amount: toNumber(row.bca_payment_usd_amount),

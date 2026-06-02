@@ -11,6 +11,7 @@ export interface UnitTransactionBilling {
   unit_transaction_billing_histories?: Array<{
     id?: string;
     unit_transaction_billing_id?: string;
+    payment_proof?: string | null;
     bca_payment_amount?: number;
     cash_payment_amount?: number;
     bca_payment_usd_amount?: number;

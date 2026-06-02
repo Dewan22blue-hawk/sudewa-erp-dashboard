@@ -52,6 +52,7 @@ type UnitBillingApiModel = {
 type UnitBillingHistoryApiModel = {
   id?: string | number;
   unit_transaction_billing_id?: string | number;
+  payment_proof?: string | null;
   bca_payment_amount?: string | number;
   cash_payment_amount?: string | number;
   bca_payment_usd_amount?: string | number;
@@ -63,6 +64,16 @@ type UnitBillingHistoryApiModel = {
     id?: string | number;
     unit_transaction_id?: string | number;
   };
+  cashes?: Array<{
+    id?: string | number;
+    uuid?: string;
+    code?: string;
+    pivot?: {
+      unit_transaction_billing_history_id?: string | number;
+      cash_id?: string | number;
+      amount?: string | number;
+    };
+  }>;
   data?: UnitBillingHistoryApiModel;
 };
 
@@ -172,15 +183,40 @@ const unwrapBillingHistory = (payload: any): UnitBillingHistoryApiModel => {
   return payload as UnitBillingHistoryApiModel;
 };
 
+const getHistoryAmountFromCashes = (item: UnitBillingHistoryApiModel, codes: string[]): number => {
+  const rows = Array.isArray(item.cashes) ? item.cashes : [];
+  return rows
+    .filter((cash) => {
+      const code = String(cash.code ?? '').toLowerCase();
+      return codes.includes(code);
+    })
+    .reduce((sum, cash) => sum + toSafeNumber(cash.pivot?.amount), 0);
+};
+
 const mapBillingHistory = (raw: UnitBillingHistoryApiModel): UnitBillingHistory => {
   const item = unwrapBillingHistory(raw);
+  const cashPayment = Math.max(toSafeNumber(item.cash_payment_amount), getHistoryAmountFromCashes(item, ['cash_idr', 'cash']));
+  const bcaPayment = Math.max(toSafeNumber(item.bca_payment_amount), getHistoryAmountFromCashes(item, ['bca_idr', 'bca']));
+  const bcaPaymentUsd = Math.max(toSafeNumber(item.bca_payment_usd_amount), getHistoryAmountFromCashes(item, ['bca_usd', 'usd']));
+
   return {
     id: String(item.id ?? ''),
     unit_transaction_billing_id: String(item.unit_transaction_billing_id ?? item.unit_transaction_billing?.id ?? ''),
     unit_transaction_id: item.unit_transaction_billing?.unit_transaction_id ? String(item.unit_transaction_billing.unit_transaction_id) : undefined,
-    bca_payment_amount: Number(item.bca_payment_amount ?? 0),
-    cash_payment_amount: Number(item.cash_payment_amount ?? 0),
-    bca_payment_usd_amount: Number(item.bca_payment_usd_amount ?? 0),
+    payment_proof: item.payment_proof ?? null,
+    bca_payment_amount: bcaPayment,
+    cash_payment_amount: cashPayment,
+    bca_payment_usd_amount: bcaPaymentUsd,
+    payment_methods: [
+      ...(bcaPayment > 0 ? ['BCA IDR'] : []),
+      ...(bcaPaymentUsd > 0 ? ['BCA USD'] : []),
+      ...(cashPayment > 0 ? ['Cash'] : []),
+    ],
+    cashes: (item.cashes ?? []).map((cash) => ({
+      id: String(cash.id ?? ''),
+      code: cash.code,
+      amount: toSafeNumber(cash.pivot?.amount),
+    })),
     payment_at: String(item.payment_at ?? ''),
     note: item.note,
     created_at: item.created_at,

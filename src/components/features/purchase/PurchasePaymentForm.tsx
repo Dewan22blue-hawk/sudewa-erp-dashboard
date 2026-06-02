@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale/id';
-import { CalendarIcon, Save, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,12 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
@@ -111,6 +107,10 @@ export function PurchasePaymentForm({
     };
 
     const getPaymentMethods = (item: UnitBillingHistory): string[] => {
+        if (Array.isArray(item.payment_methods) && item.payment_methods.length > 0) {
+            return item.payment_methods;
+        }
+
         const methods: string[] = [];
         if (Number(item.bca_payment_amount ?? 0) > 0) methods.push('BCA IDR');
         if (Number(item.bca_payment_usd_amount ?? 0) > 0) methods.push('BCA USD');
@@ -123,6 +123,7 @@ export function PurchasePaymentForm({
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Kode Beli: {purchaseCode || '-'}</p>
                 <Separator className="my-4" />
             </div>
 
@@ -340,14 +341,16 @@ export function PurchasePaymentForm({
                                     <TableHead>BCA IDR</TableHead>
                                     <TableHead>BCA USD</TableHead>
                                     <TableHead>Cash</TableHead>
+                                    <TableHead>Metode</TableHead>
                                     <TableHead className="text-right">Total</TableHead>
                                     <TableHead>Note</TableHead>
+                                    <TableHead>Bukti</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {histories.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+                                        <TableCell colSpan={8} className="h-20 text-center text-muted-foreground">
                                             Belum ada histori pembayaran
                                         </TableCell>
                                     </TableRow>
@@ -361,8 +364,18 @@ export function PurchasePaymentForm({
                                                 <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                                                 <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
                                                 <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
+                                                <TableCell>{methods.length > 0 ? methods.join(', ') : '-'}</TableCell>
                                                 <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
                                                 <TableCell>{item.note || '-'}</TableCell>
+                                                <TableCell>
+                                                    {item.payment_proof ? (
+                                                        <a href={item.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                                                            Lihat
+                                                        </a>
+                                                    ) : (
+                                                        '-'
+                                                    )}
+                                                </TableCell>
                                             </TableRow>
                                         );
                                     })
