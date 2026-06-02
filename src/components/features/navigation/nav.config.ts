@@ -67,6 +67,10 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           label: 'User',
           href: master('/user'),
         },
+        {
+          label: 'Perlengkapan',
+          href: master('/vehicle-equipment'),
+        },
       ],
     },
     {

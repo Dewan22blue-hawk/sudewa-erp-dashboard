@@ -3,13 +3,23 @@ import { unitTransactionService } from '@/services/unitTransaction.service';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
 
+const unitTransactionKeys = {
+  list: (companyId: string | number, options: { page?: number; perPage?: number; search?: string; status?: string }) =>
+    companyQueryKeys.list(companyId, 'unit-transactions', {
+      page: options.page,
+      perPage: options.perPage,
+      search: options.search,
+      status: options.status,
+    }),
+  detail: (companyId: string | number, id: string) => companyQueryKeys.detail(companyId, 'unit-transactions', id),
+  purchaseDetail: (companyId: string | number, id: string) => companyQueryKeys.detail(companyId, 'purchase-by-id', id),
+};
+
 export const useUnitTransactions = (options: { page?: number; perPage?: number; search?: string; status?: string } = {}) => {
   const { companyId } = useCompany();
 
   return useQuery({
-    queryKey: companyId
-      ? companyQueryKeys.list(companyId, 'unit-transactions', { page: options.page, perPage: options.perPage, search: options.search, status: options.status })
-      : ['unit-transactions', 'unscoped', options],
+    queryKey: companyId ? unitTransactionKeys.list(companyId, options) : ['unit-transactions', 'unscoped', options],
     queryFn: () => unitTransactionService.getUnitTransactions({ page: options.page, perPage: options.perPage, search: options.search, status: options.status, company_id: companyId ?? undefined }),
     placeholderData: (previousData) => previousData,
     refetchOnWindowFocus: false,
@@ -22,7 +32,7 @@ export const useUnitTransactionDetail = (id?: string) => {
   const { companyId } = useCompany();
 
   return useQuery({
-    queryKey: companyId ? companyQueryKeys.detail(companyId, 'unit-transactions', id ?? '') : ['unit-transaction', 'unscoped', id],
+    queryKey: companyId ? unitTransactionKeys.detail(companyId, id ?? '') : ['unit-transaction', 'unscoped', id],
     queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string, companyId ?? undefined),
     enabled: !!id && Boolean(companyId),
     staleTime: 1000 * 60 * 5,
@@ -33,7 +43,7 @@ export const usePurchaseById = (id?: string) => {
   const { companyId } = useCompany();
 
   return useQuery({
-    queryKey: companyId ? companyQueryKeys.detail(companyId, 'purchase-by-id', id ?? '') : ['purchase-by-id', 'unscoped', id],
+    queryKey: companyId ? unitTransactionKeys.purchaseDetail(companyId, id ?? '') : ['purchase-by-id', 'unscoped', id],
     queryFn: () => unitTransactionService.getUnitTransactionDetail(id as string, companyId ?? undefined),
     enabled: !!id && Boolean(companyId),
     staleTime: 1000 * 60 * 5,
@@ -67,8 +77,12 @@ export const useUpdateUnitTransactionState = () => {
     onSuccess: (data) => {
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+        queryClient.invalidateQueries({ queryKey: unitTransactionKeys.detail(companyId, data.id) });
+        queryClient.invalidateQueries({ queryKey: unitTransactionKeys.purchaseDetail(companyId, data.id) });
       }
       queryClient.invalidateQueries({ queryKey: ['unit-billings', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-current', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-history', '', data.id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.id] });
     },
   });
@@ -82,10 +96,12 @@ export const useSubmitTransactionAdjustment = () => {
     mutationFn: ({ id, payload }: { id: string; payload: { cashId: string; amount: number; description: string; itemDetailIds: string[] } }) =>
       unitTransactionService.submitTransactionAdjustment(id, payload),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['unit-transaction', variables.id] });
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+        queryClient.invalidateQueries({ queryKey: unitTransactionKeys.detail(companyId, variables.id) });
+        queryClient.invalidateQueries({ queryKey: unitTransactionKeys.purchaseDetail(companyId, variables.id) });
       }
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['transaction-adjustments', variables.id] });
     },
   });

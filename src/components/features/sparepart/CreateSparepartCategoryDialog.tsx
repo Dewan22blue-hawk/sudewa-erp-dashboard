@@ -73,7 +73,7 @@ export function CreateSparepartCategoryDialog({ open, onOpenChange, onCreated }:
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium">Code</label>
+            <label className="text-sm font-medium">Kode Grup</label>
             <Controller control={control} name="code" render={({ field }) => <Input placeholder="Tambahkan kode" value={field.value ?? ''} onChange={field.onChange} onBlur={field.onBlur} />} />
             {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
           </div>

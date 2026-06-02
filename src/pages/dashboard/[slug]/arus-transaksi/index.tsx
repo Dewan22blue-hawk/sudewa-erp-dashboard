@@ -51,7 +51,7 @@ export default function TransactionListPage() {
                 {/* HEADLINE */}
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Arus Transaksi Operasional</h1>
-                    <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
+                    {/* <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p> */}
                 </div>
 
                 {/* SUMMARY CARDS */}

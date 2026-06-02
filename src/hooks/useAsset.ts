@@ -33,14 +33,9 @@ export function useImportAsset() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ file, companyId }: { file: File; companyId?: string | number }) => importAsset(file, companyId),
-        onSuccess: (_data, variables) => {
-            if (variables.companyId !== undefined && variables.companyId !== null) {
-                queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.companyId) });
-            }
-
-            queryClient.invalidateQueries({
-                predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('assets'),
-            });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['company'] });
+            queryClient.invalidateQueries({ queryKey: ['assets'] });
         },
     });
 }
@@ -49,14 +44,9 @@ export function useCreateAsset() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: Partial<AssetPayload>) => createAsset(data),
-        onSuccess: (_data, variables) => {
-            if (variables.company_id !== undefined && variables.company_id !== null) {
-                queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.company_id) });
-            }
-
-            queryClient.invalidateQueries({
-                predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('assets'),
-            });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['company'] });
+            queryClient.invalidateQueries({ queryKey: ['assets'] });
         },
     });
 }
@@ -65,14 +55,9 @@ export function useUpdateAsset() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, data }: { id: string | number; data: Partial<AssetPayload> }) => updateAsset(id, data),
-        onSuccess: (_data, variables) => {
-            if (variables.data.company_id !== undefined && variables.data.company_id !== null) {
-                queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.data.company_id) });
-            }
-
-            queryClient.invalidateQueries({
-                predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('assets'),
-            });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['company'] });
+            queryClient.invalidateQueries({ queryKey: ['assets'] });
         },
     });
 }
@@ -82,9 +67,8 @@ export function useDeleteAsset() {
     return useMutation({
         mutationFn: (id: string | number) => deleteAsset(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('assets'),
-            });
+            queryClient.invalidateQueries({ queryKey: ['company'] });
+            queryClient.invalidateQueries({ queryKey: ['assets'] });
         },
     });
 }

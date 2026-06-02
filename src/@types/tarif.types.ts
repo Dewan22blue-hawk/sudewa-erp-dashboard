@@ -1,10 +1,8 @@
 import type { PaginatedResult } from './pagination.types';
-import type { Customer } from './customer.types';
 
 export interface Tarif {
     id: number;
     uuid?: string;
-    customerId: number;
     loadingIn: string;
     loadingOut: string;
     distance: number;
@@ -16,11 +14,11 @@ export interface Tarif {
     isActive?: boolean;
     createdAt?: string;
     updatedAt?: string;
-    customer?: Partial<Customer>;
+    customerId?: number;
+    customer?: any;
 }
 
 export interface TarifPayload {
-    customer_id: number;
     loading_in: string;
     loading_out: string;
     distance: number;
@@ -33,3 +31,4 @@ export interface TarifPayload {
 }
 
 export type TarifListResponse = PaginatedResult<Tarif>;
+

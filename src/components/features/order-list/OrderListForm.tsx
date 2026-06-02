@@ -631,9 +631,8 @@ export function OrderListForm({
                   <MoneyInput
                     value={field.value}
                     onChangeValue={field.onChange}
-                    disabled
-                    placeholder="Terisi otomatis dari total tarif"
-                    className={`h-12 rounded-xl border-[#E5E7EB] bg-slate-50 ${errors.invoiceBill ? 'border-red-500' : ''}`}
+                    placeholder="Masukkan nominal invoice ekspedisi"
+                    className={`h-12 rounded-xl border-[#E5E7EB] ${errors.invoiceBill ? 'border-red-500' : ''}`}
                   />
                 )}
               />

@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { UpsertUnitBillingPayload } from '@/@types/unit-billing.types';
+import { useCompany } from '@/contexts/CompanyContext';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useUnitBillings } from '@/hooks/useUnitBilling';
+import { companyQueryKeys } from '@/lib/query/company-key';
 import { salesPaymentService } from '@/services/salesPayment.service';
 
 const toNumber = (value: unknown): number => {
@@ -45,6 +47,7 @@ export const usePaymentData = (salesId?: string) => {
 
 export const useSubmitBilling = () => {
   const queryClient = useQueryClient();
+  const { companyId } = useCompany();
 
   return useMutation({
     mutationFn: async (payload: {
@@ -97,7 +100,12 @@ export const useSubmitBilling = () => {
       return { data, mode: 'create' as const };
     },
     onSuccess: (_result, variables) => {
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
       queryClient.invalidateQueries({ queryKey: ['unit-billings', variables.salesId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-current', variables.salesId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-history', '', variables.salesId] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction', variables.salesId] });
       queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item-details-by-transaction', variables.salesId] });

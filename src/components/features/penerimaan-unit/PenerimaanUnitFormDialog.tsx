@@ -30,7 +30,7 @@ export default function PenerimaanUnitFormDialog({ open, onClose }: Props) {
       getSuppliers({
         company_id: companyId || undefined,
         sort_order: 'asc',
-        perPage: 10,
+        perPage: 1000,
       }),
     enabled: Boolean(companyId),
   });

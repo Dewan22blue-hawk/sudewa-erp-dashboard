@@ -150,6 +150,7 @@ const mapDoOrderList = (item: any) => {
     loadContent: toText(firstTarif?.loadContent),
     qty: toNumber(firstTarif?.qty),
     tarifs,
+    vehicleType: String(item?.vehicle_type ?? item?.vehicleType ?? item?.type ?? '').trim().toLowerCase(),
   };
 };
 
@@ -274,7 +275,10 @@ const buildMainPayload = (payload: DoEkspedisiPayload, asUpdate = false) => {
     formData.append('date', payload.date);
     formData.append('vehicle_id', String(payload.vehicle_id));
     formData.append('driver_id', String(payload.driver_id));
-    if (payload.driver_note != null) formData.append('driver_note', payload.driver_note);
+    if (payload.driver_note != null) {
+      formData.append('driver_note', payload.driver_note);
+      formData.append('note', payload.driver_note);
+    }
     return formData;
   }
 
@@ -282,7 +286,10 @@ const buildMainPayload = (payload: DoEkspedisiPayload, asUpdate = false) => {
   params.append('date', payload.date);
   params.append('vehicle_id', String(payload.vehicle_id));
   params.append('driver_id', String(payload.driver_id));
-  if (payload.driver_note != null) params.append('driver_note', payload.driver_note);
+  if (payload.driver_note != null) {
+    params.append('driver_note', payload.driver_note);
+    params.append('note', payload.driver_note);
+  }
   return params;
 };
 

@@ -40,8 +40,25 @@ type UnitTransactionApiModel = {
     other_fee?: number | string;
   }>;
   unit_transaction_billing?: {
+    id?: number | string;
+    unit_transaction_id?: number | string;
+    grand_total?: number | string;
+    total_paid?: number | string;
+    remaining_payment?: number | string;
     is_paid?: boolean;
     payment_at?: string | null;
+    unit_transaction_billing_histories?: Array<{
+      id?: number | string;
+      unit_transaction_billing_id?: number | string;
+      payment_proof?: string | null;
+      bca_payment_amount?: number | string;
+      cash_payment_amount?: number | string;
+      bca_payment_usd_amount?: number | string;
+      payment_at?: string;
+      note?: string;
+      created_at?: string;
+      updated_at?: string;
+    }>;
   } | null;
   billing_summary?: {
     grand_total?: number | string;
@@ -105,6 +122,19 @@ const withBaseFallback = async <T>(
 };
 
 const toNumber = (value: string | number | undefined): number => Number(value ?? 0);
+
+const mapBillingHistoryRow = (row: NonNullable<NonNullable<UnitTransactionApiModel['unit_transaction_billing']>['unit_transaction_billing_histories']>[number]) => ({
+  id: String(row.id ?? ''),
+  unit_transaction_billing_id: String(row.unit_transaction_billing_id ?? ''),
+  payment_proof: row.payment_proof ?? null,
+  bca_payment_amount: toNumber(row.bca_payment_amount),
+  cash_payment_amount: toNumber(row.cash_payment_amount),
+  bca_payment_usd_amount: toNumber(row.bca_payment_usd_amount),
+  payment_at: row.payment_at ?? '',
+  note: row.note,
+  created_at: row.created_at,
+  updated_at: row.updated_at,
+});
 
 const readErrorMessage = (error: any): string => {
   const details = error?.details ?? error?.response?.data?.errors;
@@ -389,6 +419,28 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
     unit_transaction_item_total_dpp: itemDpp || toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
     unit_transaction_item_total_ppn: itemPpn || toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
     unit_transaction_item_bruto_total: itemBruto,
+    billing_summary: item.billing_summary
+      ? {
+          grand_total: toNumber(item.billing_summary.grand_total),
+          total_cash_payment: toNumber(item.billing_summary.total_cash_payment),
+          total_bca_payment: toNumber(item.billing_summary.total_bca_payment),
+          total_paid: toNumber(item.billing_summary.total_paid),
+          remaining_payment: toNumber(item.billing_summary.remaining_payment),
+          is_paid: Boolean(item.billing_summary.is_paid),
+        }
+      : null,
+    unit_transaction_billing: item.unit_transaction_billing
+      ? {
+          id: String(item.unit_transaction_billing.id ?? ''),
+          unit_transaction_id: String(item.unit_transaction_billing.unit_transaction_id ?? item.id ?? ''),
+          grand_total: toNumber(item.unit_transaction_billing.grand_total),
+          total_paid: toNumber(item.unit_transaction_billing.total_paid),
+          remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
+          is_paid: Boolean(item.unit_transaction_billing.is_paid),
+          payment_at: item.unit_transaction_billing.payment_at ?? null,
+          unit_transaction_billing_histories: (item.unit_transaction_billing.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
+        }
+      : null,
     unit_transaction_adjustments: item.unit_transaction_adjustments ?? [],
     unit_transaction_items: item.unit_transaction_items ?? [],
   };

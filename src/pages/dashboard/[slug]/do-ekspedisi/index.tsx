@@ -16,6 +16,50 @@ import {
   useUpdateDoEkspedisi,
 } from '@/hooks/useDoEkspedisi';
 import { useProcessDoExpedition } from '@/hooks/useDoInvoice';
+import { ApiValidationError } from '@/lib/api/response';
+import type { ApiError } from '@/@types/api';
+
+const extractValidationMessages = (error: unknown) => {
+  if (error instanceof ApiValidationError) {
+    const messages = Object.entries(error.fieldErrors ?? {}).flatMap(([field, fieldMessages]) =>
+      (fieldMessages ?? []).map((message) => `${field}: ${message}`),
+    );
+
+    return {
+      title: error.message || 'Validation error',
+      description: messages.join('\n'),
+    };
+  }
+
+  const apiError = error as ApiError & {
+    fieldErrors?: Record<string, string[]>;
+    response?: { data?: { errors?: Record<string, string[]>; message?: string } };
+  };
+
+  const rawFieldErrors =
+    apiError?.fieldErrors ??
+    apiError?.response?.data?.errors ??
+    (typeof apiError?.details === 'object' && apiError.details ? (apiError.details as Record<string, string[]>) : undefined);
+
+  if (rawFieldErrors && typeof rawFieldErrors === 'object') {
+    const messages = Object.entries(rawFieldErrors).flatMap(([field, fieldMessages]) => {
+      if (Array.isArray(fieldMessages)) {
+        return fieldMessages.map((message) => `${field}: ${message}`);
+      }
+      return [`${field}: ${String(fieldMessages)}`];
+    });
+
+    return {
+      title: apiError?.message || apiError?.response?.data?.message || 'Validation error',
+      description: messages.join('\n'),
+    };
+  }
+
+  return {
+    title: apiError?.message || 'Gagal memperbarui DO Ekspedisi',
+    description: '',
+  };
+};
 
 const toApiDate = (value?: Date) => {
   if (!value) return '';
@@ -96,7 +140,10 @@ export default function DOEkspedisiPage() {
       setIsEditOpen(false);
       setSelectedItem(null);
     } catch (error: any) {
-      toast.error(error.message || 'Gagal memperbarui DO Ekspedisi');
+      const validation = extractValidationMessages(error);
+      toast.error(validation.title, {
+        description: validation.description || undefined,
+      });
     }
   };
 

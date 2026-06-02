@@ -83,6 +83,10 @@ const buildCreatePayload = (data: ArmadaPayload) => {
   appendValue(formData, 'stnk_number', data.stnk_number);
   appendValue(formData, 'kir_book', data.kir_book);
 
+  ARMADA_EQUIPMENT_FIELDS.forEach((field) => {
+    appendValue(formData, field, data[field]);
+  });
+
   return formData;
 };
 

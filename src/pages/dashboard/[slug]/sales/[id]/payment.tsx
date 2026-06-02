@@ -342,6 +342,11 @@ export default function PaymentPage() {
       }
 
       if (!billing?.id) {
+        const createdSnapshot = await refetchCurrentBilling();
+        billing = createdSnapshot.data ?? billing ?? null;
+      }
+
+      if (!billing?.id) {
         throw new Error('Billing utama tidak ditemukan.');
       }
 
@@ -546,28 +551,41 @@ export default function PaymentPage() {
                         <TableHead>BCA IDR</TableHead>
                         <TableHead>BCA USD</TableHead>
                         <TableHead>Cash</TableHead>
+                        <TableHead>Metode</TableHead>
                         <TableHead className="text-right">Total</TableHead>
                         <TableHead>Note</TableHead>
+                        <TableHead>Bukti</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {billingHistories.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+                          <TableCell colSpan={8} className="h-20 text-center text-muted-foreground">
                             Belum ada histori pembayaran
                           </TableCell>
                         </TableRow>
                       ) : (
                         billingHistories.map((item) => {
                           const rowTotal = Number(item.bca_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0) + Number(item.cash_payment_amount ?? 0);
+                          const methods = item.payment_methods?.length ? item.payment_methods.join(', ') : '-';
                           return (
                             <TableRow key={item.id}>
                               <TableCell>{item.payment_at ? String(item.payment_at).slice(0, 10) : '-'}</TableCell>
                               <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                               <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
                               <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
+                              <TableCell>{methods}</TableCell>
                               <TableCell className="text-right font-medium">{formatCurrency(rowTotal)}</TableCell>
                               <TableCell>{item.note || '-'}</TableCell>
+                              <TableCell>
+                                {item.payment_proof ? (
+                                  <a href={item.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                                    Lihat
+                                  </a>
+                                ) : (
+                                  '-'
+                                )}
+                              </TableCell>
                             </TableRow>
                           );
                         })

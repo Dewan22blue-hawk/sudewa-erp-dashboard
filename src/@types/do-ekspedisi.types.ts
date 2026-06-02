@@ -25,6 +25,7 @@ export interface DoEkspedisiOrderList {
   loadContent: string;
   qty: number;
   tarifs: DoEkspedisiOrderTarifItem[];
+  vehicleType?: string;
 }
 
 export interface DoEkspedisiOrderTarifItem {

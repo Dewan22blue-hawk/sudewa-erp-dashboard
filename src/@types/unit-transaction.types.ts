@@ -1,8 +1,34 @@
 import { PaginationMeta } from '@/@types/pagination.types';
 
 export interface UnitTransactionBilling {
+  id?: string;
+  unit_transaction_id?: string;
   is_paid?: boolean;
   payment_at?: string | null;
+  grand_total?: number;
+  total_paid?: number;
+  remaining_payment?: number;
+  unit_transaction_billing_histories?: Array<{
+    id?: string;
+    unit_transaction_billing_id?: string;
+    payment_proof?: string | null;
+    bca_payment_amount?: number;
+    cash_payment_amount?: number;
+    bca_payment_usd_amount?: number;
+    payment_at?: string;
+    note?: string;
+    created_at?: string;
+    updated_at?: string;
+  }>;
+}
+
+export interface UnitTransactionBillingSummary {
+  grand_total?: number;
+  total_cash_payment?: number;
+  total_bca_payment?: number;
+  total_paid?: number;
+  remaining_payment?: number;
+  is_paid?: boolean;
 }
 
 export interface UnitTransaction {
@@ -51,6 +77,8 @@ export interface UnitTransactionDetail {
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;
+  billing_summary?: UnitTransactionBillingSummary | null;
+  unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
   unit_transaction_items?: any[];
 }

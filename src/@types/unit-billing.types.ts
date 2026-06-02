@@ -22,9 +22,16 @@ export interface UnitBillingHistory {
   id: string;
   unit_transaction_billing_id: string;
   unit_transaction_id?: string;
+  payment_proof?: string | null;
   bca_payment_amount: number;
   cash_payment_amount: number;
   bca_payment_usd_amount: number;
+  payment_methods?: string[];
+  cashes?: Array<{
+    id: string;
+    code?: string;
+    amount: number;
+  }>;
   payment_at: string;
   note?: string;
   created_at?: string;

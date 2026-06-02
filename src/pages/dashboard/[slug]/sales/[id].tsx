@@ -33,6 +33,22 @@ export default function SalesDetailPage() {
   const totalPaid = salesData?.totalBayar ?? 0;
   const isPaidFromBilling = data?.raw?.billing_summary?.is_paid || data?.raw?.unit_transaction_billing?.is_paid;
   const isPaid = Boolean(isPaidFromBilling) || (totalPaid >= totalTagihan && totalTagihan > 0);
+  const resolvedBillingHistories =
+    billingHistories.length > 0
+      ? billingHistories
+      : (data?.raw?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
+          id: String(history.id ?? ''),
+          unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? data?.raw?.unit_transaction_billing?.id ?? ''),
+          unit_transaction_id: String(salesId ?? ''),
+          payment_proof: history.payment_proof ?? null,
+          bca_payment_amount: Number(history.bca_payment_amount ?? 0),
+          cash_payment_amount: Number(history.cash_payment_amount ?? 0),
+          bca_payment_usd_amount: Number(history.bca_payment_usd_amount ?? 0),
+          payment_at: String(history.payment_at ?? ''),
+          note: history.note,
+          created_at: history.created_at,
+          updated_at: history.updated_at,
+        }));
 
   const mappedDetail = data?.raw
     ? mapSalesDetailCard(data.raw)
@@ -147,7 +163,7 @@ export default function SalesDetailPage() {
         <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} />
 
         {/* PAYMENT HISTORY TABLE */}
-        {billingHistories && billingHistories.length > 0 && (
+        {resolvedBillingHistories.length > 0 && (
           <div className="space-y-3">
             <div>
               <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>
@@ -166,7 +182,7 @@ export default function SalesDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {billingHistories.map((history, index) => {
+                  {resolvedBillingHistories.map((history, index) => {
                     const paymentDate = history.payment_at
                       ? new Date(history.payment_at).toLocaleDateString('id-ID', {
                           day: '2-digit',
@@ -183,8 +199,8 @@ export default function SalesDetailPage() {
                       <tr key={history.id ?? index} className="border-b border-slate-200 hover:bg-slate-50">
                         <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
                         <td className="px-4 py-3 text-slate-900">
-                          {history.note ? (
-                            <a href="#" className="text-blue-600 hover:underline text-xs font-medium">
+                          {history.payment_proof ? (
+                            <a href={history.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs font-medium">
                               Lihat
                             </a>
                           ) : (

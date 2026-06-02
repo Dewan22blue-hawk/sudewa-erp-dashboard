@@ -75,7 +75,7 @@ export function DOEkspedisiEditDialog({
   }, [item, reset]);
 
   const mergedVehicleOptions = React.useMemo(() => {
-    const selectedVehicleType = item?.vehicle?.type?.trim().toLowerCase() ?? '';
+    const selectedVehicleType = (item?.orderList?.vehicleType || item?.vehicle?.type || '').trim().toLowerCase();
     const filteredVehicleOptions = selectedVehicleType
       ? vehicleOptions.filter((option) => String(option.subtitle ?? '').trim().toLowerCase() === selectedVehicleType)
       : vehicleOptions;
@@ -86,7 +86,7 @@ export function DOEkspedisiEditDialog({
     if (filteredVehicleOptions.some((option) => option.value === String(item.vehicleId))) return filteredVehicleOptions;
 
     return [currentVehicleOption, ...filteredVehicleOptions];
-  }, [item?.vehicle, item?.vehicleId, vehicleOptions]);
+  }, [item?.orderList?.vehicleType, item?.vehicle, item?.vehicleId, vehicleOptions]);
 
   const mergedDriverOptions = React.useMemo(() => {
     if (!item?.driver || driverOptions.some((option) => option.value === String(item.driverId))) return driverOptions;
@@ -94,6 +94,12 @@ export function DOEkspedisiEditDialog({
   }, [driverOptions, item?.driver, item?.driverId]);
 
   const selectedVehicle = mergedVehicleOptions.find((option) => option.value === watch('vehicleId'));
+
+  const vehicleTypeDisplay = React.useMemo(() => {
+    const rawType = selectedVehicle?.subtitle || item?.orderList?.vehicleType || item?.vehicle?.type || '';
+    if (!rawType) return '-';
+    return rawType.charAt(0).toUpperCase() + rawType.slice(1);
+  }, [selectedVehicle?.subtitle, item?.orderList?.vehicleType, item?.vehicle?.type]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -175,7 +181,7 @@ export function DOEkspedisiEditDialog({
 
           <div className="space-y-2">
             <Label>Tipe Armada</Label>
-            <Input readOnly value={selectedVehicle?.subtitle || item?.vehicle?.type || '-'} className="h-9 rounded-lg border-slate-200 bg-white text-slate-500" />
+            <Input readOnly value={vehicleTypeDisplay} className="h-9 rounded-lg border-slate-200 bg-white text-slate-500" />
           </div>
 
           <div className="space-y-2">

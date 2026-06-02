@@ -51,6 +51,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 {
                     label: 'BBN',
                     href: base('/master/bbn'),
+                },
+                {
+                    label: 'Perlengkapan',
+                    href: base('/master/vehicle-equipment'),
                 }
             ],
         },

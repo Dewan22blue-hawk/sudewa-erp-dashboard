@@ -23,6 +23,7 @@ interface ArmadaTableProps {
   onImport: () => void;
   onEdit: (armada: Armada) => void;
   onDelete: (armada: Armada) => void;
+  onDetail?: (armada: Armada) => void;
 }
 
 const formatDate = (value?: string | null) => {
@@ -74,6 +75,7 @@ export function ArmadaTable({
   onImport,
   onEdit,
   onDelete,
+  onDetail,
 }: ArmadaTableProps) {
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
@@ -196,6 +198,11 @@ export function ArmadaTable({
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-[160px]">
+                            {onDetail && (
+                              <DropdownMenuItem onClick={() => onDetail(armada)} className="cursor-pointer">
+                                Detail
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem onClick={() => onEdit(armada)} className="cursor-pointer">
                               Edit
                             </DropdownMenuItem>

@@ -52,6 +52,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Aset',
           href: base('/master/asset'),
         },
+        {
+          label: 'Perlengkapan',
+          href: base('/master/vehicle-equipment'),
+        },
       ],
     },
     {

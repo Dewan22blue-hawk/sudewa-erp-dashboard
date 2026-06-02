@@ -33,24 +33,24 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] rounded-[24px] border-0 p-0 shadow-2xl sm:max-w-[540px]" showCloseButton={false}>
-        <DialogHeader className="space-y-1 border-b border-slate-100 px-5 pb-0 pt-5 text-left sm:px-6">
-          <DialogTitle className="text-[1.55rem] font-semibold tracking-[-0.03em] text-slate-950">{title}</DialogTitle>
-          <DialogDescription className="pb-5 text-sm text-slate-500">{description}</DialogDescription>
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-[480px] rounded-2xl border-0 p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" showCloseButton={false}>
+        <DialogHeader className="space-y-1 border-b border-slate-100 px-5 py-4 text-left sm:px-6 flex-shrink-0">
+          <DialogTitle className="text-lg font-semibold tracking-tight text-slate-950">{title}</DialogTitle>
+          <DialogDescription className="text-xs text-slate-500">{description}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-5 pb-5 pt-5 sm:px-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3.5 px-5 py-4 sm:px-6 overflow-y-auto flex-1 bg-white">
             <FormField
               control={form.control}
               name="code"
               render={({ field }) => (
-                <FormItem className="space-y-2.5">
-                  <FormLabel className="text-sm font-semibold text-slate-900">Kode Akun<RequiredMark /></FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-xs font-semibold text-slate-700">Kode Akun<RequiredMark /></FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan kode akun" className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus-visible:ring-slate-300" {...field} />
+                    <Input placeholder="Masukkan kode akun" className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
                 )}
               />
@@ -59,8 +59,8 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                 control={form.control}
                 name="accountGroupId"
                 render={({ field }) => (
-                <FormItem className="space-y-2.5">
-                  <FormLabel className="text-sm font-semibold text-slate-900">Grup Akun<RequiredMark /></FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-xs font-semibold text-slate-700">Grup Akun<RequiredMark /></FormLabel>
                   <FormControl>
                   <div className="flex items-center gap-2">
                     <div className="flex-1">
@@ -76,21 +76,21 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                       searchPlaceholder="Cari grup akun..."
                       emptyText="Grup akun tidak ditemukan."
                       loading={isLoadingGroups}
-                      className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus-visible:ring-slate-300"
+                      className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white"
                     />
                     </div>
                     <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    className="h-12 w-12 flex-shrink-0 rounded-xl border-slate-200 text-slate-900 shadow-none hover:bg-slate-50"
+                    className="h-10 w-10 flex-shrink-0 rounded-lg border-slate-200 text-slate-700 shadow-none hover:bg-slate-50"
                     onClick={() => setOpenCreateGroup(true)}
                     >
                     <Plus className="h-4 w-4" />
                     </Button>
                   </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
                 )}
               />
@@ -99,23 +99,24 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                <FormItem className="space-y-2.5">
-                  <FormLabel className="text-sm font-semibold text-slate-900">Kategori Laporan<RequiredMark /></FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-xs font-semibold text-slate-700">Kategori Laporan</FormLabel>
                   <FormControl>
-                    <Select value={field.value ?? ''} onValueChange={(val) => field.onChange(val)}>
-                      <SelectTrigger className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus:ring-slate-300">
-                        <SelectValue placeholder="Select an item" />
+                    <Select value={field.value ?? ''} onValueChange={(val) => field.onChange(val === 'none' ? undefined : val)}>
+                      <SelectTrigger className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus:ring-slate-300 bg-white">
+                        <SelectValue placeholder="Pilih Kategori Laporan (Opsional)" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none" className="text-sm text-slate-500">Pilih Kategori Laporan (Opsional)</SelectItem>
                         {ACCOUNT_CATEGORY_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem key={option.value} value={option.value} className="text-sm">
                             {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
@@ -124,12 +125,12 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem className="space-y-2.5">
-                  <FormLabel className="text-sm font-semibold text-slate-900">Nama Akun<RequiredMark /></FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-xs font-semibold text-slate-700">Nama Akun<RequiredMark /></FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan nama akun" className="h-12 rounded-xl border-slate-200 px-4 text-sm shadow-none focus-visible:ring-slate-300" {...field} />
+                    <Input placeholder="Masukkan nama akun" className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
@@ -138,21 +139,21 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem className="space-y-2.5">
-                  <FormLabel className="text-sm font-semibold text-slate-900">Deskripsi</FormLabel>
+                <FormItem className="space-y-1.5">
+                  <FormLabel className="text-xs font-semibold text-slate-700">Deskripsi</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Tulis deskripsi di sini" className="min-h-[92px] resize-none rounded-xl border-slate-200 px-4 py-3 text-sm shadow-none focus-visible:ring-slate-300" rows={4} {...field} />
+                    <Textarea placeholder="Tulis deskripsi di sini" className="min-h-[72px] resize-none rounded-lg border-slate-200 px-3 py-2 text-sm shadow-none focus-visible:ring-slate-300 bg-white" rows={3} {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
 
-            <div className="flex flex-col gap-3 pt-2">
-              <Button type="submit" className={cn('h-12 w-full rounded-xl bg-[#1F3B5B] text-sm font-semibold text-white hover:bg-[#1B3450]')} disabled={isSubmitting}>
+            <div className="flex flex-col gap-2 pt-3 flex-shrink-0">
+              <Button type="submit" className={cn('h-10 w-full rounded-lg bg-[#1F3B5B] text-sm font-semibold text-white hover:bg-[#1B3450]')} disabled={isSubmitting}>
                 {isSubmitting ? 'Menyimpan...' : submitLabel}
               </Button>
-              <Button type="button" variant="outline" className="h-12 w-full rounded-xl border-slate-200 text-sm font-semibold text-slate-900 shadow-none hover:bg-slate-50" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" className="h-10 w-full rounded-lg border-slate-200 text-sm font-semibold text-slate-700 shadow-none hover:bg-slate-50" onClick={() => onOpenChange(false)}>
                 Batal
               </Button>
             </div>

@@ -61,7 +61,7 @@ export default function TransactionListPage() {
         {/* HEADLINE */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Arus Transaksi Operasional</h1>
-          <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
+          {/* <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p> */}
           <p className="mt-2 text-sm text-muted-foreground">
             Data diperbarui otomatis setiap {LIVE_REFRESH_SECONDS} detik dan akan sinkron lagi saat tab aktif kembali.
             {' '}

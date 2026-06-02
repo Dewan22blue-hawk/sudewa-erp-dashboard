@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { formatMoneyInput, parseMoneyInput } from '@/lib/utils/money-input';
 
-type MoneyInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+type MoneyInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'> & {
   value?: number | null;
   onChangeValue: (value: number) => void;
 };
