@@ -36,6 +36,8 @@ type SalesCreateFormState = {
   price: number;
 };
 
+const DEFAULT_WAREHOUSE_ID = 1;
+
 export default function CreateSalesPage() {
   const router = useRouter();
   const { companyId } = useCompany();
@@ -163,6 +165,7 @@ export default function CreateSalesPage() {
     const transactionPayload = {
       company_id: companyIdNumber,
       person_id: customerId,
+      warehouse_id: DEFAULT_WAREHOUSE_ID,
       code: form.code,
       type: 'sales' as const,
       max_capacity: qty,

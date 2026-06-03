@@ -7,7 +7,7 @@ import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.sch
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
-import { useCreateUnitItem, useSalesItemsByWarehouse } from '@/hooks/useUnitTransactionItem';
+import { useCreateUnitItem, usePurchaseUnitItems, useSalesItemsByWarehouse } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -26,6 +26,15 @@ export default function CreateUnitPage() {
   const warehouseId = salesDetail?.raw?.warehouse?.id ?? salesDetail?.raw?.warehouse_id;
 
   const { data: stockItems, isLoading: isLoadingStockItems } = useSalesItemsByWarehouse(warehouseId);
+  const { data: salesItemsResponse } = usePurchaseUnitItems(salesId);
+
+  const existingTypeUnitIds = useMemo(
+    () =>
+      (salesItemsResponse?.data ?? [])
+        .map((item) => (item.unit_type_id ? String(item.unit_type_id) : ''))
+        .filter((value): value is string => Boolean(value)),
+    [salesItemsResponse],
+  );
 
   const availableTypeIds = useMemo(() => {
     return new Set((stockItems ?? []).map((item) => String(item.unit_type_id ?? '')).filter(Boolean));
@@ -55,8 +64,22 @@ export default function CreateUnitPage() {
         return;
       }
 
+      if (existingTypeUnitIds.includes(unitTypeId)) {
+        toast.error('Tipe unit sudah ada di transaksi ini. Pilih tipe unit lain.');
+        return;
+      }
+
       if (qty <= 0) {
         toast.error('QTY minimal 1');
+        return;
+      }
+
+      const maxCapacity = Number(salesDetail?.raw?.max_capacity ?? 0);
+      const usedQty = (salesItemsResponse?.data ?? []).reduce((acc, item) => acc + Number(item.qty_total ?? 0), 0);
+      const remainingCapacity = Math.max(0, maxCapacity - usedQty);
+
+      if (maxCapacity > 0 && qty > remainingCapacity) {
+        toast.error(`Qty melebihi kapasitas sisa transaksi. Sisa kapasitas: ${remainingCapacity}`);
         return;
       }
 
