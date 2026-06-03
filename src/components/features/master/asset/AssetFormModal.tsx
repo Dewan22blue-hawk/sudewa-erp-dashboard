@@ -11,7 +11,7 @@ import { MoneyInput } from '@/components/ui/money-input';
 export interface AssetFormData {
     company_id: number;
     name: string;
-    code: string;
+    code?: string;
     purchase_date: string;
     type: AssetType;
     price: string | number;
@@ -72,11 +72,11 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         <Label htmlFor="code" className="text-gray-900 font-medium">Kode Aset</Label>
                         <Input
                             id="code"
-                            placeholder="Contoh: AST-WJR0001"
-                            {...register('code', { required: 'Kode aset wajib diisi' })}
+                            placeholder="Kosongkan jika ingin auto generate dari backend"
+                            {...register('code')}
                             className={errors.code ? 'border-red-500' : ''}
                         />
-                        {errors.code && <p className="text-red-500 text-xs">{errors.code.message}</p>}
+                        <p className="text-xs text-gray-500">Opsional. Jika dikosongkan, kode aset akan dibuat otomatis oleh backend.</p>
                     </div>
 
                     {/* Tanggal Beli */}
