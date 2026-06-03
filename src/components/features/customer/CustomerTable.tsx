@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDate } from '@/lib/utils/format';
 import { cn } from '@/lib/utils';
 import { Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
 
@@ -114,14 +115,17 @@ export function CustomerTable({
 
       <Card className="overflow-hidden rounded-xl border border-[#D4D4D8] bg-white shadow-none">
         <div className="overflow-x-auto">
-          <Table className="min-w-[980px]">
+          <Table className="min-w-[1200px]">
             <TableHeader>
               <TableRow className="border-b border-[#E4E4E7] bg-[#F1F5F9] hover:bg-[#F1F5F9]">
+                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Kode</TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Nama Customer</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Alamat</TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">PIC</TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Phone</TableHead>
+                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">NPWP</TableHead>
+                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Alamat</TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Maps</TableHead>
+                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Created At</TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -130,7 +134,7 @@ export function CustomerTable({
               {isLoading ? (
                 Array.from({ length: Math.max(3, perPage > 3 ? 3 : perPage) }).map((_, index) => (
                   <TableRow key={index} className="border-b border-[#E4E4E7]">
-                    <TableCell colSpan={6} className="px-7 py-5">
+                    <TableCell colSpan={9} className="px-7 py-5">
                       <div className="h-10 animate-pulse rounded-lg bg-[#F4F4F5]" />
                     </TableCell>
                   </TableRow>
@@ -138,17 +142,23 @@ export function CustomerTable({
               ) : customers.length > 0 ? (
                 customers.map((customer) => (
                   <TableRow key={customer.id} className="border-b border-[#E4E4E7] align-top hover:bg-[#FAFAFA]">
+                    <TableCell className="px-7 py-4 text-center text-[15px] font-medium leading-6 text-[#171717]">
+                      <div className="mx-auto max-w-[160px] break-words">{customer.code || '-'}</div>
+                    </TableCell>
                     <TableCell className="px-7 py-4 text-center text-[15px] font-medium uppercase leading-6 text-[#171717]">
                       <div className="mx-auto max-w-[220px] break-words">{customer.name}</div>
-                    </TableCell>
-                    <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
-                      <div className="mx-auto max-w-[240px] whitespace-pre-line break-words">{customer.address || '-'}</div>
                     </TableCell>
                     <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
                       <div className="mx-auto max-w-[140px] break-words">{customer.pic || '-'}</div>
                     </TableCell>
                     <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
                       <div className="mx-auto max-w-[140px] break-words">{customer.phone || '-'}</div>
+                    </TableCell>
+                    <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
+                      <div className="mx-auto max-w-[180px] break-words">{customer.npwp || '-'}</div>
+                    </TableCell>
+                    <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
+                      <div className="mx-auto max-w-[240px] whitespace-pre-line break-words">{customer.address || '-'}</div>
                     </TableCell>
                     <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
                       {customer.map_link ? (
@@ -163,6 +173,9 @@ export function CustomerTable({
                       ) : (
                         '-'
                       )}
+                    </TableCell>
+                    <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
+                      {customer.createdAt ? formatDate(customer.createdAt) : '-'}
                     </TableCell>
                     <TableCell className="px-7 py-4 text-center">
                       <DropdownMenu>
@@ -185,8 +198,8 @@ export function CustomerTable({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="px-7 py-16 text-center text-[15px] text-[#71717A]">
-                    Tidak ada data customer ditemukan
+                  <TableCell colSpan={9} className="px-7 py-16 text-center text-[15px] text-[#71717A]">
+                    Belum ada data customer untuk company aktif
                   </TableCell>
                 </TableRow>
               )}

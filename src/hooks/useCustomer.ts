@@ -65,8 +65,13 @@ export function useDeleteCustomer() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string | number) => deleteCustomer(id),
-    onSuccess: () => {
+    mutationFn: ({ id }: { id: string | number; companyId?: string | number }) => deleteCustomer(id),
+    onSuccess: (_data, variables) => {
+      if (variables.companyId !== undefined && variables.companyId !== null) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(variables.companyId) });
+        return;
+      }
+
       queryClient.invalidateQueries({
         predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('customers'),
       });

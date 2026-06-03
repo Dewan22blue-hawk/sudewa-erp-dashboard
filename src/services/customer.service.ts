@@ -39,6 +39,21 @@ const mapCustomer = (payload: CustomerApiModel): Customer => ({
   map_link: payload.map_link ?? null,
 });
 
+const normalizeCompanyId = (value: string | number | null | undefined) => {
+  if (value === null || value === undefined || value === '') return null;
+  return String(value);
+};
+
+const filterCustomersByCompany = (customers: CustomerApiModel[], companyId?: string | number) => {
+  const normalizedCompanyId = normalizeCompanyId(companyId);
+
+  if (!normalizedCompanyId) {
+    return customers;
+  }
+
+  return customers.filter((customer) => normalizeCompanyId(customer.company_id) === normalizedCompanyId);
+};
+
 const basePath = '/wapi/master-data/customer';
 
 type PaginatedCustomerResponse = LaravelApiResponse<{
@@ -78,14 +93,16 @@ export const getCustomers = async (
   });
 
   const data = ensureSuccess(response.data);
+  const scopedData = filterCustomersByCompany(data.data ?? [], params.company_id);
+  const isFrontendFallback = scopedData.length !== (data.data ?? []).length;
 
   return toPaginatedResult(
     {
-      data: data.data ?? [],
+      data: scopedData,
       current_page: data.current_page,
       per_page: data.per_page,
-      total: data.total,
-      last_page: data.last_page,
+      total: isFrontendFallback ? scopedData.length : data.total,
+      last_page: isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.per_page ?? 1, 1))) : data.last_page,
     },
     mapCustomer,
   );
