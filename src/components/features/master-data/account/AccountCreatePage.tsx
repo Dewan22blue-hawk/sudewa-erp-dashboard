@@ -7,11 +7,13 @@ import { AccountForm } from './AccountForm';
 import { accountSchema, type AccountFormValues } from '@/scheme/account-master.schema';
 import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useCreateAccount } from '@/hooks/useAccount';
+import { useCompany } from '@/contexts/CompanyContext';
 import { ApiValidationError } from '@/lib/api/response';
 import { toast } from 'sonner';
 
 export const AccountCreatePage = () => {
   const router = useRouter();
+  const { companyId, isLoading: isLoadingCompany } = useCompany();
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
@@ -23,7 +25,13 @@ export const AccountCreatePage = () => {
     } satisfies Partial<AccountFormValues>,
   });
 
-  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({ page: 1, perPage: 100, search: '' });
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
+    page: 1,
+    perPage: 100,
+    search: '',
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId,
+  });
   const createMutation = useCreateAccount();
 
   const handleSubmit = async (values: AccountFormValues) => {

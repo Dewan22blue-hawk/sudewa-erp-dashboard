@@ -9,15 +9,23 @@ import { accountSchema, type AccountFormValues } from '@/scheme/account-master.s
 import { useAccount } from '@/hooks/useAccount';
 import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useUpdateAccount } from '@/hooks/useAccount';
+import { useCompany } from '@/contexts/CompanyContext';
 import { ApiValidationError } from '@/lib/api/response';
 import { toast } from 'sonner';
 
 export const AccountEditPage = () => {
   const router = useRouter();
   const id = router.query.id as string | undefined;
+  const { companyId, isLoading: isLoadingCompany } = useCompany();
 
   const { data, isLoading, isError } = useAccount(id);
-  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({ page: 1, perPage: 100, search: '' });
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
+    page: 1,
+    perPage: 100,
+    search: '',
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId,
+  });
   const updateMutation = useUpdateAccount();
 
   const form = useForm<AccountFormValues>({
