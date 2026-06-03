@@ -29,7 +29,7 @@ interface Props {
 const defaultSparepartValues: SparepartFormValues = {
   code: '',
   name: '',
-  categoryId: 0,
+  categoryId: null,
   unitType: '',
   purchasePrice: 0,
   sellingPrice: 0,
@@ -68,7 +68,7 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
       reset({
         code: sparepart.code || '',
         name: sparepart.name || '',
-        categoryId: sparepart.categoryId ?? sparepart.category?.id ?? 0,
+        categoryId: sparepart.categoryId ?? sparepart.category?.id ?? null,
         unitType: sparepart.unitType ? sparepart.unitType.toLowerCase() : '',
         purchasePrice: sparepart.purchasePrice ?? sparepart.price ?? 0,
         sellingPrice: sparepart.sellingPrice ?? sparepart.price ?? 0,
@@ -86,7 +86,7 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
           ? {
               code: sparepart.code || '',
               name: sparepart.name || '',
-              categoryId: sparepart.categoryId ?? sparepart.category?.id ?? 0,
+              categoryId: sparepart.categoryId ?? sparepart.category?.id ?? null,
               unitType: sparepart.unitType ? sparepart.unitType.toLowerCase() : '',
               purchasePrice: sparepart.purchasePrice ?? sparepart.price ?? 0,
               sellingPrice: sparepart.sellingPrice ?? sparepart.price ?? 0,
@@ -103,7 +103,7 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
       const payload = {
         code: values.code,
         name: values.name,
-        categoryId: Number(values.categoryId),
+        categoryId: values.categoryId ? Number(values.categoryId) : null,
         unitType: values.unitType,
         price: values.sellingPrice || values.purchasePrice,
         capacity: values.capacity ?? 0,
@@ -154,7 +154,7 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1">Grup<RequiredMark /></label>
+              <label className="block text-sm font-bold mb-1">Grup</label>
               <Controller
                 control={control}
                 name="categoryId"
@@ -175,6 +175,16 @@ export function SparepartFormDialog({ open, onOpenChange, sparepart, companyId }
                           <CommandList>
                             <CommandEmpty>Grup tidak ditemukan.</CommandEmpty>
                             <CommandGroup>
+                              <CommandItem
+                                value="tanpa grup"
+                                onSelect={() => {
+                                  field.onChange(null);
+                                  setOpenGroupSelect(false);
+                                }}
+                              >
+                                <Check className={cn('mr-2 h-4 w-4', !field.value ? 'opacity-100' : 'opacity-0')} />
+                                <span className="truncate">Tanpa grup</span>
+                              </CommandItem>
                               {(categories ?? []).map((category) => (
                                 <CommandItem
                                   key={category.id}

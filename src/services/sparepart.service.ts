@@ -104,7 +104,9 @@ const buildPayload = (payload: SparepartPayload, opts?: { asUpdate?: boolean }) 
 
   body.append('code', payload.code);
   body.append('name', payload.name);
-  body.append('sparepart_category_id', String(payload.categoryId));
+  if (payload.categoryId !== undefined && payload.categoryId !== null && Number(payload.categoryId) > 0) {
+    body.append('sparepart_category_id', String(payload.categoryId));
+  }
   body.append('unit_type', payload.unitType);
   const priceValue = payload.price ?? payload.sellingPrice ?? payload.purchasePrice ?? 0;
   const capacityValue = payload.capacity ?? 0;
