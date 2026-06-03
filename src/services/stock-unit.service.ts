@@ -25,7 +25,7 @@ interface StockUnitApiModel {
 
 const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
   id: payload.id.toString(),
-  tipeUnit: payload.unit_type?.unit_type ?? '-',
+  namaUnit: payload.unit_type?.unit_model ?? payload.unit_type?.name ?? payload.unit_type?.unit_type ?? '-',
   warna: payload.color,
   noMesin: payload.machine_number,
   noRangka: payload.chassis_number,

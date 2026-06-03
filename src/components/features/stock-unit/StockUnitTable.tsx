@@ -138,7 +138,7 @@ export default function StockUnitTable({
             <tr className="border-b border-gray-200">
               <th className="px-4 py-3 text-left">No</th>
               <th className="p-0 text-left">
-                <SortableHeader title="Tipe Unit" sortKey="tipeUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+                <SortableHeader title="Nama Unit" sortKey="namaUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
               </th>
               <th className="p-0 text-left">
                 <SortableHeader title="Warna" sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
@@ -165,7 +165,7 @@ export default function StockUnitTable({
               sortedData.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">{(page - 1) * perPage + index + 1}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{item.tipeUnit}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{item.namaUnit}</td>
                   <td className="px-4 py-3">{item.warna}</td>
                   <td className="px-4 py-3">{item.noMesin}</td>
                   <td className="px-4 py-3">{item.noRangka}</td>
