@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import PurchaseRefundFormModal from './PurchaseRefundFormModal';
 import PurchaseRefundPaymentDetailModal from './PurchaseRefundPaymentDetailModal';
 import { refundInputClassName, refundPrimaryButtonClassName } from './purchase-refund.styles';
+import { RefundPaymentProgressBadge } from '@/components/features/refund/RefundPaymentProgressBadge';
+import { getRefundPaymentProgressStatus } from '@/components/features/refund/refund.utils';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -114,11 +116,16 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
           </div>
         </div>
 
+        <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-slate-200 bg-slate-50 px-4 py-3">
+          <RefundPaymentProgressBadge status={getRefundPaymentProgressStatus(refund)} />
+          <p className="text-sm text-slate-600">Pembayaran refund hanya bisa ditambahkan setelah refund ini tersimpan.</p>
+        </div>
+
         <div className="space-y-5">
           <div className="flex justify-end">
             <Button className={refundPrimaryButtonClassName} onClick={() => setIsAddDetailOpen(true)}>
               <Plus className="h-4 w-4" />
-              Tambah
+              Tambah Pembayaran Refund
             </Button>
           </div>
 

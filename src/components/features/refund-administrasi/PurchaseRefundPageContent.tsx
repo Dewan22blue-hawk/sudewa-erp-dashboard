@@ -13,19 +13,14 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 import PurchaseRefundFormModal from './PurchaseRefundFormModal';
 import { refundInputClassName, refundPrimaryButtonClassName } from './purchase-refund.styles';
+import { RefundPaymentProgressBadge } from '@/components/features/refund/RefundPaymentProgressBadge';
+import { getRefundPaymentProgressStatus } from '@/components/features/refund/refund.utils';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-GB');
-};
-
-const getRefundStatusLabel = (refund: UnitTransactionRefund) => {
-  const totalPaid = refund.total_paid ?? (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
-  if (totalPaid <= 0) return 'Belum dibayar';
-  if (totalPaid >= Number(refund.refund_amount || 0)) return 'Lunas';
-  return 'Proses';
 };
 
 export default function PurchaseRefundPageContent({ transactionId }: { transactionId: string }) {
@@ -68,6 +63,26 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menghapus data refund pembelian');
     }
+  };
+
+  const handleEditRefund = (refund: UnitTransactionRefund) => {
+    const hasPayments = (refund.total_paid ?? (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0)) > 0;
+    if (hasPayments) {
+      toast.warning('Refund yang sudah memiliki pembayaran sebaiknya tidak diubah. Hapus atau sesuaikan pembayaran refund terlebih dahulu.');
+      return;
+    }
+
+    setEditingRefund(refund);
+  };
+
+  const handleDeletePrompt = (refund: UnitTransactionRefund) => {
+    const hasPayments = (refund.total_paid ?? (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0)) > 0;
+    if (hasPayments) {
+      toast.warning('Refund yang sudah memiliki pembayaran tidak dapat dihapus langsung. Hapus pembayaran refund terlebih dahulu.');
+      return;
+    }
+
+    setDeletingRefund(refund);
   };
 
   return (
@@ -130,7 +145,9 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(refund.refund_amount)}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(lessPayment)}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{refund.total_qty ?? refund.items?.length ?? 0}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{getRefundStatusLabel(refund)}</TableCell>
+                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">
+                        <RefundPaymentProgressBadge status={getRefundPaymentProgressStatus(refund)} />
+                      </TableCell>
                       <TableCell className="px-4 py-3 text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -139,7 +156,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
-                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => setEditingRefund(refund)}>
+                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => handleEditRefund(refund)}>
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -148,7 +165,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                             >
                               Detail
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeletingRefund(refund)}>
+                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => handleDeletePrompt(refund)}>
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -206,6 +223,10 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
               </TableBody>
             </Table>
           </div>
+        </div>
+
+        <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Pembayaran refund hanya bisa dibuat setelah refund berhasil disimpan. Jika refund sudah memiliki pembayaran, ubah atau hapus refund sebaiknya dilakukan setelah pembayaran refund disesuaikan terlebih dahulu.
         </div>
 
         <PurchaseRefundFormModal open={isCreateOpen} onClose={() => setIsCreateOpen(false)} transactionId={transactionId} />
