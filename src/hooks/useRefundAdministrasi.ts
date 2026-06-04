@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { refundAdministrasiService } from '@/services/refund-administrasi.service';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
@@ -8,6 +9,8 @@ import type { UnitTransactionItemDetail } from '@/@types/unit-transaction.types'
 const refundAdministrasiKeys = {
   list: (companyId: string | number, options: { page?: number; perPage?: number; search?: string }) =>
     companyQueryKeys.list(companyId, 'administrasi-refund-list', { page: options.page, perPage: options.perPage, search: options.search }),
+  detail: (companyId: string | number, refundId: string) =>
+    companyQueryKeys.detail(companyId, 'administrasi-refund-detail', refundId),
   itemDetails: (companyId: string | number, options: { page?: number; perPage?: number; search?: string }) =>
     companyQueryKeys.list(companyId, 'transaction-item-details', { page: options.page, perPage: options.perPage, search: options.search }),
   transactionDetail: (companyId: string | number, transactionId: string) =>
@@ -151,26 +154,81 @@ export const useRefundTransactionDetail = (transactionId?: string) => {
   });
 };
 
+export const useRefundDetail = (refundId?: string) => {
+  const { companyId } = useCompany();
+
+  return useQuery({
+    queryKey: companyId && refundId ? refundAdministrasiKeys.detail(companyId, refundId) : ['administrasi-refund-detail', 'unscoped', refundId],
+    queryFn: () => refundAdministrasiService.getRefundDetail(refundId as string),
+    enabled: Boolean(companyId) && Boolean(refundId),
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
 export const useRefundSelectableItems = (transactionId?: string) => {
   const transactionQuery = useRefundTransactionDetail(transactionId);
   const itemDetailsQuery = useTransactionItemDetails({ page: 1, perPage: 100, search: transactionId });
 
-  const transactionItems = (transactionQuery.data?.unit_transaction_items ?? []) as Array<{ id?: string | number; price?: string | number; unit_type?: { name?: string } }>;
-  const allowedItemIds = new Set(transactionItems.map((item) => String(item.id ?? '')));
+  const transactionItems = useMemo(
+    () =>
+      ((transactionQuery.data?.unit_transaction_items ?? []) as Array<{
+        id?: string | number;
+        price?: string | number;
+        unit_type?: { name?: string; unit_model?: string };
+        unit_transaction_item_details?: Array<{
+          id?: string | number;
+          unit_transaction_item_id?: string | number;
+          color?: string;
+          machine_number?: string;
+          chassis_number?: string;
+          price?: string | number;
+          status?: string;
+          in_stock?: boolean | number | string;
+          is_forecast?: boolean | number | string;
+          created_at?: string;
+        }>;
+      }>),
+    [transactionQuery.data?.unit_transaction_items],
+  );
 
-  const items = ((itemDetailsQuery.data?.data ?? []) as UnitTransactionItemDetail[]).filter((item) => allowedItemIds.has(String(item.unit_transaction_item_id ?? '')));
-  const enrichedItems = items.map((item) => {
-    const parent = transactionItems.find((entry) => String(entry.id ?? '') === String(item.unit_transaction_item_id ?? ''));
-    return {
-      ...item,
-      price: item.price ?? Number(parent?.price ?? 0),
-      unit_type_name: item.unit_type_name ?? parent?.unit_type?.name ?? '-',
-    };
-  });
+  const items = useMemo(() => {
+    const nestedItems = transactionItems.flatMap((item) =>
+      (item.unit_transaction_item_details ?? []).map((detail) => ({
+        id: String(detail.id ?? ''),
+        unit_transaction_item_id: String(detail.unit_transaction_item_id ?? item.id ?? ''),
+        unit_type_name: item.unit_type?.unit_model ?? item.unit_type?.name ?? '-',
+        price: detail.price !== undefined ? Number(detail.price) : Number(item.price ?? 0),
+        color: detail.color ?? '-',
+        machine_number: detail.machine_number ?? '-',
+        chassis_number: detail.chassis_number ?? '-',
+        status: detail.status ? String(detail.status) : '',
+        in_stock: detail.in_stock === true || detail.in_stock === 1 || detail.in_stock === '1',
+        is_forecast: detail.is_forecast === true || detail.is_forecast === 1 || detail.is_forecast === '1',
+        created_at: detail.created_at ?? '',
+      })),
+    );
+
+    const fallbackItems = ((itemDetailsQuery.data?.data ?? []) as UnitTransactionItemDetail[]).filter((item) =>
+      transactionItems.some((entry) => String(entry.id ?? '') === String(item.unit_transaction_item_id ?? '')),
+    );
+
+    if (nestedItems.length > 0) {
+      return nestedItems;
+    }
+
+    return fallbackItems.map((item) => {
+      const parent = transactionItems.find((entry) => String(entry.id ?? '') === String(item.unit_transaction_item_id ?? ''));
+      return {
+        ...item,
+        price: item.price ?? Number(parent?.price ?? 0),
+        unit_type_name: item.unit_type_name ?? parent?.unit_type?.unit_model ?? parent?.unit_type?.name ?? '-',
+      };
+    });
+  }, [itemDetailsQuery.data?.data, transactionItems]);
 
   return {
     transactionQuery,
     itemDetailsQuery,
-    items: enrichedItems,
+    items,
   };
 };

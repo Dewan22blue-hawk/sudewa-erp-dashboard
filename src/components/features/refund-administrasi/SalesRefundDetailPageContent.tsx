@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { ChevronLeft, LogOut, MoreVertical, Plus } from 'lucide-react';
 import type { UnitTransactionRefundPayment } from '@/@types/refund.type';
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useDeleteRefundPayment, useRefundList, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
+import { useDeleteRefundPayment, useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 import PurchaseRefundFormModal from './PurchaseRefundFormModal';
@@ -34,12 +34,8 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
   const deletePaymentMutation = useDeleteRefundPayment();
 
   const transactionQuery = useRefundTransactionDetail(transactionId);
-  const refundQuery = useRefundList({ page: 1, perPage: 100, search: transactionQuery.data?.code });
-
-  const refund = useMemo(
-    () => (refundQuery.data?.data ?? []).find((item) => item.id === refundId),
-    [refundId, refundQuery.data?.data],
-  );
+  const refundQuery = useRefundDetail(refundId);
+  const refund = refundQuery.data;
 
   const totalPaid = (refund?.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
   const lessPayment = Math.max(0, Number(refund?.refund_amount || 0) - totalPaid);

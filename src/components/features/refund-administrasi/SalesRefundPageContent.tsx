@@ -22,7 +22,7 @@ const formatDate = (value?: string) => {
 };
 
 const getRefundStatusLabel = (refund: UnitTransactionRefund) => {
-  const totalPaid = (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
+  const totalPaid = refund.total_paid ?? (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
   if (totalPaid <= 0) return 'Belum dibayar';
   if (totalPaid >= Number(refund.refund_amount || 0)) return 'Lunas';
   return 'Proses';
@@ -120,8 +120,8 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                 </TableRow>
               ) : refunds.length > 0 ? (
                 refunds.map((refund, index) => {
-                  const totalPaid = (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
-                  const lessPayment = Math.max(0, Number(refund.refund_amount || 0) - totalPaid);
+                  const totalPaid = refund.total_paid ?? (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
+                  const lessPayment = refund.remaining_payment ?? Math.max(0, Number(refund.refund_amount || 0) - totalPaid);
                   return (
                     <TableRow key={refund.id} className="border-[#E5E7EB] hover:bg-white">
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{index + 1}</TableCell>
@@ -129,7 +129,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                       <TableCell className="px-4 py-3 text-center text-sm leading-5 text-[#111827]">{refund.code}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(refund.refund_amount)}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(lessPayment)}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{refund.items?.length ?? 0}</TableCell>
+                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{refund.total_qty ?? refund.items?.length ?? 0}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{getRefundStatusLabel(refund)}</TableCell>
                       <TableCell className="px-4 py-3 text-center">
                         <DropdownMenu>
@@ -142,7 +142,10 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                             <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => setEditingRefund(refund)}>
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/sales/${transactionId}/refund/${refund.id}`)}>
+                            <DropdownMenuItem
+                              className="rounded-[10px] px-4 py-3 text-sm text-[#111827]"
+                              onClick={() => router.push(`/dashboard/${slug}/sales/${transactionId}/refund/${refund.id}`)}
+                            >
                               Detail
                             </DropdownMenuItem>
                             <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeletingRefund(refund)}>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
 import RefundPaymentModal from '@/components/features/refund-administrasi/RefundPaymentModal';
-import { useRefundList, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
+import { useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
 import { formatCurrency } from '@/lib/utils/currency';
 
 interface AdminRefundDetailPageProps {
@@ -28,12 +28,8 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
   const router = useRouter();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const transactionQuery = useRefundTransactionDetail(transactionId);
-  const refundQuery = useRefundList({ page: 1, perPage: 100, search: transactionQuery.data?.code });
-
-  const refund = useMemo(
-    () => (refundQuery.data?.data ?? []).find((item) => item.id === refundId),
-    [refundId, refundQuery.data?.data],
-  );
+  const refundQuery = useRefundDetail(refundId);
+  const refund = refundQuery.data;
 
   if (refundQuery.isLoading || transactionQuery.isLoading) {
     return (
@@ -51,8 +47,8 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
     );
   }
 
-  const totalPaid = (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
-  const remainingAmount = Math.max(0, Number(refund.refund_amount) - totalPaid);
+  const totalPaid = refund.total_paid ?? (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
+  const remainingAmount = refund.remaining_payment ?? Math.max(0, Number(refund.refund_amount) - totalPaid);
 
   return (
     <DashboardLayout>

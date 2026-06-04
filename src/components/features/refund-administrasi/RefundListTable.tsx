@@ -46,7 +46,7 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
       {
         header: 'Qty Unit',
         id: 'qty',
-        cell: ({ row }) => <span>{row.original.items?.length ?? 0}</span>,
+        cell: ({ row }) => <span>{row.original.total_qty ?? row.original.items?.length ?? 0}</span>,
       },
       {
         header: 'Nominal Refund',
@@ -57,7 +57,7 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
         header: 'Total Dibayar',
         id: 'paid_amount',
         cell: ({ row }) => {
-          const totalPaid = (row.original.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
+          const totalPaid = row.original.total_paid ?? (row.original.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
           return <span>{formatCurrency(totalPaid)}</span>;
         },
       },
@@ -65,8 +65,8 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
         header: 'Sisa Bayar',
         id: 'remaining_amount',
         cell: ({ row }) => {
-          const totalPaid = (row.original.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
-          return <span className="font-medium text-amber-700">{formatCurrency(Math.max(0, row.original.refund_amount - totalPaid))}</span>;
+          const remainingAmount = row.original.remaining_payment ?? Math.max(0, row.original.refund_amount - (row.original.total_paid ?? 0));
+          return <span className="font-medium text-amber-700">{formatCurrency(remainingAmount)}</span>;
         },
       },
       {

@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api/client';
-import { ensureSuccess, LaravelApiResponse } from '@/lib/api/response';
+import { ensureSuccess, LaravelApiResponse, mapLaravelPaginationMeta } from '@/lib/api/response';
 import { UnitTransactionRefundListResponse, CreateRefundPayload, CreateRefundPaymentPayload, UnitTransactionRefund, UpdateRefundPayload, UpdateRefundPaymentPayload } from '@/@types/refund.type';
 import type { UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 
@@ -14,6 +14,17 @@ const toNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const appendRefundItemDetailIds = (formData: FormData, ids?: Array<string | number>) => {
+  const normalizedIds = (ids ?? []).map((id) => String(id)).filter(Boolean);
+  normalizedIds.forEach((id) => {
+    formData.append('unit_transaction_item_detail_ids[]', id);
+  });
+
+  if (normalizedIds.length > 0) {
+    formData.append('unit_transaction_item_detail_ids', JSON.stringify(normalizedIds));
+  }
+};
+
 const mapItemDetail = (item: any): UnitTransactionItemDetail => ({
   id: toString(item.id),
   unit_transaction_item_id: toString(item.unit_transaction_item_id),
@@ -23,8 +34,26 @@ const mapItemDetail = (item: any): UnitTransactionItemDetail => ({
   machine_number: item.machine_number ?? '-',
   chassis_number: item.chassis_number ?? '-',
   in_stock: item.in_stock === true || item.in_stock === 1 || item.in_stock === '1',
+  is_forecast: item.is_forecast === true || item.is_forecast === 1 || item.is_forecast === '1',
   status: item.status ? String(item.status) : '',
   created_at: item.created_at ?? '',
+  pivot: item.pivot
+    ? {
+        unit_transaction_refund_id: item.pivot.unit_transaction_refund_id,
+        unit_transaction_item_detail_id: item.pivot.unit_transaction_item_detail_id,
+      }
+    : undefined,
+});
+
+const mapRefundPayment = (payment: any) => ({
+  id: toString(payment.id),
+  code: payment.code ? String(payment.code) : undefined,
+  unit_transaction_refund_id: toString(payment.unit_transaction_refund_id),
+  cash_id: payment.cash_id ? toString(payment.cash_id) : undefined,
+  amount: toNumber(payment.amount),
+  payment_date: payment.payment_date || '',
+  created_at: payment.created_at || '',
+  note: payment.note || payment.description || '',
 });
 
 const mapRefund = (item: any): UnitTransactionRefund => ({
@@ -36,27 +65,29 @@ const mapRefund = (item: any): UnitTransactionRefund => ({
   note: item.note || '',
   status: item.status || 'waiting',
   created_at: item.created_at || '',
-  items: Array.isArray(item.items) ? item.items.map(mapItemDetail) : [],
-      payments: Array.isArray(item.payments)
-    ? item.payments.map((payment: any) => ({
-        id: toString(payment.id),
-        unit_transaction_refund_id: toString(payment.unit_transaction_refund_id),
-        cash_id: payment.cash_id ? toString(payment.cash_id) : undefined,
-        amount: toNumber(payment.amount),
-        payment_date: payment.payment_date || '',
-        created_at: payment.created_at || '',
-        note: payment.note || payment.description || '',
-      }))
-    : [],
-  transaction: item.transaction
+  total_paid: toNumber(item.total_paid ?? item.total_terbayar),
+  total_qty: toNumber(item.total_qty),
+  total_payable: toNumber(item.total_payable ?? item.total_bayar),
+  remaining_payment: toNumber(item.remaining_payment ?? item.total_kurang_bayar),
+  items: Array.isArray(item.items)
+    ? item.items.map(mapItemDetail)
+    : Array.isArray(item.unit_transaction_item_details)
+      ? item.unit_transaction_item_details.map(mapItemDetail)
+      : [],
+  payments: Array.isArray(item.payments)
+    ? item.payments.map(mapRefundPayment)
+    : Array.isArray(item.unit_transaction_refund_payments)
+      ? item.unit_transaction_refund_payments.map(mapRefundPayment)
+      : [],
+  transaction: item.transaction ?? item.unit_transaction
     ? {
-        id: item.transaction.id ? toString(item.transaction.id) : undefined,
-        code: item.transaction.code || undefined,
-        type: item.transaction.type || undefined,
-        person: item.transaction.person
+        id: (item.transaction ?? item.unit_transaction).id ? toString((item.transaction ?? item.unit_transaction).id) : undefined,
+        code: (item.transaction ?? item.unit_transaction).code || undefined,
+        type: (item.transaction ?? item.unit_transaction).type || undefined,
+        person: (item.transaction ?? item.unit_transaction).person
           ? {
-              id: item.transaction.person.id ? toString(item.transaction.person.id) : undefined,
-              name: item.transaction.person.name || '-',
+              id: (item.transaction ?? item.unit_transaction).person.id ? toString((item.transaction ?? item.unit_transaction).person.id) : undefined,
+              name: (item.transaction ?? item.unit_transaction).person.name || '-',
             }
           : null,
       }
@@ -82,13 +113,14 @@ export const refundAdministrasiService = {
 
     return {
       data,
-      meta: {
-        currentPage: payload?.current_page ?? 1,
-        perPage: payload?.per_page ?? 10,
-        total: payload?.total ?? 0,
-        lastPage: payload?.last_page ?? 1,
-      }
+      meta: mapLaravelPaginationMeta(payload),
     };
+  },
+
+  async getRefundDetail(id: string): Promise<UnitTransactionRefund> {
+    const response = await apiClient.get<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`);
+    const payload = ensureSuccess(response.data);
+    return mapRefund(payload);
   },
 
   /**
@@ -102,10 +134,8 @@ export const refundAdministrasiService = {
     if (payload.note) {
       formData.append('note', payload.note);
     }
-    
-    payload.unit_transaction_item_detail_ids.forEach(id => {
-      formData.append('unit_transaction_item_detail_ids[]', id);
-    });
+
+    appendRefundItemDetailIds(formData, payload.unit_transaction_item_detail_ids);
 
     const response = await apiClient.post<LaravelApiResponse<any>>(BASE_PATH, formData, {
       headers: {
@@ -118,14 +148,17 @@ export const refundAdministrasiService = {
   },
 
   async updateRefund(id: string, payload: UpdateRefundPayload): Promise<UnitTransactionRefund> {
-    const body = new URLSearchParams();
-    if (payload.refund_date) body.append('refund_date', payload.refund_date);
-    if (payload.refund_amount !== undefined) body.append('refund_amount', String(payload.refund_amount));
-    if (payload.note !== undefined) body.append('note', payload.note);
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    if (payload.unit_transaction_id) formData.append('unit_transaction_id', payload.unit_transaction_id);
+    if (payload.refund_date) formData.append('refund_date', payload.refund_date);
+    if (payload.refund_amount !== undefined) formData.append('refund_amount', String(payload.refund_amount));
+    if (payload.note !== undefined) formData.append('note', payload.note);
+    appendRefundItemDetailIds(formData, payload.unit_transaction_item_detail_ids);
 
-    const response = await apiClient.put<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`, body, {
+    const response = await apiClient.post<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`, formData, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'multipart/form-data',
       },
     });
 
@@ -161,6 +194,7 @@ export const refundAdministrasiService = {
 
   async updateRefundPayment(id: string, payload: UpdateRefundPaymentPayload): Promise<void> {
     const body = new URLSearchParams();
+    if (payload.unit_transaction_refund_id) body.append('unit_transaction_refund_id', payload.unit_transaction_refund_id);
     if (payload.amount !== undefined) body.append('amount', String(payload.amount));
     if (payload.payment_date) body.append('payment_date', payload.payment_date);
     if (payload.note !== undefined) body.append('note', payload.note);
