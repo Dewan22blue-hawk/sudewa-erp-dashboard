@@ -14,7 +14,7 @@ export type StockStatus =
 
 export interface StockUnit {
   id: string;
-  tipeUnit: string;
+  namaUnit: string;
   warna: string;
   noMesin: string;
   noRangka: string;

@@ -48,6 +48,11 @@ export default function RefundPaymentModal({ open, onClose, refund }: RefundPaym
   }, [open, refund.id, remainingAmount, reset]);
 
   const onSubmit = async (values: CreateRefundPaymentFormValues) => {
+    if (values.amount > remainingAmount) {
+      toast.error('Nominal pembayaran tidak boleh melebihi sisa bayar refund');
+      return;
+    }
+
     try {
       await createPaymentMutation.mutateAsync(values);
       toast.success('Pembayaran refund berhasil ditambahkan');

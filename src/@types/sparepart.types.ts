@@ -30,7 +30,7 @@ export interface Sparepart {
 export interface SparepartPayload {
   code: string;
   name: string;
-  categoryId: number;
+  categoryId?: number | null;
   unitType: string;
   price: number;
   capacity: number;

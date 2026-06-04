@@ -54,17 +54,25 @@ const unwrapDetail = (payload: SalesApiModel | { data?: SalesApiModel }): SalesA
 };
 
 export const salesService = {
-  async getSalesList(companyId?: string | number) {
+  async getSalesList(
+    companyId?: string | number,
+    options: { page?: number; perPage?: number; search?: string; status?: string } = {},
+  ) {
     let rows: SalesApiModel[] = [];
     let responseData: LaravelPagination<SalesApiModel> | null = null;
+    const requestParams = {
+      company_id: companyId,
+      type: 'sales',
+      sort_order: 'desc',
+      page: options.page ?? 1,
+      per_page: options.perPage ?? 10,
+      search: options.search || undefined,
+      status: options.status || undefined,
+    };
 
     try {
       const response = await apiClient.get<LaravelApiResponse<LaravelPagination<any>>>(basePath, {
-        params: {
-          company_id: companyId,
-          type: 'sales',
-          sort_order: 'desc',
-        },
+        params: requestParams,
       });
 
       const payload = ensureSuccess(response.data) as LaravelPagination<SalesApiModel>;
@@ -74,11 +82,7 @@ export const salesService = {
       // Compatibility fallback for environments exposing the shorter base path.
       try {
         const fallbackResponse = await apiClient.get<LaravelApiResponse<LaravelPagination<any>>>(fallbackBasePath, {
-          params: {
-            company_id: companyId,
-            type: 'sales',
-            sort_order: 'desc',
-          },
+          params: requestParams,
         });
 
         const fallbackPayload = ensureSuccess(fallbackResponse.data) as LaravelPagination<SalesApiModel>;
@@ -95,7 +99,7 @@ export const salesService = {
         mappedData: [],
         meta: {
           currentPage: 1,
-          perPage: 10,
+          perPage: options.perPage ?? 10,
           total: 0,
           lastPage: 1,
         },
@@ -109,7 +113,7 @@ export const salesService = {
       mappedData,
       meta: {
         currentPage: responseData.current_page ?? 1,
-        per_page: responseData.per_page ?? 10,
+        perPage: responseData.per_page ?? options.perPage ?? 10,
         total: responseData.total ?? 0,
         lastPage: responseData.last_page ?? 1,
       },

@@ -5,7 +5,7 @@ export const createRefundSchema = z.object({
   refund_date: z.string().min(1, 'Tanggal refund wajib diisi'),
   refund_amount: z.coerce.number().min(1, 'Nominal refund harus lebih dari 0'),
   note: z.string().optional(),
-  unit_transaction_item_detail_ids: z.array(z.string()).min(1, 'Minimal pilih 1 item untuk direfund'),
+  unit_transaction_item_detail_ids: z.array(z.coerce.number()).min(1, 'Pilih minimal satu unit yang akan direfund.'),
 });
 
 export type CreateRefundFormValues = z.infer<typeof createRefundSchema>;

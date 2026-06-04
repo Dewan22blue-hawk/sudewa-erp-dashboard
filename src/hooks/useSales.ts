@@ -8,12 +8,19 @@ const salesKeys = {
   detail: (companyId: string, id: string) => companyQueryKeys.detail(companyId, 'sales-transactions', id),
 };
 
-export const useSalesList = () => {
+export const useSalesList = (options: { page?: number; perPage?: number; search?: string; status?: string } = {}) => {
   const { companyId } = useCompany();
 
   return useQuery({
-    queryKey: companyId ? salesKeys.all(companyId) : ['sales-transactions', 'unscoped'],
-    queryFn: () => salesService.getSalesList(companyId ?? undefined),
+    queryKey: companyId
+      ? companyQueryKeys.list(companyId, 'sales-transactions', {
+          page: options.page,
+          perPage: options.perPage,
+          search: options.search,
+          status: options.status,
+        })
+      : ['sales-transactions', 'unscoped', options],
+    queryFn: () => salesService.getSalesList(companyId ?? undefined, options),
     staleTime: 1000 * 60 * 5,
     enabled: Boolean(companyId),
   });

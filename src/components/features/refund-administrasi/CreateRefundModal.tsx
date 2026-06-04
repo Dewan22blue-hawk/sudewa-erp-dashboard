@@ -44,7 +44,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
 
   const selectedIds = watch('unit_transaction_item_detail_ids');
   const selectedItems = useMemo(
-    () => items.filter((item) => selectedIds.includes(String(item.id))),
+    () => items.filter((item) => selectedIds.includes(Number(item.id))),
     [items, selectedIds],
   );
   const selectedTotal = useMemo(
@@ -75,12 +75,23 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
   const personName = transaction?.person?.name ?? '-';
   const transactionCode = transaction?.code ?? '-';
 
-  const toggleItem = (itemId: string, checked: boolean) => {
+  const toggleItem = (itemId: number, checked: boolean) => {
     const next = checked ? [...selectedIds, itemId] : selectedIds.filter((id) => id !== itemId);
     setValue('unit_transaction_item_detail_ids', next, {
       shouldDirty: true,
       shouldValidate: true,
     });
+  };
+
+  const toggleAllItems = (checked: boolean) => {
+    setValue(
+      'unit_transaction_item_detail_ids',
+      checked ? items.map((item) => Number(item.id)) : [],
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
   };
 
   const onSubmit = async (values: CreateRefundFormValues) => {
@@ -94,6 +105,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
   };
 
   const isLoading = transactionQuery.isLoading || itemDetailsQuery.isLoading;
+  const allSelected = items.length > 0 && selectedIds.length === items.length;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -150,18 +162,23 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 hover:bg-slate-50">
-                  <TableHead className="w-14">Pilih</TableHead>
-                  <TableHead>Tipe Unit</TableHead>
+                  <TableHead className="w-14 text-center">
+                    <Checkbox checked={allSelected} onCheckedChange={(checked) => toggleAllItems(Boolean(checked))} />
+                  </TableHead>
                   <TableHead>Warna</TableHead>
                   <TableHead>No. Mesin</TableHead>
                   <TableHead>No. Rangka</TableHead>
+                  <TableHead>Status Stok</TableHead>
+                  <TableHead>Status Forecast</TableHead>
+                  <TableHead>Status Unit</TableHead>
+                  <TableHead>Tanggal Dibuat</TableHead>
                   <TableHead className="text-right">Nilai Refund</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-36">
+                    <TableCell colSpan={9} className="h-36">
                       <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Memuat item transaksi...
@@ -170,7 +187,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
                   </TableRow>
                 ) : items.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-36">
+                    <TableCell colSpan={9} className="h-36">
                       <div className="flex flex-col items-center justify-center gap-2 text-center text-sm text-slate-500">
                         <PackageSearch className="h-5 w-5" />
                         Tidak ada unit transaksi yang tersedia untuk direfund.
@@ -186,16 +203,19 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
                           name="unit_transaction_item_detail_ids"
                           render={() => (
                             <Checkbox
-                              checked={selectedIds.includes(String(item.id))}
-                              onCheckedChange={(checked) => toggleItem(String(item.id), Boolean(checked))}
+                              checked={selectedIds.includes(Number(item.id))}
+                              onCheckedChange={(checked) => toggleItem(Number(item.id), Boolean(checked))}
                             />
                           )}
                         />
                       </TableCell>
-                      <TableCell className="font-medium text-slate-900">{item.unit_type_name || '-'}</TableCell>
                       <TableCell>{item.color || '-'}</TableCell>
                       <TableCell>{item.machine_number || '-'}</TableCell>
                       <TableCell>{item.chassis_number || '-'}</TableCell>
+                      <TableCell>{item.in_stock ? 'Tersedia' : 'Tidak tersedia'}</TableCell>
+                      <TableCell>{item.is_forecast ? 'Forecast' : 'Normal'}</TableCell>
+                      <TableCell>{item.status || '-'}</TableCell>
+                      <TableCell>{item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}</TableCell>
                       <TableCell className="text-right font-medium text-slate-900">{formatCurrency(Number(item.price ?? 0))}</TableCell>
                     </TableRow>
                   ))

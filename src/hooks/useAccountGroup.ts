@@ -3,12 +3,14 @@ import type { AccountGroupDetail, AccountGroupPayload } from '@/@types/account-g
 import type { PaginationParams } from '@/@types/pagination.types';
 import { createAccountGroup, deleteAccountGroup, getAccountGroupById, getAccountGroups, quickCreateAccountGroup, updateAccountGroup } from '@/services/account-group.service';
 import type { QuickCreateAccountGroupPayload } from '@/services/account-group.service';
+import { companyQueryKeys } from '@/lib/query/company-key';
 
 export const useAccountGroups = (params: PaginationParams & { search?: string; company_id?: string | number; enabled?: boolean }) => {
   const { enabled = true, ...rest } = params;
+  const companyId = rest.company_id;
 
   return useQuery({
-    queryKey: ['account-groups', rest],
+    queryKey: companyId ? companyQueryKeys.list(companyId, 'account-groups', rest) : ['account-groups', 'unscoped', rest],
     queryFn: () => getAccountGroups(rest),
     placeholderData: (previous) => previous,
     enabled,
@@ -28,8 +30,10 @@ export const useCreateAccountGroup = () => {
 
   return useMutation({
     mutationFn: (payload: AccountGroupPayload) => createAccountGroup(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['account-groups'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.companyScope(variables.company_id),
+      });
     },
   });
 };
@@ -40,21 +44,10 @@ export const useQuickCreateAccountGroup = () => {
 
   return useMutation({
     mutationFn: (payload: QuickCreateAccountGroupPayload) => quickCreateAccountGroup(payload),
-    onSuccess: (group) => {
-      // Optimistically add to any cached account-group lists
-      queryClient.setQueriesData<any>({ queryKey: ['account-groups'] }, (prev: any) => {
-        if (!prev) return prev;
-        if (Array.isArray(prev)) return [...prev, group];
-        if (prev?.data) {
-          return {
-            ...prev,
-            data: [group, ...(prev.data ?? [])],
-            meta: prev.meta,
-          };
-        }
-        return prev;
+    onSuccess: (_group, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.companyScope(variables.companyId),
       });
-      queryClient.invalidateQueries({ queryKey: ['account-groups'] });
     },
   });
 };
@@ -64,8 +57,10 @@ export const useUpdateAccountGroup = () => {
 
   return useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload: AccountGroupPayload }) => updateAccountGroup(id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['account-groups'] });
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.companyScope(variables.payload.company_id),
+      });
       queryClient.invalidateQueries({ queryKey: ['account-group'] });
     },
   });

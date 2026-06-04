@@ -6,7 +6,7 @@ export interface Asset {
     id: number;
     uuid: string;
     company_id: number;
-    code: string;
+    code?: string;
     purchase_date: string;
     name: string;
     type: AssetType;
@@ -19,7 +19,7 @@ export interface Asset {
 export interface AssetPayload {
     company_id: number;
     name: string;
-    code: string;
+    code?: string;
     purchase_date: string;
     type: AssetType;
     price: number | string;

@@ -16,6 +16,10 @@ export interface UnitTransactionRefund {
   note: string;
   status: 'waiting' | 'approve' | 'reject' | string;
   created_at: string;
+  total_paid?: number;
+  total_qty?: number;
+  total_payable?: number;
+  remaining_payment?: number;
   items?: UnitTransactionItemDetail[];
   payments?: UnitTransactionRefundPayment[];
   transaction?: {
@@ -31,6 +35,7 @@ export interface UnitTransactionRefund {
 
 export interface UnitTransactionRefundPayment {
   id: string;
+  code?: string;
   unit_transaction_refund_id: string;
   cash_id?: string;
   amount: number;
@@ -49,13 +54,15 @@ export interface CreateRefundPayload {
   refund_date: string;
   refund_amount: number;
   note?: string;
-  unit_transaction_item_detail_ids: string[]; // string[] or number[]
+  unit_transaction_item_detail_ids: Array<string | number>;
 }
 
 export interface UpdateRefundPayload {
+  unit_transaction_id?: string;
   refund_date?: string;
   refund_amount?: number;
   note?: string;
+  unit_transaction_item_detail_ids?: Array<string | number>;
 }
 
 export interface CreateRefundPaymentPayload {
@@ -66,6 +73,7 @@ export interface CreateRefundPaymentPayload {
 }
 
 export interface UpdateRefundPaymentPayload {
+  unit_transaction_refund_id?: string;
   amount?: number;
   payment_date?: string;
   note?: string;

@@ -21,30 +21,29 @@ interface Props {
  * Sales Table Component dengan Pagination dan Bulk Select
  */
 export function SalesTable({ onAdd }: Props) {
-  const { data, isLoading } = useSalesList();
-  const deleteMutation = useDeleteSales();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  // Filter data based on search
   const [searchTerm, setSearchTerm] = useState('');
+  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
+  const deleteMutation = useDeleteSales();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const salesData = data?.data ?? [];
-
-  const filteredData = salesData.filter((item) => item.kodeJual.toLowerCase().includes(searchTerm.toLowerCase()) || item.customer.toLowerCase().includes(searchTerm.toLowerCase()) || item.tanggal.includes(searchTerm));
+  const meta = data?.meta;
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: filteredData,
+    data: salesData,
   });
 
   // Pagination logic
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const totalPages = meta?.lastPage ?? Math.ceil(sortedData.length / itemsPerPage);
   const safeTotalPages = Math.max(1, totalPages);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = sortedData.slice(startIndex, endIndex);
+  const activePage = meta?.currentPage ?? currentPage;
+  const activePerPage = meta?.perPage ?? itemsPerPage;
+  const startIndex = (activePage - 1) * activePerPage;
+  const endIndex = startIndex + sortedData.length;
+  const currentData = sortedData;
   const isDataEmpty = salesData.length === 0;
-  const isSearchEmpty = !isDataEmpty && sortedData.length === 0;
+  const isSearchEmpty = !isLoading && !isDataEmpty && currentData.length === 0;
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
@@ -219,11 +218,11 @@ export function SalesTable({ onAdd }: Props) {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, sortedData.length)} of {sortedData.length} entries
+          Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, meta?.total ?? sortedData.length)} of {meta?.total ?? sortedData.length} entries
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1}>
+          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={activePage === 1}>
             Previous
           </Button>
 
@@ -233,16 +232,16 @@ export function SalesTable({ onAdd }: Props) {
 
             if (safeTotalPages <= 5) {
               pageNum = i + 1;
-            } else if (currentPage <= 3) {
+            } else if (activePage <= 3) {
               pageNum = i + 1;
-            } else if (currentPage >= safeTotalPages - 2) {
+            } else if (activePage >= safeTotalPages - 2) {
               pageNum = safeTotalPages - 4 + i;
             } else {
-              pageNum = currentPage - 2 + i;
+              pageNum = activePage - 2 + i;
             }
 
             return (
-              <Button key={pageNum} variant={currentPage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className="w-10">
+              <Button key={pageNum} variant={activePage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className="w-10">
                 {pageNum}
               </Button>
             );
@@ -261,7 +260,7 @@ export function SalesTable({ onAdd }: Props) {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage((prev) => Math.min(safeTotalPages, prev + 1))}
-            disabled={currentPage >= safeTotalPages}
+            disabled={activePage >= safeTotalPages}
           >
             Next
           </Button>

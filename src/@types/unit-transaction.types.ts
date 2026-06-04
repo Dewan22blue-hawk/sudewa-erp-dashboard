@@ -152,8 +152,13 @@ export interface UnitTransactionItemDetail {
   machine_number: string;
   chassis_number: string;
   in_stock?: boolean;
+  is_forecast?: boolean;
   status?: string;
   created_at?: string;
+  pivot?: {
+    unit_transaction_refund_id?: string | number;
+    unit_transaction_item_detail_id?: string | number;
+  };
 }
 
 export interface TransactionAdjustment {

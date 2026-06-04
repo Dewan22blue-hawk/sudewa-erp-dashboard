@@ -1,5 +1,10 @@
-import { CustomerListPage } from '@/components/features/master-data/customer/CustomerListPage';
+import { CustomerManagementPage } from '@/components/features/customer/CustomerManagementPage';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function CustomerPage() {
-    return <CustomerListPage />;
+  return (
+    <DashboardLayout>
+      <CustomerManagementPage />
+    </DashboardLayout>
+  );
 }

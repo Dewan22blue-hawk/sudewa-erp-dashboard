@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -18,11 +17,16 @@ import { Button } from '@/components/ui/button';
 import { Plus, Upload } from 'lucide-react';
 
 export const AccountGroupListPage = () => {
-  const router = useRouter();
   const { companyId } = useCompany();
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
 
-  const { data, isLoading, isError, isFetching } = useAccountGroups({ page, perPage, search });
+  const { data, isLoading, isError, isFetching } = useAccountGroups({
+    page,
+    perPage,
+    search,
+    company_id: companyId ?? undefined,
+    enabled: !!companyId,
+  });
   const createMutation = useCreateAccountGroup();
   const updateMutation = useUpdateAccountGroup();
   const deleteMutation = useDeleteAccountGroup();

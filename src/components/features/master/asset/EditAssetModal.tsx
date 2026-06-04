@@ -70,11 +70,11 @@ function EditAssetInnerForm({ initialData, onClose, onSave }: InnerProps) {
                 <Label htmlFor="edit-code" className="text-gray-900 font-medium">Kode Aset</Label>
                 <Input
                     id="edit-code"
-                    placeholder="Contoh: AST-WJR0001"
-                    {...register('code', { required: 'Kode aset wajib diisi' })}
+                    placeholder="Kosongkan jika ingin mengikuti auto generate backend"
+                    {...register('code')}
                     className={errors.code ? 'border-red-500' : ''}
                 />
-                {errors.code && <p className="text-red-500 text-xs">{errors.code.message}</p>}
+                <p className="text-xs text-gray-500">Opsional. Tidak perlu diisi jika kode aset dikelola oleh backend.</p>
             </div>
 
             {/* Tanggal Beli */}
