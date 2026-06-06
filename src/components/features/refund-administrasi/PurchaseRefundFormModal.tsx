@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { z } from 'zod';
-import { useForm } from 'react-hook-form';
+import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarDays, Loader2, PackageSearch } from 'lucide-react';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
@@ -49,6 +49,11 @@ const formatDate = (value?: string) => {
   return date.toLocaleDateString('id-ID');
 };
 
+const parseCurrencyInput = (value: string) => {
+  const numericValue = value.replace(/[^\d]/g, '');
+  return numericValue ? Number(numericValue) : 0;
+};
+
 const getRefundErrorMessage = (error: unknown, titleLabel: string) => {
   const rawMessage = error instanceof Error ? error.message : '';
 
@@ -61,6 +66,17 @@ const getRefundErrorMessage = (error: unknown, titleLabel: string) => {
   }
 
   return rawMessage || `Gagal menyimpan data refund ${titleLabel}`;
+};
+
+const getFirstFormErrorMessage = (errors: FieldErrors<CreateRefundFormValues & { status?: string }>) => {
+  const messages = [
+    errors.refund_amount?.message,
+    errors.refund_date?.message,
+    errors.unit_transaction_item_detail_ids?.message,
+    errors.note?.message,
+  ];
+
+  return messages.find((message): message is string => typeof message === 'string' && message.length > 0) ?? 'Lengkapi data refund terlebih dahulu.';
 };
 
 export default function PurchaseRefundFormModal({
@@ -100,7 +116,7 @@ export default function PurchaseRefundFormModal({
     defaultValues: {
       unit_transaction_id: transactionId,
       refund_date: displayDate(effectiveRefund?.refund_date) || new Date().toISOString().split('T')[0],
-      refund_amount: Number(effectiveRefund?.refund_amount || 0),
+      refund_amount: effectiveRefund?.refund_amount !== undefined && effectiveRefund?.refund_amount !== null ? Number(effectiveRefund.refund_amount) : undefined,
       note: effectiveRefund?.note || '',
       unit_transaction_item_detail_ids: selectedIdsFromRefund,
       status: getDisplayStatus(effectiveRefund),
@@ -124,21 +140,12 @@ export default function PurchaseRefundFormModal({
     form.reset({
       unit_transaction_id: transactionId,
       refund_date: displayDate(effectiveRefund?.refund_date) || new Date().toISOString().split('T')[0],
-      refund_amount: Number(effectiveRefund?.refund_amount || 0),
+      refund_amount: effectiveRefund?.refund_amount !== undefined && effectiveRefund?.refund_amount !== null ? Number(effectiveRefund.refund_amount) : undefined,
       note: effectiveRefund?.note || '',
       unit_transaction_item_detail_ids: selectedIdsFromRefund,
       status: getDisplayStatus(effectiveRefund),
     });
   }, [effectiveRefund, form, open, selectedIdsFromRefund, transactionId]);
-
-  useEffect(() => {
-    if (!isCreate) return;
-
-    form.setValue('refund_amount', selectedTotal, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }, [form, isCreate, selectedTotal]);
 
   const isPending = createMutation.isPending || updateMutation.isPending;
   const isLoadingItems =
@@ -165,38 +172,43 @@ export default function PurchaseRefundFormModal({
     );
   };
 
-  const onSubmit = form.handleSubmit(async (values) => {
-    try {
-      if (isEdit && effectiveRefund) {
-        await updateMutation.mutateAsync({
-          id: effectiveRefund.id,
-          payload: {
-            unit_transaction_id: values.unit_transaction_id,
-            refund_date: values.refund_date,
-            refund_amount: values.refund_amount,
-            note: values.note,
-            unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids,
-          },
-        });
-        toast.success(`Data refund ${titleLabel} berhasil diperbarui`);
-      } else {
-        await createMutation.mutateAsync(values);
-        toast.success(`Data refund ${titleLabel} berhasil ditambahkan`);
-      }
-      onClose();
-    } catch (error: any) {
-      if (error instanceof ApiValidationError) {
-        const itemDetailErrors = error.fieldErrors.unit_transaction_item_detail_ids ?? error.fieldErrors['unit_transaction_item_detail_ids.0'];
-        if (itemDetailErrors?.[0]) {
-          form.setError('unit_transaction_item_detail_ids', {
-            type: 'server',
-            message: itemDetailErrors[0],
+  const onSubmit = form.handleSubmit(
+    async (values) => {
+      try {
+        if (isEdit && effectiveRefund) {
+          await updateMutation.mutateAsync({
+            id: effectiveRefund.id,
+            payload: {
+              unit_transaction_id: values.unit_transaction_id,
+              refund_date: values.refund_date,
+              refund_amount: values.refund_amount,
+              note: values.note,
+              unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids,
+            },
           });
+          toast.success(`Data refund ${titleLabel} berhasil diperbarui`);
+        } else {
+          await createMutation.mutateAsync(values);
+          toast.success(`Data refund ${titleLabel} berhasil ditambahkan`);
         }
+        onClose();
+      } catch (error: any) {
+        if (error instanceof ApiValidationError) {
+          const itemDetailErrors = error.fieldErrors.unit_transaction_item_detail_ids ?? error.fieldErrors['unit_transaction_item_detail_ids.0'];
+          if (itemDetailErrors?.[0]) {
+            form.setError('unit_transaction_item_detail_ids', {
+              type: 'server',
+              message: itemDetailErrors[0],
+            });
+          }
+        }
+        toast.error(getRefundErrorMessage(error, titleLabel));
       }
-      toast.error(getRefundErrorMessage(error, titleLabel));
-    }
-  });
+    },
+    (errors) => {
+      toast.error(getFirstFormErrorMessage(errors));
+    },
+  );
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -227,8 +239,32 @@ export default function PurchaseRefundFormModal({
 
             <div>
               <Label className={refundLabelClassName}>Nominal Refund</Label>
-              <Input type="number" className={refundInputClassName} placeholder="Rp" readOnly={isDetail} {...form.register('refund_amount')} />
+              <Controller
+                control={form.control}
+                name="refund_amount"
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    className={refundInputClassName}
+                    placeholder="Rp 0"
+                    readOnly={isDetail}
+                    value={field.value === undefined || field.value === null || Number(field.value) === 0 ? '' : formatCurrency(Number(field.value))}
+                    onChange={(event) => {
+                      field.onChange(parseCurrencyInput(event.target.value));
+                    }}
+                    onBlur={field.onBlur}
+                    name={field.name}
+                    ref={field.ref}
+                  />
+                )}
+              />
               {form.formState.errors.refund_amount ? <p className="mt-2 text-sm text-red-600">{form.formState.errors.refund_amount.message}</p> : null}
+              {!form.formState.errors.refund_amount ? (
+                <p className="mt-2 text-xs text-[#6B7280]">
+                  Nominal refund diisi manual. Nilai unit terpilih hanya sebagai referensi.
+                </p>
+              ) : null}
             </div>
 
             <div>
@@ -319,7 +355,7 @@ export default function PurchaseRefundFormModal({
               <>
                 <div>
                   <Label className={refundLabelClassName}>Kurang Bayar</Label>
-                  <Input readOnly className={refundInputClassName} value={`Rp ${lessPayment.toLocaleString('id-ID')}`} />
+                  <Input readOnly className={refundInputClassName} value={formatCurrency(lessPayment)} />
                 </div>
 
                 <div>

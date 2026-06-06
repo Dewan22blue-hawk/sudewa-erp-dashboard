@@ -32,7 +32,7 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const items: UnitTransactionItem[] = data?.data ?? [];
+  const items: UnitTransactionItem[] = useMemo(() => data?.data ?? [], [data?.data]);
   const totalPages = Math.max(1, Math.ceil(items.length / perPage));
   const pagedData = useMemo(() => {
     const start = (currentPage - 1) * perPage;

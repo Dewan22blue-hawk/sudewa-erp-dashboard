@@ -22,6 +22,9 @@ type UnitTransactionItemApiModel = {
   bbn_price?: number | string;
   expedition_fee?: number | string;
   other_fee?: number | string;
+  hpp_per_unit_price?: number | string;
+  dpp_per_unit_price?: number | string;
+  ppn_per_unit_price?: number | string;
   hpp_total_price?: number | string;
   dpp_total_price?: number | string;
   ppn_total_price?: number | string;
@@ -74,26 +77,42 @@ const appendIfDefined = (
 // MAPPER
 // ======================
 
-const mapItem = (item: UnitTransactionItemApiModel): UnitTransactionItem => ({
-  id: String(item.id ?? ''),
-  unit_transaction_id: String(item.unit_transaction_id ?? ''),
-  unit_type_id:
-    item.unit_type_id !== undefined
-      ? String(item.unit_type_id)
-      : undefined,
-  sparepart_id:
-    item.sparepart_id !== undefined
-      ? String(item.sparepart_id)
-      : undefined,
-  qty_total: toNumber(item.qty_total),
-  price: toNumber(item.price),
-  bbn_price: toNumber(item.bbn_price),
-  expedition_fee: toNumber(item.expedition_fee),
-  other_fee: toNumber(item.other_fee),
-  hpp_total_price: toNumber(item.hpp_total_price),
-  dpp_total_price: toNumber(item.dpp_total_price),
-  ppn_total_price: toNumber(item.ppn_total_price),
-});
+const mapItem = (item: UnitTransactionItemApiModel): UnitTransactionItem => {
+  const qty = toNumber(item.qty_total);
+  const price = toNumber(item.price);
+  const bbnPrice = toNumber(item.bbn_price);
+  const expeditionFee = toNumber(item.expedition_fee);
+  const otherFee = toNumber(item.other_fee);
+
+  const hppPerUnit = toNumber(item.hpp_per_unit_price);
+  const dppPerUnit = toNumber(item.dpp_per_unit_price);
+  const ppnPerUnit = toNumber(item.ppn_per_unit_price);
+
+  const hppTotal = toNumber(item.hpp_total_price) || (hppPerUnit > 0 ? hppPerUnit * qty : price * qty);
+  const dppTotal = toNumber(item.dpp_total_price) || (dppPerUnit > 0 ? dppPerUnit * qty : hppTotal);
+  const ppnTotal = toNumber(item.ppn_total_price) || (ppnPerUnit > 0 ? ppnPerUnit * qty : dppTotal * 0.11);
+
+  return {
+    id: String(item.id ?? ''),
+    unit_transaction_id: String(item.unit_transaction_id ?? ''),
+    unit_type_id:
+      item.unit_type_id !== undefined
+        ? String(item.unit_type_id)
+        : undefined,
+    sparepart_id:
+      item.sparepart_id !== undefined
+        ? String(item.sparepart_id)
+        : undefined,
+    qty_total: qty,
+    price,
+    bbn_price: bbnPrice,
+    expedition_fee: expeditionFee,
+    other_fee: otherFee,
+    hpp_total_price: hppTotal,
+    dpp_total_price: dppTotal,
+    ppn_total_price: ppnTotal,
+  };
+};
 
 const mapFormula = (payload: any): UnitFormulaResult => ({
   hpp_per_unit_price: toNumber(payload?.hpp_per_unit_price),
@@ -172,6 +191,7 @@ export const unitTransactionItemService = {
       {
         params: {
           unit_transaction_id: purchaseId,
+          type: 'purchase',
           page: params.page ?? 1,
           per_page: params.perPage ?? 50,
         },

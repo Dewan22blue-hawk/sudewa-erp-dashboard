@@ -131,6 +131,9 @@ export default function EditNestedUnitPage() {
       const currentTypeUnitId = unit?.unit_type_id
         ? String(unit.unit_type_id)
         : '';
+      const currentSparepartId = unit?.sparepart_id
+        ? String(unit.sparepart_id)
+        : '';
 
       const currentQty = Number(unit?.qty_total ?? 0);
       const currentPrice = Number(unit?.price ?? 0);
@@ -178,6 +181,10 @@ export default function EditNestedUnitPage() {
         selectedTypeUnitId !== currentTypeUnitId
       ) {
         payload.unit_type_id = selectedTypeUnitId;
+      }
+
+      if ((data.sparepartId || '') !== currentSparepartId) {
+        payload.sparepart_id = data.sparepartId || '';
       }
 
       if (!isSame(qty, currentQty)) {
@@ -292,6 +299,7 @@ export default function EditNestedUnitPage() {
             <PurchaseUnitForm
               defaultValues={{
                 typeUnitId: unit.unit_type_id ?? '',
+                sparepartId: unit.sparepart_id ?? '',
                 qty: unit.qty_total,
                 price: unit.price,
                 biayaBBN: unit.bbn_price,

@@ -32,6 +32,7 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
         setIsLoading(true);
         fetchCompanyDetail(currentCompany.slug)
             .then((data) => {
+                const companySlug = (data.slug || data.name || '').toLowerCase();
                 const labels = [...ALWAYS_ALLOWED];
                 if (data.modules) {
                     data.modules.forEach(m => {
@@ -40,6 +41,9 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
                             labels.push(...mapped);
                         }
                     });
+                }
+                if (companySlug.includes('yanotama')) {
+                    labels.push('Warehouse');
                 }
                 setAllowedLabels(labels);
             })

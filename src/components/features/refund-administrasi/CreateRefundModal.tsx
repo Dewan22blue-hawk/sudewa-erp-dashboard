@@ -13,6 +13,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 
+const parseCurrencyInput = (value: string) => {
+  const numericValue = value.replace(/[^\d]/g, '');
+  return numericValue ? Number(numericValue) : 0;
+};
+
 interface CreateRefundModalProps {
   open: boolean;
   onClose: () => void;
@@ -36,7 +41,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
     defaultValues: {
       unit_transaction_id: transactionId,
       refund_date: new Date().toISOString().split('T')[0],
-      refund_amount: 0,
+      refund_amount: undefined,
       note: '',
       unit_transaction_item_detail_ids: [],
     },
@@ -58,18 +63,11 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
     reset({
       unit_transaction_id: transactionId,
       refund_date: new Date().toISOString().split('T')[0],
-      refund_amount: 0,
+      refund_amount: undefined,
       note: '',
       unit_transaction_item_detail_ids: [],
     });
   }, [open, reset, transactionId]);
-
-  useEffect(() => {
-    setValue('refund_amount', selectedTotal, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }, [selectedTotal, setValue]);
 
   const transaction = transactionQuery.data;
   const personName = transaction?.person?.name ?? '-';
@@ -128,7 +126,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
               <p className="text-sm font-semibold text-slate-900">{personName}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total Pilihan</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Nilai Unit Terpilih</p>
               <p className="text-sm font-semibold text-emerald-700">{formatCurrency(selectedTotal)}</p>
             </div>
           </div>
@@ -142,7 +140,25 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
 
             <div className="space-y-2">
               <Label htmlFor="refund_amount">Nominal Refund</Label>
-              <Input id="refund_amount" type="number" min={0} {...register('refund_amount')} />
+              <Controller
+                control={control}
+                name="refund_amount"
+                render={({ field }) => (
+                  <Input
+                    id="refund_amount"
+                    type="text"
+                    inputMode="numeric"
+                    value={field.value === undefined || field.value === null || Number(field.value) === 0 ? '' : formatCurrency(Number(field.value))}
+                    onChange={(event) => {
+                      field.onChange(parseCurrencyInput(event.target.value));
+                    }}
+                    onBlur={field.onBlur}
+                    name={field.name}
+                    ref={field.ref}
+                  />
+                )}
+              />
+              {!errors.refund_amount ? <p className="text-xs text-slate-500">Nominal refund diisi manual. Nilai unit terpilih hanya sebagai referensi.</p> : null}
               {errors.refund_amount ? <p className="text-sm text-red-600">{errors.refund_amount.message}</p> : null}
             </div>
           </div>

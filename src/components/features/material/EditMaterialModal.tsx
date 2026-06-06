@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
 import { MaterialFormData } from './MaterialFormModal';
 import type { Material } from '@/@types/material.types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface EditMaterialModalProps {
     isOpen: boolean;
@@ -102,11 +103,25 @@ function EditMaterialInnerForm({ initialData, onClose, onSave }: InnerProps) {
 
             <div className="space-y-2">
                 <Label htmlFor="edit-type" className="text-gray-900 font-medium">Satuan</Label>
-                <Input
-                    id="edit-type"
-                    placeholder="Masukkan satuan"
-                    {...register('type', { required: 'Satuan wajib diisi' })}
-                    className={errors.type ? 'border-red-500' : ''}
+                <Controller
+                    control={control}
+                    name="type"
+                    rules={{ required: 'Satuan wajib diisi' }}
+                    render={({ field }) => (
+                        <Select 
+                            onValueChange={field.onChange} 
+                            value={field.value}
+                        >
+                            <SelectTrigger id="edit-type" className={errors.type ? 'border-red-500' : ''}>
+                                <SelectValue placeholder="Pilih satuan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="pcs">PCS</SelectItem>
+                                <SelectItem value="set">SET</SelectItem>
+                                <SelectItem value="box">BOX</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
                 />
                 {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
             </div>
