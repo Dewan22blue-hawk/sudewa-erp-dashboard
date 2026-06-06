@@ -56,6 +56,17 @@ const parseCurrencyInput = (value: string) => {
 
 const getRefundErrorMessage = (error: unknown, titleLabel: string) => {
   const rawMessage = error instanceof Error ? error.message : '';
+  const normalizedMessage = rawMessage.toLowerCase();
+
+  if (
+    normalizedMessage.includes('warehouse') ||
+    normalizedMessage.includes('stock') ||
+    normalizedMessage.includes('in stock') ||
+    normalizedMessage.includes('not received') ||
+    normalizedMessage.includes('not accepted')
+  ) {
+    return 'Data refund belum bisa dibuat karena unit transaksi ini belum diterima dan belum masuk ke stok warehouse. Terima unit terlebih dahulu agar bisa direfund.';
+  }
 
   if (rawMessage === 'Failed to update unit transaction refund') {
     return 'Gagal memperbarui data refund. Backend mengembalikan error saat memproses status item unit.';
@@ -99,6 +110,7 @@ export default function PurchaseRefundFormModal({
   const selectableItemsQuery = useRefundSelectableItems(transactionId);
   const selectableItems = selectableItemsQuery.items;
   const displayedItems = useMemo(() => (isDetail ? effectiveRefund?.items ?? [] : selectableItems), [effectiveRefund?.items, isDetail, selectableItems]);
+  const hasWarehouseReadyItems = useMemo(() => displayedItems.some((item) => item.in_stock), [displayedItems]);
   const lessPayment = effectiveRefund
     ? Math.max(0, Number(effectiveRefund.remaining_payment ?? Number(effectiveRefund.refund_amount || 0) - (effectiveRefund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0)))
     : 0;
@@ -174,6 +186,17 @@ export default function PurchaseRefundFormModal({
 
   const onSubmit = form.handleSubmit(
     async (values) => {
+      if (!isDetail && (!displayedItems.length || !hasWarehouseReadyItems)) {
+        toast.error('Data refund belum bisa dibuat karena unit transaksi ini belum diterima dan belum masuk ke stok warehouse. Terima unit terlebih dahulu agar bisa direfund.');
+        return;
+      }
+
+      const selectedWarehouseItems = displayedItems.filter((item) => values.unit_transaction_item_detail_ids.includes(Number(item.id)));
+      if (!isDetail && selectedWarehouseItems.some((item) => !item.in_stock)) {
+        toast.error('Unit yang dipilih belum masuk ke stok warehouse. Pilih unit yang sudah diterima terlebih dahulu.');
+        return;
+      }
+
       try {
         if (isEdit && effectiveRefund) {
           await updateMutation.mutateAsync({
@@ -335,7 +358,9 @@ export default function PurchaseRefundFormModal({
                             <TableCell colSpan={9} className="h-28 text-center text-[#6B7280]">
                               <div className="flex flex-col items-center justify-center gap-2">
                                 <PackageSearch className="h-5 w-5" />
-                                Tidak ada unit transaksi yang tersedia untuk direfund.
+                                {hasWarehouseReadyItems
+                                  ? 'Tidak ada unit transaksi yang tersedia untuk direfund.'
+                                  : 'Unit transaksi ini belum diterima dan belum masuk ke stok warehouse, sehingga belum bisa direfund.'}
                               </div>
                             </TableCell>
                           </TableRow>
