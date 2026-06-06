@@ -52,7 +52,7 @@ export function CustomerFormDialog({ open, onOpenChange, form, onSubmit, title, 
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Alamat</FormLabel>
+                    <FormLabel>Alamat<RequiredMark /></FormLabel>
                     <FormControl>
                       <Textarea placeholder="Tambahkan Alamat" className="resize-none" rows={3} {...field} />
                     </FormControl>

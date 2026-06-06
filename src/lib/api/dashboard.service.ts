@@ -115,16 +115,16 @@ export const dashboardService = {
     
     return [
       {
-        id: 'cash',
-        name: 'Cash',
-        subtitle: 'Saldo Kas Tunai',
-        type: 'cash',
-        currency: 'IDR',
-        openingBalance: opening_balance.debet.cash || 0,
-        debit: mutation.debet.cash || 0,
-        credit: mutation.kredit.cash || 0,
-        closingBalance: (opening_balance.debet.cash || 0) + (mutation.debet.cash || 0) - (mutation.kredit.cash || 0),
-        accentColor: '#16a34a' // unused but required by type if we extend or something, wait, accentColor is required
+        id: 'bca_usd',
+        name: 'BCA USD',
+        subtitle: 'Bank BCA Dollar',
+        type: 'bank',
+        currency: 'USD',
+        openingBalance: opening_balance.debet.bca_usd || 0,
+        debit: mutation.debet.bca_usd || 0,
+        credit: mutation.kredit.bca_usd || 0,
+        closingBalance: (opening_balance.debet.bca_usd || 0) + (mutation.debet.bca_usd || 0) - (mutation.kredit.bca_usd || 0),
+        accentColor: '#2563eb'
       },
       {
         id: 'bca_idr',
@@ -139,16 +139,16 @@ export const dashboardService = {
         accentColor: '#dc2626'
       },
       {
-        id: 'bca_usd',
-        name: 'BCA USD',
-        subtitle: 'Bank BCA Dollar',
-        type: 'bank',
-        currency: 'USD',
-        openingBalance: opening_balance.debet.bca_usd || 0,
-        debit: mutation.debet.bca_usd || 0,
-        credit: mutation.kredit.bca_usd || 0,
-        closingBalance: (opening_balance.debet.bca_usd || 0) + (mutation.debet.bca_usd || 0) - (mutation.kredit.bca_usd || 0),
-        accentColor: '#2563eb'
+        id: 'cash',
+        name: 'Cash',
+        subtitle: 'Saldo Kas Tunai',
+        type: 'cash',
+        currency: 'IDR',
+        openingBalance: opening_balance.debet.cash || 0,
+        debit: mutation.debet.cash || 0,
+        credit: mutation.kredit.cash || 0,
+        closingBalance: (opening_balance.debet.cash || 0) + (mutation.debet.cash || 0) - (mutation.kredit.cash || 0),
+        accentColor: '#16a34a' // unused but required by type if we extend or something, wait, accentColor is required
       },
     ];
   },
@@ -194,9 +194,9 @@ export const dashboardService = {
           bcaIdr: cumulativeBcaIdrSales,
           cash: cumulativeCashSales,
           sales: {
+            bcaUsd: cumulativeBcaUsdSales,
             cash: cumulativeCashSales,
             bcaIdr: cumulativeBcaIdrSales,
-            bcaUsd: cumulativeBcaUsdSales,
           },
           purchase: {
             cash: cumulativeCashPurchase,

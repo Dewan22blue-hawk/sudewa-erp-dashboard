@@ -31,12 +31,9 @@ export function CustomerFormModal({
 }: CustomerFormModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="max-w-[410px] rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[410px]"
-        style={{ display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' }}
-      >
-        <div className="flex flex-col overflow-hidden px-6 pt-6">
-          <DialogHeader className="shrink-0 space-y-1 text-left">
+      <DialogContent className="max-w-[410px] max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[410px]">
+        <div className="overflow-y-auto px-6 py-6">
+          <DialogHeader className="space-y-1 text-left">
             <DialogTitle className="text-[18px] font-semibold text-[#171717]">{title}</DialogTitle>
             <DialogDescription className="text-[15px] text-[#71717A]">{description}</DialogDescription>
           </DialogHeader>
@@ -87,7 +84,9 @@ export function CustomerFormModal({
                   name="address"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className="text-[14px] font-medium text-[#171717]">Alamat</FormLabel>
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">
+                        Alamat<RequiredMark />
+                      </FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
@@ -105,15 +104,14 @@ export function CustomerFormModal({
                   name="phone"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className="text-[14px] font-medium text-[#171717]">Phone</FormLabel>
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">
+                        Phone<RequiredMark />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           placeholder="Tambahkan nomer telepon"
                           className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                          onChange={(e) => {
-                            field.onChange(sanitizePhone(e.target.value));
-                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -144,7 +142,9 @@ export function CustomerFormModal({
                   name="npwp"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className="text-[14px] font-medium text-[#171717]">NPWP</FormLabel>
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">
+                        NPWP<RequiredMark />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -156,16 +156,15 @@ export function CustomerFormModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <div className="shrink-0 flex flex-col gap-3 py-6">
-                <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
-                  {isSubmitting ? 'Menyimpan...' : submitLabel}
-                </Button>
-                <Button type="button" variant="outline" className="h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
-                  Batal
-                </Button>
-              </div>
+                <div className="shrink-0 flex flex-col gap-3 py-6">
+                  <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
+                    {isSubmitting ? 'Menyimpan...' : submitLabel}
+                  </Button>
+                  <Button type="button" variant="outline" className="h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
+                    Batal
+                  </Button>
+                </div>
             </form>
           </Form>
         </div>
