@@ -39,9 +39,17 @@ export type SalesApiModel = {
     bca_payment_2?: string | number;
     bca_payment_usd_amount?: string | number;
     unit_transaction_billing_histories?: Array<{
+      id?: number | string;
+      unit_transaction_billing_id?: number | string;
+      unit_transaction_id?: number | string;
+      payment_proof?: string | null;
       bca_payment_amount?: string | number;
       cash_payment_amount?: string | number;
       bca_payment_usd_amount?: string | number;
+      payment_at?: string;
+      note?: string;
+      created_at?: string;
+      updated_at?: string;
     }>;
   } | null;
   billing_summary?: {
