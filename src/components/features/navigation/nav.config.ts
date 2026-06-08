@@ -116,6 +116,10 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
           href: base('/warehouse/penerimaan-material'),
         },
         {
+          label: 'Pengeluaran Material',
+          href: base('/warehouse/pengeluaran-material'),
+        },
+        {
           label: 'Perlengkapan Keluar',
           href: base('/warehouse/perlengkapan-keluar'),
         },

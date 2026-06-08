@@ -111,6 +111,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/warehouse/penerimaan-material'),
         },
         {
+          label: 'Pengeluaran Material',
+          href: base('/warehouse/pengeluaran-material'),
+        },
+        {
           label: 'Perlengkapan Keluar',
           href: base('/warehouse/perlengkapan-keluar'),
         },
