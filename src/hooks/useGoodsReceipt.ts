@@ -27,6 +27,9 @@ export const goodsReceiptKeys = {
   detail: (id: number | string | undefined) => [...goodsReceiptKeys.all, 'detail', id] as const,
 };
 
+const invalidateStockMaterialQueries = (queryClient: ReturnType<typeof useQueryClient>) =>
+  queryClient.invalidateQueries({ queryKey: ['warehouse-stock-material'] });
+
 export const useGoodsReceipts = (
   params: PaginationParams & {
     companyId?: number | string;
@@ -60,6 +63,7 @@ export const useCreateGoodsReceipt = () => {
     mutationFn: (payload: GoodsReceiptPayload) => createGoodsReceipt(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.all });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -71,6 +75,7 @@ export const useUpdateGoodsReceipt = () => {
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.all });
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.detail(variables.id) });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -81,6 +86,7 @@ export const useDeleteGoodsReceipt = () => {
     mutationFn: (id: number | string) => deleteGoodsReceipt(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.all });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -92,6 +98,7 @@ export const useCreateGoodsReceiptItem = () => {
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.all });
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.detail(variables.goodsTransactionId) });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -103,6 +110,7 @@ export const useUpdateGoodsReceiptItem = () => {
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.all });
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.detail(variables.payload.goodsTransactionId) });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -114,6 +122,7 @@ export const useDeleteGoodsReceiptItem = () => {
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.all });
       qc.invalidateQueries({ queryKey: goodsReceiptKeys.detail(variables.goodsTransactionId) });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };

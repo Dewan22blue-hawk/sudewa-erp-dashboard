@@ -44,7 +44,6 @@ export default function KasHarianTable({
   meta,
   hasNextPage,
   isLoading,
-  isFetching,
   isError,
   errorMessage,
   onRetry,
@@ -122,10 +121,6 @@ export default function KasHarianTable({
   return (
     <div className="space-y-5">
       <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
-        {isFetching && !isLoading ? (
-          <div className="border-b border-slate-200 bg-slate-50 px-6 py-3 text-xs text-slate-600">Memperbarui data...</div>
-        ) : null}
-
         <table className="w-full min-w-[1120px] text-sm">
           <thead className="bg-[#f3f6fb] uppercase text-sm font-semibold text-gray-900 leading-normal border-b border-slate-200 bg-gray-50/50">
             <tr>
@@ -187,7 +182,7 @@ export default function KasHarianTable({
                         <DropdownMenuItem onClick={() => onView(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
                           Detail
                         </DropdownMenuItem>
-                        {item.source === 'manual' ? (
+                        {item.cashFlowId ? (
                           <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
                             Edit
                           </DropdownMenuItem>

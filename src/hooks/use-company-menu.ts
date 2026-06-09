@@ -61,19 +61,20 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
         // Normalize name/slug to match key in map
         const compSlug = (currentCompany.slug || currentCompany.name || '').toLowerCase();
         const isTransindo = compSlug.includes('transindo');
+        const isYanotama = compSlug.includes('yanotama');
 
         // Mapping logik
         let baseMenus: MenuItem[] = [];
         if (isTransindo) {
             baseMenus = companyMenuMap['transindo'](slug);
-        } else if (compSlug.includes('yanotama')) {
+        } else if (isYanotama) {
             baseMenus = companyMenuMap['yanotama'](slug);
         } else {
             baseMenus = companyMenuMap.default(slug);
         }
 
-        // Filter out 'Perlengkapan Masuk', 'Perlengkapan Keluar', and 'Stock/Stok Perlengkapan' submenus from Warehouse if not Wajira Transindo
-        if (!isTransindo) {
+        // Keep stock-perlengkapan available for Yanotama, while preserving the old restriction for other companies.
+        if (!isTransindo && !isYanotama) {
             baseMenus = baseMenus.map((menu) => {
                 if (menu.label === 'Warehouse' && menu.children) {
                     return {

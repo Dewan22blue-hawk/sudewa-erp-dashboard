@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateFinanceBillingItem, useFinanceBillingDetail } from '@/hooks/useFinanceBilling';
+import { useKasHarianDetail } from '@/hooks/useKasHarian';
 import { formatCurrency } from '@/lib/utils/currency';
 
 const formatDate = (value?: string) => {
@@ -33,16 +34,9 @@ const parseMoneyInput = (value: string) => {
 
 const translateFinanceBillingError = (message: string) => {
   const trimmed = message.trim();
-
   const balanceMatch = trimmed.match(/^Payment amount exceeds remaining billing balance \(([\d.,]+)\)\.?$/i);
-  if (balanceMatch) {
-    return `Nominal pembayaran melebihi sisa saldo tagihan (${balanceMatch[1]}).`;
-  }
-
-  if (/^Validation failed$/i.test(trimmed)) {
-    return 'Validasi gagal. Periksa kembali data pembayaran yang Anda masukkan.';
-  }
-
+  if (balanceMatch) return `Nominal pembayaran melebihi sisa saldo tagihan (${balanceMatch[1]}).`;
+  if (/^Validation failed$/i.test(trimmed)) return 'Validasi gagal. Periksa kembali data pembayaran yang Anda masukkan.';
   return trimmed
     .replace(/^Payment amount exceeds remaining billing balance/i, 'Nominal pembayaran melebihi sisa saldo tagihan')
     .replace(/^Payment amount is required/i, 'Nominal pembayaran wajib diisi')
@@ -52,66 +46,62 @@ const translateFinanceBillingError = (message: string) => {
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!error || typeof error !== 'object') return fallback;
-
   const details = 'details' in error ? (error as { details?: unknown }).details : undefined;
-  if (typeof details === 'string' && details.trim()) {
-    return translateFinanceBillingError(details);
-  }
-
+  if (typeof details === 'string' && details.trim()) return translateFinanceBillingError(details);
   if (details && typeof details === 'object') {
     const firstValue = Object.values(details as Record<string, unknown>)[0];
-    if (typeof firstValue === 'string' && firstValue.trim()) {
-      return translateFinanceBillingError(firstValue);
-    }
-    if (Array.isArray(firstValue) && typeof firstValue[0] === 'string') {
-      return translateFinanceBillingError(firstValue[0]);
-    }
+    if (typeof firstValue === 'string' && firstValue.trim()) return translateFinanceBillingError(firstValue);
+    if (Array.isArray(firstValue) && typeof firstValue[0] === 'string') return translateFinanceBillingError(firstValue[0]);
   }
-
   const message = 'message' in error ? (error as { message?: unknown }).message : undefined;
-  if (typeof message === 'string' && message.trim()) {
-    return translateFinanceBillingError(message);
-  }
-
+  if (typeof message === 'string' && message.trim()) return translateFinanceBillingError(message);
   return fallback;
 };
 
 export default function BayarKasHarianPage() {
   const router = useRouter();
-  const { slug, id: rawId, source } = router.query;
-  const financeBillingId = typeof rawId === 'string' ? Number(rawId) : undefined;
-  const isBillingSource = source === 'billing';
+  const { slug, id: rawId } = router.query;
+  const cashFlowId = typeof rawId === 'string' ? Number(rawId) : undefined;
+
+  const cashFlowQuery = useKasHarianDetail(cashFlowId, {
+    enabled: typeof cashFlowId === 'number' && Number.isFinite(cashFlowId),
+  });
+
+  const cashFlowDetail = cashFlowQuery.data;
+  const financeBillingId = cashFlowDetail?.finance_billing?.id;
 
   const financeBillingQuery = useFinanceBillingDetail(financeBillingId, {
-    enabled: isBillingSource && typeof financeBillingId === 'number' && Number.isFinite(financeBillingId),
+    enabled: typeof financeBillingId === 'number' && Number.isFinite(financeBillingId),
   });
+
   const financeBillingDetail = financeBillingQuery.data;
-  const unitTransactionId = financeBillingDetail?.unit_transaction_billing?.unit_transaction?.id;
   const mutation = useCreateFinanceBillingItem();
-  const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [paymentDate, setPaymentDate] = useState('');
   const [bcaIdr, setBcaIdr] = useState('');
   const [bcaUsd, setBcaUsd] = useState('');
   const [cash, setCash] = useState('');
   const [note, setNote] = useState('');
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
 
-  const totalBeli = Number(financeBillingDetail?.unit_transaction_billing?.grand_total || 0);
+  const totalBeli = Number(financeBillingDetail?.unit_transaction_billing?.grand_total || cashFlowDetail?.finance_billing?.grand_total || 0);
   const totalPpn = 0;
   const totalBiaya = totalBeli + totalPpn;
+  const totalCashPayment = Number(financeBillingDetail?.total_cash_payment || 0);
+  const totalBcaPayment = Number(financeBillingDetail?.total_bca_payment || 0);
+  const totalUsdPayment = Number(financeBillingDetail?.total_usd_payment || 0);
   const totalPaid = Number(financeBillingDetail?.total_paid || 0);
-  const remainingPayment = Number(financeBillingDetail?.remaining_payment || 0);
-
-  const currentInputTotal = useMemo(
-    () => parseMoneyInput(bcaIdr) + parseMoneyInput(bcaUsd) + parseMoneyInput(cash),
-    [bcaIdr, bcaUsd, cash],
-  );
+  const remainingPayment = Number(financeBillingDetail?.remaining_payment || totalBeli);
+  const currentInputTotal = useMemo(() => parseMoneyInput(bcaIdr) + parseMoneyInput(bcaUsd) + parseMoneyInput(cash), [bcaIdr, bcaUsd, cash]);
   const totalBayar = totalPaid + currentInputTotal;
   const kurangBayar = Math.max(0, remainingPayment - currentInputTotal);
 
-  const isBusy = mutation.isPending;
+  useEffect(() => {
+    if (!financeBillingDetail?.last_payment_at) return;
+    setPaymentDate((current) => (current ? current : formatDate(financeBillingDetail.last_payment_at)));
+  }, [financeBillingDetail?.last_payment_at]);
 
   const handleSubmit = async () => {
-    if (!financeBillingId || !financeBillingDetail) {
+    if (!financeBillingId) {
       toast.error('Data finance billing belum tersedia pada transaksi ini');
       return;
     }
@@ -137,11 +127,10 @@ export default function BayarKasHarianPage() {
     }
 
     try {
-      await mutation.mutateAsync({ id: unitTransactionId as number, payload });
+      await mutation.mutateAsync({ id: financeBillingId, payload });
       toast.success('Pembayaran berhasil disimpan');
-
-      if (typeof slug === 'string') {
-        void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${financeBillingId}?source=billing`);
+      if (typeof slug === 'string' && cashFlowId) {
+        void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${cashFlowId}?source=billing`);
       }
     } catch (error) {
       toast.error(getErrorMessage(error, 'Gagal menyimpan pembayaran'));
@@ -154,34 +143,35 @@ export default function BayarKasHarianPage() {
         <title>Pembayaran Kas Harian - Wajira Dashboard</title>
       </Head>
 
-      {!isBillingSource ? (
-        <div className="rounded-[30px] border border-amber-200 bg-amber-50 px-6 py-5 text-amber-800">
-          <p className="font-medium">Fitur pembayaran hanya tersedia untuk data fractal pembayaran.</p>
-          <p className="mt-1 text-sm text-amber-700">Data kas harian manual tidak memiliki alur pembayaran dari finance billing.</p>
-        </div>
-      ) : financeBillingQuery.isLoading || router.isFallback ? (
+      {cashFlowQuery.isLoading || financeBillingQuery.isLoading || router.isFallback ? (
         <div className="flex min-h-[50vh] items-center justify-center rounded-[30px] border border-slate-200 bg-white">
           <div className="flex items-center gap-3 text-slate-500">
             <Loader2 className="h-5 w-5 animate-spin" />
             Memuat data pembayaran...
           </div>
         </div>
-      ) : financeBillingQuery.error || !financeBillingDetail ? (
+      ) : cashFlowQuery.error || financeBillingQuery.error || !cashFlowDetail || !financeBillingId ? (
         <div className="rounded-[30px] border border-red-200 bg-red-50 px-6 py-5 text-red-700">
-          <p className="font-medium">{financeBillingQuery.error instanceof Error ? financeBillingQuery.error.message : 'Data pembayaran tidak ditemukan'}</p>
-          <p className="mt-1 text-sm text-red-600">Pastikan ID billing yang dipakai sudah benar.</p>
+          <p className="font-medium">
+            {cashFlowQuery.error instanceof Error
+              ? cashFlowQuery.error.message
+              : financeBillingQuery.error instanceof Error
+                ? financeBillingQuery.error.message
+                : 'Data pembayaran tidak ditemukan'}
+          </p>
+          <p className="mt-1 text-sm text-red-600">Pastikan cash flow yang dipilih memang memiliki finance billing.</p>
         </div>
       ) : (
         <div className="space-y-6">
           <div className="space-y-2">
-            <Link href={typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian/${financeBillingId}?source=billing` : '/dashboard'} className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800">
+            <Link href={typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian/${cashFlowId}?source=billing` : '/dashboard'} className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800">
               <ArrowLeft className="h-4 w-4" />
               Kembali
             </Link>
             <div>
               <h1 className="text-[36px] font-semibold tracking-tight text-slate-950">Detail Pembayaran</h1>
               <p className="text-sm text-slate-500">
-                Nota Referensi <span className="text-[#255ee8]">{financeBillingDetail.unit_transaction_billing.unit_transaction.code}</span>
+                Nota Referensi <span className="text-[#255ee8]">{cashFlowDetail.code}</span>
               </p>
             </div>
           </div>
@@ -228,15 +218,35 @@ export default function BayarKasHarianPage() {
               <div className="mt-5 grid gap-5 md:grid-cols-3">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-900">Tanggal</label>
-                  <Input type="date" value={paymentDate || formatDate(financeBillingDetail.last_payment_at)} onChange={(event) => setPaymentDate(event.target.value)} className="h-12 rounded-xl border-slate-200" />
+                  <Input type="date" value={paymentDate || formatDate(cashFlowDetail.date)} onChange={(event) => setPaymentDate(event.target.value)} className="h-12 rounded-xl border-slate-200" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Total Bayar</label>
+                  <label className="text-sm font-medium text-slate-900">Total Paid Saat Ini</label>
+                  <Input value={formatCurrency(totalPaid)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Sisa Sebelum Bayar</label>
+                  <Input value={formatCurrency(remainingPayment)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Total Bayar Setelah Input</label>
                   <Input value={formatCurrency(totalBayar)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Kurang Bayar</label>
+                  <label className="text-sm font-medium text-slate-900">Kurang Bayar Setelah Input</label>
                   <Input value={formatCurrency(kurangBayar)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Total Cash Payment</label>
+                  <Input value={formatCurrency(totalCashPayment)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Total BCA Payment</label>
+                  <Input value={formatCurrency(totalBcaPayment)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Total USD Payment</label>
+                  <Input value={formatCurrency(totalUsdPayment)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
                 </div>
               </div>
             </section>
@@ -254,20 +264,15 @@ export default function BayarKasHarianPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-900">Catatan</label>
-              <Textarea
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                placeholder={financeBillingDetail.unit_transaction_billing.unit_transaction.code || 'pembayaran utama termin 1'}
-                className="min-h-28 resize-none rounded-2xl border-slate-200"
-              />
+              <Textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder={cashFlowDetail.note || 'pembayaran utama termin 1'} className="min-h-28 resize-none rounded-2xl border-slate-200" />
             </div>
 
-            <div className="flex items-center justify-center gap-4 pt-4">
-              <Button type="button" variant="ghost" onClick={() => router.back()} disabled={isBusy}>
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <Button type="button" variant="ghost" onClick={() => router.back()}>
                 Batal
               </Button>
-              <Button type="button" className="bg-[#12c04b] hover:bg-[#0fa040]" onClick={handleSubmit} disabled={isBusy}>
-                {isBusy ? 'Menyimpan...' : 'Bayar'}
+              <Button type="button" className="h-11 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843]" disabled={mutation.isPending} onClick={() => void handleSubmit()}>
+                {mutation.isPending ? 'Menyimpan...' : 'Simpan Pembayaran'}
               </Button>
             </div>
           </div>

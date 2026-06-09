@@ -109,12 +109,13 @@ const normalizeFinanceBillingDetail = (item: any): FinanceBillingDetail => ({
   finance_billing_items: (item?.finance_billing_items ?? []).map(normalizeFinanceBillingItem),
 });
 
-export async function fetchFinanceBilling(params: { page?: number; per_page?: number; search?: string } = {}): Promise<FinanceBillingListResult> {
+export async function fetchFinanceBilling(params: { page?: number; per_page?: number; search?: string; company_id?: number | string } = {}): Promise<FinanceBillingListResult> {
   const response = await apiClient.get<FinanceBillingListResponse>(BILLING_PATH, {
     params: {
       page: params.page ?? 1,
       per_page: params.per_page ?? 10,
       search: params.search || undefined,
+      company_id: params.company_id || undefined,
     },
   });
 

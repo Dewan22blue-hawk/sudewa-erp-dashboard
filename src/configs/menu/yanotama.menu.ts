@@ -101,6 +101,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             icon: DollarSign,
             children: [
                 {
+                    label: 'Transaksi Kas Harian',
+                    href: base('/finance/transaksi-kas-harian'),
+                },
+                {
                     label: 'Aset',
                     href: base('/finance/asset'),
                 },
@@ -110,6 +114,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             label: 'Warehouse',
             icon: Warehouse,
             children: [
+                {
+                    label: 'Stock Perlengkapan',
+                    href: base('/warehouse/stock-perlengkapan'),
+                },
                 {
                     label: 'Penerimaan Material',
                     href: base('/warehouse/penerimaan-material'),

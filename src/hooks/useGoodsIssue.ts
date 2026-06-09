@@ -27,6 +27,9 @@ export const goodsIssueKeys = {
   detail: (id: number | string | undefined) => [...goodsIssueKeys.all, 'detail', id] as const,
 };
 
+const invalidateStockMaterialQueries = (queryClient: ReturnType<typeof useQueryClient>) =>
+  queryClient.invalidateQueries({ queryKey: ['warehouse-stock-material'] });
+
 export const useGoodsIssues = (
   params: PaginationParams & {
     companyId?: number | string;
@@ -58,7 +61,10 @@ export const useCreateGoodsIssue = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: GoodsIssuePayload) => createGoodsIssue(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: goodsIssueKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: goodsIssueKeys.all });
+      invalidateStockMaterialQueries(qc);
+    },
   });
 };
 
@@ -69,6 +75,7 @@ export const useUpdateGoodsIssue = () => {
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsIssueKeys.all });
       qc.invalidateQueries({ queryKey: goodsIssueKeys.detail(variables.id) });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -77,7 +84,10 @@ export const useDeleteGoodsIssue = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number | string) => deleteGoodsIssue(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: goodsIssueKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: goodsIssueKeys.all });
+      invalidateStockMaterialQueries(qc);
+    },
   });
 };
 
@@ -89,6 +99,7 @@ export const useCreateGoodsIssueItem = () => {
       qc.invalidateQueries({ queryKey: goodsIssueKeys.all });
       qc.invalidateQueries({ queryKey: goodsIssueKeys.detail(variables.goodsTransactionId) });
       qc.invalidateQueries({ queryKey: ['materials'] });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -101,6 +112,7 @@ export const useUpdateGoodsIssueItem = () => {
       qc.invalidateQueries({ queryKey: goodsIssueKeys.all });
       qc.invalidateQueries({ queryKey: goodsIssueKeys.detail(variables.payload.goodsTransactionId) });
       qc.invalidateQueries({ queryKey: ['materials'] });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
@@ -113,6 +125,7 @@ export const useDeleteGoodsIssueItem = () => {
       qc.invalidateQueries({ queryKey: goodsIssueKeys.all });
       qc.invalidateQueries({ queryKey: goodsIssueKeys.detail(variables.goodsTransactionId) });
       qc.invalidateQueries({ queryKey: ['materials'] });
+      invalidateStockMaterialQueries(qc);
     },
   });
 };
