@@ -82,6 +82,7 @@ export default function CreatePurchaseUnitPage() {
       await addUnitMutation.mutateAsync({
         unit_transaction_id: id as string,
         unit_type_id: data.typeUnitId,
+        sparepart_id: data.sparepartId,
         qty_total: qty,
         price,
         bbn_price: bbn,

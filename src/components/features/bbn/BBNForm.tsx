@@ -75,7 +75,7 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
         onSubmit({
             dealerId: Number(data.dealerId),
             regionId: Number(data.regionId),
-            tnbkCode: data.tnbkCode,
+            tnbkCode: data.tnbkCode.trim().toUpperCase(),
             vehicleType: data.vehicleType,
             unNoticeFee: data.unNoticeFee,
             garwilFee: data.garwilFee,
@@ -137,8 +137,17 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
                                     <Input
                                         id="tnbkCode"
                                         placeholder="Masukkan kode TNBK"
-                                        {...register('tnbkCode', { required: 'Kode TNBK wajib diisi', maxLength: 10 })}
+                                        {...register('tnbkCode', {
+                                            required: 'Kode TNBK wajib diisi',
+                                            setValueAs: (value) => String(value ?? '').trim().toUpperCase(),
+                                            validate: (value) => value.trim().length > 0 || 'Kode TNBK wajib diisi',
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'Kode TNBK maksimal 10 karakter',
+                                            },
+                                        })}
                                         className={errors.tnbkCode ? 'border-red-500 bg-white' : 'bg-white'}
+                                        autoCapitalize="characters"
                                     />
                                     {errors.tnbkCode && <p className="text-red-500 text-xs">{errors.tnbkCode.message}</p>}
                                 </div>

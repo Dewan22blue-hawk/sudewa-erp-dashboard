@@ -6,7 +6,7 @@ const FINANCE_BILLING_KEY = 'finance-billing';
 
 export const financeBillingKeys = {
   all: [FINANCE_BILLING_KEY] as const,
-  list: (params: { page?: number; per_page?: number; search?: string }) => [FINANCE_BILLING_KEY, 'list', params] as const,
+  list: (params: { page?: number; per_page?: number; search?: string; company_id?: number | string }) => [FINANCE_BILLING_KEY, 'list', params] as const,
   detail: (id: number | string | undefined) => [FINANCE_BILLING_KEY, 'detail', id] as const,
 };
 
@@ -15,7 +15,7 @@ interface FinanceBillingQueryOptions {
   refetchInterval?: number | false;
 }
 
-export function useFinanceBilling(params: { page?: number; per_page?: number; search?: string }, options?: FinanceBillingQueryOptions) {
+export function useFinanceBilling(params: { page?: number; per_page?: number; search?: string; company_id?: number | string }, options?: FinanceBillingQueryOptions) {
   return useQuery({
     queryKey: financeBillingKeys.list(params),
     queryFn: () => fetchFinanceBilling(params),

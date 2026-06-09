@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarDays, Loader2 } from 'lucide-react';
 import type { UnitTransactionRefund, UnitTransactionRefundPayment } from '@/@types/refund.type';
@@ -29,6 +29,11 @@ const displayDate = (value?: string) => {
   return date.toISOString().split('T')[0] || '';
 };
 
+const parseCurrencyInput = (value: string) => {
+  const numericValue = value.replace(/[^\d]/g, '');
+  return numericValue ? Number(numericValue) : 0;
+};
+
 export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund, payment, entityLabel = 'Pembelian' }: PurchaseRefundPaymentDetailModalProps) {
   const isEdit = Boolean(payment);
   const createMutation = useCreateRefundPayment();
@@ -44,7 +49,7 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
     defaultValues: {
       unit_transaction_refund_id: refund.id,
       payment_date: displayDate(payment?.payment_date || refund.refund_date) || new Date().toISOString().split('T')[0],
-      amount: Number(payment?.amount || remainingAmount || 0),
+      amount: payment?.amount !== undefined && payment?.amount !== null ? Number(payment.amount) : undefined,
       note: payment?.note || '',
     },
   });
@@ -54,7 +59,7 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
     form.reset({
       unit_transaction_refund_id: refund.id,
       payment_date: displayDate(payment?.payment_date || refund.refund_date) || new Date().toISOString().split('T')[0],
-      amount: Number(payment?.amount || remainingAmount || 0),
+      amount: payment?.amount !== undefined && payment?.amount !== null ? Number(payment.amount) : undefined,
       note: payment?.note || '',
     });
   }, [form, open, payment, refund.id, refund.refund_date, remainingAmount]);
@@ -125,7 +130,26 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
 
           <div>
             <Label className={refundLabelClassName}>Nominal Refund</Label>
-            <Input type="number" min={1} max={remainingAmount || undefined} className={refundInputClassName} {...form.register('amount')} />
+            <Controller
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  className={refundInputClassName}
+                  placeholder="Rp 0"
+                  value={field.value === undefined || field.value === null || Number(field.value) === 0 ? '' : formatCurrency(Number(field.value))}
+                  onChange={(event) => {
+                    field.onChange(parseCurrencyInput(event.target.value));
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                />
+              )}
+            />
+            {!form.formState.errors.amount ? <p className="mt-2 text-xs text-[#6B7280]">Nominal refund diisi manual dan akan diformat ke IDR.</p> : null}
             {form.formState.errors.amount ? <p className="mt-2 text-sm text-red-600">{form.formState.errors.amount.message}</p> : null}
           </div>
 

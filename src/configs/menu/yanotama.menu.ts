@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign, Warehouse } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getYanotamaMenus = (slug: string): MenuItem[] => {
@@ -101,8 +101,30 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             icon: DollarSign,
             children: [
                 {
+                    label: 'Transaksi Kas Harian',
+                    href: base('/finance/transaksi-kas-harian'),
+                },
+                {
                     label: 'Aset',
                     href: base('/finance/asset'),
+                },
+            ],
+        },
+        {
+            label: 'Warehouse',
+            icon: Warehouse,
+            children: [
+                {
+                    label: 'Stock Perlengkapan',
+                    href: base('/warehouse/stock-perlengkapan'),
+                },
+                {
+                    label: 'Penerimaan Material',
+                    href: base('/warehouse/penerimaan-material'),
+                },
+                {
+                    label: 'Pengeluaran Material',
+                    href: base('/warehouse/pengeluaran-material'),
                 },
             ],
         },

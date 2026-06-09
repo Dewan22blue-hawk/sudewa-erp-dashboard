@@ -177,7 +177,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="flex items-end justify-between">
             <div>
               <h2 className="text-[18px] font-semibold text-[#111827]">Detail Unit yang direfund</h2>
@@ -229,7 +229,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
               </TableBody>
             </Table>
           </div>
-        </div>
+        </div> */}
 
         <PurchaseRefundPaymentDetailModal open={isAddDetailOpen} onClose={() => setIsAddDetailOpen(false)} refund={refund} />
         <PurchaseRefundPaymentDetailModal open={Boolean(editingPayment)} onClose={() => setEditingPayment(null)} refund={refund} payment={editingPayment} />
