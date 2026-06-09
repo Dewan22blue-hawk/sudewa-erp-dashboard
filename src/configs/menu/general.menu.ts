@@ -62,10 +62,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Aset',
           href: master('/asset'),
         },
-        {
-          label: 'Perlengkapan',
-          href: master('/vehicle-equipment'),
-        },
+        // {
+        //   label: 'Perlengkapan',
+        //   href: master('/vehicle-equipment'),
+        // },
       ],
     },
     {
