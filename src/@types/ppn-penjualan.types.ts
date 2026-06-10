@@ -24,7 +24,6 @@ export interface PPNPenjualan {
   supplier: string;
   fpm_date: string | null;
   nsfpm_age: string | null;
-  nsfpm_input: number;
   qty: number;
   unit_type: UnitType;
   unit_transaction_item_detail: UnitTransactionItemDetail;
@@ -32,13 +31,14 @@ export interface PPNPenjualan {
   dpp_amount: number;
   ppn_11: number;
   payment_amount: number;
+  nsfp_number: string | null;
 }
 
 export interface UpdatePPNPenjualanPayload {
   fpm_date?: string;
   nsfpm_age?: string;
-  nsfp_amount?: number;
   amount?: number;
+  nsfp_number?: string;
 }
 
 export interface UpdatePPNPenjualanMutationPayload {
@@ -61,7 +61,6 @@ export interface PPNPenjualanUpdateResponse {
     id: number;
     fpm_date: string | null;
     nsfpm_age: string | null;
-    nsfp_amount: string;
     amount: string;
   };
 }
@@ -69,8 +68,8 @@ export interface PPNPenjualanUpdateResponse {
 export const UpdatePPNPenjualanSchema = z.object({
   fpm_date: z.date().optional().nullable(),
   nsfpm_age: z.date().optional().nullable(),
-  nsfp_amount: z.number().optional().nullable(),
   amount: z.number().optional().nullable(),
+  nsfp_number: z.string().optional().nullable(),
 });
 
 export type UpdatePPNPenjualanFormValues = z.infer<typeof UpdatePPNPenjualanSchema>;

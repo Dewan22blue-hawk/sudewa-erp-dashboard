@@ -53,8 +53,8 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
     defaultValues: {
       fp_date: null,
       nsfp_age: null,
-      nsfp_amount: null,
       amount: null,
+      nsfp_number: '',
     },
   });
 
@@ -63,8 +63,8 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
       form.reset({
         fp_date: null,
         nsfp_age: null,
-        nsfp_amount: null,
         amount: null,
+        nsfp_number: '',
       });
       return;
     }
@@ -72,8 +72,8 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
     form.reset({
       fp_date: toDate(initialData.fp_date),
       nsfp_age: toDate(initialData.nsfp_age),
-      nsfp_amount: initialData.nsfp_input || null,
       amount: initialData.payment_amount || null,
+      nsfp_number: initialData.nsfp_number || '',
     });
   }, [form, initialData]);
 
@@ -86,8 +86,8 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
         payload: {
           fp_date: values.fp_date ? format(values.fp_date, 'yyyy-MM-dd') : undefined,
           nsfp_age: values.nsfp_age ? format(values.nsfp_age, 'yyyy-MM-dd') : undefined,
-          nsfp_amount: values.nsfp_amount ?? undefined,
           amount: values.amount ?? undefined,
+          nsfp_number: values.nsfp_number || undefined,
         },
       });
 
@@ -152,12 +152,12 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
 
               <FormField
                 control={form.control}
-                name="nsfp_amount"
+                name="nsfp_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>NFP Masukan</FormLabel>
+                    <FormLabel>Nomor NSFP</FormLabel>
                     <FormControl>
-                      <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Tambahkan NFP" />
+                      <Input {...field} value={field.value ?? ''} placeholder="Masukkan nomor NSFP" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -91,9 +91,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               <th className="py-2 text-left">
                 <SortableHeader title="MASA NSFPM" sortKey="nsfpm_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
               </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="Input NSFPM" sortKey="nsfpm_input" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
-              </th>
+              <th className="py-2 text-left font-semibold text-gray-900 px-4">Nomor NSFP</th>
               <th className="py-2 text-right">
                 <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
               </th>
@@ -143,7 +141,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               data.map((item) => {
                 const hasFpm = Boolean(item.fpm_date);
                 const hasNsfpmAge = Boolean(item.nsfpm_age);
-                const hasNsfpmInput = item.nsfpm_input > 0;
+                const hasNsfpNumber = Boolean(item.nsfp_number && item.nsfp_number.trim() !== '');
 
                 return (
                   <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
@@ -162,10 +160,10 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
                         {renderStatusBadge(hasNsfpmAge, 'NSFPM Terisi', 'Belum NSFPM')}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 font-medium">
                       <div className="space-y-1">
-                        <div>{formatCurrency(item.nsfpm_input)}</div>
-                        {renderStatusBadge(hasNsfpmInput, 'Sudah Input', 'Belum Input')}
+                        <div>{item.nsfp_number || '-'}</div>
+                        {renderStatusBadge(hasNsfpNumber, 'Sudah Input', 'Belum Input')}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right">{item.qty}</td>
