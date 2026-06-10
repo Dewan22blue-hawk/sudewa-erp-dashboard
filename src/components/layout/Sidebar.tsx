@@ -71,7 +71,8 @@ export function Sidebar() {
 
   useEffect(() => {
     fetchUserCompanies().then((data) => {
-      setCompanies(data);
+      const filteredData = data.filter((c) => c.name.toLowerCase().includes('morindo'));
+      setCompanies(filteredData);
     });
   }, []);
 

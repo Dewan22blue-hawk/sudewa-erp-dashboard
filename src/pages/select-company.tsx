@@ -27,7 +27,8 @@ export default function SelectCompanyPage() {
   useEffect(() => {
     fetchUserCompanies()
       .then((data) => {
-        setCompanies(data);
+        const filteredData = data.filter((c) => c.name.toLowerCase().includes('morindo'));
+        setCompanies(filteredData);
       })
       .catch((err) => {
         setError(err?.message || 'Gagal memuat perusahaan');

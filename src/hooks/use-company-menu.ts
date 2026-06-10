@@ -4,6 +4,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { companyMenuMap } from '@/configs/menu/company-menu.map';
 import { MenuItem } from '@/types/menu.types';
 import { Company, fetchCompanyDetail } from '@/services/company.service';
+import { HIDDEN_MENU_LABELS } from '@/configs/skripsi-filter';
 
 const MODULE_MAP: Record<string, string[]> = {
     'master-data': ['Master Data'],
@@ -93,7 +94,21 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
         }
 
         // Fallback if no specific menu
-        return baseMenus.filter(m => allowedLabels.includes(m.label));
+        let finalMenus = baseMenus.filter(m => allowedLabels.includes(m.label));
+
+        // Terapkan filter khusus skripsi
+        finalMenus = finalMenus.map((menu) => ({
+            ...menu,
+            children: menu.children?.filter(
+                (child) => !HIDDEN_MENU_LABELS.includes(child.label)
+            ),
+        })).filter((menu) => {
+            const isHiddenParent = HIDDEN_MENU_LABELS.includes(menu.label);
+            const hasChildren = menu.children && menu.children.length > 0;
+            return !isHiddenParent && (!menu.children || hasChildren);
+        });
+
+        return finalMenus;
     }, [currentCompany, slug, allowedLabels]);
 
     return { menus: mappedMenus, isLoading };

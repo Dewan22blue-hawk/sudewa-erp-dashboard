@@ -14,7 +14,8 @@ export default function DashboardIndex() {
         if (companyId) {
           try {
             const companies = await fetchUserCompanies();
-            const company = companies.find((c) => String(c.id) === String(companyId));
+            const filteredCompanies = companies.filter((c) => c.name.toLowerCase().includes('morindo'));
+            const company = filteredCompanies.find((c) => String(c.id) === String(companyId));
 
             if (company && company.slug) {
               router.replace(`/dashboard/${company.slug}`);
