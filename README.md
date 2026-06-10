@@ -1,4 +1,4 @@
-# 🏢 Wajira Dashboard
+# 🏢 Sudewa Dashboard
 
 > **Dashboard ERP Modern untuk Manajemen Multi-Perusahaan**  
 > *Sistem terintegrasi kanggo ngatur data penjualan, inventory, lan finansial perusahaan grup Wajira*
