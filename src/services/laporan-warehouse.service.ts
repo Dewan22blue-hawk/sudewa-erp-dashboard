@@ -107,10 +107,21 @@ const buildPaginatedResponse = <T>(
   };
 };
 
-const mapStockItem = (item: unknown): StockItem => {
+const mapStockItem = (item: unknown, brandMap?: Map<number, string>): StockItem => {
   const source = (item ?? {}) as Record<string, unknown>;
   const unitType = (source.unit_type ?? {}) as Record<string, unknown>;
   const brand = (unitType.brand ?? {}) as Record<string, unknown>;
+
+  const brandId = toNumber(brand.id) || toNumber(unitType.brand_id) || 0;
+  let brandName = toString(brand.name, '');
+
+  if (!brandName && brandId && brandMap) {
+    brandName = brandMap.get(brandId) || '';
+  }
+
+  if (!brandName) {
+    brandName = '-';
+  }
 
   // person/supplier can live in multiple places depending on the API response:
   // 1. source.person (string)
@@ -136,8 +147,8 @@ const mapStockItem = (item: unknown): StockItem => {
       id: toNumber(unitType.id),
       name: toString(unitType.name),
       brand: {
-        id: toNumber(brand.id),
-        name: toString(brand.name),
+        id: brandId,
+        name: brandName,
       },
     },
     color: toString(source.color),
@@ -216,18 +227,35 @@ export const getStockData = async (params: {
 }): Promise<PaginatedResponse<StockItem>> => {
   const companyId = params.company_id ?? 1;
 
-  const response = await apiClient.get(
-    `/wapi/warehouse/warehouse-get-stock/${companyId}`,
-    {
-      params: {
-        page: params.page ?? 1,
-        per_page: params.per_page ?? 50,
-        ...(params.status ? { status: params.status } : {}),
+  const [stockResponse, brandResponse] = await Promise.all([
+    apiClient.get(
+      `/wapi/warehouse/warehouse-get-stock/${companyId}`,
+      {
+        params: {
+          page: params.page ?? 1,
+          per_page: params.per_page ?? 50,
+          ...(params.status ? { status: params.status } : {}),
+        },
       },
-    },
-  );
+    ),
+    apiClient.get('/wapi/master-data/brand', {
+      params: { per_page: 1000 },
+    }).catch(() => null),
+  ]);
 
-  return buildPaginatedResponse(response.data?.data ?? response.data, params.per_page ?? 50, mapStockItem);
+  const brandsList = brandResponse?.data?.data?.data || [];
+  const brandMap = new Map<number, string>();
+  if (Array.isArray(brandsList)) {
+    brandsList.forEach((brand: any) => {
+      if (brand && typeof brand.id === 'number') {
+        brandMap.set(brand.id, brand.name || '');
+      }
+    });
+  }
+
+  const responseData = stockResponse.data?.data ?? stockResponse.data;
+
+  return buildPaginatedResponse(responseData, params.per_page ?? 50, (item) => mapStockItem(item, brandMap));
 };
 
 export const getStockDetailData = async (params: {
@@ -243,23 +271,40 @@ export const getStockDetailData = async (params: {
 }): Promise<PaginatedResponse<StockItem>> => {
   const warehouseId = params.warehouse_id ?? 1;
 
-  const response = await apiClient.get(
-    `/wapi/warehouse/warehouse-get-unit-transaction-item-details/${warehouseId}`,
-    {
-      params: {
-        page: params.page ?? 1,
-        per_page: params.per_page ?? 50,
-        ...(params.machine_number ? { machine_number: params.machine_number } : {}),
-        ...(params.chassis_number ? { chassis_number: params.chassis_number } : {}),
-        ...(params.color ? { color: params.color } : {}),
-        ...(params.stock_state ? { stock_state: params.stock_state } : {}),
-        ...(params.in_stock !== undefined ? { in_stock: params.in_stock } : {}),
-        ...(params.unit_transaction_item_id ? { unit_transaction_item_id: params.unit_transaction_item_id } : {}),
+  const [detailResponse, brandResponse] = await Promise.all([
+    apiClient.get(
+      `/wapi/warehouse/warehouse-get-unit-transaction-item-details/${warehouseId}`,
+      {
+        params: {
+          page: params.page ?? 1,
+          per_page: params.per_page ?? 50,
+          ...(params.machine_number ? { machine_number: params.machine_number } : {}),
+          ...(params.chassis_number ? { chassis_number: params.chassis_number } : {}),
+          ...(params.color ? { color: params.color } : {}),
+          ...(params.stock_state ? { stock_state: params.stock_state } : {}),
+          ...(params.in_stock !== undefined ? { in_stock: params.in_stock } : {}),
+          ...(params.unit_transaction_item_id ? { unit_transaction_item_id: params.unit_transaction_item_id } : {}),
+        },
       },
-    },
-  );
+    ),
+    apiClient.get('/wapi/master-data/brand', {
+      params: { per_page: 1000 },
+    }).catch(() => null),
+  ]);
 
-  return buildPaginatedResponse(response.data?.data ?? response.data, params.per_page ?? 50, mapStockItem);
+  const brandsList = brandResponse?.data?.data?.data || [];
+  const brandMap = new Map<number, string>();
+  if (Array.isArray(brandsList)) {
+    brandsList.forEach((brand: any) => {
+      if (brand && typeof brand.id === 'number') {
+        brandMap.set(brand.id, brand.name || '');
+      }
+    });
+  }
+
+  const responseData = detailResponse.data?.data ?? detailResponse.data;
+
+  return buildPaginatedResponse(responseData, params.per_page ?? 50, (item) => mapStockItem(item, brandMap));
 };
 
 export const getOrderOutstanding = async (params: {
