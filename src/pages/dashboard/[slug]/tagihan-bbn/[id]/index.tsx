@@ -295,8 +295,8 @@ export default function BBNBillDetailPage() {
                     <TableRow className="border-slate-200">
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Tanggal</TableHead>
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Bukti Pembayaran</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash BCA</TableHead>
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran USD BCA</TableHead>
+                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash BCA</TableHead>
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash</TableHead>
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Action</TableHead>
                     </TableRow>
@@ -308,8 +308,8 @@ export default function BBNBillDetailPage() {
                         <TableRow key={item.id} className="border-slate-100">
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{formatShortDate(item.paidDate)}</TableCell>
                           <TableCell className="px-4 py-3 text-sm text-slate-700">-</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA IDR' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA USD' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA IDR' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'CASH IDR' || label === 'Cash' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
                           <TableCell className="px-4 py-3">
                             <div className="flex items-center gap-3">

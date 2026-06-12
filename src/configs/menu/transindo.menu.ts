@@ -89,8 +89,8 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/warehouse/perlengkapan-masuk'),
         },
         {
-          label: 'Perlengkapan Keluar',
-          href: base('/warehouse/perlengkapan-keluar'),
+          label: 'Pengeluaran Perlengkapan',
+          href: base('/warehouse/pengeluaran-perlengkapan'),
         },
         {
           label: 'Stock Perlengkapan',

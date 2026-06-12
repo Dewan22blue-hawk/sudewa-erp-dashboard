@@ -338,8 +338,8 @@ export function PurchasePaymentForm({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Tanggal</TableHead>
-                                    <TableHead>BCA IDR</TableHead>
                                     <TableHead>BCA USD</TableHead>
+                                    <TableHead>BCA IDR</TableHead>
                                     <TableHead>Cash</TableHead>
                                     <TableHead>Metode</TableHead>
                                     <TableHead className="text-right">Total</TableHead>
@@ -361,8 +361,8 @@ export function PurchasePaymentForm({
                                         return (
                                             <TableRow key={item.id}>
                                                 <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
-                                                <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                                                 <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
+                                                <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                                                 <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
                                                 <TableCell>{methods.length > 0 ? methods.join(', ') : '-'}</TableCell>
                                                 <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>

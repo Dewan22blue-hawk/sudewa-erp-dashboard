@@ -28,6 +28,7 @@ export type SalesApiModel = {
     name?: string;
   };
   unit_transaction_billing?: {
+    id?: string | number;
     is_paid?: boolean;
     total_paid?: string | number;
     total_payment?: string | number;

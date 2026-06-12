@@ -216,8 +216,8 @@ export default function BBNBillPaymentPage() {
               <div className="rounded-[20px] border border-slate-200 p-4">
                 <div className="mb-4 border-b border-slate-100 pb-4 text-base text-slate-500">Pembayaran</div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <SummaryField label="BCA IDR" value={formatCurrency(paymentBreakdown.bca)} />
                   <SummaryField label="BCA USD" value={formatCurrency(paymentBreakdown.usd)} />
+                  <SummaryField label="BCA IDR" value={formatCurrency(paymentBreakdown.bca)} />
                   <SummaryField label="Cash" value={formatCurrency(paymentBreakdown.cash)} />
                 </div>
               </div>

@@ -215,9 +215,9 @@ export default function PurchasePaymentPage() {
 
                 await createBillingHistory.mutateAsync({
                     unit_transaction_billing_id: String(billing.id),
-                    bca_payment_amount: Number(data.bcaPayment ?? 0),
+                    bca_payment_amount: Number(data.bcaPayment2 ?? 0),
                     cash_payment_amount: Number(data.cashPayment ?? 0),
-                    bca_payment_usd_amount: Number(data.bcaPayment2 ?? 0),
+                    bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
                     payment_at: data.paymentDate,   
                     note: data.note,
                 });

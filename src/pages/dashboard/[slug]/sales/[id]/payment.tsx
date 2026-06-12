@@ -438,16 +438,6 @@ export default function PaymentPage() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">BCA IDR</p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="BCA IDR"
-                      value={formatNumberWithDot(form.bca_idr)}
-                      onChange={(e) => setForm((prev) => ({ ...prev, bca_idr: parseNumericInput(e.target.value) }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <p className="text-sm font-medium">BCA USD</p>
                     <Input
                       type="text"
@@ -455,6 +445,16 @@ export default function PaymentPage() {
                       placeholder="BCA USD"
                       value={formatNumberWithDot(form.bca_usd)}
                       onChange={(e) => setForm((prev) => ({ ...prev, bca_usd: parseNumericInput(e.target.value) }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">BCA IDR</p>
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="BCA IDR"
+                      value={formatNumberWithDot(form.bca_idr)}
+                      onChange={(e) => setForm((prev) => ({ ...prev, bca_idr: parseNumericInput(e.target.value) }))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -548,8 +548,8 @@ export default function PaymentPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Tanggal</TableHead>
-                        <TableHead>BCA IDR</TableHead>
                         <TableHead>BCA USD</TableHead>
+                        <TableHead>BCA IDR</TableHead>
                         <TableHead>Cash</TableHead>
                         <TableHead>Metode</TableHead>
                         <TableHead className="text-right">Total</TableHead>
@@ -571,8 +571,8 @@ export default function PaymentPage() {
                           return (
                             <TableRow key={item.id}>
                               <TableCell>{item.payment_at ? String(item.payment_at).slice(0, 10) : '-'}</TableCell>
-                              <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                               <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
+                              <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                               <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
                               <TableCell>{methods}</TableCell>
                               <TableCell className="text-right font-medium">{formatCurrency(rowTotal)}</TableCell>

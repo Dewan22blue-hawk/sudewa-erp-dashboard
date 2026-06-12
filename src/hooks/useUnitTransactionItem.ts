@@ -10,8 +10,17 @@ import { unitTransactionItemService } from '@/services/unitTransactionItem.servi
 export const usePurchaseUnitItems = (purchaseId?: string) => {
   return useQuery({
     queryKey: ['purchase-unit-items', purchaseId],
-    queryFn: () => unitTransactionItemService.getItems(purchaseId as string),
+    queryFn: () => unitTransactionItemService.getItems(purchaseId as string, { type: 'purchase' }),
     enabled: !!purchaseId,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useSalesUnitItems = (salesId?: string) => {
+  return useQuery({
+    queryKey: ['sales-unit-items', salesId],
+    queryFn: () => unitTransactionItemService.getItems(salesId as string, { type: 'sales' }),
+    enabled: !!salesId,
     staleTime: 1000 * 60 * 2,
   });
 };
