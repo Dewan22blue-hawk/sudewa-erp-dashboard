@@ -144,6 +144,18 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'LP Jumlah Penyerahan',
                     href: base('/laporan/lp-jumlah-penyerahan'),
                 },
+                {
+                    label: 'LP Jumlah Outstanding',
+                    href: base('/laporan/lp-jumlah-outstanding'),
+                },
+                {
+                    label: 'Laporan Stock Material',
+                    href: base('/laporan/laporan-stock-material'),
+                },
+                {
+                    label: 'Laporan Aset',
+                    href: base('/laporan/laporan-aset'),
+                },
             ],
         },
         {
