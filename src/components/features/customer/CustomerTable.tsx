@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDate } from '@/lib/utils/format';
 import { cn } from '@/lib/utils';
 import { Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface CustomerTableProps {
   customers: Customer[];
@@ -62,6 +64,10 @@ export function CustomerTable({
   onExport,
   isExporting = false,
 }: CustomerTableProps) {
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data: customers,
+  });
+
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
   const paginationItems = buildPagination(page, totalPages);
@@ -118,14 +124,30 @@ export function CustomerTable({
           <Table className="min-w-[1200px]">
             <TableHeader>
               <TableRow className="border-b border-[#E4E4E7] bg-[#F1F5F9] hover:bg-[#F1F5F9]">
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Kode</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Nama Customer</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">PIC</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Phone</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">NPWP</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Alamat</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Maps</TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Created At</TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="Kode" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="Nama Customer" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="PIC" sortKey="pic" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="Phone" sortKey="phone" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="NPWP" sortKey="npwp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="Alamat" sortKey="address" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="Maps" sortKey="map_link" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
+                <TableHead className="h-[46px] px-7 text-left">
+                  <SortableHeader title="Created At" sortKey="createdAt" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                </TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -139,8 +161,8 @@ export function CustomerTable({
                     </TableCell>
                   </TableRow>
                 ))
-              ) : customers.length > 0 ? (
-                customers.map((customer) => (
+              ) : sortedData.length > 0 ? (
+                sortedData.map((customer) => (
                   <TableRow key={customer.id} className="border-b border-[#E4E4E7] align-top hover:bg-[#FAFAFA]">
                     <TableCell className="px-7 py-4 text-center text-[15px] font-medium leading-6 text-[#171717]">
                       <div className="mx-auto max-w-[160px] break-words">{customer.code || '-'}</div>
@@ -185,10 +207,22 @@ export function CustomerTable({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[150px] rounded-2xl border-[#E4E4E7] p-2 shadow-lg">
-                          <DropdownMenuItem className="cursor-pointer rounded-xl px-3 py-2 text-[15px]" onClick={() => onEdit(customer)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer rounded-xl px-3 py-2 text-[15px]"
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              onEdit(customer);
+                            }}
+                          >
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer rounded-xl px-3 py-2 text-[15px] text-[#DC2626] focus:text-[#DC2626]" onClick={() => onDelete(customer)}>
+                          <DropdownMenuItem
+                            className="cursor-pointer rounded-xl px-3 py-2 text-[15px] text-[#DC2626] focus:text-[#DC2626]"
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              onDelete(customer);
+                            }}
+                          >
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>

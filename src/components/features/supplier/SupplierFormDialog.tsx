@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { UseFormReturn } from 'react-hook-form';
 import type { CreateSupplierFormValues } from '@/scheme/supplier.schema';
 import RequiredMark from '@/components/ui/required-mark';
+import { sanitizePhone } from '@/lib/utils/format';
 
 interface SupplierFormDialogProps {
   open: boolean;
@@ -99,9 +100,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                       placeholder="Tambahkan nomer telepon"
                       {...field}
                       onChange={(e) => {
-                        const val = e.target.value;
-                        const cleaned = val.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
-                        field.onChange(cleaned);
+                        field.onChange(sanitizePhone(e.target.value));
                       }}
                     />
                   </FormControl>

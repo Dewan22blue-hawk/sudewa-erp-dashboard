@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import RequiredMark from '@/components/ui/required-mark';
 import { Textarea } from '@/components/ui/textarea';
 import type { UseFormReturn } from 'react-hook-form';
+import { sanitizePhone } from '@/lib/utils/format';
 
 interface CustomerFormModalProps {
   open: boolean;
@@ -106,6 +107,9 @@ export function CustomerFormModal({
                         {...field}
                         placeholder="Tambahkan nomer telepon"
                         className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        onChange={(e) => {
+                          field.onChange(sanitizePhone(e.target.value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
