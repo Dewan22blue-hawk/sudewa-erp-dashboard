@@ -48,30 +48,10 @@ const translateFinanceBillingError = (message: string) => {
     .replace(/^The note field is required/i, 'Catatan wajib diisi');
 };
 
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+
 const getErrorMessage = (error: unknown, fallback: string) => {
-  if (!error || typeof error !== 'object') return fallback;
-
-  const details = 'details' in error ? (error as { details?: unknown }).details : undefined;
-  if (typeof details === 'string' && details.trim()) {
-    return translateFinanceBillingError(details);
-  }
-
-  if (details && typeof details === 'object') {
-    const firstValue = Object.values(details as Record<string, unknown>)[0];
-    if (typeof firstValue === 'string' && firstValue.trim()) {
-      return translateFinanceBillingError(firstValue);
-    }
-    if (Array.isArray(firstValue) && typeof firstValue[0] === 'string') {
-      return translateFinanceBillingError(firstValue[0]);
-    }
-  }
-
-  const message = 'message' in error ? (error as { message?: unknown }).message : undefined;
-  if (typeof message === 'string' && message.trim()) {
-    return translateFinanceBillingError(message);
-  }
-
-  return fallback;
+  return getApiErrorMessage(error);
 };
 
 export default function TransactionDetailInlineTable({ items, financeBillingId, paymentAt, disabled }: Props) {

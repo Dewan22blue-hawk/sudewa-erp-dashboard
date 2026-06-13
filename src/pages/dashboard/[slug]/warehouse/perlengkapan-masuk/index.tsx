@@ -33,27 +33,10 @@ import type { GoodsReceiptEquipmentFormValues } from '@/scheme/goods-receipt-equ
 import type { GoodsReceiptEquipmentPaymentFormValues } from '@/scheme/goods-receipt-equipment.schema';
 import { getReceiptBilling } from '@/components/features/warehouse/receipt-equipment/goodsReceiptEquipment.utils';
 
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+
 const getErrorMessage = (error: any): string => {
-  if (error instanceof ApiValidationError) {
-    const first = Object.values(error.fieldErrors)[0]?.[0];
-    if (first) return first;
-  }
-  if (error instanceof ApiResponseError) {
-    return error.message;
-  }
-  if (error && typeof error === 'object') {
-    const details = error.details;
-    if (details) {
-      if (typeof details === 'object') {
-        const first = Object.values(details)[0];
-        if (Array.isArray(first) && first[0]) return first[0];
-        if (typeof first === 'string') return first;
-      }
-      if (typeof details === 'string') return details;
-    }
-    if (error.message) return error.message;
-  }
-  return 'Gagal memproses data';
+  return getApiErrorMessage(error);
 };
 
 export default function PerlengkapanMasukListPage() {

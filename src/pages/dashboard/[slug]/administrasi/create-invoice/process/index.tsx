@@ -19,47 +19,7 @@ const parseIds = (value: string | string[] | undefined) => {
 
 const isDefined = <T,>(value: T | undefined | null): value is T => value != null;
 
-const extractValidationMessages = (error: unknown) => {
-  if (error instanceof ApiValidationError) {
-    const messages = Object.entries(error.fieldErrors ?? {}).flatMap(([field, fieldMessages]) =>
-      (fieldMessages ?? []).map((message) => `${field}: ${message}`),
-    );
-
-    return {
-      title: error.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  const apiError = error as ApiError & {
-    fieldErrors?: Record<string, string[]>;
-    response?: { data?: { errors?: Record<string, string[]>; message?: string } };
-  };
-
-  const rawFieldErrors =
-    apiError?.fieldErrors ??
-    apiError?.response?.data?.errors ??
-    (typeof apiError?.details === 'object' && apiError.details ? (apiError.details as Record<string, string[]>) : undefined);
-
-  if (rawFieldErrors && typeof rawFieldErrors === 'object') {
-    const messages = Object.entries(rawFieldErrors).flatMap(([field, fieldMessages]) => {
-      if (Array.isArray(fieldMessages)) {
-        return fieldMessages.map((message) => `${field}: ${message}`);
-      }
-      return [`${field}: ${String(fieldMessages)}`];
-    });
-
-    return {
-      title: apiError?.message || apiError?.response?.data?.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  return {
-    title: apiError?.message || 'Validation error',
-    description: '',
-  };
-};
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 export default function ProcessCreateInvoicePage() {
   const router = useRouter();
@@ -127,10 +87,7 @@ export default function ProcessCreateInvoicePage() {
     }, {
       onSuccess: () => toast.success('Invoice berhasil diproses'),
       onError: (error: unknown) => {
-        const validation = extractValidationMessages(error);
-        toast.error(validation.title, {
-          description: validation.description || 'Sinkronisasi proses invoice gagal, namun print preview tetap dibuka',
-        });
+        toast.error(getApiErrorMessage(error));
       },
     });
 

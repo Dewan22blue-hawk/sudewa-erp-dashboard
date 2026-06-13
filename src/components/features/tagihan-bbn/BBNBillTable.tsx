@@ -92,6 +92,7 @@ export function BBNBillTable({
             <TableHeader className="bg-[#edf2f7]">
               <TableRow className="border-slate-200">
                 <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">NOMOR TAGIHAN</TableHead>
+                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">KODE DITLANTAS</TableHead>
                 <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">TGL TAGIHAN</TableHead>
                 <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">NAMA DEALER</TableHead>
                 <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">TGL BAYAR</TableHead>
@@ -105,7 +106,7 @@ export function BBNBillTable({
               {isLoading
                 ? Array.from({ length: Math.min(perPage, 6) }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="animate-pulse border-slate-100">
-                      {Array.from({ length: 8 }).map((__, cellIndex) => (
+                      {Array.from({ length: 9 }).map((__, cellIndex) => (
                         <TableCell key={cellIndex} className="px-5 py-4">
                           <div className="h-4 rounded bg-slate-100" />
                         </TableCell>
@@ -115,7 +116,7 @@ export function BBNBillTable({
                 : null}
               {!isLoading && items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center text-sm text-slate-500">
+                  <TableCell colSpan={9} className="h-32 text-center text-sm text-slate-500">
                     Belum ada data tagihan BBN.
                   </TableCell>
                 </TableRow>
@@ -123,13 +124,14 @@ export function BBNBillTable({
               {!isLoading
                 ? items.map((item) => (
                     <TableRow key={item.id} className="border-slate-100">
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatBillCode(item.id)}</TableCell>
+                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{item.code || formatBillCode(item.id)}</TableCell>
+                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{item.ditlantasProcess?.code || '-'}</TableCell>
                       <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatShortDate(item.billDate)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm uppercase text-slate-700">{item.dealer?.name || '-'}</TableCell>
+                      <TableCell className="px-5 py-4 text-center text-sm uppercase text-slate-700">{item.ditlantasProcess?.vendor?.name || item.dealer?.name || '-'}</TableCell>
                       <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatShortDate(item.paidDate)}</TableCell>
                       <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bruttoAmount)}</TableCell>
                       <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(item.paidAmount)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(calculateOutstanding(item.bruttoAmount, item.paidAmount))}</TableCell>
+                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(item.remainingAmount !== undefined ? item.remainingAmount : calculateOutstanding(item.bruttoAmount, item.paidAmount))}</TableCell>
                       <TableCell className="px-5 py-4 text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -137,15 +139,11 @@ export function BBNBillTable({
                               <MoreVertical className="h-4 w-4 text-slate-600" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[190px] rounded-xl">
-                            <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">Detail</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer">Bayar Tagihan</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer">
-                              <Printer className="mr-2 h-4 w-4" />
-                              Print
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">
+                          <DropdownMenuContent align="end" className="w-[160px] rounded-xl bg-white shadow-md border border-slate-100">
+                            <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer text-slate-700 hover:bg-slate-50">Detail</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer text-slate-700 hover:bg-slate-50">Bayar Tagihan</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer text-slate-700 hover:bg-slate-50">Print</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600 hover:bg-slate-50">
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>

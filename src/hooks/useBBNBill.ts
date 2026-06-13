@@ -24,12 +24,11 @@ import {
 } from '@/services/bbn-bill.service';
 
 export const bbnBillKeys = {
-  all: ['bbn-bills'] as const,
-  list: (params: PaginationParams) => [...bbnBillKeys.all, 'list', params] as const,
-  detail: (id: string | number | null) => [...bbnBillKeys.all, 'detail', id] as const,
-  billings: (params: PaginationParams) => [...bbnBillKeys.all, 'billings', params] as const,
-  billingDetail: (id: string | number | null) => [...bbnBillKeys.all, 'billing-detail', id] as const,
-  billingItems: (params: PaginationParams) => [...bbnBillKeys.all, 'billing-items', params] as const,
+  list: (params: PaginationParams) => ['bbn-bill', params.page ?? 1, params.perPage ?? 10, 'created_at', 'asc'] as const,
+  detail: (id: string | number | null) => ['bbn-bill-detail', id] as const,
+  billings: () => ['bbn-bill-billing'] as const,
+  billingDetail: (id: string | number | null) => ['bbn-bill-billing-detail', id] as const,
+  billingItems: () => ['bbn-bill-billing-item'] as const,
 };
 
 export function useBBNBillList(params: PaginationParams & { search?: string }) {
@@ -53,7 +52,7 @@ export function useCreateBBNBill() {
   return useMutation({
     mutationFn: (payload: BBNBillPayload) => createBBNBill(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }
@@ -63,8 +62,8 @@ export function useUpdateBBNBill() {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload: BBNBillPayload }) => updateBBNBill(id, payload),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail', variables.id] });
     },
   });
 }
@@ -73,8 +72,9 @@ export function useDeleteBBNBill() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string | number) => deleteBBNBill(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail', id] });
     },
   });
 }
@@ -82,17 +82,18 @@ export function useDeleteBBNBill() {
 export function useUpdateBBNBillVehicleData() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ vehicleDataId, payload }: { vehicleDataId: string | number; payload: BBNBillVehicleFeePayload }) =>
-      updateBBNBillVehicleData(vehicleDataId, payload),
+    mutationFn: ({ vehicleRegistrationId, payload }: { vehicleRegistrationId: string | number; payload: BBNBillVehicleFeePayload }) =>
+      updateBBNBillVehicleData(vehicleRegistrationId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }
 
 export function useBBNBillBillings(params: PaginationParams & { search?: string }) {
   return useQuery({
-    queryKey: bbnBillKeys.billings(params),
+    queryKey: bbnBillKeys.billings(),
     queryFn: () => getBBNBillBillings(params),
     placeholderData: (previousData) => previousData,
   });
@@ -111,7 +112,9 @@ export function useCreateBBNBillBilling() {
   return useMutation({
     mutationFn: (payload: BBNBillBillingPayload) => createBBNBillBilling(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }
@@ -121,14 +124,16 @@ export function useDeleteBBNBillBilling() {
   return useMutation({
     mutationFn: (id: string | number) => deleteBBNBillBilling(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }
 
 export function useBBNBillBillingItems(params: PaginationParams & { search?: string }) {
   return useQuery({
-    queryKey: bbnBillKeys.billingItems(params),
+    queryKey: bbnBillKeys.billingItems(),
     queryFn: () => getBBNBillBillingItems(params),
     placeholderData: (previousData) => previousData,
   });
@@ -139,7 +144,10 @@ export function useCreateBBNBillBillingItem() {
   return useMutation({
     mutationFn: (payload: BBNBillBillingItemPayload) => createBBNBillBillingItem(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing-item'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }
@@ -149,7 +157,10 @@ export function useUpdateBBNBillBillingItem() {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload: BBNBillBillingItemPayload }) => updateBBNBillBillingItem(id, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing-item'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }
@@ -159,7 +170,10 @@ export function useDeleteBBNBillBillingItem() {
   return useMutation({
     mutationFn: (id: string | number) => deleteBBNBillBillingItem(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bbnBillKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill-billing-item'] });
+      queryClient.invalidateQueries({ queryKey: ['bbn-bill'] });
     },
   });
 }

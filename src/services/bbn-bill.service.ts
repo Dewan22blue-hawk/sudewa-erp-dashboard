@@ -35,6 +35,18 @@ const toNullableNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const unwrapVehicleData = (payload: any) => {
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+    if (Array.isArray(payload.data)) {
+      return payload.data[0] ?? {};
+    }
+    if (payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data)) {
+      return payload.data;
+    }
+  }
+  return payload;
+};
+
 const mapDealer = (item: any) => {
   if (!item) return null;
 
@@ -103,19 +115,47 @@ const mapVehicleData = (item: any): BBNBillVehicleData => ({
   vehicleRegistration: mapVehicleRegistration(item.vehicle_registration),
 });
 
-const mapBill = (item: any): BBNBill => ({
-  id: Number(item.id),
-  uuid: item.uuid ?? undefined,
-  dealerId: Number(item.dealer_id ?? 0),
-  billDate: item.bill_date ?? null,
-  paidDate: item.paid_date ?? null,
-  createdAt: item.created_at ?? undefined,
-  updatedAt: item.updated_at ?? undefined,
-  bruttoAmount: toNumber(item.brutto_amount),
-  paidAmount: toNumber(item.paid_amount),
-  isPaid: Boolean(item.is_paid),
-  dealer: mapDealer(item.dealer),
-});
+const mapBill = (item: any): BBNBill => {
+  const ditlantasProcessRaw = item.ditlantas_process || item.ditlantasProcess;
+  const vendorRaw = ditlantasProcessRaw?.vendor || item.vendor;
+  return {
+    id: Number(item.id),
+    uuid: item.uuid ?? undefined,
+    code: item.code ?? undefined,
+    dealerId: Number(item.dealer_id ?? ditlantasProcessRaw?.vendor_id ?? 0),
+    billDate: item.bill_date ?? null,
+    paidDate: item.paid_date ?? null,
+    createdAt: item.created_at ?? undefined,
+    updatedAt: item.updated_at ?? undefined,
+    bruttoAmount: toNumber(item.brutto_amount),
+    paidAmount: toNumber(item.paid_amount),
+    remainingAmount: toNullableNumber(item.remaining_amount) ?? undefined,
+    pph23Amount: toNullableNumber(item.pph23_amount) ?? undefined,
+    isPaid: Boolean(item.is_paid),
+    dealer: mapDealer(item.dealer || vendorRaw),
+    ditlantasProcess: ditlantasProcessRaw
+      ? {
+          id: Number(ditlantasProcessRaw.id),
+          uuid: ditlantasProcessRaw.uuid ?? undefined,
+          code: String(ditlantasProcessRaw.code ?? ditlantasProcessRaw.kode ?? ''),
+          processDate: ditlantasProcessRaw.process_date ?? undefined,
+          vendorId: toNullableNumber(ditlantasProcessRaw.vendor_id),
+          vendor: vendorRaw
+            ? {
+                id: Number(vendorRaw.id),
+                name: String(vendorRaw.name ?? vendorRaw.nama_vendor ?? vendorRaw.nama_dealer ?? ''),
+              }
+            : null,
+        }
+      : (item.ditlantas_process_code || item.ditlantas_code || item.kode_ditlantas
+        ? {
+            id: 0,
+            code: String(item.ditlantas_process_code ?? item.ditlantas_code ?? item.kode_ditlantas ?? ''),
+            vendor: null,
+          }
+        : null),
+  };
+};
 
 const mapBilling = (item: any): BBNBillBilling => ({
   id: Number(item.id),
@@ -143,7 +183,12 @@ const buildBillFormData = (payload: Partial<BBNBillPayload>, options?: { asUpdat
   const formData = new FormData();
   if (options?.asUpdate) formData.append('_method', 'PUT');
 
-  if (payload.dealerId !== undefined && payload.dealerId !== null) formData.append('dealer_id', String(payload.dealerId));
+  if (payload.ditlantasProcessId !== undefined && payload.ditlantasProcessId !== null) {
+    formData.append('ditlantas_process_id', String(payload.ditlantasProcessId));
+  } else if (payload.dealerId !== undefined && payload.dealerId !== null) {
+    formData.append('ditlantas_process_id', String(payload.dealerId));
+  }
+
   if (payload.billDate) formData.append('bill_date', payload.billDate);
   if (payload.paidDate) formData.append('paid_date', payload.paidDate);
 
@@ -193,12 +238,70 @@ export const getBBNBillDetail = async (id: string | number): Promise<BBNBillDeta
   const response = await apiClient.get<LaravelApiResponse<any>>(`${bbnBillPath}/${id}`);
   const data = ensureSuccess(response.data);
   const base = mapBill(data);
+
+  // Extract vehicle registrations raw list
+  const vehicleRegistrationsRaw = data.ditlantas_process?.vehicle_registrations ??
+                                  data.ditlantas_processes?.flatMap((dp: any) => dp.vehicle_registrations ?? []) ??
+                                  data.vehicle_registrations ??
+                                  [];
+
+  // Fetch missing vehicle details if vehicle_data is missing or incomplete
+  const uniqueVehicleIds = Array.from(
+    new Set<number>(
+      vehicleRegistrationsRaw
+        .map((reg: any) => reg.vehicle_data_id)
+        .filter(Boolean)
+        .map(Number)
+    )
+  );
+
+  const vehicleMap = new Map<number, any>();
+  if (uniqueVehicleIds.length > 0) {
+    try {
+      await Promise.all(
+        uniqueVehicleIds.map(async (vId) => {
+          try {
+            const vehicleResponse = await apiClient.get<LaravelApiResponse<any>>(`/wapi/transaction/vehicle-data/${vId}`);
+            const vehicleData = unwrapVehicleData(ensureSuccess(vehicleResponse.data));
+            if (vehicleData && vehicleData.id) {
+              vehicleMap.set(Number(vehicleData.id), vehicleData);
+            }
+          } catch (err) {
+            console.warn(`Failed to pre-fetch vehicle data for ID ${vId} in getBBNBillDetail:`, err);
+          }
+        })
+      );
+    } catch (err) {
+      console.error('Error pre-fetching vehicle data list for BBN bill:', err);
+    }
+  }
+
+  // Map registrations to BBNBillVehicleData
+  const mappedVehicleDatas = vehicleRegistrationsRaw.map((reg: any): BBNBillVehicleData => {
+    const vDetail = vehicleMap.get(Number(reg.vehicle_data_id)) || reg.vehicle_data;
+    return {
+      id: Number(reg.vehicle_data_id ?? vDetail?.id ?? 0),
+      uuid: reg.uuid ?? vDetail?.uuid,
+      dealerId: toNullableNumber(vDetail?.dealer_id ?? data.dealer_id),
+      invoiceNumber: String(vDetail?.invoice_number ?? ''),
+      stnkName: String(vDetail?.stnk_name ?? vDetail?.stnkName ?? ''),
+      ktpNumber: String(vDetail?.ktp_number ?? vDetail?.ktpNumber ?? ''),
+      chassisNumber: String(vDetail?.chassis_number ?? vDetail?.chassisNumber ?? ''),
+      machineNumber: String(vDetail?.machine_number ?? vDetail?.machineNumber ?? vDetail?.engine_number ?? ''),
+      vehicleRegistration: mapVehicleRegistration(reg),
+    };
+  });
+
   const dealer = data.dealer
     ? {
         ...(mapDealer(data.dealer) ?? { id: Number(data.dealer.id), name: String(data.dealer.name ?? '') }),
-        vehicleDatas: Array.isArray(data.dealer.vehicle_datas) ? data.dealer.vehicle_datas.map(mapVehicleData) : [],
+        vehicleDatas: mappedVehicleDatas,
       }
-    : null;
+    : {
+        id: Number(data.dealer_id ?? 0),
+        name: String(data.dealer?.name ?? ''),
+        vehicleDatas: mappedVehicleDatas,
+      };
 
   return {
     ...base,
@@ -247,9 +350,9 @@ export const deleteBBNBill = async (id: string | number): Promise<void> => {
   }
 };
 
-export const updateBBNBillVehicleData = async (vehicleDataId: string | number, payload: BBNBillVehicleFeePayload): Promise<BBNBillVehicleRegistrationFees> => {
+export const updateBBNBillVehicleData = async (vehicleRegistrationId: string | number, payload: BBNBillVehicleFeePayload): Promise<BBNBillVehicleRegistrationFees> => {
   try {
-    const response = await apiClient.post<LaravelApiResponse<any>>(`${bbnBillDetailPath}/${vehicleDataId}`, buildVehicleFeePayload(payload), {
+    const response = await apiClient.post<LaravelApiResponse<any>>(`${bbnBillDetailPath}/${vehicleRegistrationId}`, buildVehicleFeePayload(payload), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     return mapVehicleRegistration(ensureSuccess(response.data)) as BBNBillVehicleRegistrationFees;
