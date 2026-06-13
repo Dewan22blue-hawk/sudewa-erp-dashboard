@@ -21,6 +21,7 @@ export interface Account {
   accountGroupCode?: string;
   description?: string | null;
   isActive: boolean;
+  is_lock?: boolean;
   createdAt?: string;
   updatedAt?: string;
 

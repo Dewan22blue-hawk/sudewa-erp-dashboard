@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Pencil, Trash } from 'lucide-react';
+import { MoreVertical, Pencil, Trash, Lock } from 'lucide-react';
 import type { AccountGroup } from '@/@types/account-group.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -94,7 +95,23 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
             ) : (
               sortedData.map((group) => (
                 <TableRow key={group.id} className="hover:bg-muted/50">
-                  <TableCell className="font-semibold">{group.code}</TableCell>
+                  <TableCell className="font-semibold">
+                    <div className="flex items-center gap-1.5">
+                      <span>{group.code}</span>
+                      {group.is_lock && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex cursor-help p-0.5">
+                              <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Grup akun terkunci
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="max-w-[200px] truncate" title={group.name}>
                     {group.name.length > 50 ? `${group.name.substring(0, 50)}...` : group.name}
                   </TableCell>
@@ -114,11 +131,11 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(group)}>
+                        <DropdownMenuItem onClick={() => onEdit(group)} disabled={group.is_lock}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(group)} className="text-destructive focus:text-destructive">
+                        <DropdownMenuItem onClick={() => onDelete(group)} className="text-destructive focus:text-destructive" disabled={group.is_lock}>
                           <Trash className="mr-2 h-4 w-4" />
                           Hapus
                         </DropdownMenuItem>

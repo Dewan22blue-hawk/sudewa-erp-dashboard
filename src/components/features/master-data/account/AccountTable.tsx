@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Pencil, Plus, Trash } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { MoreVertical, Pencil, Plus, Trash, Lock } from 'lucide-react';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 
 interface AccountTableProps {
@@ -31,7 +32,23 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
       {
         accessorKey: 'code',
         header: 'Kode',
-        cell: ({ row }) => <span className="font-semibold text-sm text-foreground">{row.original.code}</span>,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1.5">
+            <span className="font-semibold text-sm text-foreground">{row.original.code}</span>
+            {row.original.is_lock && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex cursor-help p-0.5">
+                    <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Akun ini merupakan data default yang tidak bisa dihapus!
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        ),
       },
       {
         accessorKey: 'name',
@@ -69,11 +86,11 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(row.original)}>
+                <DropdownMenuItem onClick={() => onEdit(row.original)} disabled={row.original.is_lock}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50" disabled={row.original.is_lock}>
                   <Trash className="mr-2 h-4 w-4" />
                   Hapus
                 </DropdownMenuItem>
