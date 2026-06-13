@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings, DollarSign, Warehouse } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign, Warehouse, ScrollText } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getYanotamaMenus = (slug: string): MenuItem[] => {
@@ -70,14 +70,14 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'Data Kendaraan',
                     href: base('/data-kendaraan'),
                 },
-                {
-                    label: 'Pembelian Material',
-                    href: base('/pembelian-material'),
-                },
-                {
-                    label: 'Penjualan Material',
-                    href: base('/penjualan-material'),
-                },
+                // {
+                //     label: 'Pembelian Material',
+                //     href: base('/pembelian-material'),
+                // },
+                // {
+                //     label: 'Penjualan Material',
+                //     href: base('/penjualan-material'),
+                // },
                 {
                     label: 'Input STNK/BPKB',
                     href: base('/stnk-bpkb'),
@@ -86,14 +86,14 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'Tagihan BBN',
                     href: base('/tagihan-bbn'),
                 },
-                {
-                    label: 'DO Pembelian Material',
-                    href: base('/do-pembelian-material'),
-                },
-                {
-                    label: 'Stok Material',
-                    href: base('/stok-material'),
-                },
+                // {
+                //     label: 'DO Pembelian Material',
+                //     href: base('/do-pembelian-material'),
+                // },
+                // {
+                //     label: 'Stok Material',
+                //     href: base('/stok-material'),
+                // },
             ],
         },
         {
@@ -125,6 +125,20 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 {
                     label: 'Pengeluaran Material',
                     href: base('/warehouse/pengeluaran-material'),
+                },
+            ],
+        },
+        {
+            label: 'Laporan',
+            icon: ScrollText,
+            children: [
+                {
+                    label: 'LP Jumlah Daftar',
+                    href: base('/laporan/lp-jumlah-daftar'),
+                },
+                {
+                    label: 'LP Jumlah Terima',
+                    href: base('/laporan/lp-jumlah-terima'),
                 },
             ],
         },
