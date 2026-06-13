@@ -135,14 +135,20 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                             disabled={account.is_lock}
-                            onClick={() => onEdit(account)}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              onEdit(account);
+                            }}
                           >
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                             disabled={account.is_lock}
-                            onClick={() => onDelete(account)}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              onDelete(account);
+                            }}
                           >
                             Hapus
                           </DropdownMenuItem>

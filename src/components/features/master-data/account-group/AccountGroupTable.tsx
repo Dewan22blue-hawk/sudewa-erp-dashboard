@@ -131,11 +131,24 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(group)} disabled={group.is_lock}>
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            onEdit(group);
+                          }}
+                          disabled={group.is_lock}
+                        >
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(group)} className="text-destructive focus:text-destructive" disabled={group.is_lock}>
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            onDelete(group);
+                          }}
+                          className="text-destructive focus:text-destructive"
+                          disabled={group.is_lock}
+                        >
                           <Trash className="mr-2 h-4 w-4" />
                           Hapus
                         </DropdownMenuItem>

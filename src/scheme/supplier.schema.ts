@@ -8,7 +8,10 @@ export const createSupplierSchema = z.object({
     npwp: z.string().optional(),
     pic: z.string().optional(),
     // phone: z.string().min(1, 'Nomer telepon wajib diisi'),
-    phone: z.string().optional(),
+    phone: z.string().optional().refine(
+        (val) => !val || /^\+?[0-9]*$/.test(val),
+        { message: "Nomor telepon hanya boleh berisi angka dan simbol '+' di awal" }
+    ),
 })
 
 export const updateSupplierSchema = z.object({
@@ -19,7 +22,10 @@ export const updateSupplierSchema = z.object({
     npwp: z.string().optional(),
     pic: z.string().optional(),
     // phone: z.string().min(1, 'Nomer telepon wajib diisi'),
-    phone: z.string().optional(),
+    phone: z.string().optional().refine(
+        (val) => !val || /^\+?[0-9]*$/.test(val),
+        { message: "Nomor telepon hanya boleh berisi angka dan simbol '+' di awal" }
+    ),
 })
 
 export type CreateSupplierFormValues = z.infer<typeof createSupplierSchema>

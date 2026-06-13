@@ -56,6 +56,9 @@ export const AccountGroupListPage = () => {
     try {
       await deleteMutation.mutateAsync(selectedToDelete.id);
       toast.success('Grup akun berhasil dihapus');
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus grup akun';
       toast.error(message);

@@ -95,7 +95,15 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tambahkan nomer telepon" {...field} />
+                    <Input
+                      placeholder="Tambahkan nomer telepon"
+                      {...field}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const cleaned = val.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+                        field.onChange(cleaned);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
