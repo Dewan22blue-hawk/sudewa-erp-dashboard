@@ -146,8 +146,21 @@ export function SupplierTable({ suppliers, onEdit, onDelete, onAdd, onImport }: 
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(supplier)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(supplier)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            onEdit(supplier);
+                          }}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            onDelete(supplier);
+                          }}
+                          className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                        >
                           Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>

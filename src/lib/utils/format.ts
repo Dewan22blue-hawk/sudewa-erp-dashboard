@@ -81,3 +81,10 @@ export function formatRelativeTime(date: string | Date): string {
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} jam yang lalu`;
   return `${Math.floor(diffInSeconds / 86400)} hari yang lalu`;
 }
+
+/**
+ * Sanitize phone number to allow only digits and a single leading '+' sign.
+ */
+export function sanitizePhone(value: string): string {
+  return value.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+}

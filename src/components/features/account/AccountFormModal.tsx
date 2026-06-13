@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,10 +26,37 @@ interface AccountFormModalProps {
   isSubmitting?: boolean;
   accountGroups: AccountGroup[];
   isLoadingGroups?: boolean;
+  onGroupSearchChange?: (val: string) => void;
+  onLoadMoreGroups?: () => void;
+  hasMoreGroups?: boolean;
 }
 
-export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, description, submitLabel = 'Simpan', isSubmitting = false, accountGroups, isLoadingGroups = false }: AccountFormModalProps) {
+export function AccountFormModal({
+  open,
+  onOpenChange,
+  form,
+  onSubmit,
+  title,
+  description,
+  submitLabel = 'Simpan',
+  isSubmitting = false,
+  accountGroups,
+  isLoadingGroups = false,
+  onGroupSearchChange,
+  onLoadMoreGroups,
+  hasMoreGroups = false,
+}: AccountFormModalProps) {
   const [openCreateGroup, setOpenCreateGroup] = useState(false);
+
+  const groupOptions = useMemo(
+    () =>
+      accountGroups.map((group) => ({
+        value: String(group.id),
+        label: group.code || String(group.id),
+        subtitle: group.description ?? undefined,
+      })),
+    [accountGroups],
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -52,53 +79,52 @@ export function AccountFormModal({ open, onOpenChange, form, onSubmit, title, de
                   </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
-                )}
-              />
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="accountGroupId"
-                render={({ field }) => (
+            <FormField
+              control={form.control}
+              name="accountGroupId"
+              render={({ field }) => (
                 <FormItem className="space-y-1.5">
-                  <FormLabel className="text-xs font-semibold text-slate-700">Grup Akun<RequiredMark /></FormLabel>
+                  <FormLabel className="text-xs font-semibold text-slate-700">Grup Akun <RequiredMark /></FormLabel>
                   <FormControl>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                    <SearchableSelect
-                      value={field.value ? String(field.value) : ''}
-                      onChange={(value) => field.onChange(Number(value))}
-                      options={accountGroups.map((group) => ({
-                      value: String(group.id),
-                      label: group.code || String(group.id),
-                      subtitle: group.description ?? undefined,
-                      }))}
-                      placeholder={isLoadingGroups ? 'Memuat...' : 'Select an item'}
-                      searchPlaceholder="Cari grup akun..."
-                      emptyText="Grup akun tidak ditemukan."
-                      loading={isLoadingGroups}
-                      className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white"
-                    />
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <SearchableSelect
+                          value={field.value ? String(field.value) : ''}
+                          onChange={(value) => field.onChange(Number(value))}
+                          options={groupOptions}
+                          placeholder={isLoadingGroups ? 'Memuat...' : 'Select an item'}
+                          searchPlaceholder="Cari grup akun..."
+                          emptyText="Grup akun tidak ditemukan."
+                          loading={isLoadingGroups}
+                          onSearchChange={onGroupSearchChange}
+                          onLoadMore={onLoadMoreGroups}
+                          hasMore={hasMoreGroups}
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-10 w-10 flex-shrink-0 rounded-lg border-slate-200 text-slate-700 shadow-none hover:bg-slate-50"
+                        onClick={() => setOpenCreateGroup(true)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="h-10 w-10 flex-shrink-0 rounded-lg border-slate-200 text-slate-700 shadow-none hover:bg-slate-50"
-                    onClick={() => setOpenCreateGroup(true)}
-                    >
-                    <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
                   </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
-                )}
-              />
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
                 <FormItem className="space-y-1.5">
                   <FormLabel className="text-xs font-semibold text-slate-700">Kategori Laporan</FormLabel>
                   <FormControl>
