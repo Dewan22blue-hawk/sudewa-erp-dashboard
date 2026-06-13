@@ -15,6 +15,8 @@ import type {
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError, ensureSuccess, LaravelApiResponse, toPaginatedResult } from '@/lib/api/response';
+import { getVehicleDataDetail } from '@/services/vehicle-data.service';
+import { getVendorById } from '@/services/vendor.service';
 
 const documentBasePath = '/wapi/transaction/vehicle-document';
 const registrationBasePath = '/wapi/transaction/vehicle-registration';
@@ -59,18 +61,26 @@ const getDealerLabel = (vehicle: any, item?: any) =>
   coalesceText(
     vehicle?.dealer?.name,
     vehicle?.dealer?.nama_dealer,
+    vehicle?.dealer?.namaDealer,
+    vehicle?.dealerName,
     vehicle?.dealer_name,
     item?.dealer?.name,
     item?.dealer?.nama_dealer,
+    item?.dealer?.namaDealer,
+    item?.dealerName,
     item?.dealer_name,
+    vehicle?.dealerId ? `Dealer ID ${vehicle.dealerId}` : '',
     vehicle?.dealer_id ? `Dealer ID ${vehicle.dealer_id}` : '',
   );
 const getRegionLabel = (vehicle: any, item?: any) =>
   coalesceText(
     vehicle?.region?.name,
+    vehicle?.regionName,
     vehicle?.region_name,
     item?.region?.name,
+    item?.regionName,
     item?.region_name,
+    vehicle?.regionId ? `Wilayah ID ${vehicle.regionId}` : '',
     vehicle?.region_id ? `Wilayah ID ${vehicle.region_id}` : '',
   );
 const getVendorEmployeeLabel = (item: any, parentVendorName?: string) =>
@@ -82,25 +92,38 @@ const getVendorEmployeeLabel = (item: any, parentVendorName?: string) =>
     parentVendorName,
   );
 
-const mapVehicleDocumentSummary = (item: any): VehicleDocumentSummary => ({
-  id: Number(item.id),
-  uuid: text(item.uuid),
-  code: text(item.code),
-  vendorId: Number(item.vendor_id ?? item.vendor?.id ?? 0),
-  receiptDate: text(item.receipt_date),
-  description: text(item.description),
-  processedCount: numberValue(item.processed_count),
-  unprocessedCount: numberValue(item.unprocessed_count),
-  createdAt: item.created_at,
-  updatedAt: item.updated_at,
-  vendor: item.vendor
-    ? {
-        id: Number(item.vendor.id),
-        name: text(item.vendor.name),
-        code: text(item.vendor.code),
-      }
-    : undefined,
-});
+const mapVehicleDocumentSummary = (item: any): VehicleDocumentSummary => {
+  const ditlantasProcess = item.ditlantas_process;
+  const vendor = ditlantasProcess?.vendor;
+  return {
+    id: Number(item.id),
+    uuid: text(item.uuid),
+    code: text(item.code),
+    vendorId: Number(item.vendor_id ?? vendor?.id ?? 0),
+    receiptDate: text(item.receipt_date),
+    description: text(item.description),
+    processedCount: numberValue(item.processed_count),
+    unprocessedCount: numberValue(item.unprocessed_count),
+    createdAt: item.created_at,
+    updatedAt: item.updated_at,
+    ditlantasProcessId: Number(item.ditlantas_process_id ?? ditlantasProcess?.id ?? 0),
+    ditlantasProcess: ditlantasProcess
+      ? {
+          id: Number(ditlantasProcess.id),
+          code: text(ditlantasProcess.code),
+          vendorId: Number(ditlantasProcess.vendor_id),
+          processDate: text(ditlantasProcess.process_date),
+          vendor: vendor
+            ? {
+                id: Number(vendor.id),
+                name: text(vendor.name),
+                code: text(vendor.code),
+              }
+            : undefined,
+        }
+      : undefined,
+  };
+};
 
 const mapVehicleRegistrationDetail = (item: any, parentVendorName?: string): VehicleRegistrationDetail => {
   const vehicle = getVehicleDataNode(item);
@@ -113,18 +136,18 @@ const mapVehicleRegistrationDetail = (item: any, parentVendorName?: string): Veh
     vendorId: item.vendor_id == null ? null : Number(item.vendor_id),
     isAlreadyProcessed: item.is_already_processed == null ? null : Boolean(item.is_already_processed),
     isUpdateAdditionalData: item.is_update_additional_data == null ? null : Boolean(item.is_update_additional_data),
-    dealerId: vehicle?.dealer_id == null ? null : Number(vehicle.dealer_id),
-    regionId: vehicle?.region_id == null ? null : Number(vehicle.region_id),
+    dealerId: vehicle?.dealerId != null ? Number(vehicle.dealerId) : (vehicle?.dealer_id != null ? Number(vehicle.dealer_id) : null),
+    regionId: vehicle?.regionId != null ? Number(vehicle.regionId) : (vehicle?.region_id != null ? Number(vehicle.region_id) : null),
     dealerName: getDealerLabel(vehicle, item),
     regionName: getRegionLabel(vehicle, item),
     vendorName: coalesceText(vendor?.name, parentVendorName),
-    vehicleDataId: vehicle?.id == null ? null : Number(vehicle.id),
-    vehicleType: toVehicleType(vehicle?.vehicle_type, item.vehicle_type),
-    stnkName: coalesceText(vehicle?.stnk_name, item.stnk_name),
-    machineNumber: coalesceText(vehicle?.machine_number, item.machine_number),
+    vehicleDataId: vehicle?.id != null ? Number(vehicle.id) : (item.vehicle_data_id != null ? Number(item.vehicle_data_id) : null),
+    vehicleType: toVehicleType(vehicle?.vehicleType ?? vehicle?.vehicle_type, item.vehicle_type),
+    stnkName: coalesceText(vehicle?.stnkName, vehicle?.stnk_name, item.stnk_name),
+    machineNumber: coalesceText(vehicle?.machineNumber, vehicle?.machine_number, vehicle?.engine_number, item.machine_number),
     processDate: text(item.process_date),
-    invoiceDate: coalesceText(vehicle?.invoice_date, item.invoice_date),
-    invoiceReceiveDate: coalesceText(vehicle?.invoice_receive_date, item.invoice_receive_date),
+    invoiceDate: coalesceText(vehicle?.invoiceDate, vehicle?.invoice_date, item.invoice_date),
+    invoiceReceiveDate: coalesceText(vehicle?.invoiceReceiveDate, vehicle?.invoice_receive_date, item.invoice_receive_date),
     customerDeliveryDate: text(item.customer_delivery_date),
     bpkbNumber: text(item.bpkb_number),
     bpkbRegistrationDate: text(item.bpkb_registration_date),
@@ -185,10 +208,15 @@ const mapVehicleDocumentItem = (item: any, parentVendorName?: string): VehicleDo
 };
 
 const mergeDocumentTableItems = (detail: any): VehicleDocumentItem[] => {
-  const parentVendorName = text(detail?.vendor?.name);
-  const registrations = Array.isArray(detail?.vehicle_registrations) ? detail.vehicle_registrations.map((item: any) => mapVehicleDocumentItem(item, parentVendorName)) : [];
+  const ditlantasProcess = detail?.ditlantas_process;
+  const parentVendorName = text(ditlantasProcess?.vendor?.name);
+  const registrations = Array.isArray(ditlantasProcess?.vehicle_registrations)
+    ? ditlantasProcess.vehicle_registrations.map((item: any) => mapVehicleDocumentItem(item, parentVendorName))
+    : [];
   if (registrations.length) return registrations;
-  return Array.isArray(detail?.vehicle_document_items) ? detail.vehicle_document_items.map((item: any) => mapVehicleDocumentItem(item, parentVendorName)) : [];
+  return Array.isArray(detail?.vehicle_document_items)
+    ? detail.vehicle_document_items.map((item: any) => mapVehicleDocumentItem(item, parentVendorName))
+    : [];
 };
 
 export const getVehicleDocuments = async (
@@ -236,45 +264,145 @@ export const getVehicleRegistrations = async (
   );
 };
 
+const unwrapVehicleData = (payload: any) => {
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+    if (Array.isArray(payload.data)) {
+      return payload.data[0] ?? {};
+    }
+    if (payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data)) {
+      return payload.data;
+    }
+  }
+  return payload;
+};
+
 export const getVehicleDocumentDetail = async (id: string | number): Promise<VehicleDocumentDetail> => {
   const response = await apiClient.get<LaravelApiResponse<any>>(`${documentBasePath}/${id}`);
   const data = ensureSuccess(response.data);
+  const ditlantasProcess = data.ditlantas_process;
+
+  // Resolve parent vendor
+  let parentVendor = ditlantasProcess?.vendor;
+  if (!parentVendor && ditlantasProcess?.vendor_id) {
+    try {
+      parentVendor = await getVendorById(Number(ditlantasProcess.vendor_id));
+    } catch (err) {
+      console.warn(`Failed to pre-fetch parent vendor for ID ${ditlantasProcess.vendor_id}:`, err);
+    }
+  }
+
+  // Pre-fetch missing nested vehicle_data objects and any individual registration vendors in parallel
+  const vehicleRegistrationsRaw = ditlantasProcess?.vehicle_registrations || [];
+  const uniqueVehicleIds = Array.from(
+    new Set<number>(
+      vehicleRegistrationsRaw
+        .map((reg: any) => reg.vehicle_data_id)
+        .filter(Boolean)
+        .map(Number)
+    )
+  );
+
+  const uniqueVendorIds = Array.from(
+    new Set<number>(
+      vehicleRegistrationsRaw
+        .map((reg: any) => reg.vendor_id)
+        .filter(Boolean)
+        .map(Number)
+    )
+  );
+
+  const vehicleMap = new Map<number, any>();
+  const vendorMap = new Map<number, any>();
+  const fetchPromises: Promise<any>[] = [];
+
+  if (uniqueVehicleIds.length > 0) {
+    uniqueVehicleIds.forEach((vId) => {
+      fetchPromises.push(
+        apiClient.get<LaravelApiResponse<any>>(`/wapi/transaction/vehicle-data/${vId}`)
+          .then((res) => {
+            const vehicleData = unwrapVehicleData(ensureSuccess(res.data));
+            if (vehicleData && vehicleData.id) {
+              vehicleMap.set(Number(vehicleData.id), vehicleData);
+            }
+          })
+          .catch((err) => {
+            console.warn(`Failed to pre-fetch vehicle data for ID ${vId}:`, err);
+          })
+      );
+    });
+  }
+
+  if (uniqueVendorIds.length > 0) {
+    uniqueVendorIds.forEach((vendorId) => {
+      fetchPromises.push(
+        getVendorById(vendorId)
+          .then((vData) => {
+            if (vData && vData.id) {
+              vendorMap.set(Number(vData.id), vData);
+            }
+          })
+          .catch((err) => {
+            console.warn(`Failed to pre-fetch vendor for ID ${vendorId}:`, err);
+          })
+      );
+    });
+  }
+
+  if (fetchPromises.length > 0) {
+    try {
+      await Promise.all(fetchPromises);
+    } catch (err) {
+      console.error('Error pre-fetching document relations:', err);
+    }
+  }
+
+  const mappedRegistrations = vehicleRegistrationsRaw.map((item: any) => {
+    const vehicle = vehicleMap.get(Number(item.vehicle_data_id)) || item.vehicle_data;
+    const itemVendor = vendorMap.get(Number(item.vendor_id)) || item.vendor;
+
+    const itemWithRelations = {
+      ...item,
+      vehicle_data: vehicle,
+      vendor: itemVendor,
+    };
+    return mapVehicleRegistrationDetail(itemWithRelations, text(parentVendor?.name));
+  });
 
   return {
     ...mapVehicleDocumentSummary(data),
-    vendorDetail: data.vendor
+    vendorDetail: parentVendor
       ? {
-          id: Number(data.vendor.id),
-          uuid: text(data.vendor.uuid),
-          code: text(data.vendor.code),
-          type: text(data.vendor.type),
-          name: text(data.vendor.name),
-          address: text(data.vendor.address),
-          npwp: text(data.vendor.npwp),
-          phone: text(data.vendor.phone),
-          picName: text(data.vendor.pic_name),
-          identityNumber: data.vendor.identity_number,
-          driveLicenseIdentityNumber: data.vendor.drive_license_identity_number,
-          image: data.vendor.image,
-          mapLink: data.vendor.map_link,
-          socialMedia1Link: data.vendor.social_media_1_link,
-          socialMedia2Link: data.vendor.social_media_2_link,
-          socialMedia3Link: data.vendor.social_media_3_link,
-          socialMedia4Link: data.vendor.social_media_4_link,
-          websiteLink: data.vendor.website_link,
-          createdAt: data.vendor.created_at,
-          updatedAt: data.vendor.updated_at,
+          id: Number(parentVendor.id),
+          uuid: text(parentVendor.uuid),
+          code: text(parentVendor.code),
+          type: text(parentVendor.type),
+          name: text(parentVendor.name),
+          address: text(parentVendor.address),
+          npwp: text(parentVendor.npwp),
+          phone: text(parentVendor.phone),
+          picName: text(parentVendor.pic_name),
+          identityNumber: parentVendor.identity_number,
+          driveLicenseIdentityNumber: parentVendor.drive_license_identity_number,
+          image: parentVendor.image,
+          mapLink: parentVendor.map_link,
+          socialMedia1Link: parentVendor.social_media_1_link,
+          socialMedia2Link: parentVendor.social_media_2_link,
+          socialMedia3Link: parentVendor.social_media_3_link,
+          socialMedia4Link: parentVendor.social_media_4_link,
+          websiteLink: parentVendor.website_link,
+          createdAt: parentVendor.created_at,
+          updatedAt: parentVendor.updated_at,
         }
       : undefined,
     vehicleDocumentItems: mergeDocumentTableItems(data),
-    vehicleRegistrations: Array.isArray(data.vehicle_registrations) ? data.vehicle_registrations.map((item: any) => mapVehicleRegistrationDetail(item, text(data.vendor?.name))) : [],
+    vehicleRegistrations: mappedRegistrations,
   };
 };
 
 const buildVehicleDocumentPayload = (payload: Partial<VehicleDocumentPayload>, withMethodSpoof = false) => {
   const body = new URLSearchParams();
   if (withMethodSpoof) body.append('_method', 'PUT');
-  if (payload.vendorId) body.append('vendor_id', String(payload.vendorId));
+  if (payload.ditlantasProcessId) body.append('ditlantas_process_id', String(payload.ditlantasProcessId));
   if (payload.receiptDate) body.append('receipt_date', payload.receiptDate);
   if (payload.description != null) body.append('description', payload.description);
   return body;
@@ -348,6 +476,9 @@ export const exportVehicleDocument = async (): Promise<void> => {
 const buildVehicleRegistrationPayload = (payload: Partial<VehicleRegistrationPayload>) => {
   return {
     vendor_id: payload.vendorId ?? null,
+    dealer_id: payload.dealerId ?? null,
+    region_id: payload.regionId ?? null,
+    vehicle_type: payload.vehicleType ?? null,
     process_date: nullableTextValue(payload.processDate),
     bpkb_number: nullableTextValue(payload.bpkbNumber),
     bpkb_registration_date: nullableTextValue(payload.bpkbRegistrationDate),
@@ -415,4 +546,26 @@ export const updateVehicleRegistration = async (id: string | number, payload: Pa
     if (error instanceof ApiValidationError) throw error;
     throw error;
   }
+};
+
+export interface DitlantasProcessOptionItem {
+  id: number;
+  code: string;
+  vendorName: string;
+}
+
+export const getDitlantasProcessOptions = async (search?: string): Promise<DitlantasProcessOptionItem[]> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>('/wapi/transaction/ditlantas-process', {
+    params: {
+      search: search || undefined,
+      per_page: 100,
+    },
+  });
+  const data = ensureSuccess(response.data);
+  const items = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+  return items.map((item: any) => ({
+    id: Number(item.id),
+    code: String(item.code || ''),
+    vendorName: String(item.vendor?.name || ''),
+  }));
 };

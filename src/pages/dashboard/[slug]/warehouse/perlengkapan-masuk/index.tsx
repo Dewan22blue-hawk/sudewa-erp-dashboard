@@ -69,8 +69,14 @@ export default function PerlengkapanMasukListPage() {
   const debouncedSearch = useDebouncedValue(searchInput, 300);
 
   useEffect(() => {
-    updateQuery({ search: debouncedSearch, page: 1 });
-  }, [debouncedSearch, updateQuery]);
+    setSearchInput(search);
+  }, [search]);
+
+  useEffect(() => {
+    if (debouncedSearch !== search) {
+      updateQuery({ search: debouncedSearch, page: 1 });
+    }
+  }, [debouncedSearch, search, updateQuery]);
 
   const transactionsQuery = useGoodsReceiptEquipments({
     page,

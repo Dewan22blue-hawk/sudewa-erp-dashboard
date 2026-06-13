@@ -6,11 +6,11 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
-import { useVendorLookup } from '@/hooks/useVehicleData';
+import { useDitlantasProcessOptions } from '@/hooks/useVehicleDocument';
 import type { VehicleDocumentPayload, VehicleDocumentSummary } from '@/@types/vehicle-document.types';
 
 interface FormValues {
-  vendorId: string;
+  ditlantasProcessId: string;
   receiptDate?: Date;
   description: string;
 }
@@ -48,12 +48,12 @@ export function VehicleDocumentDialog({
   title,
   descriptionText,
 }: Props) {
-  const [vendorSearch, setVendorSearch] = React.useState('');
-  const vendorLookup = useVendorLookup(vendorSearch);
+  const [ditlantasSearch, setDitlantasSearch] = React.useState('');
+  const ditlantasLookup = useDitlantasProcessOptions(ditlantasSearch);
 
   const { control, register, reset, handleSubmit, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
-      vendorId: '',
+      ditlantasProcessId: '',
       receiptDate: undefined,
       description: '',
     },
@@ -62,16 +62,16 @@ export function VehicleDocumentDialog({
   React.useEffect(() => {
     if (!open) return;
     reset({
-      vendorId: initialData ? String(initialData.vendorId) : '',
+      ditlantasProcessId: initialData ? String(initialData.ditlantasProcessId || '') : '',
       receiptDate: initialData ? toDateValue(initialData.receiptDate) : undefined,
       description: initialData?.description || '',
     });
   }, [initialData, open, reset]);
 
-  const vendorOptions = (vendorLookup.data ?? []).map((item) => ({
+  const ditlantasOptions = (ditlantasLookup.data ?? []).map((item) => ({
     value: String(item.id),
-    label: item.label,
-    subtitle: item.vendor.code || item.vendor.phone || undefined,
+    label: `${item.code} - ${item.vendorName}`,
+    subtitle: item.vendorName || undefined,
   }));
 
   return (
@@ -86,7 +86,7 @@ export function VehicleDocumentDialog({
           <form
             onSubmit={handleSubmit(async (values) => {
               await onSubmit({
-                vendorId: Number(values.vendorId),
+                ditlantasProcessId: Number(values.ditlantasProcessId),
                 receiptDate: toPayloadDate(values.receiptDate),
                 description: values.description.trim(),
               });
@@ -94,26 +94,26 @@ export function VehicleDocumentDialog({
             className="space-y-6"
           >
             <div className="space-y-2">
-              <Label className="text-[18px] font-medium text-slate-900">Nama Vendor</Label>
+              <Label className="text-[18px] font-medium text-slate-900">Proses Ditlantas</Label>
               <Controller
-                name="vendorId"
+                name="ditlantasProcessId"
                 control={control}
-                rules={{ required: 'Vendor wajib dipilih' }}
+                rules={{ required: 'Proses Ditlantas wajib dipilih' }}
                 render={({ field }) => (
                   <SearchableSelect
                     value={field.value}
                     onChange={field.onChange}
-                    options={vendorOptions}
-                    loading={vendorLookup.isLoading}
-                    onSearchChange={setVendorSearch}
-                    placeholder="Masukkan nama"
-                    searchPlaceholder="Cari vendor..."
-                    emptyText="Vendor tidak ditemukan."
+                    options={ditlantasOptions}
+                    loading={ditlantasLookup.isLoading}
+                    onSearchChange={setDitlantasSearch}
+                    placeholder="Pilih kode proses Ditlantas"
+                    searchPlaceholder="Cari proses Ditlantas..."
+                    emptyText="Proses Ditlantas tidak ditemukan."
                     className="h-14 rounded-2xl border-slate-200 text-lg"
                   />
                 )}
               />
-              {errors.vendorId ? <p className="text-xs text-red-500">{errors.vendorId.message}</p> : null}
+              {errors.ditlantasProcessId ? <p className="text-xs text-red-500">{errors.ditlantasProcessId.message}</p> : null}
             </div>
 
             <div className="space-y-2">
