@@ -44,6 +44,7 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
                 }
                 if (companySlug.includes('yanotama')) {
                     labels.push('Warehouse');
+                    labels.push('Laporan');
                 }
                 setAllowedLabels(labels);
             })

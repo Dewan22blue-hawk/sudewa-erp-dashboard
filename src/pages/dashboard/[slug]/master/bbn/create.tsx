@@ -7,25 +7,7 @@ import type { ApiError } from '@/@types/api';
 import type { BBNPayload } from '@/@types/bbn.types';
 import { toast } from 'sonner';
 
-const getErrorMessage = (error: unknown) => {
-    const apiError = error as ApiError | undefined;
-    const details = apiError?.details;
-
-    if (details && typeof details === 'object' && !Array.isArray(details)) {
-        const firstDetail = Object.values(details).flatMap((value) => {
-            if (Array.isArray(value)) return value.map(String);
-            return [String(value)];
-        })[0];
-
-        if (firstDetail) return firstDetail;
-    }
-
-    if (typeof details === 'string' && details.trim()) {
-        return details;
-    }
-
-    return apiError?.message || 'Gagal menyimpan data';
-};
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 export default function CreateBBNPage() {
     const router = useRouter();
@@ -40,7 +22,7 @@ export default function CreateBBNPage() {
             toast.success('Data biaya berhasil ditambahkan');
             router.push(`/dashboard/${slug}/master/bbn`);
         } catch (error) {
-            toast.error(getErrorMessage(error));
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }

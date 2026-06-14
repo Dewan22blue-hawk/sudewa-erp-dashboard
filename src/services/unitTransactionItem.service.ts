@@ -184,14 +184,14 @@ export const unitTransactionItemService = {
   // ======================
   async getItems(
     purchaseId: string,
-    params: PaginationParams = {}
+    params: PaginationParams & { type?: 'purchase' | 'sales' } = {}
   ): Promise<UnitTransactionItemListResponse> {
     const response = await apiClient.get<LaravelApiResponse<any>>(
       basePath,
       {
         params: {
           unit_transaction_id: purchaseId,
-          type: 'purchase',
+          type: params.type ?? 'purchase',
           page: params.page ?? 1,
           per_page: params.perPage ?? 50,
         },

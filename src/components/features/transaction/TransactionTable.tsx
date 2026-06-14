@@ -52,10 +52,10 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
             </tr>
             <tr className="border-t">
               {/* BANK SUBHEADER */}
-              <th className="p-2 text-right font-medium text-xs text-black border-l">Debet USD</th>
-              <th className="p-2 text-right font-medium text-xs text-black">Kredit USD</th>
-              <th className="p-2 text-right font-medium text-xs text-black">Debet IDR</th>
-              <th className="p-2 text-right font-medium text-xs text-black border-r">Kredit IDR</th>
+              <th className="p-2 text-right font-medium text-xs text-black border-l">Debet BCA USD</th>
+              <th className="p-2 text-right font-medium text-xs text-black">Kredit BCA USD</th>
+              <th className="p-2 text-right font-medium text-xs text-black">Debet BCA IDR</th>
+              <th className="p-2 text-right font-medium text-xs text-black border-r">Kredit BCA IDR</th>
 
               {/* CASH SUBHEADER */}
               <th className="p-2 text-right font-medium text-xs text-black">Debet</th>

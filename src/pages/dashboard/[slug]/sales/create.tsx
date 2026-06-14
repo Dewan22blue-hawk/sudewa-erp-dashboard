@@ -170,6 +170,12 @@ export default function CreateSalesPage() {
       type: 'sales' as const,
       max_capacity: qty,
       stock_state: 'draft',
+      unit_type_id: unitTypeId,
+      qty_total: qty,
+      price,
+      bbn_price: biayaBbn,
+      expedition_fee: biayaEkspedisi,
+      other_fee: biayaLain,
     };
 
     if (!transactionPayload.code?.trim()) {
@@ -209,24 +215,8 @@ export default function CreateSalesPage() {
         return;
       }
 
-      // STEP 1: create transaction
-      const transaction = await createSalesMutation.mutateAsync(transactionPayload);
-      const transactionId = Number(transaction?.id ?? 0);
-
-      if (!transactionId) {
-        throw new Error('ID transaksi tidak ditemukan');
-      }
-
-      // STEP 2: create transaction item
-      await createItemMutation.mutateAsync({
-        unit_transaction_id: String(transactionId),
-        unit_type_id: String(unitTypeId),
-        qty_total: qty,
-        price,
-        bbn_price: biayaBbn,
-        expedition_fee: biayaEkspedisi,
-        other_fee: biayaLain,
-      });
+      // Create transaction and its unit item atomically
+      await createSalesMutation.mutateAsync(transactionPayload);
 
       toast.success('Penjualan unit berhasil ditambahkan');
       router.push(salesPath);

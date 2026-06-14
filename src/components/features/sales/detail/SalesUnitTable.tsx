@@ -9,7 +9,7 @@ import { Eye, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { SalesLineItem } from '../sales.data';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useBulkDeleteUnitItem, useDeleteUnitItem, usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
+import { useBulkDeleteUnitItem, useDeleteUnitItem, useSalesUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { toast } from 'sonner';
 
@@ -21,7 +21,7 @@ interface Props {
 
 export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
   const router = useRouter();
-  const { data: unitItemsData, isLoading, isError } = usePurchaseUnitItems(salesId);
+  const { data: unitItemsData, isLoading, isError } = useSalesUnitItems(salesId);
   const { data: typeUnits } = useTypeUnits();
   const deleteMutation = useDeleteUnitItem();
   const bulkDeleteMutation = useBulkDeleteUnitItem();

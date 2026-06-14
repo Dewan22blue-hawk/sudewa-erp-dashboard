@@ -299,12 +299,15 @@ export function OrderListForm({
 
   const handleVehicleTypeChange = React.useCallback(
     (index: number, vehicleType: OrderListVehicleType) => {
-      setValue(`items.${index}.vehicleType`, vehicleType, { shouldValidate: true, shouldDirty: true });
-      const tarifId = watchedItems?.[index]?.tarifId ?? '';
-      const matchedTarif = getTarifById(tarifId);
-      const fee = getVehicleFee(matchedTarif, vehicleType);
-      setValue(`items.${index}.driverFee`, fee.driverFee, { shouldDirty: true });
-      setValue(`items.${index}.expeditionInvoice`, fee.invoice, { shouldDirty: true });
+      const itemsCount = watchedItems?.length ?? 0;
+      for (let i = 0; i < itemsCount; i++) {
+        setValue(`items.${i}.vehicleType`, vehicleType, { shouldValidate: true, shouldDirty: true });
+        const tarifId = watchedItems?.[i]?.tarifId ?? '';
+        const matchedTarif = getTarifById(tarifId);
+        const fee = getVehicleFee(matchedTarif, vehicleType);
+        setValue(`items.${i}.driverFee`, fee.driverFee, { shouldDirty: true });
+        setValue(`items.${i}.expeditionInvoice`, fee.invoice, { shouldDirty: true });
+      }
     },
     [getTarifById, setValue, watchedItems],
   );
@@ -325,43 +328,34 @@ export function OrderListForm({
   }, [invoiceBill, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <input type="hidden" {...register('status')} />
+      <input type="hidden" {...register('note')} />
+
       <div className="flex items-center gap-3">
-        <button type="button" onClick={onCancel} className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
-          <ChevronLeft className="h-5 w-5" />
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-full p-1.5 text-slate-900 transition hover:bg-slate-100"
+        >
+          <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
         </button>
-        <div>
-          <h1 className="text-[20px] font-semibold text-slate-950 md:text-[24px]">
-            {mode === 'create' ? 'Form Input Order' : 'Edit Data Order'}
-          </h1>
-        </div>
+        <h1 className="text-[20px] font-bold text-slate-950 md:text-[24px]">
+          Form Input Order
+        </h1>
       </div>
 
-      <div>
-        <h2 className="text-[18px] font-semibold text-slate-950">{mode === 'create' ? 'Form Detail Order' : 'Edit Detail Order'}</h2>
-        <div className="mt-4 h-px bg-slate-200" />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-[20px] border border-slate-200 p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Grup Tarif</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-950">{totalTarifGroups}</p>
-        </Card>
-        <Card className="rounded-[20px] border border-slate-200 p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Item Muatan</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-950">{totalCargoItems}</p>
-        </Card>
-        <Card className="rounded-[20px] border border-slate-200 p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Total Qty</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-950">{totalCargoQty}</p>
-        </Card>
+      <div className="space-y-2">
+        <h2 className="text-[17px] font-bold text-slate-950">Form Detail Order</h2>
+        <div className="h-px bg-slate-200" />
       </div>
 
       <div className="space-y-5">
-        <section className="rounded-[20px] border border-[#E5E7EB] bg-white px-5 py-6 shadow-sm">
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-            <div className="space-y-2 lg:col-span-8">
-              <Label>Nama Customer</Label>
+        {/* Card 1 — Customer */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none">
+          <div className="space-y-2">
+            <Label className="text-[14px] font-semibold text-slate-900">Nama Customer</Label>
+            <div className="w-full max-w-[420px]">
               <Controller
                 control={control}
                 name="customerId"
@@ -375,36 +369,16 @@ export function OrderListForm({
                     searchPlaceholder="Cari customer..."
                     loading={customerLoading}
                     onSearchChange={onCustomerSearch}
-                    className={`h-12 rounded-xl border-[#E5E7EB] ${errors.customerId ? 'border-red-500' : ''}`}
+                    className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] ${errors.customerId ? 'border-red-500' : ''}`}
                   />
                 )}
               />
-              {selectedCustomer?.subtitle ? <p className="text-xs text-slate-500">Kode customer: {selectedCustomer.subtitle}</p> : null}
-              {errors.customerId ? <p className="text-xs text-red-500">{errors.customerId.message}</p> : null}
-            </div>
-
-            <div className="space-y-2 lg:col-span-4">
-              <Label>Status</Label>
-              <Controller
-                control={control}
-                name="status"
-                rules={{ required: 'Status wajib dipilih' }}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className={`h-12 rounded-xl border-[#E5E7EB] ${errors.status ? 'border-red-500' : ''}`}>
-                      <SelectValue placeholder="Pilih status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(mode === 'edit' ? ORDER_LIST_EDIT_STATUS_OPTIONS : ORDER_LIST_STATUS_OPTIONS).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.status ? <p className="text-xs text-red-500">{errors.status.message}</p> : null}
+              {selectedCustomer?.subtitle ? (
+                <p className="text-xs text-slate-400 mt-1">Kode customer: {selectedCustomer.subtitle}</p>
+              ) : null}
+              {errors.customerId ? (
+                <p className="text-xs text-red-500 mt-1">{errors.customerId.message}</p>
+              ) : null}
             </div>
           </div>
         </section>
@@ -414,107 +388,84 @@ export function OrderListForm({
           const tarif = getTarifById(item?.tarifId ?? '');
 
           return (
-            <section key={field.id} className="rounded-[20px] border border-[#E5E7EB] bg-white px-5 py-6 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-base font-semibold text-slate-900">Rute & Armada {fields.length > 1 ? `#${index + 1}` : ''}</h3>
-                <div className="flex items-center gap-2">
-                  {index === fields.length - 1 ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        append({
-                          localId: createItemId(),
-                          tarifId: '',
-                          vehicleType: 'fuso',
-                          loadingIn: '',
-                          loadingOut: '',
-                          deliveryDestination: '',
-                          cargoItems: [createCargoItem()],
-                          driverFee: 0,
-                          expeditionInvoice: 0,
-                        })
-                      }
-                      className="h-10 w-10 rounded-xl border-slate-200"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                  {fields.length > 1 ? (
-                    <Button type="button" variant="outline" size="icon" onClick={() => remove(index)} className="h-10 w-10 rounded-xl border-slate-200">
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
+            <React.Fragment key={field.id}>
+              {/* Card 2 — Rute & Armada */}
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
+                {/* Row 1: Pilih Rute & Loading In */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-[14px] font-semibold text-slate-900">Pilih Rute / Tarif</Label>
+                    <Controller
+                      control={control}
+                      name={`items.${index}.tarifId`}
+                      rules={{ required: 'Tarif wajib dipilih' }}
+                      render={({ field: controllerField }) => (
+                        <SearchableSelect
+                          value={controllerField.value}
+                          onChange={(value) => handleTarifChange(index, value)}
+                          options={mergedTarifOptions}
+                          placeholder="Pilih tarif"
+                          searchPlaceholder="Cari tarif..."
+                          loading={tarifLoading}
+                          onSearchChange={onTarifSearch}
+                          className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] ${errors.items?.[index]?.tarifId ? 'border-red-500' : ''}`}
+                        />
+                      )}
+                    />
+                    {errors.items?.[index]?.tarifId ? (
+                      <p className="text-xs text-red-500 mt-1">{errors.items[index]?.tarifId?.message}</p>
+                    ) : null}
+                  </div>
 
-              <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-                <div className="space-y-2 lg:col-span-12">
-                  <Label>Tarif</Label>
-                  <Controller
-                    control={control}
-                    name={`items.${index}.tarifId`}
-                    rules={{ required: 'Tarif wajib dipilih' }}
-                    render={({ field: controllerField }) => (
-                      <SearchableSelect
-                        value={controllerField.value}
-                        onChange={(value) => handleTarifChange(index, value)}
-                        options={mergedTarifOptions}
-                        placeholder="Pilih tarif"
-                        searchPlaceholder="Cari tarif..."
-                        loading={tarifLoading}
-                        onSearchChange={onTarifSearch}
-                        className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[index]?.tarifId ? 'border-red-500' : ''}`}
-                      />
-                    )}
-                  />
-                  {errors.items?.[index]?.tarifId ? <p className="text-xs text-red-500">{errors.items[index]?.tarifId?.message}</p> : null}
+                  <div className="space-y-2">
+                    <Label className="text-[14px] font-semibold text-slate-900">Loading In</Label>
+                    <Input
+                      readOnly
+                      value={item?.loadingIn ?? ''}
+                      placeholder="Contoh: Surabaya"
+                      className="h-10 rounded-xl border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2 lg:col-span-12">
-                  <Label>Loading In</Label>
-                  <Input
-                    readOnly
-                    value={item?.loadingIn ?? ''}
-                    placeholder="Contoh: Surabaya"
-                    className="h-12 rounded-xl border-[#E5E7EB] bg-slate-50"
-                  />
-                </div>
+                {/* Row 2: Loading Out, Tujuan Kirim, Tipe Armada, + Button */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-12 items-end">
+                  <div className="space-y-2 md:col-span-4">
+                    <Label className="text-[14px] font-semibold text-slate-900">Loading Out</Label>
+                    <Input
+                      readOnly
+                      value={item?.loadingOut ?? ''}
+                      placeholder="Contoh: Yogyakarta"
+                      className="h-10 rounded-xl border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
+                    />
+                  </div>
 
-                <div className="space-y-2 lg:col-span-4">
-                  <Label>Loading Out</Label>
-                  <Input
-                    readOnly
-                    value={item?.loadingOut ?? ''}
-                    placeholder="Contoh: Yogyakarta"
-                    className="h-12 rounded-xl border-[#E5E7EB] bg-slate-50"
-                  />
-                </div>
+                  <div className="space-y-2 md:col-span-4">
+                    <Label className="text-[14px] font-semibold text-slate-900">Tujuan Kirim</Label>
+                    <Input
+                      placeholder="Contoh: Nama PT"
+                      className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.deliveryDestination ? 'border-red-500' : ''}`}
+                      {...register(`items.${index}.deliveryDestination`, { required: 'Tujuan kirim wajib diisi' })}
+                    />
+                    {errors.items?.[index]?.deliveryDestination ? (
+                      <p className="text-xs text-red-500 mt-1">{errors.items[index]?.deliveryDestination?.message}</p>
+                    ) : null}
+                  </div>
 
-                <div className="space-y-2 lg:col-span-4">
-                  <Label>Tujuan Kirim</Label>
-                  <Input
-                    placeholder="Contoh: Nama PT"
-                    className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[index]?.deliveryDestination ? 'border-red-500' : ''}`}
-                    {...register(`items.${index}.deliveryDestination`, { required: 'Tujuan kirim wajib diisi' })}
-                  />
-                  {errors.items?.[index]?.deliveryDestination ? (
-                    <p className="text-xs text-red-500">{errors.items[index]?.deliveryDestination?.message}</p>
-                  ) : null}
-                </div>
-
-                <div className="space-y-2 lg:col-span-4">
-                  <Label>Tipe Armada</Label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
+                  <div className="space-y-2 md:col-span-4 flex items-center gap-2">
+                    <div className="flex-1 space-y-2">
+                      <Label className="text-[14px] font-semibold text-slate-900">Tipe Armada</Label>
                       <Controller
                         control={control}
                         name={`items.${index}.vehicleType`}
                         rules={{ required: 'Tipe armada wajib dipilih' }}
                         render={({ field: controllerField }) => (
-                          <Select value={controllerField.value} onValueChange={(value: OrderListVehicleType) => handleVehicleTypeChange(index, value)}>
-                            <SelectTrigger className="h-12 rounded-xl border-[#E5E7EB]">
+                          <Select
+                            value={controllerField.value}
+                            onValueChange={(value: OrderListVehicleType) => handleVehicleTypeChange(index, value)}
+                            disabled={index > 0}
+                          >
+                            <SelectTrigger className="h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none disabled:bg-slate-50 disabled:opacity-100 disabled:cursor-not-allowed">
                               <SelectValue placeholder="Pilih armada" />
                             </SelectTrigger>
                             <SelectContent>
@@ -528,47 +479,78 @@ export function OrderListForm({
                         )}
                       />
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => appendCargoItem(index)}
-                      className="h-12 w-12 rounded-xl border-slate-200"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                    {index === fields.length - 1 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          const currentVehicleType = watchedItems?.[0]?.vehicleType ?? 'fuso';
+                          append({
+                            localId: createItemId(),
+                            tarifId: '',
+                            vehicleType: currentVehicleType,
+                            loadingIn: '',
+                            loadingOut: '',
+                            deliveryDestination: '',
+                            cargoItems: [createCargoItem()],
+                            driverFee: 0,
+                            expeditionInvoice: 0,
+                          });
+                        }}
+                        className="h-10 w-10 shrink-0 rounded-xl border-slate-200"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      fields.length > 1 ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => remove(index)}
+                          className="h-10 w-10 shrink-0 rounded-xl border-slate-200 border-red-200 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      ) : (
+                        <div className="w-10 h-10" />
+                      )
+                    )}
                   </div>
                 </div>
 
                 {tarif ? (
-                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 lg:col-span-12">
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
                     Tarif terpilih: {tarif.loadingIn || '-'} ke {tarif.loadingOut || '-'}
                   </div>
                 ) : null}
+              </section>
 
-                <div className="space-y-3 lg:col-span-12">
-                  <div className="text-sm font-semibold text-slate-900">Muatan</div>
+              {/* Card 3 — Muatan */}
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
+                <div className="grid grid-cols-1 gap-4">
                   {(item?.cargoItems ?? []).map((cargoItem, cargoIndex) => (
-                    <div key={cargoItem.localId || `${field.id}-cargo-${cargoIndex}`} className="grid grid-cols-1 gap-3 rounded-xl border border-slate-100 p-3 lg:grid-cols-12">
-                      <div className="space-y-2 lg:col-span-6">
-                        <Label>{cargoIndex === 0 ? 'Muatan' : `Muatan #${cargoIndex + 1}`}</Label>
+                    <div key={cargoItem.localId || `${field.id}-cargo-${cargoIndex}`} className="flex items-end gap-3 w-full">
+                      <div className="flex-1 space-y-2">
+                        {cargoIndex === 0 && <Label className="text-[14px] font-semibold text-slate-900">Muatan</Label>}
                         <Input
                           placeholder="Contoh: Motor vario"
-                          className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
+                          className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
                           {...register(`items.${index}.cargoItems.${cargoIndex}.loadContent`, { required: 'Muatan wajib diisi' })}
                         />
                         {errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? (
-                          <p className="text-xs text-red-500">{errors.items[index]?.cargoItems?.[cargoIndex]?.loadContent?.message}</p>
+                          <p className="text-xs text-red-500 mt-1">{errors.items[index]?.cargoItems?.[cargoIndex]?.loadContent?.message}</p>
                         ) : null}
                       </div>
 
-                      <div className="space-y-2 lg:col-span-5">
-                        <Label>{cargoIndex === 0 ? 'QTY' : `QTY #${cargoIndex + 1}`}</Label>
+                      <div className="w-[120px] space-y-2">
+                        {cargoIndex === 0 && <Label className="text-[14px] font-semibold text-slate-900">QTY</Label>}
                         <Input
                           type="number"
                           min={0}
                           placeholder="0"
-                          className={`h-12 rounded-xl border-[#E5E7EB] ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
+                          className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
                           {...register(`items.${index}.cargoItems.${cargoIndex}.qty`, {
                             valueAsNumber: true,
                             required: 'Qty wajib diisi',
@@ -576,54 +558,63 @@ export function OrderListForm({
                           })}
                         />
                         {errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? (
-                          <p className="text-xs text-red-500">{errors.items[index]?.cargoItems?.[cargoIndex]?.qty?.message}</p>
+                          <p className="text-xs text-red-500 mt-1">{errors.items[index]?.cargoItems?.[cargoIndex]?.qty?.message}</p>
                         ) : null}
                       </div>
 
-                      <div className="flex items-end lg:col-span-1">
-                        {(item?.cargoItems?.length ?? 0) > 1 ? (
+                      <div className="shrink-0 flex items-center">
+                        {cargoIndex === (item?.cargoItems?.length ?? 0) - 1 ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => appendCargoItem(index)}
+                            className="h-10 w-10 rounded-xl border-slate-200"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        ) : (
                           <Button
                             type="button"
                             variant="outline"
                             size="icon"
                             onClick={() => removeCargoItem(index, cargoIndex)}
-                            className="h-12 w-12 rounded-xl border-slate-200"
+                            className="h-10 w-10 rounded-xl border-slate-200 border-red-200 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>
-                        ) : (
-                          <div className="h-12 w-12" />
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            </section>
+              </section>
+            </React.Fragment>
           );
         })}
 
-        <section className="rounded-[20px] border border-[#E5E7EB] bg-white px-5 py-6 shadow-sm">
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-            <div className="space-y-2 lg:col-span-12">
-              <Label>UJ Driver</Label>
-              <Controller
-                control={control}
-                name="ujDriver"
-                render={({ field }) => (
-                  <MoneyInput
-                    value={field.value}
-                    onChangeValue={field.onChange}
-                    disabled
-                    placeholder="Terisi otomatis by tipe armada"
-                    className="h-12 rounded-xl border-[#E5E7EB] bg-slate-50"
-                  />
-                )}
-              />
-            </div>
+        {/* Card 4 — UJ Driver, Invoice, PPN */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
+          <div className="space-y-2">
+            <Label className="text-[14px] font-semibold text-slate-900">UJ Driver</Label>
+            <Controller
+              control={control}
+              name="ujDriver"
+              render={({ field }) => (
+                <MoneyInput
+                  value={field.value}
+                  onChangeValue={field.onChange}
+                  disabled
+                  placeholder="Terisi otomatis by tipe armada"
+                  className="h-10 rounded-xl border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
+                />
+              )}
+            />
+          </div>
 
-            <div className="space-y-2 lg:col-span-6">
-              <Label>Invoice Ekspedisi</Label>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-[14px] font-semibold text-slate-900">Invoice Ekspedisi</Label>
               <Controller
                 control={control}
                 name="invoiceBill"
@@ -631,16 +622,18 @@ export function OrderListForm({
                   <MoneyInput
                     value={field.value}
                     onChangeValue={field.onChange}
-                    placeholder="Masukkan nominal invoice ekspedisi"
-                    className={`h-12 rounded-xl border-[#E5E7EB] ${errors.invoiceBill ? 'border-red-500' : ''}`}
+                    placeholder="Masukkan nominal invoice"
+                    className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.invoiceBill ? 'border-red-500' : ''}`}
                   />
                 )}
               />
-              {errors.invoiceBill ? <p className="text-xs text-red-500">{errors.invoiceBill.message}</p> : null}
+              {errors.invoiceBill ? (
+                <p className="text-xs text-red-500 mt-1">{errors.invoiceBill.message}</p>
+              ) : null}
             </div>
 
-            <div className="space-y-2 lg:col-span-6">
-              <Label>PPN</Label>
+            <div className="space-y-2">
+              <Label className="text-[14px] font-semibold text-slate-900">PPN</Label>
               <Controller
                 control={control}
                 name="ppn"
@@ -649,35 +642,35 @@ export function OrderListForm({
                     value={field.value}
                     onChangeValue={field.onChange}
                     placeholder="Masukkan nominal PPN"
-                    className="h-12 rounded-xl border-[#E5E7EB]"
+                    className="h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none"
                   />
                 )}
               />
             </div>
+          </div>
 
-            <div className="space-y-2 lg:col-span-12">
-              <Label>Catatan</Label>
-              <Textarea
-                rows={4}
-                placeholder="Tambahkan catatan order bila diperlukan"
-                className="rounded-2xl border-[#E5E7EB]"
-                {...register('note')}
-              />
-            </div>
-
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 lg:col-span-12">
-              Ringkasan biaya: UJ Driver {formatOrderCurrency(watchedUjDriver)} • Invoice {formatOrderCurrency(invoiceBill)} • PPN {formatOrderCurrency(watchedPpn)}
-            </div>
+          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
+            Ringkasan biaya: UJ Driver {formatOrderCurrency(watchedUjDriver)} • Invoice {formatOrderCurrency(invoiceBill)} • PPN {formatOrderCurrency(watchedPpn)}
           </div>
         </section>
       </div>
 
-      <div className="flex items-center justify-center gap-4 pt-4">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting} className="rounded-xl px-6 text-slate-700">
+      <div className="flex items-center justify-center gap-6 pt-4">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="rounded-xl px-6 text-slate-700 font-semibold hover:bg-slate-100 transition text-[15px]"
+        >
           Batal
         </Button>
-        <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-[#1f4163] px-6 hover:bg-[#183552]">
-          <Save className="mr-2 h-4 w-4" />
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="rounded-xl bg-[#1f4163] px-6 h-10 hover:bg-[#183552] text-white font-semibold flex items-center gap-2 text-[15px] shadow-none"
+        >
+          <Save className="h-4 w-4" />
           {isSubmitting ? 'Menyimpan...' : 'Simpan'}
         </Button>
       </div>

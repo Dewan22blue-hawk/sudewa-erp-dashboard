@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -216,8 +217,8 @@ export default function BBNBillPaymentPage() {
               <div className="rounded-[20px] border border-slate-200 p-4">
                 <div className="mb-4 border-b border-slate-100 pb-4 text-base text-slate-500">Pembayaran</div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <SummaryField label="BCA IDR" value={formatCurrency(paymentBreakdown.bca)} />
                   <SummaryField label="BCA USD" value={formatCurrency(paymentBreakdown.usd)} />
+                  <SummaryField label="BCA IDR" value={formatCurrency(paymentBreakdown.bca)} />
                   <SummaryField label="Cash" value={formatCurrency(paymentBreakdown.cash)} />
                 </div>
               </div>
@@ -251,7 +252,7 @@ export default function BBNBillPaymentPage() {
 
                       router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
                     } catch (error: any) {
-                      toast.error(error.message || 'Gagal menyimpan item pembayaran');
+                      toast.error(getApiErrorMessage(error));
                     }
                   })}
                   className="space-y-5"
@@ -327,7 +328,7 @@ export default function BBNBillPaymentPage() {
                             toast.success('Item pembayaran berhasil dihapus');
                             router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
                           } catch (error: any) {
-                            toast.error(error.message || 'Gagal menghapus item pembayaran');
+                            toast.error(getApiErrorMessage(error));
                           }
                         }}
                         className="rounded-xl"
@@ -360,7 +361,7 @@ export default function BBNBillPaymentPage() {
                         toast.success('Data penagihan berhasil dihapus');
                         router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
                       } catch (error: any) {
-                        toast.error(error.message || 'Gagal menghapus data penagihan');
+                        toast.error(getApiErrorMessage(error));
                       }
                     }}
                     className="rounded-xl border-slate-200"

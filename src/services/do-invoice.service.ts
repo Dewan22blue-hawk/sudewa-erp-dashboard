@@ -82,13 +82,13 @@ const mapTarif = (item: any): DoInvoiceTarif | null => {
   if (!item || typeof item !== 'object') return null;
   return {
     id: Number(item.id ?? 0),
-    description: item.description ?? item.name ?? null,
+    description: item.description || item.name || null,
     qty: toNumber(item.qty),
-    invoicePrice: toNumber(item.invoice ?? item.invoice_price ?? item.price),
-    ppnPrice: toNumber(item.ppn ?? item.ppn_price),
-    loadingIn: item.loading_in ?? item.loadingIn ?? '',
-    destination: item.destination ?? item.tujuan_kirim ?? '',
-    loadingOut: item.loading_out ?? item.loadingOut ?? '',
+    invoicePrice: toNumber(item.invoice || item.invoice_price || item.price),
+    ppnPrice: toNumber(item.ppn || item.ppn_price),
+    loadingIn: item.loading_in || item.loadingIn || '',
+    destination: item.destination || item.tujuan_kirim || item.delivery_destination || item.deliveryDestination || '',
+    loadingOut: item.loading_out || item.loadingOut || '',
   };
 };
 
@@ -111,18 +111,44 @@ const findNested = (source: any, ...keys: string[]) => {
 };
 
 const mapExpedition = (item: any): DoInvoiceExpedition => {
-  const orderListTarif = findNested(item, 'order_list_tarif', 'orderListTarif');
-  const tarif = mapTarif(findNested(item, 'tarif', 'price_tarif') ?? orderListTarif?.tarif ?? orderListTarif);
+  const orderListTarif = findNested(item, 'order_list_tarif', 'orderListTarif') ?? item?.order_list_tarifs?.[0];
+  const rawTarifObj = findNested(item, 'tarif', 'price_tarif') ?? orderListTarif?.tarif ?? orderListTarif;
+  const tarif = mapTarif(rawTarifObj);
   const vehicle = mapVehicle(findNested(item, 'vehicle', 'armada'));
   const driver = mapDriver(findNested(item, 'driver'));
   const orderList = mapOrderList(findNested(item, 'order_list', 'orderList'));
   const customer = mapCustomer(findNested(item, 'customer'));
 
-  const invoiceExpedition = toNumber(
+  let invoiceExpedition = toNumber(
     findNested(item, 'invoice_expedition', 'invoice', 'invoice_fee') ?? tarif?.invoicePrice,
   );
-  const ppn = toNumber(findNested(item, 'ppn', 'ppn_fee') ?? tarif?.ppnPrice);
-  const qty = toNumber(findNested(item, 'qty', 'quantity') ?? tarif?.qty);
+
+  if (invoiceExpedition === 0 && rawTarifObj && vehicle) {
+    const vType = vehicle.type?.toLowerCase();
+    if (vType === 'cdd') {
+      invoiceExpedition = toNumber(rawTarifObj.inv_cdd ?? rawTarifObj.invCdd);
+    } else if (vType === 'fuso') {
+      invoiceExpedition = toNumber(rawTarifObj.inv_fuso ?? rawTarifObj.invFuso);
+    } else if (vType === 'towing') {
+      invoiceExpedition = toNumber(rawTarifObj.inv_towing ?? rawTarifObj.invTowing);
+    }
+  }
+
+  let ppn = toNumber(findNested(item, 'ppn', 'ppn_fee') ?? tarif?.ppnPrice);
+  if (ppn === 0 && invoiceExpedition > 0) {
+    ppn = Math.round(invoiceExpedition * 0.011);
+  }
+
+  const qty = toNumber(findNested(item, 'qty', 'quantity') ?? tarif?.qty) || 1;
+
+  const destination =
+    orderListTarif?.delivery_destination ||
+    orderListTarif?.deliveryDestination ||
+    item?.destination ||
+    item?.tujuan_kirim ||
+    item?.delivery_destination ||
+    tarif?.destination ||
+    '-';
 
   return {
     id: Number(item?.id ?? 0),
@@ -143,11 +169,15 @@ const mapExpedition = (item: any): DoInvoiceExpedition => {
     invoiceExpedition,
     ppn,
     totalAmount: invoiceExpedition + ppn,
+    destination,
   };
 };
 
 const mapDoInvoice = (item: any): DoInvoice => {
-  const expeditionsRaw = findNested(item, 'expeditions', 'do_expeditions') ?? [];
+  const expeditionsRaw =
+    findNested(item, 'expeditions', 'do_expeditions') ??
+    findNested(item?.order_list ?? item?.orderList, 'expeditions', 'do_expeditions') ??
+    [];
   const expeditions = Array.isArray(expeditionsRaw) ? expeditionsRaw.map(mapExpedition) : [];
   const firstExpedition = expeditions[0];
   const orderList = mapOrderList(findNested(item, 'order_list', 'orderList')) ?? firstExpedition?.orderList ?? null;

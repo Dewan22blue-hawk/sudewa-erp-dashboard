@@ -57,6 +57,7 @@ export interface DoInvoiceExpedition {
   invoiceExpedition?: number;
   ppn?: number;
   totalAmount?: number;
+  destination?: string;
 }
 
 export interface DoInvoice {

@@ -1,3 +1,4 @@
+import type { ApiError } from '@/@types/api';
 import type {
   PPNPenjualan,
   PPNPenjualanFilterParams,
@@ -47,7 +48,6 @@ const normalizePPNPenjualan = (value: Partial<PPNPenjualan>): PPNPenjualan => ({
   supplier: value.supplier ?? '-',
   fpm_date: value.fpm_date ?? null,
   nsfpm_age: value.nsfpm_age ?? null,
-  nsfpm_input: toNumber(value.nsfpm_input),
   qty: toNumber(value.qty),
   unit_type: normalizeUnitType(value.unit_type),
   unit_transaction_item_detail: normalizeUnitDetail(value.unit_transaction_item_detail),
@@ -55,6 +55,7 @@ const normalizePPNPenjualan = (value: Partial<PPNPenjualan>): PPNPenjualan => ({
   dpp_amount: toNumber(value.dpp_amount),
   ppn_11: toNumber(value.ppn_11),
   payment_amount: toNumber(value.payment_amount),
+  nsfp_number: value.nsfp_number ?? null,
 });
 
 const toSuccessPayload = <T>(payload: { status: boolean; message: string; errors: Record<string, string[]> | null; data: T }) =>
@@ -62,7 +63,12 @@ const toSuccessPayload = <T>(payload: { status: boolean; message: string; errors
     ...payload,
     errors: payload.errors ?? undefined,
   }) as unknown as LaravelApiResponse<T>;
+const isMethodNotAllowed = (error: unknown) => {
+  if (!error || typeof error !== 'object') return false;
 
+  const apiError = error as ApiError;
+  return apiError.statusCode === 405;
+};
 export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {}): Promise<PPNPenjualanListResult> {
   const page = params.page ?? DEFAULT_PAGE;
   const perPage = params.per_page ?? DEFAULT_PER_PAGE;
@@ -91,14 +97,24 @@ export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {})
 }
 
 export async function updatePPNPenjualan({ id, payload }: UpdatePPNPenjualanMutationPayload) {
-  const response = await apiClient.put<PPNPenjualanUpdateResponse>(`${BASE_PATH}/${id}`, undefined, {
-    params: {
-      fpm_date: payload.fpm_date || undefined,
-      nsfpm_age: payload.nsfpm_age || undefined,
-      nsfp_amount: payload.nsfp_amount ?? undefined,
-      amount: payload.amount ?? undefined,
-    },
-  });
+  const requestBody = {
+    fpm_date: payload.fpm_date || undefined,
+    nsfpm_age: payload.nsfpm_age || undefined,
+    amount: payload.amount ?? undefined,
+    nsfp_number: payload.nsfp_number || undefined,
+  };
 
-  return ensureSuccess(toSuccessPayload(response.data));
+  try {
+    const response = await apiClient.put<PPNPenjualanUpdateResponse>(`${BASE_PATH}/${id}`, requestBody);
+    return ensureSuccess(toSuccessPayload(response.data));
+  } catch (error) {
+    if (!isMethodNotAllowed(error)) throw error;
+
+    const response = await apiClient.post<PPNPenjualanUpdateResponse>(`${BASE_PATH}/${id}`, {
+      ...requestBody,
+      _method: 'PUT',
+    });
+
+    return ensureSuccess(toSuccessPayload(response.data));
+  }
 }

@@ -91,6 +91,15 @@ const mapVehicleData = (item: any): VehicleData => ({
         name: toStringValue(item.region.name),
       }
     : undefined,
+  ditlantasProcess: Array.isArray(item.ditlantas_process)
+    ? item.ditlantas_process.map((p: any) => ({
+        id: Number(p.id),
+        uuid: toStringValue(p.uuid),
+        code: toStringValue(p.code),
+        vendorId: Number(p.vendor_id),
+        processDate: p.process_date ?? '',
+      }))
+    : undefined,
 });
 
 const buildVehiclePayload = (data: Partial<VehicleDataPayload>, withMethodSpoof = false) => {
@@ -249,13 +258,13 @@ export const exportVehicleData = async (): Promise<void> => {
 
 export const assignVehicleDataToDitlantas = async (payload: VehicleDataAssignPayload): Promise<void> => {
   const params = new URLSearchParams();
-  payload.vehicleDataIds.forEach((id, index) => {
-    params.append(`vehicle_data_ids[${index}]`, String(id));
+  payload.vehicleDataIds.forEach((id) => {
+    params.append('vehicle_data_ids[]', String(id));
   });
   params.append('vendor_id', String(payload.vendorId));
   params.append('process_date', payload.processDate);
 
-  const response = await apiClient.post<LaravelApiResponse<any>>(`${basePath}/assign-registration`, params, {
+  const response = await apiClient.post<LaravelApiResponse<any>>('/wapi/transaction/ditlantas-process', params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },

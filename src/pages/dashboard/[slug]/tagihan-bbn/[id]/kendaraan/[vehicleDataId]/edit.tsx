@@ -34,10 +34,15 @@ export default function EditBBNBillVehiclePage() {
           isSubmitting={updateMutation.isPending}
           onCancel={() => router.push(`/dashboard/${slug}/tagihan-bbn/${id}`)}
           onSubmit={async (payload) => {
-            if (!vehicleDataId) return;
+            if (!vehicle) return;
+            const vehicleRegistrationId = vehicle.vehicleRegistration?.id;
+            if (!vehicleRegistrationId) {
+              toast.error('ID Registrasi Kendaraan tidak ditemukan');
+              return;
+            }
 
             try {
-              await updateMutation.mutateAsync({ vehicleDataId, payload });
+              await updateMutation.mutateAsync({ vehicleRegistrationId, payload });
               toast.success('Data detail STNK/BPKB berhasil diperbarui');
               router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
             } catch (error: any) {

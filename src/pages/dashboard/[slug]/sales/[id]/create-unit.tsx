@@ -7,7 +7,7 @@ import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.sch
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
-import { useCreateUnitItem, usePurchaseUnitItems, useSalesItemsByWarehouse } from '@/hooks/useUnitTransactionItem';
+import { useCreateUnitItem, useSalesUnitItems, useSalesItemsByWarehouse } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -26,7 +26,7 @@ export default function CreateUnitPage() {
   const warehouseId = salesDetail?.raw?.warehouse?.id ?? salesDetail?.raw?.warehouse_id;
 
   const { data: stockItems, isLoading: isLoadingStockItems } = useSalesItemsByWarehouse(warehouseId);
-  const { data: salesItemsResponse } = usePurchaseUnitItems(salesId);
+  const { data: salesItemsResponse } = useSalesUnitItems(salesId);
 
   const existingTypeUnitIds = useMemo(
     () =>

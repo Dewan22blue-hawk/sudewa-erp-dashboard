@@ -48,14 +48,15 @@ const normalizePPNPembelian = (value: Partial<PPNPembelian>): PPNPembelian => ({
   supplier: value.supplier ?? '-',
   fp_date: value.fp_date ?? null,
   nsfp_age: value.nsfp_age ?? null,
-  nsfp_input: toNumber(value.nsfp_input),
   qty: toNumber(value.qty),
   unit_type: normalizeUnitType(value.unit_type),
   unit_transaction_item_detail: normalizeUnitDetail(value.unit_transaction_item_detail),
   unit_price: toNumber(value.unit_price),
+  total_price: toNumber(value.total_price),
   dpp_amount: toNumber(value.dpp_amount),
   ppn_11: toNumber(value.ppn_11),
   payment_amount: toNumber(value.payment_amount),
+  nsfp_number: value.nsfp_number ?? null,
 });
 
 const toSuccessPayload = <T>(payload: { status: boolean; message: string; errors: Record<string, string[]> | null; data: T }) =>
@@ -102,8 +103,8 @@ export async function updatePPNPembelian({ id, payload }: UpdatePPNPembelianMuta
   const requestBody = {
     fp_date: payload.fp_date || undefined,
     nsfp_age: payload.nsfp_age || undefined,
-    nsfp_amount: payload.nsfp_amount ?? undefined,
     amount: payload.amount ?? undefined,
+    nsfp_number: payload.nsfp_number || undefined,
   };
 
   try {

@@ -52,6 +52,13 @@ export interface VehicleData {
   } | null;
   dealer?: Pick<Dealer, 'id' | 'code' | 'namaDealer'>;
   region?: Pick<Region, 'id' | 'name'>;
+  ditlantasProcess?: {
+    id: number;
+    uuid: string;
+    code: string;
+    vendorId: number;
+    processDate: string;
+  }[] | null;
 }
 
 export interface VehicleDataPayload {

@@ -10,12 +10,12 @@ import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { useCompany } from '@/contexts/CompanyContext';
-import { useDealers } from '@/hooks/useDealer';
+import { useDitlantasProcessOptions } from '@/hooks/useVehicleDocument';
 import { useBBNBillDetail, useUpdateBBNBill } from '@/hooks/useBBNBill';
 import { toDateValue, toPayloadDate } from '@/components/features/tagihan-bbn/utils';
 
 type FormValues = {
-  dealerId: string;
+  ditlantasProcessId: string;
   billDate?: Date;
   paidDate?: Date;
 };
@@ -27,13 +27,13 @@ export default function EditBBNBillPage() {
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
 
-  const [dealerSearch, setDealerSearch] = React.useState('');
+  const [ditlantasSearch, setDitlantasSearch] = React.useState('');
   const detailQuery = useBBNBillDetail(id);
-  const dealersQuery = useDealers(safeCompanyId, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' });
+  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch);
   const updateMutation = useUpdateBBNBill();
   const form = useForm<FormValues>({
     defaultValues: {
-      dealerId: '',
+      ditlantasProcessId: '',
       billDate: undefined,
       paidDate: undefined,
     },
@@ -42,20 +42,24 @@ export default function EditBBNBillPage() {
   React.useEffect(() => {
     if (!detailQuery.data) return;
     form.reset({
-      dealerId: String(detailQuery.data.dealerId),
+      ditlantasProcessId: detailQuery.data.ditlantasProcess?.id
+        ? String(detailQuery.data.ditlantasProcess.id)
+        : detailQuery.data.dealerId
+        ? String(detailQuery.data.dealerId)
+        : '',
       billDate: toDateValue(detailQuery.data.billDate),
       paidDate: toDateValue(detailQuery.data.paidDate),
     });
   }, [detailQuery.data, form]);
 
-  const dealerOptions = React.useMemo(
+  const ditlantasOptions = React.useMemo(
     () =>
-      (dealersQuery.data?.data ?? []).map((dealer) => ({
-        value: String(dealer.id),
-        label: dealer.namaDealer || dealer.code || `Dealer ID ${dealer.id}`,
-        subtitle: dealer.code || undefined,
+      (ditlantasQuery.data ?? []).map((item) => ({
+        value: String(item.id),
+        label: `${item.code} - ${item.vendorName || ''}`,
+        subtitle: item.vendorName || undefined,
       })),
-    [dealersQuery.data?.data],
+    [ditlantasQuery.data],
   );
 
   return (
@@ -75,7 +79,7 @@ export default function EditBBNBillPage() {
             </Button>
             <div>
               <h1 className="text-[30px] font-semibold tracking-[-0.02em] text-slate-950">Ubah Data Tagihan BBN</h1>
-              <p className="mt-1 text-sm text-slate-500">Perbarui dealer dan tanggal tagihan sesuai kebutuhan.</p>
+              <p className="mt-1 text-sm text-slate-500">Perbarui proses ditlantas dan tanggal tagihan sesuai kebutuhan.</p>
             </div>
           </div>
 
@@ -88,7 +92,7 @@ export default function EditBBNBillPage() {
                   await updateMutation.mutateAsync({
                     id,
                     payload: {
-                      dealerId: values.dealerId,
+                      ditlantasProcessId: values.ditlantasProcessId,
                       billDate: toPayloadDate(values.billDate),
                       paidDate: toPayloadDate(values.paidDate),
                     },
@@ -102,19 +106,19 @@ export default function EditBBNBillPage() {
               className="grid gap-6 md:grid-cols-2"
             >
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-900">Dealer</Label>
+                <Label className="text-sm font-semibold text-slate-900">Proses Ditlantas</Label>
                 <Controller
-                  name="dealerId"
+                  name="ditlantasProcessId"
                   control={form.control}
                   render={({ field }) => (
                     <SearchableSelect
                       value={field.value}
                       onChange={field.onChange}
-                      options={dealerOptions}
-                      onSearchChange={setDealerSearch}
-                      placeholder="Pilih dealer"
-                      searchPlaceholder="Cari dealer..."
-                      emptyText="Dealer tidak ditemukan."
+                      options={ditlantasOptions}
+                      onSearchChange={setDitlantasSearch}
+                      placeholder="Pilih kode proses Ditlantas"
+                      searchPlaceholder="Cari proses Ditlantas..."
+                      emptyText="Proses Ditlantas tidak ditemukan."
                       className="h-11 rounded-xl border-slate-200"
                     />
                   )}

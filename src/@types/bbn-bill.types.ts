@@ -69,9 +69,22 @@ export interface BBNBillBillingSummary {
   updatedAt?: string;
 }
 
+export interface BBNBillDitlantasProcess {
+  id: number;
+  uuid?: string;
+  code: string;
+  processDate?: string;
+  vendorId?: number | null;
+  vendor?: {
+    id: number;
+    name: string;
+  } | null;
+}
+
 export interface BBNBill {
   id: number;
   uuid?: string;
+  code?: string;
   dealerId: number;
   billDate: string | null;
   paidDate: string | null;
@@ -79,8 +92,11 @@ export interface BBNBill {
   updatedAt?: string;
   bruttoAmount: number;
   paidAmount: number;
+  remainingAmount?: number;
+  pph23Amount?: number;
   isPaid: boolean;
   dealer: BBNBillDealer | null;
+  ditlantasProcess?: BBNBillDitlantasProcess | null;
 }
 
 export interface BBNBillDetail extends BBNBill {
@@ -119,7 +135,8 @@ export type BBNBillBillingListResponse = PaginatedResult<BBNBillBilling>;
 export type BBNBillBillingItemListResponse = PaginatedResult<BBNBillBillingItem>;
 
 export interface BBNBillPayload {
-  dealerId: number | string;
+  dealerId?: number | string;
+  ditlantasProcessId?: number | string;
   billDate: string;
   paidDate?: string;
 }
