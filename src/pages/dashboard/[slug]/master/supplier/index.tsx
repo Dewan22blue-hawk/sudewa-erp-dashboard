@@ -54,9 +54,11 @@ export default function SupplierPage() {
     },
   });
 
+  const { reset: resetEditForm } = editForm;
+
   useEffect(() => {
     if (supplierToEdit) {
-      editForm.reset({
+      resetEditForm({
         name: supplierToEdit.name,
         address: supplierToEdit.address ?? '',
         npwp: supplierToEdit.npwp ?? '',
@@ -64,7 +66,7 @@ export default function SupplierPage() {
         phone: supplierToEdit.phone ?? '',
       });
     }
-  }, [supplierToEdit, editForm]);
+  }, [supplierToEdit, resetEditForm]);
 
   const handleCreateClick = () => {
     setCreateModalOpen(true);
@@ -154,6 +156,9 @@ export default function SupplierPage() {
       setDeleteDialogOpen(false);
       setSupplierToDelete(null);
       toast.success('Data berhasil dihapus');
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       console.error('Failed to delete supplier:', error);
       toast.error('Gagal menghapus data supplier');

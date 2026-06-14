@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AccountGroupDetail, AccountGroupPayload } from '@/@types/account-group.types';
 import type { PaginationParams } from '@/@types/pagination.types';
-import { createAccountGroup, deleteAccountGroup, getAccountGroupById, getAccountGroups, quickCreateAccountGroup, updateAccountGroup } from '@/services/account-group.service';
+import { createAccountGroup, deleteAccountGroup, getAccountGroupById, getAccountGroups, quickCreateAccountGroup, updateAccountGroup, importAccountGroup } from '@/services/account-group.service';
 import type { QuickCreateAccountGroupPayload } from '@/services/account-group.service';
 import { companyQueryKeys } from '@/lib/query/company-key';
 
@@ -66,13 +66,38 @@ export const useUpdateAccountGroup = () => {
   });
 };
 
-export const useDeleteAccountGroup = () => {
+export const useDeleteAccountGroup = (companyId?: string | number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string | number) => deleteAccountGroup(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['account-groups'] });
+      if (companyId) {
+        queryClient.invalidateQueries({
+          queryKey: companyQueryKeys.companyScope(companyId),
+        });
+      }
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey.includes('account-groups'),
+      });
+    },
+  });
+};
+
+export const useImportAccountGroup = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ companyId, file }: { companyId: string | number; file: File }) => importAccountGroup(file, companyId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.companyScope(variables.companyId),
+      });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey.includes('account-groups'),
+      });
     },
   });
 };

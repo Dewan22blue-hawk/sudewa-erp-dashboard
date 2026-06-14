@@ -1,4 +1,5 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,7 +8,9 @@ import { cn } from '@/lib/utils';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { getAccountCategoryLabel } from '@/lib/account';
 import type { Account } from '@/@types/account.types';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Lock } from 'lucide-react';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface AccountTableProps {
   data: Account[];
@@ -24,8 +27,12 @@ interface AccountTableProps {
 }
 
 export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange }: AccountTableProps) {
+  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
+    data,
+  });
+
   const totalPages = Math.max(1, Math.ceil(total / perPage));
-  const pageIds = data.map((item) => String(item.id));
+  const pageIds = sortedData.map((item) => String(item.id));
   const allChecked = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
   const someChecked = pageIds.some((id) => selectedIds.has(id));
   const start = total === 0 ? 0 : (page - 1) * perPage + 1;
@@ -47,10 +54,18 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                   aria-label="Pilih semua akun"
                 />
               </TableHead>
-              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kode Akun</TableHead>
-              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Nama Akun</TableHead>
-              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Grup Akun</TableHead>
-              <TableHead className="py-4 px-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori Akun</TableHead>
+              <TableHead className="py-4 px-4 text-left">
+                <SortableHeader title="Kode Akun" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900" />
+              </TableHead>
+              <TableHead className="py-4 px-4 text-left">
+                <SortableHeader title="Nama Akun" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900" />
+              </TableHead>
+              <TableHead className="py-4 px-4 text-left">
+                <SortableHeader title="Grup Akun" sortKey="accountGroupCode" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900" />
+              </TableHead>
+              <TableHead className="py-4 px-4 text-left">
+                <SortableHeader title="Kategori Akun" sortKey="category" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900" />
+              </TableHead>
               <TableHead className="w-[90px] py-4 px-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -76,7 +91,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((account) => {
+              sortedData.map((account) => {
                 const checked = selectedIds.has(String(account.id));
 
                 return (
@@ -89,7 +104,23 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                         aria-label={`Pilih akun ${account.name}`}
                       />
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-sm font-medium text-slate-900">{account.code}</TableCell>
+                    <TableCell className="py-3 px-4 text-sm font-medium text-slate-900">
+                      <div className="flex items-center gap-1.5">
+                        <span>{account.code}</span>
+                        {account.is_lock && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex cursor-help p-0.5">
+                                <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Akun ini merupakan data default yang tidak bisa dihapus!
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="py-3 px-4 text-sm font-medium uppercase text-slate-900">{account.name}</TableCell>
                     <TableCell className="py-3 px-4 text-sm text-slate-600">{account.accountGroupCode ?? '-'}</TableCell>
                     <TableCell className="py-3 px-4 text-sm text-slate-600">{getAccountCategoryLabel(account.category)}</TableCell>
@@ -101,10 +132,24 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                          <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => onEdit(account)}>
+                          <DropdownMenuItem
+                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                            disabled={account.is_lock}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              onEdit(account);
+                            }}
+                          >
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer" onClick={() => onDelete(account)}>
+                          <DropdownMenuItem
+                            className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                            disabled={account.is_lock}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              onDelete(account);
+                            }}
+                          >
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
