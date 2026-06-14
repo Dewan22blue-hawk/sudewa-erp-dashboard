@@ -455,7 +455,7 @@ export const importVehicleDocument = async (file: File): Promise<void> => {
 export const exportVehicleDocument = async (): Promise<void> => {
   const response = await apiClient.get(`${documentBasePath}/export`, { responseType: 'blob' });
   const contentType = response.headers['content-type'];
-  const isJson = contentType && contentType.includes('application/json');
+  const isJson = typeof contentType === 'string' && contentType.includes('application/json');
 
   if (isJson) {
     const textData = await (response.data as Blob).text();

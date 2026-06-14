@@ -152,7 +152,7 @@ export const exportDriver = async (companyId: string | number): Promise<void> =>
   });
 
   const contentType = response.headers['content-type'];
-  const isJson = contentType && contentType.includes('application/json');
+  const isJson = typeof contentType === 'string' && contentType.includes('application/json');
 
   if (isJson) {
     const textData = await (response.data as Blob).text();
