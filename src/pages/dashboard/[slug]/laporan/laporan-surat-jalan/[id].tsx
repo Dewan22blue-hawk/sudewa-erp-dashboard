@@ -49,18 +49,19 @@ export default function LaporanSuratJalanDetailPage() {
 
     if (Array.isArray(tarifs) && tarifs.length > 0) {
       return tarifs.map((tarif: any, idx: number) => {
+        const pivot = tarif.pivot || {};
         return {
           no: idx + 1,
           customer: orderList.customer?.name || '-',
-          lokasi: tarif.delivery_destination || orderList.do_delivery_destination || '-',
+          lokasi: pivot.delivery_destination || tarif.delivery_destination || orderList.do_delivery_destination || '-',
           loadingIn: tarif.loading_in || orderList.loading_in || '-',
           loadingOut: tarif.loading_out || orderList.loading_out || '-',
-          ujDriver: tarif.uj_driver || orderList.uj_driver || 0,
-          ujLainnya: tarif.other_fee || orderList.uj_lainnya || orderList.other_fee || 0,
-          invoice: tarif.bill_invoice || orderList.bill_invoice || 0,
-          invTambahan: tarif.additional_cost_fee || orderList.inv_tambahan || orderList.additional_cost_fee || 0,
-          ppn: tarif.ppn || orderList.ppn || 0,
-          muatan: tarif.load_content || orderList.muatan || orderList.load_content || '-',
+          ujDriver: pivot.uj_driver || tarif.uj_driver || orderList.uj_driver || 0,
+          ujLainnya: pivot.other_fee || tarif.other_fee || orderList.uj_lainnya || orderList.other_fee || 0,
+          invoice: pivot.bill_invoice || tarif.bill_invoice || orderList.bill_invoice || 0,
+          invTambahan: pivot.additional_cost_fee || tarif.additional_cost_fee || orderList.inv_tambahan || orderList.additional_cost_fee || 0,
+          ppn: pivot.ppn || tarif.ppn || orderList.ppn || 0,
+          muatan: pivot.load_content || tarif.load_content || orderList.muatan || orderList.load_content || '-',
         };
       });
     }
