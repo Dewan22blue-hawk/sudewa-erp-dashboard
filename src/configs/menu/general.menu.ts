@@ -168,6 +168,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Aset',
           href: base('/finance/asset'),
         },
+        {
+          label: 'Laporan Bukti Potong',
+          href: base('/finance/laporan-bukti-potong'),
+        },
       ],
     },
     {
