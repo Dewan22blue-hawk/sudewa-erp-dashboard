@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
-import type { OrderList } from '@/@types/order-list.types';
+import type { OrderList, OrderListStatus } from '@/@types/order-list.types';
 import { OrderListDeleteDialog } from '@/components/features/order-list/OrderListDeleteDialog';
 import { OrderListTable } from '@/components/features/order-list/OrderListTable';
+import { OrderStatusConfirmDialog } from '@/components/features/order-list/OrderStatusConfirmDialog';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useOrderLists, useDeleteOrderList, useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
+import { useOrderLists, useDeleteOrderList, useOrderListTarifs, useOrderListTarifItems, useUpdateOrderList } from '@/hooks/useOrderList';
 import { composeOrderListWithTarifs } from '@/services/order-list.service';
 
 export default function OrderListPage() {
@@ -26,6 +27,8 @@ export default function OrderListPage() {
   const debouncedSearch = useDebouncedValue(searchInput, 350);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<OrderList | null>(null);
+  const [statusConfirmOpen, setStatusConfirmOpen] = React.useState(false);
+  const [statusUpdateData, setStatusUpdateData] = React.useState<{ item: OrderList; newStatus: OrderListStatus } | null>(null);
 
   React.useEffect(() => {
     setSearch(debouncedSearch.trim());
@@ -67,6 +70,7 @@ export default function OrderListPage() {
   const tarifItemQuery = useOrderListTarifs(tarifItemQueryParams);
   const tarifLoadItemQuery = useOrderListTarifItems(tarifLoadItemQueryParams);
   const deleteMutation = useDeleteOrderList();
+  const updateMutation = useUpdateOrderList();
 
   const tableData = React.useMemo(() => {
     const orders = listQuery.data?.data ?? [];
@@ -114,6 +118,39 @@ export default function OrderListPage() {
       toast.error(error.message || 'Gagal menghapus order list');
     }
   }, [selectedItem, deleteMutation]);
+
+  const handleUpdateStatus = React.useCallback((item: OrderList, newStatus: OrderListStatus) => {
+    setStatusUpdateData({ item, newStatus });
+    setStatusConfirmOpen(true);
+  }, []);
+
+  const handleConfirmUpdateStatus = React.useCallback(async () => {
+    if (!statusUpdateData) return;
+    const { item, newStatus } = statusUpdateData;
+
+    try {
+      await updateMutation.mutateAsync({
+        id: item.id,
+        payload: {
+          customer_id: item.customerId,
+          status: newStatus,
+          invoice_bill: item.billInvoice,
+          bill_invoice: item.billInvoice,
+          vehicle_type: item.vehicleType || 'fuso',
+          note: item.note,
+          ppn: item.ppn,
+          uj_driver: item.ujDriver,
+          loading_in: item.loadingIn,
+          loading_out: item.loadingOut,
+        }
+      });
+      toast.success('Status berhasil diperbarui');
+      setStatusConfirmOpen(false);
+      setStatusUpdateData(null);
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal memperbarui status');
+    }
+  }, [statusUpdateData, updateMutation]);
 
   const handleAdd = React.useCallback(() => {
     if (!slug) return;
@@ -172,6 +209,7 @@ export default function OrderListPage() {
         onDetail={handleDetail}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        onUpdateStatus={handleUpdateStatus}
       />
 
       <OrderListDeleteDialog
@@ -180,6 +218,15 @@ export default function OrderListPage() {
         onConfirm={handleDelete}
         isDeleting={deleteMutation.isPending}
         itemName={selectedItem?.code}
+      />
+
+      <OrderStatusConfirmDialog
+        open={statusConfirmOpen}
+        onOpenChange={setStatusConfirmOpen}
+        onConfirm={handleConfirmUpdateStatus}
+        isUpdating={updateMutation.isPending}
+        itemName={statusUpdateData?.item.code}
+        newStatus={statusUpdateData?.newStatus}
       />
     </DashboardLayout>
   );

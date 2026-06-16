@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Eye, FilePenLine, MoreVertical, Plus, Search, Trash2 } from 'lucide-react';
-import type { OrderList } from '@/@types/order-list.types';
+import type { OrderList, OrderListStatus } from '@/@types/order-list.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +22,7 @@ import {
   getOrderStatusBadgeClassName,
   getOrderStatusLabel,
   getPrimaryTarifItem,
+  ORDER_LIST_STATUS_OPTIONS,
 } from './order-list.utils';
 
 interface OrderListTableProps {
@@ -38,6 +40,7 @@ interface OrderListTableProps {
   onDetail: (item: OrderList) => void;
   onEdit: (item: OrderList) => void;
   onDelete: (item: OrderList) => void;
+  onUpdateStatus?: (item: OrderList, newStatus: OrderListStatus) => void;
 }
 
 const headers = [
@@ -69,6 +72,7 @@ export const OrderListTable = React.memo(function OrderListTable({
   onDetail,
   onEdit,
   onDelete,
+  onUpdateStatus,
 }: OrderListTableProps) {
   const totalPages = Math.max(1, Math.ceil(totalData / perPage));
   const visiblePages = getVisiblePageNumbers(totalPages, page, 5);
@@ -171,9 +175,38 @@ export const OrderListTable = React.memo(function OrderListTable({
                         </TableCell>
                         <TableCell className="px-4 py-4 text-right text-sm text-slate-700">{formatOrderCurrency(item.ppn)}</TableCell>
                         <TableCell className="px-4 py-4 text-center">
-                          <Badge variant="outline" className={cn('rounded-full px-3 py-1 font-medium', getOrderStatusBadgeClassName(item.status))}>
-                            {getOrderStatusLabel(item.status)}
-                          </Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className={cn(
+                                  'inline-flex items-center justify-center rounded-full border px-3 py-1 text-xs font-medium cursor-pointer transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2',
+                                  getOrderStatusBadgeClassName(item.status)
+                                )}
+                              >
+                                {getOrderStatusLabel(item.status)}
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="w-[140px] rounded-xl">
+                              <div className="px-2 py-1.5 text-xs font-semibold text-slate-500">Ubah Status</div>
+                              <DropdownMenuSeparator />
+                              {ORDER_LIST_STATUS_OPTIONS.map((option) => (
+                                <DropdownMenuItem
+                                  key={option.value}
+                                  disabled={item.status === option.value}
+                                  onSelect={(e) => {
+                                    e.preventDefault();
+                                    if (item.status !== option.value && onUpdateStatus) {
+                                      onUpdateStatus(item, option.value);
+                                    }
+                                  }}
+                                  className={cn('cursor-pointer rounded-lg', item.status === option.value && 'bg-slate-100 opacity-50')}
+                                >
+                                  {option.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                         <TableCell className="px-4 py-4 text-center">
                           <DropdownMenu>
