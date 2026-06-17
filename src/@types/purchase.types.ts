@@ -78,6 +78,7 @@ export interface CreatePurchaseRequest {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
+  transaction_date?: string;
 }
 
 export interface UpdatePurchaseRequest {

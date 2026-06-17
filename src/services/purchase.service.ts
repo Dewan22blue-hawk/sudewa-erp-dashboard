@@ -434,6 +434,7 @@ export const purchaseService = {
     form.append('stock_state', payload.stock_state);
     form.append('max_capacity', payload.max_capacity);
     if (payload.code) form.append('code', payload.code);
+    if (payload.transaction_date) form.append('transaction_date', payload.transaction_date);
     if (payload.unit_type_id !== undefined) form.append('unit_type_id', String(payload.unit_type_id));
     if (payload.sparepart_id !== undefined) form.append('sparepart_id', String(payload.sparepart_id));
     if (payload.qty_total !== undefined) form.append('qty_total', String(payload.qty_total));

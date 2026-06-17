@@ -86,7 +86,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(row.original)} disabled={row.original.is_lock}>
+                <DropdownMenuItem onClick={() => onEdit(row.original)}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </DropdownMenuItem>

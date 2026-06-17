@@ -173,3 +173,32 @@ export const importAccount = async (file: File, companyId?: string | number): Pr
     throw new ApiResponseError(payload.message ?? 'Failed to import account');
   }
 };
+
+export const bulkUpdateAccounts = async (payload: {
+  accountIds: (number | string)[];
+  accountGroupId: number;
+  category: string;
+}): Promise<void> => {
+  try {
+    const body = new URLSearchParams();
+    payload.accountIds.forEach((id) => {
+      body.append('account_id[]', String(id));
+    });
+    body.append('account_group_id', String(payload.accountGroupId));
+    body.append('category', payload.category);
+
+    const response = await apiClient.put<LaravelApiResponse<null>>(`${basePath}/bulk-update`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const data = response.data;
+    if (!data.status) {
+      throw new ApiResponseError(data.message ?? 'Gagal memperbarui akun terpilih secara massal');
+    }
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
+    }
+    throw error;
+  }
+};
