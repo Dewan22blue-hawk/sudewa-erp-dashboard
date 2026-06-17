@@ -107,6 +107,7 @@ export function SearchableSelect({
             />
           </div>
           <CommandList
+            className="flex-1 min-h-0"
             onScroll={(event) => {
               const target = event.currentTarget;
               const hasScrollableContent = target.scrollHeight > target.clientHeight;
