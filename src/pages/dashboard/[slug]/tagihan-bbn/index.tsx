@@ -44,7 +44,7 @@ export default function BBNBillListPage() {
   }, [searchInput]);
 
   const listQuery = useBBNBillList({ page, perPage, search });
-  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch);
+  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch, false);
   const kasQuery = useKas(safeCompanyId);
   const createMutation = useCreateBBNBill();
   const deleteMutation = useDeleteBBNBill();
@@ -53,11 +53,17 @@ export default function BBNBillListPage() {
 
   const ditlantasOptions = React.useMemo(
     () =>
-      (ditlantasQuery.data ?? []).map((item) => ({
-        value: String(item.id),
-        label: `${item.code} - ${item.vendorName || ''}`,
-        subtitle: item.vendorName || undefined,
-      })),
+      (ditlantasQuery.data ?? [])
+        .filter((item) => {
+          if (item.isAlreadyProcessed === true) return false;
+          if (item.unprocessedCount === 0) return false;
+          return true;
+        })
+        .map((item) => ({
+          value: String(item.id),
+          label: `${item.code} - ${item.vendorName || ''}`,
+          subtitle: item.vendorName || undefined,
+        })),
     [ditlantasQuery.data],
   );
 

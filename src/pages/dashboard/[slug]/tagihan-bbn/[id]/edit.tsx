@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ export default function EditBBNBillPage() {
 
   const [ditlantasSearch, setDitlantasSearch] = React.useState('');
   const detailQuery = useBBNBillDetail(id);
-  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch);
+  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch, false);
   const updateMutation = useUpdateBBNBill();
   const form = useForm<FormValues>({
     defaultValues: {
@@ -52,15 +53,34 @@ export default function EditBBNBillPage() {
     });
   }, [detailQuery.data, form]);
 
-  const ditlantasOptions = React.useMemo(
-    () =>
-      (ditlantasQuery.data ?? []).map((item) => ({
+  const currentDitlantas = detailQuery.data?.ditlantasProcess;
+
+  const ditlantasOptions = React.useMemo(() => {
+    const list = (ditlantasQuery.data ?? [])
+      .filter((item) => {
+        if (item.isAlreadyProcessed === true) return false;
+        if (item.unprocessedCount === 0) return false;
+        return true;
+      })
+      .map((item) => ({
         value: String(item.id),
         label: `${item.code} - ${item.vendorName || ''}`,
         subtitle: item.vendorName || undefined,
-      })),
-    [ditlantasQuery.data],
-  );
+      }));
+
+    if (currentDitlantas && currentDitlantas.id) {
+      const exists = list.some((opt) => opt.value === String(currentDitlantas.id));
+      if (!exists) {
+        list.unshift({
+          value: String(currentDitlantas.id),
+          label: `${currentDitlantas.code} - ${currentDitlantas.vendor?.name || ''}`,
+          subtitle: currentDitlantas.vendor?.name || undefined,
+        });
+      }
+    }
+
+    return list;
+  }, [ditlantasQuery.data, currentDitlantas]);
 
   return (
     <DashboardLayout>
@@ -100,7 +120,7 @@ export default function EditBBNBillPage() {
                   toast.success('Tagihan BBN berhasil diperbarui');
                   router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
                 } catch (error: any) {
-                  toast.error(error.message || 'Gagal memperbarui tagihan BBN');
+                  toast.error(getApiErrorMessage(error));
                 }
               })}
               className="grid gap-6 md:grid-cols-2"

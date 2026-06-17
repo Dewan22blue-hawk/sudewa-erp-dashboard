@@ -93,9 +93,9 @@ export function useUpdateVehicleRegistration() {
   });
 }
 
-export function useDitlantasProcessOptions(search?: string) {
+export function useDitlantasProcessOptions(search?: string, isAlreadyProcessed?: boolean) {
   return useQuery({
-    queryKey: ['ditlantas-process-options', search],
-    queryFn: () => getDitlantasProcessOptions(search),
+    queryKey: ['ditlantas-process-options', search, isAlreadyProcessed],
+    queryFn: () => getDitlantasProcessOptions(search, isAlreadyProcessed),
   });
 }
