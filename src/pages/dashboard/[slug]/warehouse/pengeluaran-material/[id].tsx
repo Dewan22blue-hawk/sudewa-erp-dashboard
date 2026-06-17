@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, FilePenLine } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -30,27 +30,22 @@ export default function GoodsIssueDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild className="h-auto p-0 text-slate-600 hover:bg-transparent hover:text-slate-900">
-              <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material`}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <h1 className="text-[24px] font-semibold text-slate-900">Data Pengeluaran Material</h1>
-          </div>
-          <Button asChild className="h-10 rounded-[10px] bg-[#1f4163] px-5 text-[16px] hover:bg-[#183552]">
-            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material/${issue.id}/edit`}>
-              <FilePenLine className="mr-2 h-4 w-4" />
-              Edit
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" asChild className="h-auto p-0 text-slate-600 hover:bg-transparent hover:text-slate-900">
+            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material`}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
           </Button>
+          <div>
+            <h1 className="text-[24px] font-semibold text-slate-900">Data Pengeluaran Material</h1>
+            <p className="text-[13px] text-slate-400">Detail</p>
+          </div>
         </div>
 
         <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-6">
-              <h2 className="text-[18px] font-semibold text-slate-900">Infromasi Pengeluaran</h2>
+              <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
               <Button onClick={() => setOpenInvoice(true)} className="h-10 rounded-[10px] bg-[#1f4163] px-5 text-[16px] hover:bg-[#183552]">Lihat Nota</Button>
             </div>
 
