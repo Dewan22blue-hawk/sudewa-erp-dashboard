@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,7 @@ interface TarifFormModalProps {
 }
 
 export function TarifFormModal({ isOpen, onClose, onSave, initialData }: TarifFormModalProps) {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm<TarifFormData>({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<TarifFormData>({
         defaultValues: {
             namaDealer: '',
             provinsi: '',

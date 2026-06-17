@@ -43,7 +43,7 @@ export default function LaporanPenjualanFilter({
     } else if (startDate && endDate && (!dateRange?.from || !dateRange?.to)) {
       setDateRange({ from: new Date(startDate), to: new Date(endDate) });
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, dateRange?.from, dateRange?.to]);
   const [customers, setCustomers] = useState<Array<{ id: number; name: string }>>([]);
   const [unitTypes, setUnitTypes] = useState<Array<{ id: number; name: string }>>([]);
   

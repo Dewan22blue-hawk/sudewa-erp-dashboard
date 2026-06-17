@@ -105,7 +105,7 @@ export function useCreateGoodsReceiptBilling() {
 export function useDeleteGoodsReceiptBilling() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, goodsTransactionId }: { id: number | string; goodsTransactionId: number | string }) =>
+    mutationFn: ({ id }: { id: number | string; goodsTransactionId: number | string }) =>
       deleteGoodsReceiptBilling(id),
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptEquipmentKeys.all });
@@ -127,7 +127,7 @@ export function useCreateGoodsReceiptPayment() {
 export function useDeleteGoodsReceiptPayment() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, goodsTransactionId }: { id: number | string; goodsTransactionId: number | string }) =>
+    mutationFn: ({ id }: { id: number | string; goodsTransactionId: number | string }) =>
       deleteGoodsReceiptPayment(id),
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptEquipmentKeys.all });
@@ -164,7 +164,7 @@ export function useUpdateGoodsReceiptDetail() {
 export function useDeleteGoodsReceiptDetail() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, goodsTransactionId }: { id: number | string; goodsTransactionId: number | string }) =>
+    mutationFn: ({ id }: { id: number | string; goodsTransactionId: number | string }) =>
       deleteGoodsTransactionDetail(id),
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsReceiptEquipmentKeys.all });

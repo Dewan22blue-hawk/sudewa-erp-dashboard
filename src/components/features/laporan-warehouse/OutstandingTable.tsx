@@ -15,7 +15,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGetWarehouseOutstanding } from '@/hooks/useLaporanWarehouse';
-import { OrderOutstandingItem } from '@/services/laporan-warehouse.service';
 
 type OutstandingTableProps = {
   type: 'purchase' | 'sales';
@@ -43,7 +42,7 @@ const toCsvLine = (cells: Array<string | number>): string =>
 
 const ROWS_PER_PAGE = 50;
 
-export default function OutstandingTable({ type, perPage, dateRange, onActionsChange }: OutstandingTableProps) {
+export default function OutstandingTable({ type, perPage, onActionsChange }: OutstandingTableProps) {
   const [page, setPage] = useState(1);
   const [tablePage, setTablePage] = useState(1);
 
@@ -56,7 +55,7 @@ export default function OutstandingTable({ type, perPage, dateRange, onActionsCh
     per_page: perPage,
   });
 
-  const rows = response?.data || [];
+  const rows = useMemo(() => response?.data || [], [response?.data]);
   const pagination = response || {
     current_page: 1,
     data: [],

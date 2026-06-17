@@ -58,7 +58,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
     status,
   });
 
-  const rows = response?.data || [];
+  const rows = useMemo(() => response?.data || [], [response?.data]);
   const pagination = response || {
     current_page: 1,
     data: [],

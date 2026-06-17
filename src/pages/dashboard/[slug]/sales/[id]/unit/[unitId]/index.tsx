@@ -197,40 +197,9 @@ export default function SalesUnitDetailPage() {
     toast.error(readApiError(stockError));
   }, [isStockError, stockError]);
 
-  const allItemsAssigned = useMemo(() => {
-    const rows = salesData?.raw?.unit_transaction_items ?? [];
-    if (rows.length === 0) return false;
-
-    return rows.every((item) => {
-      const required = Number(item?.qty_total ?? 0);
-      const assigned = Math.max(item?.unit_transaction_item_details?.length ?? 0, item?.unit_transaction_item_sales?.length ?? 0);
-      return required > 0 && assigned >= required;
-    });
-  }, [salesData?.raw?.unit_transaction_items]);
-
   const selectedCount = selectedIds.size;
-  const stockState = String(salesData?.raw?.stock_state ?? 'draft');
-  const hasPendingSelectionChanges = useMemo(() => {
-    if (selectedIds.size !== assignedIds.length) return true;
-
-    const assignedSet = new Set(assignedIds);
-    for (const id of selectedIds) {
-      if (!assignedSet.has(id)) return true;
-    }
-
-    return false;
-  }, [selectedIds, assignedIds]);
-
-  const selectedFromSalesCount = Array.isArray(effectiveUnitItem?.unit_transaction_item_sales) ? effectiveUnitItem.unit_transaction_item_sales.length : 0;
-  const selectedFromDetailCount = Array.isArray(effectiveUnitItem?.unit_transaction_item_details) ? effectiveUnitItem.unit_transaction_item_details.length : 0;
 
   const canAssignStock = requiredQty > 0 && selectedCount === requiredQty;
-  const canMoveToOutbound = allItemsAssigned && stockState === 'draft';
-  const canDispatch =
-    stockState === 'outbound_delivered' &&
-    allItemsAssigned &&
-    assignedIds.length === requiredQty &&
-    requiredQty > 0;
 
   const salesCode = salesData?.raw?.code ?? '-';
   const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
@@ -305,60 +274,6 @@ export default function SalesUnitDetailPage() {
       });
 
       toast.success('Stock berhasil di-assign ke item sales');
-    } catch (error: any) {
-      toast.error(readApiError(error));
-    }
-  };
-
-  const handleMoveToOutbound = async () => {
-    if (!salesId) return;
-
-    if (!allItemsAssigned) {
-      toast.error('Semua item harus sudah assign stock sebelum update state');
-      return;
-    }
-
-    try {
-      await updateStateMutation.mutateAsync({ id: salesId, stockState: 'outbound_delivered' });
-      toast.success('State transaksi berhasil diubah ke outbound_delivered');
-    } catch (error: any) {
-      toast.error(readApiError(error));
-    }
-  };
-
-  const handleDispatch = async () => {
-    if (!salesId) return;
-
-    if (stockState !== 'outbound_delivered') {
-      toast.error('Dispatch hanya bisa dilakukan saat state outbound_delivered');
-      return;
-    }
-
-    if (!allItemsAssigned) {
-      toast.error('Semua item harus sudah assign stock sebelum dispatch');
-      return;
-    }
-
-    if (!salesData?.raw?.person?.id || !salesData?.raw?.warehouse?.id) {
-      toast.error('Person atau warehouse transaksi tidak valid');
-      return;
-    }
-
-    if (assignedIds.length !== requiredQty || requiredQty <= 0) {
-      toast.error('Item ini belum memiliki stock assignment lengkap');
-      return;
-    }
-
-    try {
-      await dispatchMutation.mutateAsync({
-        transactionId: salesId,
-        personId: String(salesData.raw.person.id),
-        warehouseId: String(salesData.raw.warehouse.id),
-        unitTransactionDetails: assignedIds,
-      });
-
-      await updateStateMutation.mutateAsync({ id: salesId, stockState: 'completed' });
-      toast.success('Dispatch stock berhasil dan transaksi diselesaikan');
     } catch (error: any) {
       toast.error(readApiError(error));
     }

@@ -5,7 +5,7 @@ import type {
 } from '@/@types/goods-issue-equipment.types';
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
-import { ApiResponseError, type LaravelApiResponse, ensureSuccess, toPaginatedResult } from '@/lib/api/response';
+import { ApiResponseError, type LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
 
 const detailBasePath = '/wapi/transaction/goods-transaction-detail';
 

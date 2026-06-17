@@ -10,8 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useCompany } from '@/contexts/CompanyContext';
-import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import {
   useGoodsIssueEquipmentDetail,
   useUpdateGoodsIssueEquipment,
@@ -38,12 +36,6 @@ const formatLongDate = (value?: string) => {
   });
 };
 
-const getCategoryLabel = (category?: string) => {
-  if (category === 'equipped') return 'Perlengkapan Armada';
-  if (category === 'maintenance') return 'Maintenance Armada';
-  return category || '-';
-};
-
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 const getErrorMessage = (error: any): string => {
@@ -56,7 +48,6 @@ export default function PengeluaranPerlengkapanEditPage() {
   const rawId = typeof router.query.id === 'string' ? Number(router.query.id) : NaN;
   const id = Number.isFinite(rawId) ? rawId : undefined;
 
-  const { companyId } = useCompany();
   const companyIdValue = 4; // Enforce PT Wajira Transindo
 
   const query = useGoodsIssueEquipmentDetail(id);

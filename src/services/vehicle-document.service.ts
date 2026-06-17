@@ -15,7 +15,6 @@ import type {
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError, ensureSuccess, LaravelApiResponse, toPaginatedResult } from '@/lib/api/response';
-import { getVehicleDataDetail } from '@/services/vehicle-data.service';
 import { getVendorById } from '@/services/vendor.service';
 
 const documentBasePath = '/wapi/transaction/vehicle-document';

@@ -60,7 +60,7 @@ export const AccountListPage = () => {
   const [groupPage, setGroupPage] = useState(1);
   const [accumulatedGroups, setAccumulatedGroups] = useState<AccountGroup[]>([]);
 
-  const { data: accountGroupsData, isLoading: isLoadingGroups, isFetching: isFetchingGroups } = useAccountGroups({
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
     page: groupPage,
     perPage: 20, // Load 20 groups per request
     search: groupSearch,
@@ -92,17 +92,6 @@ export const AccountListPage = () => {
   }, [accountGroupsData, groupPage, openBulkUpdate]);
 
   const hasMoreGroups = accountGroupsData ? groupPage < accountGroupsData.meta.lastPage : false;
-
-  const handleGroupSearch = (val: string) => {
-    setGroupSearch(val);
-    setGroupPage(1);
-  };
-
-  const handleLoadMoreGroups = () => {
-    if (hasMoreGroups && !isLoadingGroups) {
-      setGroupPage((prev) => prev + 1);
-    }
-  };
 
   const accountGroups = accumulatedGroups;
   const groupOptions = useMemo(
