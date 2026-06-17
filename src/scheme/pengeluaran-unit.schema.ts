@@ -15,8 +15,8 @@ export const personOptionSchema = z.object({
 export const pengeluaranUnitSchema = z.object({
   id: z.coerce.number().int().positive(),
   uuid: z.string().optional().default(''),
-  person_id: z.coerce.number().int().positive(),
-  warehouse_id: z.coerce.number().int().positive(),
+  person_id: z.coerce.number().int().nullable().optional(),
+  warehouse_id: z.coerce.number().int().nullable().optional(),
   activity_number: z.string(),
   activity_type: z.enum(['issue', 'receipt']),
   activity_date: z.string(),
