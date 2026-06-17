@@ -163,7 +163,6 @@ export default function VehicleFleetPage() {
         processDate: formatDateValue(assignProcessDate),
       });
       toast.success('Data kendaraan berhasil diserahkan ke ditlantas');
-      setIsAssignOpen(false);
       setSelectedIds([]);
       setAssignVendorId('');
       setAssignProcessDate(undefined);

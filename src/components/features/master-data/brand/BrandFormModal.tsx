@@ -93,6 +93,7 @@ export function BrandFormModal({
                                         <div className="space-y-2">
                                             {preview ? (
                                                 <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-slate-50">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img src={preview} alt="Preview" className="h-full w-full object-contain" />
                                                     <Button
                                                         type="button"
