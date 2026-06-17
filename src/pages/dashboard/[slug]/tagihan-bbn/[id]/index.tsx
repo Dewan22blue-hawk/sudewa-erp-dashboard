@@ -222,12 +222,12 @@ export default function BBNBillDetailPage() {
                 </div>
               </div>
 
-              <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
+              {/* <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
                 <Button className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
                   <Plus className="mr-2 h-4 w-4" />
                   Tambah Pembayaran
                 </Button>
-              </Link>
+              </Link> */}
             </div>
 
             <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
