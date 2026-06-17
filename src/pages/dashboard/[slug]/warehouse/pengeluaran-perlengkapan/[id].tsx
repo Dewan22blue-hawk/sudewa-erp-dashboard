@@ -155,15 +155,13 @@ export default function PengeluaranPerlengkapanDetailPage() {
                   <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
                   <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
                   <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">STATUS IN STOCK</TableHead>
-                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">STATUS FORECAST</TableHead>
                   <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KETERANGAN</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {items.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-28 text-center text-slate-500">
+                    <TableCell colSpan={5} className="h-28 text-center text-slate-500">
                       Belum ada perlengkapan yang dimasukkan.
                     </TableCell>
                   </TableRow>
@@ -174,28 +172,6 @@ export default function PengeluaranPerlengkapanDetailPage() {
                       <TableCell className="px-5 py-4 text-[14px] text-slate-800">{item.vehicleEquipment?.code || '-'}</TableCell>
                       <TableCell className="px-5 py-4 text-[14px] text-slate-800">{item.vehicleEquipment?.name || '-'}</TableCell>
                       <TableCell className="px-5 py-4 text-[14px] font-semibold text-slate-900">{item.qty}</TableCell>
-                      <TableCell className="px-5 py-4 text-[14px]">
-                        {item.inStock ? (
-                          <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                            In Stock
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                            Out of Stock
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 text-[14px]">
-                        {item.isForecast ? (
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                            Forecast
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                            Real
-                          </span>
-                        )}
-                      </TableCell>
                       <TableCell className="px-5 py-4 text-[14px] text-slate-800">{item.description || '-'}</TableCell>
                     </TableRow>
                   ))

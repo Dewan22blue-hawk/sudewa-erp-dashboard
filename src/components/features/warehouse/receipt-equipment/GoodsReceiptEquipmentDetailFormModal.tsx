@@ -100,20 +100,7 @@ export function GoodsReceiptEquipmentDetailFormModal({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[15px] font-medium text-slate-900">QTY</Label>
-              <Input
-                type="number"
-                {...form.register('qty', { valueAsNumber: true })}
-                placeholder="0"
-                className="h-10 rounded-[10px] border-slate-200 bg-white px-3 text-[15px] shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-              {form.formState.errors.qty ? (
-                <p className="text-xs text-red-600">{form.formState.errors.qty.message}</p>
-              ) : null}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[15px] font-medium text-slate-900">Harga</Label>
+              <Label className="text-[15px] font-medium text-slate-900">Harga Satuan</Label>
               <Controller
                 control={form.control}
                 name="price"
@@ -139,6 +126,19 @@ export function GoodsReceiptEquipmentDetailFormModal({
               />
               {form.formState.errors.price ? (
                 <p className="text-xs text-red-600">{form.formState.errors.price.message}</p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[15px] font-medium text-slate-900">QTY</Label>
+              <Input
+                type="number"
+                {...form.register('qty', { valueAsNumber: true })}
+                placeholder="0"
+                className="h-10 rounded-[10px] border-slate-200 bg-white px-3 text-[15px] shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+              {form.formState.errors.qty ? (
+                <p className="text-xs text-red-600">{form.formState.errors.qty.message}</p>
               ) : null}
             </div>
 

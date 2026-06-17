@@ -76,15 +76,6 @@ export default function PengeluaranPerlengkapanIndex() {
   const endData = Math.min(page * perPage, totalData);
   const pageNumbers = useMemo(() => getVisiblePageNumbers(totalPages, page, 5), [page, totalPages]);
 
-  // Derived stats based on current loaded items
-  const stats = useMemo(() => {
-    return {
-      totalTransactions: totalData,
-      thisMonthTransactions: Math.ceil(totalData * 0.4), // dynamic proxy representing monthly transactions
-      totalReleased: Math.ceil(totalData * 3.5), // proxy for item release counts
-    };
-  }, [totalData]);
-
   const handleCreateSubmit = async (values: GoodsIssueEquipmentFormValues) => {
     try {
       const res = await createMutation.mutateAsync({
@@ -198,22 +189,6 @@ export default function PengeluaranPerlengkapanIndex() {
           >
             <Plus className="mr-2 h-5 w-5" /> Tambah
           </Button>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid gap-6 sm:grid-cols-3">
-          <Card className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none">
-            <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">TOTAL PENGELUARAN</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900">{stats.totalTransactions} Transaksi</p>
-          </Card>
-          <Card className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none">
-            <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">PENGELUARAN BULAN INI</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900">{stats.thisMonthTransactions} Transaksi</p>
-          </Card>
-          <Card className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none">
-            <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">TOTAL PERLENGKAPAN KELUAR</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900">{stats.totalReleased} Pcs</p>
-          </Card>
         </div>
 
         {/* Filters and Search */}

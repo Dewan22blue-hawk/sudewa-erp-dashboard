@@ -49,18 +49,16 @@ export function GoodsReceiptEquipmentDetailTable({
           <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NO</TableHead>
           <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
           <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">HARGA</TableHead>
+          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">HARGA SATUAN</TableHead>
+          <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
           <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TOTAL</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">STATUS IN STOCK</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">STATUS FORECAST</TableHead>
           <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-950">ACTION</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={10} className="h-28 text-center text-[15px] text-slate-500">
+            <TableCell colSpan={8} className="h-28 text-center text-[15px] text-slate-500">
               Belum ada detail perlengkapan yang dimasukkan.
             </TableCell>
           </TableRow>
@@ -75,32 +73,10 @@ export function GoodsReceiptEquipmentDetailTable({
               <TableCell className="px-5 py-4 text-[15px] text-slate-800">{index + 1}</TableCell>
               <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.code || '-'}</TableCell>
               <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.name || '-'}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
               <TableCell className="px-5 py-4 text-[15px] text-slate-800">{formatCurrency(item.price || 0)}</TableCell>
+              <TableCell className="px-5 py-4 text-center text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
               <TableCell className="px-5 py-4 text-[15px] font-semibold text-slate-900">
                 {formatCurrency((item.price || 0) * item.qty)}
-              </TableCell>
-              <TableCell className="px-5 py-4 text-[15px]">
-                {item.inStock ? (
-                  <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                    In Stock
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                    Out of Stock
-                  </span>
-                )}
-              </TableCell>
-              <TableCell className="px-5 py-4 text-[15px]">
-                {item.isForecast ? (
-                  <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                    Forecast
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-slate-200">
-                    Real
-                  </span>
-                )}
               </TableCell>
               <TableCell className="px-5 py-4 text-right">
                 <DropdownMenu>
