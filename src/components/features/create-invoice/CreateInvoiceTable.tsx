@@ -153,9 +153,22 @@ export function CreateInvoiceTable({
       </div>
 
       {selectedIds.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-          <Badge className="bg-emerald-600 text-white">{selectedIds.length} invoice terpilih</Badge>
-          <Button type="button" onClick={onProcessSelected} disabled={isProcessing} className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700">
+        <div className="flex items-center justify-between rounded-2xl border border-emerald-100 bg-emerald-50/40 px-5 py-3 shadow-sm transition-all">
+          <div className="flex items-center gap-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-sm">
+              <Check className="h-4 w-4" strokeWidth={3} />
+            </div>
+            <span className="text-sm font-semibold text-slate-800">
+              {selectedIds.length} Invoice Terpilih
+            </span>
+          </div>
+          <Button
+            type="button"
+            onClick={onProcessSelected}
+            disabled={isProcessing}
+            className="h-10 rounded-xl bg-[#1f4163] hover:bg-[#183552] text-sm font-medium px-5 gap-2 text-white shadow-sm transition-all"
+          >
+            <Printer className="h-4 w-4" />
             {isProcessing ? 'Memproses...' : 'Bulk Print Invoice'}
           </Button>
         </div>
