@@ -17,7 +17,8 @@ const schema = z.object({
   tgl_dibayar: z.string().min(1, 'Tanggal Dibayar harus diisi'),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormOutput = z.output<typeof schema>;
 
 interface Props {
   initialData: WithholdingTaxReport;
@@ -27,7 +28,7 @@ interface Props {
 }
 
 export default function LaporanBuktiPotongForm({ initialData, onSubmit, onCancel, isSubmitting }: Props) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormInput, any, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: {
       no_bukpot: initialData.no_bukpot,

@@ -6,7 +6,7 @@ import type {
 } from '@/@types/laporan-bukti-potong.types';
 
 // Dummy Data
-let dummyData: WithholdingTaxReport[] = Array.from({ length: 100 }, (_, i) => ({
+const dummyData: WithholdingTaxReport[] = Array.from({ length: 100 }, (_, i) => ({
   id: i + 1,
   company_id: 1,
   tgl_invoice: '2026-02-12',

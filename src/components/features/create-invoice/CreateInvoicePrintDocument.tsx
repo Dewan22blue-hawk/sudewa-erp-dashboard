@@ -208,7 +208,6 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
       </div>
 
       <div ref={printRef} className="relative mx-auto overflow-hidden bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={letterheadUrl} alt="Letterhead" className="absolute inset-0 h-full w-full object-cover" />
 
         <div className="relative min-h-[297mm] px-[20mm] pt-[42mm]">
