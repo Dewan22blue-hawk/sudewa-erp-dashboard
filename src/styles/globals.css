@@ -197,6 +197,8 @@ body {
     #laporan-penerimaan-print *,
     #laporan-stock-print,
     #laporan-stock-print *,
+    #tagihan-bbn-print,
+    #tagihan-bbn-print *,
     .print-letter-page,
     .print-letter-page * {
       visibility: visible;
