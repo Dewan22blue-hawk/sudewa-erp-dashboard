@@ -252,40 +252,42 @@ const mapOrderListTarifLoadItem = (item: any, parentTarif?: any): OrderListTarif
 };
 
 const mapOrderList = (item: any): OrderList => {
-  const tarifSource = Array.isArray(item?.tarifs)
-    ? item.tarifs
-    : Array.isArray(item?.do_order_list_tarifs)
-      ? item.do_order_list_tarifs
-      : Array.isArray(item?.do_orderlist_tarifs)
-        ? item.do_orderlist_tarifs
+  const dataItem = item?.do_order_list ?? item;
+  
+  const tarifSource = Array.isArray(dataItem?.tarifs)
+    ? dataItem.tarifs
+    : Array.isArray(dataItem?.do_order_list_tarifs)
+      ? dataItem.do_order_list_tarifs
+      : Array.isArray(dataItem?.do_orderlist_tarifs)
+        ? dataItem.do_orderlist_tarifs
         : [];
-  const tarifItemSource = Array.isArray(item?.do_order_list_tarif_items)
-    ? item.do_order_list_tarif_items
-    : Array.isArray(item?.order_list_tarif_items)
-      ? item.order_list_tarif_items
+  const tarifItemSource = Array.isArray(dataItem?.do_order_list_tarif_items)
+    ? dataItem.do_order_list_tarif_items
+    : Array.isArray(dataItem?.order_list_tarif_items)
+      ? dataItem.order_list_tarif_items
       : [];
-  const tarifs = composeOrderListTarifs(tarifSource.map((entry: any) => mapOrderListTarifItem(entry, item)), tarifItemSource.map((entry: any) => mapOrderListTarifLoadItem(entry)));
+  const tarifs = composeOrderListTarifs(tarifSource.map((entry: any) => mapOrderListTarifItem(entry, dataItem)), tarifItemSource.map((entry: any) => mapOrderListTarifLoadItem(entry)));
   const firstTarif = tarifs[0];
 
   return {
-    id: Number(item?.id ?? 0),
-    uuid: item?.uuid,
-    code: item?.code ?? '-',
-    customerId: Number(item?.customer_id ?? item?.customer?.id ?? 0),
-    status: (item?.status ?? 'pending') as OrderList['status'],
-    vehicleType: normalizeVehicleType(item?.vehicle_type ?? item?.vehicleType ?? firstTarif?.vehicleType),
-    billInvoice: toNumber(item?.bill_invoice ?? item?.invoice_bill),
-    ppn: toNumber(item?.ppn),
-    note: toStringValue(item?.note, item?.notes, item?.keterangan, item?.description, item?.remark),
-    ujDriver: toNumber(item?.uj_driver ?? firstTarif?.driverFee),
-    loadingIn: toStringValue(item?.loading_in, item?.loadingIn, firstTarif?.loadingIn),
-    loadingOut: toStringValue(item?.loading_out, item?.loadingOut, firstTarif?.loadingOut),
-    vehicles: Array.isArray(item?.vehicles) ? item.vehicles.map(mapOrderListVehicle) : [],
-    customer: mapOrderListCustomer(item?.customer),
+    id: Number(dataItem?.id ?? 0),
+    uuid: dataItem?.uuid,
+    code: dataItem?.code ?? '-',
+    customerId: Number(dataItem?.customer_id ?? dataItem?.customer?.id ?? 0),
+    status: (dataItem?.status ?? 'pending') as OrderList['status'],
+    vehicleType: normalizeVehicleType(dataItem?.vehicle_type ?? dataItem?.vehicleType ?? firstTarif?.vehicleType),
+    billInvoice: toNumber(dataItem?.bill_invoice ?? dataItem?.invoice_bill),
+    ppn: toNumber(dataItem?.ppn),
+    note: toStringValue(dataItem?.note, dataItem?.notes, dataItem?.keterangan, dataItem?.description, dataItem?.remark),
+    ujDriver: toNumber(dataItem?.uj_driver ?? firstTarif?.driverFee),
+    loadingIn: toStringValue(dataItem?.loading_in, dataItem?.loadingIn, firstTarif?.loadingIn),
+    loadingOut: toStringValue(dataItem?.loading_out, dataItem?.loadingOut, firstTarif?.loadingOut),
+    vehicles: Array.isArray(dataItem?.vehicles) ? dataItem.vehicles.map(mapOrderListVehicle) : [],
+    customer: mapOrderListCustomer(dataItem?.customer),
     tarifs,
-    expeditions: Array.isArray(item?.expeditions) ? item.expeditions : [],
-    createdAt: item?.created_at,
-    updatedAt: item?.updated_at,
+    expeditions: Array.isArray(dataItem?.expeditions) ? dataItem.expeditions : [],
+    createdAt: dataItem?.created_at,
+    updatedAt: dataItem?.updated_at,
   };
 };
 
