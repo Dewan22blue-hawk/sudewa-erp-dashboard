@@ -1,5 +1,10 @@
-import { SupplierListPage } from '@/components/features/master-data/supplier/SupplierListPage';
+import { SupplierManagementPage } from '@/components/features/supplier/SupplierManagementPage';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function SupplierPage() {
-    return <SupplierListPage />;
+  return (
+    <DashboardLayout>
+      <SupplierManagementPage />
+    </DashboardLayout>
+  );
 }
