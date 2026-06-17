@@ -11,9 +11,9 @@ import type { WithholdingTaxReport, UpdateWithholdingTaxReportPayload } from '@/
 const schema = z.object({
   no_bukpot: z.string().min(1, 'Nomor Bukti Potong harus diisi'),
   masa_bukpot: z.string().min(1, 'Masa Bukti Potong harus diisi'),
-  pph: z.union([z.string(), z.number()]).transform((v) => Number(v)),
+  pph: z.coerce.number({ invalid_type_error: 'PPH harus berupa angka' }),
   uang_muka_pph: z.string().min(1, 'Uang Muka PPH harus diisi'),
-  jumlah_pembayaran: z.union([z.string(), z.number()]).transform((v) => Number(v)),
+  jumlah_pembayaran: z.coerce.number({ invalid_type_error: 'Jumlah pembayaran harus berupa angka' }),
   tgl_dibayar: z.string().min(1, 'Tanggal Dibayar harus diisi'),
 });
 
