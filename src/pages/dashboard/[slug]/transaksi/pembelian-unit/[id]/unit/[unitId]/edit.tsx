@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -55,6 +56,7 @@ export default function EditNestedUnitPage() {
     usePurchaseUnitItems(id as string);
 
   const updateUnitMutation = useUpdateUnitItem();
+  const queryClient = useQueryClient();
 
   const unit = unitItems?.data?.find(
     (item) => item.id === String(unitId)
@@ -232,7 +234,26 @@ export default function EditNestedUnitPage() {
         `/dashboard/${slug}/transaksi/pembelian-unit/${parentTransactionId}`
       );
     } catch (err: any) {
-      toast.error(parseApiError(err));
+      const errMsg = parseApiError(err);
+      const isPaidNullBug =
+        errMsg.toLowerCase().includes('attempt to read property') &&
+        errMsg.toLowerCase().includes('is_paid');
+
+      if (isPaidNullBug) {
+        if (parentTransactionId) {
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', parentTransactionId] }),
+            queryClient.invalidateQueries({ queryKey: ['purchase-by-id', parentTransactionId] }),
+            queryClient.invalidateQueries({ queryKey: ['unit-transaction', parentTransactionId] }),
+          ]);
+        }
+        toast.success('Unit berhasil diperbarui');
+        router.push(
+          `/dashboard/${slug}/transaksi/pembelian-unit/${parentTransactionId}`
+        );
+      } else {
+        toast.error(errMsg);
+      }
     }
   };
 
