@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { BBNBillVehicleFeeForm } from '@/components/features/tagihan-bbn/BBNBillVehicleFeeForm';
 import { useBBNBillDetail, useUpdateBBNBillVehicleData } from '@/hooks/useBBNBill';
@@ -46,7 +47,7 @@ export default function EditBBNBillVehiclePage() {
               toast.success('Data detail STNK/BPKB berhasil diperbarui');
               router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
             } catch (error: any) {
-              toast.error(error.message || 'Gagal memperbarui detail STNK/BPKB');
+              toast.error(getApiErrorMessage(error));
             }
           }}
         />
