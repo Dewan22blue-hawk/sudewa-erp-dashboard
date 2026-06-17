@@ -24,9 +24,27 @@ export interface PurchaseTableProps {
   subTabs?: { id: string; label: string }[];
   activeSubTab?: string;
   onSubTabChange?: (id: string) => void;
+  mainTabs?: { id: string; label: string }[];
+  activeMainTab?: string;
+  onMainTabChange?: (id: string) => void;
 }
 
-export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPageChange, onPerPageChange, loading, subTabs, activeSubTab, onSubTabChange }: PurchaseTableProps) {
+export default function PurchaseTable({
+  data,
+  meta,
+  onDelete,
+  onAdd,
+  slug,
+  onPageChange,
+  onPerPageChange,
+  loading,
+  subTabs,
+  activeSubTab,
+  onSubTabChange,
+  mainTabs,
+  activeMainTab,
+  onMainTabChange,
+}: PurchaseTableProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
@@ -173,40 +191,53 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
 
   return (
     <div className="space-y-4">
-      {/* Controls Bar — semua dalam SATU BARIS sejajar (sesuai Figma) */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
-        {/* LEFT: Sub-tabs + Show + Page */}
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          {/* Sub-tabs */}
-          {subTabs && subTabs.length > 0 && (
-            <div className="flex items-center gap-1">
-              {subTabs.map((sub) => (
-                <button
-                  key={sub.id}
-                  type="button"
-                  onClick={() => onSubTabChange?.(sub.id)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
-                    activeSubTab === sub.id
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
+      {/* Controls Bar — semua dalam satu baris dengan Search di sebelah kiri */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* LEFT CONTROLS */}
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* 1. Search */}
+          <div className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <Input type="text" placeholder="Search here..." className="pl-8 bg-white h-9 border-slate-300" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
+          </div>
+
+          {/* 2. Main Status Dropdown */}
+          {mainTabs && mainTabs.length > 0 && (
+            <Select value={activeMainTab} onValueChange={onMainTabChange}>
+              <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {mainTabs.map((tab) => (
+                  <SelectItem key={tab.id} value={tab.id}>
+                    {tab.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
 
-          {/* Divider */}
+          {/* 3. Sub Status Dropdown */}
           {subTabs && subTabs.length > 0 && (
-            <div className="h-5 w-px bg-slate-200" />
+            <Select value={activeSubTab} onValueChange={onSubTabChange}>
+              <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
+                <SelectValue placeholder="Detail Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {subTabs.map((sub) => (
+                  <SelectItem key={sub.id} value={sub.id}>
+                    {sub.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
 
-          {/* Show + Page */}
+          {/* 4. Show + Page limit */}
           <div className="flex items-center gap-2 whitespace-nowrap">
             <span className="text-sm font-medium text-slate-700">Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-[70px] bg-white h-9">
+              <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
                 <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
@@ -220,19 +251,13 @@ export default function PurchaseTable({ data, meta, onDelete, onAdd, slug, onPag
           </div>
         </div>
 
-        {/* RIGHT: Search + Add */}
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-[280px]">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input type="text" placeholder="Search here..." className="pl-8 bg-white h-9" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
-          </div>
-          {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        {/* RIGHT CONTROLS */}
+        {onAdd && (
+          <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
+          </Button>
+        )}
       </div>
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">

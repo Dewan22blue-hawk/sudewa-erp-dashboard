@@ -100,35 +100,32 @@ export default function StockUnitTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 flex-1 flex-col gap-4 lg:flex-row lg:items-center">
-          {statusTabs && <div className="min-w-0 flex-1">{statusTabs}</div>}
-
-          <div className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
-            <span>Show</span>
-            <Select
-              value={String(perPage)}
-              onValueChange={(val) => {
-                onPerPageChange(Number(val));
-              }}
-            >
-              <SelectTrigger className="h-10 w-20 border-gray-300 bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
-          </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="relative w-full sm:w-80">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Input placeholder="Search here" value={search} onChange={(e) => onSearchChange(e.target.value)} className="h-10 border-gray-300 bg-white pl-9" />
         </div>
-        <div className="w-full lg:w-auto">
-          <div className="relative w-full lg:w-80">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input placeholder="Search here" value={search} onChange={(e) => onSearchChange(e.target.value)} className="h-10 border-gray-300 bg-white pl-9" />
-          </div>
+
+        {statusTabs && <div className="flex-shrink-0">{statusTabs}</div>}
+
+        <div className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
+          <span>Show</span>
+          <Select
+            value={String(perPage)}
+            onValueChange={(val) => {
+              onPerPageChange(Number(val));
+            }}
+          >
+            <SelectTrigger className="h-10 w-20 border-gray-300 bg-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+            </SelectContent>
+          </Select>
+          <span>Page</span>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import StockUnitTable from '@/components/features/stock-unit/StockUnitTable';
-import StockUnitFilterTabs from '@/components/features/stock-unit/StockUnitFilterTabs';
+import StockUnitFilterDropdown from '@/components/features/stock-unit/StockUnitFilterTabs';
 import { useStockUnits } from '@/hooks/useStockUnit';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Card } from '@/components/ui/card';
@@ -93,7 +93,7 @@ export default function StockUnitPage() {
           perPage={tablePerPage} // Pass tablePerPage state
           totalData={tableTotalData} // Pass tableTotalData state
           statusTabs={(
-            <StockUnitFilterTabs
+            <StockUnitFilterDropdown
               active={(stockState as StockStatus) ?? 'all'}
               onChange={(value) => {
                 const nextStatus = value === 'all' ? undefined : value;
