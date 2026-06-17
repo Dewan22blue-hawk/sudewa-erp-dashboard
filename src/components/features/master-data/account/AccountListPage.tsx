@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccountTable } from '@/components/features/account/AccountTable';
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAccounts, useDeleteAccount, useUpdateAccount } from '@/hooks/useAccount';
+import { useAccounts, useDeleteAccount, useUpdateAccount, useBulkUpdateAccounts } from '@/hooks/useAccount';
 import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -18,6 +18,7 @@ import { ACCOUNT_CATEGORY_OPTIONS, getAccountTypeFromCategory } from '@/lib/acco
 import { ApiResponseError } from '@/lib/api/response';
 import { toast } from 'sonner';
 import { CircleAlert, Download, PencilLine, Plus, Search, Upload } from 'lucide-react';
+import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 
 type BulkFormValues = {
   accountGroupId: string;
@@ -42,6 +43,7 @@ export const AccountListPage = () => {
   });
 
   const updateMutation = useUpdateAccount();
+  const bulkUpdateMutation = useBulkUpdateAccounts();
   const deleteMutation = useDeleteAccount();
   const router = useRouter();
 
@@ -77,7 +79,7 @@ export const AccountListPage = () => {
 
   // Accumulate groups
   useEffect(() => {
-    if (accountGroupsData?.data) {
+    if (accountGroupsData?.data && openBulkUpdate) {
       setAccumulatedGroups((prev) => {
         if (groupPage === 1) {
           return accountGroupsData.data;
@@ -87,7 +89,7 @@ export const AccountListPage = () => {
         return [...prev, ...newItems];
       });
     }
-  }, [accountGroupsData, groupPage]);
+  }, [accountGroupsData, groupPage, openBulkUpdate]);
 
   const hasMoreGroups = accountGroupsData ? groupPage < accountGroupsData.meta.lastPage : false;
 
@@ -103,6 +105,15 @@ export const AccountListPage = () => {
   };
 
   const accountGroups = accumulatedGroups;
+  const groupOptions = useMemo(
+    () =>
+      accountGroups.map((group) => ({
+        value: String(group.id),
+        label: group.code || String(group.id),
+        subtitle: group.description ?? undefined,
+      })),
+    [accountGroups],
+  );
   const accounts = data?.data;
   const accountRows = accounts ?? [];
   const totalAccounts = data?.meta.total ?? 0;
@@ -215,19 +226,12 @@ export const AccountListPage = () => {
     setBulkSubmitting(true);
 
     try {
-      for (const account of selectedRows) {
-        await updateMutation.mutateAsync({
-          id: account.id,
-          payload: {
-            accountGroupId: Number(bulkForm.accountGroupId),
-            code: account.code,
-            name: account.name,
-            description: account.description ?? '',
-            category: bulkForm.category,
-            type: getAccountTypeFromCategory(bulkForm.category),
-          },
-        });
-      }
+      const accountIds = selectedRows.map((account) => account.id);
+      await bulkUpdateMutation.mutateAsync({
+        accountIds,
+        accountGroupId: Number(bulkForm.accountGroupId),
+        category: bulkForm.category,
+      });
 
       toast.success(`${selectedRows.length} akun berhasil diperbarui`);
       setOpenBulkConfirm(false);
@@ -409,18 +413,19 @@ export const AccountListPage = () => {
             <div className="mt-8 space-y-6">
               <div className="space-y-2.5">
                 <label className="block text-base font-semibold text-slate-900">Grup Akun</label>
-                <Select value={bulkForm.accountGroupId} onValueChange={(value) => setBulkForm((previous) => ({ ...previous, accountGroupId: value }))}>
-                  <SelectTrigger className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300">
-                    <SelectValue placeholder="Select an item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accountGroups.map((group) => (
-                      <SelectItem key={group.id} value={String(group.id)}>
-                        {group.code || group.id}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  value={bulkForm.accountGroupId}
+                  onChange={(value) => setBulkForm((previous) => ({ ...previous, accountGroupId: value }))}
+                  options={groupOptions}
+                  placeholder={isLoadingGroups ? 'Memuat...' : 'Select an item'}
+                  searchPlaceholder="Cari grup akun..."
+                  emptyText="Grup akun tidak ditemukan."
+                  loading={isLoadingGroups}
+                  onSearchChange={handleGroupSearch}
+                  onLoadMore={handleLoadMoreGroups}
+                  hasMore={hasMoreGroups}
+                  className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300 bg-white"
+                />
               </div>
 
               <div className="space-y-2.5">

@@ -192,6 +192,7 @@ export const AccountEditPage = () => {
             onGroupSearchChange={handleGroupSearch}
             onLoadMoreGroups={handleLoadMoreGroups}
             hasMoreGroups={hasMoreGroups}
+            isLock={data?.is_lock}
           />
         </Card>
       </div>

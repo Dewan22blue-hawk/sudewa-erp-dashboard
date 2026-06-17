@@ -60,6 +60,10 @@ export default function CreatePurchasePage() {
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
+  const [purchaseDate, setPurchaseDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -100,6 +104,11 @@ export default function CreatePurchasePage() {
         return;
       }
 
+      if (!purchaseDate) {
+        toast.error('Tanggal pembelian wajib diisi');
+        return;
+      }
+
       if (!warehouseNumeric || warehouseNumeric <= 0) {
         toast.error('Warehouse ID wajib diisi (gunakan ID yang valid, contoh: 1)');
         return;
@@ -137,6 +146,7 @@ export default function CreatePurchasePage() {
         bbn_price: bbnNumber,
         expedition_fee: expeditionNumber,
         other_fee: otherFeeNumber,
+        transaction_date: purchaseDate,
       };
 
       if (process.env.NODE_ENV !== 'production') {
@@ -223,7 +233,16 @@ export default function CreatePurchasePage() {
             onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
             companyId={companyId}
             prependFields={
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                <div className="space-y-2">
+                  <Label>Tanggal Pembelian</Label>
+                  <Input
+                    type="date"
+                    value={purchaseDate}
+                    onChange={(e) => setPurchaseDate(e.target.value)}
+                    className="h-10 border-slate-200 bg-white"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label>Supplier</Label>
                   <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
