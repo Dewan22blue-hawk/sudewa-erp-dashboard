@@ -73,6 +73,14 @@ export function DOEkspedisiDetailCard({ data }: DOEkspedisiDetailCardProps) {
           <DetailField label="Nama Driver" value={data.driver?.name || '-'} />
           <DetailField label="Tipe Armada" value={data.vehicle?.type || '-'} />
           <DetailField label="Nomor Polisi" value={data.vehicle?.registrationNumber || '-'} />
+          <div className="md:col-span-3 border-t border-slate-100 pt-4">
+            <div className="space-y-1">
+              <p className="text-xs text-slate-700">Atensi Driver</p>
+              <div className="text-[15px] font-normal text-slate-800 whitespace-pre-wrap mt-1 leading-relaxed">
+                {data.driverNote || '-'}
+              </div>
+            </div>
+          </div>
         </div>
       </Section>
 

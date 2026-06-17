@@ -20,7 +20,6 @@ interface DraftRow {
 interface Props {
   items: FinanceBillingItem[];
   financeBillingId?: number;
-  unitTransactionId?: number;
   paymentAt?: string;
   disabled?: boolean;
 }
@@ -30,52 +29,14 @@ const defaultDraft: DraftRow = {
   amount: 0,
 };
 
-const translateFinanceBillingError = (message: string) => {
-  const trimmed = message.trim();
-
-  const balanceMatch = trimmed.match(/^Payment amount exceeds remaining billing balance \(([\d.,]+)\)\.?$/i);
-  if (balanceMatch) {
-    return `Nominal pembayaran melebihi sisa saldo tagihan (${balanceMatch[1]}).`;
-  }
-
-  if (/^Validation failed$/i.test(trimmed)) {
-    return 'Validasi gagal. Periksa kembali data yang Anda masukkan.';
-  }
-
-  return trimmed
-    .replace(/^Payment amount exceeds remaining billing balance/i, 'Nominal pembayaran melebihi sisa saldo tagihan')
-    .replace(/^Payment amount is required/i, 'Nominal pembayaran wajib diisi')
-    .replace(/^Payment date is required/i, 'Tanggal pembayaran wajib diisi')
-    .replace(/^The note field is required/i, 'Catatan wajib diisi');
-};
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
-  if (!error || typeof error !== 'object') return fallback;
-
-  const details = 'details' in error ? (error as { details?: unknown }).details : undefined;
-  if (typeof details === 'string' && details.trim()) {
-    return translateFinanceBillingError(details);
-  }
-
-  if (details && typeof details === 'object') {
-    const firstValue = Object.values(details as Record<string, unknown>)[0];
-    if (typeof firstValue === 'string' && firstValue.trim()) {
-      return translateFinanceBillingError(firstValue);
-    }
-    if (Array.isArray(firstValue) && typeof firstValue[0] === 'string') {
-      return translateFinanceBillingError(firstValue[0]);
-    }
-  }
-
-  const message = 'message' in error ? (error as { message?: unknown }).message : undefined;
-  if (typeof message === 'string' && message.trim()) {
-    return translateFinanceBillingError(message);
-  }
-
-  return fallback;
+  void fallback;
+  return getApiErrorMessage(error);
 };
 
-export default function TransactionDetailInlineTable({ items, financeBillingId, unitTransactionId, paymentAt, disabled }: Props) {
+export default function TransactionDetailInlineTable({ items, financeBillingId, paymentAt, disabled }: Props) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [editingId, setEditingId] = useState<EditableRowId | null>(null);
   const [draft, setDraft] = useState<DraftRow>(defaultDraft);
@@ -162,7 +123,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
   };
 
   const handleSave = async (rowId: EditableRowId) => {
-    if (!financeBillingId || !paymentAt || !unitTransactionId) {
+    if (!financeBillingId || !paymentAt) {
       toast.error('Data finance billing belum lengkap');
       return;
     }
@@ -180,7 +141,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
     try {
       if (rowId === 'new') {
         await createMutation.mutateAsync({
-          id: unitTransactionId,
+          id: financeBillingId,
           payload: {
             finance_billing_id: financeBillingId,
             cash_payment_amount: draft.amount,

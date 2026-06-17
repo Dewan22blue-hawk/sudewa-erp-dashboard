@@ -45,10 +45,11 @@ export function CreateInvoiceProcessForm({
   onToggleAllExpeditions,
   isSubmitting = false,
 }: Props) {
+  const isPrintedInvoice = Boolean(statusLabel?.includes('Sudah'));
   const totalInvoice = rows.reduce((sum, row) => sum + row.invoiceExpedition, 0);
   const totalPpn = rows.reduce((sum, row) => sum + row.ppn, 0);
   const totalAmount = rows.reduce((sum, row) => sum + row.totalAmount, 0);
-  const selectableRows = rows.filter((row) => !row.isPrinted);
+  const selectableRows = rows.filter((row) => !row.isPrinted || isPrintedInvoice);
   const allSelectableChecked = selectableRows.length > 0 && selectableRows.every((row) => selectedExpeditionIds.includes(row.expeditionId));
   const partialSelectableChecked = selectableRows.some((row) => selectedExpeditionIds.includes(row.expeditionId)) && !allSelectableChecked;
 
@@ -147,7 +148,7 @@ export function CreateInvoiceProcessForm({
                         <Checkbox
                           checked={selectedExpeditionIds.includes(row.expeditionId)}
                           onCheckedChange={(checked) => onToggleExpedition?.(row.expeditionId, Boolean(checked))}
-                          disabled={row.isPrinted}
+                          disabled={row.isPrinted && !isPrintedInvoice}
                         />
                       </TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{index + 1}</TableCell>

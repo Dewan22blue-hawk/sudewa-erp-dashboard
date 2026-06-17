@@ -6,6 +6,8 @@ import { useBBNDetail, useUpdateBBN } from '@/hooks/useBBN';
 import type { BBNPayload } from '@/@types/bbn.types';
 import { toast } from 'sonner';
 
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+
 export default function EditBBNPage() {
     const router = useRouter();
     const slug = router.query.slug as string;
@@ -22,8 +24,8 @@ export default function EditBBNPage() {
             await updateMutation.mutateAsync({ id, data });
             toast.success('Data biaya berhasil diubah');
             router.push(`/dashboard/${slug}/master/bbn`);
-        } catch (error: any) {
-            toast.error(error.message || 'Gagal menyimpan data');
+        } catch (error) {
+            toast.error(getApiErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }

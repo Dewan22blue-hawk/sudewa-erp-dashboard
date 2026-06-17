@@ -112,25 +112,36 @@ export default function PurchasePage() {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && !data ? (
           <div>Loading...</div>
         ) : (
-          <PurchaseTable
-            data={data?.data ?? []}
-            meta={data?.meta}
-            onDelete={(id) => setSelectedId(id)}
-            onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
-            slug={slug as string}
-            onPageChange={setPage}
-            onPerPageChange={(value) => {
-              setPerPage(value);
-              setPage(1);
-            }}
-            loading={isLoading && isFetching}
-            subTabs={(SUBTABS as any)[mainTab]}
-            activeSubTab={subTab}
-            onSubTabChange={(id) => { setSubTab(id); setPage(1); }}
-          />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <p className="text-sm text-slate-600">
+                Data pembelian unit disinkronkan otomatis dari backend saat halaman dibuka ulang, saat jendela kembali aktif, dan setiap 30 detik.
+              </p>
+              <span className={`text-xs font-medium ${isFetching ? 'text-amber-600' : 'text-emerald-600'}`}>
+                {isFetching ? 'Menyinkronkan data terbaru...' : 'Data terbaru tersinkron'}
+              </span>
+            </div>
+
+            <PurchaseTable
+              data={data?.data ?? []}
+              meta={data?.meta}
+              onDelete={(id) => setSelectedId(id)}
+              onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
+              slug={slug as string}
+              onPageChange={setPage}
+              onPerPageChange={(value) => {
+                setPerPage(value);
+                setPage(1);
+              }}
+              loading={isLoading || isFetching}
+              subTabs={(SUBTABS as any)[mainTab]}
+              activeSubTab={subTab}
+              onSubTabChange={(id) => { setSubTab(id); setPage(1); }}
+            />
+          </div>
         )}
         <DeletePurchaseDialog open={!!selectedId} onClose={() => setSelectedId(null)} onConfirm={handleDelete} loading={deleteMutation.isPending} />
       </div>

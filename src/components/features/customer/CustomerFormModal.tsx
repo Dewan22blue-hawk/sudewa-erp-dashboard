@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import RequiredMark from '@/components/ui/required-mark';
 import { Textarea } from '@/components/ui/textarea';
 import type { UseFormReturn } from 'react-hook-form';
+import { sanitizePhone } from '@/lib/utils/format';
 
 interface CustomerFormModalProps {
   open: boolean;
@@ -38,44 +39,45 @@ export function CustomerFormModal({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">
-                      Nama Customer<RequiredMark />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan nama customer"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <form onSubmit={form.handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1 }}>
+              <div className="mt-6 flex flex-col gap-4 overflow-y-auto pb-2 pr-1">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">
+                        Nama Customer<RequiredMark />
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan nama customer"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="pic"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">PIC</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan PIC"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="pic"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">PIC</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan PIC"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
               <FormField
                 control={form.control}
@@ -117,23 +119,23 @@ export function CustomerFormModal({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="map_link"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Maps</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan link maps"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="map_link"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">Maps</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan link maps"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
               <FormField
                 control={form.control}
@@ -155,7 +157,7 @@ export function CustomerFormModal({
                 )}
               />
 
-              <div className="flex flex-col gap-3 pt-2">
+              <div className="shrink-0 flex flex-col gap-3 py-6">
                 <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
                   {isSubmitting ? 'Menyimpan...' : submitLabel}
                 </Button>

@@ -2,11 +2,11 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
 import { ReactNode } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
+import { formatMoneyInput } from '@/lib/utils/money-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Save, Check, ChevronsUpDown } from 'lucide-react';
@@ -76,17 +76,12 @@ export function EditUnitForm({
     return Number.isFinite(normalized) ? normalized : 0;
   };
 
-  // Fill output fields from backend formula response.
-  useEffect(() => {
-    if (!formula) return;
-
-    form.setValue('hppSatuan', toNumber(formula.hpp_per_unit_price));
-    form.setValue('dppSatuan', toNumber(formula.dpp_per_unit_price));
-    form.setValue('ppnSatuan', toNumber(formula.ppn_per_unit_price));
-    form.setValue('totalHpp', toNumber(formula.hpp_total_price));
-    form.setValue('totalDpp', toNumber(formula.dpp_total_price));
-    form.setValue('totalPpn', toNumber(formula.ppn_total_price));
-  }, [formula, form]);
+  const hppSatuanVal = formula ? toNumber(formula.hpp_per_unit_price) : toNumber(defaultValues?.hppSatuan);
+  const dppSatuanVal = formula ? toNumber(formula.dpp_per_unit_price) : toNumber(defaultValues?.dppSatuan);
+  const ppnSatuanVal = formula ? toNumber(formula.ppn_per_unit_price) : toNumber(defaultValues?.ppnSatuan);
+  const totalHppVal = formula ? toNumber(formula.hpp_total_price) : toNumber(defaultValues?.totalHpp);
+  const totalDppVal = formula ? toNumber(formula.dpp_total_price) : toNumber(defaultValues?.totalDpp);
+  const totalPpnVal = formula ? toNumber(formula.ppn_total_price) : toNumber(defaultValues?.totalPpn);
 
   return (
     <Form {...form}>
@@ -131,6 +126,8 @@ export function EditUnitForm({
                           <button
                             type="button"
                             role="combobox"
+                            aria-expanded={false}
+                            aria-controls="combobox-options"
                             disabled={readOnly}
                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
                           >
@@ -303,140 +300,80 @@ export function EditUnitForm({
 
         {/* ROW 3: HPP Satuan, DPP Satuan, PPN Satuan */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="hppSatuan"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-                <FormControl>
-                  <MoneyInput
-                    placeholder="Rp 99.999"
-                    className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled={readOnly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+            <FormControl>
+              <Input
+                value={formatMoneyInput(String(Math.round(hppSatuanVal)))}
+                className="bg-transparent"
+                disabled
+                readOnly
+              />
+            </FormControl>
+          </FormItem>
 
-          <FormField
-            control={form.control}
-            name="dppSatuan"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-                <FormControl>
-                  <MoneyInput
-                    placeholder="Rp 99.999"
-                    className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+            <FormControl>
+              <Input
+                value={formatMoneyInput(String(Math.round(dppSatuanVal)))}
+                className="bg-transparent"
+                disabled
+                readOnly
+              />
+            </FormControl>
+          </FormItem>
 
-          <FormField
-            control={form.control}
-            name="ppnSatuan"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-                <FormControl>
-                  <MoneyInput
-                    placeholder="Rp 99.999"
-                    className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled={readOnly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+            <FormControl>
+              <Input
+                value={formatMoneyInput(String(Math.round(ppnSatuanVal)))}
+                className="bg-transparent"
+                disabled
+                readOnly
+              />
+            </FormControl>
+          </FormItem>
         </div>
 
         {/* ROW 4: Total HPP, Total DPP, Total PPN */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="totalHpp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
-                <FormControl>
-                  <MoneyInput
-                    placeholder="Rp 99.999"
-                    className="bg-transparent"
-                    disabled
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
+            <FormControl>
+              <Input
+                value={formatMoneyInput(String(Math.round(totalHppVal)))}
+                className="bg-transparent"
+                disabled
+                readOnly
+              />
+            </FormControl>
+          </FormItem>
 
-          <FormField
-            control={form.control}
-            name="totalDpp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
-                <FormControl>
-                  <MoneyInput
-                    placeholder="Rp 99.999"
-                    className="bg-transparent"
-                    disabled
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
+            <FormControl>
+              <Input
+                value={formatMoneyInput(String(Math.round(totalDppVal)))}
+                className="bg-transparent"
+                disabled
+                readOnly
+              />
+            </FormControl>
+          </FormItem>
 
-          <FormField
-            control={form.control}
-            name="totalPpn"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
-                <FormControl>
-                  <MoneyInput
-                    placeholder="Rp 99.999"
-                    className="bg-transparent"
-                    disabled
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
+            <FormControl>
+              <Input
+                value={formatMoneyInput(String(Math.round(totalPpnVal)))}
+                className="bg-transparent"
+                disabled
+                readOnly
+              />
+            </FormControl>
+          </FormItem>
         </div>
 
         {/* Action Buttons */}

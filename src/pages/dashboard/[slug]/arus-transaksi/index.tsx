@@ -6,10 +6,9 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { useTransactions, useTransactionSummary } from '@/hooks/useTransaction';
+import { useTransactions } from '@/hooks/useTransaction';
 import { useCompany } from '@/contexts/CompanyContext';
 import { TransactionTable } from '@/components/features/transaction/TransactionTable';
-import { TransactionSummaryCards } from '@/components/features/transaction/TransactionSummaryCards';
 import { DeleteTransactionDialog } from '@/components/features/transaction/DeleteTransactionDialog';
 import { Plus, Search } from 'lucide-react';
 import { Transaction } from '@/@types/transaction.types';
@@ -29,7 +28,6 @@ export default function TransactionListPage() {
 
     // Query Hooks
     const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);
-    const { data: summary, isLoading: isSummaryLoading } = useTransactionSummary(safeCompanyId);
 
     // Dialog State
     const [openDelete, setOpenDelete] = useState(false);

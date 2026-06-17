@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { financeRefundService } from '@/services/finance-refund.service';
 import { useKas } from '@/hooks/useKas';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -21,7 +21,6 @@ export default function FinanceRefundApprovalModal({ open, onClose, refundId, on
   const { companyId } = useCompany();
   const { data: kasList, isLoading: isLoadingKas } = useKas(companyId ?? undefined);
   const [selectedKas, setSelectedKas] = useState<string>('');
-  const queryClient = useQueryClient();
 
   const approveMutation = useMutation({
     mutationFn: (data: { status: 'approve' | 'reject'; cash_id?: string }) => 

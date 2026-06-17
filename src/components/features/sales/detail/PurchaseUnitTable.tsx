@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable, PaginationState } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,8 +16,7 @@ interface Props {
   salesId: string;
 }
 
-export function PurchaseUnitTable({ units, salesId }: Props) {
-  const router = useRouter();
+export function PurchaseUnitTable({ units }: Props) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,

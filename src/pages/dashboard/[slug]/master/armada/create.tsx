@@ -6,50 +6,8 @@ import { useRouter } from 'next/router';
 import { ChevronLeft } from 'lucide-react';
 import { useCreateArmada } from '@/hooks/useArmada';
 import type { ArmadaPayload } from '@/@types/armada.types';
-import { ApiValidationError } from '@/lib/api/response';
-import type { ApiError } from '@/@types/api';
 
-const extractValidationMessages = (error: unknown) => {
-  if (error instanceof ApiValidationError) {
-    const messages = Object.entries(error.fieldErrors ?? {}).flatMap(([field, fieldMessages]) =>
-      (fieldMessages ?? []).map((message) => `${field}: ${message}`),
-    );
-
-    return {
-      title: error.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  const apiError = error as ApiError & {
-    fieldErrors?: Record<string, string[]>;
-    response?: { data?: { errors?: Record<string, string[]>; message?: string } };
-  };
-
-  const rawFieldErrors =
-    apiError?.fieldErrors ??
-    apiError?.response?.data?.errors ??
-    (typeof apiError?.details === 'object' && apiError.details ? (apiError.details as Record<string, string[]>) : undefined);
-
-  if (rawFieldErrors && typeof rawFieldErrors === 'object') {
-    const messages = Object.entries(rawFieldErrors).flatMap(([field, fieldMessages]) => {
-      if (Array.isArray(fieldMessages)) {
-        return fieldMessages.map((message) => `${field}: ${message}`);
-      }
-      return [`${field}: ${String(fieldMessages)}`];
-    });
-
-    return {
-      title: apiError?.message || apiError?.response?.data?.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  return {
-    title: apiError?.message || 'Gagal menyimpan data armada',
-    description: '',
-  };
-};
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 export default function CreateArmadaPage() {
   const router = useRouter();
@@ -64,10 +22,7 @@ export default function CreateArmadaPage() {
         router.push(`/dashboard/${slug}/master/armada`);
       }
     } catch (error: any) {
-      const validation = extractValidationMessages(error);
-      toast.error(validation.title, {
-        description: validation.description || undefined,
-      });
+      toast.error(getApiErrorMessage(error));
     }
   };
 

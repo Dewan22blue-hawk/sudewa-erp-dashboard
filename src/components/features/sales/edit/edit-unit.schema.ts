@@ -14,12 +14,12 @@ export const editUnitSchema = z.object({
   harga: z.number().min(0, 'Harga tidak boleh negatif'),
 
   // Satuan section
-  hppSatuan: z.number().min(0),
-  totalHpp: z.number().min(0),
-  dppSatuan: z.number().min(0),
-  totalDpp: z.number().min(0),
-  ppnSatuan: z.number().min(0),
-  totalPpn: z.number().min(0),
+  hppSatuan: z.number().min(0).optional(),
+  totalHpp: z.number().min(0).optional(),
+  dppSatuan: z.number().min(0).optional(),
+  totalDpp: z.number().min(0).optional(),
+  ppnSatuan: z.number().min(0).optional(),
+  totalPpn: z.number().min(0).optional(),
 
   // Biaya section
   biayaBbn: z.number().min(0),

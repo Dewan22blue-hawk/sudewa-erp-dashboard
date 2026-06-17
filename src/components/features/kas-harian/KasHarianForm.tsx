@@ -23,9 +23,20 @@ interface Props {
   isLoadingCash?: boolean;
   isLoadingAccount?: boolean;
   id?: string;
+  lockAmounts?: boolean;
 }
 
-export default function KasHarianForm({ form, onSubmit, companies, cashOptions, accountOptions, isLoadingCash, isLoadingAccount, id }: Props) {
+export default function KasHarianForm({
+  form,
+  onSubmit,
+  companies,
+  cashOptions,
+  accountOptions,
+  isLoadingCash,
+  isLoadingAccount,
+  id,
+  lockAmounts = false,
+}: Props) {
   const [cashOpen, setCashOpen] = useState(false);
   const [cashSearch, setCashSearch] = useState('');
   const [accountOpen, setAccountOpen] = useState(false);
@@ -332,6 +343,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                 <MoneyInput
                   value={field.value ?? 0}
                   onChangeValue={(value) => {
+                    if (lockAmounts) return;
                     field.onChange(value);
                     if (value > 0) {
                       form.setValue('credit', 0, { shouldValidate: true });
@@ -339,8 +351,10 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                   }}
                   placeholder="Tambahkan nominal"
                   className="h-12 rounded-2xl border-slate-200 px-4"
+                  disabled={lockAmounts}
                 />
               </FormControl>
+              {lockAmounts ? <p className="text-xs text-slate-500">Nominal debet transaksi otomatis mengikuti data billing dan tidak bisa diubah di sini.</p> : null}
               <FormMessage />
             </FormItem>
           )}
@@ -356,6 +370,7 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                 <MoneyInput
                   value={field.value ?? 0}
                   onChangeValue={(value) => {
+                    if (lockAmounts) return;
                     field.onChange(value);
                     if (value > 0) {
                       form.setValue('debet', 0, { shouldValidate: true });
@@ -363,8 +378,10 @@ export default function KasHarianForm({ form, onSubmit, companies, cashOptions, 
                   }}
                   placeholder="Tambahkan nominal"
                   className="h-12 rounded-2xl border-slate-200 px-4"
+                  disabled={lockAmounts}
                 />
               </FormControl>
+              {lockAmounts ? <p className="text-xs text-slate-500">Nominal kredit transaksi otomatis mengikuti data billing dan tidak bisa diubah di sini.</p> : null}
               <FormMessage />
             </FormItem>
           )}

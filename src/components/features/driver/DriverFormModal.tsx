@@ -129,6 +129,7 @@ export function DriverFormModal({
 
         {isOpen && (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2 max-h-[75vh] overflow-y-auto px-1">
+            {/* Nama Driver */}
             <div className="space-y-1.5">
               <Label htmlFor="driver-name">Nama Driver</Label>
               <Input
@@ -141,10 +142,17 @@ export function DriverFormModal({
               {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
             </div>
 
+            {/* Alamat */}
+            <div className="space-y-1.5">
+              <Label htmlFor="driver-address">Alamat</Label>
+              <Textarea id="driver-address" placeholder="Tambahkan alamat" {...register('address')} className="resize-none" rows={3} disabled={isSubmitting} />
+            </div>
+
+            {/* KTP & Phone */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="driver-pic">PIC</Label>
-                <Input id="driver-pic" placeholder="Tambahkan PIC" {...register('picName')} disabled={isSubmitting} />
+                <Label htmlFor="driver-ktp">KTP</Label>
+                <Input id="driver-ktp" placeholder="Tambahkan nomor KTP" {...register('identityNumber')} disabled={isSubmitting} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="driver-phone">Phone</Label>
@@ -152,30 +160,28 @@ export function DriverFormModal({
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="driver-address">Alamat</Label>
-              <Textarea id="driver-address" placeholder="Tambahkan alamat" {...register('address')} className="resize-none" rows={3} disabled={isSubmitting} />
-            </div>
-
+            {/* Nomor SIM & Tgl. Gabung */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="driver-npwp">NPWP</Label>
-                <Input id="driver-npwp" placeholder="Tambahkan NPWP" {...register('npwp')} disabled={isSubmitting} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="driver-ktp">Identity Number</Label>
-                <Input id="driver-ktp" placeholder="Tambahkan nomor KTP" {...register('identityNumber')} disabled={isSubmitting} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="driver-sim">Drive License Identity Number</Label>
+                <Label htmlFor="driver-sim">Nomor SIM</Label>
                 <Input id="driver-sim" placeholder="Tambahkan nomor SIM" {...register('driveLicenseNumber')} disabled={isSubmitting} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="driver-join-date">Join Date</Label>
+                <Label htmlFor="driver-join-date">Tgl. Gabung</Label>
                 <Input id="driver-join-date" type="date" {...register('joinDate')} disabled={isSubmitting} />
+              </div>
+            </div>
+
+            {/* === HIDDEN FIELDS (uncomment jika diperlukan) ===
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="driver-pic">PIC</Label>
+                <Input id="driver-pic" placeholder="Tambahkan PIC" {...register('picName')} disabled={isSubmitting} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="driver-npwp">NPWP</Label>
+                <Input id="driver-npwp" placeholder="Tambahkan NPWP" {...register('npwp')} disabled={isSubmitting} />
               </div>
             </div>
 
@@ -215,6 +221,8 @@ export function DriverFormModal({
               <Label htmlFor="driver-image">Image</Label>
               <Input id="driver-image" type="file" accept="image/*" {...register('image')} disabled={isSubmitting} />
             </div>
+
+            === END HIDDEN FIELDS === */}
 
             <div className="flex flex-col gap-2 pt-2 pb-1">
               <Button type="submit" className="w-full bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={isSubmitting}>

@@ -16,7 +16,7 @@ export default function MaterialPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const { data: materialsData, isLoading } = useMaterials({ page, perPage, search });
+  const { data: materialsData } = useMaterials({ page, perPage, search });
   
   const createMutation = useCreateMaterial();
   const updateMutation = useUpdateMaterial();

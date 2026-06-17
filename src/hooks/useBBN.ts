@@ -28,6 +28,7 @@ export function useCreateBBN() {
         mutationFn: (data: Partial<BBNPayload>) => createBBN(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['bbns'] });
+            queryClient.invalidateQueries({ queryKey: ['bbns-list'] });
         },
     });
 }
@@ -38,6 +39,7 @@ export function useUpdateBBN() {
         mutationFn: ({ id, data }: { id: string | number; data: Partial<BBNPayload> }) => updateBBN(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['bbns'] });
+            queryClient.invalidateQueries({ queryKey: ['bbns-list'] });
         },
     });
 }
@@ -48,6 +50,7 @@ export function useDeleteBBN() {
         mutationFn: (id: string | number) => deleteBBN(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['bbns'] });
+            queryClient.invalidateQueries({ queryKey: ['bbns-list'] });
         },
     });
 }

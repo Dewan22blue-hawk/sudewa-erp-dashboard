@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form';
 import type { BBNBillVehicleData, BBNBillVehicleFeePayload } from '@/@types/bbn-bill.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
 
@@ -28,11 +27,18 @@ type FormValues = {
 function FeeField({ label, name, control }: { label: string; name: keyof FormValues; control: any }) {
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-semibold text-slate-900">{label}</Label>
+      <Label className="text-sm font-medium text-slate-900">{label}</Label>
       <Controller
         name={name as any}
         control={control}
-        render={({ field }) => <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-11 rounded-xl border-slate-200" />}
+        render={({ field }) => (
+          <MoneyInput
+            value={field.value}
+            onChangeValue={field.onChange}
+            placeholder="Rp"
+            className="h-11 rounded-xl border-slate-200 bg-white"
+          />
+        )}
       />
     </div>
   );
@@ -41,7 +47,7 @@ function FeeField({ label, name, control }: { label: string; name: keyof FormVal
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Card className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-6 border-b border-slate-100 pb-4 text-[16px] font-medium text-slate-500">{title}</div>
+      <div className="mb-6 border-b border-slate-100 pb-4 text-[15px] font-medium text-slate-400 uppercase tracking-wide">{title}</div>
       {children}
     </Card>
   );
@@ -75,14 +81,11 @@ export function BBNBillVehicleFeeForm({ vehicle, onSubmit, onCancel, isSubmittin
 
   return (
     <div className="space-y-7">
-      <div className="flex items-center gap-3">
-        <Button type="button" variant="ghost" size="icon" onClick={onCancel} className="h-9 w-9 rounded-full">
+      <div className="flex items-center gap-2">
+        <Button type="button" variant="ghost" size="icon" onClick={onCancel} className="h-9 w-9 rounded-full text-slate-700 hover:bg-slate-100">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div>
-          <h1 className="text-[22px] font-semibold text-slate-900">Ubah Data Detail STNK/BPKB</h1>
-          <p className="text-sm text-slate-500">{vehicle.stnkName || '-'} • {vehicle.machineNumber || '-'}</p>
-        </div>
+        <h1 className="text-[24px] font-semibold tracking-[-0.03em] text-slate-950">Ubah Data Detail STNK/BPKB</h1>
       </div>
 
       <form
@@ -105,10 +108,8 @@ export function BBNBillVehicleFeeForm({ vehicle, onSubmit, onCancel, isSubmittin
             <FeeField name="garwilFee" label="Biaya Acc Garwil" control={form.control} />
             <FeeField name="nikValidationFee" label="Biaya Acc NIK" control={form.control} />
             <FeeField name="accelerationFee" label="Biaya Percepatan" control={form.control} />
-            <FeeField name="stampFee" label="Biaya Materai (2 materai/berkas)" control={form.control} />
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-slate-900">Nomor Mesin</Label>
-              <Input value={vehicle.machineNumber || '-'} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50" />
+            <div className="col-span-1">
+              <FeeField name="stampFee" label="Biaya Materai (2 materai/berkas)" control={form.control} />
             </div>
           </div>
         </Section>
@@ -120,11 +121,11 @@ export function BBNBillVehicleFeeForm({ vehicle, onSubmit, onCancel, isSubmittin
           </div>
         </Section>
 
-        <div className="flex items-center justify-center gap-4 pt-2">
-          <Button type="button" variant="ghost" onClick={onCancel} className="text-[18px] text-slate-700">
+        <div className="flex items-center justify-center gap-6 pt-4">
+          <Button type="button" variant="ghost" onClick={onCancel} className="text-sm font-medium text-slate-600 hover:text-slate-950">
             Batal
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="h-10 rounded-xl bg-[#1f4163] px-6 hover:bg-[#183552]">
+          <Button type="submit" disabled={isSubmitting} className="h-10 rounded-xl bg-[#1f4163] px-6 text-sm font-medium text-white hover:bg-[#183552]">
             <Save className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Menyimpan...' : 'Simpan'}
           </Button>

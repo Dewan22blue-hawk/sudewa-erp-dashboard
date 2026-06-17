@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign, Warehouse, ScrollText } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getYanotamaMenus = (slug: string): MenuItem[] => {
@@ -70,14 +70,14 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'Data Kendaraan',
                     href: base('/data-kendaraan'),
                 },
-                {
-                    label: 'Pembelian Material',
-                    href: base('/pembelian-material'),
-                },
-                {
-                    label: 'Penjualan Material',
-                    href: base('/penjualan-material'),
-                },
+                // {
+                //     label: 'Pembelian Material',
+                //     href: base('/pembelian-material'),
+                // },
+                // {
+                //     label: 'Penjualan Material',
+                //     href: base('/penjualan-material'),
+                // },
                 {
                     label: 'Input STNK/BPKB',
                     href: base('/stnk-bpkb'),
@@ -86,14 +86,14 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'Tagihan BBN',
                     href: base('/tagihan-bbn'),
                 },
-                {
-                    label: 'DO Pembelian Material',
-                    href: base('/do-pembelian-material'),
-                },
-                {
-                    label: 'Stok Material',
-                    href: base('/stok-material'),
-                },
+                // {
+                //     label: 'DO Pembelian Material',
+                //     href: base('/do-pembelian-material'),
+                // },
+                // {
+                //     label: 'Stok Material',
+                //     href: base('/stok-material'),
+                // },
             ],
         },
         {
@@ -101,8 +101,60 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             icon: DollarSign,
             children: [
                 {
+                    label: 'Transaksi Kas Harian',
+                    href: base('/finance/transaksi-kas-harian'),
+                },
+                {
                     label: 'Aset',
                     href: base('/finance/asset'),
+                },
+            ],
+        },
+        {
+            label: 'Warehouse',
+            icon: Warehouse,
+            children: [
+                {
+                    label: 'Stock Perlengkapan',
+                    href: base('/warehouse/stock-perlengkapan'),
+                },
+                {
+                    label: 'Penerimaan Material',
+                    href: base('/warehouse/penerimaan-material'),
+                },
+                {
+                    label: 'Pengeluaran Material',
+                    href: base('/warehouse/pengeluaran-material'),
+                },
+            ],
+        },
+        {
+            label: 'Laporan',
+            icon: ScrollText,
+            children: [
+                {
+                    label: 'LP Jumlah Daftar',
+                    href: base('/laporan/lp-jumlah-daftar'),
+                },
+                {
+                    label: 'LP Jumlah Terima',
+                    href: base('/laporan/lp-jumlah-terima'),
+                },
+                {
+                    label: 'LP Jumlah Penyerahan',
+                    href: base('/laporan/lp-jumlah-penyerahan'),
+                },
+                {
+                    label: 'LP Jumlah Outstanding',
+                    href: base('/laporan/lp-jumlah-outstanding'),
+                },
+                {
+                    label: 'Laporan Stock Material',
+                    href: base('/laporan/laporan-stock-material'),
+                },
+                {
+                    label: 'Laporan Aset',
+                    href: base('/laporan/laporan-aset'),
                 },
             ],
         },

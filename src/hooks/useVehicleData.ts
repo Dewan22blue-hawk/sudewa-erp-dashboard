@@ -14,10 +14,11 @@ import {
   updateVehicleData,
 } from '@/services/vehicle-data.service';
 
-export function useVehicleDataList(params: PaginationParams & VehicleDataFilters) {
+export function useVehicleDataList(params: PaginationParams & VehicleDataFilters, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['vehicle-data', params],
     queryFn: () => getVehicleDataList(params),
+    enabled: options?.enabled,
   });
 }
 

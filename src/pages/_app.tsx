@@ -7,6 +7,7 @@ import { useAuthCheck } from "@/features/auth/hooks/use-auth-check"
 
 import "@/styles/globals.css"
 import { CompanyProvider } from "@/contexts/CompanyContext"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient({
@@ -80,10 +81,12 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <CompanyProvider>
-        <main className="font-sans">
-          <Component {...pageProps} />
-          <Toaster position="bottom-center" />
-        </main>
+        <TooltipProvider>
+          <main className="font-sans">
+            <Component {...pageProps} />
+            <Toaster position="bottom-center" />
+          </main>
+        </TooltipProvider>
       </CompanyProvider>
     </QueryClientProvider>
   )

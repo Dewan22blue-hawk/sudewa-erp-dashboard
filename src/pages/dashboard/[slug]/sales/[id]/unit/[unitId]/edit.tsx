@@ -6,7 +6,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
 import { toast } from 'sonner';
-import { usePurchaseUnitItems, useUpdateUnitItem } from '@/hooks/useUnitTransactionItem';
+import { useSalesUnitItems, useUpdateUnitItem } from '@/hooks/useUnitTransactionItem';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 
@@ -20,7 +20,7 @@ export default function EditNestedUnitPage() {
     const selectedUnitId = Array.isArray(unitId) ? unitId[0] : unitId;
 
     const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
-    const { data: itemResponse, isLoading: itemLoading } = usePurchaseUnitItems(salesId);
+    const { data: itemResponse, isLoading: itemLoading } = useSalesUnitItems(salesId);
     const { data: unitTypes, isLoading: typeUnitLoading } = useTypeUnits();
     const updateMutation = useUpdateUnitItem();
 

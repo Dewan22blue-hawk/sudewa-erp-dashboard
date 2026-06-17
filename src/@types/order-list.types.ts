@@ -56,6 +56,7 @@ export interface OrderListTarifLoadItem {
   id: number;
   uuid?: string;
   doOrderListTarifId: number;
+  doOrderListTarifUuid?: string;
   doOrderListId?: number;
   loadContent: string;
   qty: number;

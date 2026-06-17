@@ -6,7 +6,6 @@ export function useSpareparts(companyId?: string | number) {
   return useQuery({
     queryKey: ['spareparts', companyId],
     queryFn: () => getSpareparts(companyId),
-    enabled: Boolean(companyId),
   });
 }
 

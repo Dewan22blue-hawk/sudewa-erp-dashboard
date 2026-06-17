@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 export interface SearchableSelectOption {
@@ -21,6 +21,8 @@ interface SearchableSelectProps {
   disabled?: boolean;
   loading?: boolean;
   onSearchChange?: (value: string) => void;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
   className?: string;
 }
 
@@ -34,6 +36,8 @@ export function SearchableSelect({
   disabled,
   loading,
   onSearchChange,
+  onLoadMore,
+  hasMore = false,
   className,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
@@ -67,7 +71,7 @@ export function SearchableSelect({
   }, [onChange]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -81,31 +85,49 @@ export function SearchableSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverContent
+        className="w-[--radix-popover-trigger-width] p-0 pointer-events-auto"
+        align="start"
+      >
         <Command shouldFilter={false}>
-          <CommandInput
-            placeholder={searchPlaceholder}
-            value={query}
-            onValueChange={(nextValue) => {
-              setQuery(nextValue);
-              onSearchChange?.(nextValue);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && filteredOptions.length > 0) {
-                event.preventDefault();
-                selectOption(filteredOptions[0]);
+          <div className="flex h-9 items-center gap-2 border-b px-3" data-slot="command-input-wrapper">
+            <Search className="size-4 shrink-0 opacity-50" />
+            <input
+              placeholder={searchPlaceholder}
+              value={query}
+              onChange={(e) => {
+                const nextValue = e.target.value;
+                setQuery(nextValue);
+                onSearchChange?.(nextValue);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && filteredOptions.length > 0) {
+                  event.preventDefault();
+                  selectOption(filteredOptions[0]);
+                }
+              }}
+              className="placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+          <CommandList
+            className="flex-1 min-h-0"
+            onScroll={(event) => {
+              const target = event.currentTarget;
+              const hasScrollableContent = target.scrollHeight > target.clientHeight;
+              const isNearBottom = target.scrollHeight - target.scrollTop - target.clientHeight <= 20;
+              if (hasScrollableContent && isNearBottom && hasMore && !loading && onLoadMore) {
+                onLoadMore();
               }
             }}
-          />
-          <CommandList>
+          >
             <CommandEmpty>{loading ? 'Memuat...' : emptyText}</CommandEmpty>
             <CommandGroup>
               {filteredOptions.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={`${option.label} ${option.subtitle ?? ''}`}
+                  value={option.value}
                   onSelect={() => selectOption(option)}
-                  className="flex items-start gap-2"
+                  className="flex items-start gap-2 cursor-pointer py-1"
                 >
                   <Check className={cn('mt-0.5 h-4 w-4', value === option.value ? 'opacity-100' : 'opacity-0')} />
                   <div className="min-w-0">
@@ -115,6 +137,9 @@ export function SearchableSelect({
                 </CommandItem>
               ))}
             </CommandGroup>
+            {loading && hasMore && (
+              <div className="py-2 text-center text-xs text-muted-foreground">Memuat data tambahan...</div>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

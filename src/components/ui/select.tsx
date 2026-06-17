@@ -13,81 +13,85 @@ function Select(props: React.ComponentProps<typeof SelectPrimitive.Root>) {
 
 /* ================= Trigger ================= */
 
-function SelectTrigger({
-  className,
-  size = 'default',
-  children,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: 'sm' | 'default';
-}) {
-  return (
-    <SelectPrimitive.Trigger
-      data-size={size}
-      className={cn('flex w-full items-center justify-between rounded-md border bg-background px-3 py-2 text-sm shadow-sm', 'focus:outline-none focus:ring-2 focus:ring-ring', size === 'sm' ? 'h-8' : 'h-9', className)}
-      {...props}
-    >
-      {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="h-4 w-4 opacity-50" />
-      </SelectPrimitive.Icon>
-    </SelectPrimitive.Trigger>
-  );
-}
+const SelectTrigger = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    size?: 'sm' | 'default';
+  }
+>(({ className, size = 'default', children, ...props }, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    data-size={size}
+    className={cn('flex w-full items-center justify-between rounded-md border bg-background px-3 py-2 text-sm shadow-sm', 'focus:outline-none focus:ring-2 focus:ring-ring', size === 'sm' ? 'h-8' : 'h-9', className)}
+    {...props}
+  >
+    {children}
+    <SelectPrimitive.Icon>
+      <ChevronDownIcon className="h-4 w-4 opacity-50" />
+    </SelectPrimitive.Icon>
+  </SelectPrimitive.Trigger>
+));
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 /* ================= Content ================= */
 
-function SelectContent({ className, children, position = 'popper', ...props }: React.ComponentProps<typeof SelectPrimitive.Content>) {
-  return (
-    <SelectPrimitive.Portal>
-      <SelectPrimitive.Content
-        position={position}
-        className={cn(
-          'relative z-[9999] min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          'data-[side=bottom]:slide-in-from-top-2',
-          'data-[side=top]:slide-in-from-bottom-2',
-          className,
-        )}
-        {...props}
-      >
-        <SelectPrimitive.ScrollUpButton className="flex items-center justify-center py-1">
-          <ChevronUpIcon className="h-4 w-4" />
-        </SelectPrimitive.ScrollUpButton>
-
-        <SelectPrimitive.Viewport className="p-1">{children}</SelectPrimitive.Viewport>
-
-        <SelectPrimitive.ScrollDownButton className="flex items-center justify-center py-1">
-          <ChevronDownIcon className="h-4 w-4" />
-        </SelectPrimitive.ScrollDownButton>
-      </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
-  );
-}
-
-/* ================= Item ================= */
-
-function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>) {
-  return (
-    <SelectPrimitive.Item
+const SelectContent = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+>(({ className, children, position = 'popper', ...props }, ref) => (
+  <SelectPrimitive.Portal>
+    <SelectPrimitive.Content
+      ref={ref}
+      position={position}
       className={cn(
-        'relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none',
-        'focus:bg-accent focus:text-accent-foreground',
-        'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'relative z-[9999] min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[side=bottom]:slide-in-from-top-2',
+        'data-[side=top]:slide-in-from-bottom-2',
         className,
       )}
       {...props}
     >
-      <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-        <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="h-4 w-4" />
-        </SelectPrimitive.ItemIndicator>
-      </span>
+      <SelectPrimitive.ScrollUpButton className="flex items-center justify-center py-1">
+        <ChevronUpIcon className="h-4 w-4" />
+      </SelectPrimitive.ScrollUpButton>
 
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-    </SelectPrimitive.Item>
-  );
-}
+      <SelectPrimitive.Viewport className="p-1">{children}</SelectPrimitive.Viewport>
+
+      <SelectPrimitive.ScrollDownButton className="flex items-center justify-center py-1">
+        <ChevronDownIcon className="h-4 w-4" />
+      </SelectPrimitive.ScrollDownButton>
+    </SelectPrimitive.Content>
+  </SelectPrimitive.Portal>
+));
+SelectContent.displayName = SelectPrimitive.Content.displayName;
+
+/* ================= Item ================= */
+
+const SelectItem = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
+>(({ className, children, ...props }, ref) => (
+  <SelectPrimitive.Item
+    ref={ref}
+    className={cn(
+      'relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none',
+      'focus:bg-accent focus:text-accent-foreground',
+      'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      className,
+    )}
+    {...props}
+  >
+    <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+      <SelectPrimitive.ItemIndicator>
+        <CheckIcon className="h-4 w-4" />
+      </SelectPrimitive.ItemIndicator>
+    </span>
+
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+  </SelectPrimitive.Item>
+));
+SelectItem.displayName = SelectPrimitive.Item.displayName;
 
 function SelectValue(props: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value {...props} />;

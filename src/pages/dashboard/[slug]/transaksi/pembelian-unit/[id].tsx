@@ -61,18 +61,18 @@ export default function PurchaseDetailPage() {
     billingHistories.length > 0
       ? billingHistories
       : (purchase?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
-          id: String(history.id ?? ''),
-          unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? purchase?.unit_transaction_billing?.id ?? ''),
-          unit_transaction_id: purchase?.id,
-          payment_proof: history.payment_proof ?? null,
-          bca_payment_amount: Number(history.bca_payment_amount ?? 0),
-          cash_payment_amount: Number(history.cash_payment_amount ?? 0),
-          bca_payment_usd_amount: Number(history.bca_payment_usd_amount ?? 0),
-          payment_at: String(history.payment_at ?? ''),
-          note: history.note,
-          created_at: history.created_at,
-          updated_at: history.updated_at,
-        }));
+        id: String(history.id ?? ''),
+        unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? purchase?.unit_transaction_billing?.id ?? ''),
+        unit_transaction_id: purchase?.id,
+        payment_proof: history.payment_proof ?? null,
+        bca_payment_amount: Number((history as any).bca_payment_amount ?? (history as any).bca_payment ?? 0),
+        cash_payment_amount: Number((history as any).cash_payment_amount ?? (history as any).cash_payment ?? 0),
+        bca_payment_usd_amount: Number((history as any).bca_payment_usd_amount ?? (history as any).bca_payment_2 ?? 0),
+        payment_at: String(history.payment_at ?? ''),
+        note: history.note,
+        created_at: history.created_at,
+        updated_at: history.updated_at,
+      }));
 
   useEffect(() => {
     if (router.query.print === 'true' && !isLoading && purchase) {
@@ -278,19 +278,19 @@ export default function PurchaseDetailPage() {
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash BCA</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran USD BCA</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA USD</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran  BCA IDR</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran CASH IDR</th>
                   </tr>
                 </thead>
                 <tbody>
                   {resolvedBillingHistories.map((history, index) => {
                     const paymentDate = history.payment_at
                       ? new Date(history.payment_at).toLocaleDateString('id-ID', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })
                       : '-';
 
                     const bcaPayment = Number(history.bca_payment_amount ?? 0);
@@ -310,10 +310,10 @@ export default function PurchaseDetailPage() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                          {bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}
+                          {usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                          {usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}
+                          {bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">
                           {cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}

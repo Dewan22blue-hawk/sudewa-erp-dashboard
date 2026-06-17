@@ -1,23 +1,21 @@
 import { useEffect, useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccountTable } from '@/components/features/account/AccountTable';
-import { AccountFormModal } from '@/components/features/account/AccountFormModal';
 import { AccountImportModal } from '@/components/features/account/AccountImportModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAccounts, useCreateAccount, useDeleteAccount, useUpdateAccount } from '@/hooks/useAccount';
+import { useAccounts, useDeleteAccount, useUpdateAccount } from '@/hooks/useAccount';
 import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { useCompany } from '@/contexts/CompanyContext';
-import { accountSchema, type AccountFormValues } from '@/scheme/account-master.schema';
 import type { Account } from '@/@types/account.types';
+import type { AccountGroup } from '@/@types/account-group.types';
 import { ACCOUNT_CATEGORY_OPTIONS, getAccountTypeFromCategory } from '@/lib/account';
-import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
+import { ApiResponseError } from '@/lib/api/response';
 import { toast } from 'sonner';
 import { CircleAlert, Download, PencilLine, Plus, Search, Upload } from 'lucide-react';
 
@@ -43,41 +41,57 @@ export const AccountListPage = () => {
     enabled: !isLoadingCompany && !!companyId,
   });
 
-  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
-    page: 1,
-    perPage: 100,
-    search: '',
-    company_id: companyId ?? undefined,
-    enabled: !isLoadingCompany && !!companyId,
-  });
-
-  const createMutation = useCreateAccount();
   const updateMutation = useUpdateAccount();
   const deleteMutation = useDeleteAccount();
+  const router = useRouter();
 
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [editing, setEditing] = useState<Account | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [openForm, setOpenForm] = useState(false);
   const [openImport, setOpenImport] = useState(false);
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
   const [openBulkConfirm, setOpenBulkConfirm] = useState(false);
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
   const [bulkForm, setBulkForm] = useState<BulkFormValues>(initialBulkFormValues);
 
-  const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountSchema),
-    defaultValues: {
-      accountGroupId: undefined,
-      code: '',
-      name: '',
-      description: '',
-      category: undefined,
-      isActive: true,
-    },
+  // Group Account search and scroll pagination state
+  const [groupSearch, setGroupSearch] = useState('');
+  const [groupPage, setGroupPage] = useState(1);
+  const [accumulatedGroups, setAccumulatedGroups] = useState<AccountGroup[]>([]);
+
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
+    page: groupPage,
+    perPage: 20, // Load 20 groups per request
+    search: groupSearch,
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId && openBulkUpdate,
   });
 
-  const accountGroups = accountGroupsData?.data ?? [];
+  // Reset pagination state when bulk update modal is closed
+  useEffect(() => {
+    if (!openBulkUpdate) {
+      setGroupSearch('');
+      setGroupPage(1);
+      setAccumulatedGroups([]);
+    }
+  }, [openBulkUpdate]);
+
+  // Accumulate groups
+  useEffect(() => {
+    if (accountGroupsData?.data) {
+      setAccumulatedGroups((prev) => {
+        if (groupPage === 1) {
+          return accountGroupsData.data;
+        }
+        const existingIds = new Set(prev.map((g) => g.id));
+        const newItems = accountGroupsData.data.filter((g) => !existingIds.has(g.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [accountGroupsData, groupPage]);
+
+  const hasMoreGroups = accountGroupsData ? groupPage < accountGroupsData.meta.lastPage : false;
+
+  const accountGroups = accumulatedGroups;
   const accounts = data?.data;
   const accountRows = accounts ?? [];
   const totalAccounts = data?.meta.total ?? 0;
@@ -87,110 +101,18 @@ export const AccountListPage = () => {
     setSelectedIds((previous) => new Set(Array.from(previous).filter((id) => availableIds.has(id))));
   }, [accounts]);
 
-  const resetForm = () => {
-    form.reset({
-      accountGroupId: undefined,
-      code: '',
-      name: '',
-      description: '',
-      category: undefined,
-      isActive: true,
-    });
-  };
-
   const resetBulkForm = () => {
     setBulkForm(initialBulkFormValues);
   };
 
-  const translateValidationMessage = (message: string, field: string): string => {
-    const msg = message.toLowerCase();
-    if (msg.includes('already been taken')) {
-      if (field === 'code') return 'Kode akun sudah digunakan.';
-      return 'Nilai ini sudah digunakan.';
-    }
-    if (msg.includes('required')) {
-      if (field === 'code') return 'Kode akun wajib diisi.';
-      if (field === 'name') return 'Nama akun wajib diisi.';
-      if (field === 'account_group_id' || field === 'accountGroupId') return 'Grup akun wajib dipilih.';
-      if (field === 'category') return 'Kategori laporan wajib dipilih.';
-      return 'Kolom ini wajib diisi.';
-    }
-    if (msg.includes('invalid') || msg.includes('must be')) {
-      if (field === 'category') return 'Kategori laporan yang dipilih tidak valid.';
-      if (field === 'account_group_id' || field === 'accountGroupId') return 'Grup akun yang dipilih tidak valid.';
-      return 'Nilai yang dimasukkan tidak valid.';
-    }
-    return message;
-  };
-
-  const mapValidationErrors = (error: ApiValidationError) => {
-    Object.entries(error.fieldErrors).forEach(([field, messages]) => {
-      const mappedField = field === 'account_group_id' ? 'accountGroupId' : field;
-      const originalMessage = messages?.[0] || 'Validasi gagal';
-      const translatedMessage = translateValidationMessage(originalMessage, field);
-      form.setError(mappedField as keyof AccountFormValues, { message: translatedMessage });
-    });
-  };
-
   const handleAdd = () => {
-    setEditing(null);
-    resetForm();
-    setOpenForm(true);
+    const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
+    router.push(`${basePath}/create`);
   };
 
   const handleEdit = (account: Account) => {
-    setEditing(account);
-    form.reset({
-      accountGroupId: Number(account.accountGroupId),
-      code: account.code,
-      name: account.name,
-      description: account.description ?? '',
-      category: (account.category as AccountFormValues['category']) ?? undefined,
-      isActive: account.isActive,
-    });
-    setOpenForm(true);
-  };
-
-  const handleSubmit = async (values: AccountFormValues) => {
-    const payload = {
-      accountGroupId: values.accountGroupId,
-      code: values.code,
-      name: values.name,
-      description: values.description,
-      category: values.category,
-      type: getAccountTypeFromCategory(values.category),
-    };
-
-    try {
-      if (editing) {
-        await updateMutation.mutateAsync({ id: editing.id, payload });
-        toast.success('Data akun berhasil diperbarui');
-      } else {
-        await createMutation.mutateAsync(payload);
-        toast.success('Data akun berhasil ditambahkan');
-      }
-
-      setOpenForm(false);
-      setEditing(null);
-      resetForm();
-    } catch (error) {
-      console.error('[Create/Update Account Error]:', error);
-      if (error instanceof ApiValidationError) {
-        mapValidationErrors(error);
-        let mainMessage = error.message;
-        if (mainMessage.toLowerCase().includes('validation') || mainMessage.toLowerCase().includes('given data was invalid')) {
-          mainMessage = 'Gagal menyimpan data karena validasi tidak terpenuhi.';
-        }
-        toast.error(mainMessage);
-        return;
-      }
-
-      const apiErrorMessage = (error as any)?.message || (error as any)?.details;
-      const message = error instanceof ApiResponseError 
-        ? error.message 
-        : (typeof apiErrorMessage === 'string' ? apiErrorMessage : 'Gagal menyimpan akun');
-      toast.error(message);
-    }
+    const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
+    router.push(`${basePath}/${account.id}/edit`);
   };
 
   const handleDelete = async () => {
@@ -204,6 +126,9 @@ export const AccountListPage = () => {
         next.delete(String(selectedAccount.id));
         return next;
       });
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus akun';
       toast.error(message);
@@ -455,24 +380,7 @@ export const AccountListPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AccountFormModal
-        open={openForm}
-        onOpenChange={(open) => {
-          setOpenForm(open);
-          if (!open) {
-            setEditing(null);
-            resetForm();
-          }
-        }}
-        form={form}
-        onSubmit={handleSubmit}
-        title={editing ? 'Ubah Data Akun Transaksi' : 'Tambah Data Akun Transaksi'}
-        description={editing ? 'Ubah detail akun dengan cepat dan mudah' : 'Masukkan detail akun baru'}
-        submitLabel="Simpan"
-        isSubmitting={createMutation.isPending || updateMutation.isPending}
-        accountGroups={accountGroups}
-        isLoadingGroups={isLoadingGroups}
-      />
+
 
       <Dialog open={openBulkUpdate} onOpenChange={(open) => {
         setOpenBulkUpdate(open);

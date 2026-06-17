@@ -7,6 +7,7 @@ export interface AccountGroup {
   companyId?: string | number | null;
   description?: string | null;
   isActive: boolean;
+  is_lock?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

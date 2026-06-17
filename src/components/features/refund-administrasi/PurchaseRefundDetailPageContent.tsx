@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft, LogOut, MoreVertical, Plus } from 'lucide-react';
+import { ChevronLeft, MoreVertical, Plus } from 'lucide-react';
 import type { UnitTransactionRefundPayment } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useDeleteRefundPayment, useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
@@ -30,7 +29,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
   const [isAddDetailOpen, setIsAddDetailOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<UnitTransactionRefundPayment | null>(null);
   const [deletingPayment, setDeletingPayment] = useState<UnitTransactionRefundPayment | null>(null);
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const deletePaymentMutation = useDeleteRefundPayment();
 
   const transactionQuery = useRefundTransactionDetail(transactionId);
@@ -40,14 +38,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
   const totalPaid = (refund?.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
   const lessPayment = Math.max(0, Number(refund?.refund_amount || 0) - totalPaid);
   const qty = refund?.items?.length ?? 0;
-
-  const toggleItem = (itemId: string, checked: boolean) => {
-    setSelectedItemIds((current) => (checked ? [...current, itemId] : current.filter((id) => id !== itemId)));
-  };
-
-  const toggleAll = (checked: boolean) => {
-    setSelectedItemIds(checked ? (refund?.items ?? []).map((item) => item.id) : []);
-  };
 
   const handleDeletePayment = async () => {
     if (!deletingPayment) return;
@@ -177,7 +167,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="flex items-end justify-between">
             <div>
               <h2 className="text-[18px] font-semibold text-[#111827]">Detail Unit yang direfund</h2>
@@ -229,7 +219,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
               </TableBody>
             </Table>
           </div>
-        </div>
+        </div> */}
 
         <PurchaseRefundPaymentDetailModal open={isAddDetailOpen} onClose={() => setIsAddDetailOpen(false)} refund={refund} />
         <PurchaseRefundPaymentDetailModal open={Boolean(editingPayment)} onClose={() => setEditingPayment(null)} refund={refund} payment={editingPayment} />

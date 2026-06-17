@@ -140,6 +140,9 @@ export function CustomerManagementPage() {
       }
 
       handleCloseForm();
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       if (error instanceof ApiValidationError) {
         applyValidationErrors(error, form);
@@ -159,6 +162,9 @@ export function CustomerManagementPage() {
       await deleteCustomer.mutateAsync({ id: deleteTarget.id, companyId });
       toast.success('Data customer berhasil dihapus');
       setDeleteTarget(null);
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus data customer';
       toast.error(message);

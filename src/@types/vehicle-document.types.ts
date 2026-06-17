@@ -13,10 +13,17 @@ export interface VehicleDocumentSummary {
   unprocessedCount: number;
   createdAt?: string;
   updatedAt?: string;
-  vendor?: {
+  ditlantasProcessId?: number;
+  ditlantasProcess?: {
     id: number;
-    name: string;
-    code?: string;
+    code: string;
+    vendorId?: number;
+    processDate?: string;
+    vendor?: {
+      id: number;
+      name: string;
+      code?: string;
+    };
   };
 }
 
@@ -100,7 +107,7 @@ export interface VehicleDocumentDetail extends VehicleDocumentSummary {
 }
 
 export interface VehicleDocumentPayload {
-  vendorId: number;
+  ditlantasProcessId: number;
   receiptDate: string;
   description: string;
 }
@@ -124,20 +131,20 @@ export interface VehicleRegistrationPayload {
   tnkbReceivedDate: string;
   tnkbNumber: string;
   tnkbPhysicalStatus: boolean;
-  stckFee: string;
-  bbnRegistrationFee: string;
-  noticeFee: string;
-  pmiFee: string;
-  physicalCheckFee: string;
-  nikValidationFee: string;
-  garwilFee: string;
-  builtUpFee: string;
-  accelerationFee: string;
-  plateRecommendationFee: string;
-  serviceFee: string;
-  skpdFee: string;
-  stampFee: string;
-  pnbpBpkb: string;
+  stckFee: number;
+  bbnRegistrationFee: number;
+  noticeFee: number;
+  pmiFee: number;
+  physicalCheckFee: number;
+  nikValidationFee: number;
+  garwilFee: number;
+  builtUpFee: number;
+  accelerationFee: number;
+  plateRecommendationFee: number;
+  serviceFee: number;
+  skpdFee: number;
+  stampFee: number;
+  pnbpBpkb: number;
   customerDeliveryDate: string;
 }
 

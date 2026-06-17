@@ -120,11 +120,22 @@ const buildPayload = (payload: CustomerPayload, opts?: { asUpdate?: boolean }) =
   if (payload.userId !== undefined) body.append('user_id', String(payload.userId));
   if (payload.companyId !== undefined) body.append('company_id', String(payload.companyId));
   body.append('name', payload.name);
-  body.append('address', payload.address ?? '');
-  body.append('phone', payload.phone ?? '');
-  body.append('npwp', payload.npwp ?? '');
-  body.append('pic_name', payload.pic ?? '');
-  body.append('map_link', payload.map_link ?? '');
+
+  if (payload.address !== undefined && payload.address !== null && payload.address !== '') {
+    body.append('address', payload.address);
+  }
+  if (payload.phone !== undefined && payload.phone !== null && payload.phone !== '') {
+    body.append('phone', payload.phone);
+  }
+  if (payload.npwp !== undefined && payload.npwp !== null && payload.npwp !== '') {
+    body.append('npwp', payload.npwp);
+  }
+  if (payload.pic !== undefined && payload.pic !== null && payload.pic !== '') {
+    body.append('pic_name', payload.pic);
+  }
+  if (payload.map_link !== undefined && payload.map_link !== null && payload.map_link !== '') {
+    body.append('map_link', payload.map_link);
+  }
   return body;
 };
 
@@ -197,7 +208,7 @@ export const exportCustomer = async (companyId?: string | number): Promise<void>
   });
 
   const contentType = response.headers['content-type'];
-  const isJson = contentType && contentType.includes('application/json');
+  const isJson = typeof contentType === 'string' && contentType.includes('application/json');
 
   if (isJson) {
     const textData = await (response.data as Blob).text();

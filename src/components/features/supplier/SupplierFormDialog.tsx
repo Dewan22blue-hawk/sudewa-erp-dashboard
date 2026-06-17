@@ -2,11 +2,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { UseFormReturn } from 'react-hook-form';
 import type { CreateSupplierFormValues } from '@/scheme/supplier.schema';
 import RequiredMark from '@/components/ui/required-mark';
+import { sanitizePhone } from '@/lib/utils/format';
 
 interface SupplierFormDialogProps {
   open: boolean;
@@ -22,6 +22,8 @@ interface SupplierFormDialogProps {
 }
 
 export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, description, submitLabel = 'Simpan', isSubmitting = false, userOptions = [], isUserLoading = false }: SupplierFormDialogProps) {
+  void userOptions;
+  void isUserLoading;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">
@@ -95,7 +97,13 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tambahkan nomer telepon" {...field} />
+                    <Input
+                      placeholder="Tambahkan nomer telepon"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(sanitizePhone(e.target.value));
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

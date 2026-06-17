@@ -35,6 +35,7 @@ export interface KasHarian {
   debet: number;
   credit: number;
   transaction_category?: string;
+  payment_proof?: string | null;
   created_at?: string;
   updated_at?: string;
   cash: KasHarianCash;

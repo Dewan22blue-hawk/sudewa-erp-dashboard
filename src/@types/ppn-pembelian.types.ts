@@ -24,21 +24,22 @@ export interface PPNPembelian {
   supplier: string;
   fp_date: string | null;
   nsfp_age: string | null;
-  nsfp_input: number;
   qty: number;
   unit_type: UnitType;
   unit_transaction_item_detail: UnitTransactionItemDetail;
   unit_price: number;
+  total_price: number;
   dpp_amount: number;
   ppn_11: number;
   payment_amount: number;
+  nsfp_number: string | null;
 }
 
 export interface UpdatePPNPembelianPayload {
   fp_date?: string;
   nsfp_age?: string;
-  nsfp_amount?: number;
   amount?: number;
+  nsfp_number?: string;
 }
 
 export interface UpdatePPNPembelianMutationPayload {
@@ -61,7 +62,6 @@ export interface PPNPembelianUpdateResponse {
     id: number;
     fp_date: string | null;
     nsfp_age: string | null;
-    nsfp_amount: string;
     amount: string;
   };
 }
@@ -69,8 +69,8 @@ export interface PPNPembelianUpdateResponse {
 export const UpdatePPNPembelianSchema = z.object({
   fp_date: z.date().optional().nullable(),
   nsfp_age: z.date().optional().nullable(),
-  nsfp_amount: z.number().optional().nullable(),
   amount: z.number().optional().nullable(),
+  nsfp_number: z.string().optional().nullable(),
 });
 
 export type UpdatePPNPembelianFormValues = z.infer<typeof UpdatePPNPembelianSchema>;

@@ -50,6 +50,7 @@ export const BrandTable = ({
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-slate-50 overflow-hidden">
                             {row.original.image ? (
+                                // eslint-disable-next-line @next/next/no-img-element
                                 <img src={row.original.image} alt={row.original.name} className="h-full w-full object-contain" />
                             ) : (
                                 <ImageIcon className="h-5 w-5 text-slate-400" />

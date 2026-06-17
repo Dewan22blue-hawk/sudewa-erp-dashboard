@@ -36,6 +36,7 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
   note: payload.note ?? '',
   debet: toNumber(payload.debet),
   credit: toNumber(payload.credit),
+  payment_proof: payload.payment_proof ?? null,
   created_at: payload.created_at ?? '',
   updated_at: payload.updated_at ?? '',
   cash: {

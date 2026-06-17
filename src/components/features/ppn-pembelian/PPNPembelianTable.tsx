@@ -41,7 +41,7 @@ const renderStatusBadge = (hasValue: boolean, readyLabel: string, emptyLabel: st
 
 const SkeletonRow = () => (
   <tr className="border-b border-gray-200">
-    {Array.from({ length: 12 }).map((_, index) => (
+    {Array.from({ length: 13 }).map((_, index) => (
       <td key={index} className="px-4 py-4">
         <Skeleton className="h-4 w-full max-w-[140px]" />
       </td>
@@ -91,9 +91,7 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
               <th className="py-2 text-left">
                 <SortableHeader title="Masa NSFPM" sortKey="nsfp_age" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
               </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="Input NSFPM" sortKey="nsfp_input" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-start w-full px-4" />
-              </th>
+              <th className="py-2 text-left font-semibold text-gray-900 px-4">Nomor NSFP</th>
               <th className="py-2 text-right">
                 <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
               </th>
@@ -104,6 +102,9 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
               <th className="py-2 text-left">No Rangka</th>
               <th className="py-2 text-right">
                 <SortableHeader title="Harga Unit" sortKey="unit_price" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
+              </th>
+              <th className="py-2 text-right">
+                <SortableHeader title="Total Harga" sortKey="total_price" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
               </th>
               <th className="py-2 text-right">
                 <SortableHeader title="DPP" sortKey="dpp_amount" currentSortKey={sortBy} sortOrder={sortDirection} onSort={onSortChange} className="text-gray-900 justify-end w-full px-4" />
@@ -122,7 +123,7 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
               Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
             ) : isError ? (
               <tr>
-                <td colSpan={15} className="px-4 py-10 text-center">
+                <td colSpan={16} className="px-4 py-10 text-center">
                   <div className="space-y-3">
                     <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data PPN pembelian'}</p>
                     {onRetry ? (
@@ -135,7 +136,7 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={15} className="px-4 py-10 text-center text-gray-500">
+                <td colSpan={16} className="px-4 py-10 text-center text-gray-500">
                   Tidak ada data PPN pembelian
                 </td>
               </tr>
@@ -143,7 +144,7 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
               data.map((item) => {
                 const hasFp = Boolean(item.fp_date);
                 const hasNsfpAge = Boolean(item.nsfp_age);
-                const hasNsfpInput = item.nsfp_input > 0;
+                const hasNsfpNumber = Boolean(item.nsfp_number && item.nsfp_number.trim() !== '');
 
                 return (
                   <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
@@ -162,10 +163,10 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
                         {renderStatusBadge(hasNsfpAge, 'NSFPM Terisi', 'Belum NSFPM')}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 font-medium">
                       <div className="space-y-1">
-                        <div>{formatCurrency(item.nsfp_input)}</div>
-                        {renderStatusBadge(hasNsfpInput, 'Sudah Input', 'Belum Input')}
+                        <div>{item.nsfp_number || '-'}</div>
+                        {renderStatusBadge(hasNsfpNumber, 'Sudah Input', 'Belum Input')}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right">{item.qty}</td>
@@ -176,6 +177,7 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
                     <td className="px-4 py-3">{item.unit_transaction_item_detail.machine_number}</td>
                     <td className="px-4 py-3">{item.unit_transaction_item_detail.chassis_number}</td>
                     <td className="px-4 py-3 text-right">{formatCurrency(item.unit_price)}</td>
+                    <td className="px-4 py-3 text-right">{formatCurrency(item.total_price)}</td>
                     <td className="px-4 py-3 text-right">{formatCurrency(item.dpp_amount)}</td>
                     <td className="px-4 py-3 text-right">{formatCurrency(item.ppn_11)}</td>
                     <td className="px-4 py-3 text-right">{formatCurrency(item.payment_amount)}</td>

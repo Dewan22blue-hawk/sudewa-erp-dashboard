@@ -10,6 +10,9 @@ import { useArmadaDetail } from '@/hooks/useArmada';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ARMADA_EQUIPMENT_FIELDS } from '@/@types/armada.types';
 import type { ArmadaEquipmentField } from '@/@types/armada.types';
+import { useCompany } from '@/contexts/CompanyContext';
+import { VehicleDataDetail } from '@/components/features/vehicle-data/VehicleDataDetail';
+import { useVehicleDataDetail } from '@/hooks/useVehicleData';
 
 const equipmentLabels: Record<ArmadaEquipmentField, string> = {
   radio_tape: 'Radio Tape',
@@ -42,13 +45,23 @@ const formatDate = (value?: string | null) => {
 export default function VehicleFleetDetailPage() {
   const router = useRouter();
   const { slug, id } = router.query;
-  const { data: armada, isLoading, isError } = useArmadaDetail(id ? String(id) : null);
+  const { companyId } = useCompany();
+
+  // Standard Armada Hooks
+  const { data: armada, isLoading: isArmadaLoading, isError: isArmadaError } = useArmadaDetail(companyId !== '3' && id ? String(id) : null);
+
+  // Vehicle Data Hooks
+  const { data: vehicleData, isLoading: isVehicleLoading, isError: isVehicleError } = useVehicleDataDetail(companyId === '3' && id ? String(id) : null);
 
   const handleBack = () => {
     if (slug) {
       router.push(`/dashboard/${slug}/data-kendaraan`);
     }
   };
+
+  const isLoading = companyId === '3' ? isVehicleLoading : isArmadaLoading;
+  const isError = companyId === '3' ? isVehicleError : isArmadaError;
+  const hasData = companyId === '3' ? !!vehicleData : !!armada;
 
   if (isLoading) {
     return (
@@ -61,7 +74,7 @@ export default function VehicleFleetDetailPage() {
     );
   }
 
-  if (isError || !armada) {
+  if (isError || !hasData) {
     return (
       <DashboardLayout>
         <div className="flex h-64 flex-col items-center justify-center gap-3 text-center">
@@ -70,6 +83,14 @@ export default function VehicleFleetDetailPage() {
             Kembali
           </Button>
         </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (companyId === '3' && vehicleData) {
+    return (
+      <DashboardLayout>
+        <VehicleDataDetail data={vehicleData} slug={String(slug)} />
       </DashboardLayout>
     );
   }
@@ -85,7 +106,7 @@ export default function VehicleFleetDetailPage() {
           <div>
             <h1 className="text-xl font-bold text-gray-900">Detail Kendaraan</h1>
             <p className="text-sm text-gray-500">
-              Nomor Polisi <span className="font-semibold text-[#1e3a5f]">{armada.registrationNumber}</span>
+              Nomor Polisi <span className="font-semibold text-[#1e3a5f]">{armada?.registrationNumber}</span>
             </p>
           </div>
         </div>
@@ -100,42 +121,42 @@ export default function VehicleFleetDetailPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Nomor Polisi</Label>
-              <Input value={armada.registrationNumber} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed font-semibold" />
+              <Input value={armada?.registrationNumber} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed font-semibold" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Tipe</Label>
-              <Input value={armada.type} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={armada?.type} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Nomor Mesin</Label>
-              <Input value={armada.machineNumber} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={armada?.machineNumber} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Nomor Rangka</Label>
-              <Input value={armada.chassisNumber} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={armada?.chassisNumber} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Masa STNK</Label>
-              <Input value={formatDate(armada.stnkAge)} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={formatDate(armada?.stnkAge)} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Masa KIR</Label>
-              <Input value={formatDate(armada.kirAge)} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={formatDate(armada?.kirAge)} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Nomor STNK</Label>
-              <Input value={armada.stnkNumber || '-'} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={armada?.stnkNumber || '-'} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-500 font-medium">Buku KIR</Label>
-              <Input value={armada.kirBook || '-'} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
+              <Input value={armada?.kirBook || '-'} disabled className="bg-gray-50 text-gray-800 cursor-not-allowed" />
             </div>
           </div>
         </Card>
@@ -149,7 +170,7 @@ export default function VehicleFleetDetailPage() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {ARMADA_EQUIPMENT_FIELDS.map((field) => {
-              const qty = armada.equipment[field];
+              const qty = armada?.equipment[field];
               return (
                 <div key={field} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50/50">
                   <span className="text-sm font-medium text-gray-700">{equipmentLabels[field]}</span>

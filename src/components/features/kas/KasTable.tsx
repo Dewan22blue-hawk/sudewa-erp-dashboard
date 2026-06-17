@@ -1,10 +1,22 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Kas } from '@/@types/kas.types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
+
+const KAS_NAME_MAP: Record<string, string> = {
+  bca_usd: 'BANK BCA USD',
+  bca_idr: 'BANK BCA IDR',
+  cash_idr: 'CASH IDR',
+};
+
+const getKasName = (code: string) => {
+  const key = code.trim().toLowerCase();
+  if (key in KAS_NAME_MAP) return KAS_NAME_MAP[key];
+  return code.replace(/_/g, ' ').toUpperCase();
+};
 
 interface Props {
   data: Kas[];
@@ -13,8 +25,15 @@ interface Props {
 export function KasTable({ data }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const enrichedData = useMemo(() => {
+    return data.map((item) => ({
+      ...item,
+      name: getKasName(item.code),
+    }));
+  }, [data]);
+
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data,
+    data: enrichedData,
   });
 
   // Pagination logic
@@ -56,6 +75,9 @@ export function KasTable({ data }: Props) {
                 <SortableHeader title="Kode Kas" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead>
+                <SortableHeader title="Name" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              </TableHead>
+              <TableHead>
                 <SortableHeader title="Deskripsi" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead>
@@ -66,7 +88,7 @@ export function KasTable({ data }: Props) {
           <TableBody>
             {currentData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                   Tidak ada data
                 </TableCell>
               </TableRow>
@@ -74,6 +96,7 @@ export function KasTable({ data }: Props) {
               currentData.map((item) => (
                 <TableRow key={item.id} className="hover:bg-slate-50/50">
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
+                  <TableCell className="text-slate-700">{item.name}</TableCell>
                   <TableCell className="text-slate-700">{item.description}</TableCell>
                   <TableCell className="text-slate-700">{item.type === 'cash' ? 'Cash' : 'Bank'}</TableCell>
                 </TableRow>

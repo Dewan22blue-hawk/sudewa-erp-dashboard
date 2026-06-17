@@ -62,10 +62,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Aset',
           href: master('/asset'),
         },
-        {
-          label: 'Perlengkapan',
-          href: master('/vehicle-equipment'),
-        },
+        // {
+        //   label: 'Perlengkapan',
+        //   href: master('/vehicle-equipment'),
+        // },
       ],
     },
     {
@@ -105,6 +105,14 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         {
           label: 'Perlengkapan Masuk',
           href: base('/warehouse/perlengkapan-masuk'),
+        },
+        {
+          label: 'Penerimaan Material',
+          href: base('/warehouse/penerimaan-material'),
+        },
+        {
+          label: 'Pengeluaran Material',
+          href: base('/warehouse/pengeluaran-material'),
         },
         {
           label: 'Perlengkapan Keluar',
@@ -159,6 +167,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         {
           label: 'Aset',
           href: base('/finance/asset'),
+        },
+        {
+          label: 'Laporan Bukti Potong',
+          href: base('/finance/laporan-bukti-potong'),
         },
       ],
     },

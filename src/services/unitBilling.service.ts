@@ -208,8 +208,8 @@ const mapBillingHistory = (raw: UnitBillingHistoryApiModel): UnitBillingHistory 
     cash_payment_amount: cashPayment,
     bca_payment_usd_amount: bcaPaymentUsd,
     payment_methods: [
-      ...(bcaPayment > 0 ? ['BCA IDR'] : []),
       ...(bcaPaymentUsd > 0 ? ['BCA USD'] : []),
+      ...(bcaPayment > 0 ? ['BCA IDR'] : []),
       ...(cashPayment > 0 ? ['Cash'] : []),
     ],
     cashes: (item.cashes ?? []).map((cash) => ({

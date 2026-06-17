@@ -28,7 +28,7 @@ export default function SalesDetailPage() {
   const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(salesId ?? ''));
   const stockState = String(data?.raw?.stock_state ?? salesData?.stockState ?? '').toLowerCase();
   const isRefunded = stockState === 'outbound_return';
-  
+
   const totalTagihan = salesData?.totalJual ?? 0;
   const totalPaid = salesData?.totalBayar ?? 0;
   const isPaidFromBilling = data?.raw?.billing_summary?.is_paid || data?.raw?.unit_transaction_billing?.is_paid;
@@ -37,29 +37,29 @@ export default function SalesDetailPage() {
     billingHistories.length > 0
       ? billingHistories
       : (data?.raw?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
-          id: String(history.id ?? ''),
-          unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? data?.raw?.unit_transaction_billing?.id ?? ''),
-          unit_transaction_id: String(salesId ?? ''),
-          payment_proof: history.payment_proof ?? null,
-          bca_payment_amount: Number(history.bca_payment_amount ?? 0),
-          cash_payment_amount: Number(history.cash_payment_amount ?? 0),
-          bca_payment_usd_amount: Number(history.bca_payment_usd_amount ?? 0),
-          payment_at: String(history.payment_at ?? ''),
-          note: history.note,
-          created_at: history.created_at,
-          updated_at: history.updated_at,
-        }));
+        id: String((history as any).id ?? ''),
+        unit_transaction_billing_id: String((history as any).unit_transaction_billing_id ?? data?.raw?.unit_transaction_billing?.id ?? ''),
+        unit_transaction_id: String(salesId ?? ''),
+        payment_proof: (history as any).payment_proof ?? null,
+        bca_payment_amount: Number((history as any).bca_payment_amount ?? (history as any).bca_payment ?? 0),
+        cash_payment_amount: Number((history as any).cash_payment_amount ?? (history as any).cash_payment ?? 0),
+        bca_payment_usd_amount: Number((history as any).bca_payment_usd_amount ?? (history as any).bca_payment_2 ?? 0),
+        payment_at: String((history as any).payment_at ?? ''),
+        note: (history as any).note,
+        created_at: (history as any).created_at,
+        updated_at: (history as any).updated_at,
+      }));
 
   const mappedDetail = data?.raw
     ? mapSalesDetailCard(data.raw)
     : {
-        code: '-',
-        customerName: '-',
-        warehouse: '-',
-        total: 0,
-        dpp: 0,
-        ppn: 0,
-      };
+      code: '-',
+      customerName: '-',
+      warehouse: '-',
+      total: 0,
+      dpp: 0,
+      ppn: 0,
+    };
 
   useEffect(() => {
     if (!salesId || isLoading) return;
@@ -176,19 +176,19 @@ export default function SalesDetailPage() {
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash BCA</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran USD BCA</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran Cash</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA USD</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA IDR</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran CASH IDR</th>
                   </tr>
                 </thead>
                 <tbody>
                   {resolvedBillingHistories.map((history, index) => {
                     const paymentDate = history.payment_at
                       ? new Date(history.payment_at).toLocaleDateString('id-ID', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })
                       : '-';
 
                     const bcaPayment = Number(history.bca_payment_amount ?? 0);
@@ -208,10 +208,10 @@ export default function SalesDetailPage() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                          {bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}
+                          {usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                          {usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}
+                          {bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">
                           {cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}
