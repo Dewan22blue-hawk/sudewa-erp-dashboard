@@ -7,8 +7,8 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
 
 const KAS_NAME_MAP: Record<string, string> = {
-  bca_usd: 'BANK USD',
-  bca_idr: 'BANK IDR',
+  bca_usd: 'BANK BCA USD',
+  bca_idr: 'BANK BCA IDR',
   cash_idr: 'CASH IDR',
 };
 
@@ -75,10 +75,10 @@ export function KasTable({ data }: Props) {
                 <SortableHeader title="Kode Kas" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead>
-                <SortableHeader title="Deskripsi" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+                <SortableHeader title="Name" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead>
-                <SortableHeader title="Name" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+                <SortableHeader title="Deskripsi" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
               </TableHead>
               <TableHead>
                 <SortableHeader title="Jenis" sortKey="type" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
@@ -96,8 +96,8 @@ export function KasTable({ data }: Props) {
               currentData.map((item) => (
                 <TableRow key={item.id} className="hover:bg-slate-50/50">
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
-                  <TableCell className="text-slate-700">{item.description}</TableCell>
                   <TableCell className="text-slate-700">{item.name}</TableCell>
+                  <TableCell className="text-slate-700">{item.description}</TableCell>
                   <TableCell className="text-slate-700">{item.type === 'cash' ? 'Cash' : 'Bank'}</TableCell>
                 </TableRow>
               ))
