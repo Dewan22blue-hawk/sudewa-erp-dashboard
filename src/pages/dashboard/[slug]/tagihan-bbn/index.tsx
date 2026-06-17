@@ -155,7 +155,7 @@ export default function BBNBillListPage() {
             setSelectedBill(item);
             setPaymentOpen(true);
           }}
-          onPrint={(item) => window.open(`/dashboard/${slug}/tagihan-bbn/${item.id}?print=1`, '_blank', 'noopener,noreferrer')}
+          onPrint={(item) => router.push(`/dashboard/${slug}/tagihan-bbn/print/${item.id}`)}
           onDelete={(item) => {
             setSelectedBill(item);
             setDeleteOpen(true);
