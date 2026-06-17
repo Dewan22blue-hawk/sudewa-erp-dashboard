@@ -71,7 +71,7 @@ export function SearchableSelect({
   }, [onChange]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -85,7 +85,10 @@ export function SearchableSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverContent
+        className="w-[--radix-popover-trigger-width] p-0 pointer-events-auto"
+        align="start"
+      >
         <Command shouldFilter={false}>
           <div className="flex h-9 items-center gap-2 border-b px-3" data-slot="command-input-wrapper">
             <Search className="size-4 shrink-0 opacity-50" />
@@ -124,16 +127,6 @@ export function SearchableSelect({
                   key={option.value}
                   value={option.value}
                   onSelect={() => selectOption(option)}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    selectOption(option);
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    selectOption(option);
-                  }}
                   className="flex items-start gap-2 cursor-pointer py-1"
                 >
                   <Check className={cn('mt-0.5 h-4 w-4', value === option.value ? 'opacity-100' : 'opacity-0')} />
