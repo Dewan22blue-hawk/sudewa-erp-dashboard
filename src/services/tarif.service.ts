@@ -15,6 +15,7 @@ const mapTarifItem = (item: any): Tarif => ({
     ujTowing: item.uj_towing !== null && item.uj_towing !== undefined ? Number(item.uj_towing) : null,
     ujCdd: item.uj_cdd !== null && item.uj_cdd !== undefined ? Number(item.uj_cdd) : null,
     ujFuso: item.uj_fuso !== null && item.uj_fuso !== undefined ? Number(item.uj_fuso) : null,
+    invTowing: item.inv_towing !== null && item.inv_towing !== undefined ? Number(item.inv_towing) : null,
     invCdd: item.inv_cdd !== null && item.inv_cdd !== undefined ? Number(item.inv_cdd) : null,
     invFuso: item.inv_fuso !== null && item.inv_fuso !== undefined ? Number(item.inv_fuso) : null,
     isActive: item.is_active === 1 || item.is_active === true || String(item.is_active) === '1',

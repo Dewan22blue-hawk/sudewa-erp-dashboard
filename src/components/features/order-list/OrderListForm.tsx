@@ -66,6 +66,24 @@ const createCargoItem = (overrides?: Partial<OrderListFormCargoItemValue>): Orde
   qty: Number(overrides?.qty ?? 0),
 });
 
+const syncCargoItems = (
+  source: OrderListFormCargoItemValue[],
+  target: OrderListFormCargoItemValue[]
+): OrderListFormCargoItemValue[] => {
+  const result: OrderListFormCargoItemValue[] = [];
+  for (let j = 0; j < source.length; j++) {
+    const src = source[j];
+    const tgt = target?.[j];
+    result.push({
+      localId: tgt?.localId || createItemId(),
+      id: tgt?.id,
+      loadContent: src.loadContent,
+      qty: Number(src.qty || 0),
+    });
+  }
+  return result;
+};
+
 const getVehicleFee = (tarif: Tarif | undefined, vehicleType: OrderListVehicleType) => {
   if (!tarif) return { driverFee: 0, invoice: 0 };
   if (vehicleType === 'towing') {
@@ -327,8 +345,38 @@ export function OrderListForm({
     setValue('ppn', calculatedPpn, { shouldDirty: true });
   }, [invoiceBill, setValue]);
 
+  const watchedCargoItems = useWatch({ control, name: 'items.0.cargoItems' });
+
+  React.useEffect(() => {
+    if (!watchedCargoItems) return;
+    const itemsCount = watchedItems?.length ?? 0;
+    if (itemsCount <= 1) return;
+
+    for (let i = 1; i < itemsCount; i++) {
+      const currentCargo = getValues(`items.${i}.cargoItems`) ?? [];
+      const synced = syncCargoItems(watchedCargoItems, currentCargo);
+      if (JSON.stringify(currentCargo) !== JSON.stringify(synced)) {
+        setValue(`items.${i}.cargoItems`, synced, { shouldValidate: true });
+      }
+    }
+  }, [watchedCargoItems, watchedItems?.length, setValue, getValues]);
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const currentItems = getValues('items') ?? [];
+    const firstCargo = currentItems[0]?.cargoItems ?? [];
+    for (let i = 1; i < currentItems.length; i++) {
+      const currentCargo = currentItems[i]?.cargoItems ?? [];
+      const synced = syncCargoItems(firstCargo, currentCargo);
+      setValue(`items.${i}.cargoItems`, synced);
+    }
+    handleSubmit(onSubmit, (errs) => {
+      console.log('OrderListForm validation errors:', errs);
+    })(e);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <input type="hidden" {...register('status')} />
       <input type="hidden" {...register('note')} />
 
@@ -428,7 +476,7 @@ export function OrderListForm({
                   </div>
                 </div>
 
-                {/* Row 2: Loading Out, Tujuan Kirim, Tipe Armada, + Button */}
+                {/* Row 2: Loading Out, Tujuan Kirim, Tipe Armada, + / Delete Button */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-12 items-end">
                   <div className="space-y-2 md:col-span-4">
                     <Label className="text-[14px] font-semibold text-slate-900">Loading Out</Label>
@@ -486,6 +534,12 @@ export function OrderListForm({
                         size="icon"
                         onClick={() => {
                           const currentVehicleType = watchedItems?.[0]?.vehicleType ?? 'fuso';
+                          const firstCargoItems = getValues('items.0.cargoItems') || [createCargoItem()];
+                          const copiedCargoItems = firstCargoItems.map(c => ({
+                            localId: createItemId(),
+                            loadContent: c.loadContent,
+                            qty: Number(c.qty || 0),
+                          }));
                           append({
                             localId: createItemId(),
                             tarifId: '',
@@ -493,7 +547,7 @@ export function OrderListForm({
                             loadingIn: '',
                             loadingOut: '',
                             deliveryDestination: '',
-                            cargoItems: [createCargoItem()],
+                            cargoItems: copiedCargoItems,
                             driverFee: 0,
                             expeditionInvoice: 0,
                           });
@@ -526,72 +580,94 @@ export function OrderListForm({
                   </div>
                 ) : null}
               </section>
-
-              {/* Card 3 — Muatan */}
-              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
-                <div className="grid grid-cols-1 gap-4">
-                  {(item?.cargoItems ?? []).map((cargoItem, cargoIndex) => (
-                    <div key={cargoItem.localId || `${field.id}-cargo-${cargoIndex}`} className="flex items-end gap-3 w-full">
-                      <div className="flex-1 space-y-2">
-                        {cargoIndex === 0 && <Label className="text-[14px] font-semibold text-slate-900">Muatan</Label>}
-                        <Input
-                          placeholder="Contoh: Motor vario"
-                          className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
-                          {...register(`items.${index}.cargoItems.${cargoIndex}.loadContent`, { required: 'Muatan wajib diisi' })}
-                        />
-                        {errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? (
-                          <p className="text-xs text-red-500 mt-1">{errors.items[index]?.cargoItems?.[cargoIndex]?.loadContent?.message}</p>
-                        ) : null}
-                      </div>
-
-                      <div className="w-[120px] space-y-2">
-                        {cargoIndex === 0 && <Label className="text-[14px] font-semibold text-slate-900">QTY</Label>}
-                        <Input
-                          type="number"
-                          min={0}
-                          placeholder="0"
-                          className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
-                          {...register(`items.${index}.cargoItems.${cargoIndex}.qty`, {
-                            valueAsNumber: true,
-                            required: 'Qty wajib diisi',
-                            min: { value: 1, message: 'Qty minimal 1' },
-                          })}
-                        />
-                        {errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? (
-                          <p className="text-xs text-red-500 mt-1">{errors.items[index]?.cargoItems?.[cargoIndex]?.qty?.message}</p>
-                        ) : null}
-                      </div>
-
-                      <div className="shrink-0 flex items-center">
-                        {cargoIndex === (item?.cargoItems?.length ?? 0) - 1 ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => appendCargoItem(index)}
-                            className="h-10 w-10 rounded-xl border-slate-200"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeCargoItem(index, cargoIndex)}
-                            className="h-10 w-10 rounded-xl border-slate-200 border-red-200 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
             </React.Fragment>
           );
         })}
+
+        {/* Card 3 — Muatan (satu section terpisah, tidak ikut loop Rute/Tarif) */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
+          <Label className="text-[14px] font-semibold text-slate-900">Muatan</Label>
+
+          <div className="grid grid-cols-1 gap-3">
+            {/* Header kolom */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <Label className="text-[13px] font-medium text-slate-500">Nama Muatan</Label>
+              </div>
+              <div className="w-[120px]">
+                <Label className="text-[13px] font-medium text-slate-500">QTY</Label>
+              </div>
+              <div className="w-10 shrink-0" />
+            </div>
+
+            {/* Baris muatan */}
+            {(watchedItems?.[0]?.cargoItems ?? []).map((cargoItem, cargoIndex) => {
+              const cargoKey = cargoItem?.localId || `cargo-0-${cargoIndex}`;
+              const cargoCount = watchedItems?.[0]?.cargoItems?.length ?? 0;
+              return (
+                <div key={cargoKey} className="flex items-start gap-3 w-full">
+                  <div className="flex-1 space-y-1">
+                    <Input
+                      placeholder="Contoh: Motor vario"
+                      className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[0]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
+                      {...register(`items.0.cargoItems.${cargoIndex}.loadContent`, { required: 'Muatan wajib diisi' })}
+                    />
+                    {errors.items?.[0]?.cargoItems?.[cargoIndex]?.loadContent ? (
+                      <p className="text-xs text-red-500">{errors.items[0]?.cargoItems?.[cargoIndex]?.loadContent?.message}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="w-[120px] space-y-1">
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="0"
+                      className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[0]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
+                      {...register(`items.0.cargoItems.${cargoIndex}.qty`, {
+                        valueAsNumber: true,
+                        required: 'Qty wajib diisi',
+                        min: { value: 1, message: 'Qty minimal 1' },
+                      })}
+                    />
+                    {errors.items?.[0]?.cargoItems?.[cargoIndex]?.qty ? (
+                      <p className="text-xs text-red-500">{errors.items[0]?.cargoItems?.[cargoIndex]?.qty?.message}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="shrink-0 flex items-center h-10">
+                    {cargoCount > 1 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeCargoItem(0, cargoIndex)}
+                        className="h-10 w-10 rounded-xl border-red-200 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    ) : (
+                      <div className="w-10 h-10" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Tombol tambah muatan — selalu di bawah, tidak campur dengan baris muatan */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => appendCargoItem(0)}
+            className="h-9 rounded-xl border-slate-200 px-4 text-[14px] flex items-center gap-2 text-slate-600 hover:bg-slate-50"
+          >
+            <Plus className="h-4 w-4" />
+            Tambah Muatan
+          </Button>
+        </section>
+
+
+
 
         {/* Card 4 — UJ Driver, Invoice, PPN */}
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">

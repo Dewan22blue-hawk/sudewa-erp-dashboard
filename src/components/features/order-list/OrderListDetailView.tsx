@@ -43,6 +43,12 @@ interface OrderListDetailViewProps {
 
 export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) {
   const orderTarifs = data.tarifs.length ? data.tarifs : [];
+  const firstTarif = orderTarifs[0];
+  const cargoItems = firstTarif?.tarifItems?.length
+    ? firstTarif.tarifItems
+    : firstTarif?.loadContent
+      ? [{ id: `${firstTarif.id}-fallback`, loadContent: firstTarif.loadContent, qty: Number(firstTarif.qty ?? 0) }]
+      : [];
 
   return (
     <div className="space-y-6">
@@ -57,47 +63,77 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         <div className="grid gap-6 md:grid-cols-2">
           <DetailField label="Nama Customer" value={data.customer?.name || '-'} />
           <DetailField label="Kode Order" value={data.code || '-'} />
-          <DetailField
-            label="Muatan"
-            value={
-              orderTarifs.length ? (
-                <div className="space-y-3">
-                  {orderTarifs.map((item, index) => {
-                    const cargoItems = item.tarifItems?.length
-                      ? item.tarifItems
-                      : item.loadContent
-                        ? [{ id: `${item.id}-fallback`, loadContent: item.loadContent, qty: Number(item.qty ?? 0) }]
-                        : [];
-
-                    const cargoLabel = cargoItems.length
-                      ? cargoItems.map((cargoItem) => cargoItem.loadContent).filter(Boolean).join(', ')
-                      : '-';
-
-                    return (
-                      <div key={`${item.id}-${index}`} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-                        <div className="font-semibold text-slate-900">#{index + 1}</div>
-                        <div>Muatan: {cargoLabel}</div>
-                        <div>QTY: {cargoItems.length ? cargoItems.map((cargoItem) => cargoItem.qty).filter((qty) => qty > 0).join(', ') || item.qty || '-' : item.qty || '-'}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                '-'
-              )
-            }
-          />
-          <DetailField label="QTY" value={orderTarifs[0]?.qty ? `${orderTarifs[0].qty} PCS` : '-'} />
+          <div className="md:col-span-2 space-y-2">
+            <p className="text-sm text-slate-600 font-medium">Detail Muatan</p>
+            <div className="overflow-hidden rounded-xl border border-slate-200">
+              <table className="w-full border-collapse text-left text-sm text-slate-500">
+                <thead className="bg-slate-50 text-xs uppercase text-slate-700">
+                  <tr>
+                    <th className="px-4 py-2.5 font-semibold w-[60px]">No</th>
+                    <th className="px-4 py-2.5 font-semibold">Nama Muatan</th>
+                    <th className="px-4 py-2.5 font-semibold w-[150px]">QTY</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  {cargoItems.length ? (
+                    cargoItems.map((cargoItem, idx) => (
+                      <tr key={cargoItem.id || idx} className="hover:bg-slate-50 text-[15px] text-slate-900">
+                        <td className="px-4 py-2.5 font-medium text-slate-500">{idx + 1}</td>
+                        <td className="px-4 py-2.5 font-semibold">{cargoItem.loadContent || '-'}</td>
+                        <td className="px-4 py-2.5 font-semibold">{cargoItem.qty} PCS</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="px-4 py-4 text-center text-slate-400">
+                        Tidak ada data muatan
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </SectionCard>
 
       <SectionCard title="Detail Order">
-        <div className="grid gap-6 md:grid-cols-2">
-          <DetailField label="Loading In" value={orderTarifs[0]?.loadingIn || data.loadingIn || '-'} />
-          <DetailField label="Tujuan Kirim" value={orderTarifs[0]?.deliveryDestination || '-'} />
-          <DetailField label="Loading Out" value={orderTarifs[0]?.loadingOut || data.loadingOut || '-'} />
-          <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, orderTarifs[0])} />
-        </div>
+        {orderTarifs.length > 1 ? (
+          <div className="space-y-4">
+            <div className="grid gap-6 md:grid-cols-2">
+              <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, orderTarifs[0])} />
+            </div>
+            <div className="overflow-hidden rounded-xl border border-slate-200">
+              <table className="w-full border-collapse text-left text-sm text-slate-500">
+                <thead className="bg-slate-50 text-xs uppercase text-slate-700">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">No</th>
+                    <th className="px-4 py-3 font-semibold">Loading In</th>
+                    <th className="px-4 py-3 font-semibold">Loading Out</th>
+                    <th className="px-4 py-3 font-semibold">Tujuan Kirim</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  {orderTarifs.map((item, idx) => (
+                    <tr key={item.id || idx} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 font-medium text-slate-900">{idx + 1}</td>
+                      <td className="px-4 py-3 text-slate-900">{item.loadingIn || '-'}</td>
+                      <td className="px-4 py-3 text-slate-900">{item.loadingOut || '-'}</td>
+                      <td className="px-4 py-3 text-slate-900">{item.deliveryDestination || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
+            <DetailField label="Loading In" value={orderTarifs[0]?.loadingIn || data.loadingIn || '-'} />
+            <DetailField label="Tujuan Kirim" value={orderTarifs[0]?.deliveryDestination || '-'} />
+            <DetailField label="Loading Out" value={orderTarifs[0]?.loadingOut || data.loadingOut || '-'} />
+            <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, orderTarifs[0])} />
+          </div>
+        )}
       </SectionCard>
 
       <SectionCard title="Keuangan">
