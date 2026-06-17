@@ -551,13 +551,20 @@ export interface DitlantasProcessOptionItem {
   id: number;
   code: string;
   vendorName: string;
+  isAlreadyProcessed?: boolean;
+  unprocessedCount?: number;
+  processedCount?: number;
 }
 
-export const getDitlantasProcessOptions = async (search?: string): Promise<DitlantasProcessOptionItem[]> => {
+export const getDitlantasProcessOptions = async (
+  search?: string,
+  isAlreadyProcessed?: boolean
+): Promise<DitlantasProcessOptionItem[]> => {
   const response = await apiClient.get<LaravelApiResponse<any>>('/wapi/transaction/ditlantas-process', {
     params: {
       search: search || undefined,
       per_page: 100,
+      is_already_processed: isAlreadyProcessed !== undefined ? (isAlreadyProcessed ? 1 : 0) : undefined,
     },
   });
   const data = ensureSuccess(response.data);
@@ -566,5 +573,8 @@ export const getDitlantasProcessOptions = async (search?: string): Promise<Ditla
     id: Number(item.id),
     code: String(item.code || ''),
     vendorName: String(item.vendor?.name || ''),
+    isAlreadyProcessed: item.is_already_processed !== undefined ? Boolean(item.is_already_processed) : undefined,
+    unprocessedCount: item.unprocessed_count !== undefined ? Number(item.unprocessed_count) : undefined,
+    processedCount: item.processed_count !== undefined ? Number(item.processed_count) : undefined,
   }));
 };

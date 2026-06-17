@@ -79,6 +79,10 @@ export const translateValidationMessage = (message: string, field?: string): str
     return `${label} sudah digunakan.`;
   }
 
+  if (lowerMessage.includes("already been processed") || lowerMessage.includes("sudah diproses")) {
+    return "Registrasi kendaraan yang dipilih sudah diproses.";
+  }
+
   return message;
 };
 
