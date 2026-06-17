@@ -133,7 +133,7 @@ export function SearchableSelect({
                     e.stopPropagation();
                     selectOption(option);
                   }}
-                  className="flex items-start gap-2 cursor-pointer"
+                  className="flex items-start gap-2 cursor-pointer py-1"
                 >
                   <Check className={cn('mt-0.5 h-4 w-4', value === option.value ? 'opacity-100' : 'opacity-0')} />
                   <div className="min-w-0">
