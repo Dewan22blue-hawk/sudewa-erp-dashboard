@@ -132,10 +132,17 @@ const buildFormData = (payload: CreateLiabilityPaymentPayload): FormData => {
   const cashAmount = toNumber(payload.cash_payment_amount);
   const bcaAmount = toNumber(payload.bca_payment_amount);
   const usdAmount = toNumber(payload.bca_payment_usd_amount);
+  const totalPayment = cashAmount + bcaAmount + usdAmount;
 
   if (cashAmount > 0) formData.append('cash_payment_amount', String(cashAmount));
   if (bcaAmount > 0) formData.append('bca_payment_amount', String(bcaAmount));
   if (usdAmount > 0) formData.append('bca_payment_usd_amount', String(usdAmount));
+
+  // Append total payment amount to satisfy backend validation
+  formData.append('payment', String(totalPayment));
+  formData.append('payment_amount', String(totalPayment));
+  formData.append('amount', String(totalPayment));
+
   if (payload.payment_at) formData.append('payment_at', payload.payment_at);
   if (payload.note) formData.append('note', payload.note);
   if (payload.payment_proof) formData.append('payment_proof', payload.payment_proof);
