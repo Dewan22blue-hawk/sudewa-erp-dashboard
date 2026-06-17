@@ -35,7 +35,8 @@ export default function CreateInvoiceDetailPage() {
     const draft = getInvoiceProcessDraft(detailQuery.data.id);
     setValues(buildProcessDefaults(detailQuery.data, draft));
     const rows = buildDetailRows([detailQuery.data]);
-    const selectable = rows.filter((row) => row.expeditionId > 0 && !row.isPrinted).map((row) => row.expeditionId);
+    const isAlreadyPrint = Boolean(detailQuery.data.isAlreadyPrint);
+    const selectable = rows.filter((row) => row.expeditionId > 0 && (!row.isPrinted || isAlreadyPrint)).map((row) => row.expeditionId);
     const draftSelection = (draft?.selectedExpeditionIds ?? []).filter((id) => selectable.includes(id));
     setSelectedExpeditionIds(draftSelection.length ? draftSelection : selectable);
   }, [detailQuery.data]);
@@ -98,7 +99,7 @@ export default function CreateInvoiceDetailPage() {
           )
         }
         onToggleAllExpeditions={(checked) =>
-          setSelectedExpeditionIds(checked ? rows.filter((row) => row.expeditionId > 0 && !row.isPrinted).map((row) => row.expeditionId) : [])
+          setSelectedExpeditionIds(checked ? rows.filter((row) => row.expeditionId > 0 && (!row.isPrinted || Boolean(detailQuery.data?.isAlreadyPrint))).map((row) => row.expeditionId) : [])
         }
         isSubmitting={processInvoiceMutation.isPending}
       />

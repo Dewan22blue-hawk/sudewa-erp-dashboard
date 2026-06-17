@@ -58,7 +58,7 @@ export function GoodsReceiptEquipmentTable({
             <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TANGGAL TERIMA</TableHead>
             <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">SUPPLIER</TableHead>
             <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">LOKASI</TableHead>
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TOTAL BRUTTO</TableHead>
+            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TOTAL HARGA</TableHead>
             <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">STATUS</TableHead>
             <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-950">ACTION</TableHead>
           </TableRow>
