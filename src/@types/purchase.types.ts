@@ -44,6 +44,7 @@ export interface Purchase {
   maxCapacity?: number;
   warehouseName?: string;
   warehouseId?: string;
+  transaction_date?: string;
 
   totalDpp: number;
   totalPpn: number;
@@ -82,8 +83,13 @@ export interface CreatePurchaseRequest {
 }
 
 export interface UpdatePurchaseRequest {
-  date: string;
-  supplierName: string;
+  company_id: number;
+  person_id: number;
+  code: string;
+  type: 'purchase' | 'sales';
+  max_capacity: string;
+  stock_state: string;
+  transaction_date?: string;
 }
 
 export interface PurchaseFormValues {
