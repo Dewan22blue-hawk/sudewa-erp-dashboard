@@ -47,19 +47,19 @@ export function CustomerFormDialog({ open, onOpenChange, form, onSubmit, title, 
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Alamat</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Tambahkan Alamat" className="resize-none" rows={3} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Alamat<RequiredMark /></FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Tambahkan Alamat" className="resize-none" rows={3} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
               <FormField
                 control={form.control}
