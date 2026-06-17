@@ -37,9 +37,15 @@ export const DOEkspedisiPrintDocument: React.FC<Props> = ({ data }) => {
           <Row label="Kode DO" value={data.doCode} />
           <Row label="Kode Order" value={data.orderCode} />
           <Row label="Tanggal Pengiriman" value={data.date ? format(new Date(data.date), 'dd/MM/yyyy') : '-'} />
-          <Row label="Driver Note" value={data.driverNote || '-'} />
+          <Row label="Nama Driver" value={data.driver?.name || '-'} />
           <Row label="Tipe Armada" value={data.vehicle?.type || '-'} />
           <Row label="Nomor Polisi" value={data.vehicle?.registrationNumber || '-'} />
+        </div>
+        <div className="mt-3 border-t border-slate-200 pt-2">
+          <div className="text-sm text-slate-700 font-medium">Atensi Driver</div>
+          <div className="mt-1 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+            {data.driverNote || '-'}
+          </div>
         </div>
       </section>
 
