@@ -128,7 +128,7 @@ export default function CreateInvoiceListPage() {
           setSelectedIds((current) => (checked ? Array.from(new Set([...current, id])) : current.filter((item) => item !== id)))
         }
         onToggleAll={(checked) => setSelectedIds(checked ? filteredRows.map((item) => item.id) : [])}
-        onProcessSelected={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/print?ids=${selectedIds.join(',')}`)}
+        onProcessSelected={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/print/bulk?ids=${selectedIds.join(',')}`)}
       />
 
       <CreateInvoiceModal open={createOpen} onOpenChange={setCreateOpen} onSubmit={handleCreate} isSubmitting={createMutation.isPending} />
