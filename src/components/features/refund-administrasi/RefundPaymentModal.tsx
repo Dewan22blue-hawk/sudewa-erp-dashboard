@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useKas } from '@/hooks/useKas';
 
 interface RefundPaymentModalProps {
   open: boolean;
@@ -20,6 +22,8 @@ interface RefundPaymentModalProps {
 
 export default function RefundPaymentModal({ open, onClose, refund }: RefundPaymentModalProps) {
   const createPaymentMutation = useCreateRefundPayment();
+  const { companyId } = useCompany();
+  const { data: kasQuery } = useKas(companyId ?? undefined);
   const totalPaid = (refund.payments ?? []).reduce((total, item) => total + Number(item.amount), 0);
   const remainingAmount = Math.max(0, Number(refund.refund_amount) - totalPaid);
 
@@ -53,8 +57,19 @@ export default function RefundPaymentModal({ open, onClose, refund }: RefundPaym
       return;
     }
 
+    const kasList = kasQuery?.data ?? [];
+    const cashIdrAccount = kasList.find((cash) => {
+      const code = String(cash.code ?? '').toLowerCase();
+      const desc = String(cash.description ?? '').toLowerCase();
+      return (code === 'cash_idr' || code === 'cash' || code.includes('cash_idr') || code.includes('cash') || code.includes('kas')) && !code.includes('bca') && !code.includes('usd');
+    });
+    const resolvedCashId = cashIdrAccount?.id;
+
     try {
-      await createPaymentMutation.mutateAsync(values);
+      await createPaymentMutation.mutateAsync({
+        ...values,
+        cash_id: resolvedCashId,
+      });
       toast.success('Pembayaran refund berhasil ditambahkan');
       onClose();
     } catch (error: any) {
