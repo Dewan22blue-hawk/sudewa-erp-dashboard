@@ -51,31 +51,6 @@ type UnitTypeDetailApiModel = {
   stock_forecast?: boolean | number | string;
 };
 
-type UnitTypeApiModel = {
-  unit_type_details?: UnitTypeDetailApiModel[];
-  unit_item_details?: UnitTypeDetailApiModel[];
-  unit_transaction_details?: UnitTypeDetailApiModel[];
-  details?: UnitTypeDetailApiModel[];
-  stock_units?: UnitTypeDetailApiModel[];
-  warehouse_stock_units?: UnitTypeDetailApiModel[];
-  data?: {
-    unit_type_details?: UnitTypeDetailApiModel[];
-    unit_item_details?: UnitTypeDetailApiModel[];
-    unit_transaction_details?: UnitTypeDetailApiModel[];
-    details?: UnitTypeDetailApiModel[];
-    stock_units?: UnitTypeDetailApiModel[];
-    warehouse_stock_units?: UnitTypeDetailApiModel[];
-    data?: {
-      unit_type_details?: UnitTypeDetailApiModel[];
-      unit_item_details?: UnitTypeDetailApiModel[];
-      unit_transaction_details?: UnitTypeDetailApiModel[];
-      details?: UnitTypeDetailApiModel[];
-      stock_units?: UnitTypeDetailApiModel[];
-      warehouse_stock_units?: UnitTypeDetailApiModel[];
-    };
-  };
-};
-
 type WarehouseActivityApiModel = {
   id?: string | number;
   warehouse_activity_id?: string | number;
@@ -89,7 +64,6 @@ const itemSalesBasePath = '/wapi/transaction/unit-transaction/unit-transaction-i
 const itemSalesLegacyPath = '/wapi/transaction/unit-transaction-item-sales';
 const unitTransactionItemBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 const unitTransactionItemLegacyPath = '/wapi/transaction/unit-transaction-item';
-const unitTypeBasePath = '/wapi/master-data/unit-type';
 const warehouseUnitDetailsBasePath = '/wapi/warehouse/warehouse-get-unit-transaction-item-details';
 
 const warehouseActivityBasePath = '/wapi/transaction/warehouse-activity';
@@ -129,19 +103,6 @@ const toBool = (value: unknown): boolean => {
   return false;
 };
 
-const looksLikeDetailRow = (item: any): boolean => {
-  if (!item || typeof item !== 'object') return false;
-
-  const hasId = ['id', 'unit_transaction_detail_id', 'unit_transaction_item_detail_id', 'unit_type_detail_id', 'detail_id'].some(
-    (key) => item[key] !== undefined && item[key] !== null,
-  );
-  const hasVehicleIdentity = ['machine_number', 'no_mesin', 'chassis_number', 'no_rangka', 'color', 'warna'].some(
-    (key) => item[key] !== undefined && item[key] !== null,
-  );
-
-  return hasId || hasVehicleIdentity;
-};
-
 const isOnHandUnit = (item: UnitTypeDetailApiModel): boolean => {
   const stockAvailableNumber = toNumber(item?.stock_available);
   const stockForecastNumber = toNumber(item?.stock_forecast);
@@ -165,56 +126,6 @@ const isOnHandUnit = (item: UnitTypeDetailApiModel): boolean => {
   }
 
   return ['on_hand', 'on hand', 'available', 'in_stock', 'in stock', 'ready'].includes(statusText);
-};
-
-const normalizeUnitTypeDetails = (payload: any): UnitTypeDetailApiModel[] => {
-  const buckets = [
-    payload?.unit_type_details,
-    payload?.unit_item_details,
-    payload?.unit_transaction_details,
-    payload?.details,
-    payload?.stock_units,
-    payload?.warehouse_stock_units,
-    payload?.data?.unit_type_details,
-    payload?.data?.unit_item_details,
-    payload?.data?.unit_transaction_details,
-    payload?.data?.details,
-    payload?.data?.stock_units,
-    payload?.data?.warehouse_stock_units,
-    payload?.data?.data?.unit_type_details,
-    payload?.data?.data?.unit_item_details,
-    payload?.data?.data?.unit_transaction_details,
-    payload?.data?.data?.details,
-    payload?.data?.data?.stock_units,
-    payload?.data?.data?.warehouse_stock_units,
-  ];
-
-  for (const bucket of buckets) {
-    if (Array.isArray(bucket) && bucket.some(looksLikeDetailRow)) {
-      return bucket;
-    }
-  }
-
-  const walk = (input: any): UnitTypeDetailApiModel[] => {
-    if (!input || typeof input !== 'object') return [];
-
-    if (Array.isArray(input)) {
-      return input.filter(looksLikeDetailRow);
-    }
-
-    for (const value of Object.values(input)) {
-      if (!value || typeof value !== 'object') continue;
-      const found = walk(value);
-      if (found.length > 0) return found;
-    }
-
-    return [];
-  };
-
-  const deepFound = walk(payload);
-  if (deepFound.length > 0) return deepFound;
-
-  return [];
 };
 
 const normalizeWarehouseItemDetails = (payload: any): UnitTypeDetailApiModel[] => {

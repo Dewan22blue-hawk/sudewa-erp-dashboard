@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import type { FinanceRefundRecord, RefundTransactionType } from '@/@types/finance-refund.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import FinanceRefundApprovalModal from '@/components/features/finance-refund/FinanceRefundApprovalModal';

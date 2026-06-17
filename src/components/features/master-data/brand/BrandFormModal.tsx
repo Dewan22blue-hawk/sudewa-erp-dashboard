@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import RequiredMark from '@/components/ui/required-mark';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Upload, X, ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { BrandFormValues } from '@/scheme/brand.schema';
 
@@ -31,26 +31,40 @@ export function BrandFormModal({
 }: BrandFormModalProps) {
     const [preview, setPreview] = useState<string | null>(null);
 
-    const imageValue = form.watch('image');
+    const logoValue = form.watch('image');
 
     useEffect(() => {
-        if (imageValue instanceof File) {
-            const url = URL.createObjectURL(imageValue);
-            setPreview(url);
-            return () => URL.revokeObjectURL(url);
-        } else if (typeof imageValue === 'string') {
-            setPreview(imageValue);
+        if (!open) {
+            setPreview(null);
+            return;
+        }
+
+        if (logoValue) {
+            if (typeof logoValue === 'string') {
+                setPreview(logoValue);
+            } else if (logoValue instanceof File) {
+                const url = URL.createObjectURL(logoValue);
+                setPreview(url);
+                return () => URL.revokeObjectURL(url);
+            }
         } else {
             setPreview(null);
         }
-    }, [imageValue]);
+    }, [logoValue, open]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (val: any) => void) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            onChange(file);
+        }
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
-                    <DialogDescription className="text-sm text-muted-foreground">{description}</DialogDescription>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>
@@ -60,7 +74,7 @@ export function BrandFormModal({
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Nama Merk<RequiredMark /></FormLabel>
+                                    <FormLabel>Nama Merk <RequiredMark /></FormLabel>
                                     <FormControl>
                                         <Input placeholder="Masukkan nama merk" {...field} />
                                     </FormControl>
@@ -72,7 +86,7 @@ export function BrandFormModal({
                         <FormField
                             control={form.control}
                             name="image"
-                            render={({ field: { value, onChange, ...field } }) => (
+                            render={({ field: { onChange } }) => (
                                 <FormItem>
                                     <FormLabel>Logo / Gambar</FormLabel>
                                     <FormControl>

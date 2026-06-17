@@ -37,7 +37,7 @@ export function useUpdateGoodsTransactionDetail() {
 export function useDeleteGoodsTransactionDetail() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, goodsTransactionId }: { id: number | string; goodsTransactionId: number | string }) =>
+    mutationFn: ({ id }: { id: number | string; goodsTransactionId: number | string }) =>
       deleteGoodsTransactionDetail(id),
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: goodsIssueEquipmentKeys.all });

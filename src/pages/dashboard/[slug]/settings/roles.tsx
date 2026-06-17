@@ -59,7 +59,7 @@ export default function RolesPage() {
     if (selectedRole && currentPerms.length) {
       setSelectedPerms(currentPerms);
     }
-  }, [selectedRole?.id, currentPerms]);
+  }, [selectedRole, currentPerms]);
 
   const togglePerm = (perm: string) => {
     setSelectedPerms((prev) => (prev.includes(perm) ? prev.filter((p) => p !== perm) : [...prev, perm]));

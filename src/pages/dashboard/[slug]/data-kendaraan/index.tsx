@@ -39,7 +39,6 @@ export default function VehicleFleetPage() {
   const [vendorSearch, setVendorSearch] = useState('');
   const [assignProcessDate, setAssignProcessDate] = useState<Date>();
 
-  const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [isDeleteVehicleOpen, setIsDeleteVehicleOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(null);
 

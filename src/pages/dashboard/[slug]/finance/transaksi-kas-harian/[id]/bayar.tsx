@@ -32,21 +32,10 @@ const parseMoneyInput = (value: string) => {
   return Number.isFinite(amount) ? amount : 0;
 };
 
-const translateFinanceBillingError = (message: string) => {
-  const trimmed = message.trim();
-  const balanceMatch = trimmed.match(/^Payment amount exceeds remaining billing balance \(([\d.,]+)\)\.?$/i);
-  if (balanceMatch) return `Nominal pembayaran melebihi sisa saldo tagihan (${balanceMatch[1]}).`;
-  if (/^Validation failed$/i.test(trimmed)) return 'Validasi gagal. Periksa kembali data pembayaran yang Anda masukkan.';
-  return trimmed
-    .replace(/^Payment amount exceeds remaining billing balance/i, 'Nominal pembayaran melebihi sisa saldo tagihan')
-    .replace(/^Payment amount is required/i, 'Nominal pembayaran wajib diisi')
-    .replace(/^Payment date is required/i, 'Tanggal pembayaran wajib diisi')
-    .replace(/^The note field is required/i, 'Catatan wajib diisi');
-};
-
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
+  void fallback;
   return getApiErrorMessage(error);
 };
 

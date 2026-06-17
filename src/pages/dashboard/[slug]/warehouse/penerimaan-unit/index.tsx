@@ -22,7 +22,7 @@ export default function PenerimaanUnitPage() {
     perPage: 10000,
   });
 
-  const allData = activities?.data ?? [];
+  const allData = useMemo(() => activities?.data ?? [], [activities?.data]);
 
   const filteredData = useMemo(() => {
     if (!search) return allData;

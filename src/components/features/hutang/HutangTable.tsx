@@ -1,5 +1,5 @@
 import { Hutang } from '@/@types/hutang.types';
-import { MoreVertical, Search, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';

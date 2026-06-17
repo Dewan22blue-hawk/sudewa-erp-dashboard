@@ -4,7 +4,6 @@ import { Controller, useForm } from 'react-hook-form';
 import type { BBNBillVehicleData, BBNBillVehicleFeePayload } from '@/@types/bbn-bill.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
 

@@ -62,7 +62,7 @@ export function useStockMaterialReport({
     staleTime: 10_000,
   });
 
-  const rawItems = queryResult.data?.data?.data || [];
+  const rawItems = useMemo(() => queryResult.data?.data?.data || [], [queryResult.data?.data?.data]);
 
   // Safe client-side search filtering fallback
   const filteredData = useMemo(() => {
