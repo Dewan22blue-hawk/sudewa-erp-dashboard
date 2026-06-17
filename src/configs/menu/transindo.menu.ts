@@ -37,6 +37,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/master/customer'),
         },
         {
+          label: 'Supplier',
+          href: base('/master/supplier'),
+        },
+        {
           label: 'Tarif',
           href: base('/master/tarif'),
         },
