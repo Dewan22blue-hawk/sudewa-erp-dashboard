@@ -156,6 +156,7 @@ export function CustomerFormModal({
                   </FormItem>
                 )}
               />
+              </div>
 
               <div className="shrink-0 flex flex-col gap-3 py-6">
                 <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>

@@ -42,7 +42,9 @@ interface OrderListDetailViewProps {
 }
 
 export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) {
-  const orderTarifs = data.tarifs.length ? data.tarifs : [];
+  const orderTarifs = React.useMemo(() => {
+    return data.tarifs?.length ? data.tarifs : [];
+  }, [data.tarifs]);
 
   const summaryCargoItems = React.useMemo(() => {
     const map = new Map<string, number>();
