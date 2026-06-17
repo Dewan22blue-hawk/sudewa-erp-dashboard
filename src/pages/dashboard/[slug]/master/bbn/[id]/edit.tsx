@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { BBNForm } from '@/components/features/bbn/BBNForm';
 import { useBBNDetail, useUpdateBBN } from '@/hooks/useBBN';
-import type { ApiError } from '@/@types/api';
 import type { BBNPayload } from '@/@types/bbn.types';
 import { toast } from 'sonner';
 

@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, FileText, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, FileText, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { UploadInvoiceModal } from '@/components/features/material-receipt/UploadInvoiceModal';

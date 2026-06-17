@@ -1,4 +1,4 @@
-import { ApiValidationError, ApiResponseError } from '@/lib/api/response';
+import { ApiValidationError } from '@/lib/api/response';
 
 type BackendErrorResponse = {
   status?: boolean;

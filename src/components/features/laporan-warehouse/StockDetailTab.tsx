@@ -66,7 +66,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
     in_stock: inStock === 'all' ? undefined : inStock,
   });
 
-  const rows = response?.data || [];
+  const rows = useMemo(() => response?.data || [], [response?.data]);
   const pagination = response || {
     current_page: 1,
     data: [],

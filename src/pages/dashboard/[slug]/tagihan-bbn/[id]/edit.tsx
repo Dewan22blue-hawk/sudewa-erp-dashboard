@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
-import { useCompany } from '@/contexts/CompanyContext';
 import { useDitlantasProcessOptions } from '@/hooks/useVehicleDocument';
 import { useBBNBillDetail, useUpdateBBNBill } from '@/hooks/useBBNBill';
 import { toDateValue, toPayloadDate } from '@/components/features/tagihan-bbn/utils';
@@ -25,8 +24,6 @@ export default function EditBBNBillPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const id = typeof router.query.id === 'string' ? router.query.id : null;
-  const { companyId } = useCompany();
-  const safeCompanyId = companyId || '1';
 
   const [ditlantasSearch, setDitlantasSearch] = React.useState('');
   const detailQuery = useBBNBillDetail(id);

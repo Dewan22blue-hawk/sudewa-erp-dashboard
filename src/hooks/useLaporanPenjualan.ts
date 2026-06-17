@@ -88,7 +88,7 @@ export const useLaporanPenjualan = (): UseLaporanPenjualanReturn => {
             // Support both T and space separated dates
             const dateOnly = String(item.created_at).split(/[T ]/)[0]; 
             return dateOnly >= startDate && dateOnly <= endDate;
-          } catch(e) {
+          } catch {
             return true;
           }
         });

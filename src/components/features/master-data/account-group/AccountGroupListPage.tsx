@@ -14,7 +14,7 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Download, Plus, Upload } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 
 export const AccountGroupListPage = () => {

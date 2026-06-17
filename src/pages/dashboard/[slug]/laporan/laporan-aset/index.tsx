@@ -74,11 +74,6 @@ export default function LaporanAssetPage() {
     }).format(value);
   };
 
-  const formatMonthsUsed = (value?: number | null) => {
-    if (value === null || value === undefined) return '-';
-    return Number(value).toFixed(2);
-  };
-
   // Sorting handler
   const handleSort = (field: string) => {
     if (sortBy === field) {

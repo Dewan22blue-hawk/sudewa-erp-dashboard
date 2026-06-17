@@ -1,10 +1,10 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
-import { IncomeDonutChart } from '@/components/features/dashboard/charts/IncomeDonutChart';
+
 import { FinanceOverview } from '@/components/features/dashboard/FinanceOverview';
 import { FinanceChart } from '@/components/features/dashboard/FinanceChart';
 import { CustomerOverviewCard, ProductOverviewCard } from '@/components/features/dashboard/CustomerProductOverview';
-import { CashflowSummary } from '@/components/features/dashboard/CashflowSummary';
+
 import { TransactionTable } from '@/components/features/dashboard/TransactionTable';
 import { useDashboardData } from '@/hooks/useDashboardData';
 

@@ -102,19 +102,6 @@ const mapVehicleRegistration = (item: any): BBNBillVehicleRegistrationFees | nul
     updatedAt: item.updated_at ?? undefined,
   };
 };
-
-const mapVehicleData = (item: any): BBNBillVehicleData => ({
-  id: Number(item.id),
-  uuid: item.uuid ?? undefined,
-  dealerId: toNullableNumber(item.dealer_id),
-  invoiceNumber: item.invoice_number ?? '',
-  stnkName: String(item.stnk_name ?? ''),
-  ktpNumber: item.ktp_number ?? '',
-  chassisNumber: item.chassis_number ?? '',
-  machineNumber: item.machine_number ?? '',
-  vehicleRegistration: mapVehicleRegistration(item.vehicle_registration),
-});
-
 const mapBill = (item: any): BBNBill => {
   const ditlantasProcessRaw = item.ditlantas_process || item.ditlantasProcess;
   const vendorRaw = ditlantasProcessRaw?.vendor || item.vendor;

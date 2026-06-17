@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MoreVertical, Plus, Printer, Search } from 'lucide-react';
+import { MoreVertical, Plus, Search } from 'lucide-react';
 import type { BBNBill } from '@/@types/bbn-bill.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -45,6 +45,7 @@ export function BBNBillTable({
   onPrint,
   onDelete,
 }: Props) {
+  void onEdit;
   const totalPages = Math.max(1, Math.ceil(totalData / perPage));
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = Math.min(page * perPage, totalData);

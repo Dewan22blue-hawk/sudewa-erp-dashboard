@@ -6,7 +6,6 @@ import {
 import type { ColumnDef } from '@tanstack/react-table';
 import { FinanceAsset } from '@/@types/finance-asset.types';
 import { formatCurrency } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 import { useMemo } from 'react';
 
 interface AssetReportTableProps {
