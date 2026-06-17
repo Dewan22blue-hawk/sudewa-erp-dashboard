@@ -133,7 +133,7 @@ export default function BulkCreateInvoicePrintPage() {
         <div ref={printRef} className="space-y-8 bg-slate-50 p-4 rounded-2xl border border-slate-200 print:bg-white print:p-0 print:border-none print:space-y-0">
           {invoices.map((invoice) => {
             const draft = getInvoiceProcessDraft(invoice.id) ?? createProcessDraftPayload(invoice, buildProcessDefaults(invoice), undefined);
-            const rows = buildDetailRows([invoice], draft.selectedExpeditionIds);
+            const rows = buildDetailRows([invoice]);
             const payload = buildPrintPayload(invoice, rows, companyName, draft);
 
             return (
