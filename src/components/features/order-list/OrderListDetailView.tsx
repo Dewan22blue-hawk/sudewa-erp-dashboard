@@ -43,12 +43,31 @@ interface OrderListDetailViewProps {
 
 export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) {
   const orderTarifs = data.tarifs.length ? data.tarifs : [];
-  const firstTarif = orderTarifs[0];
-  const cargoItems = firstTarif?.tarifItems?.length
-    ? firstTarif.tarifItems
-    : firstTarif?.loadContent
-      ? [{ id: `${firstTarif.id}-fallback`, loadContent: firstTarif.loadContent, qty: Number(firstTarif.qty ?? 0) }]
-      : [];
+
+  const summaryCargoItems = React.useMemo(() => {
+    const map = new Map<string, number>();
+    
+    orderTarifs.forEach((tarif) => {
+      const items = tarif.tarifItems?.length
+        ? tarif.tarifItems
+        : tarif.loadContent
+          ? [{ loadContent: tarif.loadContent, qty: Number(tarif.qty ?? 0) }]
+          : [];
+          
+      items.forEach((item) => {
+        const name = String(item.loadContent || '').trim();
+        if (!name) return;
+        const currentQty = map.get(name) || 0;
+        map.set(name, currentQty + Number(item.qty || 0));
+      });
+    });
+    
+    return Array.from(map.entries()).map(([loadContent, qty], idx) => ({
+      id: `summary-${idx}`,
+      loadContent,
+      qty,
+    }));
+  }, [orderTarifs]);
 
   return (
     <div className="space-y-6">
@@ -63,20 +82,21 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         <div className="grid gap-6 md:grid-cols-2">
           <DetailField label="Nama Customer" value={data.customer?.name || '-'} />
           <DetailField label="Kode Order" value={data.code || '-'} />
+          
           <div className="md:col-span-2 space-y-2">
-            <p className="text-sm text-slate-600 font-medium">Detail Muatan</p>
+            <p className="text-sm text-slate-600 font-medium">Ringkasan (Summary) Total Muatan</p>
             <div className="overflow-hidden rounded-xl border border-slate-200">
               <table className="w-full border-collapse text-left text-sm text-slate-500">
                 <thead className="bg-slate-50 text-xs uppercase text-slate-700">
                   <tr>
                     <th className="px-4 py-2.5 font-semibold w-[60px]">No</th>
                     <th className="px-4 py-2.5 font-semibold">Nama Muatan</th>
-                    <th className="px-4 py-2.5 font-semibold w-[150px]">QTY</th>
+                    <th className="px-4 py-2.5 font-semibold w-[150px]">Total QTY</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
-                  {cargoItems.length ? (
-                    cargoItems.map((cargoItem, idx) => (
+                  {summaryCargoItems.length ? (
+                    summaryCargoItems.map((cargoItem, idx) => (
                       <tr key={cargoItem.id || idx} className="hover:bg-slate-50 text-[15px] text-slate-900">
                         <td className="px-4 py-2.5 font-medium text-slate-500">{idx + 1}</td>
                         <td className="px-4 py-2.5 font-semibold">{cargoItem.loadContent || '-'}</td>
@@ -97,49 +117,86 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         </div>
       </SectionCard>
 
-      <SectionCard title="Detail Order">
-        {orderTarifs.length > 1 ? (
-          <div className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-2">
-              <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, orderTarifs[0])} />
-            </div>
-            <div className="overflow-hidden rounded-xl border border-slate-200">
-              <table className="w-full border-collapse text-left text-sm text-slate-500">
-                <thead className="bg-slate-50 text-xs uppercase text-slate-700">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold">No</th>
-                    <th className="px-4 py-3 font-semibold">Loading In</th>
-                    <th className="px-4 py-3 font-semibold">Loading Out</th>
-                    <th className="px-4 py-3 font-semibold">Tujuan Kirim</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 bg-white">
-                  {orderTarifs.map((item, idx) => (
-                    <tr key={item.id || idx} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 font-medium text-slate-900">{idx + 1}</td>
-                      <td className="px-4 py-3 text-slate-900">{item.loadingIn || '-'}</td>
-                      <td className="px-4 py-3 text-slate-900">{item.loadingOut || '-'}</td>
-                      <td className="px-4 py-3 text-slate-900">{item.deliveryDestination || '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            <DetailField label="Loading In" value={orderTarifs[0]?.loadingIn || data.loadingIn || '-'} />
-            <DetailField label="Tujuan Kirim" value={orderTarifs[0]?.deliveryDestination || '-'} />
-            <DetailField label="Loading Out" value={orderTarifs[0]?.loadingOut || data.loadingOut || '-'} />
-            <DetailField label="Tipe Armada" value={getOrderVehicleTypeLabel(data, orderTarifs[0])} />
-          </div>
-        )}
+      <SectionCard title="Detail Rute &amp; Muatan">
+        <div className="space-y-6">
+          {orderTarifs.map((item, index) => {
+            const cargoItems = item.tarifItems?.length
+              ? item.tarifItems
+              : item.loadContent
+                ? [{ id: `${item.id}-fallback`, loadContent: item.loadContent, qty: Number(item.qty ?? 0) }]
+                : [];
+
+            return (
+              <div key={item.id || index} className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-none">
+                {/* Header Sub-Card */}
+                <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-slate-800">
+                    Rute #{index + 1}: {item.loadingIn || '-'} ke {item.loadingOut || '-'}
+                  </span>
+                  <span className="text-xs font-medium bg-[#eef3f8] text-slate-700 px-2 py-0.5 rounded-full">
+                    {getOrderVehicleTypeLabel(data, item)}
+                  </span>
+                </div>
+                
+                {/* Detail Fields */}
+                <div className="p-4 grid gap-4 md:grid-cols-3">
+                  <div className="space-y-0.5">
+                    <p className="text-xs text-slate-500">Tujuan Kirim</p>
+                    <p className="text-sm font-semibold text-slate-900">{item.deliveryDestination || '-'}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs text-slate-500">UJ Driver</p>
+                    <p className="text-sm font-semibold text-slate-900">{formatOrderCurrency(item.driverFee)}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs text-slate-500">Invoice Ekspedisi</p>
+                    <p className="text-sm font-semibold text-slate-900">{formatOrderCurrency(item.expeditionInvoice)}</p>
+                  </div>
+                </div>
+
+                {/* Cargo Table for this specific route */}
+                <div className="border-t border-slate-100 p-4 space-y-2">
+                  <p className="text-xs font-semibold text-slate-500">Muatan Rute #{index + 1}</p>
+                  <div className="overflow-hidden rounded-lg border border-slate-200">
+                    <table className="w-full border-collapse text-left text-xs text-slate-500">
+                      <thead className="bg-slate-50 text-slate-700 uppercase">
+                        <tr>
+                          <th className="px-3 py-2 font-semibold w-[50px]">No</th>
+                          <th className="px-3 py-2 font-semibold">Nama Muatan</th>
+                          <th className="px-3 py-2 font-semibold w-[120px]">QTY</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 bg-white">
+                        {cargoItems.length ? (
+                          cargoItems.map((cargo, cIdx) => (
+                            <tr key={cargo.id || cIdx} className="hover:bg-slate-50 text-[13px] text-slate-900 font-medium">
+                              <td className="px-3 py-2 text-slate-500">{cIdx + 1}</td>
+                              <td className="px-3 py-2 font-semibold">{cargo.loadContent}</td>
+                              <td className="px-3 py-2 font-semibold">{cargo.qty} PCS</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={3} className="px-3 py-3 text-center text-slate-400">
+                              Tidak ada data muatan untuk rute ini
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </SectionCard>
 
       <SectionCard title="Keuangan">
-        <div className="grid gap-6 md:grid-cols-2">
-          <DetailField label="UJ Driver" value={formatOrderCurrency(orderTarifs[0]?.driverFee || data.ujDriver)} />
-          <DetailField label="Invoice Ekspedisi" value={formatOrderCurrency(orderTarifs[0]?.expeditionInvoice || data.billInvoice)} />
+        <div className="grid gap-6 md:grid-cols-3">
+          <DetailField label="Total UJ Driver" value={formatOrderCurrency(data.ujDriver)} />
+          <DetailField label="Total Invoice Ekspedisi" value={formatOrderCurrency(data.billInvoice)} />
+          <DetailField label="PPN" value={formatOrderCurrency(data.ppn)} />
         </div>
       </SectionCard>
 
