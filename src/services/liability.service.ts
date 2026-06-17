@@ -146,6 +146,9 @@ const buildFormData = (payload: CreateLiabilityPaymentPayload): FormData => {
   if (payload.payment_at) formData.append('payment_at', payload.payment_at);
   if (payload.note) formData.append('note', payload.note);
   if (payload.payment_proof) formData.append('payment_proof', payload.payment_proof);
+  if (payload.cash_id !== undefined && payload.cash_id !== null) {
+    formData.append('cash_id', String(payload.cash_id));
+  }
 
   return formData;
 };

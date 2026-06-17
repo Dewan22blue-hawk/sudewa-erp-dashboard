@@ -476,6 +476,9 @@ export const unitBillingService = {
 
     if (payload.payment_at) form.append('payment_at', payload.payment_at);
     if (payload.note) form.append('note', payload.note);
+    if (payload.cash_id !== undefined && payload.cash_id !== null) {
+      form.append('cash_id', String(payload.cash_id));
+    }
 
     const response = await apiClient.post<LaravelApiResponse<UnitBillingHistoryApiModel>>(historyBasePath, form);
     const data = ensureSuccess(response.data);
