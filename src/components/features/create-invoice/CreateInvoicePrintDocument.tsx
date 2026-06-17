@@ -9,13 +9,14 @@ import { formatDisplayDate, formatLongDate, formatMoney } from './create-invoice
 interface Props {
   payload: CreateInvoicePrintPayload;
   letterheadUrl: string;
+  hideControls?: boolean;
 }
 
 const COMPANY_BANK_NAME = 'PT. WAJIRA JAGRATARA TRANSINDO';
 const COMPANY_BANK_ACCOUNT = '456-631-1313';
 const COMPANY_CONFIRMATION_NUMBER = '0878-8353-1313';
 
-export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
+export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControls = false }: Props) {
   const printRef = useRef<HTMLDivElement>(null);
   const totalInvoice = useMemo(() => payload.rows.reduce((sum, row) => sum + row.invoiceExpedition, 0), [payload.rows]);
   const totalPpn = useMemo(() => payload.rows.reduce((sum, row) => sum + row.ppn, 0), [payload.rows]);
@@ -196,16 +197,18 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="no-print flex items-center justify-end gap-3">
-        <Button type="button" variant="outline" onClick={handleDownload} className="gap-2 rounded-xl border-slate-200">
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
-        <Button type="button" onClick={() => handlePrint()} className="gap-2 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
-          <Printer className="h-4 w-4" />
-          Print
-        </Button>
-      </div>
+      {!hideControls && (
+        <div className="no-print flex items-center justify-end gap-3">
+          <Button type="button" variant="outline" onClick={handleDownload} className="gap-2 rounded-xl border-slate-200">
+            <Download className="h-4 w-4" />
+            Download PDF
+          </Button>
+          <Button type="button" onClick={() => handlePrint()} className="gap-2 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
+        </div>
+      )}
 
       <div ref={printRef} className="relative mx-auto overflow-hidden bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
