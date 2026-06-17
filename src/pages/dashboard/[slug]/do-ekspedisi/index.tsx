@@ -130,11 +130,9 @@ export default function DOEkspedisiPage() {
         toast.error(getApiErrorMessage(error));
         return;
       }
-      const url = `/dashboard/${slug}/do-ekspedisi/detail/${item.id}?print=1`;
-      toast.info(`Membuka tampilan cetak DO ${item.doCode}`);
-      window.open(url, '_blank', 'noopener,noreferrer');
+      router.push(`/dashboard/${slug}/do-ekspedisi/print/${item.id}`);
     },
-    [processExpeditionMutation, slug],
+    [processExpeditionMutation, slug, router],
   );
 
   const handlePerPageChange = useCallback((value: number) => {
