@@ -37,6 +37,21 @@ const mapSupplier = (payload: SupplierApiModel): Supplier => ({
   updatedAt: payload.updated_at,
 });
 
+const normalizeCompanyId = (value: string | number | null | undefined) => {
+  if (value === null || value === undefined || value === '') return null;
+  return String(value);
+};
+
+const filterSuppliersByCompany = (suppliers: SupplierApiModel[], companyId?: string | number) => {
+  const normalizedCompanyId = normalizeCompanyId(companyId);
+
+  if (!normalizedCompanyId) {
+    return suppliers;
+  }
+
+  return suppliers.filter((supplier) => normalizeCompanyId(supplier.company_id) === normalizedCompanyId);
+};
+
 const basePath = '/wapi/master-data/supplier';
 
 type PaginatedSupplierResponse = LaravelApiResponse<{
@@ -76,14 +91,16 @@ export const getSuppliers = async (
   });
 
   const data = ensureSuccess(response.data);
+  const scopedData = filterSuppliersByCompany(data.data ?? [], params.company_id);
+  const isFrontendFallback = scopedData.length !== (data.data ?? []).length;
 
   return toPaginatedResult(
     {
-      data: data.data ?? [],
+      data: scopedData,
       current_page: data.current_page,
       per_page: data.perPage,
-      total: data.total,
-      last_page: data.last_page,
+      total: isFrontendFallback ? scopedData.length : data.total,
+      last_page: isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.perPage ?? 1, 1))) : data.last_page,
     },
     mapSupplier,
   );
@@ -162,3 +179,29 @@ export const importSupplier = async (file: File, companyId?: string | number): P
     throw new ApiResponseError(payload.message ?? 'Failed to import supplier');
   }
 };
+
+export const exportSupplier = async (companyId?: string | number): Promise<void> => {
+  const response = await apiClient.get(`${basePath}/export`, {
+    params: companyId ? { company_id: companyId } : undefined,
+    responseType: 'blob',
+  });
+
+  const contentType = response.headers['content-type'];
+  const isJson = typeof contentType === 'string' && contentType.includes('application/json');
+
+  if (isJson) {
+    const textData = await (response.data as Blob).text();
+    const jsonResponse = JSON.parse(textData);
+    throw new ApiResponseError(jsonResponse.message ?? 'Failed to export supplier');
+  }
+
+  const url = window.URL.createObjectURL(new Blob([response.data as Blob]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `Supplier_${Date.now()}.xlsx`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
