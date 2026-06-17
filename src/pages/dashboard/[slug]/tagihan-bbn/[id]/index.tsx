@@ -38,7 +38,6 @@ export default function BBNBillDetailPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const id = typeof router.query.id === 'string' ? router.query.id : null;
-  const shouldPrint = router.query.print === '1';
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
 
@@ -145,14 +144,6 @@ export default function BBNBillDetailPage() {
     );
   }, [vehicles]);
 
-  React.useEffect(() => {
-    if (!shouldPrint || !detailQuery.data) return;
-    const timeout = window.setTimeout(() => {
-      window.print();
-    }, 350);
-    return () => window.clearTimeout(timeout);
-  }, [detailQuery.data, shouldPrint]);
-
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
@@ -176,7 +167,7 @@ export default function BBNBillDetailPage() {
                   Edit
                 </Button>
               </Link>
-              <Button onClick={() => window.print()} className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
+              <Button onClick={() => router.push(`/dashboard/${slug}/tagihan-bbn/print/${detailQuery.data.id}`)} className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
                 <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>
@@ -231,12 +222,12 @@ export default function BBNBillDetailPage() {
                 </div>
               </div>
 
-              <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
+              {/* <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
                 <Button className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
                   <Plus className="mr-2 h-4 w-4" />
                   Tambah Pembayaran
                 </Button>
-              </Link>
+              </Link> */}
             </div>
 
             <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

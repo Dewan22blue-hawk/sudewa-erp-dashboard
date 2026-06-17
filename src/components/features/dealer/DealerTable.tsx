@@ -80,9 +80,9 @@ export function DealerTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -112,7 +112,7 @@ export function DealerTable({
                             <TableHead className="text-xs font-semibold text-gray-600 w-[25%] uppercase px-4 py-3">NAMA DEALER</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">ALAMAT</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PIC</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">HANDPHONE</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PHONE</TableHead>
                             <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>

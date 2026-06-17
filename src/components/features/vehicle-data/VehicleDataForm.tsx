@@ -364,18 +364,18 @@ export function VehicleDataForm({ title, initialData, isSubmitting = false, onSu
           <Section title="Data Kepemilikan">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <div className="space-y-2">
-                <FieldLabel required>Nomor KTP</FieldLabel>
-                <Input placeholder="Masukkan nomor" {...register('ktpNumber', { required: 'Nomor KTP wajib diisi' })} />
+                <FieldLabel>Nomor KTP</FieldLabel>
+                <Input placeholder="Masukkan nomor" {...register('ktpNumber')} />
                 <FormError message={errors.ktpNumber?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Nomor Handphone</FieldLabel>
-                <Input placeholder="Masukkan nomor" {...register('phoneNumber', { required: 'Nomor handphone wajib diisi' })} />
+                <FieldLabel>Nomor Handphone</FieldLabel>
+                <Input placeholder="Masukkan nomor" {...register('phoneNumber')} />
                 <FormError message={errors.phoneNumber?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Pekerjaan</FieldLabel>
-                <Input placeholder="Masukkan pekerjaan" {...register('occupation', { required: 'Pekerjaan wajib diisi' })} />
+                <FieldLabel>Pekerjaan</FieldLabel>
+                <Input placeholder="Masukkan pekerjaan" {...register('occupation')} />
                 <FormError message={errors.occupation?.message} />
               </div>
               <div className="space-y-2 xl:col-span-1">
@@ -384,38 +384,38 @@ export function VehicleDataForm({ title, initialData, isSubmitting = false, onSu
                 <FormError message={errors.stnkName?.message} />
               </div>
               <div className="space-y-2 md:col-span-2 xl:col-span-2">
-                <FieldLabel required>Alamat STNK</FieldLabel>
-                <Textarea placeholder="Masukkan alamat" rows={3} className="bg-white" {...register('stnkAddress', { required: 'Alamat STNK wajib diisi' })} />
+                <FieldLabel>Alamat STNK</FieldLabel>
+                <Textarea placeholder="Masukkan alamat sesuai STNK" rows={3} className="bg-white" {...register('stnkAddress')} />
                 <FormError message={errors.stnkAddress?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Kelurahan</FieldLabel>
-                <Input placeholder="Masukkan kelurahan" {...register('village', { required: 'Kelurahan wajib diisi' })} />
-                <FormError message={errors.village?.message} />
-              </div>
-              <div className="space-y-2">
-                <FieldLabel required>Kecamatan</FieldLabel>
-                <Input placeholder="Masukkan kecamatan" {...register('district', { required: 'Kecamatan wajib diisi' })} />
-                <FormError message={errors.district?.message} />
-              </div>
-              <div className="space-y-2">
-                <FieldLabel required>RW / Sub Village</FieldLabel>
-                <Input placeholder="Masukkan RW" {...register('subVillage', { required: 'RW wajib diisi' })} />
+                <FieldLabel>RT / RW</FieldLabel>
+                <Input placeholder="Masukkan RT/RW (contoh: 001/002)" {...register('subVillage')} />
                 <FormError message={errors.subVillage?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Sub District</FieldLabel>
-                <Input placeholder="Masukkan sub district" {...register('subDistrict', { required: 'Sub district wajib diisi' })} />
-                <FormError message={errors.subDistrict?.message} />
+                <FieldLabel>Desa / Kelurahan</FieldLabel>
+                <Input placeholder="Masukkan desa/kelurahan" {...register('village')} />
+                <FormError message={errors.village?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Kabupaten</FieldLabel>
-                <Input placeholder="Masukkan kabupaten" {...register('regency', { required: 'Kabupaten wajib diisi' })} />
+                <FieldLabel>Kecamatan</FieldLabel>
+                <Input placeholder="Masukkan kecamatan" {...register('district')} />
+                <FormError message={errors.district?.message} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Kabupaten / Kota</FieldLabel>
+                <Input placeholder="Masukkan kabupaten/kota" {...register('regency')} />
                 <FormError message={errors.regency?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Kode Pos</FieldLabel>
-                <Input placeholder="Masukkan kode pos" {...register('postalCode', { required: 'Kode pos wajib diisi' })} />
+                <FieldLabel>Provinsi</FieldLabel>
+                <Input placeholder="Masukkan provinsi" {...register('subDistrict')} />
+                <FormError message={errors.subDistrict?.message} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Kode Pos</FieldLabel>
+                <Input placeholder="Masukkan kode pos" {...register('postalCode')} />
                 <FormError message={errors.postalCode?.message} />
               </div>
             </div>
@@ -424,49 +424,45 @@ export function VehicleDataForm({ title, initialData, isSubmitting = false, onSu
           <Section title="Data Kendaraan">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <div className="space-y-2">
-                <FieldLabel required>Merk Motor</FieldLabel>
-                <Input placeholder="Masukkan nama" {...register('motorcycleBrand', { required: 'Merk motor wajib diisi' })} />
+                <FieldLabel>Merk Motor</FieldLabel>
+                <Input placeholder="Masukkan nama" {...register('motorcycleBrand')} />
                 <FormError message={errors.motorcycleBrand?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Tipe Motor</FieldLabel>
-                <Input placeholder="Masukkan tipe" {...register('motorcycleType', { required: 'Tipe motor wajib diisi' })} />
+                <FieldLabel>Tipe Motor</FieldLabel>
+                <Input placeholder="Masukkan tipe" {...register('motorcycleType')} />
                 <FormError message={errors.motorcycleType?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Jenis Motor</FieldLabel>
-                <Input placeholder="Masukkan jenis" {...register('motorcycleCategory', { required: 'Jenis motor wajib diisi' })} />
+                <FieldLabel>Jenis Motor</FieldLabel>
+                <Input placeholder="Masukkan jenis" {...register('motorcycleCategory')} />
                 <FormError message={errors.motorcycleCategory?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Model Motor</FieldLabel>
-                <Input placeholder="Masukkan model" {...register('motorcycleModel', { required: 'Model motor wajib diisi' })} />
+                <FieldLabel>Model Motor</FieldLabel>
+                <Input placeholder="Masukkan model" {...register('motorcycleModel')} />
                 <FormError message={errors.motorcycleModel?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Tahun Rakit</FieldLabel>
-                <Input placeholder="Masukkan tahun" {...register('manufactureYear', { required: 'Tahun rakit wajib diisi' })} />
+                <FieldLabel>Tahun Rakit</FieldLabel>
+                <Input placeholder="Masukkan tahun" {...register('manufactureYear')} />
                 <FormError message={errors.manufactureYear?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Isi Silinder</FieldLabel>
-                <Input placeholder="Masukkan jumlah" {...register('engineCapacity', { required: 'Isi silinder wajib diisi' })} />
+                <FieldLabel>Isi Silinder</FieldLabel>
+                <Input placeholder="Masukkan jumlah" {...register('engineCapacity')} />
                 <FormError message={errors.engineCapacity?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Warna</FieldLabel>
-                <Input placeholder="Masukkan warna" {...register('color', { required: 'Warna wajib diisi' })} />
+                <FieldLabel>Warna</FieldLabel>
+                <Input placeholder="Masukkan warna" {...register('color')} />
                 <FormError message={errors.color?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Harga</FieldLabel>
+                <FieldLabel>Harga</FieldLabel>
                 <Controller
                   name="price"
                   control={control}
-                  rules={{
-                    required: 'Harga wajib diisi',
-                    min: { value: 1, message: 'Harga wajib lebih dari 0' },
-                  }}
                   render={({ field }) => (
                     <MoneyInput
                       placeholder="Masukkan nominal"
@@ -490,33 +486,33 @@ export function VehicleDataForm({ title, initialData, isSubmitting = false, onSu
                 <FormError message={errors.machineNumber?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Formulir A/B</FieldLabel>
-                <Input placeholder="Masukkan formulir" {...register('formAb', { required: 'Formulir A/B wajib diisi' })} />
+                <FieldLabel>Formulir A/B</FieldLabel>
+                <Input placeholder="Masukkan formulir" {...register('formAb')} />
                 <FormError message={errors.formAb?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>PIB</FieldLabel>
-                <Input placeholder="Masukkan PIB" {...register('pib', { required: 'PIB wajib diisi' })} />
+                <FieldLabel>PIB</FieldLabel>
+                <Input placeholder="Masukkan PIB" {...register('pib')} />
                 <FormError message={errors.pib?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Nomor TPT</FieldLabel>
-                <Input placeholder="Masukkan nomor" {...register('tptNumber', { required: 'Nomor TPT wajib diisi' })} />
+                <FieldLabel>Nomor TPT</FieldLabel>
+                <Input placeholder="Masukkan nomor" {...register('tptNumber')} />
                 <FormError message={errors.tptNumber?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Nomor SUT</FieldLabel>
-                <Input placeholder="Masukkan nomor" {...register('sutNumber', { required: 'Nomor SUT wajib diisi' })} />
+                <FieldLabel>Nomor SUT</FieldLabel>
+                <Input placeholder="Masukkan nomor" {...register('sutNumber')} />
                 <FormError message={errors.sutNumber?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Nomor SRUT</FieldLabel>
-                <Input placeholder="Masukkan nomor" {...register('srutNumber', { required: 'Nomor SRUT wajib diisi' })} />
+                <FieldLabel>Nomor SRUT</FieldLabel>
+                <Input placeholder="Masukkan nomor" {...register('srutNumber')} />
                 <FormError message={errors.srutNumber?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Bahan Bakar</FieldLabel>
-                <Input placeholder="Masukkan bahan bakar" {...register('fuelType', { required: 'Bahan bakar wajib diisi' })} />
+                <FieldLabel>Bahan Bakar</FieldLabel>
+                <Input placeholder="Masukkan bahan bakar" {...register('fuelType')} />
                 <FormError message={errors.fuelType?.message} />
               </div>
             </div>

@@ -371,7 +371,7 @@ export const createGoodsReceiptItem = async (payload: GoodsReceiptItemPayload): 
 
 export const updateGoodsReceiptItem = async (id: number | string, payload: GoodsReceiptItemPayload): Promise<GoodsReceiptItem> => {
   try {
-    const body = new FormData();
+    const body = new URLSearchParams();
     body.append('goods_transaction_id', String(payload.goodsTransactionId));
     body.append('material_id', String(payload.materialId));
     body.append('qty', String(payload.qty));
@@ -380,7 +380,7 @@ export const updateGoodsReceiptItem = async (id: number | string, payload: Goods
     if (payload.description) body.append('description', payload.description);
 
     const response = await apiClient.put<ItemApiResponse<GoodsReceiptItemApiModel>>(`${detailBasePath}/${id}`, body, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     return mapItem(ensureSuccess(response.data));
   } catch (error) {
