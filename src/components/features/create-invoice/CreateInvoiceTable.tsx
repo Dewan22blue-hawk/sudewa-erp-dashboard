@@ -156,7 +156,7 @@ export function CreateInvoiceTable({
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
           <Badge className="bg-emerald-600 text-white">{selectedIds.length} invoice terpilih</Badge>
           <Button type="button" onClick={onProcessSelected} disabled={isProcessing} className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700">
-            {isProcessing ? 'Memproses...' : 'Proses Invoice'}
+            {isProcessing ? 'Memproses...' : 'Bulk Print Invoice'}
           </Button>
         </div>
       ) : null}
