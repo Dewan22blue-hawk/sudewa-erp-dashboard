@@ -6,6 +6,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableHeader } from '@/components/ui/sortable-header';
 
+const KAS_TYPE_MAP: Record<string, string> = {
+  bca_usd: 'BANK USD',
+  bca_idr: 'BANK IDR',
+  cash_idr: 'CASH IDR',
+};
+
+const getKasTypeLabel = (code: string, type: string) => {
+  const key = code.trim().toLowerCase();
+  return KAS_TYPE_MAP[key] || (type === 'cash' ? 'CASH' : 'BANK');
+};
+
 interface Props {
   data: Kas[];
 }
@@ -75,7 +86,7 @@ export function KasTable({ data }: Props) {
                 <TableRow key={item.id} className="hover:bg-slate-50/50">
                   <TableCell className="font-medium text-slate-800">{item.code}</TableCell>
                   <TableCell className="text-slate-700">{item.description}</TableCell>
-                  <TableCell className="text-slate-700">{item.type === 'cash' ? 'Cash' : 'Bank'}</TableCell>
+                  <TableCell className="text-slate-700">{getKasTypeLabel(item.code, item.type)}</TableCell>
                 </TableRow>
               ))
             )}
