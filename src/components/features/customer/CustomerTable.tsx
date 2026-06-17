@@ -145,9 +145,6 @@ export function CustomerTable({
                 <TableHead className="h-[46px] px-7 text-left">
                   <SortableHeader title="Maps" sortKey="map_link" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="Created At" sortKey="createdAt" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
-                </TableHead>
                 <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -195,9 +192,6 @@ export function CustomerTable({
                       ) : (
                         '-'
                       )}
-                    </TableCell>
-                    <TableCell className="px-7 py-4 text-center text-[15px] leading-6 text-[#171717]">
-                      {customer.createdAt ? formatDate(customer.createdAt) : '-'}
                     </TableCell>
                     <TableCell className="px-7 py-4 text-center">
                       <DropdownMenu>
