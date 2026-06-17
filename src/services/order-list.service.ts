@@ -71,15 +71,29 @@ const mapOrderListVehicle = (item: any): OrderListVehicle => ({
 });
 
 const createTarifLoadItemMap = (items: OrderListTarifLoadItem[]) => {
-  const map = new Map<number, OrderListTarifLoadItem[]>();
+  const idMap = new Map<number, OrderListTarifLoadItem[]>();
+  const uuidMap = new Map<string, OrderListTarifLoadItem[]>();
 
   items.forEach((item) => {
-    const current = map.get(item.doOrderListTarifId) ?? [];
-    current.push(item);
-    map.set(item.doOrderListTarifId, current);
+    if (item.doOrderListTarifId) {
+      const current = idMap.get(item.doOrderListTarifId) ?? [];
+      current.push(item);
+      idMap.set(item.doOrderListTarifId, current);
+    }
+    if (item.doOrderListTarifUuid) {
+      const current = uuidMap.get(item.doOrderListTarifUuid) ?? [];
+      current.push(item);
+      uuidMap.set(item.doOrderListTarifUuid, current);
+    }
   });
 
-  return map;
+  return {
+    get: (id: number, uuid?: string | null) => {
+      if (uuid && uuidMap.has(uuid)) return uuidMap.get(uuid);
+      if (id && idMap.has(id)) return idMap.get(id);
+      return undefined;
+    }
+  };
 };
 
 const buildDisplayTarifItem = (
@@ -105,7 +119,7 @@ const buildDisplayTarifItem = (
 export const composeOrderListTarifs = (tarifs: OrderListTarifItem[], tarifItems: OrderListTarifLoadItem[] = []) => {
   const tarifLoadItemMap = createTarifLoadItemMap(tarifItems);
 
-  return tarifs.map((item) => buildDisplayTarifItem(item, tarifLoadItemMap.get(item.id), item.vehicleType));
+  return tarifs.map((item) => buildDisplayTarifItem(item, tarifLoadItemMap.get(item.id, item.uuid), item.vehicleType));
 };
 
 export const composeOrderListWithTarifs = (
@@ -117,7 +131,7 @@ export const composeOrderListWithTarifs = (
 
   return {
     ...order,
-    tarifs: tarifs.map((item) => buildDisplayTarifItem(item, tarifLoadItemMap.get(item.id), order.vehicleType)),
+    tarifs: tarifs.map((item) => buildDisplayTarifItem(item, tarifLoadItemMap.get(item.id, item.uuid), order.vehicleType)),
   };
 };
 
@@ -157,7 +171,13 @@ const resolveInvoiceFee = (vehicleType: OrderListVehicleType | null, tarif?: Ord
 };
 
 const mapOrderListTarifItem = (item: any, parent?: any): OrderListTarifItem => {
-  const tarif = mapTarifReference(item.tarif ?? item.tariff ?? item.master_tarif ?? item.do_order_list_tarif?.tarif);
+  const tarif = mapTarifReference(
+    item.tarif ??
+      item.tariff ??
+      item.master_tarif ??
+      item.do_order_list_tarif?.tarif ??
+      (item.uj_towing !== undefined || item.uj_cdd !== undefined ? item : undefined)
+  );
   const vehicleType = normalizeVehicleType(
     item.vehicle_type ??
       item.vehicleType ??
@@ -168,7 +188,9 @@ const mapOrderListTarifItem = (item: any, parent?: any): OrderListTarifItem => {
       item.type_armada ??
       item.armada ??
       parent?.vehicle_type ??
-      parent?.vehicleType,
+      parent?.vehicleType ??
+      item.pivot?.vehicle_type ??
+      item.pivot?.vehicleType
   );
 
   const tarifItems = Array.isArray(item?.do_order_list_tarif_items)
@@ -178,10 +200,10 @@ const mapOrderListTarifItem = (item: any, parent?: any): OrderListTarifItem => {
       : [];
 
   return {
-    id: Number(item.id ?? 0),
-    uuid: item.uuid,
-    doOrderListId: Number(item.do_orderlist_id ?? item.do_order_list_id ?? parent?.id ?? parent?.do_orderlist_id ?? 0),
-    tarifId: Number(item.tarif_id ?? item.tarif?.id ?? item.tariff?.id ?? item.do_order_list_tarif?.tarif_id ?? 0),
+    id: Number(item.id ?? item.pivot?.id ?? 0),
+    uuid: item.pivot?.uuid ?? item.uuid,
+    doOrderListId: Number(item.do_orderlist_id ?? item.do_order_list_id ?? parent?.id ?? parent?.do_orderlist_id ?? item.pivot?.do_orderlist_id ?? item.pivot?.do_order_list_id ?? 0),
+    tarifId: Number(item.tarif_id ?? item.tarif?.id ?? item.tariff?.id ?? item.do_order_list_tarif?.tarif_id ?? item.pivot?.tarif_id ?? item.id ?? 0),
     deliveryDestination: toStringValue(
       item.delivery_destination,
       item.deliveryDestination,
@@ -189,18 +211,28 @@ const mapOrderListTarifItem = (item: any, parent?: any): OrderListTarifItem => {
       item.tujuan_kirim,
       item.delivery_address,
       item.do_order_list_tarif?.delivery_destination,
+      item.pivot?.delivery_destination,
+      item.pivot?.deliveryDestination,
     ),
     vehicleType,
     loadingIn: toStringValue(item.loading_in, item.loadingIn, tarif?.loadingIn, parent?.loading_in, parent?.loadingIn),
     loadingOut: toStringValue(item.loading_out, item.loadingOut, tarif?.loadingOut, parent?.loading_out, parent?.loadingOut),
-    loadContent: toStringValue(item.load_content, item.muatan, item.loadContent),
-    qty: item.qty != null ? toNumber(item.qty) : undefined,
-    driverFee: resolveDriverFee(vehicleType, tarif, item.uj_driver ?? item.driver_fee),
-    expeditionInvoice: resolveInvoiceFee(vehicleType, tarif, item.bill_invoice ?? item.invoice_bill ?? item.invoice_fee),
+    loadContent: toStringValue(item.load_content, item.muatan, item.loadContent, item.pivot?.load_content, item.pivot?.muatan),
+    qty: item.qty != null ? toNumber(item.qty) : (item.pivot?.qty != null ? toNumber(item.pivot.qty) : undefined),
+    driverFee: resolveDriverFee(
+      vehicleType,
+      tarif,
+      item.uj_driver ?? item.driver_fee ?? item.pivot?.uj_driver ?? item.pivot?.driver_fee ?? item.pivot?.driverFee
+    ),
+    expeditionInvoice: resolveInvoiceFee(
+      vehicleType,
+      tarif,
+      item.bill_invoice ?? item.invoice_bill ?? item.invoice_fee ?? item.pivot?.bill_invoice ?? item.pivot?.invoice_bill ?? item.pivot?.expeditionInvoice
+    ),
     tarifItems: tarifItems.length ? tarifItems : undefined,
     tarif,
-    createdAt: item.created_at,
-    updatedAt: item.updated_at,
+    createdAt: item.created_at ?? item.pivot?.created_at,
+    updatedAt: item.updated_at ?? item.pivot?.updated_at,
   };
 };
 
@@ -209,8 +241,9 @@ const mapOrderListTarifLoadItem = (item: any, parentTarif?: any): OrderListTarif
   return {
     id: Number(item?.id ?? 0),
     uuid: item?.uuid,
-    doOrderListTarifId: Number(item?.do_order_list_tarif_id ?? parent?.id ?? 0),
-    doOrderListId: Number(parent?.do_orderlist_id ?? parent?.do_order_list_id ?? 0) || undefined,
+    doOrderListTarifId: Number(item?.do_order_list_tarif_id ?? parent?.id ?? parent?.pivot?.id ?? 0),
+    doOrderListTarifUuid: item?.do_order_list_tarif?.uuid ?? parent?.uuid ?? parent?.pivot?.uuid ?? undefined,
+    doOrderListId: Number(parent?.do_orderlist_id ?? parent?.do_order_list_id ?? parent?.pivot?.do_orderlist_id ?? parent?.pivot?.do_order_list_id ?? 0) || undefined,
     loadContent: toStringValue(item?.load_content, item?.muatan, item?.loadContent),
     qty: toNumber(item?.qty),
     createdAt: item?.created_at,
