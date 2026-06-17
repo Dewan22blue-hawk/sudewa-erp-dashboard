@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 
 // Import new hooks, types, and components
@@ -24,7 +23,7 @@ import {
 import { GoodsReceiptEquipmentFormModal } from '@/components/features/warehouse/receipt-equipment/GoodsReceiptEquipmentFormModal';
 import { GoodsReceiptEquipmentDetailFormModal } from '@/components/features/warehouse/receipt-equipment/GoodsReceiptEquipmentDetailFormModal';
 import { GoodsReceiptEquipmentDetailTable } from '@/components/features/warehouse/receipt-equipment/GoodsReceiptEquipmentDetailTable';
-import { formatDate, formatCurrency } from '@/components/features/warehouse/receipt-equipment/goodsReceiptEquipment.utils';
+import { formatDate } from '@/components/features/warehouse/receipt-equipment/goodsReceiptEquipment.utils';
 import type { GoodsTransactionDetailEquipment } from '@/@types/goods-receipt-equipment.types';
 import type { GoodsReceiptEquipmentFormValues, GoodsReceiptEquipmentItemFormValues } from '@/scheme/goods-receipt-equipment.schema';
 

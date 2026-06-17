@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api/client';
-import { ApiResponseError, type LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
+import { type LaravelApiResponse, ensureSuccess } from '@/lib/api/response';
 
 const basePath = '/wapi/transaction/goods-transaction';
 

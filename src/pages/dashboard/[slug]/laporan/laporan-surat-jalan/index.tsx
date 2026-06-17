@@ -11,10 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-import { useExpeditionReport, useExpeditionReportDetail } from '@/hooks/report/useExpeditionReport';
+import { useExpeditionReport } from '@/hooks/report/useExpeditionReport';
 import { useCompany } from '@/contexts/CompanyContext';
 import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 import { PrintLetterPage } from '@/components/common/PrintLetterPage';
@@ -38,10 +37,6 @@ export default function LaporanSuratJalanPage() {
   const [orderBy, setOrderBy] = useState<string>('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
 
-  // Detail Modal State
-  const [selectedId, setSelectedId] = useState<number | string | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
-
   // Debounce search query
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -61,9 +56,6 @@ export default function LaporanSuratJalanPage() {
     orderSort,
   });
 
-  // Fetch detail data if selected
-  const { data: detailData, isLoading: isDetailLoading } = useExpeditionReportDetail(selectedId);
-
   const visiblePages = getVisiblePageNumbers(pagination.lastPage, page, 5);
 
   // Formatting helpers
@@ -72,15 +64,6 @@ export default function LaporanSuratJalanPage() {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return format(date, 'dd/MM/yyyy');
-  };
-
-  const formatIDR = (value?: number | null) => {
-    if (value === null || value === undefined) return '-';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(value);
   };
 
   // Sorting handler

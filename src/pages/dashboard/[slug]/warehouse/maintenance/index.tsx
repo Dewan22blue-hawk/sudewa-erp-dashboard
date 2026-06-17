@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Search } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -17,8 +16,6 @@ import { MaintenanceDetailModal } from '@/components/features/warehouse/maintena
 import type { MaintenanceItem } from '@/@types/maintenance.types';
 
 export default function MaintenanceListPage() {
-  const router = useRouter();
-  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const { isLoading: isCompanyLoading } = useCompany();
 
   // PT Wajira Transindo company ID is 4

@@ -6,7 +6,6 @@ import type { OrderList, OrderListVehicleType } from '@/@types/order-list.types'
 import type { Tarif } from '@/@types/tarif.types';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
@@ -15,8 +14,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { orderListFormSchema, type OrderListFormSchema } from '@/schemas/order-list.schema';
 import {
-  ORDER_LIST_EDIT_STATUS_OPTIONS,
-  ORDER_LIST_STATUS_OPTIONS,
   ORDER_LIST_VEHICLE_OPTIONS,
   formatOrderCurrency,
 } from './order-list.utils';
@@ -143,7 +140,6 @@ const mergeSelectOptions = (options: SearchableSelectOption[], extras: Searchabl
 };
 
 export function OrderListForm({
-  mode,
   initialData,
   customerOptions,
   tarifOptions,
@@ -227,13 +223,6 @@ export function OrderListForm({
   const invoiceBill = useWatch({ control, name: 'invoiceBill' });
   const watchedPpn = useWatch({ control, name: 'ppn' });
   const watchedUjDriver = useWatch({ control, name: 'ujDriver' });
-  const totalTarifGroups = watchedItems?.length ?? 0;
-  const totalCargoItems = (watchedItems ?? []).reduce((sum, item) => sum + (item?.cargoItems?.length ?? 0), 0);
-  const totalCargoQty = (watchedItems ?? []).reduce(
-    (sum, item) => sum + (item?.cargoItems ?? []).reduce((cargoSum, cargoItem) => cargoSum + Number(cargoItem?.qty ?? 0), 0),
-    0,
-  );
-
   const selectedCustomer = mergedCustomerOptions.find((item) => item.value === customerId);
 
   const appendCargoItem = React.useCallback(

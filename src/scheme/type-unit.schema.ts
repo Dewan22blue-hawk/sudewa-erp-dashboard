@@ -1,11 +1,5 @@
 import { z } from 'zod';
 
-const toOptionalNumber = (value: unknown) => {
-  if (value === '' || value === null || value === undefined) return undefined;
-  const num = Number(value);
-  return Number.isNaN(num) ? undefined : num;
-};
-
 export const typeUnitSchema = z.object({
   brandId: z.coerce.number().min(1, 'Brand ID wajib diisi'),
   code: z.string().min(1, 'Kode wajib diisi'),

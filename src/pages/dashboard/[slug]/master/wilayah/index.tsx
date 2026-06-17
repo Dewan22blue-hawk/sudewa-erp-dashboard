@@ -16,7 +16,7 @@ export default function RegionPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const { data: regionsData, isLoading } = useRegions({ page, perPage, search });
+  const { data: regionsData } = useRegions({ page, perPage, search });
   
   const createMutation = useCreateRegion();
   const updateMutation = useUpdateRegion();

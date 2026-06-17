@@ -23,9 +23,7 @@ export function LaporanKasTable({
     data, 
     totalPemasukan = 0, 
     totalPengeluaran = 0,
-    onSort,
-    sortKey,
-    sortOrder 
+    onSort
 }: LaporanKasTableProps) {
     const formatCurrency = (val: number) => {
         return `Rp ${val.toLocaleString('id-ID')}`;

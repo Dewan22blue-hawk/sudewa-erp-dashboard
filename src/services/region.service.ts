@@ -46,18 +46,6 @@ export const getRegionById = async (id: string | number): Promise<Region> => {
     };
 };
 
-const buildPayload = (data: Partial<RegionPayload>, opts?: { asUpdate?: boolean }) => {
-    const formData = new URLSearchParams();
-    // Use URLSearchParams since the prompt hints "request Body urlencoded" for PUT 
-    // Wait, prompt says: "request Body form-data" for POST, "request Body urlencoded" for PUT.
-    // I will use FormData for POST and URLSearchParams for PUT to strictly follow the prompt if we didn't spoof _method.
-    // Wait, I can just use URLSearchParams for both if simple string, OR follow exactly.
-    // Let's use URLSearchParams for both, OR follow exactly: FormData for create, URLSearchParams for update.
-    // The previous instruction and standard Laravel is perfectly fine with `FormData` with method spoofing, OR I can just use `URLSearchParams` for urlencoded.
-    // The prompt literally said: POST with body form-data, PUT with body urlencoded.
-    // I will write custom build for each.
-};
-
 export const createRegion = async (data: Partial<RegionPayload>): Promise<void> => {
     const formData = new FormData();
     if (data.code) formData.append('code', data.code);

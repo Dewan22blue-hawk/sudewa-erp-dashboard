@@ -23,8 +23,6 @@ import { GoodsIssueEquipmentFormModal } from '@/components/features/warehouse/is
 import { GoodsIssueEquipmentUploadInvoiceModal } from '@/components/features/warehouse/issue-equipment/GoodsIssueEquipmentUploadInvoiceModal';
 import type { GoodsIssueEquipment } from '@/@types/goods-issue-equipment.types';
 import type { GoodsIssueEquipmentFormValues } from '@/scheme/goods-issue-equipment.schema';
-import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
-
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 const getErrorMessage = (error: any): string => {
@@ -34,7 +32,7 @@ const getErrorMessage = (error: any): string => {
 export default function PengeluaranPerlengkapanIndex() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { companyId, isLoading: isCompanyLoading } = useCompany();
+  const { isLoading: isCompanyLoading } = useCompany();
 
   // Enforce company ID 4 (Transindo) for data fetching
   const activeCompanyId = 4;

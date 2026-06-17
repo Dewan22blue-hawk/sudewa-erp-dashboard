@@ -15,7 +15,6 @@ import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError, type LaravelApiResponse, ensureSuccess, toPaginatedResult } from '@/lib/api/response';
 
 const basePath = '/wapi/transaction/goods-transaction';
-const detailBasePath = '/wapi/transaction/goods-transaction-detail';
 const billingBasePath = '/wapi/transaction/goods-transaction-billing';
 const paymentBasePath = '/wapi/transaction/goods-transaction-billing-payment';
 

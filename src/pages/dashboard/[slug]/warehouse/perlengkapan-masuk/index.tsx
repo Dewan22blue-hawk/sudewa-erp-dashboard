@@ -8,11 +8,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useCompany } from '@/contexts/CompanyContext';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
-import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { useKas } from '@/hooks/useKas';
 
 // Import new hooks, types, components
@@ -42,8 +40,6 @@ const getErrorMessage = (error: any): string => {
 export default function PerlengkapanMasukListPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { companyId } = useCompany();
-
   // PT Wajira Transindo company_id is 4
   const activeCompanyId = 4;
 
