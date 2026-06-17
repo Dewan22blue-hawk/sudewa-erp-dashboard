@@ -3,7 +3,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { MoreVertical, Pencil, Trash, Lock } from 'lucide-react';
 import type { AccountGroup } from '@/@types/account-group.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
@@ -40,23 +40,6 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
   return (
     <div className="space-y-4">
-      {/* SHOW ENTRIES */}
-      <div className="flex items-center gap-2 text-sm">
-        <span>Show</span>
-        <Select value={String(perPage)} onValueChange={handlePerPageChange}>
-          <SelectTrigger className="h-9 w-20 bg-white">
-            <SelectValue placeholder="10" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="25">25</SelectItem>
-            <SelectItem value="50">50</SelectItem>
-            <SelectItem value="100">100</SelectItem>
-          </SelectContent>
-        </Select>
-        <span>Entries</span>
-      </div>
-
       <div className="rounded-xl border overflow-hidden">
         <Table>
           <TableHeader>

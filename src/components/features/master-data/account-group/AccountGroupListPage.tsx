@@ -14,7 +14,8 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Download, Plus } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, Plus, Search } from 'lucide-react';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 
 export const AccountGroupListPage = () => {
@@ -130,16 +131,36 @@ export const AccountGroupListPage = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <div className="relative w-64 text-gray-400 focus-within:text-gray-900">
-              <Input
-                placeholder="Search here"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-3 h-10 border-gray-200 rounded-lg text-gray-900"
-              />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* LEFT: Search + Show */}
+            <div className="flex items-center gap-3">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search here"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9 h-10 border-gray-200 rounded-lg text-gray-900"
+                />
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
+                <span>Show</span>
+                <Select value={String(perPage)} onValueChange={(val) => { setPerPage(Number(val)); setPage(1); }}>
+                  <SelectTrigger className="h-10 w-20 border-gray-200 bg-white rounded-lg">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Entries</span>
+              </div>
             </div>
-            <div className="flex flex-row gap-2">
+            {/* RIGHT: Import + Tambah */}
+            <div className="flex flex-row items-center gap-2">
               <Button onClick={() => setOpenImport(true)} className="gap-2" variant="outline">
                 <Download className="h-4 w-4" />
                 Import
