@@ -51,7 +51,20 @@ export default function OrderListDetailPage() {
   const effectiveData = React.useMemo(() => {
     if (!detailQuery.data) return null;
     const listRecord = orderListLookupQuery.data?.data.find((item) => item.id === detailQuery.data?.id);
-    const tarifs = tarifItemQuery.data?.data?.length ? tarifItemQuery.data.data : detailQuery.data.tarifs;
+    
+    const rawEntries = tarifItemQuery.data?.data?.length ? tarifItemQuery.data.data : detailQuery.data.tarifs;
+    const tarifs = rawEntries.map((entry) => {
+      const match = detailQuery.data?.tarifs?.find(
+        (t) => t.tarifId === entry.tarifId || (t.uuid && t.uuid === entry.uuid)
+      );
+      return {
+        ...entry,
+        tarif: entry.tarif ?? match?.tarif,
+        driverFee: entry.driverFee || match?.driverFee || 0,
+        expeditionInvoice: entry.expeditionInvoice || match?.expeditionInvoice || 0,
+      };
+    });
+
     const tarifLoadItems = tarifLoadItemQuery.data?.data ?? [];
 
     return composeOrderListWithTarifs(

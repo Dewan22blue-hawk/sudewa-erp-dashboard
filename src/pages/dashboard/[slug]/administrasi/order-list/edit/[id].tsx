@@ -81,7 +81,19 @@ export default function EditOrderListPage() {
   const effectiveOrderData = React.useMemo(() => {
     if (!detailQuery.data) return null;
 
-    const tarifEntries = tarifItemQuery.data?.data?.length ? tarifItemQuery.data.data : detailQuery.data.tarifs;
+    const rawEntries = tarifItemQuery.data?.data?.length ? tarifItemQuery.data.data : detailQuery.data.tarifs;
+    const tarifEntries = rawEntries.map((entry) => {
+      const match = detailQuery.data?.tarifs?.find(
+        (t) => t.tarifId === entry.tarifId || (t.uuid && t.uuid === entry.uuid)
+      );
+      return {
+        ...entry,
+        tarif: entry.tarif ?? match?.tarif,
+        driverFee: entry.driverFee || match?.driverFee || 0,
+        expeditionInvoice: entry.expeditionInvoice || match?.expeditionInvoice || 0,
+      };
+    });
+    
     const tarifLoadItems = (tarifLoadItemQuery.data?.data ?? []).filter((item) => !id || Number(item.doOrderListId ?? 0) === Number(id));
 
     return composeOrderListWithTarifs(detailQuery.data, tarifEntries, tarifLoadItems);

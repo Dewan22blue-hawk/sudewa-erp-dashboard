@@ -31,129 +31,134 @@ export function CustomerFormModal({
 }: CustomerFormModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[410px] rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[410px]">
-        <div className="px-6 py-6">
-          <DialogHeader className="space-y-1 text-left">
+      <DialogContent
+        className="max-w-[410px] rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[410px]"
+        style={{ display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' }}
+      >
+        <div className="flex flex-col overflow-hidden px-6 pt-6">
+          <DialogHeader className="shrink-0 space-y-1 text-left">
             <DialogTitle className="text-[18px] font-semibold text-[#171717]">{title}</DialogTitle>
             <DialogDescription className="text-[15px] text-[#71717A]">{description}</DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">
-                      Nama Customer<RequiredMark />
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan nama customer"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <form onSubmit={form.handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1 }}>
+              <div className="mt-6 flex flex-col gap-4 overflow-y-auto pb-2 pr-1">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">
+                        Nama Customer<RequiredMark />
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan nama customer"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="pic"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">PIC</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan PIC"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="pic"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">PIC</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan PIC"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Alamat</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Tambahkan Alamat"
-                        className="min-h-[112px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">Alamat</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Tambahkan Alamat"
+                          className="min-h-[112px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Phone</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan nomer telepon"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                        onChange={(e) => {
-                          field.onChange(sanitizePhone(e.target.value));
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">Phone</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan nomer telepon"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                          onChange={(e) => {
+                            field.onChange(sanitizePhone(e.target.value));
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="map_link"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Maps</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan link maps"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="map_link"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">Maps</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan link maps"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="npwp"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">NPWP</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Tambahkan NPWP"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="npwp"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[14px] font-medium text-[#171717]">NPWP</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Tambahkan NPWP"
+                          className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <div className="flex flex-col gap-3 pt-2">
+              <div className="shrink-0 flex flex-col gap-3 py-6">
                 <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
                   {isSubmitting ? 'Menyimpan...' : submitLabel}
                 </Button>

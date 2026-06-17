@@ -332,13 +332,13 @@ export default function PerlengkapanMasukDetailPage() {
           <div className="overflow-hidden rounded-xl border border-slate-200">
             <Table>
               <TableHeader className="bg-slate-50">
-                <TableRow>
-                  <TableHead className="w-12 text-center">NO</TableHead>
-                  <TableHead>KODE BARANG</TableHead>
-                  <TableHead>NAMA BARANG</TableHead>
-                  <TableHead className="text-center">QTY</TableHead>
-                  <TableHead>HARGA</TableHead>
-                  <TableHead>TOTAL</TableHead>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[56px] px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">NO</TableHead>
+                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
+                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
+                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">HARGA SATUAN</TableHead>
+                  <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
+                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TOTAL</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -351,12 +351,12 @@ export default function PerlengkapanMasukDetailPage() {
                 ) : (
                   items.map((item, index) => (
                     <TableRow key={item.id} className="hover:bg-slate-50/50">
-                      <TableCell className="text-center text-[15px] text-slate-800">{index + 1}</TableCell>
-                      <TableCell className="text-[15px] text-slate-800">{item.vehicleEquipment?.code ?? '-'}</TableCell>
-                      <TableCell className="text-[15px] text-slate-800">{item.vehicleEquipment?.name ?? '-'}</TableCell>
-                      <TableCell className="text-center text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
-                      <TableCell className="text-[15px] text-slate-800">{formatCurrency(item.price || 0)}</TableCell>
-                      <TableCell className="text-[15px] font-semibold text-slate-900">{formatCurrency((item.price || 0) * item.qty)}</TableCell>
+                      <TableCell className="px-5 py-4 text-center text-[15px] text-slate-800">{index + 1}</TableCell>
+                      <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.code ?? '-'}</TableCell>
+                      <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.name ?? '-'}</TableCell>
+                      <TableCell className="px-5 py-4 text-[15px] text-slate-800">{formatCurrency(item.price || 0)}</TableCell>
+                      <TableCell className="px-5 py-4 text-center text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
+                      <TableCell className="px-5 py-4 text-[15px] font-semibold text-slate-900">{formatCurrency((item.price || 0) * item.qty)}</TableCell>
                     </TableRow>
                   ))
                 )}

@@ -9,6 +9,7 @@ export interface Tarif {
     ujTowing?: number | null;
     ujCdd?: number | null;
     ujFuso?: number | null;
+    invTowing?: number | null;
     invCdd?: number | null;
     invFuso?: number | null;
     isActive?: boolean;
@@ -25,6 +26,7 @@ export interface TarifPayload {
     uj_towing?: number | null;
     uj_cdd?: number | null;
     uj_fuso?: number | null;
+    inv_towing?: number | null;
     inv_cdd?: number | null;
     inv_fuso?: number | null;
     is_active?: boolean;
