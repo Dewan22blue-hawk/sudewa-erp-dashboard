@@ -384,38 +384,38 @@ export function VehicleDataForm({ title, initialData, isSubmitting = false, onSu
                 <FormError message={errors.stnkName?.message} />
               </div>
               <div className="space-y-2 md:col-span-2 xl:col-span-2">
-                <FieldLabel required>Alamat STNK</FieldLabel>
-                <Textarea placeholder="Masukkan alamat" rows={3} className="bg-white" {...register('stnkAddress', { required: 'Alamat STNK wajib diisi' })} />
+                <FieldLabel>Alamat STNK</FieldLabel>
+                <Textarea placeholder="Masukkan alamat sesuai STNK" rows={3} className="bg-white" {...register('stnkAddress')} />
                 <FormError message={errors.stnkAddress?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Kelurahan</FieldLabel>
-                <Input placeholder="Masukkan kelurahan" {...register('village', { required: 'Kelurahan wajib diisi' })} />
-                <FormError message={errors.village?.message} />
-              </div>
-              <div className="space-y-2">
-                <FieldLabel required>Kecamatan</FieldLabel>
-                <Input placeholder="Masukkan kecamatan" {...register('district', { required: 'Kecamatan wajib diisi' })} />
-                <FormError message={errors.district?.message} />
-              </div>
-              <div className="space-y-2">
-                <FieldLabel required>RW / Sub Village</FieldLabel>
-                <Input placeholder="Masukkan RW" {...register('subVillage', { required: 'RW wajib diisi' })} />
+                <FieldLabel>RT / RW</FieldLabel>
+                <Input placeholder="Masukkan RT/RW (contoh: 001/002)" {...register('subVillage')} />
                 <FormError message={errors.subVillage?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Sub District</FieldLabel>
-                <Input placeholder="Masukkan sub district" {...register('subDistrict', { required: 'Sub district wajib diisi' })} />
-                <FormError message={errors.subDistrict?.message} />
+                <FieldLabel>Desa / Kelurahan</FieldLabel>
+                <Input placeholder="Masukkan desa/kelurahan" {...register('village')} />
+                <FormError message={errors.village?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Kabupaten</FieldLabel>
-                <Input placeholder="Masukkan kabupaten" {...register('regency', { required: 'Kabupaten wajib diisi' })} />
+                <FieldLabel>Kecamatan</FieldLabel>
+                <Input placeholder="Masukkan kecamatan" {...register('district')} />
+                <FormError message={errors.district?.message} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Kabupaten / Kota</FieldLabel>
+                <Input placeholder="Masukkan kabupaten/kota" {...register('regency')} />
                 <FormError message={errors.regency?.message} />
               </div>
               <div className="space-y-2">
-                <FieldLabel required>Kode Pos</FieldLabel>
-                <Input placeholder="Masukkan kode pos" {...register('postalCode', { required: 'Kode pos wajib diisi' })} />
+                <FieldLabel>Provinsi</FieldLabel>
+                <Input placeholder="Masukkan provinsi" {...register('subDistrict')} />
+                <FormError message={errors.subDistrict?.message} />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Kode Pos</FieldLabel>
+                <Input placeholder="Masukkan kode pos" {...register('postalCode')} />
                 <FormError message={errors.postalCode?.message} />
               </div>
             </div>
