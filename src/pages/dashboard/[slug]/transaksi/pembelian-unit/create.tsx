@@ -6,12 +6,13 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { useCreatePurchase } from '@/hooks/usePurchase';
-import { ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -209,20 +210,21 @@ export default function CreatePurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
-            Pembelian Unit
-          </span>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">Tambah Pembelian</span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <PageHeader title="Tambah Pembelian Unit" description="" />
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Kode Beli</span>
-            <span className="text-blue-600 font-medium">{generatedCode}</span>
+        {/* HEADER */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ChevronLeft className="h-6 w-6 text-slate-800" />
+          </button>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tambah Pembelian</h1>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Kode Beli</span>
+              <span className="text-blue-600 font-medium">{generatedCode}</span>
+            </div>
           </div>
         </div>
 
@@ -233,13 +235,19 @@ export default function CreatePurchasePage() {
             onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
             companyId={companyId}
             prependFields={
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Tanggal Pembelian</Label>
-                  <Input
-                    type="date"
+                  <Label>Tanggal</Label>
+                  <DatePicker
                     value={purchaseDate}
-                    onChange={(e) => setPurchaseDate(e.target.value)}
+                    onChange={(date) => {
+                      if (date) {
+                        const offset = date.getTimezoneOffset();
+                        const adjusted = new Date(date.getTime() - (offset * 60 * 1000));
+                        setPurchaseDate(adjusted.toISOString().split('T')[0]);
+                      }
+                    }}
+                    placeholder="Pick a date"
                     className="h-10 border-slate-200 bg-white"
                   />
                 </div>

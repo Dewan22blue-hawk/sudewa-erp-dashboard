@@ -37,7 +37,10 @@ export const useCreateRefund = () => {
   const { companyId } = useCompany();
 
   return useMutation({
-    mutationFn: (payload: CreateRefundPayload) => refundAdministrasiService.createRefund(payload),
+    mutationFn: (payload: CreateRefundPayload) => refundAdministrasiService.createRefund({
+      company_id: payload.company_id ?? companyId ?? undefined,
+      ...payload
+    }),
     onSuccess: () => {
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
@@ -53,7 +56,10 @@ export const useUpdateRefund = () => {
   const { companyId } = useCompany();
 
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateRefundPayload }) => refundAdministrasiService.updateRefund(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateRefundPayload }) => refundAdministrasiService.updateRefund(id, {
+      company_id: payload.company_id ?? companyId ?? undefined,
+      ...payload
+    }),
     onSuccess: () => {
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });

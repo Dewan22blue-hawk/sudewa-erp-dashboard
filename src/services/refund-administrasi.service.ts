@@ -134,6 +134,9 @@ export const refundAdministrasiService = {
     if (payload.note) {
       formData.append('note', payload.note);
     }
+    if (payload.company_id) {
+      formData.append('company_id', String(payload.company_id));
+    }
 
     appendRefundItemDetailIds(formData, payload.unit_transaction_item_detail_ids);
 
@@ -154,6 +157,7 @@ export const refundAdministrasiService = {
     if (payload.refund_date) formData.append('refund_date', payload.refund_date);
     if (payload.refund_amount !== undefined) formData.append('refund_amount', String(payload.refund_amount));
     if (payload.note !== undefined) formData.append('note', payload.note);
+    if (payload.company_id) formData.append('company_id', String(payload.company_id));
     appendRefundItemDetailIds(formData, payload.unit_transaction_item_detail_ids);
 
     const response = await apiClient.post<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`, formData, {
@@ -182,6 +186,9 @@ export const refundAdministrasiService = {
     if (payload.note) {
       body.append('note', payload.note);
     }
+    if (payload.cash_id) {
+      body.append('cash_id', String(payload.cash_id));
+    }
 
     const response = await apiClient.post<LaravelApiResponse<any>>(PAYMENT_PATH, body, {
       headers: {
@@ -198,6 +205,7 @@ export const refundAdministrasiService = {
     if (payload.amount !== undefined) body.append('amount', String(payload.amount));
     if (payload.payment_date) body.append('payment_date', payload.payment_date);
     if (payload.note !== undefined) body.append('note', payload.note);
+    if (payload.cash_id) body.append('cash_id', String(payload.cash_id));
 
     const response = await apiClient.put<LaravelApiResponse<any>>(`${PAYMENT_PATH}/${id}`, body, {
       headers: {
