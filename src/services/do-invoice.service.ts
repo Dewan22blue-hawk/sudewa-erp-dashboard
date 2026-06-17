@@ -55,8 +55,8 @@ const mapVehicle = (item: any): DoInvoiceVehicle | null => {
   return {
     id: Number(item.id ?? 0),
     uuid: item.uuid,
-    registrationNumber: item.registration_number ?? item.no_polisi ?? '-',
-    type: item.type ?? item.vehicle_type ?? '-',
+    registrationNumber: item.registration_number ?? item.registrationNumber ?? item.no_polisi ?? item.noPolisi ?? '-',
+    type: item.type ?? item.vehicle_type ?? item.vehicleType ?? '-',
   };
 };
 
@@ -65,7 +65,7 @@ const mapDriver = (item: any): DoInvoiceDriver | null => {
   return {
     id: Number(item.id ?? 0),
     uuid: item.uuid,
-    name: item.name ?? '-',
+    name: item.name ?? item.driverName ?? '-',
   };
 };
 
@@ -114,8 +114,8 @@ const mapExpedition = (item: any): DoInvoiceExpedition => {
   const orderListTarif = findNested(item, 'order_list_tarif', 'orderListTarif') ?? item?.order_list_tarifs?.[0];
   const rawTarifObj = findNested(item, 'tarif', 'price_tarif') ?? orderListTarif?.tarif ?? orderListTarif;
   const tarif = mapTarif(rawTarifObj);
-  const vehicle = mapVehicle(findNested(item, 'vehicle', 'armada'));
-  const driver = mapDriver(findNested(item, 'driver'));
+  const vehicle = mapVehicle(findNested(item, 'vehicle', 'vehicle_fleet', 'vehicleFleet', 'armada'));
+  const driver = mapDriver(findNested(item, 'driver', 'driver_fleet', 'driverFleet'));
   const orderList = mapOrderList(findNested(item, 'order_list', 'orderList'));
   const customer = mapCustomer(findNested(item, 'customer'));
 
