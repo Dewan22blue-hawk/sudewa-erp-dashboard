@@ -1,106 +1,106 @@
-stages:
-  - build
-  - test
-  - deploy
+# stages:
+#   - build
+#   - test
+#   - deploy
 
-workflow:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
+# workflow:
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "push"
 
-# =========================
-# GLOBAL BEFORE SCRIPT
-# =========================
-default:
-  before_script:
-    - 'echo "🚧 Runner: $(hostname)"'
-    - 'echo "👤 User: $(whoami)"'
-    - 'docker --version || true'
+# # =========================
+# # GLOBAL BEFORE SCRIPT
+# # =========================
+# default:
+#   before_script:
+#     - 'echo "🚧 Runner: $(hostname)"'
+#     - 'echo "👤 User: $(whoami)"'
+#     - 'docker --version || true'
 
-# =========================
-# BASE TEMPLATE
-# =========================
-.default-dev: &default-dev
-  tags:
-    - stagging
-    - deraly
-    - hq
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
+# # =========================
+# # BASE TEMPLATE
+# # =========================
+# .default-dev: &default-dev
+#   tags:
+#     - stagging
+#     - deraly
+#     - hq
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "development"'
 
-.default-prod: &default-prod
-  tags:
-    - cloud
-    - wajira
-    - production
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-
-
-# =========================
-# DEVELOPMENT PIPELINE
-# =========================
-build-dev:
-  <<: *default-dev
-  stage: build
-  script:
-    - echo "Build development (optional)"
-
-test-dev:
-  <<: *default-dev
-  stage: test
-  script:
-    - echo "Testing development (optional)"
-
-deploy-dev:
-  <<: *default-dev
-  stage: deploy
-  environment:
-    name: staging
-  script:
-    - echo "Deploy to staging"
+# .default-prod: &default-prod
+#   tags:
+#     - cloud
+#     - wajira
+#     - production
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "master"'
 
 
-# =========================
-# PRODUCTION PIPELINE
-# =========================
-build-prod:
-  <<: *default-prod
-  stage: build
-  script:
-    - echo "Build production (optional)"
+# # =========================
+# # DEVELOPMENT PIPELINE
+# # =========================
+# build-dev:
+#   <<: *default-dev
+#   stage: build
+#   script:
+#     - echo "Build development (optional)"
 
-test-prod:
-  <<: *default-prod
-  stage: test
-  script:
-    - echo "Testing production (optional)"
+# test-dev:
+#   <<: *default-dev
+#   stage: test
+#   script:
+#     - echo "Testing development (optional)"
 
-deploy-prod:
-  <<: *default-prod
-  stage: deploy
-  environment:
-    name: production
-  script:
-    - echo "🚀 Deploy Production Started"
+# deploy-dev:
+#   <<: *default-dev
+#   stage: deploy
+#   environment:
+#     name: staging
+#   script:
+#     - echo "Deploy to staging"
 
-    - |
-      sudo -u wajira-team bash << 'EOF'
-      set -e
 
-      cd /home/wajira-team/production/finance-dash
+# # =========================
+# # PRODUCTION PIPELINE
+# # =========================
+# build-prod:
+#   <<: *default-prod
+#   stage: build
+#   script:
+#     - echo "Build production (optional)"
 
-      echo "📥 Pull latest code"
-      git pull origin master
+# test-prod:
+#   <<: *default-prod
+#   stage: test
+#   script:
+#     - echo "Testing production (optional)"
 
-      echo "🐳 Rebuild container"
-      docker compose -f docker-compose.prod.yaml down -v
-      docker rmi wajira-finance-dashboard:latest
-      docker compose -f docker-compose.prod.yaml build --no-cache
-      docker compose -f docker-compose.prod.yaml up -d
+# deploy-prod:
+#   <<: *default-prod
+#   stage: deploy
+#   environment:
+#     name: production
+#   script:
+#     - echo "🚀 Deploy Production Started"
 
-      echo "⏳ Wait container ready"
-      sleep 5
+#     - |
+#       sudo -u wajira-team bash << 'EOF'
+#       set -e
 
-      EOF
+#       cd /home/wajira-team/production/finance-dash
 
-    - echo "✅ Deploy Done"
+#       echo "📥 Pull latest code"
+#       git pull origin master
+
+#       echo "🐳 Rebuild container"
+#       docker compose -f docker-compose.prod.yaml down -v
+#       docker rmi wajira-finance-dashboard:latest
+#       docker compose -f docker-compose.prod.yaml build --no-cache
+#       docker compose -f docker-compose.prod.yaml up -d
+
+#       echo "⏳ Wait container ready"
+#       sleep 5
+
+#       EOF
+
+#     - echo "✅ Deploy Done"
