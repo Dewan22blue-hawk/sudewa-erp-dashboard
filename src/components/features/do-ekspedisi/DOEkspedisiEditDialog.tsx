@@ -93,7 +93,11 @@ export function DOEkspedisiEditDialog({
     return [{ value: String(item.driverId), label: item.driver.name, subtitle: item.driver.phone ?? undefined }, ...driverOptions];
   }, [driverOptions, item?.driver, item?.driverId]);
 
-  const selectedVehicle = mergedVehicleOptions.find((option) => option.value === watch('vehicleId'));
+  const vehicleId = watch('vehicleId');
+
+  const selectedVehicle = React.useMemo(() => {
+    return mergedVehicleOptions.find((option) => option.value === vehicleId);
+  }, [mergedVehicleOptions, vehicleId]);
 
   const vehicleTypeDisplay = React.useMemo(() => {
     const rawType = selectedVehicle?.subtitle || item?.orderList?.vehicleType || item?.vehicle?.type || '';
