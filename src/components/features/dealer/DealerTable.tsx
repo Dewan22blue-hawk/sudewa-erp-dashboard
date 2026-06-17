@@ -82,6 +82,9 @@ export function DealerTable({
                         <Button
                             onClick={onExport}
                             variant="outline"
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -105,13 +108,13 @@ export function DealerTable({
             <Card className="rounded-xl overflow-hidden border border-gray-200 shadow-none">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="hover:bg-[#f8f9fa]">
-                            <TableHead className="text-xs font-semibold text-gray-500 w-[15%] uppercase px-4 py-4 text-left">KODE DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-500 w-[25%] uppercase px-4 py-4 text-left">NAMA DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
+                        <TableRow>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">KODE DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[25%] uppercase px-4 py-3">NAMA DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">ALAMAT</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PIC</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PHONE</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
