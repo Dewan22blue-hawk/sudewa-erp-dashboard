@@ -3,16 +3,17 @@
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { PageHeader } from '@/components/common/PageHeader';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { useCreatePurchase } from '@/hooks/usePurchase';
 import { ChevronLeft, ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronLeft, Check, ChevronsUpDown } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
+import { Button } from '@/components/ui/button';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -65,6 +66,7 @@ export default function CreatePurchasePage() {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -207,6 +209,8 @@ export default function CreatePurchasePage() {
     }
   };
 
+  const purchasePath = `/dashboard/${slug}/transaksi/pembelian-unit`;
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -225,87 +229,113 @@ export default function CreatePurchasePage() {
               <span className="text-muted-foreground">Kode Beli</span>
               <span className="text-blue-600 font-medium">{generatedCode}</span>
             </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border bg-white p-6 md:p-8">
-          <PurchaseUnitForm
-            onSubmit={handleSubmit}
-            loading={mutation.isPending}
-            onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
-            companyId={companyId}
-            prependFields={
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Tanggal</Label>
-                  <DatePicker
-                    value={purchaseDate}
-                    onChange={(date) => {
-                      if (date) {
-                        const offset = date.getTimezoneOffset();
-                        const adjusted = new Date(date.getTime() - (offset * 60 * 1000));
-                        setPurchaseDate(adjusted.toISOString().split('T')[0]);
-                      }
-                    }}
-                    placeholder="Pick a date"
-                    className="h-10 border-slate-200 bg-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Supplier</Label>
-                  <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        role="combobox"
-                        aria-expanded={supplierOpen}
-                        aria-controls="supplier-combobox-list"
-                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                      >
-                        <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : 'Pilih supplier'}</span>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Cari supplier..." />
-                        <CommandList id="supplier-combobox-list">
-                          <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
-                          <CommandGroup>
-                            {personOptions.map((person) => (
-                              <CommandItem
-                                key={String(person.id)}
-                                value={`${person.name} ${person.code ?? ''} ${person.id}`}
-                                onSelect={() => {
-                                  setPersonId(String(person.id));
-                                  setSupplierOpen(false);
-                                }}
-                              >
-                                <Check className={cn('mr-2 h-4 w-4', personId === String(person.id) ? 'opacity-100' : 'opacity-0')} />
-                                {person.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Alamat</Label>
-                  <Input value={selectedPerson?.address ?? ''} readOnly className="bg-transparent" placeholder="Alamat supplier" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>NPWP</Label>
-                  <Input value={selectedPerson?.npwp ?? ''} readOnly className="bg-transparent" placeholder="NPWP supplier" />
-                </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push(purchasePath)}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <h1 className="text-2xl font-semibold tracking-tight">Tambah Pembelian</h1>
               </div>
+              <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
+                <span className="text-muted-foreground">Kode Beli</span>
+                <span className="text-blue-500 font-medium">{generatedCode}</span>
+              </div>
+            </div>
+
+            <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
+              <PurchaseUnitForm
+                onSubmit={handleSubmit}
+                loading={mutation.isPending}
+                onCancel={() => router.push(purchasePath)}
+                companyId={companyId}
+                prependFields={
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Tanggal</Label>
+                      <DatePicker
+                        value={purchaseDate}
+                        onChange={(date) => {
+                          if (date) {
+                            const offset = date.getTimezoneOffset();
+                            const adjusted = new Date(date.getTime() - (offset * 60 * 1000));
+                            setPurchaseDate(adjusted.toISOString().split('T')[0]);
+                          }
+                        }}
+                        placeholder="Pick a date"
+                        className="h-10 border-slate-200 bg-white"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Tanggal</Label>
+                        <Input
+                          type="date"
+                          value={tanggal}
+                          onChange={(e) => setTanggal(e.target.value)}
+                          className="bg-transparent"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Supplier</Label>
+                        <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={supplierOpen}
+                              className="w-full justify-between bg-transparent font-normal"
+                            >
+                              <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>
+                                {selectedPerson ? selectedPerson.name : 'Pilih supplier'}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Cari supplier..." />
+                              <CommandList id="supplier-combobox-list">
+                                <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
+                                <CommandGroup>
+                                  {personOptions.map((person) => (
+                                    <CommandItem
+                                      key={String(person.id)}
+                                      value={`${person.name} ${person.code ?? ''} ${person.id}`}
+                                      onSelect={() => {
+                                        setPersonId(String(person.id));
+                                        setSupplierOpen(false);
+                                      }}
+                                    >
+                                      <Check className={cn('mr-2 h-4 w-4', personId === String(person.id) ? 'opacity-100' : 'opacity-0')} />
+                                      {person.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Alamat</Label>
+                        <Input value={selectedPerson?.address ?? ''} readOnly disabled className="bg-transparent" placeholder="Alamat supplier" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">NPWP</Label>
+                        <Input value={selectedPerson?.npwp ?? ''} readOnly disabled className="bg-transparent" placeholder="NPWP supplier" />
+                      </div>
+                    </div>
             }
           />
-        </div>
+                  </div>
       </div>
-    </DashboardLayout>
-  );
+          </DashboardLayout>
+          );
 }
