@@ -172,10 +172,10 @@ export function DriverTable({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     {onImport && (
-                        <Button variant="outline" onClick={onImport} className="gap-2">
-                            <Upload className="h-4 w-4" />
+                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                            <Upload className="h-4 w-4 mr-2" />
                             Import
                         </Button>
                     )}
@@ -184,14 +184,14 @@ export function DriverTable({
                             variant="outline"
                             onClick={onExport}
                             disabled={isExporting}
-                            className="gap-2"
+                            className="w-full sm:w-auto"
                         >
-                            <Download className="h-4 w-4" />
+                            <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
-                    <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] gap-2">
-                        <Plus className="h-4 w-4" />
+                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                        <Plus className="h-4 w-4 mr-2" />
                         Tambah
                     </Button>
                 </div>
@@ -203,25 +203,25 @@ export function DriverTable({
                     <Table className="min-w-[900px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-[#f8f9fa]">
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     NAMA DRIVER
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     ALAMAT
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     KTP
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     PHONE
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
                                     SIM
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
                                     TGL GABUNG
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">
                                     ACTION
                                 </TableHead>
                             </TableRow>

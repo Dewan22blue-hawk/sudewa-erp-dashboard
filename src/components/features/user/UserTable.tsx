@@ -113,14 +113,16 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         </div>
 
         {onAdd && (
-          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white px-4 h-10 rounded-xl shadow-sm gap-2">
-            <Plus className="h-4 w-4" />
-            Tambah
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah
+            </Button>
+          </div>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-transparent border-gray-100">
@@ -215,9 +217,11 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                            <DropdownMenuItem onClick={() => onEdit(user)} className="cursor-pointer rounded-xl px-3 py-2.5 text-sm text-slate-900">Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(user)} className="cursor-pointer rounded-xl px-3 py-2.5 text-sm text-red-600 focus:text-red-600">
+                          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                            <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -233,7 +237,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
       </div>
 
       {data.length > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
           <div>
             Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} entries
           </div>

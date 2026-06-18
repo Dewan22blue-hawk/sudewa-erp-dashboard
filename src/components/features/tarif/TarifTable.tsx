@@ -125,7 +125,7 @@ export function TarifTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                         <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
@@ -142,7 +142,7 @@ export function TarifTable({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                         <Plus className="h-4 w-4 mr-2" />
                         Tambah
@@ -156,31 +156,31 @@ export function TarifTable({
                     <Table className="min-w-[1100px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-[#f8f9fa]">
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     LOADING IN
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     LOADING OUT
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
                                     JARAK (KM)
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">
                                     UJ TOWING
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">
                                     UJ CDD
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">
                                     UJ FUSO
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">
                                     INV CDD
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">
                                     INV FUSO
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">
                                     ACTION
                                 </TableHead>
                             </TableRow>
@@ -263,7 +263,7 @@ export function TarifTable({
             </Card>
 
             {/* Pagination */}
-            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div className="text-sm text-gray-500">
                     Showing {startData}-{endData} of {totalData} data
                 </div>

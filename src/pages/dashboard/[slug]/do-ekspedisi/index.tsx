@@ -152,9 +152,11 @@ export default function DOEkspedisiPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-[24px] font-semibold text-slate-950">Data DO Ekspedisi</h1>
-          <p className="mt-1 text-sm text-slate-500">Buat faktur dengan informasi penagihan yang diperlukan.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Data DO Ekspedisi</h1>
+            <p className="text-sm text-muted-foreground">Buat faktur dengan informasi penagihan yang diperlukan.</p>
+          </div>
         </div>
 
         <DOEkspedisiTable

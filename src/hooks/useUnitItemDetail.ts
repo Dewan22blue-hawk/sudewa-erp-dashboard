@@ -37,6 +37,7 @@ export const useCreateUnitItemDetail = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['unit-item-details', data.unit_transaction_item_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', data.unit_transaction_item_id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details-by-transaction'] });
     },
   });
 };
@@ -48,6 +49,7 @@ export const useUpdateUnitItemDetail = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['unit-item-details', data.unit_transaction_item_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', data.unit_transaction_item_id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details-by-transaction'] });
     },
   });
 };
@@ -59,6 +61,7 @@ export const useDeleteUnitItemDetail = () => {
     onSuccess: ({ unitItemId }) => {
       queryClient.invalidateQueries({ queryKey: ['unit-item-details', unitItemId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', unitItemId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details-by-transaction'] });
     },
   });
 };
@@ -70,6 +73,7 @@ export const useImportUnitItemDetails = () => {
     onSuccess: ({ unitItemId }) => {
       queryClient.invalidateQueries({ queryKey: ['unit-item-details', unitItemId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', unitItemId] });
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details-by-transaction'] });
     },
   });
 };

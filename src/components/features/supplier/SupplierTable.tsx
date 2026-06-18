@@ -110,17 +110,17 @@ export function SupplierTable({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <Button variant="outline" className="h-10 px-4" onClick={onImport}>
-            <Upload className="mr-2 h-4 w-4" />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
+            <Upload className="h-4 w-4 mr-2" />
             Import
           </Button>
-          <Button variant="outline" className="h-10 px-4" onClick={onExport} disabled={isExporting}>
-            <Download className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="w-full sm:w-auto" onClick={onExport} disabled={isExporting}>
+            <Upload className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button className="h-10 bg-[#1e3a5f] hover:bg-[#152e4d] px-5 text-white" onClick={onAdd}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={onAdd}>
+            <Plus className="h-4 w-4 mr-2" />
             Tambah
           </Button>
         </div>
@@ -135,7 +135,7 @@ export function SupplierTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[12%]',
-                    sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('code')}
                 >
@@ -148,7 +148,7 @@ export function SupplierTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[22%]',
-                    sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('name')}
                 >
@@ -161,7 +161,7 @@ export function SupplierTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[15%]',
-                    sortKey === 'pic' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'pic' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('pic')}
                 >
@@ -174,7 +174,7 @@ export function SupplierTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[13%]',
-                    sortKey === 'phone' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'phone' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('phone')}
                 >
@@ -187,7 +187,7 @@ export function SupplierTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[15%]',
-                    sortKey === 'npwp' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'npwp' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('npwp')}
                 >
@@ -200,7 +200,7 @@ export function SupplierTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[23%]',
-                    sortKey === 'address' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'address' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('address')}
                 >
@@ -210,7 +210,7 @@ export function SupplierTable({
                   </div>
                 </TableHead>
                 {/* Action */}
-                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
                   Action
                 </TableHead>
               </TableRow>
@@ -291,7 +291,7 @@ export function SupplierTable({
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <p>
           Showing {startData}-{endData} of {totalData} data
         </p>

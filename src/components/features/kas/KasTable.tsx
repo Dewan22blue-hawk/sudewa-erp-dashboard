@@ -116,7 +116,7 @@ export function KasTable({ data }: Props) {
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[20%]',
-                  sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('code')}
               >
@@ -129,7 +129,7 @@ export function KasTable({ data }: Props) {
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[30%]',
-                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('name')}
               >
@@ -142,7 +142,7 @@ export function KasTable({ data }: Props) {
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[35%]',
-                  sortKey === 'description' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'description' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('description')}
               >
@@ -155,7 +155,7 @@ export function KasTable({ data }: Props) {
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[15%]',
-                  sortKey === 'type' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'type' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('type')}
               >
@@ -189,7 +189,7 @@ export function KasTable({ data }: Props) {
 
       {/* Pagination Controls */}
       {data.length > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
           <div>
             Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} entries
           </div>

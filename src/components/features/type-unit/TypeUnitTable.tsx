@@ -73,16 +73,16 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto justify-end gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {onImport && (
-            <Button onClick={onImport} variant="outline" className="gap-2">
-              <Upload className="h-4 w-4" />
+            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+              <Upload className="h-4 w-4 mr-2" />
               Import
             </Button>
           )}
           {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap">
-              <Plus className="h-4 w-4" />
+            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="h-4 w-4 mr-2" />
               Tambah
             </Button>
           )}
@@ -97,7 +97,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
-                  sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('code')}
               >
@@ -110,7 +110,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[150px]',
-                  sortKey === ('brand.name' as any) ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === ('brand.name' as any) ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('brand.name' as any)}
               >
@@ -123,7 +123,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[180px]',
-                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('name')}
               >
@@ -136,7 +136,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-right text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
-                  sortKey === 'buyPrice' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'buyPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('buyPrice')}
               >
@@ -149,7 +149,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-right text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
-                  sortKey === 'sellPrice' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'sellPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('sellPrice')}
               >
@@ -162,7 +162,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
-                  sortKey === 'unitType' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'unitType' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('unitType')}
               >
@@ -175,7 +175,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
-                  sortKey === 'unitModel' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'unitModel' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('unitModel')}
               >
@@ -188,7 +188,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
-                  sortKey === 'nettoWeight' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'nettoWeight' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('nettoWeight')}
               >
@@ -202,7 +202,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
-                  sortKey === 'brutoWeight' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'brutoWeight' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('brutoWeight')}
               >
@@ -213,7 +213,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">ACTION</TableHead>
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -278,7 +278,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
 
       {/* Pagination Controls */}
       {typeUnits.length > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
           <div>
             Showing {hasData ? startIndex : 0} to {hasData ? endIndex : 0} of {meta?.total ?? typeUnits.length} entries
           </div>

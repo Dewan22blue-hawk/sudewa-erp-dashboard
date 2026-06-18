@@ -168,21 +168,6 @@ export default function PurchasePaymentPage() {
                 if (validationResult.error) {
                     const message = readCheckRightAmountError(validationResult.error);
                     setValidationMessage(message);
-                    const invalidItemIds = getInvalidItemIds(validationResult.error);
-
-                    if (invalidItemIds.length > 0) {
-                        toast.error(message, {
-                            action: {
-                                label: 'Lengkapi Detail',
-                                onClick: () => {
-                                    router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${invalidItemIds[0]}`);
-                                },
-                            },
-                        });
-                        return;
-                    }
-
-                    throw new Error(message);
                 }
 
                 let billing = latestBilling ?? currentBilling;

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DoEkspedisi } from '@/@types/do-ekspedisi.types';
+import { cn } from '@/lib/utils';
 
 interface DOEkspedisiTableProps {
   data: DoEkspedisi[];
@@ -52,24 +53,47 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
 
+  const renderPaginationNumbers = () => {
+    const pages = renderPagination(page, totalPages);
+    return pages.map((p, idx) => (
+      <Button
+        key={idx}
+        variant="ghost"
+        size="sm"
+        disabled={p === '...'}
+        onClick={() => typeof p === 'number' && onPageChange(p)}
+        className={cn(
+          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          p === page
+            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+            : p === '...'
+              ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+              : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+        )}
+      >
+        {p}
+      </Button>
+    ));
+  };
+
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
-          <div className="relative w-full sm:w-[310px]">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search here"
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
-              className="h-12 rounded-xl border-[#E5E7EB] bg-white pl-11"
+              className="pl-9 bg-white"
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-600">Show</span>
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-12 w-[88px] rounded-xl border-[#E5E7EB] bg-white">
+              <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue placeholder="10" />
               </SelectTrigger>
               <SelectContent>
@@ -79,25 +103,23 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm text-slate-600">Page</span>
+            <span>Page</span>
           </div>
         </div>
-
-        {/* Add button removed: creation of DO is not supported by API */}
       </div>
 
-      <Card className="overflow-hidden rounded-2xl border border-[#D7DEE7] bg-white shadow-sm">
+      <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
         <div className="overflow-x-auto">
           <Table className="min-w-[980px]">
-            <TableHeader className="bg-[#EEF3F8]">
-              <TableRow className="border-b border-[#D7DEE7]">
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Kode DO</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Kode Order</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Tanggal</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Nama Driver</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">No Polisi</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Tipe</TableHead>
-                <TableHead className="h-11 text-center text-xs font-semibold uppercase text-slate-700">Action</TableHead>
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+              <TableRow className="hover:bg-[#f8f9fa]">
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Kode DO</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Kode Order</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Tanggal</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Nama Driver</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No Polisi</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Tipe</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,7 +133,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                 ))
               ) : data.length > 0 ? (
                 data.map((item) => (
-                  <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-slate-50/80">
+                  <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-800">{item.doCode || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.orderCode || item.orderList?.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">
@@ -121,31 +143,33 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.vehicle?.registrationNumber || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.vehicle?.type || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4 text-slate-500" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[170px]">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">
-                            <FileText className="mr-2 h-4 w-4" />
-                            Detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer">
-                            <Printer className="mr-2 h-4 w-4" />
-                            Print
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex justify-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                            <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDetail(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                              <FileText className="mr-2 h-4 w-4" />
+                              Detail
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onPrint(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                              <Printer className="mr-2 h-4 w-4" />
+                              Print
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -161,33 +185,36 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 px-1 pt-1 lg:flex-row lg:items-center lg:justify-between">
-        <div className="text-sm text-slate-500">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+        <div>
           Showing {startData}-{endData} of {totalData} data
         </div>
 
-        {totalPages > 1 ? (
-          <div className="flex flex-wrap items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page === 1} className="text-slate-600">
+        {totalPages > 1 && (
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 1}
+            >
               Previous
             </Button>
-            {renderPagination(page, totalPages).map((item, index) => (
-              <Button
-                key={`${item}-${index}`}
-                variant={item === page ? 'outline' : 'ghost'}
-                size="sm"
-                disabled={item === '...'}
-                onClick={() => typeof item === 'number' && onPageChange(item)}
-                className={item === page ? 'border-[#D7DEE7] bg-white' : 'text-slate-600'}
-              >
-                {item}
-              </Button>
-            ))}
-            <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page === totalPages} className="text-slate-600">
+            
+            {renderPaginationNumbers()}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page === totalPages}
+            >
               Next
             </Button>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

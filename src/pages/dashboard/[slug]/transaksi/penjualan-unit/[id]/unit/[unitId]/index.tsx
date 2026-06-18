@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { WarehouseStockUnit } from '@/@types/unit-transaction.types';
 import { StockPickerTable } from '@/components/features/sales/detail/StockPickerTable';
@@ -203,7 +203,7 @@ export default function SalesUnitDetailPage() {
 
   const salesCode = salesData?.raw?.code ?? '-';
   const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
-  const salesPath = slugValue ? `/dashboard/${slugValue}/sales` : '/sales';
+  const salesPath = slugValue ? `/dashboard/${slugValue}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
   const hasRequiredRouteParams = Boolean(salesId && selectedUnitId);
 
   const toggleOne = (stockId: number, checked: boolean) => {
@@ -321,27 +321,46 @@ export default function SalesUnitDetailPage() {
     );
   }
 
+  const resolvedBillingHistories = (salesData?.raw?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
+    id: String((history as any).id ?? ''),
+    unit_transaction_billing_id: String((history as any).unit_transaction_billing_id ?? salesData?.raw?.unit_transaction_billing?.id ?? ''),
+    unit_transaction_id: String(salesId ?? ''),
+    payment_proof: (history as any).payment_proof ?? null,
+    bca_payment_amount: Number((history as any).bca_payment_amount ?? (history as any).bca_payment ?? 0),
+    cash_payment_amount: Number((history as any).cash_payment_amount ?? (history as any).cash_payment ?? 0),
+    bca_payment_usd_amount: Number((history as any).bca_payment_usd_amount ?? (history as any).bca_payment_2 ?? 0),
+    payment_at: String((history as any).payment_at ?? ''),
+    note: (history as any).note,
+    created_at: (history as any).created_at,
+    updated_at: (history as any).updated_at,
+  }));
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button
-            onClick={() => router.back()}
-            className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">Detail Penjualan Unit</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Jual</span>
-              <span className="font-medium text-blue-600">{salesCode}</span>
-            </div>
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
+            Penjualan Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}>
+            Detail Penjualan
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Detail Unit</span>
+        </div>
+
+        {/* Title Section */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Detail Penjualan Unit</h1>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <span>Kode Jual:</span>
+            <span className="font-semibold text-blue-600">{salesCode}</span>
           </div>
         </div>
 
-        <SalesDetailCards data={salesData.ui} />
+        <SalesDetailCards data={salesData.ui} billingHistories={resolvedBillingHistories} />
 
         <Card className="rounded-xl">
           <CardContent className="space-y-4 p-6">

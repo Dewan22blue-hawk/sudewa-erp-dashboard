@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Trash2, Info } from 'lucide-react';
 import { UnitTransactionItem } from '@/@types/unit-transaction.types';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { useBulkDeleteUnitItem, useDeleteUnitItem, usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { useUnitItemDetailsByTransactionId } from '@/hooks/useUnitItemDetail';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -23,6 +24,7 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
   const router = useRouter();
   const { data, isLoading, isError } = usePurchaseUnitItems(purchaseId);
   const { data: typeUnits } = useTypeUnits();
+  const { data: allDetails = [] } = useUnitItemDetailsByTransactionId(purchaseId);
   const deleteMutation = useDeleteUnitItem();
   const bulkDeleteMutation = useBulkDeleteUnitItem();
 
@@ -38,6 +40,13 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
     const start = (currentPage - 1) * perPage;
     return items.slice(start, start + perPage);
   }, [currentPage, perPage, items]);
+
+  const hasIncompleteDetails = useMemo(() => {
+    return items.some((item) => {
+      const itemDetails = allDetails.filter((d) => String(d.unit_transaction_item_id) === String(item.id));
+      return itemDetails.length !== Number(item.qty_total ?? 0);
+    });
+  }, [items, allDetails]);
 
   const getUnitTypeName = (id?: string | number) => {
     if (!id) return '-';
@@ -107,6 +116,19 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
 
   return (
     <div className="space-y-4">
+      {hasIncompleteDetails && (
+        <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-slate-800 animate-in fade-in duration-200">
+          <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-slate-900">Detail Unit Belum Lengkap</p>
+            <p className="text-xs mt-0.5 text-slate-600">
+              Beberapa tipe unit belum memiliki detail unit (Warna, No Rangka, No Mesin) yang lengkap. 
+              Silakan klik menu <span className="font-semibold">Action &gt; Detail / Kelola Unit</span> pada baris item untuk melengkapi detailnya sebelum melakukan Terima Barang.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Container — matches SalesUnitTable style */}
       <div className="rounded-xl border bg-white">
 
@@ -175,14 +197,14 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
                   />
                 </TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE UNIT</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">QTY</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">QTY</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PRICE</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BBN</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">EXPEDITION FEE</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">OTHER FEE</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP TOTAL</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN TOTAL</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[120px]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -205,49 +227,64 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
                   </TableCell>
                 </TableRow>
               ) : (
-                pagedData.map((item, idx) => (
-                  <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
-                      <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))}
-                        aria-label="Pilih baris"
-                      />
-                    </TableCell>
-                    <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.qty_total}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.price)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{formatCurrency(item.dpp_total_price)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppn_total_price)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(item.id)}>
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDetail(item.id)}>
-                            <Eye className="mr-2 h-4 w-4" /> Detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                            onClick={() => setUnitToDelete(item.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
+                pagedData.map((item, idx) => {
+                  const itemDetails = allDetails.filter((d) => String(d.unit_transaction_item_id) === String(item.id));
+                  const isComplete = itemDetails.length === Number(item.qty_total ?? 0);
+                  return (
+                    <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
+                      <TableCell className="px-4 py-4 text-center">
+                        <Checkbox
+                          checked={selectedIds.has(item.id)}
+                          onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))}
+                          aria-label="Pilih baris"
+                        />
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="font-semibold">{item.qty_total}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                            isComplete
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            Detail: {itemDetails.length}/{item.qty_total}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{formatCurrency(item.dpp_total_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppn_total_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(item.id)}>
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDetail(item.id)}>
+                              <Eye className="mr-2 h-4 w-4" /> Detail / Kelola Unit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                              onClick={() => setUnitToDelete(item.id)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

@@ -89,7 +89,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
     <DashboardLayout>
       <div className="space-y-12 p-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/sales/${transactionId}`)}>
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}`)}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-[22px] font-semibold text-[#111827]">Refund Penjualan</h1>
@@ -161,7 +161,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="rounded-[10px] px-4 py-3 text-sm text-[#111827]"
-                              onClick={() => router.push(`/dashboard/${slug}/sales/${transactionId}/refund/${refund.id}`)}
+                              onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/${refund.id}`)}
                             >
                               Detail
                             </DropdownMenuItem>

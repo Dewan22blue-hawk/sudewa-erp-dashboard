@@ -27,11 +27,11 @@ export function EditVendorModal({ isOpen, onClose, onSave, initialData }: EditVe
                         Edit data vendor baru
                     </DialogDescription>
                 </DialogHeader>
-                
-                <EditVendorInnerForm 
-                    initialData={initialData} 
-                    onClose={onClose} 
-                    onSave={onSave} 
+
+                <EditVendorInnerForm
+                    initialData={initialData}
+                    onClose={onClose}
+                    onSave={onSave}
                 />
             </DialogContent>
         </Dialog>
@@ -95,7 +95,7 @@ function EditVendorInnerForm({ initialData, onClose, onSave }: InnerProps) {
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="edit-phone" className="text-gray-900 font-medium">Handphone</Label>
+                <Label htmlFor="edit-phone" className="text-gray-900 font-medium">PHONE</Label>
                 <Input
                     id="edit-phone"
                     placeholder="Masukkan nomor handphone"

@@ -14,20 +14,16 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { toast } from 'sonner';
 
-const paymentSchema = z
-    .object({
-        bcaPayment: z.number().min(0, 'Tidak boleh negatif'),
-        cashPayment: z.number().min(0, 'Tidak boleh negatif'),
-        bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
-        paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
-        note: z.string().max(255, 'Maksimal 255 karakter'),
-        isPaid: z.boolean(),
-    })
-    .refine((value) => (value.bcaPayment || 0) + (value.cashPayment || 0) + (value.bcaPayment2 || 0) > 0, {
-        path: ['bcaPayment'],
-        message: 'Minimal salah satu nominal pembayaran harus lebih dari 0',
-    });
+const paymentSchema = z.object({
+    bcaPayment: z.number().min(0, 'Tidak boleh negatif'),
+    cashPayment: z.number().min(0, 'Tidak boleh negatif'),
+    bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
+    paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
+    note: z.string().max(255, 'Maksimal 255 karakter'),
+    isPaid: z.boolean(),
+});
 
 export type PaymentFormData = z.infer<typeof paymentSchema>;
 
@@ -73,7 +69,7 @@ export function PurchasePaymentForm({
         0,
     );
     const totalPaidFromBilling = Number(billing?.total_paid ?? (Number(billing?.bca_payment ?? 0) + Number(billing?.cash_payment ?? 0) + Number(billing?.bca_payment_2 ?? 0)));
-    const totalPaid = billing?.is_paid ? Math.max(totalPaidFromBilling, historyPaid) : historyPaid;
+    const totalPaid = Math.max(totalPaidFromBilling, historyPaid);
     const billingRemaining = Number(billing?.remaining_payment ?? 0);
     const remainingPayment = billing?.is_paid ? 0 : billingRemaining > 0 ? billingRemaining : Math.max(0, totalTagihan - totalPaid);
 
@@ -84,6 +80,8 @@ export function PurchasePaymentForm({
 
     const projectedTotalPaid = useMemo(() => totalPaid + totalPaymentInput, [totalPaid, totalPaymentInput]);
     const projectedRemaining = Math.max(0, totalTagihan - projectedTotalPaid);
+
+    const totalDpp = Math.max(0, totalTagihan - totalPpn);
 
     useEffect(() => {
         const autoIsPaid = projectedTotalPaid >= totalTagihan && totalTagihan > 0;
@@ -102,6 +100,11 @@ export function PurchasePaymentForm({
     };
 
     const handleSubmit = async (values: PaymentFormData) => {
+        const total = (values.bcaPayment || 0) + (values.cashPayment || 0) + (values.bcaPayment2 || 0);
+        if (total <= 0) {
+            toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
+            return;
+        }
         await onSubmitPayment(values);
         resetForm();
     };
@@ -136,7 +139,7 @@ export function PurchasePaymentForm({
                     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Beli</p>
-                            <Input value={formatCurrency(totalTagihan)} disabled />
+                            <Input value={formatCurrency(totalDpp)} disabled />
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total PPN</p>
@@ -144,7 +147,7 @@ export function PurchasePaymentForm({
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Biaya</p>
-                            <Input value={formatCurrency(remainingPayment)} disabled />
+                            <Input value={formatCurrency(totalTagihan)} disabled />
                         </div>
                     </div>
                 </div>
@@ -229,27 +232,18 @@ export function PurchasePaymentForm({
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                                 {/* Tanggal */}
-                                <FormField
-                                    control={form.control}
-                                    name="paymentDate"
-                                    render={({ field }) => (
-                                        <FormItem className="space-y-2">
-                                            <FormLabel className="text-sm font-medium">Tanggal</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="date"
-                                                    value={field.value}
-                                                    onChange={(e) => field.onChange(e.target.value)}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Tanggal</p>
+                                    <Input
+                                        type="date"
+                                        value={form.watch('paymentDate')}
+                                        onChange={(e) => form.setValue('paymentDate', e.target.value)}
+                                    />
+                                </div>
                                 {/* Total Bayar */}
                                 <div className="space-y-2">
                                     <p className="text-sm font-medium">Total Bayar</p>
-                                    <Input value={formatCurrency(totalPaymentInput)} disabled />
+                                    <Input value={formatCurrency(projectedTotalPaid)} disabled />
                                 </div>
                                 {/* Kurang Bayar */}
                                 <div className="space-y-2">

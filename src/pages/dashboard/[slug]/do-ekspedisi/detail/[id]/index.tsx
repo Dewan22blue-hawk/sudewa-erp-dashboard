@@ -138,7 +138,7 @@ export default function DetailDOEkspedisiPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
             </div>
           </div>
 
@@ -173,7 +173,7 @@ export default function DetailDOEkspedisiPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
             </div>
           </div>
 
@@ -200,7 +200,7 @@ export default function DetailDOEkspedisiPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
             </div>
           </div>
           <button
@@ -213,7 +213,7 @@ export default function DetailDOEkspedisiPage() {
                 toast.error(getApiErrorMessage(error));
               }
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#1E3A5F] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#18314F]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#152e4d]"
           >
             <Printer className="h-4 w-4" />
             Print DO
