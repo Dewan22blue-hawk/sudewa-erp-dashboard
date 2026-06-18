@@ -152,7 +152,7 @@ export function DriverTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                         <span>Show</span>
                         <Select
                             value={perPage.toString()}
@@ -303,7 +303,7 @@ export function DriverTable({
             </Card>
 
             {/* Pagination */}
-            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>
                     Showing {startData}-{endData} of {totalData} data
                 </div>

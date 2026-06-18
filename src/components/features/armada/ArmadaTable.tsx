@@ -82,15 +82,15 @@ export function ArmadaTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <div className="flex w-full items-center gap-4 sm:w-auto">
-          <div className="relative w-full sm:w-[320px]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input placeholder="Search here" className="bg-white pl-9" value={search} onChange={(e) => onSearchChange(e.target.value)} />
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Show</span>
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
               <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue placeholder="25" />
@@ -102,7 +102,7 @@ export function ArmadaTable({
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm text-gray-500">Page</span>
+            <span>Page</span>
           </div>
         </div>
 
@@ -227,31 +227,49 @@ export function ArmadaTable({
         </div>
       </Card>
 
-      <div className="flex items-center justify-between px-2 pt-2">
-        <div className="text-sm text-gray-500">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+        <div>
           Showing {startData}-{endData} of {totalData} data
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page === 1} className="text-gray-500">
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 1}
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+            >
               Previous
             </Button>
 
             {renderPagination(page, totalPages).map((item, index) => (
               <Button
                 key={`${item}-${index}`}
-                variant={item === page ? 'outline' : 'ghost'}
+                variant="ghost"
                 size="sm"
                 disabled={item === '...'}
                 onClick={() => typeof item === 'number' && onPageChange(item)}
-                className={item === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+                className={
+                  item === page
+                    ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                    : item === '...'
+                    ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                    : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                }
               >
                 {item}
               </Button>
             ))}
 
-            <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page === totalPages} className="text-gray-500">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page === totalPages}
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+            >
               Next
             </Button>
           </div>
