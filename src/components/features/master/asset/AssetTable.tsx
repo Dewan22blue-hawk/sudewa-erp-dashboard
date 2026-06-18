@@ -104,10 +104,10 @@ export function AssetTable({
 
     const formatAssetType = (type: string) => {
         const types: Record<string, string> = {
-            inventory: 'Inventory',
-            vehicles: 'Vehicles',
-            buildings: 'Buildings',
-            land: 'Land'
+            inventory: 'Inventaris Kantor',
+            vehicles: 'Kendaraan',
+            buildings: 'Bangunan',
+            land: 'Tanah'
         };
         return types[type] || type;
     };
