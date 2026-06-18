@@ -259,12 +259,7 @@ export default function PurchaseDetailPage() {
         ) : isAlreadyReceived ? (
           <div className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50/40 px-4 py-3 text-sm text-emerald-800">
             <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-            <div>
-              <span className="font-semibold text-emerald-950">Stok sudah diterima</span>
-              <span className="text-xs ml-2 text-emerald-700/95">
-                (Status stok saat ini: <span className="font-mono bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-900">inbound_receipt</span>)
-              </span>
-            </div>
+            <span className="font-semibold text-emerald-950">Stok sudah diterima</span>
           </div>
         ) : !isPaid ? (
           <div className="flex items-center gap-2.5 rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-3 text-sm text-blue-800">
