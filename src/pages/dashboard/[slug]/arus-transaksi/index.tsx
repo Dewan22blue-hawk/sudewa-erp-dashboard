@@ -47,9 +47,11 @@ export default function TransactionListPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 {/* HEADLINE */}
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Arus Transaksi Operasional</h1>
-                    {/* <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p> */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-950">Arus Transaksi Operasional</h1>
+                        <p className="text-sm text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
+                    </div>
                 </div>
 
                 {/* SUMMARY CARDS */}

@@ -59,16 +59,17 @@ export default function TransactionListPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* HEADLINE */}
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Arus Transaksi Operasional</h1>
-          {/* <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p> */}
-          <p className="mt-2 text-sm text-muted-foreground">
-            Data diperbarui otomatis setiap {LIVE_REFRESH_SECONDS} detik dan akan sinkron lagi saat tab aktif kembali.
-            {' '}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Arus Transaksi Operasional</h1>
+            <p className="text-sm text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
+          </div>
+          <div className="text-xs text-slate-500 text-left sm:text-right self-start sm:self-center">
+            Data diperbarui otomatis setiap {LIVE_REFRESH_SECONDS} detik •{' '}
             <span className={isListFetching || isSummaryFetching ? 'text-emerald-600 font-medium' : 'font-medium'}>
               {isListFetching || isSummaryFetching ? 'Menyinkronkan data...' : `Update terakhir ${lastUpdatedLabel}`}
             </span>
-          </p>
+          </div>
         </div>
 
         <TransactionSummaryCards
