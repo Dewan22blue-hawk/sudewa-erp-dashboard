@@ -88,24 +88,24 @@ export function SupplierTable({
   const paginationItems = buildPagination(page, totalPages);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          <div className="relative w-full lg:w-[332px]">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A3A3A3]" />
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search here"
-              className="h-10 rounded-xl border-[#D4D4D8] bg-white pl-11 text-[15px] text-[#171717] placeholder:text-[#A3A3A3]"
+              className="pl-9 bg-white"
             />
           </div>
 
-          <div className="flex items-center gap-3 text-[15px] text-[#171717]">
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-10 w-[64px] rounded-xl border-[#D4D4D8] bg-white px-3">
-                <SelectValue />
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="10">10</SelectItem>

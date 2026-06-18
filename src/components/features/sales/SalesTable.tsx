@@ -5,7 +5,8 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
-import { Plus, ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
@@ -131,28 +132,23 @@ export function SalesTable({ onAdd }: Props) {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-72">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </span>
-            <input
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
               type="text"
               placeholder="Search here"
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-white"
+              className="pl-9 bg-white"
             />
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={String(itemsPerPage)} onValueChange={(val) => handleItemsPerPageChange(val)}>
-              <SelectTrigger className="h-9 w-[70px] bg-white">
+              <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue placeholder="10" />
               </SelectTrigger>
               <SelectContent>

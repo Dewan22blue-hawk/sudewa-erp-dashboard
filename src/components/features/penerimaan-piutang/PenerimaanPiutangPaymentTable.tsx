@@ -81,9 +81,8 @@ export default function PenerimaanPiutangPaymentTable({
 
     return (
         <div className="space-y-4">
-            {/* SHOW PER PAGE */}
-            <div className="flex justify-start items-center gap-4">
-                <div className="flex items-center gap-2 text-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                     <span>Show</span>
                     <Select
                         value={itemsPerPage}
@@ -92,8 +91,8 @@ export default function PenerimaanPiutangPaymentTable({
                             setCurrentPage(1)
                         }}
                     >
-                        <SelectTrigger className="h-9 w-[70px]">
-                            <SelectValue />
+                        <SelectTrigger className="w-[70px] bg-white">
+                            <SelectValue placeholder="10" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="5">5</SelectItem>

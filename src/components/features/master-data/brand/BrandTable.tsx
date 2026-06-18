@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTableSort } from '@/hooks/useTableSort';
 import { format } from 'date-fns';
@@ -17,6 +18,7 @@ interface BrandTableProps {
     data: Brand[];
     meta?: PaginationMeta;
     search: string;
+    onSearchChange: (value: string) => void;
     page: number;
     perPage: number;
     isLoading?: boolean;
@@ -38,6 +40,8 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
 export const BrandTable = ({
     data,
     meta,
+    search,
+    onSearchChange,
     page,
     perPage,
     isLoading = false,
@@ -131,21 +135,34 @@ export const BrandTable = ({
 
     return (
         <div className="space-y-4">
-            {/* SHOW ENTRIES */}
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-                <span>Show</span>
-                <Select value={String(perPage)} onValueChange={(val) => onPerPageChange(Number(val))}>
-                    <SelectTrigger className="h-9 w-20 bg-white">
-                        <SelectValue placeholder="10" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="10">10</SelectItem>
-                        <SelectItem value="25">25</SelectItem>
-                        <SelectItem value="50">50</SelectItem>
-                        <SelectItem value="100">100</SelectItem>
-                    </SelectContent>
-                </Select>
-                <span>Entries</span>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-[300px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                            placeholder="Search here"
+                            className="pl-9 bg-white"
+                            value={search}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
+                        <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
+                            <SelectTrigger className="w-[70px] bg-white">
+                                <SelectValue placeholder="10" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <span>Page</span>
+                    </div>
+                </div>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">

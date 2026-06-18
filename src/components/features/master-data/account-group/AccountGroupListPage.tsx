@@ -131,23 +131,23 @@ export const AccountGroupListPage = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* LEFT: Search + Show */}
-            <div className="flex items-center gap-3">
-              <div className="relative w-64">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search here"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 h-10 border-gray-200 rounded-lg text-gray-900"
+                  className="pl-9 bg-white"
                 />
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(val) => { setPerPage(Number(val)); setPage(1); }}>
-                  <SelectTrigger className="h-10 w-20 border-gray-200 bg-white rounded-lg">
-                    <SelectValue />
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="10">10</SelectItem>
@@ -156,7 +156,7 @@ export const AccountGroupListPage = () => {
                     <SelectItem value="100">100</SelectItem>
                   </SelectContent>
                 </Select>
-                <span>Entries</span>
+                <span>Page</span>
               </div>
             </div>
             {/* RIGHT: Import + Tambah */}

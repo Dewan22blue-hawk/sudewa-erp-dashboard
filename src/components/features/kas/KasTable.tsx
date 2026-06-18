@@ -4,7 +4,8 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -43,8 +44,20 @@ export function KasTable({ data }: Props) {
     }));
   }, [data]);
 
+  const [search, setSearch] = useState('');
+
+  const filteredData = useMemo(() => {
+    if (!search) return enrichedData;
+    const lower = search.toLowerCase();
+    return enrichedData.filter(
+      (item) =>
+        item.code.toLowerCase().includes(lower) ||
+        item.name.toLowerCase().includes(lower)
+    );
+  }, [enrichedData, search]);
+
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: enrichedData,
+    data: filteredData,
   });
 
   // Pagination logic
@@ -58,23 +71,40 @@ export function KasTable({ data }: Props) {
     setCurrentPage(1); // Reset to page 1 on page size change
   };
 
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="flex items-center gap-2 whitespace-nowrap text-sm text-slate-500">
-          <span>Show</span>
-          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-            <SelectTrigger className="w-[70px] bg-white h-10">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Entries</span>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search here"
+              className="pl-9 bg-white"
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
+            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="10" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+            <span>Page</span>
+          </div>
         </div>
       </div>
 

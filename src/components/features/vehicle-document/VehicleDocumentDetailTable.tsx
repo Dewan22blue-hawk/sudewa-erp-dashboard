@@ -34,25 +34,27 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="relative w-full md:w-[324px]">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-10" />
-        </div>
-        <div className="flex items-center gap-2 text-sm text-slate-700">
-          <span>Show</span>
-          <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-            <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Page</span>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="pl-9 bg-white" />
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
+            <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="25" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+            <span>Page</span>
+          </div>
         </div>
       </div>
 
