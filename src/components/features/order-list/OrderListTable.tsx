@@ -81,28 +81,30 @@ export const OrderListTable = React.memo(function OrderListTable({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[38px] font-semibold tracking-[-0.03em] text-slate-950">Order List</h1>
-        <p className="mt-1 text-base text-slate-500">Lihat dan kelola pesanan pelanggan dengan mudah.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Order List</h1>
+          <p className="text-sm text-muted-foreground">Lihat dan kelola pesanan pelanggan dengan mudah.</p>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative w-full lg:w-[310px]">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search here"
-              className="h-11 rounded-xl border-slate-200 bg-white pl-11 text-sm"
+              className="pl-9 bg-white"
             />
           </div>
-          {isRefetching ? <span className="text-xs font-medium text-slate-500">Memperbarui data...</span> : null}
+          {isRefetching ? <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Memperbarui data...</span> : null}
 
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-700">Show</span>
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-11 w-[92px] rounded-xl border-slate-200 bg-white">
+              <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -112,17 +114,17 @@ export const OrderListTable = React.memo(function OrderListTable({
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm text-slate-700">Page</span>
+            <span>Page</span>
           </div>
         </div>
 
-        <Button type="button" onClick={onAdd} className="h-11 cursor-pointer rounded-xl bg-[#1f4163] px-5 text-sm font-medium hover:bg-[#183552]">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button type="button" onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Plus className="h-4 w-4 mr-2" />
           Tambah
         </Button>
       </div>
 
-      <Card className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+      <Card className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
         <div className="overflow-x-auto">
           <Table className="min-w-[1180px]">
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -305,26 +307,45 @@ export const OrderListTable = React.memo(function OrderListTable({
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-slate-500">Showing {startData}-{endData} of {totalData} data</p>
-        <div className="flex flex-wrap items-center gap-1">
-          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="cursor-pointer text-slate-600">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+        <p>Showing {startData}-{endData} of {totalData} data</p>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          >
             Previous
           </Button>
           {visiblePages[0] > 1 ? <span className="px-2 text-sm text-slate-500">1 ...</span> : null}
           {visiblePages.map((value) => (
             <Button
               key={value}
-              variant={value === page ? 'outline' : 'ghost'}
+              variant="ghost"
               size="sm"
               onClick={() => onPageChange(value)}
-              className={cn('cursor-pointer', value === page ? 'rounded-xl border-slate-200 bg-white' : 'text-slate-600')}
+              className={cn(
+                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                value === page
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+              )}
             >
               {value}
             </Button>
           ))}
           {visiblePages[visiblePages.length - 1] < totalPages ? <span className="px-2 text-sm text-slate-500">... {totalPages}</span> : null}
-          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="cursor-pointer text-slate-600">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= totalPages}
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          >
             Next
           </Button>
         </div>
