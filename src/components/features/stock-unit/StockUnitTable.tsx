@@ -109,33 +109,35 @@ export default function StockUnitTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="relative w-full sm:w-80">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <Input placeholder="Search here" value={search} onChange={(e) => onSearchChange(e.target.value)} className="h-10 border-gray-300 bg-white pl-9" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input placeholder="Search here" value={search} onChange={(e) => onSearchChange(e.target.value)} className="pl-9 bg-white" />
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
+            <Select
+              value={String(perPage)}
+              onValueChange={(val) => {
+                onPerPageChange(Number(val));
+              }}
+            >
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+            <span>Page</span>
+          </div>
         </div>
 
-        {statusTabs && <div className="flex-shrink-0">{statusTabs}</div>}
-
-        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-          <span>Show</span>
-          <Select
-            value={String(perPage)}
-            onValueChange={(val) => {
-              onPerPageChange(Number(val));
-            }}
-          >
-            <SelectTrigger className="h-10 w-20 border-gray-300 bg-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Page</span>
-        </div>
+        {statusTabs && <div className="flex-shrink-0 w-full sm:w-auto flex justify-end">{statusTabs}</div>}
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">

@@ -71,84 +71,89 @@ export default function PenerimaanUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Data Penerimaan Unit</h1>
-            <p className="text-sm text-gray-500">Kelola dan lacak semua data penerimaan stock unit</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Data Penerimaan Unit</h1>
+          <p className="text-sm text-gray-500 mt-1">Kelola dan lacak semua data penerimaan stock unit</p>
         </div>
 
-        <div className="bg-white rounded-xl border p-4 space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4 w-full sm:w-auto">
-              <div className="relative w-full sm:w-[300px]">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Search here"
-                  className="pl-9 bg-white"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                <span>Show</span>
-                <Select
-                  value={itemsPerPage}
-                  onValueChange={(val) => {
-                    setItemsPerPage(val);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger className="w-[70px] bg-white">
-                    <SelectValue placeholder="10" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span>Page</span>
-              </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search here"
+                className="pl-9 bg-white"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
 
-            <Button className="bg-[#19355d]" onClick={() => setOpenForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah
-            </Button>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select
+                value={itemsPerPage}
+                onValueChange={(val) => {
+                  setItemsPerPage(val);
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="10" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
 
-          {isLoading ? <div className="p-8 text-center text-gray-500">Loading...</div> : isError ? <div className="p-8 text-center text-red-500">{apiErrorMessage}</div> : <PenerimaanUnitTable data={data} />}
+          <Button className="h-10 rounded-xl bg-[#19355d] text-white hover:bg-[#152e52]" onClick={() => setOpenForm(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah
+          </Button>
+        </div>
 
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <div>
-              Showing {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} of {totalItems} data
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
-                Previous
+        {isLoading ? (
+          <div className="bg-white rounded-xl border p-8 text-center text-gray-500">Loading...</div>
+        ) : isError ? (
+          <div className="bg-white rounded-xl border p-8 text-center text-red-500">{apiErrorMessage}</div>
+        ) : (
+          <PenerimaanUnitTable data={data} />
+        )}
+
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-1">
+          <p className="text-sm text-slate-500">
+            Showing {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} of {totalItems} data
+          </p>
+          <div className="flex items-center gap-1 text-[16px]">
+            <Button variant="ghost" className="text-slate-700" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
+              Previous
+            </Button>
+            {getPageNumbers().map((page, idx) => (
+              <Button
+                key={idx}
+                variant={page === currentPage ? 'outline' : 'ghost'}
+                className={
+                  page === currentPage
+                    ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white font-semibold'
+                    : 'h-10 min-w-10 rounded-xl text-slate-700'
+                }
+                onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                disabled={typeof page !== 'number'}
+              >
+                {page}
               </Button>
-              {getPageNumbers().map((page, idx) => (
-                <Button
-                  key={idx}
-                  variant={page === currentPage ? 'outline' : 'ghost'}
-                  size="sm"
-                  className={page === currentPage ? 'bg-gray-100' : ''}
-                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                  disabled={typeof page !== 'number'}
-                >
-                  {page}
-                </Button>
-              ))}
-              <Button variant="outline" size="sm" disabled={currentPage === totalPages || totalItems === 0} onClick={() => setCurrentPage((p) => p + 1)}>
-                Next
-              </Button>
-            </div>
+            ))}
+            <Button variant="ghost" className="text-slate-700" disabled={currentPage === totalPages || totalItems === 0} onClick={() => setCurrentPage((p) => p + 1)}>
+              Next
+            </Button>
           </div>
         </div>
 
