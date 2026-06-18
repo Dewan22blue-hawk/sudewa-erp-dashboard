@@ -123,11 +123,9 @@ export const AccountGroupListPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Grup Akun</h1>
-            <p className="text-sm text-muted-foreground">Kelola grup akun untuk mengatur akun transaksi</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Grup Akun</h1>
+          <p className="text-sm text-gray-500 mt-1">Kelola grup akun untuk mengatur akun transaksi</p>
         </div>
 
         <div className="space-y-4">
