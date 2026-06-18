@@ -74,6 +74,7 @@ export interface CreateLiabilityPaymentPayload {
     payment_at?: string;
     note?: string;
     payment_proof?: File | null;
+    cash_id?: number | string;
 }
 
 export type PembayaranHutang = LiabilityListItem;

@@ -13,6 +13,7 @@ import { CreateAccountGroupDialog } from '@/components/features/account/CreateAc
 import { ACCOUNT_CATEGORY_OPTIONS } from '@/lib/account';
 import { Plus } from 'lucide-react';
 import RequiredMark from '@/components/ui/required-mark';
+import { cn } from '@/lib/utils';
 
 interface AccountFormProps {
   form: UseFormReturn<AccountFormValues>;
@@ -25,6 +26,7 @@ interface AccountFormProps {
   onGroupSearchChange?: (val: string) => void;
   onLoadMoreGroups?: () => void;
   hasMoreGroups?: boolean;
+  isLock?: boolean;
 }
 
 export const AccountForm = ({
@@ -38,6 +40,7 @@ export const AccountForm = ({
   onGroupSearchChange,
   onLoadMoreGroups,
   hasMoreGroups = false,
+  isLock = false,
 }: AccountFormProps) => {
   const [openCreateGroup, setOpenCreateGroup] = useState(false);
 
@@ -62,7 +65,7 @@ export const AccountForm = ({
               <FormItem className="space-y-1.5">
                 <FormLabel className="text-xs font-semibold text-slate-700">Kode Akun<RequiredMark /></FormLabel>
                 <FormControl>
-                  <Input placeholder="Masukkan kode akun" className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white" {...field} />
+                  <Input readOnly={isLock} placeholder="Masukkan kode akun" className={cn("h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white", isLock && "bg-slate-50 text-slate-500 cursor-not-allowed")} {...field} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -117,7 +120,7 @@ export const AccountForm = ({
               <FormItem className="space-y-1.5">
                 <FormLabel className="text-xs font-semibold text-slate-700">Nama Akun<RequiredMark /></FormLabel>
                 <FormControl>
-                  <Input placeholder="Masukkan nama akun" className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white" {...field} />
+                  <Input readOnly={isLock} placeholder="Masukkan nama akun" className={cn("h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white", isLock && "bg-slate-50 text-slate-500 cursor-not-allowed")} {...field} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -132,7 +135,7 @@ export const AccountForm = ({
                 <FormLabel className="text-xs font-semibold text-slate-700">Kategori Laporan</FormLabel>
                 <FormControl>
                   <Select value={field.value ?? ''} onValueChange={(val) => field.onChange(val === 'none' ? undefined : val)}>
-                    <SelectTrigger className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus:ring-slate-300 bg-white">
+                    <SelectTrigger className={cn("h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus:ring-slate-300 bg-white", isLock && "pointer-events-none opacity-60 bg-slate-50 cursor-not-allowed")} tabIndex={isLock ? -1 : undefined}>
                       <SelectValue placeholder="Pilih Kategori Laporan (Opsional)" />
                     </SelectTrigger>
                     <SelectContent>
@@ -158,7 +161,7 @@ export const AccountForm = ({
             <FormItem className="space-y-1.5">
               <FormLabel className="text-xs font-semibold text-slate-700">Deskripsi</FormLabel>
               <FormControl>
-                <Textarea placeholder="Tulis deskripsi di sini" className="min-h-[72px] resize-none rounded-lg border-slate-200 px-3 py-2 text-sm shadow-none focus-visible:ring-slate-300 bg-white" rows={3} {...field} />
+                <Textarea readOnly={isLock} placeholder="Tulis deskripsi di sini" className={cn("min-h-[72px] resize-none rounded-lg border-slate-200 px-3 py-2 text-sm shadow-none focus-visible:ring-slate-300 bg-white", isLock && "bg-slate-50 text-slate-500 cursor-not-allowed")} rows={3} {...field} />
               </FormControl>
               <FormMessage className="text-xs" />
             </FormItem>
@@ -175,7 +178,7 @@ export const AccountForm = ({
                 <p className="text-sm text-muted-foreground">Aktifkan akun untuk dapat digunakan</p>
               </div>
               <FormControl>
-                <Switch checked={!!field.value} onCheckedChange={field.onChange} />
+                <Switch checked={!!field.value} onCheckedChange={field.onChange} className={cn(isLock && "pointer-events-none opacity-60")} tabIndex={isLock ? -1 : undefined} />
               </FormControl>
             </FormItem>
           )}

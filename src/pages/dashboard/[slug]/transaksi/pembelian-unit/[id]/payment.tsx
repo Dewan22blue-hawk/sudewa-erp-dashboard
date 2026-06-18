@@ -15,8 +15,46 @@ import {
     useCurrentBilling,
 } from '@/hooks/useUnitBilling';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useKas } from '@/hooks/useKas';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+
+const resolveCashId = (
+    cashes: any[] | undefined,
+    paymentType: 'bca_usd' | 'bca_idr' | 'cash_idr'
+): number | string | undefined => {
+    if (!cashes || !Array.isArray(cashes)) return undefined;
+
+    const findByCode = (keywords: string[], excludeKeywords: string[] = []) => {
+        return cashes.find((cash) => {
+            const code = String(cash.code ?? '').toLowerCase();
+            const desc = String(cash.description ?? '').toLowerCase();
+            
+            const matchesKeyword = keywords.some((kw) => code === kw || code.includes(kw) || desc.includes(kw));
+            if (!matchesKeyword) return false;
+            
+            const matchesExclude = excludeKeywords.some((ex) => code.includes(ex) || desc.includes(ex));
+            return !matchesExclude;
+        });
+    };
+
+    if (paymentType === 'bca_usd') {
+        const found = findByCode(['bca_usd', 'usd']);
+        return found?.id;
+    }
+
+    if (paymentType === 'bca_idr') {
+        const found = findByCode(['bca_idr', 'bca'], ['usd']);
+        return found?.id;
+    }
+
+    if (paymentType === 'cash_idr') {
+        const found = findByCode(['cash_idr', 'cash', 'kas'], ['bca']);
+        return found?.id;
+    }
+
+    return undefined;
+};
 
 const readApiError = (error: any): string => {
     const stringifyDetail = (value: unknown): string => {
@@ -108,6 +146,7 @@ export default function PurchasePaymentPage() {
         const purchaseId = String(id ?? '');
         const { companyId } = useCompany();
         const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId)
+        const { data: kasQuery, isLoading: kasLoading } = useKas(companyId ?? undefined);
         const { refetch: revalidateAmount } = useBillingValidation(
             companyId ? String(companyId) : undefined,
             purchaseId,
@@ -198,6 +237,17 @@ export default function PurchasePaymentPage() {
                     throw new Error('Billing utama tidak ditemukan.');
                 }
 
+                let resolvedCashId: string | number | undefined;
+                const kasList = kasQuery?.data ?? [];
+
+                if (Number(data.cashPayment ?? 0) > 0) {
+                    resolvedCashId = resolveCashId(kasList, 'cash_idr');
+                } else if (Number(data.bcaPayment2 ?? 0) > 0) {
+                    resolvedCashId = resolveCashId(kasList, 'bca_idr');
+                } else if (Number(data.bcaPayment ?? 0) > 0) {
+                    resolvedCashId = resolveCashId(kasList, 'bca_usd');
+                }
+
                 await createBillingHistory.mutateAsync({
                     unit_transaction_billing_id: String(billing.id),
                     bca_payment_amount: Number(data.bcaPayment2 ?? 0),
@@ -205,6 +255,7 @@ export default function PurchasePaymentPage() {
                     bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
                     payment_at: data.paymentDate,   
                     note: data.note,
+                    cash_id: resolvedCashId,
                 });
 
                 await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);
@@ -221,7 +272,7 @@ export default function PurchasePaymentPage() {
             }
         }
 
-        if (purchaseLoading || billingLoading || historyLoading) {
+        if (purchaseLoading || billingLoading || historyLoading || kasLoading) {
         return (
             <DashboardLayout>
                 <div className="flex h-[50vh] items-center justify-center">

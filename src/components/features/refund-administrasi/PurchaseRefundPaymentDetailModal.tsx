@@ -13,6 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils/currency';
 import { refundInputClassName, refundLabelClassName, refundPrimaryButtonClassName, refundSecondaryButtonClassName } from './purchase-refund.styles';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useKas } from '@/hooks/useKas';
 
 interface PurchaseRefundPaymentDetailModalProps {
   open: boolean;
@@ -38,6 +40,8 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
   const isEdit = Boolean(payment);
   const createMutation = useCreateRefundPayment();
   const updateMutation = useUpdateRefundPayment();
+  const { companyId } = useCompany();
+  const { data: kasQuery } = useKas(companyId ?? undefined);
   const totalPaid = (refund.payments ?? []).reduce((total, item) => {
     if (payment && item.id === payment.id) return total;
     return total + Number(item.amount);
@@ -75,6 +79,14 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
       return;
     }
 
+    const kasList = kasQuery?.data ?? [];
+    const cashIdrAccount = kasList.find((cash) => {
+      const code = String(cash.code ?? '').toLowerCase();
+      const desc = String(cash.description ?? '').toLowerCase();
+      return (code === 'cash_idr' || code === 'cash' || code.includes('cash_idr') || code.includes('cash') || code.includes('kas')) && !code.includes('bca') && !code.includes('usd');
+    });
+    const resolvedCashId = cashIdrAccount?.id;
+
     try {
       if (payment) {
         await updateMutation.mutateAsync({
@@ -84,11 +96,15 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
             payment_date: values.payment_date,
             amount: values.amount,
             note: values.note,
+            cash_id: resolvedCashId,
           },
         });
         toast.success(`Detail refund ${entityLabel.toLowerCase()} berhasil diperbarui`);
       } else {
-        await createMutation.mutateAsync(values);
+        await createMutation.mutateAsync({
+          ...values,
+          cash_id: resolvedCashId,
+        });
         toast.success(`Detail refund ${entityLabel.toLowerCase()} berhasil ditambahkan`);
       }
       onClose();

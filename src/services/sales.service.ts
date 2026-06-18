@@ -21,6 +21,7 @@ export type SalesPayload = {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
+  transaction_date?: string;
 };
 
 const appendIfDefined = (form: FormData, key: string, value: string | number | undefined) => {
@@ -44,6 +45,7 @@ const appendPayload = (form: FormData, payload: SalesPayload) => {
   appendIfDefined(form, 'bbn_price', payload.bbn_price);
   appendIfDefined(form, 'expedition_fee', payload.expedition_fee);
   appendIfDefined(form, 'other_fee', payload.other_fee);
+  appendIfDefined(form, 'transaction_date', payload.transaction_date);
 };
 
 const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
@@ -77,6 +79,9 @@ const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
   }
   if (payload.other_fee !== undefined && payload.other_fee !== null) {
     params.append('other_fee', String(payload.other_fee));
+  }
+  if (payload.transaction_date) {
+    params.append('transaction_date', payload.transaction_date);
   }
   return params;
 };
