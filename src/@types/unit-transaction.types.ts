@@ -112,6 +112,8 @@ export interface CreateUnitTransactionItemPayload {
   bbn_price: number;
   expedition_fee: number;
   other_fee: number;
+  company_id?: string | number;
+  type?: string;
 }
 
 export interface UpdateUnitTransactionItemPayload {
