@@ -58,7 +58,7 @@ export function PurchasePaymentForm({
             bcaPayment: 0,
             cashPayment: 0,
             bcaPayment2: 0,
-            paymentDate: format(new Date(), 'yyyy-MM-dd'),
+            paymentDate: new Date().toISOString().slice(0, 10),
             note: '',
             isPaid: false,
         },
@@ -69,7 +69,7 @@ export function PurchasePaymentForm({
         0,
     );
     const totalPaidFromBilling = Number(billing?.total_paid ?? (Number(billing?.bca_payment ?? 0) + Number(billing?.cash_payment ?? 0) + Number(billing?.bca_payment_2 ?? 0)));
-    const totalPaid = billing?.is_paid ? Math.max(totalPaidFromBilling, historyPaid) : historyPaid;
+    const totalPaid = Math.max(totalPaidFromBilling, historyPaid);
     const billingRemaining = Number(billing?.remaining_payment ?? 0);
     const remainingPayment = billing?.is_paid ? 0 : billingRemaining > 0 ? billingRemaining : Math.max(0, totalTagihan - totalPaid);
 
@@ -81,6 +81,8 @@ export function PurchasePaymentForm({
     const projectedTotalPaid = useMemo(() => totalPaid + totalPaymentInput, [totalPaid, totalPaymentInput]);
     const projectedRemaining = Math.max(0, totalTagihan - projectedTotalPaid);
 
+    const totalDpp = Math.max(0, totalTagihan - totalPpn);
+
     useEffect(() => {
         const autoIsPaid = projectedTotalPaid >= totalTagihan && totalTagihan > 0;
         form.setValue('isPaid', autoIsPaid);
@@ -91,7 +93,7 @@ export function PurchasePaymentForm({
             bcaPayment: 0,
             cashPayment: 0,
             bcaPayment2: 0,
-            paymentDate: format(new Date(), 'yyyy-MM-dd'),
+            paymentDate: new Date().toISOString().slice(0, 10),
             note: '',
             isPaid: projectedTotalPaid >= totalTagihan && totalTagihan > 0,
         });
@@ -137,7 +139,7 @@ export function PurchasePaymentForm({
                     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Beli</p>
-                            <Input value={formatCurrency(totalTagihan - totalPpn)} disabled />
+                            <Input value={formatCurrency(totalDpp)} disabled />
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total PPN</p>
