@@ -61,7 +61,7 @@ export default function CreatePurchasePage() {
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
-  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
+  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -224,6 +224,7 @@ export default function CreatePurchasePage() {
               <span className="text-muted-foreground">Kode Beli</span>
               <span className="text-blue-600 font-medium">{generatedCode}</span>
             </div>
+          </div>
         </div>
 
         <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { usePurchaseById, useUpdatePurchase } from '@/hooks/usePurchase';
 import { Card, CardContent } from '@/components/ui/card';
+import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { ChevronRight, Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -32,7 +33,7 @@ export default function EditPurchasePage() {
     try {
       await updateMutation.mutateAsync({
         id: itemId as string,
-        payload,
+        payload: data,
       });
 
       toast.success('Pembelian berhasil diperbarui');
@@ -101,7 +102,7 @@ export default function EditPurchasePage() {
 
         <Card className="rounded-xl border border-gray-200 shadow-none">
           <CardContent className="p-6">
-            <PurchaseForm defaultValues={defaultValues} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} companyId={companyId} />
+            <PurchaseUnitForm defaultValues={defaultValues as any} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} companyId={companyId} />
           </CardContent>
         </Card>
       </div>

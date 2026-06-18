@@ -93,6 +93,18 @@ export const AccountListPage = () => {
 
   const hasMoreGroups = accountGroupsData ? groupPage < accountGroupsData.meta.lastPage : false;
 
+  const handleGroupSearch = (query: string) => {
+    setGroupSearch(query);
+    setGroupPage(1);
+    setAccumulatedGroups([]);
+  };
+
+  const handleLoadMoreGroups = () => {
+    if (hasMoreGroups) {
+      setGroupPage((prev) => prev + 1);
+    }
+  };
+
   const accountGroups = accumulatedGroups;
   const groupOptions = useMemo(
     () =>
