@@ -222,6 +222,11 @@ export default function PurchaseDetailPage() {
                   Belum Lunas
                 </Badge>
               )}
+              {isAlreadyReceived ? (
+                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
+                  Stok Diterima
+                </Badge>
+              ) : null}
               {isRefunded ? (
                 <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
                   Sudah Refund
@@ -255,11 +260,6 @@ export default function PurchaseDetailPage() {
                 Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">inbound_return</span>. Proses terima barang dinonaktifkan.
               </p>
             </div>
-          </div>
-        ) : isAlreadyReceived ? (
-          <div className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50/40 px-4 py-3 text-sm text-emerald-800">
-            <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-            <span className="font-semibold text-emerald-950">Stok sudah diterima</span>
           </div>
         ) : !isPaid ? (
           <div className="flex items-center gap-2.5 rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-3 text-sm text-blue-800">
