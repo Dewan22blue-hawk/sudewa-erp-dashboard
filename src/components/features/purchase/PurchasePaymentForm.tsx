@@ -58,7 +58,7 @@ export function PurchasePaymentForm({
             bcaPayment: 0,
             cashPayment: 0,
             bcaPayment2: 0,
-            paymentDate: new Date().toISOString().slice(0, 10),
+            paymentDate: format(new Date(), 'yyyy-MM-dd'),
             note: '',
             isPaid: false,
         },
@@ -91,7 +91,7 @@ export function PurchasePaymentForm({
             bcaPayment: 0,
             cashPayment: 0,
             bcaPayment2: 0,
-            paymentDate: new Date().toISOString().slice(0, 10),
+            paymentDate: format(new Date(), 'yyyy-MM-dd'),
             note: '',
             isPaid: projectedTotalPaid >= totalTagihan && totalTagihan > 0,
         });
@@ -137,7 +137,7 @@ export function PurchasePaymentForm({
                     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Beli</p>
-                            <Input value={formatCurrency(totalTagihan)} disabled />
+                            <Input value={formatCurrency(totalTagihan - totalPpn)} disabled />
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total PPN</p>
@@ -145,7 +145,7 @@ export function PurchasePaymentForm({
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Biaya</p>
-                            <Input value={formatCurrency(remainingPayment)} disabled />
+                            <Input value={formatCurrency(totalTagihan)} disabled />
                         </div>
                     </div>
                 </div>
@@ -250,7 +250,7 @@ export function PurchasePaymentForm({
                                 {/* Total Bayar */}
                                 <div className="space-y-2">
                                     <p className="text-sm font-medium">Total Bayar</p>
-                                    <Input value={formatCurrency(totalPaymentInput)} disabled />
+                                    <Input value={formatCurrency(projectedTotalPaid)} disabled />
                                 </div>
                                 {/* Kurang Bayar */}
                                 <div className="space-y-2">
