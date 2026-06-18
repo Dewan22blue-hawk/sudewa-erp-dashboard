@@ -248,6 +248,13 @@ export const unitTransactionItemService = {
       toIntegerString(payload.unit_type_id)
     );
 
+    if (payload.company_id) {
+      form.append('company_id', String(payload.company_id));
+    }
+    if (payload.type) {
+      form.append('type', payload.type);
+    }
+
     appendIfDefined(
       form,
       'sparepart_id',
