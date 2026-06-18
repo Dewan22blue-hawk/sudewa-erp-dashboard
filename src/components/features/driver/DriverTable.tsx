@@ -203,25 +203,25 @@ export function DriverTable({
                     <Table className="min-w-[900px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-[#f8f9fa]">
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     NAMA DRIVER
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     ALAMAT
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     KTP
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     PHONE
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
                                     SIM
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
                                     TGL GABUNG
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">
                                     ACTION
                                 </TableHead>
                             </TableRow>
