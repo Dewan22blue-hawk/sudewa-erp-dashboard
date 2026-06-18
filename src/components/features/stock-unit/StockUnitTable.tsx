@@ -35,19 +35,19 @@ const statusLabel: Record<StockStatus, string> = {
   outbound_return: 'return',
 };
 
-const statusBadgeClasses: Record<StockStatus, string> = {
-  draft: 'border border-gray-300 bg-gray-50 text-gray-700',
-  cancel: 'border border-red-200 bg-red-50 text-red-600',
-  rejected: 'border border-red-200 bg-red-50 text-red-600',
-  prepare: 'border border-amber-200 bg-amber-50 text-amber-700',
-  inbound_purcase_order: 'border border-blue-200 bg-blue-50 text-blue-600',
-  inbound_incoming_goods: 'border border-blue-200 bg-blue-50 text-blue-600',
-  inbound_receipt: 'border border-emerald-200 bg-emerald-50 text-emerald-600',
-  inbound_return: 'border border-orange-200 bg-orange-50 text-orange-600',
-  outbound_reserved: 'border border-orange-200 bg-orange-50 text-orange-600',
-  outbound_in_transit: 'border border-indigo-200 bg-indigo-50 text-indigo-600',
-  outbound_delivered: 'border border-emerald-200 bg-emerald-50 text-emerald-600',
-  outbound_return: 'border border-rose-200 bg-rose-50 text-rose-600',
+const statusTextClasses: Record<StockStatus, string> = {
+  draft: 'text-gray-500 font-medium',
+  cancel: 'text-red-600 font-medium',
+  rejected: 'text-red-600 font-medium',
+  prepare: 'text-amber-600 font-medium',
+  inbound_purcase_order: 'text-blue-600 font-medium',
+  inbound_incoming_goods: 'text-blue-600 font-medium',
+  inbound_receipt: 'text-emerald-600 font-medium',
+  inbound_return: 'text-orange-600 font-medium',
+  outbound_reserved: 'text-orange-600 font-medium',
+  outbound_in_transit: 'text-indigo-600 font-medium',
+  outbound_delivered: 'text-emerald-600 font-medium',
+  outbound_return: 'text-rose-600 font-medium',
 };
 
 function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
@@ -101,7 +101,7 @@ export default function StockUnitTable({
 
   const renderStatus = (status: StockStatus) => {
     return (
-      <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-block ${statusBadgeClasses[status] ?? 'bg-gray-100 text-gray-600'}`}>
+      <span className={cn('text-sm', statusTextClasses[status] ?? 'text-gray-600')}>
         {statusLabel[status] ?? status}
       </span>
     );
