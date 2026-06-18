@@ -232,23 +232,14 @@ export function PurchasePaymentForm({
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                                 {/* Tanggal */}
-                                <FormField
-                                    control={form.control}
-                                    name="paymentDate"
-                                    render={({ field }) => (
-                                        <FormItem className="space-y-2">
-                                            <FormLabel className="text-sm font-medium">Tanggal</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="date"
-                                                    value={field.value}
-                                                    onChange={(e) => field.onChange(e.target.value)}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Tanggal</p>
+                                    <Input
+                                        type="date"
+                                        value={form.watch('paymentDate')}
+                                        onChange={(e) => form.setValue('paymentDate', e.target.value)}
+                                    />
+                                </div>
                                 {/* Total Bayar */}
                                 <div className="space-y-2">
                                     <p className="text-sm font-medium">Total Bayar</p>
