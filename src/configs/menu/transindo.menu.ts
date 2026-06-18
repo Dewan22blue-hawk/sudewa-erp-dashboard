@@ -111,6 +111,14 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: DollarSign,
       children: [
         {
+          label: 'Kas Harian',
+          href: base('/finance/transaksi-kas-harian'),
+        },
+        {
+          label: 'Linimasa Driver',
+          href: base('/finance/uj-driver'),
+        },
+        {
           label: 'Aset',
           href: base('/finance/asset'),
         },
