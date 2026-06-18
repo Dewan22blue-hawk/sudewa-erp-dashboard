@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { MoreVertical, Pencil, Plus, Trash, Lock } from 'lucide-react';
+import { MoreVertical, Pencil, Plus, Trash, Lock, Search } from 'lucide-react';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -135,29 +135,42 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <Input value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Cari akun" className="w-64" />
-          <Button onClick={onAdd} className="gap-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Cari akun"
+              className="pl-9 bg-white"
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
+
+          {/* Show Page Pagination Dropdown */}
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Tampilkan</span>
+            <select className="rounded border px-3 py-2 text-sm bg-white border-slate-200 text-slate-700" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
+              {[10, 25, 50].map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <span>data</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-10 gap-2 rounded-xl">
             <Plus className="h-4 w-4" />
             Tambah
           </Button>
         </div>
-
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span>Tampilkan</span>
-          <select className="rounded border px-3 py-2 text-sm bg-white border-slate-200 text-slate-700" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
-            {[10, 25, 50].map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <span>data</span>
-        </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -171,8 +184,8 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                     <TableHead
                       key={header.id}
                       className={cn(
-                        'px-4 py-4 text-xs font-semibold text-gray-500 uppercase select-none transition-colors',
-                        (isAction || isStatus) ? 'text-center text-gray-600' : 'text-left',
+                        'px-4 py-4 text-xs font-semibold text-slate-500 uppercase select-none transition-colors',
+                        (isAction || isStatus) ? 'text-center text-slate-500' : 'text-left',
                         isAction && 'w-[80px]'
                       )}
                     >
@@ -220,7 +233,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
         </Table>
       </div>
 
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <div>
           Menampilkan {start}-{end} dari {total} data
         </div>
