@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
-import { Check, Search, Trash } from 'lucide-react';
+import { Check, Search, Trash, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { DispatchUnitTableRow } from '@/@types/pengeluaran-unit.types';
 import DeletePengeluaranUnitDialog from './DeletePengeluaranUnitDialog';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Props {
     data: DispatchUnitTableRow[];
@@ -41,6 +41,29 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
     const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
         data: filtered,
     });
+
+    const renderSortHeader = (key: string, label: string) => {
+        const isSorted = sortKey === key;
+        return (
+            <TableHead
+                onClick={() => handleSort(key as any)}
+                className="px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap text-left"
+            >
+                <div className="flex items-center gap-1 justify-start">
+                    {label}
+                    {isSorted ? (
+                        sortOrder === 'asc' ? (
+                            <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+                        ) : (
+                            <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+                        )
+                    ) : (
+                        <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+                    )}
+                </div>
+            </TableHead>
+        );
+    };
 
     const perPage = Number(itemsPerPage);
     const totalItems = sortedData.length;
@@ -130,57 +153,45 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700 uppercase">
-                        <tr>
-                            <th className="px-4 py-3 text-center w-[48px]">
+                <Table className="w-full text-sm">
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        <TableRow>
+                            <TableHead className="px-4 py-4 text-center w-[48px]">
                                 <Checkbox checked={paginated.length > 0 && paginated.every((d) => selected.includes(d.id))} onCheckedChange={() => toggleAll()} />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="NO" sortKey="id" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="KODE JUAL" sortKey="salesCode" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="TIPE UNIT" sortKey="unitTypeName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="NO MESIN" sortKey="machineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="NO RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full px-4" />
-                            </th>
-                        </tr>
-                    </thead>
+                            </TableHead>
+                            {renderSortHeader('id', 'NO')}
+                            {renderSortHeader('salesCode', 'KODE JUAL')}
+                            {renderSortHeader('unitTypeName', 'TIPE UNIT')}
+                            {renderSortHeader('color', 'WARNA')}
+                            {renderSortHeader('machineNumber', 'NO MESIN')}
+                            {renderSortHeader('chassisNumber', 'NO RANGKA')}
+                        </TableRow>
+                    </TableHeader>
 
-                    <tbody className="divide-y divide-gray-100">
+                    <TableBody>
                         {paginated.length > 0 ? (
                             paginated.map((item, index) => (
-                                <tr key={item.id} className="hover:bg-gray-50">
-                                    <td className="px-4 py-3 text-center">
+                                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors border-slate-100">
+                                    <TableCell className="px-4 py-4 text-center">
                                         <Checkbox checked={selected.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
-                                    </td>
-                                    <td className="px-4 py-3">{startIndex + index + 1}</td>
-                                    <td className="px-4 py-3">{item.salesCode}</td>
-                                    <td className="px-4 py-3">{item.unitTypeName}</td>
-                                    <td className="px-4 py-3">{item.color}</td>
-                                    <td className="px-4 py-3">{item.machineNumber}</td>
-                                    <td className="px-4 py-3">{item.chassisNumber}</td>
-                                </tr>
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.salesCode}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.unitTypeName}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.color}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.machineNumber}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.chassisNumber}</TableCell>
+                                </TableRow>
                             ))
                         ) : (
-                            <tr>
-                                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                            <TableRow>
+                                <TableCell colSpan={7} className="px-4 py-8 text-center text-gray-500 text-sm">
                                     Tidak ada data.
-                                </td>
-                            </tr>
+                                </TableCell>
+                            </TableRow>
                         )}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             </div>
 
             <div className="flex justify-between items-center text-sm text-gray-500 mt-4">

@@ -5,10 +5,9 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
 import { toast } from 'sonner';
 
@@ -104,6 +103,31 @@ export function SalesTable({ onAdd }: Props) {
     }
   };
 
+  const renderSortHeader = (key: string, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
+    const isSorted = sortKey === key;
+    const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
+    const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
+    return (
+      <TableHead
+        onClick={() => handleSort(key as any)}
+        className={`px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap ${textAlignment}`}
+      >
+        <div className={`flex items-center gap-1 ${justifyClass}`}>
+          <span>{label}</span>
+          {isSorted ? (
+            sortOrder === 'asc' ? (
+              <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+            ) : (
+              <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+            )
+          ) : (
+            <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+          )}
+        </div>
+      </TableHead>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {/* Controls */}
@@ -154,36 +178,20 @@ export function SalesTable({ onAdd }: Props) {
 
       <div className="rounded-sm border bg-card shadow-md hover:shadow-lg transition-shadow duration-300">
         <Table>
-          <TableHeader>
-            <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
-              <TableHead className="w-12">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow>
+              <TableHead className="w-12 px-4 py-4 text-center">
                 <Checkbox checked={allCurrentPageSelected && currentPageIds.length > 0} onCheckedChange={handleBulkSelect} />
               </TableHead>
-              <TableHead className="p-0 font-semibold text-foreground">
-                <SortableHeader title="KODE JUAL" sortKey="kodeJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-foreground">
-                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-foreground">
-                <SortableHeader title="CUSTOMER" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL BIAYA" sortKey="biaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL DPP" sortKey="totalDPP" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL PPN" sortKey="totalPPN" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL JUAL" sortKey="totalJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="KURANG BAYAR" sortKey="kurangBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="font-semibold text-right text-foreground">ACTION</TableHead>
+              {renderSortHeader('kodeJual', 'KODE JUAL', 'left')}
+              {renderSortHeader('tanggal', 'TANGGAL', 'center')}
+              {renderSortHeader('customer', 'CUSTOMER', 'left')}
+              {renderSortHeader('biaya', 'TOTAL BIAYA', 'center')}
+              {renderSortHeader('totalDPP', 'TOTAL DPP', 'center')}
+              {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
+              {renderSortHeader('totalJual', 'TOTAL JUAL', 'center')}
+              {renderSortHeader('kurangBayar', 'KURANG BAYAR', 'center')}
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
 

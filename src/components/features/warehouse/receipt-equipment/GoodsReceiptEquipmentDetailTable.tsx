@@ -41,24 +41,24 @@ export function GoodsReceiptEquipmentDetailTable({
 
   return (
     <Table>
-      <TableHeader className="bg-slate-100/90">
+      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
         <TableRow className="border-slate-200 hover:bg-transparent">
-          <TableHead className="w-12 px-3 py-4 text-center">
+          <TableHead className="w-12 px-4 py-4 text-center">
             <Checkbox checked={isAllChecked} onCheckedChange={(checked) => toggleAll(!!checked)} />
           </TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NO</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">HARGA SATUAN</TableHead>
-          <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TOTAL</TableHead>
-          <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-950">ACTION</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE BARANG</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NAMA BARANG</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">HARGA SATUAN</TableHead>
+          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">QTY</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TOTAL</TableHead>
+          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={8} className="h-28 text-center text-[15px] text-slate-500">
+            <TableCell colSpan={8} className="h-28 text-center text-sm text-slate-500">
               Belum ada detail perlengkapan yang dimasukkan.
             </TableCell>
           </TableRow>
@@ -66,42 +66,42 @@ export function GoodsReceiptEquipmentDetailTable({
           data.map((item, index) => {
             console.log('GoodsReceiptEquipmentDetailTable item:', item);
             return (
-              <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70">
-                <TableCell className="px-3 py-4 text-center">
+              <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70 transition-colors">
+                <TableCell className="px-4 py-4 text-center">
                   <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => toggleOne(item.id, !!checked)} />
                 </TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{index + 1}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.code || '-'}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.name || '-'}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{formatCurrency(item.price || 0)}</TableCell>
-              <TableCell className="px-5 py-4 text-center text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] font-semibold text-slate-900">
-                {formatCurrency((item.price || 0) * item.qty)}
-              </TableCell>
-              <TableCell className="px-5 py-4 text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-                      <MoreVertical className="h-4 w-4 text-slate-700" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
-                    <DropdownMenuItem
-                      onClick={() => onEdit(item)}
-                      className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
-                    >
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(item)}
-                      className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
-                    >
-                      Hapus
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
+                <TableCell className="px-4 py-4 text-[15px] text-slate-800 text-left">{index + 1}</TableCell>
+                <TableCell className="px-4 py-4 text-[15px] text-slate-800 text-left">{item.vehicleEquipment?.code || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-[15px] text-slate-800 text-left">{item.vehicleEquipment?.name || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-[15px] text-slate-800 text-left">{formatCurrency(item.price || 0)}</TableCell>
+                <TableCell className="px-4 py-4 text-center text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
+                <TableCell className="px-4 py-4 text-[15px] font-semibold text-slate-900 text-left">
+                  {formatCurrency((item.price || 0) * item.qty)}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
+                        <MoreVertical className="h-4 w-4 text-slate-700" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
+                      <DropdownMenuItem
+                        onClick={() => onEdit(item)}
+                        className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onDelete(item)}
+                        className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
+                      >
+                        Hapus
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
             );
           })
         )}

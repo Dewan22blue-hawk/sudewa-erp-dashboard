@@ -20,13 +20,13 @@ interface GoodsReceiptEquipmentTableProps {
 
 const SkeletonRow = () => (
   <TableRow className="border-slate-200">
-    <TableCell className="px-5 py-4"><Skeleton className="h-5 w-28 rounded-lg" /></TableCell>
-    <TableCell className="px-5 py-4"><Skeleton className="h-5 w-24 rounded-lg" /></TableCell>
-    <TableCell className="px-5 py-4"><Skeleton className="h-5 w-36 rounded-lg" /></TableCell>
-    <TableCell className="px-5 py-4"><Skeleton className="h-5 w-24 rounded-lg" /></TableCell>
-    <TableCell className="px-5 py-4"><Skeleton className="h-5 w-28 rounded-lg" /></TableCell>
-    <TableCell className="px-5 py-4"><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
-    <TableCell className="px-5 py-4 text-right"><Skeleton className="h-9 w-9 rounded-full ml-auto" /></TableCell>
+    <TableCell className="px-4 py-4"><Skeleton className="h-5 w-28 rounded-lg" /></TableCell>
+    <TableCell className="px-4 py-4"><Skeleton className="h-5 w-24 rounded-lg" /></TableCell>
+    <TableCell className="px-4 py-4"><Skeleton className="h-5 w-36 rounded-lg" /></TableCell>
+    <TableCell className="px-4 py-4"><Skeleton className="h-5 w-24 rounded-lg" /></TableCell>
+    <TableCell className="px-4 py-4"><Skeleton className="h-5 w-28 rounded-lg" /></TableCell>
+    <TableCell className="px-4 py-4"><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
+    <TableCell className="px-4 py-4 text-center"><Skeleton className="h-9 w-9 rounded-full mx-auto" /></TableCell>
   </TableRow>
 );
 
@@ -52,15 +52,15 @@ export function GoodsReceiptEquipmentTable({
       )}
 
       <Table>
-        <TableHeader className="bg-slate-100/90">
+        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
           <TableRow className="border-slate-200 hover:bg-transparent cursor-default hover:shadow-none">
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE TRANSAKSI</TableHead>
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TANGGAL TERIMA</TableHead>
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">SUPPLIER</TableHead>
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">LOKASI</TableHead>
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TOTAL HARGA</TableHead>
-            <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">STATUS</TableHead>
-            <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-950">ACTION</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE TRANSAKSI</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TANGGAL TERIMA</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">SUPPLIER</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">LOKASI</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TOTAL HARGA</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS</TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching && !isLoading ? 'opacity-60 transition-opacity duration-200' : 'transition-opacity duration-200'}>
@@ -68,7 +68,7 @@ export function GoodsReceiptEquipmentTable({
             Array.from({ length: 5 }).map((_, index) => <SkeletonRow key={index} />)
           ) : data.length === 0 ? (
             <TableRow className="hover:bg-transparent cursor-default hover:shadow-none">
-              <TableCell colSpan={7} className="h-28 text-center text-slate-500">
+              <TableCell colSpan={7} className="h-28 text-center text-slate-500 text-sm">
                 Belum ada data penerimaan perlengkapan.
               </TableCell>
             </TableRow>
@@ -80,12 +80,12 @@ export function GoodsReceiptEquipmentTable({
 
               return (
                 <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70 cursor-default hover:shadow-none transition-colors duration-150">
-                  <TableCell className="px-5 py-4 text-[15px] font-medium text-slate-900">{item.code || '-'}</TableCell>
-                  <TableCell className="px-5 py-4 text-[15px] text-slate-800">{formatDate(item.transactionDate)}</TableCell>
-                  <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.supplier?.name || '-'}</TableCell>
-                  <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.location || '-'}</TableCell>
-                  <TableCell className="px-5 py-4 text-[15px] font-semibold text-slate-900">{formatCurrency(item.totalBrutto)}</TableCell>
-                  <TableCell className="px-5 py-4 text-[15px]">
+                  <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.code || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.supplier?.name || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.location || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-semibold text-slate-900 text-left">{formatCurrency(item.totalBrutto)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">
                     {isPaid ? (
                       <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                         Lunas
@@ -96,7 +96,7 @@ export function GoodsReceiptEquipmentTable({
                       </span>
                     )}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-right">
+                  <TableCell className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-9 w-9 rounded-full p-0">

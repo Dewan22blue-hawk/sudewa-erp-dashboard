@@ -96,23 +96,25 @@ export default function KasHarianTable({
     return [1, '...', page - 1, page, page + 1, '...', meta.lastPage];
   })();
 
-  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' = 'left') => {
+  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = sortBy === sortKey;
+    const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
+    const textAlignment = align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
     return (
       <button
         type="button"
-        className={`flex items-center gap-1.5 font-semibold text-gray-900 cursor-pointer ${align === 'right' ? 'justify-end w-full' : 'justify-start'}`}
+        className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
         onClick={() => handleSort(sortKey)}
       >
         <span>{title}</span>
         {isSorted ? (
           sortDirection === 'asc' ? (
-            <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+            <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
           ) : (
-            <ArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+            <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
           )
         ) : (
-          <ArrowUpDown className="h-3.5 w-3.5 opacity-50 text-slate-400" />
+          <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
         )}
       </button>
     );
@@ -120,18 +122,18 @@ export default function KasHarianTable({
 
   return (
     <div className="space-y-5">
-      <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <table className="w-full min-w-[1120px] text-sm">
-          <thead className="bg-[#f3f6fb] uppercase text-sm font-semibold text-gray-900 leading-normal border-b border-slate-200 bg-gray-50/50">
+          <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
-              <th className="px-6 py-4 text-left">{renderSortHeader('TANGGAL', 'date')}</th>
-              <th className="px-6 py-4 text-left">{renderSortHeader('NOTA REFF', 'code')}</th>
-              <th className="px-6 py-4 text-left">{renderSortHeader('KETERANGAN', 'note')}</th>
-              <th className="px-6 py-4 text-left">{renderSortHeader('DEBET', 'debet')}</th>
-              <th className="px-6 py-4 text-left">{renderSortHeader('KREDIT', 'credit')}</th>
-              <th className="px-6 py-4 text-left">{renderSortHeader('AKUN', 'accountName')}</th>
-              <th className="px-6 py-4 text-left">{renderSortHeader('KAS', 'cashName')}</th>
-              <th className="px-6 py-4 text-center">ACTION</th>
+              <th className="p-0 text-left">{renderSortHeader('TANGGAL', 'date', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('NOTA REFF', 'code', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('AKUN', 'accountName', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('KAS', 'cashName', 'left')}</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -139,7 +141,7 @@ export default function KasHarianTable({
               Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
             ) : isError ? (
               <tr>
-                <td colSpan={8} className="px-6 py-14 text-center">
+                <td colSpan={8} className="px-4 py-10 text-center">
                   <div className="space-y-3">
                     <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data transaksi kas harian'}</p>
                     {onRetry ? (
@@ -152,21 +154,21 @@ export default function KasHarianTable({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-14 text-center text-slate-500">
+                <td colSpan={8} className="px-4 py-10 text-center text-slate-500">
                   Belum ada data transaksi kas harian.
                 </td>
               </tr>
             ) : (
               sortedData.map((item) => (
-                <tr key={`${item.source}-${item.id}`} className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50/60">
-                  <td className="px-6 py-4 text-slate-700">{formatDate(item.date)}</td>
-                  <td className="px-6 py-4 text-slate-800">{item.code}</td>
-                  <td className="px-6 py-4 text-slate-700">{item.note || '-'}</td>
-                  <td className="px-6 py-4 font-medium text-emerald-500">{formatCurrency(item.debet)}</td>
-                  <td className="px-6 py-4 font-medium text-red-500">{formatCurrency(item.credit)}</td>
-                  <td className="px-6 py-4 text-slate-700">{item.accountName}</td>
-                  <td className="px-6 py-4 text-slate-700">{item.cashName || '-'}</td>
-                  <td className="px-6 py-4 text-center">
+                <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                  <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code}</td>
+                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.note || '-'}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{formatCurrency(item.debet)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{formatCurrency(item.credit)}</td>
+                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.accountName}</td>
+                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.cashName || '-'}</td>
+                  <td className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">

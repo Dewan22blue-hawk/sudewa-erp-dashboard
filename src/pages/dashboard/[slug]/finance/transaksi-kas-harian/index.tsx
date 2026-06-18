@@ -155,8 +155,8 @@ export default function KasHarianPage() {
       <div className="space-y-8 p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-[40px] font-semibold tracking-tight text-slate-950">Arus Transaksi Kas Harian</h1>
-            <p className="mt-1 text-lg text-slate-500">Kelola arus transaksi kas harian</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Arus Transaksi Kas Harian</h1>
+            <p className="mt-1 text-sm text-slate-500">Kelola arus transaksi kas harian</p>
           </div>
 
           <Button type="button" onClick={() => setIsAddOpen(true)} className="h-12 rounded-2xl bg-[#18385b] px-6 text-base hover:bg-[#102843]">

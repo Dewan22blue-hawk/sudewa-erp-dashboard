@@ -25,6 +25,7 @@ import {
     TableCell,
 } from '@/components/ui/table';
 import type { Driver } from '@/@types/driver.types';
+import { cn } from '@/lib/utils';
 
 interface DriverTableProps {
     drivers: Driver[];
@@ -83,10 +84,15 @@ export function DriverTable({
             return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
                     key={p}
-                    variant={p === page ? 'outline' : 'ghost'}
+                    variant="ghost"
                     size="sm"
                     onClick={() => onPageChange(p)}
-                    className={p === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+                    className={cn(
+                        'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                        p === page
+                            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                    )}
                 >
                     {p}
                 </Button>
@@ -113,11 +119,18 @@ export function DriverTable({
         return pages.map((p, idx) => (
             <Button
                 key={idx}
-                variant={p === page ? 'outline' : 'ghost'}
+                variant="ghost"
                 size="sm"
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
-                className={p === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+                className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    p === page
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : p === '...'
+                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
             >
                 {p}
             </Button>
@@ -139,8 +152,8 @@ export function DriverTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <span>Show</span>
                         <Select
                             value={perPage.toString()}
                             onValueChange={(v) => onPerPageChange(Number(v))}
@@ -155,7 +168,7 @@ export function DriverTable({
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
@@ -185,30 +198,30 @@ export function DriverTable({
             </div>
 
             {/* Table */}
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
                 <div className="overflow-x-auto">
                     <Table className="min-w-[900px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                            <TableRow className="hover:bg-[#f8f9fa]">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
                                     NAMA DRIVER
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
                                     ALAMAT
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
                                     KTP
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
                                     PHONE
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
                                     SIM
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
                                     TGL GABUNG
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">
                                     ACTION
                                 </TableHead>
                             </TableRow>
@@ -216,29 +229,29 @@ export function DriverTable({
                         <TableBody>
                             {isLoading ? (
                                 Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="animate-pulse">
+                                    <TableRow key={i} className="hover:bg-gray-50 transition-colors">
                                         {Array.from({ length: 7 }).map((_, j) => (
                                             <TableCell key={j} className="px-4 py-4">
-                                                <div className="h-4 bg-gray-200 rounded w-full" />
+                                                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
                                             </TableCell>
                                         ))}
                                     </TableRow>
                                 ))
                             ) : drivers.length > 0 ? (
                                 drivers.map((driver) => (
-                                    <TableRow key={driver.id} className="hover:bg-gray-50/50">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-900 font-medium whitespace-nowrap">
+                                    <TableRow key={driver.id} className="hover:bg-gray-50 transition-colors">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-900 text-left font-medium whitespace-nowrap">
                                             {driver.name || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                                             <span className="line-clamp-2 max-w-[220px]">
                                                 {driver.address || '-'}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
                                             {driver.identityNumber || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
                                             {driver.phone || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
@@ -248,27 +261,29 @@ export function DriverTable({
                                             {formatDate(driver.joinedAt)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-center">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem
-                                                        onClick={() => onEdit(driver)}
-                                                        className="cursor-pointer text-gray-700"
-                                                    >
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => onDelete(driver)}
-                                                        className="text-red-600 cursor-pointer focus:text-red-600"
-                                                    >
-                                                        Hapus
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <div className="flex justify-center">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEdit(driver)}
+                                                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                                                        >
+                                                            Edit
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDelete(driver)}
+                                                            className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                                                        >
+                                                            Hapus
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -276,7 +291,7 @@ export function DriverTable({
                                 <TableRow>
                                     <TableCell
                                         colSpan={7}
-                                        className="h-32 text-center text-gray-500"
+                                        className="h-32 text-center text-gray-505 py-10 text-sm"
                                     >
                                         Tidak ada data driver ditemukan
                                     </TableCell>
@@ -288,19 +303,19 @@ export function DriverTable({
             </Card>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between px-2 pt-2">
-                <div className="text-sm text-gray-500">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+                <div>
                     Showing {startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                         >
                             Previous
                         </Button>
@@ -312,7 +327,7 @@ export function DriverTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                         >
                             Next
                         </Button>

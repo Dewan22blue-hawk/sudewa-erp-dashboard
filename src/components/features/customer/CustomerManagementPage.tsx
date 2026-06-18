@@ -205,8 +205,8 @@ export function CustomerManagementPage() {
     <>
       <div className="space-y-6">
         <div>
-          <h1 className="text-[40px] font-semibold leading-tight tracking-[-0.02em] text-[#171717]">Customer</h1>
-          <p className="mt-1 text-[24px] text-[#71717A]">Kelola data customer dengan mudah</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Customer</h1>
+          <p className="text-sm text-gray-500 mt-1">Kelola data customer dengan mudah</p>
         </div>
 
         <CustomerTable

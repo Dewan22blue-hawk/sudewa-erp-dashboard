@@ -84,23 +84,24 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
   const endIndex = meta?.to ?? (data.length > 0 ? startIndex + data.length - 1 : 0);
   const totalItems = meta?.total ?? 0;
 
-  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' = 'left') => {
+  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = sortBy === sortKey;
+    const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
     return (
       <button
         type="button"
-        className={`flex items-center gap-1.5 font-semibold text-gray-900 cursor-pointer ${align === 'right' ? 'justify-end w-full' : 'justify-start'}`}
+        className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
         onClick={() => handleSort(sortKey)}
       >
         <span>{title}</span>
         {isSorted ? (
           sortDirection === 'asc' ? (
-            <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+            <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
           ) : (
-            <ArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+            <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
           )
         ) : (
-          <ArrowUpDown className="h-3.5 w-3.5 opacity-50 text-slate-400" />
+          <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
         )}
       </button>
     );
@@ -156,24 +157,24 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
         </div>
       ) : null}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal border-b border-gray-200">
+          <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left">NO</th>
-              <th className="py-2.5 px-4 text-left">{renderSortHeader('NO PENJUALAN', 'code')}</th>
-              <th className="py-2.5 px-4 text-left">{renderSortHeader('TANGGAL', 'date')}</th>
-              <th className="py-2.5 px-4 text-left">{renderSortHeader('NAMA CUSTOMER', 'supplier_name')}</th>
-              <th className="py-2.5 px-4 text-right">{renderSortHeader('TOTAL JUAL', 'grand_total', 'right')}</th>
-              <th className="py-2.5 px-4 text-right">{renderSortHeader('TOTAL BAYAR', 'total_paid', 'right')}</th>
-              <th className="py-2.5 px-4 text-right">{renderSortHeader('AMOUNT PIUTANG', 'remaining_payment', 'right')}</th>
-              <th className="px-4 py-3 text-center">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NO</th>
+              <th className="p-0 text-left">{renderSortHeader('NO PENJUALAN', 'code', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('TANGGAL', 'date', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('NAMA CUSTOMER', 'supplier_name', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('TOTAL JUAL', 'grand_total', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('TOTAL BAYAR', 'total_paid', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('AMOUNT PIUTANG', 'remaining_payment', 'center')}</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {loading && data.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
                   <span className="inline-flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Memuat data...
@@ -182,24 +183,24 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
               </tr>
             ) : sortedData.length > 0 ? (
               sortedData.map((item, i) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">{startIndex + i}</td>
-                  <td className="px-4 py-3 font-medium">{item.code}</td>
-                  <td className="px-4 py-3">{formatDate(item.date)}</td>
-                  <td className="px-4 py-3">{item.supplier_name}</td>
-                  <td className="px-4 py-3 text-right">{formatCurrency(item.grand_total)}</td>
-                  <td className="px-4 py-3 text-right text-emerald-600 font-medium">{formatCurrency(item.total_paid)}</td>
-                  <td className="px-4 py-3 text-right text-orange-600 font-medium">{formatCurrency(item.remaining_payment)}</td>
-                  <td className="px-4 py-3 text-center">
+                <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                  <td className="px-4 py-4 text-center text-sm text-slate-500">{startIndex + i}</td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code}</td>
+                  <td className="px-4 py-4 text-center text-sm text-slate-500">{formatDate(item.date)}</td>
+                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.supplier_name}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.grand_total)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-emerald-600">{formatCurrency(item.total_paid)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-orange-600">{formatCurrency(item.remaining_payment)}</td>
+                  <td className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          {slug ? <Link href={`/dashboard/${slug}/finance/data-piutang/${item.id}`}>Detail</Link> : <span className="text-gray-400 cursor-not-allowed">Detail</span>}
+                      <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2.5">
+                          {slug ? <Link href={`/dashboard/${slug}/finance/data-piutang/${item.id}`}>Detail</Link> : <span className="text-slate-400 cursor-not-allowed">Detail</span>}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -208,7 +209,7 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
                   Tidak ada data yang ditemukan.
                 </td>
               </tr>

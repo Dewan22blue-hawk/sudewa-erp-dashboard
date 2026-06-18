@@ -105,8 +105,8 @@ export default function AssetPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data Aset</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data aset perusahaan dengan mudah</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Data Aset</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola data aset perusahaan dengan mudah</p>
         </div>
 
         {/* Content */}
