@@ -14,20 +14,16 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { toast } from 'sonner';
 
-const paymentSchema = z
-    .object({
-        bcaPayment: z.number().min(0, 'Tidak boleh negatif'),
-        cashPayment: z.number().min(0, 'Tidak boleh negatif'),
-        bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
-        paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
-        note: z.string().max(255, 'Maksimal 255 karakter'),
-        isPaid: z.boolean(),
-    })
-    .refine((value) => (value.bcaPayment || 0) + (value.cashPayment || 0) + (value.bcaPayment2 || 0) > 0, {
-        path: ['bcaPayment'],
-        message: 'Minimal salah satu nominal pembayaran harus lebih dari 0',
-    });
+const paymentSchema = z.object({
+    bcaPayment: z.number().min(0, 'Tidak boleh negatif'),
+    cashPayment: z.number().min(0, 'Tidak boleh negatif'),
+    bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
+    paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
+    note: z.string().max(255, 'Maksimal 255 karakter'),
+    isPaid: z.boolean(),
+});
 
 export type PaymentFormData = z.infer<typeof paymentSchema>;
 
@@ -102,6 +98,11 @@ export function PurchasePaymentForm({
     };
 
     const handleSubmit = async (values: PaymentFormData) => {
+        const total = (values.bcaPayment || 0) + (values.cashPayment || 0) + (values.bcaPayment2 || 0);
+        if (total <= 0) {
+            toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
+            return;
+        }
         await onSubmitPayment(values);
         resetForm();
     };
