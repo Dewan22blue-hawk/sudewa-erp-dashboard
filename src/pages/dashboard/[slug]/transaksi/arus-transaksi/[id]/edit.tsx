@@ -101,8 +101,8 @@ export default function EditTransactionPage() {
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Edit Transaksi</h1>
-          <p className="text-muted-foreground">Ubah detail transaksi yang sudah ada</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Edit Transaksi</h1>
+          <p className="text-sm text-muted-foreground">Ubah detail transaksi yang sudah ada</p>
         </div>
 
         <div className="rounded-xl border bg-white p-6 md:p-8">
