@@ -7,11 +7,12 @@ import { toast } from 'sonner';
 import { useCreateTypeUnit } from '@/hooks/useTypeUnit';
 import { typeUnitSchema, type TypeUnitFormValues } from '@/scheme/type-unit.schema';
 import { TypeUnitForm } from '@/components/features/type-unit/TypeUnitForm';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 export default function CreateTypeUnitPage() {
   const router = useRouter();
   const createTypeUnit = useCreateTypeUnit();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
   const form = useForm<TypeUnitFormValues>({
     resolver: zodResolver(typeUnitSchema),
@@ -45,7 +46,6 @@ export default function CreateTypeUnitPage() {
         capacity: values.capacity ?? null,
       });
       toast.success('Data berhasil ditambahkan');
-      const slug = router.query.slug as string;
       router.push(`/dashboard/${slug}/master/type-unit`);
     } catch (error) {
       console.error('Failed to create type unit:', error);
@@ -54,26 +54,29 @@ export default function CreateTypeUnitPage() {
   };
 
   const handleCancel = () => {
-    const slug = router.query.slug as string;
     router.push(`/dashboard/${slug}/master/type-unit`);
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex items-center gap-4">
-          <div className="rounded-full bg-muted p-2 cursor-pointer hover:bg-muted/80 transition-colors" onClick={handleCancel}>
-            <ChevronLeft className="h-4 w-4" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold">Tambahkan Tipe Unit</h1>
-            <p className="text-sm text-muted-foreground">Masukkan detail tipe baru</p>
-          </div>
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="hover:text-foreground cursor-pointer" onClick={handleCancel}>
+            Tipe Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0" />
+          <span className="font-medium text-foreground">Tambah Tipe Unit</span>
+        </div>
+
+        {/* Title */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold text-slate-950">Tambahkan Tipe Unit</h1>
+          <p className="text-sm text-muted-foreground">Masukkan detail tipe baru</p>
         </div>
 
         {/* FORM CARD */}
-        <Card className="rounded-xl p-8">
+        <Card className="rounded-xl p-6">
           <TypeUnitForm form={form} onSubmit={onSubmit} onCancel={handleCancel} isSubmitting={createTypeUnit.isPending} submitLabel="Simpan" />
         </Card>
       </div>
