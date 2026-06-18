@@ -63,12 +63,12 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input
-              placeholder="Cari sparepart"
+              placeholder="Search here"
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value);
@@ -78,10 +78,10 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
             />
           </div>
 
-          <div className="flex items-center gap-2 whitespace-nowrap text-sm text-slate-500">
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-[70px] bg-white h-10">
+              <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue placeholder="10" />
               </SelectTrigger>
               <SelectContent>
@@ -91,7 +91,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span>Entries</span>
+            <span>Page</span>
           </div>
         </div>
 

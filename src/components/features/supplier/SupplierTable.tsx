@@ -81,23 +81,23 @@ export function SupplierTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          <div className="relative w-full lg:w-[300px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search here"
-              className="h-10 rounded-xl border-gray-300 bg-white pl-9 text-[15px]"
+              className="pl-9 bg-white"
             />
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-slate-500">
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-10 w-[70px] bg-white">
-                <SelectValue />
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="10">10</SelectItem>

@@ -50,16 +50,16 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input placeholder="Search here" value={search} onChange={(e) => onSearchChange(e.target.value)} className="pl-9 bg-white" />
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={perPage.toString()} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="bg-white w-20">
+              <SelectTrigger className="w-[70px] bg-white">
                 <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>

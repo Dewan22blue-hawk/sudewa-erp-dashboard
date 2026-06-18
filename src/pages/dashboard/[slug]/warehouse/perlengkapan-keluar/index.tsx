@@ -157,24 +157,25 @@ export default function MaterialReleaseListPage() {
           <p className="mt-1 text-[18px] text-slate-500">Kelola dan lacak semua data pengeluaran stock perlengkapan</p>
         </div>
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-[316px]">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="h-[42px] rounded-xl border-slate-200 pl-11 shadow-sm" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="pl-9 bg-white" />
             </div>
 
-            <div className="flex items-center gap-3 text-[16px] text-slate-800">
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="h-[42px] w-[58px] rounded-xl border-slate-200 shadow-sm">
-                  <SelectValue />
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="10" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="5">5</SelectItem>
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
               <span>Page</span>
@@ -195,15 +196,15 @@ export default function MaterialReleaseListPage() {
 
         <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
           <Table>
-            <TableHeader className="bg-slate-100/90">
-              <TableRow className="border-slate-200">
-                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">TANGGAL KELUAR</TableHead>
-                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
-                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG / TUJUAN</TableHead>
-                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">HARGA JUAL</TableHead>
-                <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">LOKASI</TableHead>
-                <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-950">ACTION</TableHead>
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+              <TableRow className="hover:bg-[#f8f9fa]">
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TANGGAL KELUAR</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">KODE BARANG</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NAMA BARANG / TUJUAN</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HARGA JUAL</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">QTY</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">LOKASI</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -217,7 +218,7 @@ export default function MaterialReleaseListPage() {
                 </TableRow>
               ) : (
                 (transactionsQuery.data?.data ?? []).map((item) => (
-                  <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70">
+                  <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                     {(() => {
                       const detail = detailMap.get(item.id);
                       const firstMaterial = detail?.materialTransactionDetails[0]?.material;
@@ -226,16 +227,16 @@ export default function MaterialReleaseListPage() {
 
                       return (
                         <>
-                          <TableCell className="px-5 py-4 text-[15px] text-slate-800">{formatDate(item.transactionDate)}</TableCell>
-                          <TableCell className="px-5 py-4 text-[15px] text-slate-800">{firstMaterial?.code || item.code}</TableCell>
-                          <TableCell className="px-5 py-4 text-[15px] text-slate-800">
-                            <div className="font-medium">{firstMaterial?.name || item.supplierName}</div>
-                            <div className="text-sm text-slate-500">{item.supplierName}</div>
+                          <TableCell className="px-4 py-4 text-sm text-slate-600 text-center">{formatDate(item.transactionDate)}</TableCell>
+                          <TableCell className="px-4 py-4 text-sm text-slate-600 text-left">{firstMaterial?.code || item.code}</TableCell>
+                          <TableCell className="px-4 py-4 text-sm text-slate-600 text-left">
+                            <div className="font-medium text-slate-900">{firstMaterial?.name || item.supplierName}</div>
+                            <div className="text-xs text-slate-500">{item.supplierName}</div>
                           </TableCell>
-                          <TableCell className="px-5 py-4 text-[15px] text-slate-800">Rp {(firstPrice || 0).toLocaleString('id-ID')}</TableCell>
-                          <TableCell className="px-5 py-4 text-center text-[15px] text-slate-800">{totalQty || '-'}</TableCell>
-                          <TableCell className="px-5 py-4 text-[15px] text-slate-800">{getWarehouseName(item)}</TableCell>
-                          <TableCell className="px-5 py-4 text-right">
+                          <TableCell className="px-4 py-4 text-sm text-slate-600 text-center">Rp {(firstPrice || 0).toLocaleString('id-ID')}</TableCell>
+                          <TableCell className="px-4 py-4 text-sm text-slate-600 text-center">{totalQty || '-'}</TableCell>
+                          <TableCell className="px-4 py-4 text-sm text-slate-600 text-left">{getWarehouseName(item)}</TableCell>
+                          <TableCell className="px-4 py-4 text-center">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="h-9 w-9 rounded-full p-0">

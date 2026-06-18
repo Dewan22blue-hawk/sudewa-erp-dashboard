@@ -268,26 +268,26 @@ export const AccountListPage = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center">
-              <div className="relative w-full max-w-[320px]">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Cari akun..."
+                  placeholder="Search here"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  className="h-10 rounded-xl border-gray-200 bg-white pl-9 text-sm text-gray-900 shadow-none focus-visible:ring-slate-300"
+                  className="pl-9 bg-white"
                 />
               </div>
 
-              <div className="flex items-center gap-2.5 text-sm text-slate-500">
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(value) => {
                   setPerPage(Number(value));
                   setPage(1);
                 }}>
-                  <SelectTrigger className="h-10 w-[80px] rounded-xl border-gray-200 bg-white px-3 text-sm text-slate-900 shadow-none focus:ring-slate-300">
-                    <SelectValue />
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
                     {[10, 25, 50, 100].map((option) => (
@@ -297,7 +297,7 @@ export const AccountListPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <span>entries</span>
+                <span>Page</span>
               </div>
             </div>
 

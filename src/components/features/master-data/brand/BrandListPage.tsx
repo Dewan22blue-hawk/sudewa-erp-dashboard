@@ -105,18 +105,6 @@ export const BrandListPage = () => {
                 </div>
 
                 <Card className="p-6">
-                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                        <div className="relative w-full sm:w-80">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                placeholder="Cari merk..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="pl-9"
-                            />
-                        </div>
-                    </div>
-
                     {isError ? (
                         <div className="py-10 text-center text-red-600">Gagal memuat data merk</div>
                     ) : (
@@ -124,6 +112,10 @@ export const BrandListPage = () => {
                             data={data?.data ?? []}
                             meta={data?.meta}
                             search={search}
+                            onSearchChange={(v) => {
+                                setSearch(v);
+                                setPage(1);
+                            }}
                             page={page}
                             perPage={perPage}
                             isLoading={isLoading || isFetching}
