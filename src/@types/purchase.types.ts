@@ -39,6 +39,8 @@ export interface Purchase {
   code: string;
   date: string;
   supplierName: string;
+  supplierAddress?: string | null;
+  supplierNpwp?: string | null;
   companyId: string;
   stockState?: string;
   maxCapacity?: number;
@@ -89,6 +91,8 @@ export interface PurchaseFormValues {
   supplierName: string;
   date: string;
   code: string;
+  supplierAddress?: string | null;
+  supplierNpwp?: string | null;
 }
 
 export interface CreatePurchaseUnitRequest {

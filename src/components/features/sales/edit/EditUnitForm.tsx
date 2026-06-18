@@ -31,6 +31,7 @@ interface EditUnitFormProps {
   cancelDisabled?: boolean;
   productOptions?: ProductOption[];
   searchableTypeUnit?: boolean;
+  hideItemFields?: boolean;
 }
 
 /**
@@ -50,6 +51,7 @@ export function EditUnitForm({
   cancelDisabled = false,
   productOptions,
   searchableTypeUnit = false,
+  hideItemFields = false,
 }: EditUnitFormProps) {
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
@@ -89,6 +91,7 @@ export function EditUnitForm({
         {/* Section Header */}
         <div>
           <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Penjualan</h2>
+          <p className="text-sm text-gray-500 mt-1">Kelola detail informasi penjualan unit dan biaya-biaya terkait</p>
           <div className="my-6 h-px bg-muted/60" />
         </div>
 
@@ -110,271 +113,275 @@ export function EditUnitForm({
           />
         )}
 
-        {/* ROW 1: Tipe Unit, Qty, Harga */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="tipeUnit"
-            render={({ field }) => (
-              <FormItem className="min-w-0">
-                <FormLabel className="text-sm font-medium">Tipe Unit</FormLabel>
-                <div className="flex items-center gap-2">
-                  {searchableTypeUnit ? (
-                    <Popover>
-                      <FormControl>
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            role="combobox"
-                            aria-expanded={false}
-                            aria-controls="combobox-options"
-                            disabled={readOnly}
-                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
-                              {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
-                            </span>
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </button>
-                        </PopoverTrigger>
-                      </FormControl>
-                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                        <Command>
-                          <CommandInput placeholder="Cari tipe unit..." />
-                          <CommandList>
-                            <CommandEmpty>Tipe Unit tidak ditemukan.</CommandEmpty>
-                            <CommandGroup>
-                              {unitOptions.map((option) => (
-                                <CommandItem key={option.value} value={option.label} onSelect={() => field.onChange(option.value)}>
-                                  <Check className={cn('mr-2 h-4 w-4', field.value === option.value ? 'opacity-100' : 'opacity-0')} />
-                                  {option.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  ) : (
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
-                      <FormControl>
-                        <SelectTrigger className="w-full bg-transparent">
-                          <SelectValue placeholder="Select an item" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {unitOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+        {!hideItemFields && (
+          <>
+            {/* ROW 1: Tipe Unit, Qty, Harga */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="tipeUnit"
+                render={({ field }) => (
+                  <FormItem className="min-w-0">
+                    <FormLabel className="text-sm font-medium">Tipe Unit</FormLabel>
+                    <div className="flex items-center gap-2">
+                      {searchableTypeUnit ? (
+                        <Popover>
+                          <FormControl>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                role="combobox"
+                                aria-expanded={false}
+                                aria-controls="combobox-options"
+                                disabled={readOnly}
+                                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
+                                  {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
+                                </span>
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </button>
+                            </PopoverTrigger>
+                          </FormControl>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Cari tipe unit..." />
+                              <CommandList>
+                                <CommandEmpty>Tipe Unit tidak ditemukan.</CommandEmpty>
+                                <CommandGroup>
+                                  {unitOptions.map((option) => (
+                                    <CommandItem key={option.value} value={option.label} onSelect={() => field.onChange(option.value)}>
+                                      <Check className={cn('mr-2 h-4 w-4', field.value === option.value ? 'opacity-100' : 'opacity-0')} />
+                                      {option.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
+                          <FormControl>
+                            <SelectTrigger className="w-full bg-transparent">
+                              <SelectValue placeholder="Select an item" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {unitOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
 
-                  {showAddUnitButton && !readOnly && (
-                    <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 bg-transparent" onClick={onAddUnitClick}>
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                      {showAddUnitButton && !readOnly && (
+                        <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 bg-transparent" onClick={onAddUnitClick}>
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="qty"
-            render={({ field }) => (
+              <FormField
+                control={form.control}
+                name="qty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">QTY</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        className="bg-transparent"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === '' ? undefined : Number(value));
+                        }}
+                        disabled={readOnly}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="harga"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Harga</FormLabel>
+                    <FormControl>
+                      <MoneyInput
+                        className="bg-transparent"
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        value={toNumber(field.value)}
+                        onChangeValue={field.onChange}
+                        disabled={readOnly}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* ROW 2: Biaya BBN, Biaya Ekspedisi, Biaya Lain */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="biayaBbn"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
+                    <FormControl>
+                      <MoneyInput
+                        placeholder="Value"
+                        className="bg-transparent"
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        value={toNumber(field.value)}
+                        onChangeValue={field.onChange}
+                        disabled={readOnly}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="biayaEkspedisi"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Biaya Expedisi</FormLabel>
+                    <FormControl>
+                      <MoneyInput
+                        placeholder="Value"
+                        className="bg-transparent"
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        value={toNumber(field.value)}
+                        onChangeValue={field.onChange}
+                        disabled={readOnly}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="biayaLain"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
+                    <FormControl>
+                      <MoneyInput
+                        placeholder="Value"
+                        className="bg-transparent"
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        value={toNumber(field.value)}
+                        onChangeValue={field.onChange}
+                        disabled={readOnly}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* ROW 3: HPP Satuan, DPP Satuan, PPN Satuan */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormItem>
-                <FormLabel className="text-sm font-medium">QTY</FormLabel>
+                <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
-                      min="1"
+                    value={formatMoneyInput(String(Math.round(hppSatuanVal)))}
                     className="bg-transparent"
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value === '' ? undefined : Number(value));
-                    }}
-                    disabled={readOnly}
+                    disabled
+                    readOnly
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
-            )}
-          />
 
-          <FormField
-            control={form.control}
-            name="harga"
-            render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">Harga</FormLabel>
+                <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
                 <FormControl>
-                  <MoneyInput
+                  <Input
+                    value={formatMoneyInput(String(Math.round(dppSatuanVal)))}
                     className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled={readOnly}
+                    disabled
+                    readOnly
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
-            )}
-          />
-        </div>
 
-        {/* ROW 2: Biaya BBN, Biaya Ekspedisi, Biaya Lain */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="biayaBbn"
-            render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
+                <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
                 <FormControl>
-                  <MoneyInput
-                    placeholder="Value"
+                  <Input
+                    value={formatMoneyInput(String(Math.round(ppnSatuanVal)))}
                     className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled={readOnly}
+                    disabled
+                    readOnly
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
-            )}
-          />
+            </div>
 
-          <FormField
-            control={form.control}
-            name="biayaEkspedisi"
-            render={({ field }) => (
+            {/* ROW 4: Total HPP, Total DPP, Total PPN */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormItem>
-                <FormLabel className="text-sm font-medium">Biaya Expedisi</FormLabel>
+                <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
                 <FormControl>
-                  <MoneyInput
-                    placeholder="Value"
+                  <Input
+                    value={formatMoneyInput(String(Math.round(totalHppVal)))}
                     className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled={readOnly}
+                    disabled
+                    readOnly
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
-            )}
-          />
 
-          <FormField
-            control={form.control}
-            name="biayaLain"
-            render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
+                <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
                 <FormControl>
-                  <MoneyInput
-                    placeholder="Value"
+                  <Input
+                    value={formatMoneyInput(String(Math.round(totalDppVal)))}
                     className="bg-transparent"
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    value={toNumber(field.value)}
-                    onChangeValue={field.onChange}
-                    disabled={readOnly}
+                    disabled
+                    readOnly
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
-            )}
-          />
-        </div>
 
-        {/* ROW 3: HPP Satuan, DPP Satuan, PPN Satuan */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormItem>
-            <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-            <FormControl>
-              <Input
-                value={formatMoneyInput(String(Math.round(hppSatuanVal)))}
-                className="bg-transparent"
-                disabled
-                readOnly
-              />
-            </FormControl>
-          </FormItem>
-
-          <FormItem>
-            <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-            <FormControl>
-              <Input
-                value={formatMoneyInput(String(Math.round(dppSatuanVal)))}
-                className="bg-transparent"
-                disabled
-                readOnly
-              />
-            </FormControl>
-          </FormItem>
-
-          <FormItem>
-            <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-            <FormControl>
-              <Input
-                value={formatMoneyInput(String(Math.round(ppnSatuanVal)))}
-                className="bg-transparent"
-                disabled
-                readOnly
-              />
-            </FormControl>
-          </FormItem>
-        </div>
-
-        {/* ROW 4: Total HPP, Total DPP, Total PPN */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormItem>
-            <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
-            <FormControl>
-              <Input
-                value={formatMoneyInput(String(Math.round(totalHppVal)))}
-                className="bg-transparent"
-                disabled
-                readOnly
-              />
-            </FormControl>
-          </FormItem>
-
-          <FormItem>
-            <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
-            <FormControl>
-              <Input
-                value={formatMoneyInput(String(Math.round(totalDppVal)))}
-                className="bg-transparent"
-                disabled
-                readOnly
-              />
-            </FormControl>
-          </FormItem>
-
-          <FormItem>
-            <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
-            <FormControl>
-              <Input
-                value={formatMoneyInput(String(Math.round(totalPpnVal)))}
-                className="bg-transparent"
-                disabled
-                readOnly
-              />
-            </FormControl>
-          </FormItem>
-        </div>
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(totalPpnVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
+              </FormItem>
+            </div>
+          </>
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-center items-center gap-6 pt-10">

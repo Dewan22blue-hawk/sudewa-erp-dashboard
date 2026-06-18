@@ -45,15 +45,15 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
 
     const handleEdit = () => {
-        router.push(slug ? `/dashboard/${slug}/sales/edit/${item.id}` : `/sales/edit/${item.id}`)
+        router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/edit/${item.id}` : `/transaksi/penjualan-unit/edit/${item.id}`)
     }
 
     const handleDetail = () => {
-        router.push(slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`)
+        router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}` : `/transaksi/penjualan-unit/${item.id}`)
     }
 
     const handleRefund = () => {
-        router.push(slug ? `/dashboard/${slug}/sales/${item.id}/refund` : `/sales/${item.id}/refund`)
+        router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}/refund` : `/transaksi/penjualan-unit/${item.id}/refund`)
     }
 
     const handleDelete = async () => {
@@ -70,18 +70,10 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
 
     return (
         <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-            {/* Checkbox */}
-            <TableCell className="px-4 py-4 text-center w-12">
-                <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => onToggle(item.id)}
-                />
-            </TableCell>
-
             {/* Kode Jual - Link biru */}
             <TableCell className="px-4 py-4 text-left text-sm font-medium">
                 <Link
-                    href={slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`}
+                    href={slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}` : `/transaksi/penjualan-unit/${item.id}`}
                     className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
                 >
                     {item.kodeJual}
@@ -144,7 +136,7 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                         <DropdownMenuItem onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
                             {item.isRefunded ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/sales/${item.id}?print=true` : `/sales/${item.id}?print=true`, '_blank')}>
+                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}?print=true` : `/transaksi/penjualan-unit/${item.id}?print=true`, '_blank')}>
                             Print
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-red-600">

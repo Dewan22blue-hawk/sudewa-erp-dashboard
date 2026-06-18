@@ -1,17 +1,22 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
-import { Calendar, User, FileText, DollarSign, Warehouse } from 'lucide-react';
+import { Calendar, User, FileText, DollarSign, CreditCard } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 
 interface Props {
   data: UnitTransactionDetail;
+  billingHistories?: any[];
 }
 
-export function PurchaseDetailCards({ data }: Props) {
+export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
   const totalBruto = Number(data.unit_transaction_bruto_total ?? data.unit_transaction_item_bruto_total ?? 0);
   const totalHpp = Number(data.unit_transaction_item_total_hpp ?? 0);
   const totalDpp = Number(data.unit_transaction_item_total_dpp ?? 0);
   const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
+
+  const debetBankUsd = billingHistories.reduce((sum, item) => sum + Number(item.bca_payment_usd_amount ?? 0), 0);
+  const debetBankIdr = billingHistories.reduce((sum, item) => sum + Number(item.bca_payment_amount ?? 0), 0);
+  const debetCashIdr = billingHistories.reduce((sum, item) => sum + Number(item.cash_payment_amount ?? 0), 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -44,13 +49,6 @@ export function PurchaseDetailCards({ data }: Props) {
                 <span className="uppercase">{data.person?.name ?? '-'}</span>
               </div>
             </div>
-            {/* <div className="space-y-1">
-              <p>Gudang</p>
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <Warehouse className="h-4 w-4 text-slate-500" />
-                <span>{data.warehouse?.name ?? '-'}</span>
-              </div>
-            </div> */}
           </div>
         </CardContent>
       </Card>
@@ -86,28 +84,28 @@ export function PurchaseDetailCards({ data }: Props) {
         </CardContent>
       </Card>
 
-      {/* Card 3: Ringkasan Transaksi */}
+      {/* Card 3: Riwayat Pembayaran */}
       <Card className="rounded-lg border border-slate-200 shadow-sm h-full">
         <CardContent className="p-5 flex flex-col h-full gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-md bg-red-50">
-              <DollarSign className="h-5 w-5 text-red-500" />
+            <div className="p-2 rounded-md bg-purple-50">
+              <CreditCard className="h-5 w-5 text-purple-500" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-700">Ringkasan Nilai</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Riwayat Pembayaran</h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
-              <span>Bruto</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalBruto)}</span>
+              <span>Debet Bank USD</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankUsd, 'USD')}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
+              <span>Debet Bank IDR</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankIdr)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>PPN</span>
-              <span className="text-sm font-semibold text-red-500">{formatCurrency(totalPpn)}</span>
+              <span>Debet Cash IDR</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetCashIdr)}</span>
             </div>
           </div>
         </CardContent>
@@ -115,3 +113,4 @@ export function PurchaseDetailCards({ data }: Props) {
     </div>
   );
 }
+

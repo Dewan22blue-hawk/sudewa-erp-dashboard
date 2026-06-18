@@ -23,7 +23,7 @@ export default function SalesPage() {
 
         {/* Sales Table */}
         <SalesTable
-          onAdd={() => router.push(slug ? `/dashboard/${slug}/sales/create` : '/sales/create')}
+          onAdd={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/create` : '/transaksi/penjualan-unit/create')}
         />
       </div>
     </DashboardLayout>

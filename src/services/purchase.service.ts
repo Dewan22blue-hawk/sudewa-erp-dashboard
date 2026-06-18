@@ -67,6 +67,8 @@ type UnitTransactionListApiModel = {
     code?: string;
     name?: string;
     type?: string;
+    address?: string | null;
+    npwp?: string | null;
   };
   unit_transaction_billing?: {
     total_dpp?: string | number;
@@ -171,6 +173,8 @@ const mapDetailToPurchase = (detail: UnitTransactionDetailApiModel): Purchase =>
     code: detail.code ?? '-',
     date: detail.created_at ?? '',
     supplierName: detail.person?.name ?? '-',
+    supplierAddress: detail.person?.address ?? null,
+    supplierNpwp: detail.person?.npwp ?? null,
     companyId: String(detail.person_id ?? ''),
     stockState: detail.stock_state,
     maxCapacity: detail.max_capacity !== undefined && detail.max_capacity !== null ? Number(detail.max_capacity) : undefined,

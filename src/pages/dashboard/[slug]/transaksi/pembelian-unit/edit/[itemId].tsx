@@ -4,15 +4,29 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseForm from '@/components/features/purchase/PurchaseForm';
 import { usePurchaseById, useUpdatePurchase } from '@/hooks/usePurchase';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
+import { useCompany } from '@/contexts/CompanyContext';
 
 export default function EditPurchasePage() {
   const router = useRouter();
+  const { companyId } = useCompany();
   const { slug, itemId } = router.query; // Changed from id to itemId to match folder structure
 
   // Note: usePurchaseById usually expects 'id'. We need to ensure logic handles 'itemId'
   const { data: purchase, isLoading } = usePurchaseById(itemId as string);
   const updateMutation = useUpdatePurchase();
+
+  const defaultValues = useMemo(() => {
+    if (!purchase) return undefined;
+    return {
+      supplierName: purchase.supplierName,
+      date: purchase.date ? purchase.date.slice(0, 10) : '',
+      code: purchase.code,
+      supplierAddress: purchase.supplierAddress,
+      supplierNpwp: purchase.supplierNpwp,
+    };
+  }, [purchase]);
 
   const handleSubmit = async (data: any) => {
     try {
@@ -53,24 +67,27 @@ export default function EditPurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
+            Pembelian Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0" />
+          <span className="font-medium text-foreground">Edit Pembelian</span>
+        </div>
 
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">Edit Pembelian</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Pembelian</span>
-              <span className="text-blue-600 font-medium">{purchase.code}</span>
-            </div>
+        {/* Title */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold text-slate-950">Edit Pembelian</h1>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Kode Beli</span>
+            <span className="text-blue-600 font-medium">{purchase.code}</span>
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-xl border border-gray-200 shadow-none">
           <CardContent className="p-6">
-            <PurchaseForm defaultValues={purchase} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} />
+            <PurchaseForm defaultValues={defaultValues} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} companyId={companyId} />
           </CardContent>
         </Card>
       </div>
