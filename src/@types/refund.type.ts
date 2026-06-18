@@ -50,6 +50,7 @@ export interface UnitTransactionRefundListResponse {
 }
 
 export interface CreateRefundPayload {
+  company_id?: string | number;
   unit_transaction_id: string;
   refund_date: string;
   refund_amount: number;
@@ -58,6 +59,7 @@ export interface CreateRefundPayload {
 }
 
 export interface UpdateRefundPayload {
+  company_id?: string | number;
   unit_transaction_id?: string;
   refund_date?: string;
   refund_amount?: number;
@@ -70,6 +72,7 @@ export interface CreateRefundPaymentPayload {
   amount: number;
   payment_date: string;
   note?: string;
+  cash_id?: string | number;
 }
 
 export interface UpdateRefundPaymentPayload {
@@ -77,4 +80,5 @@ export interface UpdateRefundPaymentPayload {
   amount?: number;
   payment_date?: string;
   note?: string;
+  cash_id?: string | number;
 }

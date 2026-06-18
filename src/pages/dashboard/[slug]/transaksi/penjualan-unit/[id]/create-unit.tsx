@@ -10,6 +10,7 @@ import { useSalesDetail } from '@/hooks/useSales';
 import { useCreateUnitItem, useSalesUnitItems, useSalesItemsByWarehouse } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCompany } from '@/contexts/CompanyContext';
 
 /**
  * Tambah Unit Page - Nested under Sales Detail
@@ -17,15 +18,13 @@ import { useQueryClient } from '@tanstack/react-query';
 export default function CreateUnitPage() {
   const router = useRouter();
   const { id } = router.query;
+  const { companyId } = useCompany();
   const queryClient = useQueryClient();
   const salesId = Array.isArray(id) ? id[0] : id;
   const { data: salesDetail, isLoading: isLoadingDetail } = useSalesDetail(salesId);
   const createItemMutation = useCreateUnitItem();
-  const { data: typeUnitData, isLoading: isLoadingTypeUnits } = useTypeUnits();
+  const { data: typeUnitData, isLoading: isLoadingTypeUnits } = useTypeUnits({ in_stock: true });
 
-  const warehouseId = salesDetail?.raw?.warehouse?.id ?? salesDetail?.raw?.warehouse_id;
-
-  const { data: stockItems, isLoading: isLoadingStockItems } = useSalesItemsByWarehouse(warehouseId);
   const { data: salesItemsResponse } = useSalesUnitItems(salesId);
 
   const existingTypeUnitIds = useMemo(
@@ -35,10 +34,6 @@ export default function CreateUnitPage() {
         .filter((value): value is string => Boolean(value)),
     [salesItemsResponse],
   );
-
-  const availableTypeIds = useMemo(() => {
-    return new Set((stockItems ?? []).map((item) => String(item.unit_type_id ?? '')).filter(Boolean));
-  }, [stockItems]);
 
   const productOptions = useMemo(() => {
     return (typeUnitData?.data ?? []).map((item) => ({
@@ -83,11 +78,6 @@ export default function CreateUnitPage() {
         return;
       }
 
-      if (availableTypeIds.size > 0 && !availableTypeIds.has(unitTypeId)) {
-        toast.error('Unit tidak tersedia di gudang');
-        return;
-      }
-
       await createItemMutation.mutateAsync({
         unit_transaction_id: salesId,
         unit_type_id: unitTypeId,
@@ -96,6 +86,8 @@ export default function CreateUnitPage() {
         bbn_price: Number(data.biayaBbn ?? 0),
         expedition_fee: Number(data.biayaEkspedisi ?? 0),
         other_fee: Number(data.biayaLain ?? 0),
+        company_id: companyId ?? undefined,
+        type: 'sales',
       });
 
       await Promise.all([
@@ -173,7 +165,7 @@ export default function CreateUnitPage() {
               searchableTypeUnit
               onSubmit={handleSubmit}
               onCancel={() => router.back()}
-              submitDisabled={createItemMutation.isPending || isLoadingTypeUnits || isLoadingStockItems}
+              submitDisabled={createItemMutation.isPending || isLoadingTypeUnits}
               cancelDisabled={createItemMutation.isPending}
             />
           </CardContent>

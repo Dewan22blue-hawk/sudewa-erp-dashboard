@@ -462,14 +462,23 @@ export const unitBillingService = {
     const bcaPaymentAmount = Number(payload.bca_payment_amount ?? 0);
     const cashPaymentAmount = Number(payload.cash_payment_amount ?? 0);
     const bcaPaymentUsdAmount = Number(payload.bca_payment_usd_amount ?? 0);
+    const totalPayment = bcaPaymentAmount + cashPaymentAmount + bcaPaymentUsdAmount;
 
     form.append('unit_transaction_billing_id', String(payload.unit_transaction_billing_id));
     if (bcaPaymentAmount > 0) form.append('bca_payment_amount', String(bcaPaymentAmount));
     if (cashPaymentAmount > 0) form.append('cash_payment_amount', String(cashPaymentAmount));
     if (bcaPaymentUsdAmount > 0) form.append('bca_payment_usd_amount', String(bcaPaymentUsdAmount));
 
+    // Append total payment amount to satisfy backend validation
+    form.append('payment', String(totalPayment));
+    form.append('payment_amount', String(totalPayment));
+    form.append('amount', String(totalPayment));
+
     if (payload.payment_at) form.append('payment_at', payload.payment_at);
     if (payload.note) form.append('note', payload.note);
+    if (payload.cash_id !== undefined && payload.cash_id !== null) {
+      form.append('cash_id', String(payload.cash_id));
+    }
 
     const response = await apiClient.post<LaravelApiResponse<UnitBillingHistoryApiModel>>(historyBasePath, form);
     const data = ensureSuccess(response.data);

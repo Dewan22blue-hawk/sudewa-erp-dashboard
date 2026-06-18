@@ -12,6 +12,45 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreatePembayaranHutangPayment } from '@/hooks/usePembayaranHutang';
 import type { CreateLiabilityPaymentPayload } from '@/types/pembayaran-hutang.types';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useKas } from '@/hooks/useKas';
+
+const resolveCashId = (
+  cashes: any[] | undefined,
+  paymentType: 'bca_usd' | 'bca_idr' | 'cash_idr'
+): number | string | undefined => {
+  if (!cashes || !Array.isArray(cashes)) return undefined;
+
+  const findByCode = (keywords: string[], excludeKeywords: string[] = []) => {
+    return cashes.find((cash) => {
+      const code = String(cash.code ?? '').toLowerCase();
+      const desc = String(cash.description ?? '').toLowerCase();
+      
+      const matchesKeyword = keywords.some((kw) => code === kw || code.includes(kw) || desc.includes(kw));
+      if (!matchesKeyword) return false;
+      
+      const matchesExclude = excludeKeywords.some((ex) => code.includes(ex) || desc.includes(ex));
+      return !matchesExclude;
+    });
+  };
+
+  if (paymentType === 'bca_usd') {
+    const found = findByCode(['bca_usd', 'usd']);
+    return found?.id;
+  }
+
+  if (paymentType === 'bca_idr') {
+    const found = findByCode(['bca_idr', 'bca'], ['usd']);
+    return found?.id;
+  }
+
+  if (paymentType === 'cash_idr') {
+    const found = findByCode(['cash_idr', 'cash', 'kas'], ['bca']);
+    return found?.id;
+  }
+
+  return undefined;
+};
 
 type FormValues = {
   cash_payment_amount?: string;
@@ -59,6 +98,8 @@ interface Props {
 export default function PembayaranHutangPaymentDialog({ open, onOpenChange, billingId, remainingPayment, code }: Props) {
   const mutation = useCreatePembayaranHutangPayment();
   const schema = useMemo(() => createSchema(), []);
+  const { companyId } = useCompany();
+  const { data: kasQuery } = useKas(companyId ?? undefined);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -121,6 +162,17 @@ export default function PembayaranHutangPaymentDialog({ open, onOpenChange, bill
       return;
     }
 
+    const kasList = kasQuery?.data ?? [];
+    let resolvedCashId: string | number | undefined;
+
+    if (cashAmount > 0) {
+      resolvedCashId = resolveCashId(kasList, 'cash_idr');
+    } else if (bcaAmount > 0) {
+      resolvedCashId = resolveCashId(kasList, 'bca_idr');
+    } else if (usdAmount > 0) {
+      resolvedCashId = resolveCashId(kasList, 'bca_usd');
+    }
+
     const payload: CreateLiabilityPaymentPayload = {
       unit_transaction_billing_id: billingId,
       cash_payment_amount: cashAmount,
@@ -129,6 +181,7 @@ export default function PembayaranHutangPaymentDialog({ open, onOpenChange, bill
       payment_at: values.payment_at || undefined,
       note: values.note || undefined,
       payment_proof: values.payment_proof?.[0] ?? null,
+      cash_id: resolvedCashId,
     };
 
     try {

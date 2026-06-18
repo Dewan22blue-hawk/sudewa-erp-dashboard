@@ -61,4 +61,5 @@ export interface CreateUnitBillingHistoryPayload {
   bca_payment_usd_amount: number;
   payment_at: string;
   note?: string;
+  cash_id?: number | string;
 }

@@ -185,9 +185,9 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
         grand_total: toNumber(item.unit_transaction_billing.grand_total),
         total_paid: toNumber(item.unit_transaction_billing.total_paid),
         remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
-        is_paid: Boolean(item.unit_transaction_billing.is_paid),
+        is_paid: Boolean(item.unit_transaction_billing?.is_paid),
         payment_at: item.unit_transaction_billing.payment_at ?? null,
-        unit_transaction_billing_histories: (item.unit_transaction_billing.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
+        unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
       }
     : null,
   isPaid: Boolean(item.unit_transaction_billing?.is_paid || item.billing_summary?.is_paid),
@@ -437,7 +437,7 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
           total_bca_payment: toNumber(item.billing_summary.total_bca_payment),
           total_paid: toNumber(item.billing_summary.total_paid),
           remaining_payment: toNumber(item.billing_summary.remaining_payment),
-          is_paid: Boolean(item.billing_summary.is_paid),
+          is_paid: Boolean(item.billing_summary?.is_paid),
         }
       : null,
     unit_transaction_billing: item.unit_transaction_billing
@@ -447,9 +447,9 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
           grand_total: toNumber(item.unit_transaction_billing.grand_total),
           total_paid: toNumber(item.unit_transaction_billing.total_paid),
           remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
-          is_paid: Boolean(item.unit_transaction_billing.is_paid),
+          is_paid: Boolean(item.unit_transaction_billing?.is_paid),
           payment_at: item.unit_transaction_billing.payment_at ?? null,
-          unit_transaction_billing_histories: (item.unit_transaction_billing.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
+          unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
         }
       : null,
     unit_transaction_adjustments: item.unit_transaction_adjustments ?? [],

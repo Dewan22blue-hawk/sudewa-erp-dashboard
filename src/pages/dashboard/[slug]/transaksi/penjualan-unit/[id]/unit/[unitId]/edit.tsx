@@ -65,13 +65,15 @@ export default function EditNestedUnitPage() {
                 return;
             }
 
-            // Send only backend-required fields for edit.
+            // Omit unit_transaction_id and unit_type_id if they haven't changed to bypass backend unique constraint bug
+            const isUnitTypeChanged = values.tipeUnit && String(values.tipeUnit) !== String(item?.unit_type_id);
+
             await updateMutation.mutateAsync({
                 id: String(selectedUnitId),
                 payload: {
-                    unit_transaction_id: String(item?.unit_transaction_id),
-                    unit_type_id: String(values.tipeUnit),
-                    sparepart_id: item?.sparepart_id,
+                    unit_transaction_id: undefined, // Selalu abaikan karena tidak mungkin pindah transaksi
+                    unit_type_id: isUnitTypeChanged && String(values.tipeUnit) !== 'null' ? String(values.tipeUnit) : undefined,
+                    sparepart_id: item?.sparepart_id && String(item.sparepart_id) !== 'null' ? String(item.sparepart_id) : undefined,
                     qty_total: Number(values.qty ?? 0),
                     price: Number(values.harga ?? 0),
                     bbn_price: Number(values.biayaBbn ?? 0),
@@ -84,7 +86,18 @@ export default function EditNestedUnitPage() {
             const basePath = slugValue ? `/dashboard/${slugValue}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
             router.push(`${basePath}/${salesId}`);
         } catch (error: any) {
-            toast.error(error?.message || 'Gagal memperbarui unit.');
+            const responseData = error?.response?.data;
+            const errorMsg = responseData?.message || error?.message || 'Gagal memperbarui unit.';
+            const validationErrors = responseData?.errors;
+            
+            if (validationErrors && typeof validationErrors === 'object') {
+                const firstErrorKey = Object.keys(validationErrors)[0];
+                const firstErrorArray = validationErrors[firstErrorKey];
+                const firstErrorMessage = Array.isArray(firstErrorArray) ? firstErrorArray[0] : firstErrorArray;
+                toast.error(`${errorMsg} - ${firstErrorMessage}`);
+            } else {
+                toast.error(errorMsg);
+            }
         }
     };
 

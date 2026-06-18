@@ -194,7 +194,6 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                         <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
-                            disabled={account.is_lock}
                             onSelect={(e) => {
                               e.preventDefault();
                               onEdit(account);

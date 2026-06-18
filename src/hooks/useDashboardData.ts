@@ -11,11 +11,11 @@ import { useEffect } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
 
-export function useDashboardData(): UseQueryResult<DashboardApiResponse, Error> {
+export function useDashboardData(startDate?: string | null, endDate?: string | null): UseQueryResult<DashboardApiResponse, Error> {
     const { companyId } = useCompany();
     const query = useQuery({
-        queryKey: companyId ? companyQueryKeys.list(companyId, 'dashboard-overview') : ['company', 'unselected', 'dashboard-overview'],
-        queryFn: () => dashboardService.getDashboardData(companyId as string),
+        queryKey: companyId ? [...companyQueryKeys.list(companyId, 'dashboard-overview'), startDate, endDate] : ['company', 'unselected', 'dashboard-overview', startDate, endDate],
+        queryFn: () => dashboardService.getDashboardData(companyId as string, startDate, endDate),
         enabled: Boolean(companyId),
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,

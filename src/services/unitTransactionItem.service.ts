@@ -248,6 +248,13 @@ export const unitTransactionItemService = {
       toIntegerString(payload.unit_type_id)
     );
 
+    if (payload.company_id) {
+      form.append('company_id', String(payload.company_id));
+    }
+    if (payload.type) {
+      form.append('type', payload.type);
+    }
+
     appendIfDefined(
       form,
       'sparepart_id',
@@ -296,15 +303,20 @@ async updateItem(
 ): Promise<UnitTransactionItem> {
   const params = new URLSearchParams();
 
-  if (payload.unit_transaction_id !== undefined) {
+  if (payload.unit_transaction_id !== undefined && String(payload.unit_transaction_id) !== 'null') {
     params.append('unit_transaction_id', String(payload.unit_transaction_id));
   }
 
-  if (payload.unit_type_id !== undefined) {
+  if (payload.unit_type_id !== undefined && String(payload.unit_type_id) !== 'null') {
     params.append('unit_type_id', String(payload.unit_type_id));
   }
 
-  if (payload.sparepart_id !== undefined && payload.sparepart_id !== null && String(payload.sparepart_id).length > 0) {
+  if (
+    payload.sparepart_id !== undefined &&
+    payload.sparepart_id !== null &&
+    String(payload.sparepart_id) !== 'null' &&
+    String(payload.sparepart_id).trim().length > 0
+  ) {
     params.append('sparepart_id', String(payload.sparepart_id));
   }
 

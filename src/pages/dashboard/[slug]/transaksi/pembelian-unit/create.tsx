@@ -61,6 +61,7 @@ export default function CreatePurchasePage() {
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -101,6 +102,11 @@ export default function CreatePurchasePage() {
         return;
       }
 
+      if (!purchaseDate) {
+        toast.error('Tanggal pembelian wajib diisi');
+        return;
+      }
+
       if (!warehouseNumeric || warehouseNumeric <= 0) {
         toast.error('Warehouse ID wajib diisi (gunakan ID yang valid, contoh: 1)');
         return;
@@ -138,6 +144,7 @@ export default function CreatePurchasePage() {
         bbn_price: bbnNumber,
         expedition_fee: expeditionNumber,
         other_fee: otherFeeNumber,
+        transaction_date: purchaseDate,
       };
 
       if (process.env.NODE_ENV !== 'production') {
@@ -196,6 +203,8 @@ export default function CreatePurchasePage() {
       }
     }
   };
+
+  const purchasePath = `/dashboard/${slug}/transaksi/pembelian-unit`;
 
   const purchasePath = `/dashboard/${slug}/transaksi/pembelian-unit`;
 

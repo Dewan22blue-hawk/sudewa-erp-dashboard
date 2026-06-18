@@ -1,7 +1,8 @@
+'use client';
+
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import PurchaseForm from '@/components/features/purchase/PurchaseForm';
 import { usePurchaseById, useUpdatePurchase } from '@/hooks/usePurchase';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, Loader2 } from 'lucide-react';
@@ -13,8 +14,7 @@ export default function EditPurchasePage() {
   const { companyId } = useCompany();
   const { slug, itemId } = router.query; // Changed from id to itemId to match folder structure
 
-  // Note: usePurchaseById usually expects 'id'. We need to ensure logic handles 'itemId'
-  const { data: purchase, isLoading } = usePurchaseById(itemId as string);
+  const { data: purchase, isLoading: isPurchaseLoading } = usePurchaseById(itemId as string);
   const updateMutation = useUpdatePurchase();
 
   const defaultValues = useMemo(() => {
@@ -32,16 +32,30 @@ export default function EditPurchasePage() {
     try {
       await updateMutation.mutateAsync({
         id: itemId as string,
-        payload: data,
+        payload,
       });
+
       toast.success('Pembelian berhasil diperbarui');
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
-    } catch {
-      toast.error('Gagal memperbarui pembelian');
+    } catch (err: any) {
+      const apiMessage = err?.message || 'Gagal memperbarui pembelian';
+      const apiErrors = err?.details || err?.response?.data?.errors;
+      let detail = '';
+
+      if (apiErrors && typeof apiErrors === 'object') {
+        detail = Object.entries(apiErrors)
+          .map(([k, v]) => {
+            const msg = Array.isArray(v) ? v[0] : String(v);
+            return `${k}: ${msg}`;
+          })
+          .join(', ');
+      }
+
+      toast.error(detail || apiMessage);
     }
   };
 
-  if (isLoading) {
+  if (isPurchaseLoading) {
     return (
       <DashboardLayout>
         <div className="flex h-[50vh] items-center justify-center">
