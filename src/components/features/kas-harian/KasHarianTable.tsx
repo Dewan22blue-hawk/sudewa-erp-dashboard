@@ -180,10 +180,11 @@ export default function KasHarianTable({
                           <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
                             Bayar
                           </DropdownMenuItem>
-                        ) : null}
-                        <DropdownMenuItem onClick={() => onView(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
-                          Detail
-                        </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem onClick={() => onView(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                            Detail
+                          </DropdownMenuItem>
+                        )}
                         {item.cashFlowId ? (
                           <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
                             Edit

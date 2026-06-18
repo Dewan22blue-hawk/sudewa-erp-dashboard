@@ -138,12 +138,10 @@ export default function KasHarianPage() {
     setIsDeleteOpen(true);
   };
 
-  const pushTo = (item: KasHarianListItem, path?: 'bayar') => {
-    if (typeof slug !== 'string') return;
-    const targetId = item.cashFlowId;
+  const pushTo = (item: KasHarianListItem) => {
+    const targetId = item.cashFlowId || item.id;
     if (!targetId) return;
-    const suffix = path === 'bayar' ? '/bayar' : '';
-    void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${targetId}${suffix}?source=${item.source}`);
+    void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${targetId}?source=${item.source}`);
   };
 
   return (
@@ -226,8 +224,8 @@ export default function KasHarianPage() {
           onRetry={() => {
             void kasHarianQuery.refetch();
           }}
-          onView={(item) => pushTo(item)}
-          onPay={(item) => pushTo(item, 'bayar')}
+          onView={pushTo}
+          onPay={pushTo}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onPageChange={setPage}

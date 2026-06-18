@@ -117,6 +117,8 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
               isLoadingCash={cashQuery.isLoading}
               isLoadingAccount={accountQuery.isLoading}
               lockAmounts={lockAmounts}
+              initialCash={data?.cash}
+              initialAccount={data?.account}
             />
           </div>
 
