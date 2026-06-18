@@ -161,7 +161,7 @@ export function AssetTable({
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
-                            <Download className="h-4 w-4 mr-2" />
+                            <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}

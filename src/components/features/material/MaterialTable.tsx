@@ -146,30 +146,30 @@ export function MaterialTable({
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
                         <Button 
-                            variant="ghost"
-                            className="h-10 rounded-xl px-3.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
                             onClick={onExport} 
+                            variant="outline" 
+                            className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
-                            <Upload className="mr-1.5 h-4 w-4" />
+                            <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
                     {onImport && (
                         <Button 
+                            onClick={onImport} 
                             variant="outline" 
-                            className="h-10 rounded-xl border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50"
-                            onClick={onImport}
+                            className="w-full sm:w-auto"
                         >
-                            <Download className="mr-1.5 h-4 w-4" />
+                            <Upload className="h-4 w-4 mr-2" />
                             Import
                         </Button>
                     )}
                     <Button 
-                        className="h-10 rounded-xl bg-[#1F3B5B] px-4 text-sm font-medium text-white hover:bg-[#1B3450]"
-                        onClick={onAdd}
+                        onClick={onAdd} 
+                        className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
                     >
-                        <Plus className="mr-1.5 h-4 w-4" />
+                        <Plus className="h-4 w-4 mr-2" />
                         Tambah
                     </Button>
                 </div>

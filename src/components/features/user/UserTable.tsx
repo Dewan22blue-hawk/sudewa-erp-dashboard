@@ -113,10 +113,12 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         </div>
 
         {onAdd && (
-          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white px-4 h-10 rounded-xl shadow-sm gap-2">
-            <Plus className="h-4 w-4" />
-            Tambah
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah
+            </Button>
+          </div>
         )}
       </div>
 

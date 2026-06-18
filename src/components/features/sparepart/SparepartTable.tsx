@@ -95,16 +95,16 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto gap-2 justify-end">
+        <div className="flex flex-wrap items-center gap-2">
           {onImport && (
-            <Button variant="outline" onClick={onImport} className="bg-white hover:bg-slate-50 border-slate-200 h-10">
-              <Upload className="h-4 w-4" />
+            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+              <Upload className="h-4 w-4 mr-2" />
               Import
             </Button>
           )}
           {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-10 gap-2 rounded-xl">
-              <Plus className="h-4 w-4" />
+            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="h-4 w-4 mr-2" />
               Tambah
             </Button>
           )}

@@ -145,18 +145,18 @@ export function BBNTable({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    {onImport ? (
+                    {onImport && (
                         <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
                             <Upload className="h-4 w-4 mr-2" />
                             Import
                         </Button>
-                    ) : null}
-                    {onExport ? (
+                    )}
+                    {onExport && (
                         <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
-                            <Download className="h-4 w-4 mr-2" />
+                            <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
-                    ) : null}
+                    )}
                     <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                         <Plus className="h-4 w-4 mr-2" />
                         Tambah

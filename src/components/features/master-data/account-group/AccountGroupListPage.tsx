@@ -15,7 +15,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Plus, Search } from 'lucide-react';
+import { Download, Plus, Search, Upload } from 'lucide-react';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 
 export const AccountGroupListPage = () => {
@@ -159,14 +159,13 @@ export const AccountGroupListPage = () => {
                 <span>Page</span>
               </div>
             </div>
-            {/* RIGHT: Import + Tambah */}
-            <div className="flex flex-row items-center gap-2">
-              <Button onClick={() => setOpenImport(true)} className="gap-2" variant="outline">
-                <Download className="h-4 w-4" />
+            <div className="flex flex-wrap items-center gap-2">
+              <Button onClick={() => setOpenImport(true)} variant="outline" className="w-full sm:w-auto">
+                <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
-              <Button onClick={handleAdd} className="gap-2">
-                <Plus className="h-4 w-4" />
+              <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="h-4 w-4 mr-2" />
                 Tambah
               </Button>
             </div>

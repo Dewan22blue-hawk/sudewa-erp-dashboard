@@ -73,16 +73,16 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
           </div>
         </div>
 
-        <div className="flex w-full sm:w-auto justify-end gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {onImport && (
-            <Button onClick={onImport} variant="outline" className="gap-2">
-              <Upload className="h-4 w-4" />
+            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+              <Upload className="h-4 w-4 mr-2" />
               Import
             </Button>
           )}
           {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap">
-              <Plus className="h-4 w-4" />
+            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="h-4 w-4 mr-2" />
               Tambah
             </Button>
           )}
