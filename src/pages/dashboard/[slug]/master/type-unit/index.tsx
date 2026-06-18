@@ -9,7 +9,6 @@ import { DeleteTypeUnitDialog } from '@/components/features/type-unit/DeleteType
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useCompany } from '@/contexts/CompanyContext';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function TypeUnitPage() {
   const router = useRouter();
@@ -17,21 +16,13 @@ export default function TypeUnitPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const inStockFilter = router.query.in_stock === 'true';
-
-  const { data, isLoading, isError, refetch } = useTypeUnits({ in_stock: inStockFilter });
+  const { data, isLoading, isError, refetch } = useTypeUnits();
   const filteredData = useMemo(() => {
     const term = search.toLowerCase();
-    let result = data?.data || [];
-
-    if (inStockFilter) {
-      result = result.filter(
-        (item) => item.availableStock !== null && item.availableStock !== undefined && item.availableStock > 0
-      );
-    }
+    const result = data?.data || [];
 
     return result.filter((item) => [item.code, item.name, item.unitType, item.unitModel, item.brand?.name].filter(Boolean).some((value) => value!.toString().toLowerCase().includes(term)));
-  }, [data?.data, search, inStockFilter]);
+  }, [data?.data, search]);
 
   const paginatedData = useMemo(() => {
     const start = (page - 1) * perPage;
@@ -134,21 +125,6 @@ export default function TypeUnitPage() {
     );
   }
 
-  const handleTabChange = (value: string) => {
-    const slug = router.query.slug as string;
-    if (value === 'in_stock') {
-      router.push({
-        pathname: `/dashboard/${slug}/master/type-unit`,
-        query: { in_stock: 'true' },
-      });
-    } else {
-      router.push({
-        pathname: `/dashboard/${slug}/master/type-unit`,
-      });
-    }
-    setPage(1);
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -160,24 +136,6 @@ export default function TypeUnitPage() {
           </div>
         </div>
 
-
-        {/* TABS FILTER */}
-        <Tabs value={inStockFilter ? 'in_stock' : 'all'} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="inline-flex h-auto min-w-max items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1">
-            <TabsTrigger
-              value="all"
-              className="h-9 flex-shrink-0 rounded-lg px-4 text-sm font-semibold capitalize text-slate-600 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
-            >
-              Semua Tipe Unit
-            </TabsTrigger>
-            <TabsTrigger
-              value="in_stock"
-              className="h-9 flex-shrink-0 rounded-lg px-4 text-sm font-semibold capitalize text-slate-600 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
-            >
-              Stok Tersedia
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
         {/* TABLE CARD */}
         <div className="">
           <TypeUnitTable

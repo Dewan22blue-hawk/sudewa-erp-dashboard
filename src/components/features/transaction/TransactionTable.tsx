@@ -4,6 +4,7 @@ import { MoreVertical, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useTableSort } from '@/hooks/useTableSort';
+import { formatDate } from '@/lib/utils/format';
 
 interface Props {
   data: Transaction[];
@@ -80,7 +81,7 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
             {sortedData.length > 0 ? (
               sortedData.map((trx) => (
                 <tr key={trx.id} className="border-b hover:bg-gray-50 transition-colors border-slate-100 last:border-0">
-                  <td className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">{trx.date}</td>
+                  <td className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">{formatDate(trx.date)}</td>
                   <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{trx.name}</td>
 
                   {/* BANK */}

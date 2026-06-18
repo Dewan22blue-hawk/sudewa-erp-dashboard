@@ -8,11 +8,12 @@ import { toast } from 'sonner';
 import { useTypeUnit, useUpdateTypeUnit } from '@/hooks/useTypeUnit';
 import { typeUnitSchema, type TypeUnitFormValues } from '@/scheme/type-unit.schema';
 import { TypeUnitForm } from '@/components/features/type-unit/TypeUnitForm';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 export default function EditTypeUnitPage() {
   const router = useRouter();
   const { id } = router.query;
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const { data: typeUnit, isLoading, isError } = useTypeUnit(id as string);
   const updateTypeUnit = useUpdateTypeUnit();
 
@@ -55,7 +56,6 @@ export default function EditTypeUnitPage() {
 
   const onSubmit = async (values: TypeUnitFormValues) => {
     if (!id) return;
-    const slug = router.query.slug as string;
     if (!values.brandId) {
       toast.error('Brand ID wajib diisi');
       return;
@@ -81,7 +81,6 @@ export default function EditTypeUnitPage() {
   };
 
   const handleCancel = () => {
-    const slug = router.query.slug as string;
     router.push(`/dashboard/${slug}/master/type-unit`);
   };
 
@@ -108,19 +107,26 @@ export default function EditTypeUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex items-center gap-4">
-          <div className="rounded-full bg-muted p-2 cursor-pointer hover:bg-muted/80 transition-colors" onClick={handleCancel}>
-            <ChevronLeft className="h-4 w-4" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold">Edit Tipe Unit</h1>
-            <p className="text-sm text-muted-foreground">Ubah detail tipe unit</p>
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="hover:text-foreground cursor-pointer" onClick={handleCancel}>
+            Tipe Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0" />
+          <span className="font-medium text-foreground">Edit Tipe Unit</span>
+        </div>
+
+        {/* Title */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold text-slate-955">Edit Tipe Unit</h1>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-slate-500">Kode</span>
+            <span className="text-blue-600 font-medium">{typeUnit.code}</span>
           </div>
         </div>
 
         {/* FORM CARD */}
-        <Card className="rounded-xl p-8">
+        <Card className="rounded-xl p-6">
           <TypeUnitForm form={form} onSubmit={onSubmit} onCancel={handleCancel} isSubmitting={updateTypeUnit.isPending} submitLabel="Perbarui" />
         </Card>
       </div>
