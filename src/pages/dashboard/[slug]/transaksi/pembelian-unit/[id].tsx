@@ -10,6 +10,7 @@ import PurchaseUnitTable from '@/components/features/purchase/PurchaseUnitTable'
 import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
 import { useUnitBillings, useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
 import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
+import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
 import { ChevronLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
@@ -44,6 +45,7 @@ export default function PurchaseDetailPage() {
   const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(purchase?.id ?? ''));
   const { data: unitItemsResponse, isLoading: unitItemsLoading } = usePurchaseUnitItems(purchase?.id);
   const updateState = useUpdateUnitTransactionState();
+  const { data: typeUnits } = useTypeUnits();
 
   const totalTagihan = Number(purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
   const totalPaid = billings.reduce(
@@ -102,14 +104,29 @@ export default function PurchaseDetailPage() {
         return;
       }
 
+      const getUnitTypeName = (typeId?: string | number) => {
+        if (!typeId) return '-';
+        return typeUnits?.data?.find((type) => String(type.id) === String(typeId))?.name ?? String(typeId);
+      };
+
+      const incompleteItems: string[] = [];
       const detailRows = await Promise.all(
-        unitItems.map((item) => unitItemDetailService.getDetails(String(item.id), { page: 1, perPage: 200 })),
+        unitItems.map(async (item) => {
+          const res = await unitItemDetailService.getDetails(String(item.id), { page: 1, perPage: 200 });
+          const qty = Number(item.qty_total ?? 0);
+          const detailsCount = res.data?.length ?? 0;
+          if (qty !== detailsCount) {
+            incompleteItems.push(`${getUnitTypeName(item.unit_type_id)} (Qty: ${qty}, Detail Terisi: ${detailsCount})`);
+          }
+          return res;
+        }),
       );
 
-      const qtyTotal = unitItems.reduce((acc, item) => acc + Number(item.qty_total ?? 0), 0);
-      const detailTotal = detailRows.reduce((acc, row) => acc + row.data.length, 0);
-      if (qtyTotal !== detailTotal) {
-        toast.error(`Jumlah detail unit tidak sesuai qty_total. qty_total=${qtyTotal}, detail=${detailTotal}.`);
+      if (incompleteItems.length > 0) {
+        toast.error(
+          `Detail unit belum lengkap:\n- ${incompleteItems.join('\n- ')}\n\nSilakan klik tombol Action > Detail / Kelola Unit pada tabel di bawah untuk melengkapi nomor rangka, nomor mesin, dan warna setiap unit.`,
+          { duration: 8000 }
+        );
         return;
       }
 
