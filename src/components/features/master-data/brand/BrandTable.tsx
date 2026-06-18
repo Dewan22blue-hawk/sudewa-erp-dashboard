@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, ImageIcon, Pencil, Trash } from 'lucide-react';
+import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface BrandTableProps {
     data: Brand[];
@@ -24,6 +24,15 @@ interface BrandTableProps {
     onDelete: (brand: Brand) => void;
     onPageChange: (page: number) => void;
     onPerPageChange: (perPage: number) => void;
+}
+
+function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
+  const isActive = currentSortKey === sortKey;
+  if (isActive && sortOrder === 'asc')
+    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  if (isActive && sortOrder === 'desc')
+    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
 export const BrandTable = ({
@@ -45,7 +54,12 @@ export const BrandTable = ({
         () => [
             {
                 accessorKey: 'name',
-                header: () => <SortableHeader title="NAMA MERK" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />,
+                header: () => (
+                    <div className="flex items-center gap-1">
+                        NAMA MERK
+                        <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                    </div>
+                ),
                 cell: ({ row }) => (
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-slate-50 overflow-hidden">
@@ -62,7 +76,12 @@ export const BrandTable = ({
             },
             {
                 accessorKey: 'createdAt',
-                header: () => <SortableHeader title="TANGGAL DIBUAT" sortKey="createdAt" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />,
+                header: () => (
+                    <div className="flex items-center gap-1">
+                        TANGGAL DIBUAT
+                        <SortIcon sortKey="createdAt" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                    </div>
+                ),
                 cell: ({ row }) => (
                     <span className="text-sm text-slate-600">
                         {row.original.createdAt ? format(new Date(row.original.createdAt), 'dd MMMM yyyy', { locale: localeId }) : '-'}
@@ -71,12 +90,12 @@ export const BrandTable = ({
             },
             {
                 id: 'actions',
-                header: () => <div className="text-right font-semibold uppercase">ACTION</div>,
+                header: () => 'ACTION',
                 cell: ({ row }) => (
-                    <div className="flex justify-end">
+                    <div className="flex justify-center">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 p-0 rounded-full">
                                     <MoreVertical className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
@@ -113,7 +132,7 @@ export const BrandTable = ({
     return (
         <div className="space-y-4">
             {/* SHOW ENTRIES */}
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm text-slate-500">
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(val) => onPerPageChange(Number(val))}>
                     <SelectTrigger className="h-9 w-20 bg-white">
@@ -129,51 +148,70 @@ export const BrandTable = ({
                 <span>Entries</span>
             </div>
 
-            <div className="rounded-xl border overflow-hidden">
+            <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                 <Table>
-                    <TableHeader>
-                        <TableRow className="bg-muted hover:bg-muted">
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        <TableRow className="hover:bg-[#f8f9fa]">
                             {table.getHeaderGroups().map((headerGroup) => (
-                                headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="text-xs font-semibold text-muted-foreground py-4">
-                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                ))
+                                headerGroup.headers.map((header) => {
+                                    const columnId = header.id;
+                                    const isSortable = columnId === 'name' || columnId === 'createdAt';
+                                    const isAction = columnId === 'actions';
+                                    const isSorted = sortKey === columnId;
+
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            className={cn(
+                                                'px-4 py-4 text-xs font-semibold uppercase select-none transition-colors',
+                                                isAction ? 'text-center text-gray-600 w-[100px]' : 'text-left',
+                                                isSortable ? 'group cursor-pointer' : '',
+                                                isSortable && isSorted ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                                            )}
+                                            onClick={isSortable ? () => handleSort(columnId) : undefined}
+                                        >
+                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableHead>
+                                    );
+                                })
                             ))}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             [...Array(perPage)].map((_, i) => (
-                                <TableRow key={i}>
-                                    <TableCell>
+                                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                                    <TableCell className="px-4 py-4">
                                         <div className="flex items-center gap-3">
                                             <Skeleton className="h-10 w-10 rounded-lg" />
                                             <Skeleton className="h-4 w-32" />
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="px-4 py-4">
                                         <Skeleton className="h-4 w-32" />
                                     </TableCell>
-                                    <TableCell className="text-right">
-                                        <Skeleton className="h-8 w-8 ml-auto" />
+                                    <TableCell className="px-4 py-4 text-center">
+                                        <Skeleton className="h-8 w-8 mx-auto rounded-full" />
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : data.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="text-center text-muted-foreground py-10">
+                                <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
                                     Tidak ada data.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="hover:bg-muted/50">
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-4 text-sm">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
+                                <TableRow key={row.id} className="hover:bg-gray-50 transition-colors">
+                                    {row.getVisibleCells().map((cell) => {
+                                        const isAction = cell.column.id === 'actions';
+                                        return (
+                                            <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isAction ? "text-center" : "text-left")}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        );
+                                    })}
                                 </TableRow>
                             ))
                         )}
@@ -182,13 +220,13 @@ export const BrandTable = ({
             </div>
 
             {/* PAGINATION */}
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
                 <span>
                     Showing {data.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, total)} of {total} entries
                 </span>
 
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page === 1}>
+                <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+                    <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
                         Previous
                     </Button>
 
@@ -205,7 +243,18 @@ export const BrandTable = ({
                         }
 
                         return (
-                            <Button key={pageNum} variant={page === pageNum ? 'default' : 'outline'} size="sm" onClick={() => onPageChange(pageNum)} className="w-10">
+                            <Button
+                                key={pageNum}
+                                variant="ghost"
+                                size="sm"
+                                className={cn(
+                                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                                    page === pageNum
+                                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                                )}
+                                onClick={() => onPageChange(pageNum)}
+                            >
                                 {pageNum}
                             </Button>
                         );
@@ -213,14 +262,14 @@ export const BrandTable = ({
 
                     {totalPages > 5 && page < totalPages - 2 && (
                         <>
-                            <span className="text-muted-foreground">...</span>
-                            <Button variant="outline" size="sm" onClick={() => onPageChange(totalPages)} className="w-10">
+                            <span className="px-1 text-sm text-slate-500">...</span>
+                            <Button variant="ghost" size="sm" className="h-9 min-w-9 rounded-xl border border-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
                                 {totalPages}
                             </Button>
                         </>
                     )}
 
-                    <Button variant="outline" size="sm" onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
+                    <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
                         Next
                     </Button>
                 </div>

@@ -104,8 +104,8 @@ export default function LaporanStockMaterialPage() {
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Laporan Stock Material</h1>
-            <p className="text-[15px] text-gray-500">Laporan stock material, penerimaan barang, dan pengeluaran barang</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Laporan Stock Material</h1>
+            <p className="text-sm text-slate-500 mt-1">Laporan stock material, penerimaan barang, dan pengeluaran barang</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
             <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
@@ -201,24 +201,33 @@ export default function LaporanStockMaterialPage() {
                 <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm w-full">
                   <div className="overflow-x-auto">
                     <Table>
-                      <TableHeader className="bg-slate-50 border-b border-slate-200">
+                      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
-                          <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700">NO</TableHead>
+                          <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NO</TableHead>
                           {activeTab !== 'stock' && (
-                            <TableHead onClick={() => handleSort('transaction_date')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                              TANGGAL <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead onClick={() => handleSort('transaction_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <span>TANGGAL</span>
+                                <ArrowUpDown className="h-3 w-3 text-slate-400 shrink-0" />
+                              </div>
                             </TableHead>
                           )}
-                          <TableHead onClick={() => handleSort('material_code')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                            KODE BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableHead onClick={() => handleSort('material_code')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
+                            <div className="flex items-center justify-start gap-1">
+                              <span>KODE BARANG</span>
+                              <ArrowUpDown className="h-3 w-3 text-slate-400 shrink-0" />
+                            </div>
                           </TableHead>
-                          <TableHead onClick={() => handleSort('material_name')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                            NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableHead onClick={() => handleSort('material_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
+                            <div className="flex items-center justify-start gap-1">
+                              <span>NAMA BARANG</span>
+                              <ArrowUpDown className="h-3 w-3 text-slate-400 shrink-0" />
+                            </div>
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">
                             QTY
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
                             SATUAN
                           </TableHead>
                         </TableRow>
@@ -251,21 +260,21 @@ export default function LaporanStockMaterialPage() {
                               : '-';
 
                             return (
-                              <TableRow key={item.uuid || idx} className="border-slate-100 hover:bg-slate-50/50">
-                                <TableCell className="text-center font-medium text-slate-500">{indexNumber}</TableCell>
+                              <TableRow key={item.uuid || idx} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-500">{indexNumber}</TableCell>
                                 {activeTab !== 'stock' && (
-                                  <TableCell className="text-slate-600 whitespace-nowrap">{tgl}</TableCell>
+                                  <TableCell className="text-center px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{tgl}</TableCell>
                                 )}
-                                <TableCell className="font-mono text-[13px] text-slate-700 whitespace-nowrap">{code}</TableCell>
-                                <TableCell className="font-semibold text-slate-800 whitespace-nowrap">{name}</TableCell>
-                                <TableCell className="text-slate-800 font-medium whitespace-nowrap">{displayQty}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap">{satuan}</TableCell>
+                                <TableCell className="text-left px-4 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{code}</TableCell>
+                                <TableCell className="text-left px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{name}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{displayQty}</TableCell>
+                                <TableCell className="text-left px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{satuan}</TableCell>
                               </TableRow>
                             );
                           })
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={activeTab === 'stock' ? 5 : 6} className="h-28 text-center text-slate-500 font-medium">
+                            <TableCell colSpan={activeTab === 'stock' ? 5 : 6} className="h-28 text-center text-slate-500 font-medium px-4 py-4">
                               Tidak ada data laporan ditemukan.
                             </TableCell>
                           </TableRow>

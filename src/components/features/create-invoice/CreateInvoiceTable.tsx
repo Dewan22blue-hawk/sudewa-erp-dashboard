@@ -177,16 +177,29 @@ export function CreateInvoiceTable({
       <Card className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-[#eef3f8]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200">
                 <TableHead className="w-[56px] px-4 py-4 text-center">
                   <Checkbox checked={allSelected ? true : partialSelected ? 'indeterminate' : false} onCheckedChange={(checked) => onToggleAll(Boolean(checked))} />
                 </TableHead>
-                {['KODE INVOICE', 'KODE ORDER', 'NAMA CUSTOMER', 'TANGGAL', 'STATUS', 'ACTION'].map((header) => (
-                  <TableHead key={header} className="whitespace-nowrap px-4 py-4 text-center text-sm font-semibold text-slate-900">
-                    {header}
-                  </TableHead>
-                ))}
+                <TableHead className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
+                  KODE INVOICE
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  KODE ORDER
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  NAMA CUSTOMER
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  TANGGAL
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  STATUS
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  ACTION
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

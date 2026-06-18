@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
-import { ArrowDown, ArrowUp, MoreVertical, Plus, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, MoreVertical, Plus, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -130,31 +130,39 @@ export default function PurchaseTable({
   const startIndex = totalEntries === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endIndex = startIndex === 0 ? 0 : startIndex + processedData.length - 1;
 
-  const handleSort = (key: string, direction: 'asc' | 'desc') => {
-    setSortConfig({ key, direction });
+  const handleSort = (key: string) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      return { key, direction: 'asc' };
+    });
   };
 
-  const SortableHeader = ({ label, sortKey }: { label: string; sortKey: string }) => (
-    <div className="flex items-center gap-2">
-      <span>{label}</span>
-      <button
-        type="button"
-        className={`rounded p-0.5 ${sortConfig.key === sortKey && sortConfig.direction === 'asc' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-700'}`}
-        onClick={() => handleSort(sortKey, 'asc')}
-        aria-label={`Sort ${label} ascending`}
+  const renderSortHeader = (key: string, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
+    const isSorted = sortConfig.key === key;
+    const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
+    const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
+    return (
+      <TableHead
+        onClick={() => handleSort(key)}
+        className={`px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap ${textAlignment}`}
       >
-        <ArrowUp className="h-3.5 w-3.5" />
-      </button>
-      <button
-        type="button"
-        className={`rounded p-0.5 ${sortConfig.key === sortKey && sortConfig.direction === 'desc' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-700'}`}
-        onClick={() => handleSort(sortKey, 'desc')}
-        aria-label={`Sort ${label} descending`}
-      >
-        <ArrowDown className="h-3.5 w-3.5" />
-      </button>
-    </div>
-  );
+        <div className={`flex items-center gap-1 ${justifyClass}`}>
+          <span>{label}</span>
+          {isSorted ? (
+            sortConfig.direction === 'asc' ? (
+              <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+            ) : (
+              <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+            )
+          ) : (
+            <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+          )}
+        </div>
+      </TableHead>
+    );
+  };
 
   const handleItemsPerPageChange = (value: string) => {
     const parsed = Number(value);
@@ -262,35 +270,33 @@ export default function PurchaseTable({
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
-          <TableHeader className="bg-[#f5f6f8]">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="KODE BELI" sortKey="code" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TANGGAL" sortKey="created_at" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="SUPPLIER" sortKey="supplier" /></TableHead>
-              {/* <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="GUDANG" sortKey="warehouse" /></TableHead> */}
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL BRUTO" sortKey="transaction_bruto_total" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BBN" sortKey="transaction_bbn_total" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BIAYA LAIN" sortKey="transaction_other_fee" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL DPP" sortKey="transaction_dpp_total" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="TOTAL PPN" sortKey="transaction_ppn_total" /></TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="KURANG BAYAR" sortKey="remainingPayment" /></TableHead>
-              {/* <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="STATUS STOK" sortKey="stock_state" /></TableHead> */}
-              <TableHead className="text-xs font-semibold uppercase text-slate-600 px-4 py-3"><SortableHeader label="BILLING" sortKey="billing" /></TableHead>
-              <TableHead className="text-right text-xs font-semibold uppercase text-slate-600 px-4 py-3">ACTION</TableHead>
+              {renderSortHeader('code', 'KODE BELI', 'left')}
+              {renderSortHeader('created_at', 'TANGGAL', 'center')}
+              {renderSortHeader('supplier', 'SUPPLIER', 'left')}
+              {renderSortHeader('transaction_bruto_total', 'TOTAL BRUTO', 'center')}
+              {renderSortHeader('transaction_bbn_total', 'BBN', 'center')}
+              {renderSortHeader('transaction_other_fee', 'BIAYA LAIN', 'center')}
+              {renderSortHeader('transaction_dpp_total', 'TOTAL DPP', 'center')}
+              {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
+              {renderSortHeader('remainingPayment', 'KURANG BAYAR', 'center')}
+              {renderSortHeader('billing', 'BILLING', 'center')}
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {processedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={11} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
                   Tidak ada data
                 </TableCell>
               </TableRow>
             ) : (
               processedData.map((item) => (
-                <TableRow key={item.id} className="border-t hover:bg-slate-50 transition-colors">
+                <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   {/* Kode Jual - Link biru */}
-                  <TableCell className="px-4">
+                  <TableCell className="px-4 py-4 text-left text-sm font-medium">
                     <button
                       type="button"
                       className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
@@ -299,17 +305,15 @@ export default function PurchaseTable({
                       {item.code || '-'}
                     </button>
                   </TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{item.supplier || '-'}</TableCell>
-                  {/* <TableCell className="text-slate-700 px-4">{item.warehouse || '-'}</TableCell> */}
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
-                  <TableCell className="text-slate-700 px-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
-                  <TableCell className={`px-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{formatCurrency(getRemainingPayment(item))}</TableCell>
-                  {/* <TableCell className="text-slate-700 px-4">{item.stock_state || '-'}</TableCell> */}
-                  <TableCell className="text-slate-700 px-4">
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
+                  <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
+                  <TableCell className={`text-center text-sm px-4 py-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{formatCurrency(getRemainingPayment(item))}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">
                     {isRefunded(item) ? (
                       <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
                         Sudah Refund
@@ -325,7 +329,7 @@ export default function PurchaseTable({
                     )}
                   </TableCell>
 
-                  <TableCell className="text-right px-4">
+                  <TableCell className="text-center px-4 py-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

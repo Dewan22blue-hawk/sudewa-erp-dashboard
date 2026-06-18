@@ -40,38 +40,38 @@ export function GoodsIssueEquipmentDetailTable({
 
   return (
     <Table>
-      <TableHeader className="bg-slate-100/90">
+      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
         <TableRow className="border-slate-200 hover:bg-transparent">
-          <TableHead className="w-12 px-3 py-4 text-center">
+          <TableHead className="w-12 px-4 py-4 text-center">
             <Checkbox checked={isAllChecked} onCheckedChange={(checked) => toggleAll(!!checked)} />
           </TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NO</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
-          <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-          <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KETERANGAN</TableHead>
-          <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-950">ACTION</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE BARANG</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NAMA BARANG</TableHead>
+          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">QTY</TableHead>
+          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KETERANGAN</TableHead>
+          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={7} className="h-28 text-center text-[15px] text-slate-500">
+            <TableCell colSpan={7} className="h-28 text-center text-sm text-slate-500">
               Belum ada detail perlengkapan yang dimasukkan.
             </TableCell>
           </TableRow>
         ) : (
           data.map((item, index) => (
-            <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70">
-              <TableCell className="px-3 py-4 text-center">
+            <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70 transition-colors">
+              <TableCell className="px-4 py-4 text-center">
                 <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => toggleOne(item.id, !!checked)} />
               </TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{index + 1}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.code || '-'}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.vehicleEquipment?.name || '-'}</TableCell>
-              <TableCell className="px-5 py-4 text-center text-[15px] font-semibold text-slate-900">{item.qty}</TableCell>
-              <TableCell className="px-5 py-4 text-[15px] text-slate-800">{item.description || '-'}</TableCell>
-              <TableCell className="px-5 py-4 text-right">
+              <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{index + 1}</TableCell>
+              <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.vehicleEquipment?.code || '-'}</TableCell>
+              <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.vehicleEquipment?.name || '-'}</TableCell>
+              <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{item.qty}</TableCell>
+              <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.description || '-'}</TableCell>
+              <TableCell className="px-4 py-4 text-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-9 w-9 rounded-full p-0">

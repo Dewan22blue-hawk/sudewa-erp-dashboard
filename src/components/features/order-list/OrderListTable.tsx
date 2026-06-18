@@ -125,13 +125,13 @@ export const OrderListTable = React.memo(function OrderListTable({
       <Card className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table className="min-w-[1180px]">
-            <TableHeader className="bg-[#eef3f8]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200">
                 {headers.map((header) => (
                   <TableHead
                     key={header.key}
                     className={cn(
-                      'whitespace-nowrap px-4 py-4 text-sm font-semibold text-slate-900',
+                      'whitespace-nowrap px-4 py-4 text-xs font-semibold uppercase text-slate-500',
                       header.align === 'left' && 'text-left',
                       header.align === 'center' && 'text-center',
                       header.align === 'right' && 'text-right'

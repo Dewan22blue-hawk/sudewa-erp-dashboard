@@ -88,48 +88,52 @@ export function StockPickerTable({
 
       <div className="rounded-md border overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
-              <TableHead className="w-[56px]">No</TableHead>
-              <TableHead className="w-[56px] text-center">
+              <TableHead className="w-[60px] text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No</TableHead>
+              <TableHead className="w-[50px] text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">
                 <Checkbox checked={allPageSelected} onCheckedChange={(checked) => onToggleAllPage(Boolean(checked))} aria-label="Pilih semua baris" />
               </TableHead>
-              <TableHead>Warna</TableHead>
-              <TableHead>Nomor Mesin</TableHead>
-              <TableHead>Nomor Rangka</TableHead>
-              <TableHead>Status Stock</TableHead>
+              <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">Warna</TableHead>
+              <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">Nomor Mesin</TableHead>
+              <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">Nomor Rangka</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Status Stock</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Memuat stock unit...
                 </TableCell>
               </TableRow>
             ) : isError ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-20 text-center text-destructive">
+                <TableCell colSpan={6} className="h-20 text-center text-destructive px-4 py-4 text-sm">
                   Gagal memuat stock unit
                 </TableCell>
               </TableRow>
             ) : pagedRows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Stock unit tidak tersedia
                 </TableCell>
               </TableRow>
             ) : (
               pagedRows.map((row, index) => (
-                <TableRow key={row.id}>
-                  <TableCell>{(currentPage - 1) * perPage + index + 1}</TableCell>
-                  <TableCell className="text-center">
+                <TableRow key={row.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                  <TableCell className="text-center px-4 py-4 text-sm text-slate-500">{(currentPage - 1) * perPage + index + 1}</TableCell>
+                  <TableCell className="text-center px-4 py-4">
                     <Checkbox checked={selectedIds.has(row.id)} onCheckedChange={(checked) => onToggleOne(row.id, Boolean(checked))} aria-label="Pilih baris" />
                   </TableCell>
-                  <TableCell>{row.color}</TableCell>
-                  <TableCell>{row.machine_number}</TableCell>
-                  <TableCell>{row.chassis_number}</TableCell>
-                  <TableCell>{row.in_stock ? 'In Stock' : 'Out Stock'}</TableCell>
+                  <TableCell className="text-left px-4 py-4 text-sm text-slate-700">{row.color}</TableCell>
+                  <TableCell className="text-left px-4 py-4 text-sm text-slate-700 font-medium">{row.machine_number}</TableCell>
+                  <TableCell className="text-left px-4 py-4 text-sm text-slate-700">{row.chassis_number}</TableCell>
+                  <TableCell className="text-center px-4 py-4 text-sm text-slate-700">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${row.in_stock ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                      {row.in_stock ? 'In Stock' : 'Out Stock'}
+                    </span>
+                  </TableCell>
                 </TableRow>
               ))
             )}

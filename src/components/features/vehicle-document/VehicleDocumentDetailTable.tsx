@@ -59,24 +59,24 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
       <div className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-[#eef3fa] text-slate-800">
-              <tr className="border-b border-slate-200 align-top text-xs font-semibold uppercase">
-                <th className="px-3 py-4 text-left">Dealer</th>
-                <th className="px-3 py-4 text-left">Nama</th>
-                <th className="px-3 py-4 text-left">Wilayah</th>
-                <th className="px-3 py-4 text-left">No Mesin</th>
-                <th className="px-3 py-4 text-left">Tgl Terima Faktur</th>
-                <th className="px-3 py-4 text-left">Tgl Daftar BPKB</th>
-                <th className="px-3 py-4 text-left">Tgl Daftar STNK</th>
-                <th className="px-3 py-4 text-left">Tgl Bayar SKPD</th>
-                <th className="px-3 py-4 text-left">Tgl Terima BPKB</th>
-                <th className="px-3 py-4 text-left">Tgl Terima STNK</th>
-                <th className="px-3 py-4 text-left">Tgl Terima SKPD</th>
-                <th className="px-3 py-4 text-left">Tgl Terima TNKB</th>
-                <th className="px-3 py-4 text-left">Nomor TNKB</th>
-                <th className="px-3 py-4 text-left">Notice SKPD</th>
-                <th className="px-3 py-4 text-left">Vendor Karyawan</th>
-                <th className="px-3 py-4 text-center">Action</th>
+            <thead className="bg-[#f8f9fa] border-b border-gray-200 text-slate-500">
+              <tr className="align-top text-xs font-semibold uppercase">
+                <th className="px-4 py-4 text-left">Dealer</th>
+                <th className="px-4 py-4 text-left">Nama</th>
+                <th className="px-4 py-4 text-left">Wilayah</th>
+                <th className="px-4 py-4 text-left">No Mesin</th>
+                <th className="px-4 py-4 text-center">Tgl Terima Faktur</th>
+                <th className="px-4 py-4 text-center">Tgl Daftar BPKB</th>
+                <th className="px-4 py-4 text-center">Tgl Daftar STNK</th>
+                <th className="px-4 py-4 text-center">Tgl Bayar SKPD</th>
+                <th className="px-4 py-4 text-center">Tgl Terima BPKB</th>
+                <th className="px-4 py-4 text-center">Tgl Terima STNK</th>
+                <th className="px-4 py-4 text-center">Tgl Terima SKPD</th>
+                <th className="px-4 py-4 text-center">Tgl Terima TNKB</th>
+                <th className="px-4 py-4 text-left">Nomor TNKB</th>
+                <th className="px-4 py-4 text-center">Notice SKPD</th>
+                <th className="px-4 py-4 text-left">Vendor Karyawan</th>
+                <th className="px-4 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -84,7 +84,7 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
                 Array.from({ length: Math.min(perPage, 6) }).map((_, rowIndex) => (
                   <tr key={rowIndex} className="animate-pulse border-b border-slate-100 text-slate-700">
                     {Array.from({ length: 16 }).map((__, cellIndex) => (
-                      <td key={cellIndex} className="px-3 py-4">
+                      <td key={cellIndex} className="px-4 py-4">
                         <div className="h-4 rounded bg-slate-100" />
                       </td>
                     ))}
@@ -92,23 +92,23 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <tr key={`${item.id}-${item.registrationId}`} className="border-b border-slate-100 text-slate-700 hover:bg-slate-50/60">
-                    <td className="px-3 py-4">{item.dealerName || '-'}</td>
-                    <td className="px-3 py-4">{item.stnkName || '-'}</td>
-                    <td className="px-3 py-4">{item.regionName || '-'}</td>
-                    <td className="px-3 py-4">{item.machineNumber || '-'}</td>
-                    <td className="px-3 py-4">{formatDate(item.invoiceReceiveDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.bpkbRegistrationDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.stnkRegistrationDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.skpdPaymentDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.bpkbReceivedDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.stnkReceivedDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.skpdReceivedDate)}</td>
-                    <td className="px-3 py-4">{formatDate(item.tnkbReceivedDate)}</td>
-                    <td className="px-3 py-4">{item.tnkbNumber || '-'}</td>
-                    <td className="px-3 py-4">{new Intl.NumberFormat('id-ID').format(item.noticeFee || 0)}</td>
-                    <td className="px-3 py-4">{item.vendorEmployee || '-'}</td>
-                    <td className="px-3 py-4 text-center">
+                  <tr key={`${item.id}-${item.registrationId}`} className="border-b border-slate-200 text-slate-700 hover:bg-gray-50/70 transition-colors">
+                    <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.dealerName || '-'}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.stnkName || '-'}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.regionName || '-'}</td>
+                    <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.machineNumber || '-'}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.invoiceReceiveDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.bpkbRegistrationDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.stnkRegistrationDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.skpdPaymentDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.bpkbReceivedDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.stnkReceivedDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.skpdReceivedDate)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.tnkbReceivedDate)}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.tnkbNumber || '-'}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-700">{new Intl.NumberFormat('id-ID').format(item.noticeFee || 0)}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.vendorEmployee || '-'}</td>
+                    <td className="px-4 py-4 text-center">
                       <Button variant="ghost" size="icon" onClick={() => onEdit(item)} className="h-8 w-8">
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -117,7 +117,7 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
                 ))
               ) : (
                 <tr>
-                  <td colSpan={16} className="h-24 text-center text-sm text-slate-500">Belum ada detail registrasi.</td>
+                  <td colSpan={16} className="h-24 text-center text-sm text-slate-500 px-4 py-4">Belum ada detail registrasi.</td>
                 </tr>
               )}
             </tbody>

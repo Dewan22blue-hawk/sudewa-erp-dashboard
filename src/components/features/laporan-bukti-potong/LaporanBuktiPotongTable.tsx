@@ -73,7 +73,7 @@ export default function LaporanBuktiPotongTable({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-950">Laporan Bukti Potong</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">Laporan Bukti Potong</h1>
         <p className="text-sm text-slate-500 mt-1">Kelola bukti potong dengan mudah</p>
       </div>
 
@@ -108,24 +108,24 @@ export default function LaporanBuktiPotongTable({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
         <div className="overflow-x-auto">
           <table className="w-full text-sm whitespace-nowrap">
-            <thead className="bg-[#f8fafc] border-b border-slate-200 uppercase text-xs font-semibold text-slate-600">
+            <thead className="bg-[#f8f9fa] border-b border-gray-200">
               <tr>
-                <th className="px-4 py-4 text-center">NO</th>
-                <th className="px-4 py-4 text-center">TGL INVOICE</th>
-                <th className="px-4 py-4 text-center">NO INVOICE</th>
-                <th className="px-4 py-4 text-center">NAMA CUSTOMER</th>
-                <th className="px-4 py-4 text-center">NO BUKPOT</th>
-                <th className="px-4 py-4 text-center">MASA BUKPOT</th>
-                <th className="px-4 py-4 text-center">NOMINAL INVOICE</th>
-                <th className="px-4 py-4 text-center">PPH</th>
-                <th className="px-4 py-4 text-center">UANG MUKA PPH</th>
-                <th className="px-4 py-4 text-center">ACTION</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NO</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TGL INVOICE</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO INVOICE</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NAMA CUSTOMER</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO BUKPOT</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA BUKPOT</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NOMINAL INVOICE</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPH</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">UANG MUKA PPH</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {loading && data.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="px-4 py-12 text-center text-slate-500">
@@ -137,27 +137,27 @@ export default function LaporanBuktiPotongTable({
                 </tr>
               ) : data.length > 0 ? (
                 data.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-4 text-center text-slate-700">{startIndex + index}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{formatDate(item.tgl_invoice)}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{item.no_invoice}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{item.nama_customer}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{item.no_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{item.masa_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{formatCurrency(item.nominal_invoice)}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{formatCurrency(item.pph)}</td>
-                    <td className="px-4 py-4 text-center text-slate-700">{item.uang_muka_pph || '-'}</td>
+                  <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <td className="px-4 py-4 text-center text-sm text-slate-500">{startIndex + index}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-500">{formatDate(item.tgl_invoice)}</td>
+                    <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.no_invoice}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.nama_customer}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.no_bukpot || '-'}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-500">{item.masa_bukpot || '-'}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.nominal_invoice)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.pph)}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-500">{item.uang_muka_pph || '-'}</td>
                     <td className="px-4 py-4 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0 cursor-pointer text-slate-500 hover:text-slate-900">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500 hover:text-slate-900">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[160px] rounded-xl p-1">
+                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
                           <DropdownMenuItem
                             onSelect={() => onEdit(item)}
-                            className="cursor-pointer py-2 rounded-lg"
+                            className="cursor-pointer rounded-xl px-3 py-2.5"
                           >
                             <Edit2 className="mr-2 h-4 w-4 text-slate-500" />
                             <span className="text-sm font-medium">Edit Bukpot</span>
@@ -165,7 +165,7 @@ export default function LaporanBuktiPotongTable({
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onSelect={() => onDelete(item)}
-                            className="cursor-pointer py-2 rounded-lg text-red-600 focus:text-red-600 focus:bg-red-50"
+                            className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600 focus:bg-red-50"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             <span className="text-sm font-medium">Hapus Data</span>
