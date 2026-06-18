@@ -92,12 +92,12 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-            <TableRow className="hover:bg-[#f8f9fa]">
+            <TableRow className="hover:bg-transparent border-gray-100">
               {/* User ID */}
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[20%]',
-                  sortKey === 'username' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'username' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
                 )}
                 onClick={() => handleSort('username')}
               >
@@ -110,7 +110,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[25%]',
-                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
                 )}
                 onClick={() => handleSort('name')}
               >
@@ -120,15 +120,15 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 </div>
               </TableHead>
               {/* Role */}
-              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-gray-505">
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
                 Role
               </TableHead>
               {/* Status */}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-gray-505 w-[160px]">
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[160px]">
                 Status
               </TableHead>
               {/* Action */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
                 Action
               </TableHead>
             </TableRow>
@@ -136,7 +136,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
           <TableBody>
             {currentData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-gray-505 py-10 text-sm">
+                <TableCell colSpan={5} className="text-center text-slate-500 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
@@ -151,11 +151,11 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 const isUpdating = isActivating || isDeactivating;
 
                 return (
-                  <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
-                    <TableCell className="px-4 py-4 font-semibold text-gray-900 text-sm text-left">{userIdLabel}</TableCell>
-                    <TableCell className="px-4 py-4 text-slate-700 text-sm text-left">{user.name}</TableCell>
-                    <TableCell className="px-4 py-4 text-slate-700 text-sm text-left">{roleNames}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-center">
+                  <tr key={user.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <td className="px-4 py-4 font-semibold text-slate-900 text-sm text-left">{userIdLabel}</td>
+                    <td className="px-4 py-4 text-slate-700 text-sm text-left">{user.name}</td>
+                    <td className="px-4 py-4 text-slate-700 text-sm text-left">{roleNames}</td>
+                    <td className="px-4 py-4 text-sm text-center">
                       <div className="flex items-center justify-center gap-2">
                         {isUpdating ? (
                           <div className="flex items-center gap-2">
@@ -175,25 +175,25 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                           </div>
                         )}
                       </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    </td>
+                    <td className="px-4 py-4 text-center">
                       <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                            <Button size="icon" variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                            <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                          <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                            <DropdownMenuItem onClick={() => onEdit(user)} className="cursor-pointer rounded-xl px-3 py-2.5 text-sm text-slate-900">Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(user)} className="cursor-pointer rounded-xl px-3 py-2.5 text-sm text-red-600 focus:text-red-600">
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 );
               })
             )}
