@@ -16,14 +16,6 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
     data,
   });
 
-  if (!sortedData.length) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center border rounded-xl bg-white h-64">
-        <p className="text-muted-foreground">Tidak ada data transaksi</p>
-      </div>
-    );
-  }
-
   const renderSortHeader = (key: keyof Transaction, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
     const isSorted = sortKey === key;
     const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
@@ -48,7 +40,7 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
   };
 
   return (
-    <div className="rounded-xl border bg-white overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
@@ -85,41 +77,53 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((trx) => (
-              <tr key={trx.id} className="border-b hover:bg-slate-50/70 transition-colors border-slate-100">
-                <td className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">{trx.date}</td>
-                <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{trx.name}</td>
+            {sortedData.length > 0 ? (
+              sortedData.map((trx) => (
+                <tr key={trx.id} className="border-b hover:bg-gray-50 transition-colors border-slate-100 last:border-0">
+                  <td className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">{trx.date}</td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{trx.name}</td>
 
-                {/* BANK */}
-                <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? formatCurrency(trx.debitUSD, 'USD') : '0'}</td>
-                <td className={`px-4 py-4 text-center text-sm ${trx.creditUSD ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditUSD ? formatCurrency(trx.creditUSD, 'USD') : '0'}</td>
-                <td className={`px-4 py-4 text-center text-sm ${trx.debitIDR ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitIDR ? formatCurrency(trx.debitIDR, 'IDR') : '0'}</td>
-                <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditIDR ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditIDR ? formatCurrency(trx.creditIDR, 'IDR') : '0'}</td>
+                  {/* BANK */}
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? formatCurrency(trx.debitUSD, 'USD') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.creditUSD ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditUSD ? formatCurrency(trx.creditUSD, 'USD') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitIDR ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitIDR ? formatCurrency(trx.debitIDR, 'IDR') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditIDR ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditIDR ? formatCurrency(trx.creditIDR, 'IDR') : '0'}</td>
 
-                {/* CASH */}
-                <td className={`px-4 py-4 text-center text-sm ${trx.debitCash ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitCash ? formatCurrency(trx.debitCash, 'IDR') : '0'}</td>
-                <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditCash ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditCash ? formatCurrency(trx.creditCash, 'IDR') : '0'}</td>
+                  {/* CASH */}
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitCash ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitCash ? formatCurrency(trx.debitCash, 'IDR') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditCash ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditCash ? formatCurrency(trx.creditCash, 'IDR') : '0'}</td>
 
-                <td className="px-4 py-4 text-left text-sm text-slate-500 max-w-[150px] truncate" title={trx.description}>
-                  {trx.description || '-'}
-                </td>
-                <td className="px-4 py-4 text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onEdit(trx)}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => onDelete(trx)}>
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <td className="px-4 py-4 text-left text-sm text-slate-500 max-w-[150px] truncate" title={trx.description}>
+                    {trx.description || '-'}
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <div className="flex justify-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem onClick={() => onEdit(trx)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onDelete(trx)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={10} className="h-64 text-center text-slate-500 text-sm">
+                  Tidak ada data transaksi
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
