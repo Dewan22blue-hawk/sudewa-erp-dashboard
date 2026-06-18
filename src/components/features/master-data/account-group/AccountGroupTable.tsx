@@ -50,7 +50,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
@@ -58,7 +58,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('code')}
               >
@@ -71,7 +71,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('name')}
               >
@@ -84,7 +84,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'description' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'description' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('description')}
               >
@@ -97,7 +97,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'isActive' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'isActive' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('isActive')}
               >
@@ -108,7 +108,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
                 ACTION
               </TableHead>
             </TableRow>
@@ -208,10 +208,10 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
       </div>
 
       {/* PAGINATION */}
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
-        <span>
-          Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, safeTotal)} of {safeTotal} entries
-        </span>
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+        <div>
+          Showing {sortedData.length > 0 ? startIndex + 1 : 0}-{Math.min(endIndex, safeTotal)} of {safeTotal} data
+        </div>
 
         <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
           <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>

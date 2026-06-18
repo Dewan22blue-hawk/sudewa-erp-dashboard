@@ -137,28 +137,91 @@ export function SupplierTable({
 
       <Card className="overflow-hidden rounded-xl border border-[#D4D4D8] bg-white shadow-none">
         <div className="overflow-x-auto">
-          <Table className="min-w-[1200px]">
-            <TableHeader>
-              <TableRow className="border-b border-[#E4E4E7] bg-[#F1F5F9] hover:bg-[#F1F5F9]">
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="Kode" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+          <Table>
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+              <TableRow className="hover:bg-[#f8f9fa]">
+                {/* Kode */}
+                <TableHead
+                  className={cn(
+                    'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[12%]',
+                    sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  )}
+                  onClick={() => handleSort('code')}
+                >
+                  <div className="flex items-center gap-1">
+                    Kode
+                    <SortIcon sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  </div>
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="Nama Supplier" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                {/* Nama Supplier */}
+                <TableHead
+                  className={cn(
+                    'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[22%]',
+                    sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  )}
+                  onClick={() => handleSort('name')}
+                >
+                  <div className="flex items-center gap-1">
+                    Nama Supplier
+                    <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  </div>
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="PIC" sortKey="pic" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                {/* PIC */}
+                <TableHead
+                  className={cn(
+                    'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[15%]',
+                    sortKey === 'pic' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  )}
+                  onClick={() => handleSort('pic')}
+                >
+                  <div className="flex items-center gap-1">
+                    PIC
+                    <SortIcon sortKey="pic" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  </div>
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="Phone" sortKey="phone" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                {/* Phone */}
+                <TableHead
+                  className={cn(
+                    'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[13%]',
+                    sortKey === 'phone' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  )}
+                  onClick={() => handleSort('phone')}
+                >
+                  <div className="flex items-center gap-1">
+                    Phone
+                    <SortIcon sortKey="phone" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  </div>
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="NPWP" sortKey="npwp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                {/* NPWP */}
+                <TableHead
+                  className={cn(
+                    'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[15%]',
+                    sortKey === 'npwp' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  )}
+                  onClick={() => handleSort('npwp')}
+                >
+                  <div className="flex items-center gap-1">
+                    NPWP
+                    <SortIcon sortKey="npwp" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  </div>
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-left">
-                  <SortableHeader title="Alamat" sortKey="address" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-[15px] font-semibold uppercase text-[#171717] hover:text-slate-900" />
+                {/* Alamat */}
+                <TableHead
+                  className={cn(
+                    'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[23%]',
+                    sortKey === 'address' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  )}
+                  onClick={() => handleSort('address')}
+                >
+                  <div className="flex items-center gap-1">
+                    Alamat
+                    <SortIcon sortKey="address" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  </div>
                 </TableHead>
-                <TableHead className="h-[46px] px-7 text-center text-[15px] font-semibold uppercase text-[#171717]">Action</TableHead>
+                {/* Action */}
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+                  Action
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -235,7 +298,7 @@ export function SupplierTable({
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 text-[15px] text-[#71717A] md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <p>
           Showing {startData}-{endData} of {totalData} data
         </p>

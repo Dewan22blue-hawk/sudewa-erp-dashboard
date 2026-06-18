@@ -46,6 +46,64 @@ export function DealerTable({
     const startData = (page - 1) * perPage + 1;
     const endData = Math.min(page * perPage, totalData);
 
+    const renderPaginationNumbers = () => {
+        if (totalPages <= 7) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Button
+                    key={p}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onPageChange(p)}
+                    className={cn(
+                        'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                        p === page
+                            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                    )}
+                >
+                    {p}
+                </Button>
+            ));
+        }
+
+        const pages = [];
+        if (page <= 3) {
+            for (let i = 1; i <= 4; i++) pages.push(i);
+            pages.push('...');
+            pages.push(totalPages);
+        } else if (page >= totalPages - 2) {
+            pages.push(1);
+            pages.push('...');
+            for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            pages.push('...');
+            pages.push(page - 1, page, page + 1);
+            pages.push('...');
+            pages.push(totalPages);
+        }
+
+        return pages.map((p, idx) => (
+            <Button
+                key={idx}
+                variant="ghost"
+                size="sm"
+                disabled={p === '...'}
+                onClick={() => typeof p === 'number' && onPageChange(p)}
+                className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    p === page
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : p === '...'
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
+            >
+                {p}
+            </Button>
+        ));
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -60,7 +118,7 @@ export function DealerTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                         <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
@@ -108,13 +166,13 @@ export function DealerTable({
             <Card className="rounded-xl overflow-hidden border border-gray-200 shadow-none">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">KODE DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[25%] uppercase px-4 py-3">NAMA DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">ALAMAT</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PIC</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PHONE</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">KODE DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[25%] uppercase px-4 py-4 text-left">NAMA DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -168,7 +226,7 @@ export function DealerTable({
                 </Table>
             </Card>
 
-            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
@@ -185,22 +243,7 @@ export function DealerTable({
                             Previous
                         </Button>
 
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                            <Button
-                                key={p}
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onPageChange(p)}
-                                className={cn(
-                                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-                                    p === page
-                                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-                                )}
-                            >
-                                {p}
-                            </Button>
-                        ))}
+                        {renderPaginationNumbers()}
 
                         <Button
                             variant="ghost"

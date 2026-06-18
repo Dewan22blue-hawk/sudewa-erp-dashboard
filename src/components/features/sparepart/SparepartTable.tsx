@@ -119,7 +119,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[180px]',
-                  sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('code')}
               >
@@ -132,7 +132,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[250px]',
-                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('name')}
               >
@@ -145,7 +145,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[180px]',
-                  sortKey === ('category.name' as any) ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === ('category.name' as any) ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('category.name' as any)}
               >
@@ -158,7 +158,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[120px]',
-                  sortKey === 'unitType' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'unitType' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('unitType')}
               >
@@ -172,7 +172,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[150px]',
-                  sortKey === 'purchasePrice' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'purchasePrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('purchasePrice')}
               >
@@ -185,7 +185,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               <TableHead
                 className={cn(
                   'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[150px]',
-                  sortKey === 'sellingPrice' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                  sortKey === 'sellingPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('sellingPrice')}
               >
@@ -195,7 +195,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">ACTION</TableHead>
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -240,7 +240,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
 
       {/* Pagination Controls */}
       {filteredData.length > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
           <div>
             Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
           </div>

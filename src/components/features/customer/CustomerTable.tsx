@@ -135,7 +135,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[10%]',
-                    sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('code')}
                 >
@@ -148,7 +148,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[20%]',
-                    sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('name')}
                 >
@@ -161,7 +161,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[13%]',
-                    sortKey === 'pic' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'pic' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('pic')}
                 >
@@ -174,7 +174,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[12%]',
-                    sortKey === 'phone' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'phone' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('phone')}
                 >
@@ -187,7 +187,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[13%]',
-                    sortKey === 'npwp' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'npwp' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('npwp')}
                 >
@@ -200,7 +200,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[20%]',
-                    sortKey === 'address' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'address' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('address')}
                 >
@@ -213,7 +213,7 @@ export function CustomerTable({
                 <TableHead
                   className={cn(
                     'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[12%]',
-                    sortKey === 'map_link' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                    sortKey === 'map_link' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                   )}
                   onClick={() => handleSort('map_link')}
                 >
@@ -223,7 +223,7 @@ export function CustomerTable({
                   </div>
                 </TableHead>
                 {/* Action */}
-                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Action</TableHead>
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">Action</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -316,7 +316,7 @@ export function CustomerTable({
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <p>
           Showing {startData}-{endData} of {totalData} data
         </p>

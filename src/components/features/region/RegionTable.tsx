@@ -118,7 +118,7 @@ export function RegionTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                         <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
@@ -164,9 +164,9 @@ export function RegionTable({
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-[#f8f9fa]">
-                            <TableHead className="text-xs font-semibold text-gray-505 w-[30%] uppercase px-4 py-4 text-left">KODE WILAYAH</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-505 w-[60%] uppercase px-4 py-4 text-left">NAMA WILAYAH</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">KODE WILAYAH</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[60%] uppercase px-4 py-4 text-left">NAMA WILAYAH</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -211,7 +211,7 @@ export function RegionTable({
                 </Table>
             </Card>
 
-            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div className="text-sm text-gray-500">
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
