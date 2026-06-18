@@ -102,9 +102,11 @@ export default function RegionPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data Wilayah</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data wilayah dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Data Wilayah</h1>
+            <p className="text-sm text-muted-foreground">Kelola data wilayah dengan mudah</p>
+          </div>
         </div>
 
         {/* Content */}
