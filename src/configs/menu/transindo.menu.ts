@@ -119,6 +119,14 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/finance/uj-driver'),
         },
         {
+          label: 'Invoice',
+          href: base('/finance/invoice'),
+        },
+        {
+          label: 'Laporan Bukti Potong',
+          href: base('/finance/bukti-potong'),
+        },
+        {
           label: 'Aset',
           href: base('/finance/asset'),
         },
