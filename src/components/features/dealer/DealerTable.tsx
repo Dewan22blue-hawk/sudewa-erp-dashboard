@@ -8,7 +8,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Dealer } from '@/@types/dealer.types';
 import { cn } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 
 interface DealerTableProps {
     dealers: Dealer[];
@@ -121,181 +120,141 @@ export function DealerTable({
 
                     <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                         <span>Show</span>
-                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                            <span>Show</span>
-                            <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
-                                <SelectTrigger className="w-[70px] bg-white">
-                                    <SelectValue placeholder="25" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                    <SelectItem value="100">100</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <span>Page</span>
-                            <span>Page</span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                        {onExport && (
-                            <Button
-                                onClick={onExport}
-                                variant="outline"
-                                className="w-full sm:w-auto"
-                                disabled={isExporting}
-                            >
-                                <Upload className="h-4 w-4 mr-2" />
-                                {isExporting ? 'Exporting...' : 'Export'}
-                            </Button>
-                        )}
-                        {onImport && (
-                            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-                                <Upload className="h-4 w-4 mr-2" />
-                                Import
-                            </Button>
-                        )}
-                        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Tambah
-                        </Button>
+                        <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
+                            <SelectTrigger className="w-[70px] bg-white">
+                                <SelectValue placeholder="25" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <span>Page</span>
                     </div>
                 </div>
 
-                <Card className="rounded-xl overflow-hidden border border-gray-200 shadow-none">
-                    <Card className="rounded-xl overflow-hidden border border-gray-200 shadow-none">
-                        <Table>
-                            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                                <TableRow className="hover:bg-[#f8f9fa]">
-                                    <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">KODE DEALER</TableHead>
-                                    <TableHead className="text-xs font-semibold text-slate-500 w-[25%] uppercase px-4 py-4 text-left">NAMA DEALER</TableHead>
-                                    <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
-                                    <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
-                                    <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
-                                    <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
-                                    <TableRow className="hover:bg-[#f8f9fa]">
-                                        <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">KODE DEALER</TableHead>
-                                        <TableHead className="text-xs font-semibold text-slate-500 w-[25%] uppercase px-4 py-4 text-left">NAMA DEALER</TableHead>
-                                        <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
-                                        <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
-                                        <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
-                                        <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
-                                    </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {dealers.length > 0 ? (
-                                    dealers.map((dealer) => (
-                                        <TableRow key={dealer.id} className="hover:bg-gray-50 transition-colors">
-                                            <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                <TableRow key={dealer.id} className="hover:bg-gray-50 transition-colors">
-                                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                        {dealer.code || '-'}
-                                                    </TableCell>
-                                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left truncate">
-                                                        <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left truncate">
-                                                            {dealer.namaDealer}
-                                                        </TableCell>
-                                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                            <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                                <span className="line-clamp-2">{dealer.alamat || '-'}</span>
-                                                            </TableCell>
-                                                            <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                                <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                                    {dealer.pic || '-'}
-                                                                </TableCell>
-                                                                <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                                                        {dealer.handphone || '-'}
-                                                                    </TableCell>
-                                                                    <TableCell className="px-4 py-4 text-sm text-center">
-                                                                        <div className="flex justify-center">
-                                                                            <DropdownMenu>
-                                                                                <DropdownMenuTrigger asChild>
-                                                                                    <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                                                                                        <MoreVertical className="h-4 w-4" />
-                                                                                    </Button>
-                                                                                </DropdownMenuTrigger>
-                                                                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                                                                                    <DropdownMenuItem onClick={() => onEdit(dealer)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-                                                                                        Edit
-                                                                                    </DropdownMenuItem>
-                                                                                    <DropdownMenuItem onClick={() => onDelete(dealer)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-                                                                                        Hapus
-                                                                                    </DropdownMenuItem>
-                                                                                </DropdownMenuContent>
-                                                                            </DropdownMenu>
-                                                                        </div>
-                                                                        <div className="flex justify-center">
-                                                                            <DropdownMenu>
-                                                                                <DropdownMenuTrigger asChild>
-                                                                                    <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                                                                                        <MoreVertical className="h-4 w-4" />
-                                                                                    </Button>
-                                                                                </DropdownMenuTrigger>
-                                                                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                                                                                    <DropdownMenuItem onClick={() => onEdit(dealer)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-                                                                                        Edit
-                                                                                    </DropdownMenuItem>
-                                                                                    <DropdownMenuItem onClick={() => onDelete(dealer)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-                                                                                        Hapus
-                                                                                    </DropdownMenuItem>
-                                                                                </DropdownMenuContent>
-                                                                            </DropdownMenu>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                                ))
-                                                                ) : (
-                                                                <TableRow>
-                                                                    <TableCell colSpan={6} className="h-32 text-center text-gray-500 text-sm">
-                                                                        <TableCell colSpan={6} className="h-32 text-center text-gray-500 text-sm">
-                                                                            Tidak ada data dealer ditemukan
-                                                                        </TableCell>
-                                                                </TableRow>
+                <div className="flex flex-wrap items-center gap-2">
+                    {onExport && (
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
+
+                            className="w-full sm:w-auto"
+                            disabled={isExporting}
+                        >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {isExporting ? 'Exporting...' : 'Export'}
+                        </Button>
+                    )}
+                    {onImport && (
+                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Import
+                        </Button>
+                    )}
+                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Tambah
+                    </Button>
+                </div>
+            </div>
+
+            <Card className="rounded-xl overflow-hidden border border-gray-200 shadow-none">
+                <Table>
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">KODE DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[25%] uppercase px-4 py-4 text-left">NAMA DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {dealers.length > 0 ? (
+                            dealers.map((dealer) => (
+                                <TableRow key={dealer.id} className="hover:bg-gray-50 transition-colors">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
+                                        {dealer.code || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left truncate">
+                                        {dealer.namaDealer}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
+                                        <span className="line-clamp-2">{dealer.alamat || '-'}</span>
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
+                                        {dealer.pic || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
+                                        {dealer.handphone || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-center">
+                                        <div className="flex justify-center">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                                    <DropdownMenuItem onClick={() => onEdit(dealer)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => onDelete(dealer)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                                        Hapus
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={6} className="h-32 text-center text-gray-500 text-sm">
+                                    Tidak ada data dealer ditemukan
+                                </TableCell>
+                            </TableRow>
                         )}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </Card>
+                    </TableBody>
+                </Table>
+            </Card>
 
-                                                    <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
-                                                        <div>
-                                                            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
-                                                                <div>
-                                                                    Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
-                                                                </div>
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+                <div>
+                    Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
+                </div>
 
-                                                                {totalPages > 1 && (
-                                                                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-                                                                        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-                                                                            <Button
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-                                                                                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-                                                                                onClick={() => onPageChange(page - 1)}
-                                                                                disabled={page === 1}
-                                                                            >
-                                                                                Previous
-                                                                            </Button>
+                {totalPages > 1 && (
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                            onClick={() => onPageChange(page - 1)}
+                            disabled={page === 1}
+                        >
+                            Previous
+                        </Button>
 
-                                                                            {renderPaginationNumbers()}
-                                                                            {renderPaginationNumbers()}
+                        {renderPaginationNumbers()}
 
-                                                                            <Button
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-                                                                                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-                                                                                onClick={() => onPageChange(page + 1)}
-                                                                                disabled={page === totalPages}
-                                                                            >
-                                                                                Next
-                                                                            </Button>
-                                                                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                            onClick={() => onPageChange(page + 1)}
+                            disabled={page === totalPages}
+                        >
+                            Next
+                        </Button>
+                    </div>
                 )}
-                                                                    </div>
+            </div>
         </div>
-                                                            );
+    );
 }
