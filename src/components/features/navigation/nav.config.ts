@@ -87,7 +87,7 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
         },
         {
           label: 'Penjualan Unit',
-          href: base('/sales'),
+          href: base('/transaksi/penjualan-unit'),
         },
       ],
     },

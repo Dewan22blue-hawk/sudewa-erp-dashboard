@@ -12,7 +12,7 @@ import { useUnitBillings, useCurrentBilling, useBillingHistory } from '@/hooks/u
 import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ChevronLeft, CreditCard, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
@@ -197,32 +197,36 @@ export default function PurchaseDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
+            Pembelian Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Detail Pembelian</span>
+        </div>
+
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-start gap-2">
-            <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-xl font-semibold text-slate-900">Data Pembelian</h1>
-              <div className="text-xs text-slate-500 flex items-center gap-2">
-                <span>Kode Beli:</span>
-                <span className="text-blue-600 font-semibold">{purchase.code}</span>
-                {isPaid ? (
-                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
-                    Lunas
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700">
-                    Belum Lunas
-                  </Badge>
-                )}
-                {isRefunded ? (
-                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
-                    Sudah Refund
-                  </Badge>
-                ) : null}
-              </div>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Data Pembelian</h1>
+            <div className="text-sm text-slate-500 flex items-center gap-2">
+              <span>Kode Beli:</span>
+              <span className="text-blue-600 font-semibold">{purchase.code}</span>
+              {isPaid ? (
+                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                  Lunas
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                  Belum Lunas
+                </Badge>
+              )}
+              {isRefunded ? (
+                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                  Sudah Refund
+                </Badge>
+              ) : null}
             </div>
           </div>
 
@@ -233,7 +237,7 @@ export default function PurchaseDetailPage() {
             </Button>
             <Button
               variant="outline"
-              className="bg-white hover:bg-gray-50"
+              className="bg-white hover:bg-gray-50 border-gray-200"
               disabled={!canReceive || updateState.isPending}
               onClick={handleReceipt}
             >
@@ -242,24 +246,40 @@ export default function PurchaseDetailPage() {
           </div>
         </div>
 
-        {!canReceive && (
-          <p className="text-xs text-muted-foreground">
-            {isRefunded
-              ? 'Transaksi sudah direfund (inbound_return). Proses terima barang dinonaktifkan.'
-              : isAlreadyReceived
-                ? 'Stok sudah diterima (inbound_receipt).'
-                : 'Tombol Terima Barang aktif setelah pembayaran lunas.'}
-          </p>
-        )}
-
         {isRefunded ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Transaksi ini sudah direfund. Status stok saat ini: <span className="font-semibold">inbound_return</span>.
+          <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">
+            <AlertTriangle className="h-5 w-5 text-amber-650 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-amber-900">Transaksi Sudah Direfund</p>
+              <p className="text-xs mt-0.5 text-amber-700/95">
+                Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">inbound_return</span>. Proses terima barang dinonaktifkan.
+              </p>
+            </div>
+          </div>
+        ) : isAlreadyReceived ? (
+          <div className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50/40 px-4 py-3 text-sm text-emerald-800">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+            <div>
+              <span className="font-semibold text-emerald-950">Stok sudah diterima</span>
+              <span className="text-xs ml-2 text-emerald-700/95">
+                (Status stok saat ini: <span className="font-mono bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-900">inbound_receipt</span>)
+              </span>
+            </div>
+          </div>
+        ) : !isPaid ? (
+          <div className="flex items-center gap-2.5 rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-3 text-sm text-blue-800">
+            <Info className="h-5 w-5 text-blue-600 shrink-0" />
+            <div>
+              <span className="font-semibold text-blue-950">Menunggu Pembayaran Lunas</span>
+              <span className="text-xs ml-2 text-blue-700/95">
+                Tombol Terima Barang akan aktif setelah pembayaran lunas.
+              </span>
+            </div>
           </div>
         ) : null}
 
         {/* 3-COLUMN CARDS */}
-        <PurchaseDetailCards data={purchase} />
+        <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
         {/* UNIT TABLE */}
         <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} />

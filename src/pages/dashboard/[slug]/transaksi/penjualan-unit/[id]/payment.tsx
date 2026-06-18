@@ -162,8 +162,9 @@ const hasCompleteAssignmentsFromUnitItems = async (invalidItemIds: string[]): Pr
  */
 export default function PaymentPage() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, slug } = router.query;
   const salesId = Array.isArray(id) ? id[0] : id;
+  const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
   const { companyId } = useCompany();
   const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
   const { refetch: revalidateAmount } = useBillingValidation(
@@ -290,9 +291,7 @@ export default function PaymentPage() {
         } else {
 
           if (invalidItemIds.length > 0) {
-            const slugQuery = router.query.slug;
-            const slugValue = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-            const basePath = slugValue ? `/dashboard/${slugValue}/sales` : '/sales';
+            const basePath = slugValue ? `/dashboard/${slugValue}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
 
             toast.error(message, {
               action: {
@@ -362,9 +361,7 @@ export default function PaymentPage() {
       setForm((prev) => ({ ...prev, bca_idr: 0, bca_usd: 0, cash: 0 }));
 
       toast.success('Pembayaran berhasil disimpan!');
-      const slugQuery = router.query.slug;
-      const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-      const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
+      const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
       router.push(`${basePath}/${salesId}`);
     } catch (error: any) {
       const message = readApiError(error);

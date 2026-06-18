@@ -18,6 +18,7 @@ export default function EditNestedUnitPage() {
     const { id, unitId, slug } = router.query;
     const salesId = Array.isArray(id) ? id[0] : id;
     const selectedUnitId = Array.isArray(unitId) ? unitId[0] : unitId;
+    const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
 
     const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
     const { data: itemResponse, isLoading: itemLoading } = useSalesUnitItems(salesId);
@@ -82,8 +83,7 @@ export default function EditNestedUnitPage() {
             });
 
             toast.success('Unit berhasil diperbarui!');
-            const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
-            const basePath = slugValue ? `/dashboard/${slugValue}/sales` : '/sales';
+            const basePath = slugValue ? `/dashboard/${slugValue}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
             router.push(`${basePath}/${salesId}`);
         } catch (error: any) {
             const responseData = error?.response?.data;

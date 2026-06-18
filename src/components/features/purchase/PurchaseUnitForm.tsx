@@ -154,12 +154,13 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {prependFields}
-
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Unit</h2>
-            <div className="my-4 h-px bg-border" />
+            <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Pembelian</h2>
+            <p className="text-sm text-gray-500 mt-1">Kelola detail informasi pembelian unit dan biaya-biaya terkait</p>
+            <div className="my-6 h-px bg-muted/60" />
           </div>
+
+          {prependFields}
 
           {/* Row Type Unit / Qty / Harga */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

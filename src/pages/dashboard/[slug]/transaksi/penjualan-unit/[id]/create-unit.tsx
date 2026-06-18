@@ -98,7 +98,7 @@ export default function CreateUnitPage() {
       toast.success('Unit berhasil ditambahkan!');
       const slugQuery = router.query.slug;
       const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-      const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
+      const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
       router.push(`${basePath}/${salesId}`);
     } catch (error: any) {
       const status = error?.statusCode ?? error?.response?.status;

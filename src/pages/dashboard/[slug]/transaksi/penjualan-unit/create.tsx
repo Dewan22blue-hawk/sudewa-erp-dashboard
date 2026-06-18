@@ -3,7 +3,8 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { PageHeader } from '@/components/common/PageHeader';
 import { toast } from 'sonner';
 import { useCreateSales } from '@/hooks/useSales';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -48,7 +49,7 @@ export default function CreateSalesPage() {
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
   const slugQuery = router.query.slug;
   const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-  const salesPath = slug ? `/dashboard/${slug}/sales` : '/sales';
+  const salesPath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
   const generatedCode = useMemo(() => generateSalesCode(router.query.slug), [router.query.slug]);
 
   const [customerList, setCustomerList] = useState<SalesCustomerOption[]>([]);
@@ -275,19 +276,20 @@ export default function CreateSalesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => router.push(salesPath)}
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-2xl font-semibold tracking-tight">Tambah Penjualan</h1>
-          </div>
-          <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(salesPath)}>
+            Penjualan Unit
+          </span>
+          <ChevronRight className="h-4 w-4" />
+          <span className="font-medium text-foreground">Tambah Penjualan</span>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <PageHeader title="Tambah Penjualan Unit" description="" />
+          <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Kode Jual</span>
-            <span className="text-blue-500 font-medium">{generatedCode}</span>
+            <span className="text-blue-600 font-medium">{generatedCode}</span>
           </div>
         </div>
 

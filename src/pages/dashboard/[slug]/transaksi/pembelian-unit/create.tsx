@@ -16,6 +16,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Button } from '@/components/ui/button';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
+import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
@@ -62,10 +63,6 @@ export default function CreatePurchasePage() {
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
-  const [purchaseDate, setPurchaseDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
@@ -249,93 +246,77 @@ export default function CreatePurchasePage() {
               <PurchaseUnitForm
                 onSubmit={handleSubmit}
                 loading={mutation.isPending}
-                onCancel={() => router.push(purchasePath)}
+                onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
                 companyId={companyId}
                 prependFields={
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label>Tanggal</Label>
-                      <DatePicker
-                        value={purchaseDate}
-                        onChange={(date) => {
-                          if (date) {
-                            const offset = date.getTimezoneOffset();
-                            const adjusted = new Date(date.getTime() - (offset * 60 * 1000));
-                            setPurchaseDate(adjusted.toISOString().split('T')[0]);
-                          }
-                        }}
-                        placeholder="Pick a date"
-                        className="h-10 border-slate-200 bg-white"
+                      <Label className="text-sm font-medium">Tanggal</Label>
+                      <Input
+                        type="date"
+                        value={tanggal}
+                        onChange={(e) => setTanggal(e.target.value)}
+                        className="bg-transparent"
                       />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Tanggal</Label>
-                        <Input
-                          type="date"
-                          value={tanggal}
-                          onChange={(e) => setTanggal(e.target.value)}
-                          className="bg-transparent"
-                        />
-                      </div>
 
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Supplier</Label>
-                        <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={supplierOpen}
-                              className="w-full justify-between bg-transparent font-normal"
-                            >
-                              <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>
-                                {selectedPerson ? selectedPerson.name : 'Pilih supplier'}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                            <Command>
-                              <CommandInput placeholder="Cari supplier..." />
-                              <CommandList id="supplier-combobox-list">
-                                <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
-                                <CommandGroup>
-                                  {personOptions.map((person) => (
-                                    <CommandItem
-                                      key={String(person.id)}
-                                      value={`${person.name} ${person.code ?? ''} ${person.id}`}
-                                      onSelect={() => {
-                                        setPersonId(String(person.id));
-                                        setSupplierOpen(false);
-                                      }}
-                                    >
-                                      <Check className={cn('mr-2 h-4 w-4', personId === String(person.id) ? 'opacity-100' : 'opacity-0')} />
-                                      {person.name}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Alamat</Label>
-                        <Input value={selectedPerson?.address ?? ''} readOnly disabled className="bg-transparent" placeholder="Alamat supplier" />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">NPWP</Label>
-                        <Input value={selectedPerson?.npwp ?? ''} readOnly disabled className="bg-transparent" placeholder="NPWP supplier" />
-                      </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Supplier</Label>
+                      <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={supplierOpen}
+                            className="w-full justify-between bg-transparent font-normal"
+                          >
+                            <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>
+                              {selectedPerson ? selectedPerson.name : 'Pilih supplier'}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Cari supplier..." />
+                            <CommandList id="supplier-combobox-list">
+                              <CommandEmpty>Supplier tidak ditemukan.</CommandEmpty>
+                              <CommandGroup>
+                                {personOptions.map((person) => (
+                                  <CommandItem
+                                    key={String(person.id)}
+                                    value={`${person.name} ${person.code ?? ''} ${person.id}`}
+                                    onSelect={() => {
+                                      setPersonId(String(person.id));
+                                      setSupplierOpen(false);
+                                    }}
+                                  >
+                                    <Check className={cn('mr-2 h-4 w-4', personId === String(person.id) ? 'opacity-100' : 'opacity-0')} />
+                                    {person.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
-            }
-          />
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Alamat</Label>
+                      <Input value={selectedPerson?.address ?? ''} readOnly className="bg-transparent" placeholder="Alamat supplier" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">NPWP</Label>
+                      <Input value={selectedPerson?.npwp ?? ''} readOnly className="bg-transparent" placeholder="NPWP supplier" />
+                    </div>
                   </div>
-      </div>
-          </DashboardLayout>
-          );
+                }
+              />
+            </div>
+          </div>
+        </DashboardLayout>
+        );
 }

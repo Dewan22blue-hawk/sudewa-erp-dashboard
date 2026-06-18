@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Wallet } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Wallet } from 'lucide-react';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
 import { useEffect } from 'react';
@@ -21,7 +21,7 @@ export default function SalesDetailPage() {
   const { data, isLoading } = useSalesDetail(salesId);
 
   const { slug } = router.query;
-  const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
+  const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
   const salesData = data?.ui ?? null;
   const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(salesId ?? ''));
   const billingId = String(currentBilling?.id ?? '');
@@ -95,42 +95,46 @@ export default function SalesDetailPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500 print:hidden">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
+            Penjualan Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Detail Penjualan</span>
+        </div>
+
         {/* Header Section */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
-          <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" className="mt-1 h-8 w-8" onClick={() => router.back()}>
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold tracking-tight">Data Penjualan</h1>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground">Kode Jual</span>
-                <span className="font-medium text-blue-600">{salesData.kodeJual}</span>
-                {isPaid ? (
-                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
-                    Lunas
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700">
-                    Belum Lunas
-                  </Badge>
-                )}
-                {isRefunded ? (
-                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
-                    Sudah Refund
-                  </Badge>
-                ) : null}
-              </div>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Data Penjualan</h1>
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+              <span>Kode Jual:</span>
+              <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
+              {isPaid ? (
+                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                  Lunas
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                  Belum Lunas
+                </Badge>
+              )}
+              {isRefunded ? (
+                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                  Sudah Refund
+                </Badge>
+              ) : null}
             </div>
           </div>
 
-          <div className="flex gap-3 ml-12 md:ml-0">
+          <div className="flex gap-2">
             <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
               <Wallet className="mr-2 h-4 w-4" />
               Bayar
             </Button>
-            <Button variant="outline" disabled={isRefunded} className="bg-white hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`${basePath}/${id}/refund`)}>
+            <Button variant="outline" disabled={isRefunded} className="bg-white hover:bg-gray-50 border-gray-200 disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`${basePath}/${id}/refund`)}>
               {isRefunded ? 'Sudah Refund' : 'Refund'}
             </Button>
           </div>
@@ -157,7 +161,7 @@ export default function SalesDetailPage() {
         ) : null}
 
         {/* 3 Info Cards */}
-        <SalesDetailCards data={salesData} />
+        <SalesDetailCards data={salesData} billingHistories={resolvedBillingHistories} />
 
         {/* Detail Unit Table */}
         <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} />

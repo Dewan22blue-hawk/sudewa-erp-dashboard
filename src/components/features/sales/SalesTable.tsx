@@ -24,7 +24,41 @@ export function SalesTable({ onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
+  const [mainTab, setMainTab] = useState('common');
+  const [subTab, setSubTab] = useState('all');
+
+  const TABS = [
+    { id: 'common', label: 'Common' },
+    { id: 'inbound', label: 'Inbound' },
+    { id: 'outbound', label: 'Outbound' },
+  ];
+
+  const SUBTABS = {
+    common: [
+      { id: 'all', label: 'All' },
+      { id: 'draft', label: 'Draft' },
+      { id: 'cancel', label: 'Cancel' },
+      { id: 'rejected', label: 'Rejected' },
+      { id: 'prepare', label: 'Prepare' },
+    ],
+    inbound: [
+      { id: 'all', label: 'All' },
+      { id: 'inbound_purcase_order', label: 'Purchase Order' },
+      { id: 'inbound_incoming_goods', label: 'Incoming Goods' },
+      { id: 'inbound_receipt', label: 'Receipt' },
+      { id: 'inbound_return', label: 'Return' },
+    ],
+    outbound: [
+      { id: 'all', label: 'All' },
+      { id: 'outbound_reserved', label: 'Reserved' },
+      { id: 'outbound_in_transit', label: 'In Transit' },
+      { id: 'outbound_delivered', label: 'Delivered' },
+      { id: 'outbound_return', label: 'Return' },
+    ]
+  };
+
+  const activeStatus = subTab === 'all' ? undefined : subTab;
+  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm, status: activeStatus });
   const deleteMutation = useDeleteSales();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const salesData = data?.data ?? [];
@@ -39,8 +73,9 @@ export function SalesTable({ onAdd }: Props) {
   const safeTotalPages = Math.max(1, totalPages);
   const activePage = meta?.currentPage ?? currentPage;
   const activePerPage = meta?.perPage ?? itemsPerPage;
-  const startIndex = (activePage - 1) * activePerPage;
-  const endIndex = startIndex + sortedData.length;
+  const totalEntries = meta?.total ?? sortedData.length;
+  const startIndex = totalEntries === 0 ? 0 : (activePage - 1) * activePerPage + 1;
+  const endIndex = startIndex === 0 ? 0 : startIndex + sortedData.length - 1;
   const currentData = sortedData;
   const isDataEmpty = salesData.length === 0;
   const isSearchEmpty = !isLoading && !isDataEmpty && currentData.length === 0;
@@ -104,6 +139,35 @@ export function SalesTable({ onAdd }: Props) {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPageButtons = () => {
+    const buttons = [] as number[];
+    if (safeTotalPages <= 5) {
+      for (let i = 1; i <= safeTotalPages; i++) buttons.push(i);
+    } else if (activePage <= 3) {
+      buttons.push(1, 2, 3, 4, 5);
+    } else if (activePage >= safeTotalPages - 2) {
+      for (let i = safeTotalPages - 4; i <= safeTotalPages; i++) buttons.push(i);
+    } else {
+      buttons.push(activePage - 2, activePage - 1, activePage, activePage + 1, activePage + 2);
+    }
+
+    return buttons.map((page) => (
+      <Button
+        key={page}
+        variant={activePage === page ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => handlePageChange(page)}
+        className={`h-8 w-8 p-0 ${activePage === page ? 'bg-[#1f304f] hover:bg-[#1a2842] text-white' : ''}`}
+      >
+        {page}
+      </Button>
+    ));
+  };
+
   const renderSortHeader = (key: string, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
     const isSorted = sortKey === key;
     const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
@@ -132,53 +196,80 @@ export function SalesTable({ onAdd }: Props) {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-[300px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* LEFT CONTROLS */}
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* 1. Search */}
+          <div className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search here"
+              placeholder="Search here..."
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-9 bg-white"
+              className="pl-8 bg-white h-9 border-slate-300"
             />
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-            <span>Show</span>
-            <Select value={String(itemsPerPage)} onValueChange={(val) => handleItemsPerPageChange(val)}>
-              <SelectTrigger className="w-[70px] bg-white">
+          {/* 2. Main Status Dropdown */}
+          <Select value={mainTab} onValueChange={(val) => { setMainTab(val); setSubTab('all'); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {TABS.map((tab) => (
+                <SelectItem key={tab.id} value={tab.id}>
+                  {tab.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* 3. Sub Status Dropdown */}
+          <Select value={subTab} onValueChange={(val) => { setSubTab(val); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
+              <SelectValue placeholder="Detail Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {SUBTABS[mainTab as keyof typeof SUBTABS].map((sub) => (
+                <SelectItem key={sub.id} value={sub.id}>
+                  {sub.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* 4. Show + Page limit */}
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <span className="text-sm font-medium text-slate-700">Show</span>
+            <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
+              <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
                 <SelectValue placeholder="10" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span>Page</span>
+            <span className="text-sm font-medium text-slate-700">Page</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {onAdd && (
-            <Button size="sm" onClick={onAdd} className="bg-[#1e293b] hover:bg-[#0f172a] text-white">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        {/* RIGHT CONTROLS */}
+        {onAdd && (
+          <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
+          </Button>
+        )}
       </div>
 
-      <div className="rounded-sm border bg-card shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
-              <TableHead className="w-12 px-4 py-4 text-center">
-                <Checkbox checked={allCurrentPageSelected && currentPageIds.length > 0} onCheckedChange={handleBulkSelect} />
-              </TableHead>
               {renderSortHeader('kodeJual', 'KODE JUAL', 'left')}
               {renderSortHeader('tanggal', 'TANGGAL', 'center')}
               {renderSortHeader('customer', 'CUSTOMER', 'left')}
@@ -194,19 +285,19 @@ export function SalesTable({ onAdd }: Props) {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center">
+                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
               <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
               <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>
               </TableRow>
@@ -217,59 +308,39 @@ export function SalesTable({ onAdd }: Props) {
             )}
           </TableBody>
         </Table>
+        {isLoading && <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-sm text-muted-foreground">Memuat data...</div>}
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, meta?.total ?? sortedData.length)} of {meta?.total ?? sortedData.length} entries
+      {currentData.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+          <div className="text-sm text-slate-500">
+            Showing {startIndex} to {endIndex} of {totalEntries} data
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(Math.max(1, activePage - 1))}
+              disabled={activePage === 1}
+              className="h-8 px-3"
+            >
+              Previous
+            </Button>
+            {renderPageButtons()}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(Math.min(safeTotalPages, activePage + 1))}
+              disabled={activePage === safeTotalPages}
+              className="h-8 px-3"
+            >
+              Next
+            </Button>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={activePage === 1}>
-            Previous
-          </Button>
-
-          {/* Page numbers */}
-          {Array.from({ length: Math.min(5, safeTotalPages) }, (_, i) => {
-            let pageNum: number;
-
-            if (safeTotalPages <= 5) {
-              pageNum = i + 1;
-            } else if (activePage <= 3) {
-              pageNum = i + 1;
-            } else if (activePage >= safeTotalPages - 2) {
-              pageNum = safeTotalPages - 4 + i;
-            } else {
-              pageNum = activePage - 2 + i;
-            }
-
-            return (
-              <Button key={pageNum} variant={activePage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className="w-10">
-                {pageNum}
-              </Button>
-            );
-          })}
-
-          {safeTotalPages > 5 && (
-            <>
-              <span className="text-muted-foreground">...</span>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(safeTotalPages)} className="w-10">
-                {safeTotalPages}
-              </Button>
-            </>
-          )}
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(safeTotalPages, prev + 1))}
-            disabled={activePage >= safeTotalPages}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
