@@ -79,9 +79,11 @@ export default function VehicleEquipmentPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 {/* Header Title */}
-                <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Perlengkapan</h1>
-                    <p className="text-sm text-gray-500 mt-1">Kelola data perlengkapan dengan mudah</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold">Perlengkapan</h1>
+                        <p className="text-sm text-muted-foreground">Kelola data perlengkapan dengan mudah</p>
+                    </div>
                 </div>
 
                 {/* Loading / Error States */}
