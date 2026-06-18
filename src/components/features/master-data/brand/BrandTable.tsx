@@ -118,7 +118,7 @@ export const BrandTable = ({
                 ),
             },
         ],
-        [onDelete, onEdit, sortKey, sortOrder, handleSort],
+        [onDelete, onEdit, sortKey, sortOrder],
     );
 
     const table = useReactTable({
