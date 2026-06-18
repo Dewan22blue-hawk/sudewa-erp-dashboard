@@ -102,7 +102,7 @@ export default function TransactionListPage() {
             </div>
           </div>
 
-          <Button className="bg-[#1e293b] text-white hover:bg-[#0f172a]" onClick={() => router.push(`${basePath}/create`)}>
+          <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => router.push(`${basePath}/create`)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -119,19 +119,39 @@ export default function TransactionListPage() {
 
         {/* PAGINATION INFO */}
         {!isListLoading && data && (
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
+          <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+            <div>
               Showing {(page - 1) * limit + 1}-{Math.min(page * limit, data.total)} of {data.total} data
-            </span>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>
-                Previous
-              </Button>
-              <div className="bg-white border text-black font-medium px-3 py-1 rounded-md text-sm">{page}</div>
-              <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page * limit >= data.total}>
-                Next
-              </Button>
             </div>
+            {data.total > limit && (
+              <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-slate-200 bg-white text-slate-950 shadow-sm"
+                >
+                  {page}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page * limit >= data.total}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
