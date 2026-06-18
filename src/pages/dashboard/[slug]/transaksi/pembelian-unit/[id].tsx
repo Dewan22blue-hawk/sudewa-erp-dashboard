@@ -280,6 +280,18 @@ export default function PurchaseDetailPage() {
           </div>
         ) : null}
 
+        {!isPaid && !isAlreadyReceived && !isRefunded && (
+          <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-slate-800 animate-in fade-in duration-200">
+            <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-slate-900">Menunggu Pembayaran Lunas</p>
+              <p className="text-xs mt-0.5 text-slate-600">
+                Tombol Terima Barang akan aktif setelah pembayaran lunas.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* 3-COLUMN CARDS */}
         <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
