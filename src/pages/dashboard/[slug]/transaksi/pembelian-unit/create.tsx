@@ -12,7 +12,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { DatePicker } from '@/components/ui/date-picker';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -61,7 +60,7 @@ export default function CreatePurchasePage() {
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
-  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -102,11 +101,6 @@ export default function CreatePurchasePage() {
         return;
       }
 
-      if (!purchaseDate) {
-        toast.error('Tanggal pembelian wajib diisi');
-        return;
-      }
-
       if (!warehouseNumeric || warehouseNumeric <= 0) {
         toast.error('Warehouse ID wajib diisi (gunakan ID yang valid, contoh: 1)');
         return;
@@ -144,7 +138,6 @@ export default function CreatePurchasePage() {
         bbn_price: bbnNumber,
         expedition_fee: expeditionNumber,
         other_fee: otherFeeNumber,
-        transaction_date: purchaseDate,
       };
 
       if (process.env.NODE_ENV !== 'production') {
@@ -209,21 +202,19 @@ export default function CreatePurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.push(purchasePath)}
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ChevronLeft className="h-6 w-6 text-slate-800" />
-          </button>
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tambah Pembelian</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Beli</span>
-              <span className="text-blue-600 font-medium">{generatedCode}</span>
-            </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(purchasePath)}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <h1 className="text-2xl font-semibold tracking-tight">Tambah Pembelian</h1>
+          </div>
+          <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
+            <span className="text-muted-foreground">Kode Beli</span>
+            <span className="text-blue-500 font-medium">{generatedCode}</span>
           </div>
         </div>
 
@@ -237,17 +228,11 @@ export default function CreatePurchasePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Tanggal</Label>
-                  <DatePicker
-                    value={purchaseDate}
-                    onChange={(date) => {
-                      if (date) {
-                        const offset = date.getTimezoneOffset();
-                        const adjusted = new Date(date.getTime() - (offset * 60 * 1000));
-                        setPurchaseDate(adjusted.toISOString().split('T')[0]);
-                      }
-                    }}
-                    placeholder="Pick a date"
-                    className="h-10 border-slate-200 bg-white"
+                  <Input
+                    type="date"
+                    value={tanggal}
+                    onChange={(e) => setTanggal(e.target.value)}
+                    className="bg-transparent"
                   />
                 </div>
 
@@ -296,12 +281,12 @@ export default function CreatePurchasePage() {
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Alamat</Label>
-                  <Input value={selectedPerson?.address ?? ''} readOnly className="bg-transparent" placeholder="Alamat supplier" />
+                  <Input value={selectedPerson?.address ?? ''} readOnly disabled className="bg-transparent" placeholder="Alamat supplier" />
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">NPWP</Label>
-                  <Input value={selectedPerson?.npwp ?? ''} readOnly className="bg-transparent" placeholder="NPWP supplier" />
+                  <Input value={selectedPerson?.npwp ?? ''} readOnly disabled className="bg-transparent" placeholder="NPWP supplier" />
                 </div>
               </div>
             }
