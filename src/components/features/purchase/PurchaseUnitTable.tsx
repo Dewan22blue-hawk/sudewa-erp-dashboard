@@ -252,18 +252,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                         />
                       </TableCell>
                       <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                        <div className="flex flex-col items-center gap-1">
-                          <span className="font-semibold">{item.qty_total}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                            isComplete
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
-                          }`}>
-                            Detail: {itemDetails.length}/{item.qty_total}
-                          </span>
-                        </div>
-                      </TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{item.qty_total}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.price)}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
