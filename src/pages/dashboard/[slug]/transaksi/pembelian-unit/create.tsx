@@ -3,15 +3,15 @@
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { PageHeader } from '@/components/common/PageHeader';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { useCreatePurchase } from '@/hooks/usePurchase';
-import { ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronLeft, Check, ChevronsUpDown } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { CreatePurchaseRequest } from '@/@types/purchase.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -60,6 +60,7 @@ export default function CreatePurchasePage() {
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -196,48 +197,61 @@ export default function CreatePurchasePage() {
     }
   };
 
+  const purchasePath = `/dashboard/${slug}/transaksi/pembelian-unit`;
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
-            Pembelian Unit
-          </span>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">Tambah Pembelian</span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <PageHeader title="Tambah Pembelian Unit" description="" />
-          <div className="flex items-center gap-2 text-sm">
+        <div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(purchasePath)}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <h1 className="text-2xl font-semibold tracking-tight">Tambah Pembelian</h1>
+          </div>
+          <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
             <span className="text-muted-foreground">Kode Beli</span>
-            <span className="text-blue-600 font-medium">{generatedCode}</span>
+            <span className="text-blue-500 font-medium">{generatedCode}</span>
           </div>
         </div>
 
-        <div className="rounded-xl border bg-white p-6 md:p-8">
+        <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
           <PurchaseUnitForm
             onSubmit={handleSubmit}
             loading={mutation.isPending}
-            onCancel={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+            onCancel={() => router.push(purchasePath)}
             companyId={companyId}
             prependFields={
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Supplier</Label>
+                  <Label className="text-sm font-medium">Tanggal</Label>
+                  <Input
+                    type="date"
+                    value={tanggal}
+                    onChange={(e) => setTanggal(e.target.value)}
+                    className="bg-transparent"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Supplier</Label>
                   <Popover open={supplierOpen} onOpenChange={setSupplierOpen}>
                     <PopoverTrigger asChild>
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
                         role="combobox"
                         aria-expanded={supplierOpen}
-                        aria-controls="supplier-combobox-list"
-                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                        className="w-full justify-between bg-transparent font-normal"
                       >
-                        <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>{selectedPerson ? selectedPerson.name : 'Pilih supplier'}</span>
+                        <span className={cn('truncate', !selectedPerson && 'text-muted-foreground')}>
+                          {selectedPerson ? selectedPerson.name : 'Pilih supplier'}
+                        </span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </button>
+                      </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
@@ -266,13 +280,13 @@ export default function CreatePurchasePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Alamat</Label>
-                  <Input value={selectedPerson?.address ?? ''} readOnly className="bg-transparent" placeholder="Alamat supplier" />
+                  <Label className="text-sm font-medium">Alamat</Label>
+                  <Input value={selectedPerson?.address ?? ''} readOnly disabled className="bg-transparent" placeholder="Alamat supplier" />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>NPWP</Label>
-                  <Input value={selectedPerson?.npwp ?? ''} readOnly className="bg-transparent" placeholder="NPWP supplier" />
+                  <Label className="text-sm font-medium">NPWP</Label>
+                  <Input value={selectedPerson?.npwp ?? ''} readOnly disabled className="bg-transparent" placeholder="NPWP supplier" />
                 </div>
               </div>
             }
