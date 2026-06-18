@@ -18,9 +18,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 interface Props {
   purchaseId: string;
   slug: string;
+  isPaid?: boolean;
 }
 
-export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
+export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: Props) {
   const router = useRouter();
   const { data, isLoading, isError } = usePurchaseUnitItems(purchaseId);
   const { data: typeUnits } = useTypeUnits();
@@ -116,7 +117,17 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
 
   return (
     <div className="space-y-4">
-      {hasIncompleteDetails && (
+      {!isPaid ? (
+        <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-slate-800 animate-in fade-in duration-200">
+          <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-slate-900">Menunggu Pembayaran Lunas</p>
+            <p className="text-xs mt-0.5 text-slate-600">
+              Tombol Terima Barang akan aktif setelah pembayaran lunas.
+            </p>
+          </div>
+        </div>
+      ) : hasIncompleteDetails ? (
         <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-slate-800 animate-in fade-in duration-200">
           <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
@@ -127,7 +138,7 @@ export default function PurchaseUnitTable({ purchaseId, slug }: Props) {
             </p>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Container — matches SalesUnitTable style */}
       <div className="rounded-xl border bg-white">
