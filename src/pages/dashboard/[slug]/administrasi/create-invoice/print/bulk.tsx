@@ -106,7 +106,7 @@ export default function BulkCreateInvoicePrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+        <div className="no-print flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -116,28 +116,28 @@ export default function BulkCreateInvoicePrintPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[18px] font-semibold text-slate-900">Cetak Massal Invoice</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">Cetak Massal Invoice</h1>
               <p className="text-sm text-slate-500">Total terpilih: {invoices.length} dokumen</p>
             </div>
           </div>
           <Button
             type="button"
             onClick={() => handlePrint()}
-            className="gap-2 rounded-xl bg-[#1f4163] hover:bg-[#183552]"
+            className="gap-2 rounded-xl bg-[#1e3a5f] hover:bg-[#152e4d]"
           >
             <Printer className="h-4 w-4" />
             Print All ({invoices.length})
           </Button>
         </div>
 
-        <div ref={printRef} className="space-y-8 bg-slate-50 p-4 rounded-2xl border border-slate-200 print:bg-white print:p-0 print:border-none print:space-y-0">
+        <div ref={printRef} className="space-y-8 bg-slate-50 p-4 rounded-xl border border-gray-200 print:bg-white print:p-0 print:border-none print:space-y-0">
           {invoices.map((invoice) => {
             const draft = getInvoiceProcessDraft(invoice.id) ?? createProcessDraftPayload(invoice, buildProcessDefaults(invoice), undefined);
             const rows = buildDetailRows([invoice]);
             const payload = buildPrintPayload(invoice, rows, companyName, draft);
 
             return (
-              <div key={invoice.id} className="print-page bg-white shadow-md print:shadow-none p-4 print:p-0 rounded-2xl border border-slate-100 print:border-none">
+              <div key={invoice.id} className="print-page bg-white shadow-md print:shadow-none p-4 print:p-0 rounded-xl border border-gray-200 print:border-none">
                 <CreateInvoicePrintDocument
                   payload={payload}
                   letterheadUrl={letterheadUrl}

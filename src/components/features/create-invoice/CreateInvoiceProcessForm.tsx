@@ -60,17 +60,17 @@ export function CreateInvoiceProcessForm({
           <ChevronLeft className="h-5 w-5 text-slate-500" />
         </button>
         <div>
-          <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">{title}</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">{title}</h1>
           <p className="mt-1 text-sm text-slate-500">
             {mode === 'bulk' ? `${selectedInvoiceCount} invoice dipilih untuk diproses` : 'Kelola informasi invoice dan expedisi'}
           </p>
         </div>
       </div>
 
-      <Card className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+      <Card className="rounded-xl border border-gray-200 bg-white p-6 shadow-none md:p-8">
         <div className="space-y-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <h2 className="text-[18px] font-semibold text-slate-900">Informasi Ekspedisi</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Informasi Ekspedisi</h2>
             {statusLabel ? (
               <Badge className={statusLabel.includes('Sudah') ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-red-400 bg-red-50 text-red-500'}>
                 {statusLabel}
@@ -122,10 +122,10 @@ export function CreateInvoiceProcessForm({
             <Textarea value={values.letterContent} onChange={(event) => onChange('letterContent', event.target.value)} placeholder="Masukkan isi surat invoice" className="min-h-[140px] rounded-xl border-slate-200" />
           </div>
 
-          <div className="overflow-hidden rounded-[20px] border border-slate-200">
+          <div className="overflow-hidden rounded-xl border border-gray-200">
             <div className="max-h-[460px] overflow-auto">
               <Table>
-                <TableHeader className="sticky top-0 z-10 bg-[#eef3f8]">
+                <TableHeader className="sticky top-0 z-10 bg-[#f8f9fa] border-b border-gray-200">
                   <TableRow className="border-slate-200">
                     <TableHead className="w-[54px] px-4 py-4 text-center">
                       <Checkbox
@@ -135,7 +135,7 @@ export function CreateInvoiceProcessForm({
                       />
                     </TableHead>
                     {['NO', 'TANGGAL', 'NO POLISI', 'TYPE', 'DRIVER', 'LOADING IN', 'TUJUAN KIRIM', 'LOADING OUT', 'NO SURAT DO', 'DESKRIPSI', 'QTY', 'INV EKSPEDISI', 'PPN', 'STATUS'].map((header) => (
-                      <TableHead key={header} className="whitespace-nowrap px-4 py-4 text-center text-sm font-semibold text-slate-900">
+                      <TableHead key={header} className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
                         {header}
                       </TableHead>
                     ))}
@@ -190,7 +190,7 @@ export function CreateInvoiceProcessForm({
         <Button type="button" variant="ghost" onClick={onCancel} className="text-base text-slate-700 hover:bg-transparent hover:text-slate-900">
           Batal
         </Button>
-        <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="h-12 rounded-xl bg-[#1f4163] px-6 text-base font-medium hover:bg-[#183552]">
+        <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="h-10 rounded-xl bg-[#1e3a5f] px-6 text-sm font-semibold text-white hover:bg-[#152e4d]">
           <Printer className="mr-2 h-4 w-4" />
           {isSubmitting ? 'Memproses...' : 'Print Invoice'}
         </Button>

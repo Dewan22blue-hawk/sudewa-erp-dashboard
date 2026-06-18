@@ -299,7 +299,7 @@ export default function EditOrderListPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Edit Order List</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Edit Order List</h1>
             </div>
           </div>
 
@@ -334,7 +334,7 @@ export default function EditOrderListPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Edit Order List</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Edit Order List</h1>
             </div>
           </div>
 

@@ -77,7 +77,7 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         <Button type="button" variant="ghost" size="icon" onClick={onBack} className="h-10 w-10 rounded-full">
           <ChevronLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-[20px] font-semibold text-slate-950 md:text-[24px]">Detail Order</h1>
+        <h1 className="text-2xl font-semibold text-slate-950">Detail Order</h1>
       </div>
 
       <SectionCard title="Detail Customer">
