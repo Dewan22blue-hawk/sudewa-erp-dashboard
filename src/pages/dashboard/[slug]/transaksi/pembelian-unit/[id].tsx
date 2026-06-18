@@ -253,22 +253,12 @@ export default function PurchaseDetailPage() {
 
         {isRefunded ? (
           <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">
-            <AlertTriangle className="h-5 w-5 text-amber-650 shrink-0 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-amber-655 shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-amber-900">Transaksi Sudah Direfund</p>
               <p className="text-xs mt-0.5 text-amber-700/95">
                 Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">inbound_return</span>. Proses terima barang dinonaktifkan.
               </p>
-            </div>
-          </div>
-        ) : !isPaid ? (
-          <div className="flex items-center gap-2.5 rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-3 text-sm text-blue-800">
-            <Info className="h-5 w-5 text-blue-600 shrink-0" />
-            <div>
-              <span className="font-semibold text-blue-950">Menunggu Pembayaran Lunas</span>
-              <span className="text-xs ml-2 text-blue-700/95">
-                Tombol Terima Barang akan aktif setelah pembayaran lunas.
-              </span>
             </div>
           </div>
         ) : null}
