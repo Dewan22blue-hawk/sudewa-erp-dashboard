@@ -38,7 +38,7 @@ export interface OrderListFormCargoItemValue {
   qty: number;
 }
 
-export interface OrderListFormValues extends OrderListFormSchema {}
+export interface OrderListFormValues extends OrderListFormSchema { }
 
 interface OrderListFormProps {
   mode: 'create' | 'edit';
@@ -112,18 +112,18 @@ const toItemDefaults = (order?: OrderList | null): OrderListFormItemValue[] => {
     cargoItems:
       item.tarifItems?.length
         ? item.tarifItems.map((tarifItem) =>
-            createCargoItem({
-              id: tarifItem.id,
-              loadContent: tarifItem.loadContent,
-              qty: Number(tarifItem.qty ?? 0),
-            }),
-          )
+          createCargoItem({
+            id: tarifItem.id,
+            loadContent: tarifItem.loadContent,
+            qty: Number(tarifItem.qty ?? 0),
+          }),
+        )
         : [
-            createCargoItem({
-              loadContent: item.loadContent ?? '',
-              qty: Number(item.qty ?? 0),
-            }),
-          ],
+          createCargoItem({
+            loadContent: item.loadContent ?? '',
+            qty: Number(item.qty ?? 0),
+          }),
+        ],
     driverFee: Number(item.driverFee ?? 0),
     expeditionInvoice: Number(item.expeditionInvoice ?? order.billInvoice ?? 0),
   }));

@@ -95,8 +95,8 @@ export function DealerTable({
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
-                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                 )}
             >
                 {p}
@@ -140,6 +140,7 @@ export function DealerTable({
                         <Button
                             onClick={onExport}
                             variant="outline"
+
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >

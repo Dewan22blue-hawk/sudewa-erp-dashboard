@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { useCreatePurchase } from '@/hooks/usePurchase';
-import { ChevronLeft, ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronLeft, Check, ChevronsUpDown } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
@@ -61,10 +61,7 @@ export default function CreatePurchasePage() {
   const { data: supplierData } = useSuppliers(companyId || null);
   const [personId, setPersonId] = useState('');
   const [supplierOpen, setSupplierOpen] = useState(false);
-  const [purchaseDate, setPurchaseDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
 
   const personOptions = useMemo(() => supplierData?.data ?? [], [supplierData]);
 
@@ -227,7 +224,6 @@ export default function CreatePurchasePage() {
               <span className="text-muted-foreground">Kode Beli</span>
               <span className="text-blue-600 font-medium">{generatedCode}</span>
             </div>
-          </div>
         </div>
 
         <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
@@ -237,7 +233,7 @@ export default function CreatePurchasePage() {
             onCancel={() => router.push(purchasePath)}
             companyId={companyId}
             prependFields={
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Tanggal</Label>
                   <DatePicker
@@ -299,12 +295,12 @@ export default function CreatePurchasePage() {
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Alamat</Label>
-                  <Input value={selectedPerson?.address ?? ''} readOnly disabled className="bg-transparent" placeholder="Alamat supplier" />
+                  <Input value={selectedPerson?.address ?? ''} readOnly className="bg-transparent" placeholder="Alamat supplier" />
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">NPWP</Label>
-                  <Input value={selectedPerson?.npwp ?? ''} readOnly disabled className="bg-transparent" placeholder="NPWP supplier" />
+                  <Input value={selectedPerson?.npwp ?? ''} readOnly className="bg-transparent" placeholder="NPWP supplier" />
                 </div>
               </div>
             }

@@ -205,14 +205,14 @@ export function CreateInvoiceTable({
             <TableBody>
               {isLoading
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`} className="border-slate-100">
-                      {Array.from({ length: 7 }).map((__, cellIndex) => (
-                        <TableCell key={cellIndex} className="px-4 py-4">
-                          <div className="h-4 animate-pulse rounded bg-slate-100" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  <TableRow key={`skeleton-${index}`} className="border-slate-100">
+                    {Array.from({ length: 7 }).map((__, cellIndex) => (
+                      <TableCell key={cellIndex} className="px-4 py-4">
+                        <div className="h-4 animate-pulse rounded bg-slate-100" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
                 : null}
 
               {!isLoading && rows.length === 0 ? (
