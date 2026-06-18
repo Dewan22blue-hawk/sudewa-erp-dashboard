@@ -7,20 +7,24 @@ import { DashboardApiResponse, BillingStatsRaw, CustomerStatsRaw, ProductStatsRa
 import { apiClient } from './client';
 
 export const dashboardService = {
-  async getDashboardData(companyId: string): Promise<DashboardApiResponse> {
+  async getDashboardData(companyId: string, startDate?: string | null, endDate?: string | null): Promise<DashboardApiResponse> {
+    const defaultParams: any = { company_id: companyId };
+    if (startDate) defaultParams.start_date = startDate;
+    if (endDate) defaultParams.end_date = endDate;
+
     // Fetch real data dari API secara paralel
     const [statsResponse, customerResponse, productResponse, transactionResponse] = await Promise.all([
-      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: { company_id: companyId } }),
-      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: { company_id: companyId } }),
-      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: { company_id: companyId } }),
+      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: defaultParams }),
+      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: defaultParams }),
+      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: defaultParams }),
       apiClient.get<{ status: boolean; data: TransactionStatsRaw }>('/wapi/transaction/unit-transaction/unit-transaction', {
         params: {
           sort_order: 'desc',
           per_page: 5,
-          type: 'purchase',
+          // type: 'purchase', // Removed to get all transactions for history
           page: 1,
           is_paid: true,
-          company_id: companyId,
+          ...defaultParams,
         },
       })
     ]);
@@ -104,6 +108,9 @@ export const dashboardService = {
   },
 
   transformToAccounts(stats: BillingStatsRaw): AccountOverview[] {
+    if (!stats || !stats.opening_balance || !stats.mutation) {
+      return [];
+    }
     const { opening_balance, mutation } = stats;
     
     return [
@@ -147,6 +154,9 @@ export const dashboardService = {
   },
 
   generateChartData(stats: BillingStatsRaw): FinanceSeriesPoint[] {
+    if (!stats || !stats.mutation) {
+      return [];
+    }
     const { mutation } = stats;
     const currentMonth = new Date().getMonth() + 1; // Jan=1, Dec=12
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -215,7 +225,7 @@ export const dashboardService = {
     return series;
   },
 
-  async refreshDashboard(companyId: string): Promise<DashboardApiResponse> {
-    return dashboardService.getDashboardData(companyId);
+  async refreshDashboard(companyId: string, startDate?: string | null, endDate?: string | null): Promise<DashboardApiResponse> {
+    return dashboardService.getDashboardData(companyId, startDate, endDate);
   },
 };
