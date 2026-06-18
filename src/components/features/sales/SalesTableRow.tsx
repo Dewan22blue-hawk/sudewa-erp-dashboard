@@ -69,9 +69,9 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     }
 
     return (
-        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 hover:bg-accent/50">
+        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
             {/* Checkbox */}
-            <TableCell className="w-12 transition-all duration-200 group-hover:translate-x-0.5">
+            <TableCell className="px-4 py-4 text-center w-12">
                 <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onToggle(item.id)}
@@ -79,7 +79,7 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             </TableCell>
 
             {/* Kode Jual - Link biru */}
-            <TableCell className="transition-all duration-200">
+            <TableCell className="px-4 py-4 text-left text-sm font-medium">
                 <Link
                     href={slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`}
                     className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
@@ -89,10 +89,10 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             </TableCell>
 
             {/* Tanggal */}
-            <TableCell className="transition-all duration-200">{item.tanggal}</TableCell>
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.tanggal}</TableCell>
 
             {/* Customer */}
-            <TableCell className="transition-all duration-200">
+            <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                 <div className="flex items-center gap-2">
                     <span>{item.customer}</span>
                     {item.isRefunded ? (
@@ -102,35 +102,35 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             </TableCell>
 
             {/* Total Biaya */}
-            <TableCell className="text-left transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
                 {item.totalBiaya}
             </TableCell>
 
             {/* Total DPP */}
-            <TableCell className="text-right py-4 transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
                 {formatCurrency(item.totalDpp)}
             </TableCell>
 
             {/* Total PPN */}
-            <TableCell className="text-right py-4 transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
                 {formatCurrency(item.totalPpn)}
             </TableCell>
 
             {/* Total Jual */}
-            <TableCell className="text-right font-semibold py-4 transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">
                 {formatCurrency(item.totalJual)}
             </TableCell>
 
             {/* Kurang Bayar - MERAH */}
-            <TableCell className="text-right text-red-600 font-semibold py-4 transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center text-sm text-red-600 font-semibold">
                 {formatCurrency(item.kurangBayar)}
             </TableCell>
 
             {/* Action Dropdown */}
-            <TableCell className="text-right transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="rounded-md p-1 hover:bg-muted transition-colors duration-200 hover:scale-110 active:scale-95 transform">
+                        <button className="rounded-md p-1 hover:bg-slate-100 transition-colors duration-200 hover:scale-110 active:scale-95 transform">
                             <MoreVertical className="h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>

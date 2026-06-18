@@ -119,8 +119,8 @@ export default function StockPerlengkapanPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">Data Stock Material</h1>
-          <p className="mt-1 text-[18px] text-slate-500">Kelola dan lacak semua stock material</p>
+          <h1 className="text-2xl font-semibold text-slate-900">Data Stock Material</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola dan lacak semua stock material</p>
         </div>
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -175,28 +175,28 @@ export default function StockPerlengkapanPage() {
         <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
           <div className="overflow-x-auto">
             <Table className={activeTab === 'keluar' ? 'min-w-[860px]' : 'min-w-[720px]'}>
-              <TableHeader className="bg-slate-100/90">
+              <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                 <TableRow className="border-slate-200 hover:bg-transparent">
-                  <TableHead className="w-[56px] px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">NO</TableHead>
-                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE MATERIAL</TableHead>
-                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
-                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-                  <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">SATUAN</TableHead>
-                  {activeTab === 'keluar' ? <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-950">CUSTOMER</TableHead> : null}
+                  <TableHead className="w-[60px] px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NO</TableHead>
+                  <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">KODE MATERIAL</TableHead>
+                  <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NAMA BARANG</TableHead>
+                  <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">QTY</TableHead>
+                  <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">SATUAN</TableHead>
+                  {activeTab === 'keluar' ? <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">CUSTOMER</TableHead> : null}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stockQuery.isLoading || isCompanyLoading ? (
                   <TableRow>
-                    <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-5 text-center text-[15px] text-slate-500">
+                    <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-4 py-4 text-center text-sm text-slate-500">
                       Memuat data stock material...
                     </TableCell>
                   </TableRow>
                 ) : stockQuery.isError ? (
                   <TableRow>
-                    <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-5 text-center">
+                    <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-4 py-4 text-center">
                       <div className="space-y-3">
-                        <p className="text-[15px] text-red-500">Gagal memuat data stock material.</p>
+                        <p className="text-sm text-red-500">Gagal memuat data stock material.</p>
                         <Button variant="outline" className="rounded-xl border-slate-200" onClick={() => stockQuery.refetch()}>
                           Coba Lagi
                         </Button>
@@ -205,19 +205,19 @@ export default function StockPerlengkapanPage() {
                   </TableRow>
                 ) : materials.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-5 text-center text-[15px] text-slate-500">
+                    <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-4 py-4 text-center text-sm text-slate-500">
                       Belum ada data stock material.
                     </TableCell>
                   </TableRow>
                 ) : (
                   materials.map((item, index) => (
-                    <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/60">
-                      <TableCell className="px-5 py-3 text-center text-[14px] text-slate-800">{startData + index}</TableCell>
-                      <TableCell className="px-5 py-3 text-[14px] text-slate-800">{item.code || '-'}</TableCell>
-                      <TableCell className="px-5 py-3 text-[14px] text-slate-800">{item.name || '-'}</TableCell>
-                      <TableCell className="px-5 py-3 text-[14px] text-slate-800">{activeTab === 'diterima' ? item.stockIn : item.stockOut}</TableCell>
-                      <TableCell className="px-5 py-3 text-[14px] text-slate-800">{formatUnitLabel(item.type)}</TableCell>
-                      {activeTab === 'keluar' ? <TableCell className="px-5 py-3 text-[14px] text-slate-800">{item.customerName || '-'}</TableCell> : null}
+                    <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{startData + index}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.name || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{activeTab === 'diterima' ? item.stockIn : item.stockOut}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{formatUnitLabel(item.type)}</TableCell>
+                      {activeTab === 'keluar' ? <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.customerName || '-'}</TableCell> : null}
                     </TableRow>
                   ))
                 )}

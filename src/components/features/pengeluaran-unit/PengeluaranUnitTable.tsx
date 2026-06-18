@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { PaginationMeta } from '@/@types/pagination.types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Props {
   data: PengeluaranUnit[];
@@ -122,51 +123,51 @@ export default function PengeluaranUnitTable({
       </div>
 
       <div className="bg-white rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700 uppercase">
-            <tr>
-              <th className="px-4 py-3 text-left">NO PENGELUARAN</th>
-              <th className="px-4 py-3 text-left">TANGGAL</th>
-              <th className="px-4 py-3 text-left">CUSTOMER</th>
-              <th className="px-4 py-3 text-left">WAREHOUSE</th>
-              <th className="px-4 py-3 text-left">KETERANGAN</th>
-              <th className="px-4 py-3 text-center w-15">ACTION</th>
-            </tr>
-          </thead>
+        <Table className="w-full text-sm">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO PENGELUARAN</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TANGGAL</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">CUSTOMER</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">WAREHOUSE</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KETERANGAN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-15 whitespace-nowrap">ACTION</TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody className="divide-y divide-gray-100">
+          <TableBody>
             {isLoading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Loading...
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : isError ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-red-600">
+              <TableRow>
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-red-600 text-sm">
                   <div className="space-y-2">
                     <p>{errorMessage ?? 'Gagal memuat data pengeluaran unit'}</p>
                     <Button variant="outline" size="sm" onClick={onRetry}>
                       Coba Lagi
                     </Button>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Tidak ada data.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               data.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 text-gray-900 font-medium">{item.activityNumber}</td>
-                  <td className="px-4 py-4 text-gray-600">{formatDate(item.activityDate)}</td>
-                  <td className="px-4 py-4 text-gray-600">{item.person?.name ?? '-'}</td>
-                  <td className="px-4 py-4 text-gray-600">{item.warehouse?.name ?? '-'}</td>
-                  <td className="px-4 py-4 text-gray-600">{item.description || '-'}</td>
-                  <td className="px-4 py-4 text-center">
+                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors border-slate-100">
+                  <TableCell className="px-4 py-4 text-gray-900 font-medium text-left text-sm">{item.activityNumber}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{formatDate(item.activityDate)}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.person?.name ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.warehouse?.name ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.description || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button type="button" className="p-1 outline-none text-gray-400 hover:text-gray-700 transition" aria-label="Aksi data pengeluaran unit">
@@ -182,12 +183,12 @@ export default function PengeluaranUnitTable({
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <div className="flex justify-between items-center text-sm text-gray-500 mt-4 px-1">

@@ -90,17 +90,17 @@ export function BBNBillTable({
       <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-[#edf2f7]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200">
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">NOMOR TAGIHAN</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">KODE DITLANTAS</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">TGL TAGIHAN</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">NAMA DEALER</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">TGL BAYAR</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">TOTAL TAGIHAN</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">TERBAYAR</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">KURANG BAYAR</TableHead>
-                <TableHead className="px-5 py-4 text-center text-sm font-semibold text-slate-900">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NOMOR TAGIHAN</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">KODE DITLANTAS</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TGL TAGIHAN</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NAMA DEALER</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TGL BAYAR</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TOTAL TAGIHAN</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TERBAYAR</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">KURANG BAYAR</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -108,7 +108,7 @@ export function BBNBillTable({
                 ? Array.from({ length: Math.min(perPage, 6) }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="animate-pulse border-slate-100">
                       {Array.from({ length: 9 }).map((__, cellIndex) => (
-                        <TableCell key={cellIndex} className="px-5 py-4">
+                        <TableCell key={cellIndex} className="px-4 py-4">
                           <div className="h-4 rounded bg-slate-100" />
                         </TableCell>
                       ))}
@@ -117,23 +117,23 @@ export function BBNBillTable({
                 : null}
               {!isLoading && items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-32 text-center text-sm text-slate-500">
+                  <TableCell colSpan={9} className="h-32 text-center text-sm text-slate-500 px-4 py-4">
                     Belum ada data tagihan BBN.
                   </TableCell>
                 </TableRow>
               ) : null}
               {!isLoading
                 ? items.map((item) => (
-                    <TableRow key={item.id} className="border-slate-100">
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{item.code || formatBillCode(item.id)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{item.ditlantasProcess?.code || '-'}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatShortDate(item.billDate)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm uppercase text-slate-700">{item.ditlantasProcess?.vendor?.name || item.dealer?.name || '-'}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatShortDate(item.paidDate)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bruttoAmount)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(item.paidAmount)}</TableCell>
-                      <TableCell className="px-5 py-4 text-center text-sm text-slate-700">{formatCurrency(item.remainingAmount !== undefined ? item.remainingAmount : calculateOutstanding(item.bruttoAmount, item.paidAmount))}</TableCell>
-                      <TableCell className="px-5 py-4 text-center">
+                    <TableRow key={item.id} className="border-b border-slate-100 hover:bg-gray-50/70 transition-colors">
+                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code || formatBillCode(item.id)}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.ditlantasProcess?.code || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatShortDate(item.billDate)}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm uppercase text-slate-700">{item.ditlantasProcess?.vendor?.name || item.dealer?.name || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatShortDate(item.paidDate)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bruttoAmount)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.paidAmount)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-700">{formatCurrency(item.remainingAmount !== undefined ? item.remainingAmount : calculateOutstanding(item.bruttoAmount, item.paidAmount))}</TableCell>
+                      <TableCell className="px-4 py-4 text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">

@@ -42,9 +42,9 @@ export function FinanceRefundPage({ title, description, transactionType }: Finan
       </Head>
 
       <div className="space-y-6 p-6">
-        <div className="space-y-1.5">
-          <h1 className="text-[28px] font-bold tracking-tight text-slate-950 font-sans">{title}</h1>
-          <p className="text-sm font-normal text-slate-500 font-sans">{description}</p>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
+          <p className="text-sm text-slate-500 mt-1">{description}</p>
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center py-1">

@@ -202,21 +202,21 @@ export function VehicleDataTable({
       <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-[#eef3fa]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200 hover:bg-transparent">
-                <TableHead className="w-14 px-4 py-4">
+                <TableHead className="w-14 px-4 py-4 text-center">
                   <Checkbox checked={allSelected} onCheckedChange={handleSelectAll} aria-label="Pilih semua data kendaraan" />
                 </TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Kode Ditlantas</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Dealer</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Nama STNK</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Wilayah</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Tipe Motor</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">No Mesin</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">No Rangka</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Tgl Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Tgl Terima Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-800">Action</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Ditlantas</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Dealer</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Nama STNK</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Wilayah</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Tipe Motor</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Mesin</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Rangka</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Faktur</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Terima Faktur</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -232,8 +232,8 @@ export function VehicleDataTable({
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60' : 'border-slate-200 hover:bg-slate-50/60'}>
-                    <TableCell className="px-4 py-4">
+                  <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}>
+                    <TableCell className="px-4 py-4 text-center">
                       <Checkbox
                         checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
                         disabled={assignedIds.includes(item.id)}
@@ -241,12 +241,12 @@ export function VehicleDataTable({
                         aria-label={`Pilih data kendaraan ${item.invoiceNumber}`}
                       />
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-sm font-medium text-slate-700">
+                    <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">
                       {item.ditlantasProcess?.[0]?.code || '-'}
                     </TableCell>
-                    <TableCell className="max-w-[220px] px-4 py-4 text-sm font-medium text-slate-700">
+                    <TableCell className="max-w-[220px] px-4 py-4 text-sm text-slate-700 text-left">
                       <div className="space-y-2">
-                        <div className="line-clamp-2 uppercase">{item.dealer?.namaDealer || '-'}</div>
+                        <div className="line-clamp-2 uppercase font-medium text-slate-900">{item.dealer?.namaDealer || '-'}</div>
                         {assignedIds.includes(item.id) ? (
                           <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
                             Sudah assign Ditlantas
@@ -258,13 +258,13 @@ export function VehicleDataTable({
                         ) : null}
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.stnkName || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.region?.name || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.motorcycleType || item.motorcycleModel || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.machineNumber || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.chassisNumber || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{formatDate(item.invoiceDate)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{formatDate(item.invoiceReceiveDate)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.stnkName || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.region?.name || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.motorcycleType || item.motorcycleModel || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left font-medium">{item.machineNumber || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.chassisNumber || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceDate)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceReceiveDate)}</TableCell>
                     <TableCell className="px-4 py-4 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
