@@ -1,11 +1,9 @@
-'use client';
-
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import PurchaseForm from '@/components/features/purchase/PurchaseForm';
 import { usePurchaseById, useUpdatePurchase } from '@/hooks/usePurchase';
 import { Card, CardContent } from '@/components/ui/card';
-import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { ChevronRight, Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -15,7 +13,8 @@ export default function EditPurchasePage() {
   const { companyId } = useCompany();
   const { slug, itemId } = router.query; // Changed from id to itemId to match folder structure
 
-  const { data: purchase, isLoading: isPurchaseLoading } = usePurchaseById(itemId as string);
+  // Note: usePurchaseById usually expects 'id'. We need to ensure logic handles 'itemId'
+  const { data: purchase, isLoading } = usePurchaseById(itemId as string);
   const updateMutation = useUpdatePurchase();
 
   const defaultValues = useMemo(() => {
@@ -35,28 +34,14 @@ export default function EditPurchasePage() {
         id: itemId as string,
         payload: data,
       });
-
       toast.success('Pembelian berhasil diperbarui');
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
-    } catch (err: any) {
-      const apiMessage = err?.message || 'Gagal memperbarui pembelian';
-      const apiErrors = err?.details || err?.response?.data?.errors;
-      let detail = '';
-
-      if (apiErrors && typeof apiErrors === 'object') {
-        detail = Object.entries(apiErrors)
-          .map(([k, v]) => {
-            const msg = Array.isArray(v) ? v[0] : String(v);
-            return `${k}: ${msg}`;
-          })
-          .join(', ');
-      }
-
-      toast.error(detail || apiMessage);
+    } catch {
+      toast.error('Gagal memperbarui pembelian');
     }
   };
 
-  if (isPurchaseLoading) {
+  if (isLoading) {
     return (
       <DashboardLayout>
         <div className="flex h-[50vh] items-center justify-center">
@@ -102,7 +87,7 @@ export default function EditPurchasePage() {
 
         <Card className="rounded-xl border border-gray-200 shadow-none">
           <CardContent className="p-6">
-            <PurchaseUnitForm defaultValues={defaultValues as any} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} companyId={companyId} />
+            <PurchaseForm defaultValues={defaultValues} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} companyId={companyId} />
           </CardContent>
         </Card>
       </div>

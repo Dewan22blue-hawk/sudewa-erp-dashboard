@@ -16,7 +16,6 @@ import { Transaction } from '@/@types/transaction.types';
 
 // This page implements the List view
 export default function TransactionListPage() {
-  const LIVE_REFRESH_SECONDS = 10;
   const router = useRouter();
   const { slug } = router.query;
   const { companyId } = useCompany();
@@ -29,21 +28,12 @@ export default function TransactionListPage() {
   const [localSearch, setLocalSearch] = useState('');
 
   // Query Hooks
-  const { data, isLoading: isListLoading, isFetching: isListFetching, dataUpdatedAt } = useTransactions(safeCompanyId, page, limit, localSearch);
-  const { data: summary, isLoading: isSummaryLoading, isFetching: isSummaryFetching } = useTransactionSummary(safeCompanyId);
+  const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);
+  const { data: summary, isLoading: isSummaryLoading } = useTransactionSummary(safeCompanyId);
 
   // Dialog State
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
-
-  const lastUpdatedLabel = useMemo(() => {
-    if (!dataUpdatedAt) return 'Menunggu sinkronisasi data terbaru...';
-
-    return new Intl.DateTimeFormat('id-ID', {
-      dateStyle: 'medium',
-      timeStyle: 'medium',
-    }).format(new Date(dataUpdatedAt));
-  }, [dataUpdatedAt]);
 
   // Handlers
   const handleEdit = (trx: Transaction) => {
@@ -63,12 +53,6 @@ export default function TransactionListPage() {
           <div>
             <h1 className="text-2xl font-semibold text-slate-950">Arus Transaksi Operasional</h1>
             <p className="text-sm text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
-          </div>
-          <div className="text-xs text-slate-500 text-left sm:text-right self-start sm:self-center">
-            Data diperbarui otomatis setiap {LIVE_REFRESH_SECONDS} detik •{' '}
-            <span className={isListFetching || isSummaryFetching ? 'text-emerald-600 font-medium' : 'font-medium'}>
-              {isListFetching || isSummaryFetching ? 'Menyinkronkan data...' : `Update terakhir ${lastUpdatedLabel}`}
-            </span>
           </div>
         </div>
 
