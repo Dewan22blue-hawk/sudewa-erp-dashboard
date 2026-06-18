@@ -1,11 +1,11 @@
-import { Search } from 'lucide-react';
+import { Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { StockStatus, StockUnit } from '@/@types/stock-unit.types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data: StockUnit[];
@@ -50,6 +50,15 @@ const statusBadgeClasses: Record<StockStatus, string> = {
   outbound_return: 'border border-rose-200 bg-rose-50 text-rose-600',
 };
 
+function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
+  const isActive = currentSortKey === sortKey;
+  if (isActive && sortOrder === 'asc')
+    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  if (isActive && sortOrder === 'desc')
+    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
+}
+
 export default function StockUnitTable({
   data,
   isLoading,
@@ -92,7 +101,7 @@ export default function StockUnitTable({
 
   const renderStatus = (status: StockStatus) => {
     return (
-      <span className={`text-xs px-2 py-1 rounded-full ${statusBadgeClasses[status] ?? 'bg-gray-100 text-gray-600'}`}>
+      <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-block ${statusBadgeClasses[status] ?? 'bg-gray-100 text-gray-600'}`}>
         {statusLabel[status] ?? status}
       </span>
     );
@@ -108,7 +117,7 @@ export default function StockUnitTable({
 
         {statusTabs && <div className="flex-shrink-0">{statusTabs}</div>}
 
-        <div className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
+        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
           <span>Show</span>
           <Select
             value={String(perPage)}
@@ -131,23 +140,80 @@ export default function StockUnitTable({
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 uppercase text-xs font-semibold tracking-wide text-gray-900">
-            <tr className="border-b border-gray-200">
-              <th className="px-4 py-3 text-left">No</th>
-              <th className="p-0 text-left">
-                <SortableHeader title="Nama Unit" sortKey="namaUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+          <thead className="bg-[#f8f9fa] border-b border-gray-200">
+            <tr className="hover:bg-[#f8f9fa]">
+              {/* No */}
+              <th className="text-xs font-semibold text-gray-500 uppercase px-4 py-4 text-left w-[60px]">No</th>
+
+              {/* Nama Unit */}
+              <th
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'namaUnit' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('namaUnit')}
+              >
+                <div className="flex items-center gap-1">
+                  Nama Unit
+                  <SortIcon sortKey="namaUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </th>
-              <th className="p-0 text-left">
-                <SortableHeader title="Warna" sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+
+              {/* Warna */}
+              <th
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'warna' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('warna')}
+              >
+                <div className="flex items-center gap-1">
+                  Warna
+                  <SortIcon sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </th>
-              <th className="p-0 text-left">
-                <SortableHeader title="Nomor Mesin" sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+
+              {/* Nomor Mesin */}
+              <th
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'noMesin' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('noMesin')}
+              >
+                <div className="flex items-center gap-1">
+                  Nomor Mesin
+                  <SortIcon sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </th>
-              <th className="p-0 text-left">
-                <SortableHeader title="Nomor Rangka" sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+
+              {/* Nomor Rangka */}
+              <th
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'noRangka' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('noRangka')}
+              >
+                <div className="flex items-center gap-1">
+                  Nomor Rangka
+                  <SortIcon sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </th>
-              <th className="p-0 text-left">
-                <SortableHeader title="Status" sortKey="status" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start px-4 text-gray-900 uppercase" />
+
+              {/* Status */}
+              <th
+                className={cn(
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'status' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('status')}
+              >
+                <div className="inline-flex items-center">
+                  <span className="w-3 shrink-0" />
+                  <span>Status</span>
+                  <SortIcon sortKey="status" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </th>
             </tr>
           </thead>
@@ -161,12 +227,12 @@ export default function StockUnitTable({
             ) : data.length > 0 ? (
               sortedData.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">{(page - 1) * perPage + index + 1}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{item.namaUnit}</td>
-                  <td className="px-4 py-3">{item.warna}</td>
-                  <td className="px-4 py-3">{item.noMesin}</td>
-                  <td className="px-4 py-3">{item.noRangka}</td>
-                  <td className="px-4 py-3">{renderStatus(item.status)}</td>
+                  <td className="px-4 py-4 text-sm text-left text-gray-600">{(page - 1) * perPage + index + 1}</td>
+                  <td className="px-4 py-4 text-sm font-medium text-gray-900 text-left">{item.namaUnit}</td>
+                  <td className="px-4 py-4 text-sm text-gray-600 text-left">{item.warna}</td>
+                  <td className="px-4 py-4 text-sm text-gray-600 text-left">{item.noMesin}</td>
+                  <td className="px-4 py-4 text-sm text-gray-600 text-left">{item.noRangka}</td>
+                  <td className="px-4 py-4 text-sm text-center">{renderStatus(item.status)}</td>
                 </tr>
               ))
             ) : (
@@ -180,22 +246,33 @@ export default function StockUnitTable({
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
         <div>
           Showing {totalData === 0 ? 0 : startIndex + 1}-{endIndex} of {totalData} data
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" disabled={page === 1 || isLoading} onClick={() => onPageChange(page - 1)}>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            disabled={page === 1 || isLoading}
+            onClick={() => onPageChange(page - 1)}
+          >
             Previous
           </Button>
 
           {getPageNumbers().map((pageNum, idx) => (
             <Button
               key={idx}
-              variant={pageNum === page ? 'outline' : 'ghost'}
+              variant="ghost"
               size="sm"
-              className={pageNum === page ? 'bg-gray-100' : ''}
+              className={cn(
+                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                pageNum === page
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+              )}
               onClick={() => typeof pageNum === 'number' && onPageChange(pageNum)}
               disabled={typeof pageNum !== 'number' || isLoading}
             >
@@ -203,7 +280,13 @@ export default function StockUnitTable({
             </Button>
           ))}
 
-          <Button variant="outline" size="sm" disabled={page === totalPages || totalData === 0 || isLoading} onClick={() => onPageChange(page + 1)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            disabled={page === totalPages || totalData === 0 || isLoading}
+            onClick={() => onPageChange(page + 1)}
+          >
             Next
           </Button>
         </div>

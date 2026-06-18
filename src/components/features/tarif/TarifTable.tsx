@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Tarif } from '@/@types/tarif.types';
+import { cn } from '@/lib/utils';
 
 interface TarifTableProps {
     tarifs: Tarif[];
@@ -56,10 +57,15 @@ export function TarifTable({
             return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
                     key={p}
-                    variant={p === page ? 'outline' : 'ghost'}
+                    variant="ghost"
                     size="sm"
                     onClick={() => onPageChange(p)}
-                    className={p === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+                    className={cn(
+                        'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                        p === page
+                            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                    )}
                 >
                     {p}
                 </Button>
@@ -86,11 +92,18 @@ export function TarifTable({
         return pages.map((p, idx) => (
             <Button
                 key={idx}
-                variant={p === page ? 'outline' : 'ghost'}
+                variant="ghost"
                 size="sm"
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
-                className={p === page ? 'border-gray-200 bg-white' : 'text-gray-500'}
+                className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    p === page
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : p === '...'
+                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
             >
                 {p}
             </Button>
@@ -112,8 +125,8 @@ export function TarifTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
                                 <SelectValue placeholder="10" />
@@ -125,7 +138,7 @@ export function TarifTable({
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
@@ -138,36 +151,36 @@ export function TarifTable({
             </div>
 
             {/* Table */}
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
                 <div className="overflow-x-auto">
                     <Table className="min-w-[1100px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                            <TableRow className="hover:bg-[#f8f9fa]">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
                                     LOADING IN
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-left">
                                     LOADING OUT
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-center">
                                     JARAK (KM)
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
                                     UJ TOWING
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
                                     UJ CDD
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
                                     UJ FUSO
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
                                     INV CDD
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">
+                                <TableHead className="text-xs font-semibold text-gray-505 uppercase px-4 py-4 text-right">
                                     INV FUSO
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">
+                                <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">
                                     ACTION
                                 </TableHead>
                             </TableRow>
@@ -175,69 +188,71 @@ export function TarifTable({
                         <TableBody>
                             {isLoading ? (
                                 Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="animate-pulse">
+                                    <TableRow key={i} className="hover:bg-gray-50 transition-colors">
                                         {Array.from({ length: 9 }).map((_, j) => (
                                             <TableCell key={j} className="px-4 py-4">
-                                                <div className="h-4 bg-gray-200 rounded w-full" />
+                                                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
                                             </TableCell>
                                         ))}
                                     </TableRow>
                                 ))
                             ) : tarifs.length > 0 ? (
                                 tarifs.map((tarif) => (
-                                    <TableRow key={tarif.id} className="hover:bg-gray-50/50">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                    <TableRow key={tarif.id} className="hover:bg-gray-50 transition-colors">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
                                             {tarif.loadingIn || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
                                             {tarif.loadingOut || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-center font-medium">
                                             {tarif.distance ?? '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">
                                             {formatCurrency(tarif.ujTowing)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">
                                             {formatCurrency(tarif.ujCdd)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">
                                             {formatCurrency(tarif.ujFuso)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">
                                             {formatCurrency(tarif.invCdd)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">
                                             {formatCurrency(tarif.invFuso)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-center">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                     </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem
-                                                        onClick={() => onEdit(tarif)}
-                                                        className="cursor-pointer text-gray-700"
-                                                    >
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => onDelete(tarif)}
-                                                        className="text-red-600 cursor-pointer focus:text-red-600"
-                                                    >
-                                                        Hapus
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <div className="flex justify-center">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEdit(tarif)}
+                                                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                                                        >
+                                                            Edit
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() => onDelete(tarif)}
+                                                            className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                                                        >
+                                                            Hapus
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={9} className="h-32 text-center text-gray-500">
+                                    <TableCell colSpan={9} className="h-32 text-center text-gray-552 py-10 text-sm">
                                         Tidak ada data tarif ditemukan
                                     </TableCell>
                                 </TableRow>
@@ -248,19 +263,19 @@ export function TarifTable({
             </Card>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between px-2 pt-2">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
                 <div className="text-sm text-gray-500">
                     Showing {startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                         >
                             Previous
                         </Button>
@@ -272,7 +287,7 @@ export function TarifTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                         >
                             Next
                         </Button>

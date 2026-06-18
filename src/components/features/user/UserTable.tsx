@@ -4,18 +4,27 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, MoreVertical, Plus } from 'lucide-react';
+import { Loader2, MoreVertical, Plus, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import { Switch } from '@/components/ui/switch';
 import { useActivateUser, useDeactivateUser } from '@/hooks/useUser';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onAdd?: () => void;
+}
+
+function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
+  const isActive = currentSortKey === sortKey;
+  if (isActive && sortOrder === 'asc')
+    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  if (isActive && sortOrder === 'desc')
+    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
 export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
@@ -55,54 +64,80 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        {' '}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-          <div className="flex items-center gap-2 whitespace-nowrap text-sm text-slate-700">
-            <span>Show</span>
-            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-[68px] h-9 border-slate-200">
-                <SelectValue placeholder="10" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Entries</span>
-          </div>
-
-          {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white px-4 h-9 rounded-md shadow-sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div className="flex items-center gap-2 whitespace-nowrap text-sm text-slate-500">
+          <span>Show</span>
+          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+            <SelectTrigger className="w-[70px] bg-white h-10 border-slate-200">
+              <SelectValue placeholder="10" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+            </SelectContent>
+          </Select>
+          <span>Entries</span>
         </div>
+
+        {onAdd && (
+          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white px-4 h-10 rounded-xl shadow-sm gap-2">
+            <Plus className="h-4 w-4" />
+            Tambah
+          </Button>
+        )}
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
-          <TableHeader className="bg-[#f8fafc]">
-            <TableRow className="border-slate-200">
-              <TableHead className="py-3">
-                <SortableHeader title="User ID" sortKey="username" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs" />
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow className="hover:bg-[#f8f9fa]">
+              {/* User ID */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[20%]',
+                  sortKey === 'username' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('username')}
+              >
+                <div className="flex items-center gap-1">
+                  User ID
+                  <SortIcon sortKey="username" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </TableHead>
-              <TableHead className="py-3">
-                <SortableHeader title="Nama Pengguna" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-xs" />
+              {/* Nama Pengguna */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[25%]',
+                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center gap-1">
+                  Nama Pengguna
+                  <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </TableHead>
-              <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">Role</TableHead>
-              <TableHead className="py-3 text-sm font-semibold uppercase text-slate-700 tracking-wide">Status</TableHead>
-              <TableHead className="py-3 pr-6 text-right text-sm font-semibold uppercase text-slate-700 tracking-wide">Action</TableHead>
+              {/* Role */}
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-gray-505">
+                Role
+              </TableHead>
+              {/* Status */}
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-gray-505 w-[160px]">
+                Status
+              </TableHead>
+              {/* Action */}
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+                Action
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  Tidak ada data
+                <TableCell colSpan={5} className="text-center text-gray-505 py-10 text-sm">
+                  Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
@@ -116,15 +151,15 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 const isUpdating = isActivating || isDeactivating;
 
                 return (
-                  <TableRow key={user.id} className="hover:bg-slate-50/60">
-                    <TableCell className="font-medium text-slate-800 text-sm">{userIdLabel}</TableCell>
-                    <TableCell className="text-slate-700 text-sm">{user.name}</TableCell>
-                    <TableCell className="text-slate-700 text-sm">{roleNames}</TableCell>
-                    <TableCell className="text-slate-700 text-sm">
-                      <div className="flex items-center gap-2">
+                  <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
+                    <TableCell className="px-4 py-4 font-semibold text-gray-900 text-sm text-left">{userIdLabel}</TableCell>
+                    <TableCell className="px-4 py-4 text-slate-700 text-sm text-left">{user.name}</TableCell>
+                    <TableCell className="px-4 py-4 text-slate-700 text-sm text-left">{roleNames}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-center">
+                      <div className="flex items-center justify-center gap-2">
                         {isUpdating ? (
                           <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                            <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
                             <span className="text-xs font-medium text-slate-400 italic">Memproses...</span>
                           </div>
                         ) : (
@@ -141,20 +176,22 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right pr-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-slate-100">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-32">
-                          <DropdownMenuItem onClick={() => onEdit(user)}>Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(user)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <TableCell className="px-4 py-4 text-center">
+                      <div className="flex justify-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                            <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -165,12 +202,12 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
       </div>
 
       {data.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-2">
-          <div className="text-sm text-slate-500">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+          <div>
             Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} entries
           </div>
-          <div className="flex items-center gap-1 text-xs">
-            <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="h-8 px-3 border-slate-200">
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300">
               Previous
             </Button>
 
@@ -184,10 +221,15 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
               return (
                 <Button
                   key={pageNum}
-                  variant={currentPage === pageNum ? 'default' : 'outline'}
+                  variant="ghost"
                   size="sm"
+                  className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    currentPage === pageNum
+                      ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                      : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                  )}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`h-8 w-8 p-0 text-xs ${currentPage === pageNum ? 'bg-[#1f304f] hover:bg-[#1a2842]' : 'border-slate-200'}`}
                 >
                   {pageNum}
                 </Button>
@@ -196,14 +238,14 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
 
             {totalPages > 5 && currentPage < totalPages - 2 && (
               <>
-                <span className="px-2 text-slate-500">...</span>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} className="h-8 w-8 p-0 text-xs border-slate-200">
+                <span className="px-1 text-sm text-slate-500">...</span>
+                <Button variant="ghost" size="sm" onClick={() => setCurrentPage(totalPages)} className="h-9 min-w-9 rounded-xl border border-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white">
                   {totalPages}
                 </Button>
               </>
             )}
 
-            <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="h-8 px-3 border-slate-200">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300">
               Next
             </Button>
           </div>

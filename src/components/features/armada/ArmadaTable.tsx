@@ -121,15 +121,15 @@ export function ArmadaTable({
       <Card className="overflow-hidden rounded-xl border border-gray-200">
         <div className="overflow-x-auto">
           <Table className="min-w-[1100px]">
-            <TableHeader className="border-b border-gray-200 bg-[#f1f5f9]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">NO POLISI</TableHead>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">TIPE</TableHead>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">NO MESIN</TableHead>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">NO RANGKA</TableHead>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">MASA STNK</TableHead>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">MASA KIR</TableHead>
-                <TableHead className="py-3 text-center text-xs font-semibold uppercase text-gray-600">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO POLISI</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO MESIN</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO RANGKA</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA STNK</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA KIR</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -145,14 +145,14 @@ export function ArmadaTable({
                 armadas.map((armada) => {
                   const stnkInfo = getRemainingLabel(armada.stnkAge);
                   const kirInfo = getRemainingLabel(armada.kirAge);
-
+ 
                   return (
-                    <TableRow key={armada.id} className="hover:bg-gray-50/50">
-                      <TableCell className="px-4 py-4 text-center text-sm text-gray-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-gray-600 whitespace-nowrap">{armada.type}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-gray-600 whitespace-nowrap">{armada.machineNumber}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-gray-600 whitespace-nowrap">{armada.chassisNumber}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-gray-600 whitespace-nowrap">
+                    <TableRow key={armada.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.type}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700 font-medium whitespace-nowrap">{armada.machineNumber}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.chassisNumber}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">
                         <div>{formatDate(armada.stnkAge)}</div>
                         {stnkInfo && (
                           <div className="mt-1 flex justify-center">
@@ -171,7 +171,7 @@ export function ArmadaTable({
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-gray-600 whitespace-nowrap">
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">
                         <div>{formatDate(armada.kirAge)}</div>
                         {kirInfo && (
                           <div className="mt-1 flex justify-center">
@@ -217,7 +217,7 @@ export function ArmadaTable({
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center text-gray-500">
+                  <TableCell colSpan={7} className="h-32 text-center text-slate-500 px-4 py-4 text-sm">
                     Tidak ada data armada ditemukan
                   </TableCell>
                 </TableRow>

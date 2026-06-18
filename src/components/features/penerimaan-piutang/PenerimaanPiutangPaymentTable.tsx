@@ -2,7 +2,7 @@ import { LiabilityPaymentHistory } from "@/types/pembayaran-hutang.types"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useTableSort } from "@/hooks/useTableSort"
-import { SortableHeader } from "@/components/ui/sortable-header"
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react"
 import {
     Select,
     SelectContent,
@@ -56,6 +56,29 @@ export default function PenerimaanPiutangPaymentTable({
     // Subtotal based on ALL payments (not just paginated)
     const total = payments.reduce((acc, cur) => acc + cur.cash_payment_amount + cur.bca_payment_amount, 0)
 
+    const renderSortHeader = (title: string, sortKeyParam: string, align: 'left' | 'right' | 'center' = 'left') => {
+        const isSorted = sortKey === sortKeyParam;
+        const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
+        return (
+            <button
+                type="button"
+                className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
+                onClick={() => handleSort(sortKeyParam as any)}
+            >
+                <span>{title}</span>
+                {isSorted ? (
+                    sortOrder === 'asc' ? (
+                        <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+                    ) : (
+                        <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+                    )
+                ) : (
+                    <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
+                )}
+            </button>
+        );
+    };
+
     return (
         <div className="space-y-4">
             {/* SHOW PER PAGE */}
@@ -82,34 +105,26 @@ export default function PenerimaanPiutangPaymentTable({
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
                 <table className="w-full text-sm">
-                    <thead className="bg-gray-200/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
-                        <tr className="border-b border-gray-200">
-                            <th className="px-4 py-3 text-left">No</th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="Kode Terima" sortKey="kodeTerima" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="TANGGAL" sortKey="tanggalTerima" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
-                            </th>
-                            <th className="py-2 text-left">
-                                <SortableHeader title="Kas Masuk" sortKey="kasMasuk" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-start w-full" />
-                            </th>
-                            <th className="py-2 text-right">
-                                <SortableHeader title="Jumlah Diterima" sortKey="jumlahTerima" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
-                            </th>
+                    <thead className="bg-[#f8f9fa] border-b border-gray-200">
+                        <tr>
+                            <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">No</th>
+                            <th className="p-0 text-left">{renderSortHeader('Kode Terima', 'kodeTerima', 'left')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('TANGGAL', 'tanggalTerima', 'center')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Kas Masuk', 'kasMasuk', 'left')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Jumlah Diterima', 'jumlahTerima', 'center')}</th>
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody>
                         {paginatedData.map((item, index) => (
-                            <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-4 py-3">{startIndex + index + 1}</td>
-                                <td className="px-4 py-3 font-medium">{item.id}</td>
-                                <td className="px-4 py-3">{item.payment_at}</td>
-                                <td className="px-4 py-3">{item.cash_payment_amount}</td>
-                                <td className="px-4 py-3 text-right">
+                            <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                                <td className="px-4 py-4 text-center text-sm text-slate-500">{startIndex + index + 1}</td>
+                                <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.id}</td>
+                                <td className="px-4 py-4 text-center text-sm text-slate-500">{item.payment_at}</td>
+                                <td className="px-4 py-4 text-left text-sm text-slate-700">{item.cash_payment_amount}</td>
+                                <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">
                                     {formatCurrency((item.cash_payment_amount + item.bca_payment_amount))}
                                 </td>
                             </tr>
@@ -117,12 +132,12 @@ export default function PenerimaanPiutangPaymentTable({
                     </tbody>
 
                     <tfoot>
-                        <tr className="bg-gray-200/50 font-semibold border-t">
+                        <tr className="bg-slate-50/50 border-t border-slate-200 font-semibold">
                             <td colSpan={3}></td>
-                            <td className="px-4 py-3 text-left text-gray-900">
+                            <td className="px-4 py-4 text-left text-sm font-semibold text-slate-900">
                                 Sub Total
                             </td>
-                            <td className="px-4 py-3 text-right text-gray-900">
+                            <td className="px-4 py-4 text-center text-sm font-semibold text-slate-900">
                                 {formatCurrency(total)}
                             </td>
                         </tr>

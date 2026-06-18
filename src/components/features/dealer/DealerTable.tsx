@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Dealer } from '@/@types/dealer.types';
+import { cn } from '@/lib/utils';
 
 interface DealerTableProps {
     dealers: Dealer[];
@@ -25,7 +26,6 @@ interface DealerTableProps {
     isExporting?: boolean;
 }
 
-
 export function DealerTable({
     dealers,
     search,
@@ -42,7 +42,6 @@ export function DealerTable({
     onDelete,
     isExporting = false,
 }: DealerTableProps) {
-
     const totalPages = Math.ceil(totalData / perPage);
     const startData = (page - 1) * perPage + 1;
     const endData = Math.min(page * perPage, totalData);
@@ -61,8 +60,8 @@ export function DealerTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
                                 <SelectValue placeholder="25" />
@@ -74,7 +73,7 @@ export function DealerTable({
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
@@ -101,62 +100,63 @@ export function DealerTable({
                         Tambah
                     </Button>
                 </div>
-
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200">
+            <Card className="rounded-xl overflow-hidden border border-gray-200 shadow-none">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">KODE DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[25%] uppercase px-4 py-3">NAMA DEALER</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">ALAMAT</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PIC</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[15%] uppercase px-4 py-3">PHONE</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="text-xs font-semibold text-gray-500 w-[15%] uppercase px-4 py-4 text-left">KODE DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-500 w-[25%] uppercase px-4 py-4 text-left">NAMA DEALER</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {dealers.length > 0 ? (
                             dealers.map((dealer) => (
-                                <TableRow key={dealer.id} className="hover:bg-gray-50/50">
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                <TableRow key={dealer.id} className="hover:bg-gray-50 transition-colors">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                                         {dealer.code || '-'}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 truncate">
+                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left truncate">
                                         {dealer.namaDealer}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                                         <span className="line-clamp-2">{dealer.alamat || '-'}</span>
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                                         {dealer.pic || '-'}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                                         {dealer.handphone || '-'}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-center">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-[160px]">
-                                                <DropdownMenuItem onClick={() => onEdit(dealer)} className="cursor-pointer">
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => onDelete(dealer)} className="text-red-600 cursor-pointer focus:text-red-600">
-                                                    Hapus
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <div className="flex justify-center">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                                    <DropdownMenuItem onClick={() => onEdit(dealer)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => onDelete(dealer)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                                        Hapus
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                                <TableCell colSpan={6} className="h-32 text-center text-gray-500 text-sm">
                                     Tidak ada data dealer ditemukan
                                 </TableCell>
                             </TableRow>
@@ -165,19 +165,19 @@ export function DealerTable({
                 </Table>
             </Card>
 
-            <div className="flex items-center justify-between px-2 pt-2">
-                <div className="text-sm text-gray-500">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+                <div>
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500"
                         >
                             Previous
                         </Button>
@@ -185,10 +185,15 @@ export function DealerTable({
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                             <Button
                                 key={p}
-                                variant={p === page ? "outline" : "ghost"}
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => onPageChange(p)}
-                                className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                                className={cn(
+                                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                                    p === page
+                                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                                )}
                             >
                                 {p}
                             </Button>
@@ -197,9 +202,9 @@ export function DealerTable({
                         <Button
                             variant="ghost"
                             size="sm"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500"
                         >
                             Next
                         </Button>

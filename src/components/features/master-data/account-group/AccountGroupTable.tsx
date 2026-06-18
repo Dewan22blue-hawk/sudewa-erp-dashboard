@@ -3,13 +3,14 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
-import { MoreVertical, Pencil, Trash, Lock } from 'lucide-react';
+import { MoreVertical, Pencil, Trash, Lock, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import type { AccountGroup } from '@/@types/account-group.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface AccountGroupTableProps {
   data: AccountGroup[];
@@ -21,6 +22,15 @@ interface AccountGroupTableProps {
   perPage: number;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+}
+
+function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
+  const isActive = currentSortKey === sortKey;
+  if (isActive && sortOrder === 'asc')
+    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  if (isActive && sortOrder === 'desc')
+    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
+  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
 export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange }: AccountGroupTableProps) => {
@@ -40,45 +50,92 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border overflow-hidden">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow className="bg-muted hover:bg-muted">
-              <TableHead>
-                <SortableHeader title="KODE" sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow className="hover:bg-[#f8f9fa]">
+              {/* KODE */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('code')}
+              >
+                <div className="flex items-center gap-1">
+                  KODE
+                  <SortIcon sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </TableHead>
-              <TableHead>
-                <SortableHeader title="NAMA GRUP" sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              {/* NAMA GRUP */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center gap-1">
+                  NAMA GRUP
+                  <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </TableHead>
-              <TableHead>
-                <SortableHeader title="DESKRIPSI" sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              {/* DESKRIPSI */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'description' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('description')}
+              >
+                <div className="flex items-center gap-1">
+                  DESKRIPSI
+                  <SortIcon sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </TableHead>
-              <TableHead>
-                <SortableHeader title="STATUS" sortKey="isActive" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} />
+              {/* STATUS */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
+                  sortKey === 'isActive' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
+                )}
+                onClick={() => handleSort('isActive')}
+              >
+                <div className="inline-flex items-center">
+                  <span className="w-3 shrink-0" />
+                  <span>STATUS</span>
+                  <SortIcon sortKey="isActive" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
               </TableHead>
-              <TableHead className="text-right font-semibold">ACTION</TableHead>
+              {/* ACTION */}
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+                ACTION
+              </TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
               [...Array(perPage)].map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell colSpan={5} className="h-12 text-center text-muted-foreground">
-                    Memuat...
-                  </TableCell>
+                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-48" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
                 </TableRow>
               ))
             ) : sortedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                  Tidak ada data
+                <TableCell colSpan={5} className="text-center text-gray-500 py-10 text-sm">
+                  Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
               sortedData.map((group) => (
-                <TableRow key={group.id} className="hover:bg-muted/50">
-                  <TableCell className="font-semibold">
+                <TableRow key={group.id} className="hover:bg-gray-50 transition-colors">
+                  {/* KODE */}
+                  <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">
                     <div className="flex items-center gap-1.5">
                       <span>{group.code}</span>
                       {group.is_lock && (
@@ -95,31 +152,36 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate" title={group.name}>
+                  {/* NAMA GRUP */}
+                  <TableCell className="px-4 py-4 text-sm text-gray-900 text-left max-w-[200px] truncate" title={group.name}>
                     {group.name.length > 50 ? `${group.name.substring(0, 50)}...` : group.name}
                   </TableCell>
-                  <TableCell className="max-w-[300px] truncate" title={group.description ?? undefined}>
+                  {/* DESKRIPSI */}
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left max-w-[300px] truncate" title={group.description ?? undefined}>
                     {group.description ? (group.description.length > 50 ? `${group.description.substring(0, 50)}...` : group.description) : '-'}
                   </TableCell>
-                  <TableCell>
+                  {/* STATUS */}
+                  <TableCell className="px-4 py-4 text-center">
                     <Badge variant={group.isActive ? 'default' : 'secondary'} className={group.isActive ? '' : 'bg-gray-200 text-gray-700'}>
                       {group.isActive ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  {/* ACTION */}
+                  <TableCell className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                         <DropdownMenuItem
                           onSelect={(e) => {
                             e.preventDefault();
                             onEdit(group);
                           }}
                           disabled={group.is_lock}
+                          className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                         >
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
@@ -129,7 +191,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                             e.preventDefault();
                             onDelete(group);
                           }}
-                          className="text-destructive focus:text-destructive"
+                          className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                           disabled={group.is_lock}
                         >
                           <Trash className="mr-2 h-4 w-4" />
@@ -146,13 +208,13 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
       </div>
 
       {/* PAGINATION */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
         <span>
           Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, safeTotal)} of {safeTotal} entries
         </span>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page === 1}>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
             Previous
           </Button>
 
@@ -169,7 +231,18 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
             }
 
             return (
-              <Button key={pageNum} variant={page === pageNum ? 'default' : 'outline'} size="sm" onClick={() => onPageChange(pageNum)} className="w-10">
+              <Button
+                key={pageNum}
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  page === pageNum
+                    ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                    : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
+                onClick={() => onPageChange(pageNum)}
+              >
                 {pageNum}
               </Button>
             );
@@ -177,14 +250,14 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
           {totalPages > 5 && (
             <>
-              <span className="text-muted-foreground">...</span>
-              <Button variant="outline" size="sm" onClick={() => onPageChange(totalPages)} className="w-10">
+              <span className="px-1 text-sm text-slate-500">...</span>
+              <Button variant="ghost" size="sm" className="h-9 min-w-9 rounded-xl border border-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
                 {totalPages}
               </Button>
             </>
           )}
 
-          <Button variant="outline" size="sm" onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
+          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
             Next
           </Button>
         </div>

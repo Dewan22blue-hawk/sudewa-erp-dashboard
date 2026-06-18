@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Region } from '@/@types/region.types';
+import { cn } from '@/lib/utils';
 
 interface RegionTableProps {
     regions: Region[];
@@ -41,7 +42,6 @@ export function RegionTable({
     onDelete,
     isExporting = false,
 }: RegionTableProps) {
-
     const totalPages = Math.ceil(totalData / perPage);
     const startData = (page - 1) * perPage + 1;
     const endData = Math.min(page * perPage, totalData);
@@ -51,10 +51,15 @@ export function RegionTable({
             return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
                     key={p}
-                    variant={p === page ? "outline" : "ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={() => onPageChange(p)}
-                    className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                    className={cn(
+                        'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                        p === page
+                            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                    )}
                 >
                     {p}
                 </Button>
@@ -81,11 +86,18 @@ export function RegionTable({
         return pages.map((p, idx) => (
             <Button
                 key={idx}
-                variant={p === page ? "outline" : "ghost"}
+                variant="ghost"
                 size="sm"
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
-                className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    p === page
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : p === '...'
+                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
             >
                 {p}
             </Button>
@@ -106,8 +118,8 @@ export function RegionTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
                                 <SelectValue placeholder="25" />
@@ -119,7 +131,7 @@ export function RegionTable({
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
@@ -148,47 +160,49 @@ export function RegionTable({
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200">
+            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[30%] uppercase px-4 py-3">KODE WILAYAH</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[60%] uppercase px-4 py-3">NAMA WILAYAH</TableHead>
-                            <TableHead className="text-xs font-semibold text-gray-600 w-[10%] uppercase px-4 py-3 text-center">ACTION</TableHead>
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="text-xs font-semibold text-gray-505 w-[30%] uppercase px-4 py-4 text-left">KODE WILAYAH</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-505 w-[60%] uppercase px-4 py-4 text-left">NAMA WILAYAH</TableHead>
+                            <TableHead className="text-xs font-semibold text-gray-600 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {regions.length > 0 ? (
                             regions.map((region) => (
-                                <TableRow key={region.uuid} className="hover:bg-gray-50/50">
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                <TableRow key={region.uuid} className="hover:bg-gray-50 transition-colors">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left font-medium">
                                         {region.code || '-'}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 truncate uppercase">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-900 text-left truncate uppercase">
                                         {region.name}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-center">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-[160px]">
-                                                <DropdownMenuItem onClick={() => onEdit(region)} className="cursor-pointer">
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => onDelete(region)} className="text-red-600 cursor-pointer focus:text-red-600">
-                                                    Hapus
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <div className="flex justify-center">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                                    <DropdownMenuItem onClick={() => onEdit(region)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => onDelete(region)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                                        Hapus
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={3} className="h-32 text-center text-gray-500">
+                                <TableCell colSpan={3} className="h-32 text-center text-gray-505 py-10 text-sm">
                                     Tidak ada data wilayah ditemukan
                                 </TableCell>
                             </TableRow>
@@ -197,19 +211,19 @@ export function RegionTable({
                 </Table>
             </Card>
 
-            <div className="flex items-center justify-between px-2 pt-2">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
                 <div className="text-sm text-gray-500">
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500"
                         >
                             Previous
                         </Button>
@@ -219,9 +233,9 @@ export function RegionTable({
                         <Button
                             variant="ghost"
                             size="sm"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500"
                         >
                             Next
                         </Button>
