@@ -45,12 +45,12 @@ export default function CreateInvoicePrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+        <div className="no-print flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
           <button type="button" onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/detail/${id}`)} className="rounded-md p-1 transition-colors hover:bg-slate-100">
             <ChevronLeft className="h-5 w-5 text-slate-500" />
           </button>
           <div>
-            <h1 className="text-[18px] font-semibold text-slate-900">Invoice {payload.invoiceCode}</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">Invoice {payload.invoiceCode}</h1>
             <p className="text-sm text-slate-500">Dibuat: {payload.draft.date}</p>
           </div>
         </div>

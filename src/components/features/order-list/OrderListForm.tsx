@@ -335,7 +335,7 @@ export function OrderListForm({
         >
           <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
         </button>
-        <h1 className="text-[20px] font-bold text-slate-950 md:text-[24px]">
+        <h1 className="text-2xl font-semibold text-slate-950">
           Form Input Order
         </h1>
       </div>
@@ -684,7 +684,7 @@ export function OrderListForm({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-xl bg-[#1f4163] px-6 h-10 hover:bg-[#183552] text-white font-semibold flex items-center gap-2 text-[15px] shadow-none"
+          className="rounded-xl bg-[#1e3a5f] px-6 h-10 hover:bg-[#152e4d] text-white font-semibold flex items-center gap-2 text-[15px] shadow-none"
         >
           <Save className="h-4 w-4" />
           {isSubmitting ? 'Menyimpan...' : 'Simpan'}
