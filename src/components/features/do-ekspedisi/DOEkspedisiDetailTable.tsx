@@ -35,24 +35,24 @@ export function DOEkspedisiDetailTable({
   };
 
   return (
-    <Card className="overflow-hidden rounded-[20px] border border-[#D7DEE7] bg-white shadow-sm">
+    <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
       <div className="overflow-x-auto">
         <Table className="min-w-[1500px]">
-          <TableHeader className="bg-[#EEF3F8]">
-            <TableRow className="border-b border-[#D7DEE7]">
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">No</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Customer</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Loading In</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Tujuan Kirim</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Loading Out</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Keterangan</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">UJ Driver</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">UJ Lainnya</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Invoice</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Invoice Tambahan</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">PPN</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Fee</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-700">Action</TableHead>
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow className="hover:bg-[#f8f9fa]">
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Customer</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Loading In</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Tujuan Kirim</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Loading Out</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Keterangan</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UJ Driver</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UJ Lainnya</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Invoice</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Invoice Tambahan</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PPN</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Fee</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px]">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -66,7 +66,7 @@ export function DOEkspedisiDetailTable({
               ))
             ) : data.length > 0 ? (
               data.map((item, index) => (
-                <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-slate-50/80">
+                <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{(page - 1) * perPage + index + 1}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.customerName || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.loadingIn || '-'}</TableCell>
@@ -80,24 +80,26 @@ export function DOEkspedisiDetailTable({
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppnFee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.serviceFee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4 text-slate-500" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[160px]">
-                        <DropdownMenuItem onClick={() => onView(item)} className="cursor-pointer">
-                          Detail
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex justify-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem onClick={() => onView(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                            Detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

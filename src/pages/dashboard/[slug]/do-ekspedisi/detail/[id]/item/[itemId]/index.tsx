@@ -52,7 +52,7 @@ export default function DetailDOEkspedisiItemPage() {
             <ChevronLeft className="h-5 w-5 text-slate-500" />
           </button>
           <div>
-            <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">Detail DO</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">Detail DO</h1>
             <p className="text-sm text-slate-500">Nomor Polisi <span className="font-medium text-[#2563EB]">{expeditionQuery.data?.vehicle?.registrationNumber || '-'}</span></p>
           </div>
         </div>
