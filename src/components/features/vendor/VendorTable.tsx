@@ -95,8 +95,8 @@ export function VendorTable({
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
-                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                 )}
             >
                 {p}
@@ -137,9 +137,9 @@ export function VendorTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -169,7 +169,7 @@ export function VendorTable({
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-left">NAMA VENDOR</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">HANDPHONE</TableHead>
+                                <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -241,7 +241,7 @@ export function VendorTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

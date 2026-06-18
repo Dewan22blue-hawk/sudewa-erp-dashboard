@@ -119,17 +119,17 @@ export function SupplierTable({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          <Button variant="outline" className="h-10 rounded-xl border-[#D4D4D8] px-4 text-[#171717]" onClick={onImport}>
-            <Upload className="mr-2 h-4 w-4" />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
+            <Upload className="h-4 w-4 mr-2" />
             Import
           </Button>
-          <Button variant="outline" className="h-10 rounded-xl border-[#D4D4D8] px-4 text-[#171717]" onClick={onExport} disabled={isExporting}>
-            <Download className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="w-full sm:w-auto" onClick={onExport} disabled={isExporting}>
+            <Upload className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button className="h-10 rounded-xl bg-[#1F3B5B] px-5 text-white hover:bg-[#19314b]" onClick={onAdd}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={onAdd}>
+            <Plus className="h-4 w-4 mr-2" />
             Tambah
           </Button>
         </div>

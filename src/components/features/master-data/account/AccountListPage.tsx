@@ -308,16 +308,16 @@ export const AccountListPage = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="ghost" className="h-10 rounded-xl px-3.5 text-sm font-medium text-slate-700 hover:bg-slate-100" onClick={handleExport}>
-                <Upload className="mr-1.5 h-4 w-4" />
+              <Button variant="outline" className="w-full sm:w-auto" onClick={handleExport}>
+                <Upload className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button variant="outline" className="h-10 rounded-xl border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50" onClick={() => setOpenImport(true)}>
-                <Download className="mr-1.5 h-4 w-4" />
+              <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpenImport(true)}>
+                <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
-              <Button className="h-10 rounded-xl bg-[#1F3B5B] px-4 text-sm font-medium text-white hover:bg-[#1B3450]" onClick={handleAdd}>
-                <Plus className="mr-1.5 h-4 w-4" />
+              <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={handleAdd}>
+                <Plus className="h-4 w-4 mr-2" />
                 Tambah
               </Button>
             </div>
