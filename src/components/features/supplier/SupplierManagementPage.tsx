@@ -212,9 +212,17 @@ export function SupplierManagementPage() {
   return (
     <>
       <div className="space-y-6">
+<<<<<<< HEAD
         <div>
           <h1 className="text-[40px] font-semibold leading-tight tracking-[-0.02em] text-[#171717]">Supplier</h1>
           <p className="mt-1 text-[24px] text-[#71717A]">Kelola data supplier dengan mudah</p>
+=======
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Supplier</h1>
+            <p className="text-sm text-muted-foreground">Kelola data supplier dengan mudah</p>
+          </div>
+>>>>>>> 4093734 (style: standardize supplier page header style and margin to match type-unit)
         </div>
 
         <SupplierTable
