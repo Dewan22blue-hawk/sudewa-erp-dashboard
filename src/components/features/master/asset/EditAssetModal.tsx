@@ -114,10 +114,10 @@ function EditAssetInnerForm({ initialData, onClose, onSave }: InnerProps) {
                                 <SelectValue placeholder="Select an item" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="inventory">Inventory</SelectItem>
-                                <SelectItem value="vehicles">Vehicles</SelectItem>
-                                <SelectItem value="buildings">Buildings</SelectItem>
-                                <SelectItem value="land">Land</SelectItem>
+                                <SelectItem value="inventory">Inventaris Kantor</SelectItem>
+                                <SelectItem value="vehicles">Kendaraan</SelectItem>
+                                <SelectItem value="buildings">Bangunan</SelectItem>
+                                <SelectItem value="land">Tanah</SelectItem>
                             </SelectContent>
                         </Select>
                     )}
