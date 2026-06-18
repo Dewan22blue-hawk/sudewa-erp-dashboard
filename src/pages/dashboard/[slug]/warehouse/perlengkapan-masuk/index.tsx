@@ -171,29 +171,30 @@ export default function PerlengkapanMasukListPage() {
           <p className="mt-1 text-[16px] text-slate-500">Kelola dan lacak semua transaksi perlengkapan masuk</p>
         </div>
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-[316px]">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
                 placeholder="Search here"
-                className="h-[42px] rounded-xl border-slate-200 pl-11 shadow-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="pl-9 bg-white"
               />
             </div>
 
-            <div className="flex items-center gap-3 text-[16px] text-slate-800">
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="h-[42px] w-[58px] rounded-xl border-slate-200 shadow-sm">
-                  <SelectValue />
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="5">5</SelectItem>
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
               <span>Page</span>

@@ -110,31 +110,33 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center">
-                <div className="relative w-full md:max-w-md">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <Input placeholder="Cari kode transaksi atau customer" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 h-10" />
-                </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-[300px]">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <Input placeholder="Search here" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 bg-white" />
+                    </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600 md:shrink-0">
-                    <span>Show</span>
-                    <Select
-                        value={String(perPage)}
-                        onValueChange={(value) => {
-                            onPerPageChange(Number(value));
-                        }}
-                    >
-                        <SelectTrigger className="h-9 w-20">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="25">25</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <span>Page</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
+                        <Select
+                            value={String(perPage)}
+                            onValueChange={(value) => {
+                                onPerPageChange(Number(value));
+                            }}
+                        >
+                            <SelectTrigger className="w-[70px] bg-white">
+                                <SelectValue placeholder="25" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <span>Page</span>
+                    </div>
                 </div>
             </div>
 
