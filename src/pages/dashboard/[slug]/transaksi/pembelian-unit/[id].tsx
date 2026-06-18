@@ -284,7 +284,7 @@ export default function PurchaseDetailPage() {
         <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
         {/* UNIT TABLE */}
-        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} />
+        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} />
 
         {/* PAYMENT HISTORY TABLE */}
         {resolvedBillingHistories.length > 0 && (
