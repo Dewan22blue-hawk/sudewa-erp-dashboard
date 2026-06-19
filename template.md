@@ -341,6 +341,44 @@ import { Button } from '@/components/ui/button';
 
 ---
 
+## 12. Tabs Component Standard (Premium Pill Style)
+
+**Aturan**: Gunakan flex container untuk membungkus `TabsList`. Triggers menggunakan visual pill dengan latar belakang abu-abu tipis dan status aktif berlatar belakang putih bersih dengan bayangan halus.
+
+```tsx
+<Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+  {/* Tab triggers wrapped to look like pills */}
+  <div className="flex no-print">
+    <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+      <TabsTrigger 
+        value="per-nota" 
+        className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+      >
+        Laporan Pembelian Per Nota
+      </TabsTrigger>
+      <TabsTrigger 
+        value="per-tipe" 
+        className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+      >
+        Laporan Pembelian Per Tipe
+      </TabsTrigger>
+      <TabsTrigger 
+        value="per-supplier" 
+        className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+      >
+        Laporan Pembelian Per Supplier
+      </TabsTrigger>
+    </TabsList>
+  </div>
+
+  <TabsContent value="per-nota" className="mt-0">
+    {/* Konten Tab */}
+  </TabsContent>
+</Tabs>
+```
+
+---
+
 ## Ringkasan Kelas Kunci
 
 | Elemen | Kelas |
@@ -349,6 +387,8 @@ import { Button } from '@/components/ui/button';
 | Toolbar ↔ Table gap | `space-y-4` (wrapper) |
 | H1 | `text-2xl font-semibold` |
 | Subheader | `text-sm text-muted-foreground` |
+| TabsList (Pills) | `flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl` |
+| TabsTrigger (Pills) | `rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm` |
 | Search Input | `pl-9 bg-white` |
 | Select pagination | `w-[70px] bg-white` |
 | Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none` |

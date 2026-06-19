@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
+import { Search, Printer, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -20,6 +20,15 @@ import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils/format';
+
+function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: 'asc' | 'desc' }) {
+  const isActive = currentSortKey === sortKey;
+  if (isActive && sortOrder === 'asc')
+    return <ArrowUp className="h-3.5 w-3.5 text-indigo-600 shrink-0 transition-colors ml-1 inline-block" />;
+  if (isActive && sortOrder === 'desc')
+    return <ArrowDown className="h-3.5 w-3.5 text-indigo-600 shrink-0 transition-colors ml-1 inline-block" />;
+  return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150 ml-1 inline-block" />;
+}
 
 export default function LaporanStockPerlengkapanPage() {
   const router = useRouter();
@@ -110,10 +119,40 @@ export default function LaporanStockPerlengkapanPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Stock Perlengkapan</h1>
-            <p className="text-sm text-muted-foreground">Laporan stock perlengkapan, penerimaan barang, dan pengeluaran barang</p>
+        <div className="no-print">
+          <h1 className="text-2xl font-semibold">Laporan Stock Perlengkapan</h1>
+          <p className="text-sm text-muted-foreground">Laporan stock perlengkapan, penerimaan barang, dan pengeluaran barang</p>
+        </div>
+
+        {/* Search + Print row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search here"
+                className="pl-9 bg-white"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="8">8</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
           <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
             <Printer className="mr-2 h-4 w-4" /> Print
@@ -121,61 +160,29 @@ export default function LaporanStockPerlengkapanPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          {/* Tabs Navigation & Filtering Block */}
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print mb-6">
-            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-xl w-fit">
+          {/* Tabs Navigation */}
+          <div className="flex mb-4 no-print">
+            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl w-fit">
               <TabsTrigger
                 value="stock"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
               >
                 Laporan Stock Perlengkapan
               </TabsTrigger>
               <TabsTrigger
                 value="penerimaan"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
               >
                 Laporan Penerimaan Barang
               </TabsTrigger>
               <TabsTrigger
                 value="pengeluaran"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
               >
                 Laporan Pengeluaran Barang
               </TabsTrigger>
             </TabsList>
-
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-2">
-              <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="relative w-full sm:w-[300px]">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search here"
-                    className="pl-9 bg-white"
-                  />
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                  <span>Show</span>
-                  <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                    <SelectTrigger className="w-[70px] bg-white">
-                      <SelectValue placeholder="25" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5</SelectItem>
-                      <SelectItem value="8">8</SelectItem>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span>Page</span>
-                </div>
-              </div>
-            </div>
           </div>
-
 
           {/* Print Letter Wrapping Container */}
           <PrintLetterPage
@@ -197,72 +204,152 @@ export default function LaporanStockPerlengkapanPage() {
                 </p>
               </div>
 
-              {/* Loader and Table Rendering */}
-              {isLoading ? (
-                <div className="flex justify-center items-center py-24 w-full bg-white rounded-xl border border-slate-200">
-                  <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                </div>
-              ) : isError ? (
-                <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-xl border border-red-100 text-center p-6">
-                  <p className="text-red-600 font-semibold mb-1">Gagal memuat data laporan</p>
-                  <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-                  <div className="overflow-x-auto">
-                    <Table>
+              {/* Table Rendering (static header, dynamic body) */}
+              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+                <div className="overflow-x-auto">
+                  <Table>
                       <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         {activeTab === 'stock' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('code')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              KODE BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('code')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'code' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>KODE BARANG</span>
+                                <SortIcon sortKey="code" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA BARANG</span>
+                                <SortIcon sortKey="name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">QTY</TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">LOKASI/ARMADA</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">QTY</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">LOKASI/ARMADA</TableHead>
                           </TableRow>
                         )}
 
                         {activeTab === 'penerimaan' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('transaction_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              TANGGAL <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('transaction_date')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'transaction_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>TANGGAL</span>
+                                <SortIcon sortKey="transaction_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('code')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              KODE BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('code')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'code' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>KODE BARANG</span>
+                                <SortIcon sortKey="code" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA BARANG</span>
+                                <SortIcon sortKey="name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">QTY</TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">LOKASI</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">QTY</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">LOKASI</TableHead>
                           </TableRow>
                         )}
 
                         {activeTab === 'pengeluaran' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('transaction_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              TANGGAL <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('transaction_date')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'transaction_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>TANGGAL</span>
+                                <SortIcon sortKey="transaction_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('code')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              KODE BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('code')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'code' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>KODE BARANG</span>
+                                <SortIcon sortKey="code" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA BARANG</span>
+                                <SortIcon sortKey="name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">QTY</TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO POLISI</TableHead>
-                            <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">DRIVER</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">QTY</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">NO POLISI</TableHead>
+                            <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">DRIVER</TableHead>
                           </TableRow>
                         )}
                       </TableHeader>
                       <TableBody>
-                        {data.length > 0 ? (
+                        {isLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="h-32 text-center">
+                              <div className="flex items-center justify-center gap-2 text-slate-400">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <span className="text-sm font-medium">Memuat data...</span>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : isError ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="h-32 text-center text-red-600 font-semibold p-4">
+                              <p className="mb-0.5">Gagal memuat data laporan</p>
+                              <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
+                            </TableCell>
+                          </TableRow>
+                        ) : data.length > 0 ? (
                           data.map((item, idx) => {
                             const indexNumber = idx + 1 + (page - 1) * perPage;
 
@@ -286,11 +373,11 @@ export default function LaporanStockPerlengkapanPage() {
 
                               return (
                                 <TableRow key={item.uuid || idx} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                  <TableCell className="text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
-                                  <TableCell className="font-mono text-sm text-gray-900 whitespace-nowrap">{code}</TableCell>
-                                  <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{name}</TableCell>
-                                  <TableCell className="text-gray-900 font-medium whitespace-nowrap text-sm">{displayQty}</TableCell>
-                                  <TableCell className="text-slate-600 whitespace-nowrap text-sm">{lokasiArmada}</TableCell>
+                                  <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
+                                  <TableCell className="px-4 py-4 text-left font-mono text-sm text-gray-900 whitespace-nowrap">{code}</TableCell>
+                                  <TableCell className="px-4 py-4 text-left text-sm font-semibold text-gray-900 whitespace-nowrap">{name}</TableCell>
+                                  <TableCell className="px-4 py-4 text-center text-gray-900 font-medium whitespace-nowrap text-sm">{displayQty}</TableCell>
+                                  <TableCell className="px-4 py-4 text-left text-sm text-slate-600 whitespace-nowrap">{lokasiArmada}</TableCell>
                                 </TableRow>
                               );
                             }
@@ -304,12 +391,12 @@ export default function LaporanStockPerlengkapanPage() {
 
                               return (
                                 <TableRow key={item.uuid || idx} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                  <TableCell className="text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
-                                  <TableCell className="text-slate-600 whitespace-nowrap text-sm">{tgl}</TableCell>
-                                  <TableCell className="font-mono text-sm text-gray-900 whitespace-nowrap">{code}</TableCell>
-                                  <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{name}</TableCell>
-                                  <TableCell className="text-gray-900 font-medium whitespace-nowrap text-sm">{qtyVal}</TableCell>
-                                  <TableCell className="text-slate-600 whitespace-nowrap text-sm">{lokasi}</TableCell>
+                                  <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
+                                  <TableCell className="px-4 py-4 text-center text-sm text-slate-600 whitespace-nowrap">{tgl}</TableCell>
+                                  <TableCell className="px-4 py-4 text-left font-mono text-sm text-gray-900 whitespace-nowrap">{code}</TableCell>
+                                  <TableCell className="px-4 py-4 text-left text-sm font-semibold text-gray-900 whitespace-nowrap">{name}</TableCell>
+                                  <TableCell className="px-4 py-4 text-center text-gray-900 font-medium whitespace-nowrap text-sm">{qtyVal}</TableCell>
+                                  <TableCell className="px-4 py-4 text-left text-sm text-slate-600 whitespace-nowrap">{lokasi}</TableCell>
                                 </TableRow>
                               );
                             }
@@ -328,13 +415,13 @@ export default function LaporanStockPerlengkapanPage() {
 
                             return (
                               <TableRow key={item.uuid || idx} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                <TableCell className="text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{tgl}</TableCell>
-                                <TableCell className="font-mono text-sm text-gray-900 whitespace-nowrap">{code}</TableCell>
-                                <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{name}</TableCell>
-                                <TableCell className="text-gray-900 font-medium whitespace-nowrap text-sm">{qtyVal}</TableCell>
-                                <TableCell className="font-mono text-sm text-gray-900 whitespace-nowrap">{noPolisi}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{driver}</TableCell>
+                                <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
+                                <TableCell className="px-4 py-4 text-center text-sm text-slate-600 whitespace-nowrap">{tgl}</TableCell>
+                                <TableCell className="px-4 py-4 text-left font-mono text-sm text-gray-900 whitespace-nowrap">{code}</TableCell>
+                                <TableCell className="px-4 py-4 text-left text-sm font-semibold text-gray-900 whitespace-nowrap">{name}</TableCell>
+                                <TableCell className="px-4 py-4 text-center text-gray-900 font-medium whitespace-nowrap text-sm">{qtyVal}</TableCell>
+                                <TableCell className="px-4 py-4 text-left font-mono text-sm text-gray-900 whitespace-nowrap">{noPolisi}</TableCell>
+                                <TableCell className="px-4 py-4 text-left text-sm text-slate-600 whitespace-nowrap">{driver}</TableCell>
                               </TableRow>
                             );
                           })
@@ -349,7 +436,6 @@ export default function LaporanStockPerlengkapanPage() {
                     </Table>
                   </div>
                 </div>
-              )}
             </div>
           </PrintLetterPage>
 

@@ -167,10 +167,14 @@ export default function AccountingReportPage() {
     syncQuery(tab, appliedDate);
   };
 
-  const handleShow = () => {
-    setAppliedDate(selectedDate);
-    syncQuery(activeTab, selectedDate);
-  };
+  // Trigger filter automatically when selectedDate changes
+  useEffect(() => {
+    if (selectedDate.getTime() !== appliedDate.getTime()) {
+      setAppliedDate(selectedDate);
+      syncQuery(activeTab, selectedDate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, activeTab, appliedDate]);
 
   const handlePrint = () => {
     window.print();
@@ -218,28 +222,29 @@ export default function AccountingReportPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <header className="print:hidden">
-          <h1 className="text-2xl font-semibold text-slate-950">
+        <div className="no-print">
+          <h1 className="text-2xl font-semibold">
             Laporan Akuntansi
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Pantau semua pemasukan dan pengeluaran
           </p>
-        </header>
+        </div>
 
-        <AccountingReportFilters
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          onShow={handleShow}
-          onPrint={handlePrint}
-          onDownload={handleDownload}
-          isDownloading={isDownloading}
-        />
+        <div className="space-y-4">
+          <AccountingReportFilters
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+            onPrint={handlePrint}
+            onDownload={handleDownload}
+            isDownloading={isDownloading}
+          />
 
-        <AccountingReportTabs activeTab={activeTab} onChange={handleTabChange} />
+          <AccountingReportTabs activeTab={activeTab} onChange={handleTabChange} />
 
-        <div className="pt-2 print:pt-0">
-          {isLoading ? <LoadingState /> : renderActiveReport()}
+          <div className="print:pt-0">
+            {isLoading ? <LoadingState /> : renderActiveReport()}
+          </div>
         </div>
       </div>
     </DashboardLayout>

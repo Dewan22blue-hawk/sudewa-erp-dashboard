@@ -111,79 +111,81 @@ export default function LaporanPenerimaanPage() {
           <p className="text-sm text-muted-foreground">Pantau semua transaksi penerimaan unit</p>
         </div>
 
-        <LaporanPenerimaanFilter
-          activeTab={activeTab}
-          startDate={startDate}
-          endDate={endDate}
-          onApplyFilters={handleApplyFilters}
-          onPrint={handlePrint}
-          onDownload={exportToCSV}
-        />
+        <div className="space-y-4">
+          <LaporanPenerimaanFilter
+            activeTab={activeTab}
+            startDate={startDate}
+            endDate={endDate}
+            onApplyFilters={handleApplyFilters}
+            onPrint={handlePrint}
+            onDownload={exportToCSV}
+          />
 
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-8">
-          <div className="flex mb-12 no-print">
-            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
-              <TabsTrigger value="per-nota" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Penerimaan
-              </TabsTrigger>
-              <TabsTrigger value="per-tipe" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Penerimaan Per Tipe
-              </TabsTrigger>
-              <TabsTrigger value="per-supplier" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Penerimaan Per Supplier
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <PrintLetterPage
-            id="laporan-penerimaan-print"
-            className="laporan-penerimaan-print-area"
-            letterheadSrc={selectedPrintBackground}
-          >
-            <div className="laporan-penerimaan-print-content">
-              <div className="flex flex-col items-center justify-center text-center space-y-1 mb-8">
-                <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
-                  REKAP PENERIMAAN {activeTab.replace('-', ' ')}
-                </h2>
-                <p className="text-[13px] font-bold text-gray-900 tracking-wide">
-                  PT WAJIRA JAGRATARA MORINDO
-                </p>
-                <p className="text-[13px] font-semibold text-gray-800 opacity-90">
-                  {startDate && endDate
-                    ? `Periode: ${format(new Date(startDate), 'dd/MM/yyyy')} s.d. ${format(new Date(endDate), 'dd/MM/yyyy')}`
-                    : '2026'}
-                </p>
-              </div>
-
-              <TabsContent value="per-nota" className="mt-0">
-                <LaporanPenerimaanTable
-                  data={data}
-                  pagination={pagination}
-                  isLoading={isLoading}
-                  onPageChange={setPage}
-                />
-              </TabsContent>
-
-              <TabsContent value="per-tipe" className="mt-0">
-                <LaporanPenerimaanPerTipe
-                  data={data}
-                  pagination={pagination}
-                  isLoading={isLoading}
-                  onPageChange={setPage}
-                />
-              </TabsContent>
-
-              <TabsContent value="per-supplier" className="mt-0">
-                <LaporanPenerimaanPerSupplier
-                  data={data}
-                  pagination={pagination}
-                  isLoading={isLoading}
-                  onPageChange={setPage}
-                />
-              </TabsContent>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+            <div className="flex no-print">
+              <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+                <TabsTrigger value="per-nota" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                  Laporan Penerimaan
+                </TabsTrigger>
+                <TabsTrigger value="per-tipe" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                  Laporan Penerimaan Per Tipe
+                </TabsTrigger>
+                <TabsTrigger value="per-supplier" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                  Laporan Penerimaan Per Supplier
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </PrintLetterPage>
-        </Tabs>
+
+            <PrintLetterPage
+              id="laporan-penerimaan-print"
+              className="laporan-penerimaan-print-area"
+              letterheadSrc={selectedPrintBackground}
+            >
+              <div className="laporan-penerimaan-print-content">
+                <div className="flex flex-col items-center justify-center text-center space-y-1 mb-8">
+                  <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
+                    REKAP PENERIMAAN {activeTab.replace('-', ' ')}
+                  </h2>
+                  <p className="text-[13px] font-bold text-gray-900 tracking-wide">
+                    PT WAJIRA JAGRATARA MORINDO
+                  </p>
+                  <p className="text-[13px] font-semibold text-gray-800 opacity-90">
+                    {startDate && endDate
+                      ? `Periode: ${format(new Date(startDate), 'dd/MM/yyyy')} s.d. ${format(new Date(endDate), 'dd/MM/yyyy')}`
+                      : '2026'}
+                  </p>
+                </div>
+
+                <TabsContent value="per-nota" className="mt-0">
+                  <LaporanPenerimaanTable
+                    data={data}
+                    pagination={pagination}
+                    isLoading={isLoading}
+                    onPageChange={setPage}
+                  />
+                </TabsContent>
+
+                <TabsContent value="per-tipe" className="mt-0">
+                  <LaporanPenerimaanPerTipe
+                    data={data}
+                    pagination={pagination}
+                    isLoading={isLoading}
+                    onPageChange={setPage}
+                  />
+                </TabsContent>
+
+                <TabsContent value="per-supplier" className="mt-0">
+                  <LaporanPenerimaanPerSupplier
+                    data={data}
+                    pagination={pagination}
+                    isLoading={isLoading}
+                    onPageChange={setPage}
+                  />
+                </TabsContent>
+              </div>
+            </PrintLetterPage>
+          </Tabs>
+        </div>
       </div>
     </DashboardLayout>
   );

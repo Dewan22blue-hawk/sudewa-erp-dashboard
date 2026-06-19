@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
+import { Search, Printer, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -21,6 +21,15 @@ import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils/format';
+
+function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: 'asc' | 'desc' }) {
+  const isActive = currentSortKey === sortKey;
+  if (isActive && sortOrder === 'asc')
+    return <ArrowUp className="h-3.5 w-3.5 text-indigo-600 shrink-0 transition-colors ml-1 inline-block" />;
+  if (isActive && sortOrder === 'desc')
+    return <ArrowDown className="h-3.5 w-3.5 text-indigo-600 shrink-0 transition-colors ml-1 inline-block" />;
+  return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150 ml-1 inline-block" />;
+}
 
 export default function LPJumlahTerimaPage() {
   const router = useRouter();
@@ -125,10 +134,39 @@ export default function LPJumlahTerimaPage() {
 
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Jumlah Terima</h1>
-            <p className="text-sm text-muted-foreground">Laporan jumlah data masuk ke sistem</p>
+        <div className="no-print">
+          <h1 className="text-2xl font-semibold">Laporan Jumlah Terima</h1>
+          <p className="text-sm text-muted-foreground">Laporan jumlah data masuk ke sistem</p>
+        </div>
+
+        {/* Search + Print row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search here"
+                className="pl-9 bg-white"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
           <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
             <Printer className="mr-2 h-4 w-4" /> Print
@@ -137,29 +175,29 @@ export default function LPJumlahTerimaPage() {
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tabs Navigation (Pills structure) */}
-          <div className="flex mb-6 no-print">
-            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-xl">
+          <div className="flex mb-4 no-print">
+            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
               <TabsTrigger
                 value="bpkb"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer"
               >
                 LP Jumlah Terima BPKB
               </TabsTrigger>
               <TabsTrigger
                 value="stnk"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer"
               >
                 LP Jumlah Terima STNK
               </TabsTrigger>
               <TabsTrigger
                 value="skpd"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer"
               >
                 LP Jumlah Terima SKPD
               </TabsTrigger>
               <TabsTrigger
                 value="tnkb"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer"
               >
                 LP Jumlah Terima TNKB
               </TabsTrigger>
@@ -167,36 +205,7 @@ export default function LPJumlahTerimaPage() {
           </div>
 
           <div className="space-y-4">
-            {/* Filtering Block (Search and Show Page dropdown) */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print">
-              <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="relative w-full sm:w-[300px]">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search here"
-                    className="pl-9 bg-white"
-                  />
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                  <span>Show</span>
-                  <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                    <SelectTrigger className="w-[70px] bg-white">
-                      <SelectValue placeholder="25" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5</SelectItem>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span>Page</span>
-                </div>
-              </div>
-            </div>
+
 
             {/* Print Letter Wrapping Container */}
             <PrintLetterPage
@@ -221,192 +230,564 @@ export default function LPJumlahTerimaPage() {
                   </p>
                 </div>
 
-                {/* Loader and Table Rendering */}
-                {isLoading ? (
-                  <div className="flex justify-center items-center py-24 w-full bg-white rounded-xl border border-slate-200">
-                    <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                  </div>
-                ) : isError ? (
-                  <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-xl border border-red-100 text-center p-6">
-                    <p className="text-red-600 font-semibold mb-1">Gagal memuat data laporan</p>
-                    <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                         {/* Tab BPKB Header */}
+                {/* Table Rendering (static header, dynamic body) */}
+                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        {/* Tab BPKB Header */}
                         {activeTab === 'bpkb' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA BPKB <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('stnk_name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA BPKB</span>
+                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('bpkb_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NOMOR BPKB <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('bpkb_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'bpkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NOMOR BPKB</span>
+                                <SortIcon sortKey="bpkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              WILAYAH <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('region')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>WILAYAH</span>
+                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              DEALER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('dealer')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>DEALER</span>
+                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              VENDOR <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vendor')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>VENDOR</span>
+                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO POLISI <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('tnkb_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO POLISI</span>
+                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vehicle_type')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              JENIS <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vehicle_type')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>JENIS</span>
+                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('chassis_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO RANGKA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('chassis_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO RANGKA</span>
+                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('machine_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO MESIN <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('machine_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO MESIN</span>
+                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('registration_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              TGL TERIMA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('registration_date')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>TGL TERIMA</span>
+                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('bpkb_physical_status')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap text-center">
-                              FISIK BPKB <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('bpkb_physical_status')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'bpkb_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>FISIK BPKB</span>
+                                <SortIcon sortKey="bpkb_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
                           </TableRow>
                         )}
 
                         {/* Tab STNK Header */}
                         {activeTab === 'stnk' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA STNK <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('stnk_name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA STNK</span>
+                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('stnk_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NOMOR STNK <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('stnk_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'stnk_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NOMOR STNK</span>
+                                <SortIcon sortKey="stnk_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              WILAYAH <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('region')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>WILAYAH</span>
+                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              DEALER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('dealer')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>DEALER</span>
+                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              VENDOR <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vendor')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>VENDOR</span>
+                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO POLISI <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('tnkb_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO POLISI</span>
+                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vehicle_type')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              JENIS <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vehicle_type')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>JENIS</span>
+                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('chassis_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO RANGKA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('chassis_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO RANGKA</span>
+                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('machine_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO MESIN <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('machine_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO MESIN</span>
+                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('registration_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              TGL TERIMA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('registration_date')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>TGL TERIMA</span>
+                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('stnk_physical_status')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap text-center">
-                              FISIK STNK <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('stnk_physical_status')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'stnk_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>FISIK STNK</span>
+                                <SortIcon sortKey="stnk_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
                           </TableRow>
                         )}
 
                         {/* Tab SKPD Header */}
                         {activeTab === 'skpd' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA STNK <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('stnk_name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA STNK</span>
+                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              WILAYAH <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('region')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>WILAYAH</span>
+                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              DEALER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('dealer')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>DEALER</span>
+                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              VENDOR <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vendor')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>VENDOR</span>
+                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO POLISI <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('tnkb_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO POLISI</span>
+                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vehicle_type')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              JENIS <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vehicle_type')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>JENIS</span>
+                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('chassis_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO RANGKA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('chassis_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO RANGKA</span>
+                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('machine_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO MESIN <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('machine_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO MESIN</span>
+                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('registration_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              TGL TERIMA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('registration_date')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>TGL TERIMA</span>
+                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
                           </TableRow>
                         )}
 
                         {/* Tab TNKB Header */}
                         {activeTab === 'tnkb' && (
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                            <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NAMA STNK <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                          <TableRow className="hover:bg-[#f8f9fa]">
+                            <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                            <TableHead
+                              onClick={() => handleSort('stnk_name')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NAMA STNK</span>
+                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              WILAYAH <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('region')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>WILAYAH</span>
+                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              DEALER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('dealer')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>DEALER</span>
+                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              VENDOR <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vendor')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>VENDOR</span>
+                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO POLISI <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('tnkb_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO POLISI</span>
+                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('vehicle_type')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              JENIS <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('vehicle_type')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>JENIS</span>
+                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('chassis_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO RANGKA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('chassis_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO RANGKA</span>
+                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('machine_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              NO MESIN <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('machine_number')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>NO MESIN</span>
+                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort('registration_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                              TGL TERIMA <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                            <TableHead
+                              onClick={() => handleSort('registration_date')}
+                              className={cn(
+                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                              )}
+                            >
+                              <div className="inline-flex items-center justify-center">
+                                <span className="w-3.5 shrink-0" />
+                                <span>TGL TERIMA</span>
+                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                              </div>
                             </TableHead>
                           </TableRow>
                         )}
                       </TableHeader>
                       <TableBody>
-                        {data.length > 0 ? (
+                        {isLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={12} className="h-32 text-center">
+                              <div className="flex items-center justify-center gap-2 text-slate-400">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <span className="text-sm font-medium">Memuat data...</span>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : isError ? (
+                          <TableRow>
+                            <TableCell colSpan={12} className="h-32 text-center text-red-600 font-semibold p-4">
+                              <p className="mb-0.5">Gagal memuat data laporan</p>
+                              <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
+                            </TableCell>
+                          </TableRow>
+                        ) : data.length > 0 ? (
                           data.map((item, idx) => {
                             const indexNumber = idx + 1 + (page - 1) * perPage;
                             return (
                               <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                <TableCell className="text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
-                                <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{item.stnk_name || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap text-left">{item.stnk_name || '-'}</TableCell>
                                 
-                                {activeTab === 'bpkb' && <TableCell className="font-medium whitespace-nowrap text-sm">{(item as any).bpkb_number || '-'}</TableCell>}
-                                {activeTab === 'stnk' && <TableCell className="font-medium whitespace-nowrap text-sm">{(item as any).stnk_number || '-'}</TableCell>}
+                                {activeTab === 'bpkb' && <TableCell className="px-4 py-4 text-sm font-medium whitespace-nowrap text-left">{(item as any).bpkb_number || '-'}</TableCell>}
+                                {activeTab === 'stnk' && <TableCell className="px-4 py-4 text-sm font-medium whitespace-nowrap text-left">{(item as any).stnk_number || '-'}</TableCell>}
 
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{item.region || '-'}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{item.dealer || '-'}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{item.vendor || '-'}</TableCell>
-                                <TableCell className="font-medium text-gray-900 whitespace-nowrap text-sm">{item.tnkb_number || '-'}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{formatVehicleType(item.vehicle_type)}</TableCell>
-                                <TableCell className="text-slate-600 font-mono text-sm whitespace-nowrap">{item.chassis_number || '-'}</TableCell>
-                                <TableCell className="text-slate-600 font-mono text-sm whitespace-nowrap">{item.machine_number || '-'}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.registration_date)}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{item.region || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{item.dealer || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{item.vendor || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 whitespace-nowrap text-left">{item.tnkb_number || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{formatVehicleType(item.vehicle_type)}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{item.chassis_number || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{item.machine_number || '-'}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-center">{formatDateString(item.registration_date)}</TableCell>
                                 
                                 {(activeTab === 'bpkb' || activeTab === 'stnk') && (
-                                  <TableCell className="text-center whitespace-nowrap text-sm">
+                                  <TableCell className="px-4 py-4 text-sm text-center whitespace-nowrap">
                                     {activeTab === 'bpkb' && renderPhysicalStatus((item as any).bpkb_physical_status)}
                                     {activeTab === 'stnk' && renderPhysicalStatus((item as any).stnk_physical_status)}
                                   </TableCell>
@@ -416,7 +797,7 @@ export default function LPJumlahTerimaPage() {
                           })
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={activeTab === 'skpd' || activeTab === 'tnkb' ? 10 : 12} className="h-28 text-center text-slate-500 font-medium">
+                            <TableCell colSpan={12} className="h-28 text-center text-slate-500 font-medium">
                               Tidak ada data laporan ditemukan.
                             </TableCell>
                           </TableRow>
@@ -425,7 +806,6 @@ export default function LPJumlahTerimaPage() {
                     </Table>
                   </div>
                 </div>
-              )}
             </div>
           </PrintLetterPage>
 

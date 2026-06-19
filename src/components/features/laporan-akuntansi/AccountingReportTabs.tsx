@@ -15,17 +15,17 @@ export default function AccountingReportTabs({
 }: AccountingReportTabsProps) {
   return (
     <div className="print:hidden overflow-x-auto">
-      <div className="inline-flex min-w-full rounded-[20px] bg-[#f3f4f6] p-1.5">
+      <div className="inline-flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
         {ACCOUNTING_REPORT_TABS.map((tab) => (
           <button
             key={tab.value}
             type="button"
             onClick={() => onChange(tab.value)}
             className={cn(
-              'rounded-2xl px-4 py-3 text-sm font-medium text-[#1f2937] transition-all whitespace-nowrap',
+              'rounded-lg px-6 py-2.5 text-[14px] font-medium transition-all whitespace-nowrap',
               activeTab === tab.value
-                ? 'bg-white shadow-[0_1px_4px_rgba(15,23,42,0.12)] ring-1 ring-black/5'
-                : 'hover:text-black',
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-slate-600 hover:text-gray-900',
             )}
           >
             {tab.label}

@@ -7,12 +7,14 @@ import {
 } from '@/services/report/jumlahPenyerahanReport.service';
 
 export function useJumlahPenyerahanReport({
+  activeTab,
   page,
   perPage,
   search,
   sortBy,
   sortOrder,
 }: {
+  activeTab: 'bpkb' | 'stnk' | 'skpd' | 'tnkb';
   page: number;
   perPage: number;
   search: string;
@@ -20,7 +22,7 @@ export function useJumlahPenyerahanReport({
   sortOrder?: 'asc' | 'desc';
 }) {
   const queryResult = useQuery({
-    queryKey: ['jumlah-penyerahan-report', page, perPage, search, sortBy, sortOrder],
+    queryKey: ['jumlah-penyerahan-report', activeTab, page, perPage, search, sortBy, sortOrder],
     queryFn: async () => {
       const params: JumlahPenyerahanReportParams = {
         page,

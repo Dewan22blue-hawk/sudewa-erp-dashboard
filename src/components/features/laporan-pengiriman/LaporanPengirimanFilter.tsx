@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
@@ -38,25 +38,30 @@ export default function LaporanPengirimanFilter({
   onPrint,
   onDownload,
 }: LaporanPengirimanFilterProps) {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    if (startDate && endDate) return { from: new Date(startDate), to: new Date(endDate) };
-    if (startDate) return { from: new Date(startDate), to: undefined };
+  const dateRange = useMemo(() => {
+    if (startDate && endDate) {
+      const from = new Date(startDate);
+      const to = new Date(endDate);
+      return {
+        from: Number.isNaN(from.getTime()) ? undefined : from,
+        to: Number.isNaN(to.getTime()) ? undefined : to,
+      };
+    }
+    if (startDate) {
+      const from = new Date(startDate);
+      return {
+        from: Number.isNaN(from.getTime()) ? undefined : from,
+        to: undefined,
+      };
+    }
     return undefined;
-  });
+  }, [startDate, endDate]);
   const [customers, setCustomers] = useState<OptionItem[]>([]);
   const [unitTypes, setUnitTypes] = useState<OptionItem[]>([]);
   const [openBox, setOpenBox] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTermInside, setSearchTermInside] = useState('');
   const [perPage, setPerPage] = useState('50');
-
-  useEffect(() => {
-    if (!startDate && !endDate) {
-      setDateRange(undefined);
-    } else if (startDate && endDate && (!dateRange?.from || !dateRange?.to)) {
-      setDateRange({ from: new Date(startDate), to: new Date(endDate) });
-    }
-  }, [startDate, endDate, dateRange?.from, dateRange?.to]);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -101,8 +106,36 @@ export default function LaporanPengirimanFilter({
   );
 
   useEffect(() => {
-    const appliedStartDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const appliedEndDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : appliedStartDate;
+    let customerId: number | null = null;
+    let unitTypeId: number | null = null;
+
+    if (activeTab === 'per-customer') {
+      const matchedCustomer = customers.find(
+        (customer) => customer.name?.toLowerCase() === searchQuery.trim().toLowerCase()
+      );
+      customerId = matchedCustomer ? matchedCustomer.id : null;
+    }
+
+    if (activeTab === 'per-tipe') {
+      const matchedType = unitTypes.find(
+        (unitType) => unitType.name?.toLowerCase() === searchQuery.trim().toLowerCase()
+      );
+      unitTypeId = matchedType ? matchedType.id : null;
+    }
+
+    onApplyFilters({
+      startDate,
+      endDate,
+      customerId,
+      unitTypeId,
+      perPage: parseInt(perPage, 10),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, activeTab, perPage]);
+
+  const handleDateChange = (newRange: DateRange | undefined) => {
+    const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
+    const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
     let customerId: number | null = null;
     let unitTypeId: number | null = null;
@@ -128,8 +161,7 @@ export default function LaporanPengirimanFilter({
       unitTypeId,
       perPage: parseInt(perPage, 10),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange, searchQuery, activeTab, perPage]);
+  };
 
   return (
     <div className="flex items-end justify-between w-full no-print gap-4">
@@ -137,7 +169,7 @@ export default function LaporanPengirimanFilter({
         <div className="flex flex-col space-y-2">
           <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
           <div className="w-[280px]">
-            <DatePickerWithRange date={dateRange} onChange={setDateRange} />
+            <DatePickerWithRange date={dateRange} onChange={handleDateChange} />
           </div>
         </div>
 
@@ -205,7 +237,7 @@ export default function LaporanPengirimanFilter({
             </Popover>
           </div>
         )}
- 
+
         <div className="flex flex-col space-y-2">
           <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
@@ -221,7 +253,7 @@ export default function LaporanPengirimanFilter({
           </Select>
         </div>
       </div>
- 
+
       <div className="flex items-center gap-2">
         <Button variant="outline" onClick={onPrint} className="w-full sm:w-auto">
           <Printer className="h-4 w-4 mr-2" /> Print
