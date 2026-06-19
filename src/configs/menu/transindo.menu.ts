@@ -130,6 +130,7 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Aset',
           href: base('/finance/asset'),
         },
+
       ],
     },
     {
@@ -143,6 +144,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
         {
           label: 'Laporan Persediaan Barang',
           href: base('/laporan/laporan-stock-perlengkapan'),
+        },
+        {
+          label: 'Laporan Invoice',
+          href: base('/laporan/laporan-invoice'),
         },
       ],
     },
