@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LaporanKasTable } from '@/components/features/laporan-kas/LaporanKasTable';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -10,6 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLaporanKas } from '@/hooks/useLaporanKas';
 import { cn } from '@/lib/utils';
+import { useCompany } from '@/contexts/CompanyContext';
+import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
+import { PrintLetterPage } from '@/components/common/PrintLetterPage';
+import { formatDate } from '@/lib/utils/format';
 
 export default function LaporanTransaksiKasPage() {
   const {
@@ -26,6 +31,24 @@ export default function LaporanTransaksiKasPage() {
     sortKey,
     sortOrder,
   } = useLaporanKas();
+
+  const router = useRouter();
+  const { companyId } = useCompany();
+  const slugParam = router.query.slug;
+
+  const resolvedCompanyId = resolveCompanyId(slugParam, companyId) || 3;
+  const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
+
+  const getCompanyName = (coId: number) => {
+    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
+    if (coId === 3) return 'PT WAJIRA YANOTAMA';
+    if (coId === 4) return 'PT WAJIRA TRANSINDO';
+    return 'PT WAJIRA JAGRATARA';
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const [dateRange, setDateRangeState] = useState<DateRange | undefined>({
     from: new Date(2025, 0, 20),
@@ -82,9 +105,15 @@ export default function LaporanTransaksiKasPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold">Laporan Transaksi Kas</h1>
-          <p className="text-sm text-muted-foreground">Pantau semua pemasukan dan pengeluaran</p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div>
+            <h1 className="text-2xl font-semibold">Laporan Transaksi Kas</h1>
+            <p className="text-sm text-muted-foreground">Pantau semua pemasukan dan pengeluaran</p>
+          </div>
+          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+            <Printer className="h-4 w-4 mr-2" />
+            Print
+          </Button>
         </div>
 
         {/* Filters */}
@@ -142,14 +171,36 @@ export default function LaporanTransaksiKasPage() {
             </div>
           ) : (
             <>
-              <LaporanKasTable 
-                data={data} 
-                totalPemasukan={totalPemasukan}
-                totalPengeluaran={totalPengeluaran}
-                onSort={(key) => setSort(key, sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc')}
-                sortKey={sortKey}
-                sortOrder={sortOrder}
-              />
+              {/* Print Letter Wrapping Container */}
+              <PrintLetterPage
+                id="laporan-transaksi-kas-print"
+                className="laporan-penerimaan-print-area"
+                letterheadSrc={selectedPrintBackground}
+              >
+                <div className="laporan-penerimaan-print-content print-letter-content">
+                  {/* Cover Letter Heading - Visible only in Print */}
+                  <div className="hidden print:flex flex-col items-center justify-center text-center space-y-1 mb-8 w-full">
+                    <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
+                      Laporan Transaksi Kas
+                    </h2>
+                    <p className="text-[13px] font-bold text-gray-900 tracking-wide">
+                      {getCompanyName(resolvedCompanyId)}
+                    </p>
+                    <p className="text-[11px] text-gray-600">
+                      Tanggal Cetak: {formatDate(new Date())}
+                    </p>
+                  </div>
+
+                  <LaporanKasTable 
+                    data={data} 
+                    totalPemasukan={totalPemasukan}
+                    totalPengeluaran={totalPengeluaran}
+                    onSort={(key) => setSort(key, sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc')}
+                    sortKey={sortKey}
+                    sortOrder={sortOrder}
+                  />
+                </div>
+              </PrintLetterPage>
               
               {/* Pagination */}
               {data.length > 0 && (
