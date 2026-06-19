@@ -146,6 +146,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/laporan/laporan-stock-perlengkapan'),
         },
         {
+          label: 'Laporan Aset',
+          href: base('/laporan/laporan-aset'),
+        },
+        {
           label: 'Laporan Invoice',
           href: base('/laporan/laporan-invoice'),
         },

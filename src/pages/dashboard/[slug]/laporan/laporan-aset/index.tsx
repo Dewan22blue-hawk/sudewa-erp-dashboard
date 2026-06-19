@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Search, Printer, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -27,6 +27,13 @@ export default function LaporanAssetPage() {
 
   const resolvedCompanyId = resolveCompanyId(slugParam, companyId) || 3;
   const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
+
+  const getCompanyName = (coId: number) => {
+    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
+    if (coId === 3) return 'PT WAJIRA YANOTAMA';
+    if (coId === 4) return 'PT WAJIRA TRANSINDO';
+    return 'PT WAJIRA';
+  };
 
   // States
   const [page, setPage] = useState<number>(1);
@@ -83,29 +90,6 @@ export default function LaporanAssetPage() {
       setSortOrder('desc');
     }
     setPage(1);
-  };
-
-  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
-    const isSorted = sortBy === sortKey;
-    const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    return (
-      <button
-        type="button"
-        className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase transition-colors ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
-        onClick={() => handleSort(sortKey)}
-      >
-        <span>{title}</span>
-        {isSorted ? (
-          sortOrder === 'asc' ? (
-            <ArrowUp className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-          ) : (
-            <ArrowDown className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-          )
-        ) : (
-          <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
-        )}
-      </button>
-    );
   };
 
   // Print triggering handler
@@ -171,7 +155,7 @@ export default function LaporanAssetPage() {
                 Laporan Aset
               </h2>
               <p className="text-[15px] font-bold text-gray-900 tracking-wide">
-                PT WAJIRA YANOTAMA
+                {getCompanyName(resolvedCompanyId)}
               </p>
               <p className="text-[12px] text-gray-600">
                 Tanggal Cetak: {formatDate(new Date())}
@@ -194,22 +178,22 @@ export default function LaporanAssetPage() {
                   <Table>
                     <TableHeader className="bg-slate-50 border-b border-slate-200">
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-12 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
-                        <TableHead className="p-0 text-left">
-                          {renderSortHeader('Kode Aset', 'asset_code')}
+                        <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700">NO</TableHead>
+                        <TableHead onClick={() => handleSort('asset_code')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          KODE ASET <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                         </TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">TGL BELI</TableHead>
-                        <TableHead className="p-0 text-left">
-                          {renderSortHeader('Nama Barang', 'asset_name')}
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TGL BELI</TableHead>
+                        <TableHead onClick={() => handleSort('asset_name')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                         </TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">TIPE ASET</TableHead>
-                        <TableHead className="p-0 text-left">
-                          {renderSortHeader('Serial Number', 'serial_number')}
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE ASET</TableHead>
+                        <TableHead onClick={() => handleSort('serial_number')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          SERIAL NUMBER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                         </TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">HARGA BELI</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">UMUR EKONOMIS</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">PENYUSUTAN/BULAN</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">NILAI AKHIR</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">HARGA BELI</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UMUR EKONOMIS</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">PENYUSUTAN/BULAN</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NILAI AKHIR</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
