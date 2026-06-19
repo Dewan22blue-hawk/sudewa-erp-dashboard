@@ -185,7 +185,7 @@ export default function LPJumlahOutstandingPage() {
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Laporan Jumlah Outstanding</h1>
+            <h1 className="text-2xl font-semibold text-slate-950">Laporan Jumlah Outstanding</h1>
             <p className="text-sm text-slate-500 mt-1">Laporan jumlah data outstanding dokumen kendaraan</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">

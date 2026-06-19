@@ -173,7 +173,7 @@ export default function LaporanStockPage() {
         <DashboardLayout>
             <div className="space-y-6 px-1">
                 <div className="no-print">
-                    <h1 className="text-2xl font-semibold text-slate-900">{activeMeta.title}</h1>
+                    <h1 className="text-2xl font-semibold text-slate-950">{activeMeta.title}</h1>
                     <p className="text-sm text-slate-500 mt-1">{activeMeta.subtitle}</p>
                 </div>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

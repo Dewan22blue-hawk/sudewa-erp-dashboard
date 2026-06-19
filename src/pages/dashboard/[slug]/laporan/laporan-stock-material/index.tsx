@@ -104,7 +104,7 @@ export default function LaporanStockMaterialPage() {
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Laporan Stock Material</h1>
+            <h1 className="text-2xl font-semibold text-slate-950">Laporan Stock Material</h1>
             <p className="text-sm text-slate-500 mt-1">Laporan stock material, penerimaan barang, dan pengeluaran barang</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">

@@ -167,7 +167,7 @@ export default function LaporanPembelianPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <div className="no-print">
-          <h1 className="text-2xl font-semibold text-slate-900">Laporan Pembelian</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">Laporan Pembelian</h1>
           <p className="text-sm text-slate-500 mt-1">Pantau semua transaksi pembelian</p>
         </div>
 

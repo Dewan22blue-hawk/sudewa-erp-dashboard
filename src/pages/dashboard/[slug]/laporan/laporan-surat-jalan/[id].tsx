@@ -158,8 +158,8 @@ export default function LaporanSuratJalanDetailPage() {
             <ArrowLeft className="h-5 w-5 text-slate-700" />
           </Button>
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Informasi Surat Jalan</h1>
-            <p className="text-[15px] text-gray-500">Informasi lengkap mengenai surat jalan</p>
+            <h1 className="text-2xl font-semibold text-slate-950">Informasi Surat Jalan</h1>
+            <p className="text-sm text-slate-500 mt-1">Informasi lengkap mengenai surat jalan</p>
           </div>
         </div>
 

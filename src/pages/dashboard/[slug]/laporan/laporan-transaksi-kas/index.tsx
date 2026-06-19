@@ -85,7 +85,7 @@ export default function LaporanTransaksiKasPage() {
       <div className="space-y-6 px-1">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Laporan Transaksi Kas</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">Laporan Transaksi Kas</h1>
           <p className="text-sm text-slate-500 mt-1">Pantau semua pemasukan dan pengeluaran</p>
         </div>
 

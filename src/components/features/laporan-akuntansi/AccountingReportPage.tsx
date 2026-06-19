@@ -219,7 +219,7 @@ export default function AccountingReportPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <header className="print:hidden">
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-950">
             Laporan Akuntansi
           </h1>
           <p className="text-sm text-slate-500 mt-1">

@@ -122,7 +122,7 @@ export default function LPJumlahTerimaPage() {
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Laporan Jumlah Terima</h1>
+            <h1 className="text-2xl font-semibold text-slate-950">Laporan Jumlah Terima</h1>
             <p className="text-sm text-slate-500 mt-1">Laporan jumlah data masuk ke sistem</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">

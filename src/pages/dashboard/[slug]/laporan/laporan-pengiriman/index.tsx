@@ -107,7 +107,7 @@ export default function LaporanPengirimanPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <div className="no-print">
-          <h1 className="text-2xl font-semibold text-slate-900">Laporan Pengiriman</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">Laporan Pengiriman</h1>
           <p className="text-sm text-slate-500 mt-1">Pantau semua transaksi pengiriman unit</p>
         </div>
 
