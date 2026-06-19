@@ -52,8 +52,8 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
   // Filter states
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPerPage, setCurrentPerPage] = useState(10);
-  const [startDate, setStartDate] = useState<string | null>('2025-01-20');
-  const [endDate, setEndDate] = useState<string | null>('2025-02-09');
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
   const [currentSearch, setCurrentSearch] = useState('');
   const [sortKey, setSortKey] = useState<string>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -71,12 +71,12 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
         sort_direction: sortOrder,
         company_id: resolvedCompanyId ?? undefined,
       };
-      
+
       if (startDate) params.start_date = startDate;
       if (endDate) params.end_date = endDate;
-      
+
       const result = await cashFlowService.getCashFlow(params);
-      
+
       setData(result.data);
       setPagination({
         currentPage: result.current_page,
@@ -86,13 +86,13 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
         from: result.from || 0,
         to: result.to || 0,
       });
-      
+
       // Hitung total pemasukan dan pengeluaran dari data yang ditampilkan
       const pemasukan = result.data.reduce((sum, item) => sum + (item.debet || 0), 0);
       const pengeluaran = result.data.reduce((sum, item) => sum + (item.credit || 0), 0);
       setTotalPemasukan(pemasukan);
       setTotalPengeluaran(pengeluaran);
-      
+
     } catch (err: any) {
       setError(err.message || 'Gagal mengambil data laporan kas');
       toast.error('Gagal memuat data');

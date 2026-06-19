@@ -50,10 +50,7 @@ export default function LaporanTransaksiKasPage() {
     window.print();
   };
 
-  const [dateRange, setDateRangeState] = useState<DateRange | undefined>({
-    from: new Date(2025, 0, 20),
-    to: addDays(new Date(2025, 0, 20), 20),
-  });
+  const [dateRange, setDateRangeState] = useState<DateRange | undefined>(undefined);
   const [searchInput, setSearchInput] = useState('');
 
   // Debounce search
