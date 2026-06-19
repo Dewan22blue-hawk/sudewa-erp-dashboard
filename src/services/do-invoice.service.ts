@@ -11,12 +11,14 @@ import type {
   DoInvoiceProcessResponse,
   DoInvoiceTarif,
   DoInvoiceVehicle,
+  CreateFinanceInvoicePaymentPayload,
 } from '@/@types/create-invoice.types';
 import type { PaginationParams } from '@/@types/pagination.types';
 import { apiClient } from '@/lib/api/client';
-import { ensureSuccess, type LaravelApiResponse, toPaginatedResult } from '@/lib/api/response';
+import { ApiValidationError, ensureSuccess, type LaravelApiResponse, toPaginatedResult } from '@/lib/api/response';
 
 const basePath = '/wapi/transaction/do-invoice';
+const paymentPath = '/wapi/finance/finance-invoice-billing-payment';
 
 const toNumber = (value: unknown) => {
   if (value == null || value === '') return 0;
@@ -75,6 +77,11 @@ const mapOrderList = (item: any): DoInvoiceOrderList | null => {
     id: Number(item.id ?? 0),
     uuid: item.uuid,
     code: item.code ?? '-',
+    doDeliveryDestination: item.do_delivery_destination ?? item.delivery_destination ?? item.doDeliveryDestination ?? null,
+    loadingIn: item.loading_in ?? item.loadingIn ?? null,
+    loadingOut: item.loading_out ?? item.loadingOut ?? null,
+    vehicleType: item.vehicle_type ?? item.vehicleType ?? null,
+    billInvoice: toNumber(item.bill_invoice ?? item.billInvoice),
   };
 };
 
@@ -193,10 +200,15 @@ const mapDoInvoice = (item: any): DoInvoice => {
     letterContent: item?.letter_content ?? '',
     description: item?.description ?? null,
     isAlreadyPrint: toBool(item?.is_already_print ?? item?.is_printed),
+    other_fee: toNumber(item?.other_fee),
+    additional_fee: toNumber(item?.additional_fee),
+    finance_billing_payment: item?.finance_billing_payment || null,
     createdAt: item?.created_at,
     updatedAt: item?.updated_at,
     customer,
     orderList,
+    vehicle: mapVehicle(item?.vehicle),
+    driver: mapDriver(item?.driver),
     expeditions,
     raw: item,
   };
@@ -317,4 +329,22 @@ export const processExpeditionById = async (
   });
 
   return ensureSuccess(response.data);
+};
+
+export const createFinanceInvoiceBillingPayment = async (payload: CreateFinanceInvoicePaymentPayload): Promise<any> => {
+  try {
+    const formData = new FormData();
+    formData.append('do_invoice_id', String(payload.do_invoice_id));
+    formData.append('cash_id', String(payload.cash_id));
+    formData.append('amount', String(payload.amount));
+
+    const response = await apiClient.post<LaravelApiResponse<any>>(paymentPath, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return ensureSuccess(response.data);
+  } catch (error) {
+    if (error instanceof ApiValidationError) throw error;
+    throw error;
+  }
 };

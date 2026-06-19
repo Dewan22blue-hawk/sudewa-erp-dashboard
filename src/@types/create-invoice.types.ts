@@ -12,6 +12,11 @@ export interface DoInvoiceOrderList {
   id: number;
   uuid?: string;
   code: string;
+  doDeliveryDestination?: string | null;
+  loadingIn?: string | null;
+  loadingOut?: string | null;
+  vehicleType?: string | null;
+  billInvoice?: number | null;
 }
 
 export interface DoInvoiceVehicle {
@@ -60,6 +65,16 @@ export interface DoInvoiceExpedition {
   destination?: string;
 }
 
+export interface FinanceBillingPayment {
+  id?: number;
+  uuid?: string | null;
+  amount?: number | null;
+  total_paid?: number | null;
+  cash_id?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
 export interface DoInvoice {
   id: number;
   uuid?: string;
@@ -70,10 +85,15 @@ export interface DoInvoice {
   letterContent: string;
   description: string | null;
   isAlreadyPrint: boolean;
+  other_fee?: number | null;
+  additional_fee?: number | null;
+  finance_billing_payment?: FinanceBillingPayment | null;
   createdAt?: string;
   updatedAt?: string;
   customer?: DoInvoiceCustomer | null;
   orderList?: DoInvoiceOrderList | null;
+  vehicle?: DoInvoiceVehicle | null;
+  driver?: DoInvoiceDriver | null;
   expeditions: DoInvoiceExpedition[];
   raw?: Record<string, unknown>;
 }
@@ -179,6 +199,12 @@ export interface CreateInvoicePrintPayload {
   customerName: string;
   rows: CreateInvoiceDetailRow[];
   statusLabel: string;
+}
+
+export interface CreateFinanceInvoicePaymentPayload {
+  do_invoice_id: number;
+  cash_id: number;
+  amount: number;
 }
 
 export type DoInvoiceListResponse = PaginatedResult<DoInvoice>;

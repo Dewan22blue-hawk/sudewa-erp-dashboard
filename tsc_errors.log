@@ -1,0 +1,7 @@
+src/components/features/finance/withholding-tax/WithholdingTaxFormModal.tsx(7,44): error TS2307: Cannot find module '@/components/ui/radio-group' or its corresponding type declarations.
+src/components/features/finance/withholding-tax/WithholdingTaxFormModal.tsx(55,35): error TS2339: Property 'cash_name' does not exist on type 'Kas'.
+src/components/features/finance/withholding-tax/WithholdingTaxFormModal.tsx(196,14): error TS2552: Cannot find name 'Skeleton'. Did you mean 'Selection'?
+src/components/features/finance/withholding-tax/WithholdingTaxFormModal.tsx(197,14): error TS2552: Cannot find name 'Skeleton'. Did you mean 'Selection'?
+src/components/features/finance/withholding-tax/WithholdingTaxFormModal.tsx(198,14): error TS2552: Cannot find name 'Skeleton'. Did you mean 'Selection'?
+src/components/features/finance/withholding-tax/WithholdingTaxFormModal.tsx(207,33): error TS7006: Parameter 'val' implicitly has an 'any' type.
+src/pages/dashboard/[slug]/finance/bukti-potong/index.tsx(48,5): error TS2561: Object literal may only specify known properties, but 'per_page' does not exist in type 'WithholdingTaxListParams & { enabled?: boolean | undefined; }'. Did you mean to write 'perPage'?
