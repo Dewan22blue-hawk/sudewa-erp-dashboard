@@ -130,6 +130,7 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Aset',
           href: base('/finance/asset'),
         },
+
       ],
     },
     {
