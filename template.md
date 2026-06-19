@@ -51,32 +51,35 @@ tsx
    {/* Action Buttons (Kanan) */}
 </div>
 5. Input & Control Elements
-Aturan: Semua control inputs (Search Input, Dropdown Select, Date Picker, Popover) harus seragam menggunakan border-radius rounded-xl, border tipis border-slate-200, latar belakang bg-white, soft shadow shadow-sm, dan tinggi default normal (h-9 / default, tidak menggunakan h-12 atau h-11).
+Aturan: Semua control inputs (Search Input, Dropdown Select, Date Picker) harus seragam menggunakan border-radius DEFAULT rounded-md (bukan rounded-xl) — konsisten dengan Master Data Akun. Cukup set bg-white, tanpa perlu override border-color atau shadow secara eksplisit.
 Standardisasi:
 Search Input:
-tsx
-
+```tsx
 <div className="relative w-full sm:w-[300px]">
   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
   <Input
     placeholder="Search here"
-    className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
+    className="pl-9 bg-white"
   />
 </div>
-Select Trigger:
-tsx
-
-<SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
+```
+Select Trigger (pagination):
+```tsx
+<SelectTrigger className="w-[70px] bg-white cursor-pointer">
   <SelectValue />
 </SelectTrigger>
-DatePicker (single date):
-tsx
+```
+DatePickerWithRange (sudah built-in styling rounded-md):
+```tsx
+<DatePickerWithRange
+  className="w-[240px]"
+  date={dateRange}
+  onChange={...}
+/>
+```
 
-<DatePicker className="rounded-xl border-slate-200 bg-white shadow-sm" placeholder="Pilih tanggal" ... />
-DatePickerWithRange:
-tsx
+> ⚠️ CATATAN: Jangan gunakan rounded-xl pada Search Input, SelectTrigger pagination, dan DatePickerWithRange di halaman list/filter. rounded-xl hanya dipakai untuk action button (Tambah, Back button) dan Reset Filter button.
 
-<DatePickerWithRange placeholder="Pilih rentang tanggal" date={...} onChange={...} />
 CATATAN FORMAT TANGGAL (BUG FIX):
 - Format tanggal yang digunakan adalah "dd MMM yyyy" (contoh: 19 Jun 2025), BUKAN "PPP" atau "LLL dd, y" yang bergantung pada locale bahasa Inggris.
 - DatePickerWithRange sekarang mendukung prop `placeholder` opsional. Default: "Pilih rentang tanggal".

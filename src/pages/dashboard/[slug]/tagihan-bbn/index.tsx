@@ -136,9 +136,11 @@ export default function BBNBillListPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-[38px] font-semibold tracking-[-0.03em] text-slate-950">Data Tagihan BBN</h1>
-          <p className="mt-1 text-base text-slate-500">Kelola data bbn dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Data Tagihan BBN</h1>
+            <p className="text-sm text-slate-500">Kelola data tagihan BBN dengan mudah</p>
+          </div>
         </div>
 
         <BBNBillTable

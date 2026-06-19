@@ -43,7 +43,7 @@ function SummaryField({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium text-slate-900">{label}</Label>
-      <Input value={value} readOnly className="h-11 rounded-xl border-slate-200 bg-white text-slate-500" />
+      <Input value={value} readOnly className="rounded-xl border-slate-200 bg-white text-slate-500 shadow-sm" />
     </div>
   );
 }
@@ -263,7 +263,7 @@ export default function BBNBillPaymentPage() {
                       <Controller
                         name="paidDate"
                         control={form.control}
-                        render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />}
+                        render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
                       />
                     </div>
                     <div className="space-y-2">
@@ -273,8 +273,8 @@ export default function BBNBillPaymentPage() {
                         control={form.control}
                         render={({ field }) => (
                           <Select value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger className="h-11 rounded-xl border-slate-200">
-                              <SelectValue placeholder="Select an item" />
+                            <SelectTrigger className="rounded-xl border-slate-200 bg-white shadow-sm">
+                              <SelectValue placeholder="Pilih kas masuk" />
                             </SelectTrigger>
                             <SelectContent>
                               {cashOptions.map((cash) => (
@@ -292,7 +292,7 @@ export default function BBNBillPaymentPage() {
                       <Controller
                         name="amount"
                         control={form.control}
-                        render={({ field }) => <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-11 rounded-xl border-slate-200" />}
+                        render={({ field }) => <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="rounded-xl border-slate-200 shadow-sm" />}
                       />
                     </div>
                   </div>
@@ -303,7 +303,7 @@ export default function BBNBillPaymentPage() {
                       <Label className="text-sm font-medium text-slate-900">Upload Bukti Pembayaran</Label>
                         <Input
                           type="file"
-                          className="h-11 rounded-xl border-slate-200"
+                          className="rounded-xl border-slate-200 bg-white shadow-sm"
                           onChange={(event) => {
                             setProofName(event.target.files?.[0]?.name || '');
                           }}

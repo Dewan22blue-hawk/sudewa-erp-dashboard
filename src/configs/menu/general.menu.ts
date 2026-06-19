@@ -103,6 +103,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/warehouse/pengeluaran-unit'),
         },
         {
+          label: 'Stock Perlengkapan',
+          href: base('/warehouse/stock-perlengkapan'),
+        },
+        {
           label: 'Perlengkapan Masuk',
           href: base('/warehouse/perlengkapan-masuk'),
         },
@@ -117,10 +121,6 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         {
           label: 'Perlengkapan Keluar',
           href: base('/warehouse/perlengkapan-keluar'),
-        },
-        {
-          label: 'Stock Perlengkapan',
-          href: base('/warehouse/stock-perlengkapan'),
         },
       ],
     },

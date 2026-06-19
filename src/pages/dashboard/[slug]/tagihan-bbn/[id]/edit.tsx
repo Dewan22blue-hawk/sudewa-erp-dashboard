@@ -147,7 +147,7 @@ export default function EditBBNBillPage() {
                 <Controller
                   name="billDate"
                   control={form.control}
-                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />}
+                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
                 />
               </div>
 
@@ -156,12 +156,12 @@ export default function EditBBNBillPage() {
                 <Controller
                   name="paidDate"
                   control={form.control}
-                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />}
+                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
                 />
               </div>
 
               <div className="flex items-end justify-end">
-                <Button type="submit" disabled={updateMutation.isPending} className="h-11 rounded-xl bg-[#1f4163] px-6 hover:bg-[#183552]">
+                <Button type="submit" disabled={updateMutation.isPending} className="rounded-xl bg-[#1e3a5f] px-6 hover:bg-[#152e4d]">
                   <Save className="mr-2 h-4 w-4" />
                   {updateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
                 </Button>

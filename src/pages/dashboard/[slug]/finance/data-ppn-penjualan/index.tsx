@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
-import { Search, RotateCw, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import type { PPNPenjualan } from '@/@types/ppn-penjualan.types';
 import PPNPenjualanFormDialog from '@/components/features/ppn-penjualan/PPNPenjualanFormDialog';
@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePPNPenjualan } from '@/hooks/usePPNPenjualan';
-import { DatePicker } from '@/components/ui/date-picker';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 
 export default function DataPPNPenjualanPage() {
@@ -22,8 +23,7 @@ export default function DataPPNPenjualanPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [selected, setSelected] = useState<PPNPenjualan | null>(null);
   const [openForm, setOpenForm] = useState(false);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -39,12 +39,12 @@ export default function DataPPNPenjualanPage() {
       page,
       per_page: perPage,
       search: search || undefined,
-      start_date: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
-      end_date: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
+      start_date: dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
+      end_date: dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
       sort_by: sortBy,
       sort_direction: sortDirection,
     }),
-    [page, perPage, search, startDate, endDate, sortBy, sortDirection],
+    [page, perPage, search, dateRange, sortBy, sortDirection],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } = usePPNPenjualan(query);
@@ -91,98 +91,69 @@ export default function DataPPNPenjualanPage() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 no-print">
-          {/* === Kiri: Search + Date Filter === */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap w-full sm:w-auto">
-            {/* Search Input */}
-            <div className="relative w-full sm:w-[240px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search here"
-                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm h-9 text-sm"
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-              />
-            </div>
-
-            {/* Date Range Group */}
-            <div className="flex items-center bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden divide-x divide-slate-200">
-              <div className="w-[148px]">
-                <DatePicker
-                  className="rounded-none border-0 shadow-none bg-transparent h-9 text-sm"
-                  value={startDate}
-                  onChange={(date) => { setStartDate(date ?? null); setPage(1); }}
-                  placeholder="Mulai Tanggal"
-                />
-              </div>
-              <div className="px-2 text-slate-400 text-xs font-medium select-none">→</div>
-              <div className="w-[148px]">
-                <DatePicker
-                  className="rounded-none border-0 shadow-none bg-transparent h-9 text-sm"
-                  value={endDate}
-                  onChange={(date) => { setEndDate(date ?? null); setPage(1); }}
-                  placeholder="Sampai Tanggal"
-                />
-              </div>
-            </div>
-
-            {/* Reset Button (muncul hanya saat ada filter aktif) */}
-            {(searchInput || startDate || endDate) && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-9 px-3 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
-                onClick={() => {
-                  setSearchInput('');
-                  setSearch('');
-                  setStartDate(null);
-                  setEndDate(null);
-                  setPage(1);
-                }}
-              >
-                <X className="h-3.5 w-3.5" />
-                Reset Filter
-              </Button>
-            )}
+        <div className="flex items-center gap-2 flex-wrap no-print">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search here"
+              className="pl-9 bg-white"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+            />
           </div>
 
-          {/* === Kanan: Show Per Page + Refresh === */}
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select
-                value={String(perPage)}
-                onValueChange={(value) => {
-                  setPerPage(Number(value));
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
-            </div>
+          {/* Date Range Picker */}
+          <DatePickerWithRange
+            className="w-[240px]"
+            date={dateRange}
+            onChange={(range) => {
+              setDateRange(range);
+              setPage(1);
+            }}
+          />
 
+          {/* Pagination Dropdown */}
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Show</span>
+            <Select
+              value={String(perPage)}
+              onValueChange={(value) => {
+                setPerPage(Number(value));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+            <span>Page</span>
+          </div>
+
+          {/* Reset Button (muncul hanya saat ada filter aktif) */}
+          {(searchInput || dateRange) && (
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="h-9 rounded-xl border-slate-200 gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 cursor-pointer"
-              onClick={() => void refetch()}
-              disabled={isFetching}
+              className="h-9 px-3 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
+              onClick={() => {
+                setSearchInput('');
+                setSearch('');
+                setDateRange(undefined);
+                setPage(1);
+              }}
             >
-              <RotateCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-              Refresh
+              <X className="h-3.5 w-3.5" />
+              Reset Filter
             </Button>
-          </div>
+          )}
         </div>
 
 

@@ -89,19 +89,19 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: Warehouse,
       children: [
         {
-          label: 'Perlengkapan Masuk',
-          href: base('/warehouse/perlengkapan-masuk'),
-        },
-        {
-          label: 'Pengeluaran Perlengkapan',
-          href: base('/warehouse/pengeluaran-perlengkapan'),
-        },
-        {
-          label: 'Stock Perlengkapan',
+          label: 'Persediaan Barang',
           href: base('/warehouse/stock-perlengkapan'),
         },
         {
-          label: 'Maintenance',
+          label: 'Penerimaan Barang',
+          href: base('/warehouse/perlengkapan-masuk'),
+        },
+        {
+          label: 'Pengeluaran Barang',
+          href: base('/warehouse/pengeluaran-perlengkapan'),
+        },
+        {
+          label: 'Maintenance Armada',
           href: base('/warehouse/maintenance'),
         },
       ],
@@ -141,7 +141,7 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/laporan/laporan-surat-jalan'),
         },
         {
-          label: 'Laporan Stock Perlengkapan',
+          label: 'Laporan Persediaan Barang',
           href: base('/laporan/laporan-stock-perlengkapan'),
         },
       ],

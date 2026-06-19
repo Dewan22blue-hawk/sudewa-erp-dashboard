@@ -119,11 +119,11 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     href: base('/warehouse/stock-perlengkapan'),
                 },
                 {
-                    label: 'Penerimaan Material',
+                    label: 'Penerimaan Perlengkapan',
                     href: base('/warehouse/penerimaan-material'),
                 },
                 {
-                    label: 'Pengeluaran Material',
+                    label: 'Pengeluaran Perlengkapan',
                     href: base('/warehouse/pengeluaran-material'),
                 },
             ],
