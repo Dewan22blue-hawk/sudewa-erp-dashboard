@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
+import { Printer, Download, ChevronsUpDown, Check } from 'lucide-react';
 import { getSuppliers, getUnitTypes } from '@/services/laporan-pembelian.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -92,9 +92,9 @@ export default function LaporanPembelianFilter({
   const rawOptions = activeTab === 'per-supplier' ? suppliers : unitTypes;
   const currentOptions = Array.isArray(rawOptions) ? rawOptions : [];
 
-  const handleApplyFilter = () => {
-    const startDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDate;
+  useEffect(() => {
+    const startDateVal = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
+    const endDateVal = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDateVal;
 
     let supplierId: number | null = null;
     let search = '';
@@ -111,12 +111,13 @@ export default function LaporanPembelianFilter({
     }
 
     onApplyFilters({
-      startDate,
-      endDate,
+      startDate: startDateVal,
+      endDate: endDateVal,
       supplierId,
       search,
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, searchQuery, activeTab]);
 
   const filteredOptions = currentOptions.filter(opt =>
     opt?.name?.toLowerCase().includes(searchTermInside.toLowerCase())
@@ -199,16 +200,6 @@ export default function LaporanPembelianFilter({
             </Popover>
           </div>
         )}
-
-        {/* Tombol Show (Dipindah ke paling kanan filter group) */}
-        <Button 
-          variant="outline" 
-          onClick={handleApplyFilter} 
-          className="bg-[#f8f9fa] border border-slate-200 shadow-sm text-gray-700 hover:bg-slate-50 gap-2 px-4 whitespace-nowrap rounded-xl mb-[1px] cursor-pointer"
-        >
-          <Eye className="h-4 w-4" />
-          Show
-        </Button>
       </div>
 
       {/* Action Buttons */}

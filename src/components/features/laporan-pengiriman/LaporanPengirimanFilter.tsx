@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
+import { Printer, Download, ChevronsUpDown, Check } from 'lucide-react';
 import { getCustomers, getUnitTypes } from '@/services/laporan-pengiriman.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -100,7 +100,7 @@ export default function LaporanPengirimanFilter({
     option.name?.toLowerCase().includes(searchTermInside.toLowerCase())
   );
 
-  const handleApplyFilter = () => {
+  useEffect(() => {
     const appliedStartDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
@@ -128,7 +128,8 @@ export default function LaporanPengirimanFilter({
       unitTypeId,
       perPage: parseInt(perPage, 10),
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, searchQuery, activeTab, perPage]);
 
   return (
     <div className="flex items-end justify-between w-full no-print gap-4">
@@ -219,15 +220,6 @@ export default function LaporanPengirimanFilter({
             </SelectContent>
           </Select>
         </div>
- 
-        <Button
-          variant="outline"
-          onClick={handleApplyFilter}
-          className="gap-2 px-4 whitespace-nowrap rounded-xl mb-[1px]"
-        >
-          <Eye className="h-4 w-4" />
-          Show
-        </Button>
       </div>
  
       <div className="flex items-center gap-2">

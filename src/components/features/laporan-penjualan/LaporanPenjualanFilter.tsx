@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
+import { Printer, Download, ChevronsUpDown, Check } from 'lucide-react';
 import { getCustomers, getUnitTypes } from '@/services/laporan-penjualan.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -92,9 +92,9 @@ export default function LaporanPenjualanFilter({
   const rawOptions = activeTab === 'per-customer' ? customers : unitTypes;
   const currentOptions = Array.isArray(rawOptions) ? rawOptions : [];
 
-  const handleApplyFilter = () => {
-    const startDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDate;
+  useEffect(() => {
+    const startDateVal = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
+    const endDateVal = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDateVal;
 
     let customerId: number | null = null;
     let search = '';
@@ -111,12 +111,13 @@ export default function LaporanPenjualanFilter({
     }
 
     onApplyFilters({
-      startDate,
-      endDate,
+      startDate: startDateVal,
+      endDate: endDateVal,
       customerId,
       search,
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, searchQuery, activeTab]);
 
   const filteredOptions = currentOptions.filter(opt =>
     opt?.name?.toLowerCase().includes(searchTermInside.toLowerCase())
@@ -199,16 +200,6 @@ export default function LaporanPenjualanFilter({
             </Popover>
           </div>
         )}
- 
-        {/* Tombol Show */}
-        <Button 
-          variant="outline" 
-          onClick={handleApplyFilter} 
-          className="gap-2 px-4 whitespace-nowrap rounded-xl mb-[1px]"
-        >
-          <Eye className="h-4 w-4" />
-          Show
-        </Button>
       </div>
  
       {/* Action Buttons */}
