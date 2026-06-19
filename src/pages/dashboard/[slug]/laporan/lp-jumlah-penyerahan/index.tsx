@@ -73,6 +73,22 @@ export default function LPJumlahPenyerahanPage() {
     return format(date, 'dd/MM/yyyy');
   };
 
+  const renderDocBadge = (label: string, isDelivered: boolean) => {
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border transition-all",
+          isDelivered
+            ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm"
+            : "bg-slate-50 text-slate-400 border-slate-200/80"
+        )}
+      >
+        <span className={cn("h-1.5 w-1.5 rounded-full", isDelivered ? "bg-emerald-500" : "bg-slate-300")} />
+        {label}
+      </span>
+    );
+  };
+
   // Sorting handler
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -205,6 +221,9 @@ export default function LPJumlahPenyerahanPage() {
                           TGL TERIMA BPKB
                         </TableHead>
                         <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          STATUS PENYERAHAN
+                        </TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
                           TGL PENYERAHAN
                         </TableHead>
                       </TableRow>
@@ -257,13 +276,21 @@ export default function LPJumlahPenyerahanPage() {
                               <TableCell className="text-slate-600 whitespace-nowrap">{tglDaftar}</TableCell>
                               <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.stnk_received_date)}</TableCell>
                               <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.bpkb_received_date)}</TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                <div className="flex items-center gap-1.5">
+                                  {renderDocBadge('STNK', Boolean(item.customer_delivery_date && item.stnk_received_date))}
+                                  {renderDocBadge('TNKB', Boolean(item.customer_delivery_date && item.tnkb_received_date))}
+                                  {renderDocBadge('SKPD', Boolean(item.customer_delivery_date && item.skpd_received_date))}
+                                  {renderDocBadge('BPKB', Boolean(item.customer_delivery_date && item.bpkb_received_date))}
+                                </div>
+                              </TableCell>
                               <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.customer_delivery_date)}</TableCell>
                             </TableRow>
                           );
                         })
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={13} className="h-28 text-center text-slate-500 font-medium">
+                          <TableCell colSpan={14} className="h-28 text-center text-slate-500 font-medium">
                             Tidak ada data laporan ditemukan.
                           </TableCell>
                         </TableRow>
