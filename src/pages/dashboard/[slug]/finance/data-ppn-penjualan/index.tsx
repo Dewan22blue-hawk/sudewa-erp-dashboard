@@ -149,8 +149,8 @@ export default function DataPPNPenjualanPage() {
 
           {/* === Kanan: Show Per Page + Refresh === */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl shadow-sm px-3 h-9">
-              <span className="text-xs text-slate-500 whitespace-nowrap">Tampilkan</span>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
               <Select
                 value={String(perPage)}
                 onValueChange={(value) => {
@@ -158,7 +158,7 @@ export default function DataPPNPenjualanPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[52px] border-0 shadow-none bg-transparent h-7 px-1 text-sm font-medium text-slate-700 focus:ring-0 cursor-pointer">
+                <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -168,7 +168,7 @@ export default function DataPPNPenjualanPage() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-xs text-slate-500">data</span>
+              <span>Page</span>
             </div>
 
             <Button

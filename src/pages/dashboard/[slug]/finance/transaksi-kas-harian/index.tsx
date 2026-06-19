@@ -207,9 +207,8 @@ export default function KasHarianPage() {
             }}
             disabled={isFetching}
           >
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
             <RotateCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-            Live Update
+            Refresh
           </Button>
         </div>
 
