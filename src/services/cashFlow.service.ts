@@ -6,6 +6,8 @@ export interface CashFlowQueryParams {
   start_date?: string;
   end_date?: string;
   search?: string;
+  sort_by?: string;
+  sort_direction?: string;
 }
 
 export interface CashFlowItem {

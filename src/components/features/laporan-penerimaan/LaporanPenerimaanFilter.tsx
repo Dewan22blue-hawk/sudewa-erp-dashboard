@@ -134,7 +134,7 @@ export default function LaporanPenerimaanFilter({
     <div className="flex items-end justify-between w-full no-print gap-4">
       <div className="flex items-end gap-6 flex-wrap">
         <div className="flex flex-col space-y-2">
-          <label className="text-[13px] font-bold text-gray-900">Periode Transaksi</label>
+          <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
           <div className="w-[280px]">
             <DatePickerWithRange date={dateRange} onChange={setDateRange} />
           </div>
@@ -142,7 +142,7 @@ export default function LaporanPenerimaanFilter({
 
         {activeTab !== 'per-nota' && (
           <div className="flex flex-col space-y-2">
-            <label className="text-[13px] font-bold text-gray-900">
+            <label className="text-[13px] font-medium text-slate-700">
               {activeTab === 'per-tipe' ? 'Masukkan Tipe ' : 'Masukkan Supplier '}
               <span className="text-red-500">*</span>
             </label>
@@ -206,7 +206,7 @@ export default function LaporanPenerimaanFilter({
         )}
 
         <div className="flex flex-col space-y-2">
-          <label className="text-[13px] font-bold text-gray-900">Per Halaman</label>
+          <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
             <SelectTrigger className="w-[130px] bg-white">
               <SelectValue />

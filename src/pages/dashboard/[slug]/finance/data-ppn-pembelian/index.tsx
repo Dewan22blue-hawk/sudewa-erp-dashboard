@@ -89,11 +89,11 @@ export default function DataPPNPembelianPage() {
           <p className="text-sm text-gray-500">Kelola dan lacak semua data PPN pembelian unit langsung dari report backend.</p>
         </div>
 
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap">
-            <div className="relative w-full md:w-[280px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <Input placeholder="Cari kode pembelian, supplier, atau tipe unit" className="pl-10 bg-white" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5 bg-white p-4 rounded-xl border border-slate-200">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap w-full sm:w-auto">
+            <div className="relative w-full sm:w-[280px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input placeholder="Search here" className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} />
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -110,6 +110,7 @@ export default function DataPPNPembelianPage() {
               <Button
                 type="button"
                 variant="outline"
+                className="rounded-xl border-slate-200"
                 onClick={() => {
                   setSearchInput('');
                   setSearch('');
@@ -122,8 +123,8 @@ export default function DataPPNPembelianPage() {
               </Button>
             ) : null}
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Show</span>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
               <Select
                 value={String(perPage)}
                 onValueChange={(value) => {
@@ -131,7 +132,7 @@ export default function DataPPNPembelianPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[80px] bg-white">
+                <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm">
                   <SelectValue placeholder="10" />
                 </SelectTrigger>
                 <SelectContent>
@@ -141,11 +142,11 @@ export default function DataPPNPembelianPage() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-gray-500">Page</span>
+              <span>Page</span>
             </div>
           </div>
 
-          <Button type="button" variant="outline" className="w-full xl:w-auto" onClick={() => void refetch()} disabled={isFetching}>
+          <Button type="button" variant="outline" className="w-full sm:w-auto rounded-xl border-slate-200" onClick={() => void refetch()} disabled={isFetching}>
             <RotateCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             Refresh
           </Button>

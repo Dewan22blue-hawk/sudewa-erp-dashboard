@@ -8,7 +8,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { CashFlowItem } from '@/services/cashFlow.service';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface LaporanKasTableProps {
     data: CashFlowItem[];
@@ -23,7 +23,9 @@ export function LaporanKasTable({
     data, 
     totalPemasukan = 0, 
     totalPengeluaran = 0,
-    onSort
+    onSort,
+    sortKey,
+    sortOrder
 }: LaporanKasTableProps) {
     const formatCurrency = (val: number) => {
         return `Rp ${val.toLocaleString('id-ID')}`;
@@ -38,41 +40,48 @@ export function LaporanKasTable({
         });
     };
 
+    const renderSortHeader = (title: string, key: string, align: 'left' | 'right' | 'center' = 'left') => {
+        const isSorted = sortKey === key;
+        const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
+        return (
+            <button
+                type="button"
+                className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase transition-colors ${
+                    isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
+                } ${justifyClass}`}
+                onClick={() => onSort?.(key)}
+            >
+                <span>{title}</span>
+                {isSorted ? (
+                    sortOrder === 'asc' ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                    ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                    )
+                ) : (
+                    <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
+                )}
+            </button>
+        );
+    };
+
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
             <div className="overflow-x-auto">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[150px]">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer select-none"
-                                    onClick={() => onSort?.('date')}
-                                >
-                                    TANGGAL
-                                    <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <TableHead className="p-0 text-left w-[150px]">
+                                {renderSortHeader('Tanggal', 'date', 'left')}
                             </TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[150px]">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer select-none"
-                                    onClick={() => onSort?.('code')}
-                                >
-                                    NOTA REFF
-                                    <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <TableHead className="p-0 text-left w-[150px]">
+                                {renderSortHeader('Nota Reff', 'code', 'left')}
                             </TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer select-none"
-                                    onClick={() => onSort?.('note')}
-                                >
-                                    KETERANGAN
-                                    <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <TableHead className="p-0 text-left">
+                                {renderSortHeader('Keterangan', 'note', 'left')}
                             </TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px]">PEMASUKAN</TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px]">PENGELUARAN</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-left">PEMASUKAN</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-left">PENGELUARAN</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

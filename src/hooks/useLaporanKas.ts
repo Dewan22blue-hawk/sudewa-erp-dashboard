@@ -20,6 +20,9 @@ interface UseLaporanKasReturn {
   setPerPage: (perPage: number) => void;
   setDateRange: (startDate: string | null, endDate: string | null) => void;
   setSearch: (search: string) => void;
+  setSort: (key: string, direction: 'asc' | 'desc') => void;
+  sortKey: string;
+  sortOrder: 'asc' | 'desc';
   refetch: () => void;
 }
 
@@ -44,6 +47,8 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [currentSearch, setCurrentSearch] = useState('');
+  const [sortKey, setSortKey] = useState<string>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -53,6 +58,8 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
         page: currentPage,
         per_page: currentPerPage,
         search: currentSearch || undefined,
+        sort_by: sortKey,
+        sort_direction: sortOrder,
       };
       
       if (startDate) params.start_date = startDate;
@@ -82,7 +89,7 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, currentPerPage, startDate, endDate, currentSearch]);
+  }, [currentPage, currentPerPage, startDate, endDate, currentSearch, sortKey, sortOrder]);
 
   useEffect(() => {
     fetchData();
@@ -92,6 +99,12 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
     setStartDate(start);
     setEndDate(end);
     setCurrentPage(1); // Reset ke halaman pertama
+  };
+
+  const setSort = (key: string, direction: 'asc' | 'desc') => {
+    setSortKey(key);
+    setSortOrder(direction);
+    setCurrentPage(1);
   };
 
   return {
@@ -111,6 +124,9 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
       setCurrentSearch(search);
       setCurrentPage(1);
     },
+    setSort,
+    sortKey,
+    sortOrder,
     refetch: fetchData,
   };
 };
