@@ -153,7 +153,7 @@ export default function LaporanPenerimaanFilter({
                   variant="outline"
                   role="combobox"
                   aria-expanded={openBox}
-                  className="w-[260px] justify-between text-left font-normal bg-white"
+                  className="w-[260px] justify-between text-left font-normal bg-white rounded-xl border-slate-200 shadow-sm"
                 >
                   <span className="truncate">
                     {searchQuery
@@ -208,7 +208,7 @@ export default function LaporanPenerimaanFilter({
         <div className="flex flex-col space-y-2">
           <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
-            <SelectTrigger className="w-[130px] bg-white">
+            <SelectTrigger className="w-[130px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -223,7 +223,7 @@ export default function LaporanPenerimaanFilter({
         <Button
           variant="outline"
           onClick={handleApplyFilter}
-          className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 px-4 whitespace-nowrap mb-[1px]"
+          className="bg-[#f8f9fa] border border-slate-200 shadow-sm text-gray-700 hover:bg-slate-50 gap-2 px-4 whitespace-nowrap rounded-xl mb-[1px] cursor-pointer"
         >
           <Eye className="h-4 w-4" />
           Show
@@ -234,13 +234,13 @@ export default function LaporanPenerimaanFilter({
         <Button
           variant="outline"
           onClick={onPrint}
-          className="gap-2 px-4 bg-white text-gray-700 shadow-sm border-gray-200"
+          className="gap-2 px-4 bg-white text-gray-700 shadow-sm border-slate-200 rounded-xl cursor-pointer"
         >
           <Printer className="h-4 w-4" /> Print
         </Button>
         <Button
           onClick={onDownload}
-          className="gap-2 px-4 shadow-sm bg-[#16a34a] hover:bg-[#15803d] text-white border-0"
+          className="gap-2 px-4 shadow-sm bg-[#16a34a] hover:bg-[#15803d] text-white border-0 rounded-xl cursor-pointer"
         >
           <Download className="h-4 w-4" /> Download
         </Button>

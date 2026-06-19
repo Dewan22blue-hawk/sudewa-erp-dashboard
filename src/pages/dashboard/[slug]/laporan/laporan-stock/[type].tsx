@@ -9,6 +9,8 @@ import LaporanStockDetailView from "@/components/features/laporan-stock/LaporanS
 import POOutstandingView from "@/components/features/laporan-stock/POOutstandingView"
 import SOOutstandingView from "@/components/features/laporan-stock/SOOutstandingView"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
 
 export default function DetailLaporanStockPage() {
     const params = useParams()
@@ -25,39 +27,40 @@ export default function DetailLaporanStockPage() {
         queryKey: ["laporan-stock", type, awal, akhir],
         queryFn: () =>
             getLaporanStock({
-                jenis: type as any,
-                periodeAwal: awal,
-                periodeAkhir: akhir,
-            }),
+                start_date: awal,
+                end_date: akhir,
+            } as any),
     })
 
     const getReportTitle = () => {
         switch (type) {
-            case "laporan-stock": return "Laporan Stock"
+            case "laporan-stock": return "Laporan Jumlah Stock"
             case "laporan-stock-detail": return "Laporan Stock Detail"
-            case "po-outstanding": return "Purchase Order Outstanding"
-            case "so-outstanding": return "Sales Order Outstanding"
+            case "purchase-order": return "Laporan Purchase Order Outstanding"
+            case "sales-order": return "Laporan Sales Order Outstanding"
             default: return "Laporan Stock"
         }
     }
 
     return (
         <DashboardLayout>
-            <div className="space-y-6 px-1">
+            <div className="space-y-6">
 
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <button
+                        <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => router.push(`/dashboard/${slug}/laporan/laporan-stock`)}
-                            className="text-gray-500 hover:text-gray-900 transition-colors"
+                            className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                        </button>
+                            <ArrowLeft className="h-5 w-5 text-slate-700" />
+                        </Button>
                         <div>
                             <h1 className="text-2xl font-semibold text-slate-950">
                                 {getReportTitle()}
                             </h1>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-sm text-slate-500">
                                 Lihat detail laporan stock gudang dan order transaksi
                             </p>
                         </div>

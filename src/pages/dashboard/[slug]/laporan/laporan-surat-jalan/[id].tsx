@@ -159,7 +159,7 @@ export default function LaporanSuratJalanDetailPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-semibold text-slate-950">Informasi Surat Jalan</h1>
-            <p className="text-sm text-slate-500 mt-1">Informasi lengkap mengenai surat jalan</p>
+            <p className="text-sm text-slate-500">Informasi lengkap mengenai surat jalan</p>
           </div>
         </div>
 

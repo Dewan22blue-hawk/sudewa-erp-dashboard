@@ -105,10 +105,10 @@ export default function LaporanPengirimanPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 px-1">
+      <div className="space-y-6">
         <div className="no-print">
           <h1 className="text-2xl font-semibold text-slate-950">Laporan Pengiriman</h1>
-          <p className="text-sm text-slate-500 mt-1">Pantau semua transaksi pengiriman unit</p>
+          <p className="text-sm text-slate-500">Pantau semua transaksi pengiriman unit</p>
         </div>
 
         <LaporanPengirimanFilter
