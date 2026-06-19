@@ -311,7 +311,7 @@ export default function LaporanRitaseArmadaPage() {
                       {activeTab === 'maintenance' && (
                         paginatedMaintenance.length > 0 ? paginatedMaintenance.map((item, idx) => (
                           <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
-                            <TableCell className="text-center font-medium text-slate-500 whitespace-nowrap">{item.no}</TableCell>
+                            <TableCell className="text-center font-medium text-slate-500 whitespace-nowrap">{item.id}</TableCell>
                             <TableCell className="font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
                             <TableCell className="text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
                             <TableCell className="text-slate-600 whitespace-nowrap">{item.driverPic}</TableCell>

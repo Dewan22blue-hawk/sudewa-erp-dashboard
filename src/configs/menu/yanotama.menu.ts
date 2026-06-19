@@ -156,6 +156,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'Laporan Aset',
                     href: base('/laporan/laporan-aset'),
                 },
+                {
+                    label: 'Laporan Akuntansi',
+                    href: base('/laporan/laporan-akuntansi'),
+                },
             ],
         },
         {
