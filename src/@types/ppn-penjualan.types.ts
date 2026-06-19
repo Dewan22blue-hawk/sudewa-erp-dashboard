@@ -20,8 +20,8 @@ export interface UnitTransactionItemDetail {
 export interface PPNPenjualan {
   id: number;
   code: string;
-  buy_date: string;
-  supplier: string;
+  sales_date: string;
+  customer: string;
   fpm_date: string | null;
   nsfpm_age: string | null;
   qty: number;

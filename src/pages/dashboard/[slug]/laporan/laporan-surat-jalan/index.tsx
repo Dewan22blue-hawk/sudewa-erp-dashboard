@@ -84,12 +84,12 @@ export default function LaporanSuratJalanPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen laporan-penerimaan-page">
+      <div className="space-y-6 px-1">
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Laporan Surat Jalan</h1>
-            <p className="text-[15px] text-gray-500">Laporan data surat jalan ekspedisi</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Laporan Surat Jalan</h1>
+            <p className="text-sm text-slate-500 mt-1">Laporan data surat jalan ekspedisi</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
             <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
@@ -97,31 +97,33 @@ export default function LaporanSuratJalanPage() {
         </div>
 
         {/* Filtering Block (Search and Show Page dropdown) */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center no-print mb-5">
-          <div className="relative w-full md:w-[320px]">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search here"
-              className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm focus-visible:ring-1"
-            />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <span>Show</span>
-            <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-              <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem className="cursor-pointer" value="5">5</SelectItem>
-                <SelectItem className="cursor-pointer" value="10">10</SelectItem>
-                <SelectItem className="cursor-pointer" value="25">25</SelectItem>
-                <SelectItem className="cursor-pointer" value="50">50</SelectItem>
-                <SelectItem className="cursor-pointer" value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search here"
+                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
+                <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem className="cursor-pointer" value="5">5</SelectItem>
+                  <SelectItem className="cursor-pointer" value="10">10</SelectItem>
+                  <SelectItem className="cursor-pointer" value="25">25</SelectItem>
+                  <SelectItem className="cursor-pointer" value="50">50</SelectItem>
+                  <SelectItem className="cursor-pointer" value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
         </div>
 

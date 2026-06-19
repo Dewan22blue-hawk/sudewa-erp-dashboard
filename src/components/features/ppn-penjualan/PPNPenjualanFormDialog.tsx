@@ -123,7 +123,7 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
               </div>
               <div>
                 <div className="text-xs uppercase text-slate-500">Customer</div>
-                <div className="font-medium text-slate-900">{initialData.supplier}</div>
+                <div className="font-medium text-slate-900">{initialData.customer}</div>
               </div>
               <div>
                 <div className="text-xs uppercase text-slate-500">Tipe Unit</div>

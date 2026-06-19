@@ -8,12 +8,14 @@ import type {
 import type { PaginationParams } from '@/@types/pagination.types';
 import {
   createDoInvoice,
+  createFinanceInvoiceBillingPayment,
   deleteDoInvoice,
   getDoInvoiceById,
   getDoInvoicesList,
   processExpeditionById,
   processInvoiceById,
 } from '@/services/do-invoice.service';
+import type { CreateFinanceInvoicePaymentPayload } from '@/@types/create-invoice.types';
 
 export function useDoInvoices(params: PaginationParams & DoInvoiceListParams & { enabled?: boolean }) {
   const { enabled = true, ...rest } = params;
@@ -74,6 +76,17 @@ export function useProcessDoExpedition() {
 
   return useMutation({
     mutationFn: ({ id, payload }: { id: string | number; payload?: DoInvoiceProcessPayload }) => processExpeditionById(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['do-invoice'] });
+    },
+  });
+}
+
+export function useCreateFinanceInvoicePayment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateFinanceInvoicePaymentPayload) => createFinanceInvoiceBillingPayment(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['do-invoice'] });
     },

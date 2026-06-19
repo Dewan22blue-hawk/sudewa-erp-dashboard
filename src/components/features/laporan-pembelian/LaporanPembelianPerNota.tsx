@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PurchaseTransactionItem } from '@/services/laporan-pembelian.service';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data: PurchaseTransactionItem[];
@@ -109,79 +110,127 @@ export default function LaporanPembelianPerNota({ data, pagination, isLoading, o
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-20 bg-white rounded-xl border">
+      <div className="flex justify-center items-center py-20 bg-white rounded-xl border border-gray-200">
         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     );
   }
 
+  // Generate pagination items
+  const pages: (number | string)[] = [];
+  if (lastTablePage <= 5) {
+    for (let i = 1; i <= lastTablePage; i++) pages.push(i);
+  } else {
+    if (safePage <= 3) {
+      pages.push(1, 2, 3, 4, '...', lastTablePage);
+    } else if (safePage >= lastTablePage - 2) {
+      pages.push(1, '...', lastTablePage - 3, lastTablePage - 2, lastTablePage - 1, lastTablePage);
+    } else {
+      pages.push(1, '...', safePage - 1, safePage, safePage + 1, '...', lastTablePage);
+    }
+  }
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader className="bg-gray-50 ">
-            <TableRow >
-              <TableHead className="text-center w-16 font-semibold">NO</TableHead>
-              <TableHead className='fo font-semibold'>NO PEMBELIAN</TableHead>
-              <TableHead className="font-semibold">TGL BELI</TableHead>
-              <TableHead className="font-semibold">TIPE UNIT</TableHead>
-              <TableHead className="text-right font-semibold">QTY</TableHead>
-              <TableHead className="text-right font-semibold">HARGA BELI</TableHead>
-              <TableHead className="text-right font-semibold">BIAYA BBN</TableHead>
-              <TableHead className="text-right font-semibold">BIAYA EKSPEDISI</TableHead>
-              <TableHead className="text-right font-semibold">BIAYA LAINNYA</TableHead>
-              <TableHead className="text-right font-semibold">HPP</TableHead>
-              <TableHead className="text-right font-semibold">DPP</TableHead>
-              <TableHead className="text-right font-semibold">PPN</TableHead>
-              <TableHead className="text-right font-semibold">JUMLAH</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pagedData.map((item, idx) => (
-              <TableRow key={item.id} className="hover:bg-gray-50">
-                <TableCell className="text-center">{idx + 1 + (safePage - 1) * rowsPerPage}</TableCell>
-                <TableCell className="font-medium whitespace-nowrap">{item.noPembelian}</TableCell>
-                <TableCell className="whitespace-nowrap">{formatDate(item.tanggal)}</TableCell>
-                <TableCell className="whitespace-nowrap">{item.tipeUnit}</TableCell>
-                <TableCell className="text-right">{item.qty}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.hargaBeli)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.biayaBbn)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.biayaEkspedisi)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.biayaLainnya)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.hpp)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.dpp)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">{formatCurrency(item.ppn)}</TableCell>
-                <TableCell className="text-right font-semibold whitespace-nowrap">{formatCurrency(item.jumlah)}</TableCell>
-              </TableRow>
-            ))}
-            {pagedData.length === 0 && (
+    <div className="space-y-4">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
-                <TableCell colSpan={13} className="h-24 text-center text-gray-500">
-                  Tidak ada data pembelian.
-                </TableCell>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-16">NO</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO PEMBELIAN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TGL BELI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">QTY</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">HARGA BELI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA BBN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA EKSPEDISI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA LAINNYA</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">HPP</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">DPP</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">PPN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">JUMLAH</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {pagedData.map((item, idx) => (
+                <TableRow key={item.id} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{idx + 1 + (safePage - 1) * rowsPerPage}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left whitespace-nowrap">{item.noPembelian}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{formatDate(item.tanggal)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{item.tipeUnit}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{item.qty}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.hargaBeli)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.biayaBbn)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.biayaEkspedisi)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.biayaLainnya)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.hpp)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.dpp)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.ppn)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-semibold text-slate-900 text-right whitespace-nowrap">{formatCurrency(item.jumlah)}</TableCell>
+                </TableRow>
+              ))}
+              {pagedData.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={13} className="px-4 py-10 text-center text-sm text-gray-500">
+                    Tidak ada data pembelian.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Pagination */}
       {totalRows > 0 && (
-        <div className="flex justify-between items-center p-4 border-t no-print">
-          <div className="text-sm text-gray-500">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1 no-print">
+          <div>
             Showing {showingFrom} to {showingTo} of {totalRows} data
           </div>
-          <div className="flex gap-1">
-            <Button variant="outline" size="sm" disabled={safePage === 1} onClick={() => setTablePage((prev) => Math.max(1, prev - 1))}>
-              Previous
-            </Button>
-            <Button variant="default" size="sm" className="bg-primary pointer-events-none">
-              {safePage}
-            </Button>
-            <Button variant="outline" size="sm" disabled={safePage === lastTablePage} onClick={() => setTablePage((prev) => Math.min(lastTablePage, prev + 1))}>
-              Next
-            </Button>
-          </div>
+          {lastTablePage > 1 && (
+            <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+              <Button
+                variant="ghost"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                onClick={() => setTablePage((prev) => Math.max(1, prev - 1))}
+                disabled={safePage <= 1}
+              >
+                Previous
+              </Button>
+
+              {pages.map((p, idx) =>
+                p === '...' ? (
+                  <span key={`ellipsis-${idx}`} className="px-1 text-sm text-slate-500">
+                    ...
+                  </span>
+                ) : (
+                  <Button
+                    key={p}
+                    variant="ghost"
+                    className={cn(
+                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                      p === safePage
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                    )}
+                    onClick={() => setTablePage(Number(p))}
+                  >
+                    {p}
+                  </Button>
+                )
+              )}
+
+              <Button
+                variant="ghost"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                onClick={() => setTablePage((prev) => Math.min(lastTablePage, prev + 1))}
+                disabled={safePage >= lastTablePage}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

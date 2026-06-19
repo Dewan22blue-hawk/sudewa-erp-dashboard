@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
+import { Search, Printer, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -85,6 +85,29 @@ export default function LaporanAssetPage() {
     setPage(1);
   };
 
+  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
+    const isSorted = sortBy === sortKey;
+    const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
+    return (
+      <button
+        type="button"
+        className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase transition-colors ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
+        onClick={() => handleSort(sortKey)}
+      >
+        <span>{title}</span>
+        {isSorted ? (
+          sortOrder === 'asc' ? (
+            <ArrowUp className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+          ) : (
+            <ArrowDown className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
+        )}
+      </button>
+    );
+  };
+
   // Print triggering handler
   const handlePrint = () => {
     window.print();
@@ -92,12 +115,12 @@ export default function LaporanAssetPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen laporan-penerimaan-page">
+      <div className="space-y-6 px-1">
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Laporan Aset</h1>
-            <p className="text-[15px] text-gray-500">Laporan data aset perusahaan</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Laporan Aset</h1>
+            <p className="text-sm text-slate-500 mt-1">Laporan data aset perusahaan</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
             <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
@@ -105,31 +128,33 @@ export default function LaporanAssetPage() {
         </div>
 
         {/* Filtering Block (Search and Show Page dropdown) */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center no-print mb-5">
-          <div className="relative w-full md:w-[320px]">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search here"
-              className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm focus-visible:ring-1"
-            />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <span>Show</span>
-            <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-              <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem className="cursor-pointer" value="5">5</SelectItem>
-                <SelectItem className="cursor-pointer" value="10">10</SelectItem>
-                <SelectItem className="cursor-pointer" value="25">25</SelectItem>
-                <SelectItem className="cursor-pointer" value="50">50</SelectItem>
-                <SelectItem className="cursor-pointer" value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search here"
+                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
+                <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem className="cursor-pointer" value="5">5</SelectItem>
+                  <SelectItem className="cursor-pointer" value="10">10</SelectItem>
+                  <SelectItem className="cursor-pointer" value="25">25</SelectItem>
+                  <SelectItem className="cursor-pointer" value="50">50</SelectItem>
+                  <SelectItem className="cursor-pointer" value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
         </div>
 
@@ -164,27 +189,27 @@ export default function LaporanAssetPage() {
                 <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
               </div>
             ) : (
-              <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm w-full">
+              <Card className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none w-full">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader className="bg-slate-50 border-b border-slate-200">
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700">NO</TableHead>
-                        <TableHead onClick={() => handleSort('asset_code')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                          KODE ASET <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                        <TableHead className="w-12 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
+                        <TableHead className="p-0 text-left">
+                          {renderSortHeader('Kode Aset', 'asset_code')}
                         </TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TGL BELI</TableHead>
-                        <TableHead onClick={() => handleSort('asset_name')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                          NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">TGL BELI</TableHead>
+                        <TableHead className="p-0 text-left">
+                          {renderSortHeader('Nama Barang', 'asset_name')}
                         </TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE ASET</TableHead>
-                        <TableHead onClick={() => handleSort('serial_number')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                          SERIAL NUMBER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">TIPE ASET</TableHead>
+                        <TableHead className="p-0 text-left">
+                          {renderSortHeader('Serial Number', 'serial_number')}
                         </TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">HARGA BELI</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UMUR EKONOMIS</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">PENYUSUTAN/BULAN</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NILAI AKHIR</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">HARGA BELI</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">UMUR EKONOMIS</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">PENYUSUTAN/BULAN</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap text-left">NILAI AKHIR</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

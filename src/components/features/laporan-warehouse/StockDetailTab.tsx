@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { cn } from '@/lib/utils';
 
 type StockDetailTabProps = {
   perPage: number;
@@ -128,6 +129,23 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
     onActionsChange?.({ print: handlePrint, download: handleDownload });
   }, [handleDownload, handlePrint, onActionsChange]);
 
+  // Generate pagination items
+  const pages: (number | string)[] = [];
+  const currentPage = pagination.current_page;
+  const lastPage = pagination.last_page;
+  
+  if (lastPage <= 5) {
+    for (let i = 1; i <= lastPage; i++) pages.push(i);
+  } else {
+    if (currentPage <= 3) {
+      pages.push(1, 2, 3, 4, '...', lastPage);
+    } else if (currentPage >= lastPage - 2) {
+      pages.push(1, '...', lastPage - 3, lastPage - 2, lastPage - 1, lastPage);
+    } else {
+      pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', lastPage);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 no-print">
@@ -180,68 +198,68 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         </Select>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-gray-100">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
-                <TableHead className="w-16 text-center">NO</TableHead>
-                <TableHead>SUPPLIER</TableHead>
-                <TableHead>TIPE UNIT</TableHead>
-                <TableHead>WARNA</TableHead>
-                <TableHead>NO MESIN</TableHead>
-                <TableHead>NO RANGKA</TableHead>
-                <TableHead className="text-right">HARGA BELI</TableHead>
+                <TableHead className="w-16 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">SUPPLIER</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">WARNA</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO MESIN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO RANGKA</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
+                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
                   </TableRow>
                 ))
               ) : isError ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-16">
+                  <TableCell colSpan={7} className="py-16 px-4">
                     <div className="flex flex-col items-center justify-center text-red-500">
                       <AlertCircle className="h-8 w-8 mb-2" />
-                      <p>Gagal memuat data stock detail</p>
+                      <p className="text-sm">Gagal memuat data stock detail</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10 text-center text-gray-500">
+                  <TableCell colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
                     Data tidak tersedia
                   </TableCell>
                 </TableRow>
               ) : (
                 <>
                   {rows.map((item, index) => (
-                    <TableRow key={`${item.id}-${index}`}>
-                      <TableCell className="text-center">
+                    <TableRow key={`${item.id}-${index}`} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                         {(pagination.from > 0 ? pagination.from - 1 : 0) + index + 1}
                       </TableCell>
-                      <TableCell>{item.person || '-'}</TableCell>
-                      <TableCell>{item.unit_type?.name || '-'}</TableCell>
-                      <TableCell>{item.color || '-'}</TableCell>
-                      <TableCell>{item.machine_number || '-'}</TableCell>
-                      <TableCell>{item.chassis_number || '-'}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.purchase_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.person || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.unit_type?.name || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.color || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.machine_number || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.chassis_number || '-'}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{formatCurrency(item.purchase_price)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow className="bg-blue-100/70 font-semibold">
-                    <TableCell colSpan={6} className="text-center">
+                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
+                    <TableCell colSpan={6} className="px-4 py-4 text-center text-slate-900">
                       GRAND TOTAL
                     </TableCell>
-                    <TableCell className="text-right">{formatCurrency(grandTotalPurchase)}</TableCell>
+                    <TableCell className="px-4 py-4 text-right text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
                   </TableRow>
                 </>
               )}
@@ -251,31 +269,53 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
       </div>
 
       {!isLoading && !isError && pagination.total > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600 no-print">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1 no-print">
           <div>
             Showing {pagination.from || 0}–{pagination.to || 0} of {pagination.total} data
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.current_page <= 1}
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            >
-              Previous
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              {pagination.current_page} / {pagination.last_page}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.current_page >= pagination.last_page}
-              onClick={() => setPage((prev) => prev + 1)}
-            >
-              Next
-            </Button>
-          </div>
+          {lastPage > 1 && (
+            <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+              <Button
+                variant="ghost"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage <= 1}
+              >
+                Previous
+              </Button>
+
+              {pages.map((p, idx) =>
+                p === '...' ? (
+                  <span key={`ellipsis-${idx}`} className="px-1 text-sm text-slate-500">
+                    ...
+                  </span>
+                ) : (
+                  <Button
+                    key={p}
+                    variant="ghost"
+                    className={cn(
+                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                      p === currentPage
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                    )}
+                    onClick={() => setPage(Number(p))}
+                  >
+                    {p}
+                  </Button>
+                )
+              )}
+
+              <Button
+                variant="ghost"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={currentPage >= lastPage}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

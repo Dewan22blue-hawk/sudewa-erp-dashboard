@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data: PPNPenjualan[];
@@ -57,11 +58,11 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
   const canGoNext = isTotalExact ? page < meta.lastPage : hasNextPage;
   const pageNumbers = isTotalExact
     ? Array.from({ length: Math.min(5, meta.lastPage) }, (_, index) => {
-        if (meta.lastPage <= 5) return index + 1;
-        if (page <= 3) return index + 1;
-        if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
-        return page - 2 + index;
-      })
+      if (meta.lastPage <= 5) return index + 1;
+      if (page <= 3) return index + 1;
+      if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
+      return page - 2 + index;
+    })
     : [page];
 
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
@@ -99,8 +100,8 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
               <th className="p-0 text-left">{renderSortHeader('Kode Invoice', 'code', 'left')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Tanggal Beli', 'buy_date', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Customer', 'supplier', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('Tanggal Jual', 'sales_date', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('Customer', 'customer', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('Tanggal FPM', 'fpm_date', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('MASA NSFPM', 'nsfpm_age', 'center')}</th>
               <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Nomor NSFP</th>
@@ -146,8 +147,8 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
                 return (
                   <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                     <td className="px-4 py-4 text-left font-medium text-blue-600 whitespace-nowrap">{item.code}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.buy_date)}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.supplier}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.sales_date)}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.customer}</td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500">
                       <div className="space-y-1">
                         <div>{formatDate(item.fpm_date)}</div>
@@ -197,39 +198,74 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1 py-4">
         <div>
           {isTotalExact
             ? `Showing ${startIndex}-${endIndex} of ${meta.total} data`
             : `Showing ${startIndex}-${endIndex} on page ${page}${hasNextPage ? ' (lebih banyak data tersedia)' : ''}`}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-1.5 self-end lg:self-auto text-slate-800">
           {isTotalExact ? (
-            <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(1)} disabled={!canGoPrevious}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(1)}
+              disabled={!canGoPrevious}
+              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+            >
               First
             </Button>
           ) : null}
-          <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(page - 1)} disabled={!canGoPrevious}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onPageChange(page - 1)}
+            disabled={!canGoPrevious}
+            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+          >
             Previous
           </Button>
-          {pageNumbers.map((pageNumber) => (
+
+          {pageNumbers.map((p, idx) => (
             <Button
-              key={pageNumber}
+              key={idx}
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className={pageNumber === page ? 'bg-gray-100' : ''}
-              onClick={() => onPageChange(pageNumber)}
-              disabled={pageNumber === page}
+              disabled={p === page}
+              onClick={() => onPageChange(p)}
+              className={cn(
+                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                p === page
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+              )}
             >
-              {pageNumber}
+              {p}
             </Button>
           ))}
-          <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(page + 1)} disabled={!canGoNext}>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onPageChange(page + 1)}
+            disabled={!canGoNext}
+            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+          >
             Next
           </Button>
           {isTotalExact ? (
-            <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(meta.lastPage)} disabled={!canGoNext}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(meta.lastPage)}
+              disabled={!canGoNext}
+              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+            >
               Last
             </Button>
           ) : null}

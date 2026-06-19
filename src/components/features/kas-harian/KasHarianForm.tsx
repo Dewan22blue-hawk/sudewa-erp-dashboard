@@ -24,6 +24,8 @@ interface Props {
   isLoadingAccount?: boolean;
   id?: string;
   lockAmounts?: boolean;
+  initialCash?: any;
+  initialAccount?: any;
 }
 
 export default function KasHarianForm({
@@ -36,6 +38,8 @@ export default function KasHarianForm({
   isLoadingAccount,
   id,
   lockAmounts = false,
+  initialCash,
+  initialAccount,
 }: Props) {
   const [cashOpen, setCashOpen] = useState(false);
   const [cashSearch, setCashSearch] = useState('');
@@ -53,15 +57,23 @@ export default function KasHarianForm({
     [companies, selectedCompanyId],
   );
 
-  const selectedCash = useMemo(
-    () => cashOptions.find((cash) => Number(cash.id) === Number(selectedCashId)),
-    [cashOptions, selectedCashId],
-  );
+  const selectedCash = useMemo(() => {
+    const found = cashOptions.find((cash) => Number(cash.id) === Number(selectedCashId));
+    if (found) return found;
+    if (initialCash && Number(initialCash.id) === Number(selectedCashId)) {
+      return initialCash;
+    }
+    return null;
+  }, [cashOptions, selectedCashId, initialCash]);
 
-  const selectedAccount = useMemo(
-    () => accountOptions.find((account) => Number(account.id) === Number(selectedAccountId)),
-    [accountOptions, selectedAccountId],
-  );
+  const selectedAccount = useMemo(() => {
+    const found = accountOptions.find((account) => Number(account.id) === Number(selectedAccountId));
+    if (found) return found;
+    if (initialAccount && Number(initialAccount.id) === Number(selectedAccountId)) {
+      return initialAccount;
+    }
+    return null;
+  }, [accountOptions, selectedAccountId, initialAccount]);
 
   const filteredCashOptions = useMemo(() => {
     const query = cashSearch.trim().toLowerCase();

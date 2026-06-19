@@ -128,7 +128,7 @@ export default function LaporanPenjualanFilter({
         
         {/* Periode Transaksi */}
         <div className="flex flex-col space-y-2">
-          <label className="text-[13px] font-bold text-gray-900">Periode Transaksi</label>
+          <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
           <div className="w-[280px]">
             <DatePickerWithRange date={dateRange} onChange={setDateRange} />
           </div>
@@ -137,7 +137,7 @@ export default function LaporanPenjualanFilter({
         {/* Dynamic Searchable Select Field (Hidden for 'per-nota') */}
         {activeTab !== 'per-nota' && (
           <div className="flex flex-col space-y-2">
-            <label className="text-[13px] font-bold text-gray-900">
+            <label className="text-[13px] font-medium text-slate-700">
               {activeTab === 'per-tipe' ? 'Masukkan Tipe ' : 'Masukkan Customer '} 
               <span className="text-red-500">*</span>
             </label>

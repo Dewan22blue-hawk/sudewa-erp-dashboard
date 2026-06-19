@@ -44,8 +44,8 @@ const normalizeUnitDetail = (value: Partial<UnitTransactionItemDetail> | null | 
 const normalizePPNPenjualan = (value: Partial<PPNPenjualan>): PPNPenjualan => ({
   id: toNumber(value.id),
   code: value.code ?? '-',
-  buy_date: value.buy_date ?? '',
-  supplier: value.supplier ?? '-',
+  sales_date: value.sales_date ?? '',
+  customer: value.customer ?? '-',
   fpm_date: value.fpm_date ?? null,
   nsfpm_age: value.nsfpm_age ?? null,
   qty: toNumber(value.qty),
@@ -81,7 +81,7 @@ export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {})
       search: params.search || undefined,
       start_date: params.start_date || undefined,
       end_date: params.end_date || undefined,
-      sort_by: params.sort_by ?? 'buy_date',
+      sort_by: params.sort_by ?? 'sales_date',
       sort_direction: params.sort_direction ?? 'desc',
     },
   });

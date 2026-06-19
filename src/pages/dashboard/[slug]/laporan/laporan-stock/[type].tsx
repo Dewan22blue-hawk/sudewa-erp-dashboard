@@ -43,7 +43,7 @@ export default function DetailLaporanStockPage() {
 
     return (
         <DashboardLayout>
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 px-1">
 
                 <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export default function DetailLaporanStockPage() {
                             <h1 className="text-2xl font-semibold">
                                 {getReportTitle()}
                             </h1>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-slate-500 mt-1">
                                 Lihat detail laporan stock gudang dan order transaksi
                             </p>
                         </div>
