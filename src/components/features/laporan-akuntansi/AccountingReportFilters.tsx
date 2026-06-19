@@ -23,7 +23,7 @@ export default function AccountingReportFilters({
   isDownloading = false,
 }: AccountingReportFiltersProps) {
   return (
-    <div className="print:hidden flex flex-col gap-4 sm:flex-row sm:items-end justify-between w-full bg-white p-4 rounded-xl border border-slate-200 shadow-none">
+    <div className="print:hidden flex flex-col gap-4 sm:flex-row sm:items-end justify-between w-full">
       <div className="space-y-2">
         <label className="text-[13px] font-medium text-slate-700">
           Periode Transaksi

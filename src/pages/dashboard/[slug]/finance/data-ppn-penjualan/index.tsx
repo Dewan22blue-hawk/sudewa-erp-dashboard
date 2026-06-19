@@ -89,7 +89,7 @@ export default function DataPPNPenjualanPage() {
           <p className="text-sm text-slate-500 mt-1">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5 bg-white p-4 rounded-xl border border-slate-200">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap w-full sm:w-auto">
             <div className="relative w-full sm:w-[280px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

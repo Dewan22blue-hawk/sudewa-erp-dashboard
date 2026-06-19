@@ -90,7 +90,7 @@ export default function LaporanTransaksiKasPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-end justify-between w-full no-print gap-4 flex-wrap bg-white p-4 rounded-xl border border-slate-200">
+        <div className="flex items-end justify-between w-full no-print gap-4 flex-wrap mb-5">
           <div className="flex items-end gap-6 flex-wrap">
             <div className="flex flex-col space-y-2">
               <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>

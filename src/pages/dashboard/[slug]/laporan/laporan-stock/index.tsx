@@ -207,7 +207,7 @@ export default function LaporanStockPage() {
                     </div>
 
                     {/* Unified Filter Toolbar */}
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end justify-between w-full no-print bg-white p-4 rounded-xl border border-slate-200">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end justify-between w-full no-print">
                         <div className="flex items-end gap-4 w-full sm:w-auto">
                             {pageFilter}
                         </div>
