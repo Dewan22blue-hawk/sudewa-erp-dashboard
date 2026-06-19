@@ -109,14 +109,21 @@ export function useInvoiceReport({
   }, [mergedItems, search]);
 
   const pagination = useMemo(() => {
-    const backendPagination = queryResult.data;
+    const meta = queryResult.data?.meta;
+    const currentPage = meta?.currentPage || page;
+    const perPageVal = meta?.perPage || perPage;
+    const total = meta?.total || 0;
+
+    const from = total === 0 ? 0 : (currentPage - 1) * perPageVal + 1;
+    const to = total === 0 ? 0 : Math.min(currentPage * perPageVal, total);
+
     return {
-      currentPage: backendPagination?.current_page || page,
-      lastPage: backendPagination?.last_page || 1,
-      perPage: backendPagination?.per_page || perPage,
-      total: backendPagination?.total || 0,
-      from: backendPagination?.from || 0,
-      to: backendPagination?.to || 0,
+      currentPage,
+      lastPage: meta?.lastPage || 1,
+      perPage: perPageVal,
+      total,
+      from,
+      to,
     };
   }, [queryResult.data, page, perPage]);
 
