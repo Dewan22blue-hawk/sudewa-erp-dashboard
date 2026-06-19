@@ -166,7 +166,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
         </Select>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table className="border-collapse">
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -205,7 +205,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
               ) : (
                 <>
                   {groupedRows.map((item, index) => (
-                    <TableRow key={`${item.brand}-${item.unit}-${index}`} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                    <TableRow key={`${item.brand}-${item.unit}-${index}`} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{index + 1}</TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.brand}</TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.unit}</TableCell>

@@ -86,7 +86,14 @@ import { Button } from '@/components/ui/button';
 
 ## 5. Toolbar Filter Layout
 
-**Aturan**: Toolbar terdiri dari dua sisi — kiri (Search + Show per page) dan kanan (action buttons).
+**Aturan Urutan Cascading Filters (Kiri)**:
+1. **Search Bar**: Selalu diletakkan paling awal (sebelah kiri).
+2. **Filter Dropdowns / Combobox / DatePicker**: Filter tambahan seperti Kategori, Tipe, Wilayah, Supplier, atau Tanggal diletakkan setelah Search Bar.
+3. **Dropdown Pagination (`Show per Page`)**: Selalu diletakkan di bagian paling akhir dari grup filter sebelah kiri.
+
+**Aturan Margin & Spacing Buttons**:
+- Gunakan flex container dengan `gap-2` untuk menata tombol aksi (Export, Import, Tambah, Print, dll.) agar memiliki margin yang konsisten dan rapi.
+- Gunakan kelas `w-full sm:w-auto` pada tombol aksi agar responsif.
 
 ```tsx
 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -206,6 +213,20 @@ import { Button } from '@/components/ui/button';
 
 **Standar padding cell**: `px-4 py-4` di semua `TableHead` dan `TableCell`.
 
+### Standar Perataan Sel Tabel (Cell Alignment)
+
+- **Rata Tengah (`text-center` / `'center'`)**:
+  - **Angka Format Uang / Nominal**: Semua kolom mata uang/nominal (Bruto, HPP, DPP, PPN, Total Beli, Total Jual, Biaya BBN, Biaya Ekspedisi, Biaya Lain, dll.).
+  - **Kuantitas / Qty**: Kolom jumlah unit/barang (Qty, Qty Beli, Qty Terima, Qty Kirim, Kurang, dll.).
+  - **Tanggal**: Semua kolom tanggal (Tgl Jual, Tgl Beli, Tgl Terima, Tgl Kirim, dll.).
+  - **Status / Billing**: Label status pembayaran (Lunas, Belum Lunas, Refund, dll.) dan badge status unit.
+  - **Aksi / Action**: Kolom tombol aksi/dropdown action.
+
+- **Rata Kiri (`text-left` / `'left'`)**:
+  - **Kode Transaksi**: Kolom kode unik (No Penjualan, No Pembelian, No Penerimaan, No Pengiriman, dll.).
+  - **Nama Entitas**: Nama Customer, Nama Supplier, PIC, dll.
+  - **Deskripsi / Keterangan**: Tipe Unit, Nama Barang, Alamat, Keterangan Kas, dll.
+
 ---
 
 ## 8. Action Dropdown Menu
@@ -292,10 +313,20 @@ import { Button } from '@/components/ui/button';
   Tambah
 </Button>
 
-{/* Export / Import */}
+{/* Export / Import / Download / Print */}
 <Button variant="outline" className="w-full sm:w-auto">
   <Upload className="h-4 w-4 mr-2" />
   Export
+</Button>
+
+<Button variant="outline" className="w-full sm:w-auto">
+  <Download className="h-4 w-4 mr-2" />
+  Download
+</Button>
+
+<Button variant="outline" className="w-full sm:w-auto">
+  <Printer className="h-4 w-4 mr-2" />
+  Print
 </Button>
 ```
 

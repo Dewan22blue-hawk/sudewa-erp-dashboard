@@ -7,7 +7,6 @@ import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -183,13 +182,13 @@ export default function LPJumlahOutstandingPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex justify-between items-center no-print">
+        <div className="flex items-center justify-between no-print">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Laporan Jumlah Outstanding</h1>
-            <p className="text-sm text-slate-500">Laporan jumlah data outstanding dokumen kendaraan</p>
+            <h1 className="text-2xl font-semibold">Laporan Jumlah Outstanding</h1>
+            <p className="text-sm text-muted-foreground">Laporan jumlah data outstanding dokumen kendaraan</p>
           </div>
-          <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
-            <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
+          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+            <Printer className="mr-2 h-4 w-4" /> Print
           </Button>
         </div>
 
@@ -225,7 +224,7 @@ export default function LPJumlahOutstandingPage() {
           </div>
 
           {/* Filtering Block (Search and Show Page dropdown) */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print">
             <div className="flex items-center gap-4 w-full sm:w-auto">
               <div className="relative w-full sm:w-[300px]">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -233,21 +232,21 @@ export default function LPJumlahOutstandingPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search here"
-                  className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
+                  className="pl-9 bg-white"
                 />
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                  <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
-                    <SelectValue />
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem className="cursor-pointer" value="5">5</SelectItem>
-                    <SelectItem className="cursor-pointer" value="10">10</SelectItem>
-                    <SelectItem className="cursor-pointer" value="25">25</SelectItem>
-                    <SelectItem className="cursor-pointer" value="50">50</SelectItem>
-                    <SelectItem className="cursor-pointer" value="100">100</SelectItem>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
                   </SelectContent>
                 </Select>
                 <span>Page</span>
@@ -286,40 +285,40 @@ export default function LPJumlahOutstandingPage() {
                   <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
                 </div>
               ) : (
-                <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm w-full">
+                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                   <div className="overflow-x-auto">
                     <Table>
-                      <TableHeader className="bg-slate-50 border-b border-slate-200">
+                      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
-                          <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700">NO</TableHead>
-                          <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                          <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             {activeTab === 'bpkb' ? 'NAMA BPKB' : 'NAMA STNK'} <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                           </TableHead>
-                          <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             WILAYAH <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                           </TableHead>
-                          <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             DEALER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                           </TableHead>
-                          <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             VENDOR <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                           </TableHead>
-                          <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             NO POLISI <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             JENIS
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             NO RANGKA
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             NO MESIN
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             STATUS
                           </TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
+                          <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
                             KETERANGAN
                           </TableHead>
                         </TableRow>
@@ -352,17 +351,17 @@ export default function LPJumlahOutstandingPage() {
                             const keterangan = getOutstandingKeterangan(activeTab, item);
 
                             return (
-                              <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/50">
-                                <TableCell className="text-center font-medium text-slate-500">{indexNumber}</TableCell>
-                                <TableCell className="font-semibold text-slate-800 whitespace-nowrap">{stnkName}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap">{region}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap">{dealer}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap">{vendor}</TableCell>
-                                <TableCell className="font-medium text-slate-800 whitespace-nowrap">{item.tnkb_number || '-'}</TableCell>
-                                <TableCell className="text-slate-600 whitespace-nowrap">{formatVehicleType(vehicleType)}</TableCell>
-                                <TableCell className="text-slate-600 font-mono text-[13px] whitespace-nowrap">{chassisNumber}</TableCell>
-                                <TableCell className="text-slate-600 font-mono text-[13px] whitespace-nowrap">{machineNumber}</TableCell>
-                                <TableCell className="whitespace-nowrap">{renderOutstandingStatusBadge(statusText)}</TableCell>
+                              <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
+                                <TableCell className="text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
+                                <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{stnkName}</TableCell>
+                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{region}</TableCell>
+                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{dealer}</TableCell>
+                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{vendor}</TableCell>
+                                <TableCell className="font-medium text-gray-900 whitespace-nowrap text-sm">{item.tnkb_number || '-'}</TableCell>
+                                <TableCell className="text-slate-600 whitespace-nowrap text-sm">{formatVehicleType(vehicleType)}</TableCell>
+                                <TableCell className="text-slate-600 font-mono text-sm whitespace-nowrap">{chassisNumber}</TableCell>
+                                <TableCell className="text-slate-600 font-mono text-sm whitespace-nowrap">{machineNumber}</TableCell>
+                                <TableCell className="whitespace-nowrap text-sm">{renderOutstandingStatusBadge(statusText)}</TableCell>
                                 <TableCell className="text-slate-600 whitespace-nowrap text-sm">{keterangan}</TableCell>
                               </TableRow>
                             );
@@ -377,51 +376,64 @@ export default function LPJumlahOutstandingPage() {
                       </TableBody>
                     </Table>
                   </div>
-                </Card>
+                </div>
               )}
             </div>
           </PrintLetterPage>
 
           {/* Pagination Footer */}
           {!isLoading && !isError && pagination.total > 0 && (
-            <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between no-print">
-              <div className="text-sm text-slate-500">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
+              <p className="text-sm text-slate-500">
                 Showing {pagination.from}-{pagination.to} of {pagination.total} data
-              </div>
-              <div className="flex items-center gap-1 text-sm text-slate-700">
+              </p>
+              <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  disabled={page <= 1 || isLoading}
                   onClick={() => setPage(page - 1)}
-                  disabled={page <= 1}
-                  className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                 >
                   Previous
                 </Button>
-                {visiblePages[0] > 1 && <span className="px-1.5 text-slate-400">...</span>}
                 {visiblePages.map((pageNumber) => (
                   <Button
                     key={pageNumber}
-                    variant={pageNumber === page ? 'outline' : 'ghost'}
+                    variant="ghost"
                     size="sm"
-                    onClick={() => setPage(pageNumber)}
                     className={cn(
-                      "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
                       pageNumber === page
-                        ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
-                        : "text-slate-600 hover:bg-slate-100"
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                     )}
+                    disabled={isLoading}
+                    onClick={() => setPage(pageNumber)}
                   >
                     {pageNumber}
                   </Button>
                 ))}
-                {visiblePages[visiblePages.length - 1] < pagination.lastPage && <span className="px-1.5 text-slate-400">...</span>}
+                {pagination.lastPage > 5 && !visiblePages.includes(pagination.lastPage) && (
+                  <>
+                    <span className="px-1 text-slate-500">...</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                      disabled={isLoading}
+                      onClick={() => setPage(pagination.lastPage)}
+                    >
+                      {pagination.lastPage}
+                    </Button>
+                  </>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
                   onClick={() => setPage(page + 1)}
-                  disabled={page >= pagination.lastPage}
-                  className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                 >
                   Next
                 </Button>

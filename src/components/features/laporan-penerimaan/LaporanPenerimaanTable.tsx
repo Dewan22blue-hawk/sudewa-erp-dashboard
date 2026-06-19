@@ -9,6 +9,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PenerimaanItem } from '@/services/laporan-penerimaan.service';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface Props {
   data: PenerimaanItem[];
@@ -17,7 +19,10 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
-const formatDate = (date: string) => new Date(date).toLocaleDateString('id-ID');
+const formatDate = (date: string) => {
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMM yyyy', { locale: id });
+};
 
 import { cn } from '@/lib/utils';
 
@@ -62,14 +67,14 @@ export default function LaporanPenerimaanTable({
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-12">NO</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO PENERIMAAN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TGL TERIMA</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">TGL TERIMA</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NAMA SUPPLIER</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">WARNA</TableHead>
@@ -79,12 +84,12 @@ export default function LaporanPenerimaanTable({
             </TableHeader>
             <TableBody>
               {data.map((item, idx) => (
-                <TableRow key={item.id} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                     {idx + 1 + (pagination.currentPage - 1) * pagination.perPage}
                   </TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.transaction_code}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{formatDate(item.receipt_date)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatDate(item.receipt_date)}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.person}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.unit_type.name}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.color}</TableCell>

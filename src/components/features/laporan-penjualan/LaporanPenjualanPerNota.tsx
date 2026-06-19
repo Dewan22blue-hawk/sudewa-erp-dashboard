@@ -2,6 +2,8 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { SalesTransactionItem } from '@/services/laporan-penjualan.service';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface Props {
   data: SalesTransactionItem[];
@@ -11,7 +13,10 @@ interface Props {
 }
 
 const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')}`;
-const formatDate = (date: string) => new Date(date).toLocaleDateString('id-ID');
+const formatDate = (date: string) => {
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMM yyyy', { locale: id });
+};
 
 import { cn } from '@/lib/utils';
 
@@ -62,42 +67,42 @@ export default function LaporanPenjualanPerNota({ data, pagination, isLoading, o
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-16">NO</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO PENJUALAN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TGL JUAL</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">TGL JUAL</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">QTY</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">HARGA JUAL</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA BBN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA EKSPEDISI</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA LAINNYA</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">HPP</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">DPP</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">PPN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">JUMLAH</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">QTY</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">HARGA JUAL</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">BIAYA BBN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">BIAYA EKSPEDISI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">BIAYA LAINNYA</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">HPP</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">DPP</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">PPN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">JUMLAH</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {flattenedData.map((item, idx) => (
-                <TableRow key={item.id} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{idx + 1 + (pagination.currentPage - 1) * pagination.perPage}</TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left whitespace-nowrap">{item.noPenjualan}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{formatDate(item.tanggal)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatDate(item.tanggal)}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{item.tipeUnit}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{item.qty}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.hargaJual)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.biayaBbn)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.biayaEkspedisi)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.biayaLainnya)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.hpp)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.dpp)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(item.ppn)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm font-semibold text-slate-900 text-right whitespace-nowrap">{formatCurrency(item.jumlah)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.qty}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.hargaJual)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.biayaBbn)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.biayaEkspedisi)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.biayaLainnya)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.hpp)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.dpp)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(item.ppn)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-semibold text-slate-900 text-center whitespace-nowrap">{formatCurrency(item.jumlah)}</TableCell>
                 </TableRow>
               ))}
               {flattenedData.length === 0 && (

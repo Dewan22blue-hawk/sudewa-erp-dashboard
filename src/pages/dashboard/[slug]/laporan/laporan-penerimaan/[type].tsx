@@ -55,10 +55,10 @@ export default function DetailLaporanPenerimaanPage() {
                             <ArrowLeft className="h-5 w-5 text-slate-700" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-semibold text-slate-950">
+                            <h1 className="text-2xl font-semibold">
                                 {getReportTitle()}
                             </h1>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                                 Lihat detail laporan penerimaan barang
                             </p>
                         </div>

@@ -198,18 +198,18 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         </Select>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
-                <TableHead className="w-16 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
+                 <TableHead className="w-16 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">SUPPLIER</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">WARNA</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO MESIN</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO RANGKA</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
+                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -243,7 +243,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
               ) : (
                 <>
                   {rows.map((item, index) => (
-                    <TableRow key={`${item.id}-${index}`} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                    <TableRow key={`${item.id}-${index}`} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                         {(pagination.from > 0 ? pagination.from - 1 : 0) + index + 1}
                       </TableCell>
@@ -252,14 +252,14 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.color || '-'}</TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.machine_number || '-'}</TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.chassis_number || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{formatCurrency(item.purchase_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatCurrency(item.purchase_price)}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
                     <TableCell colSpan={6} className="px-4 py-4 text-center text-slate-900">
                       GRAND TOTAL
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-right text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
                   </TableRow>
                 </>
               )}
