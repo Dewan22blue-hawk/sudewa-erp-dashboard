@@ -24,10 +24,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Akun',
           href: base('/master/account'),
         },
-        {
-          label: 'Grup Akun',
-          href: base('/master/account-group'),
-        },
+        // {
+        //   label: 'Grup Akun',
+        //   href: base('/master/account-group'),
+        // },
         {
           label: 'Dealer',
           href: base('/master/dealer'),
@@ -36,10 +36,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Customer',
           href: base('/master/customer'),
         },
-        {
-          label: 'Supplier',
-          href: base('/master/supplier'),
-        },
+        // {
+        //   label: 'Supplier',
+        //   href: base('/master/supplier'),
+        // },
         {
           label: 'Tarif',
           href: base('/master/tarif'),
@@ -138,16 +138,32 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: ScrollText,
       children: [
         {
+          label: 'Laporan Transaksi Kas',
+          href: base('/laporan/laporan-transaksi-kas'),
+        },
+        {
+          label: 'Laporan Akuntansi',
+          href: base('/laporan/laporan-akuntansi'),
+        },
+        {
           label: 'Laporan Surat Jalan',
           href: base('/laporan/laporan-surat-jalan'),
+        },
+        {
+          label: 'Laporan Invoice',
+          href: base('/laporan/laporan-invoice'),
+        },
+        {
+          label: 'Laporan Ritase Armada/Maintenance',
+          href: base('/laporan/laporan-ritase-armada'),
         },
         {
           label: 'Laporan Persediaan Barang',
           href: base('/laporan/laporan-stock-perlengkapan'),
         },
         {
-          label: 'Laporan Invoice',
-          href: base('/laporan/laporan-invoice'),
+          label: 'Laporan Aset',
+          href: base('/laporan/laporan-aset'),
         },
       ],
     },
