@@ -148,8 +148,8 @@ export default function LaporanPenjualanPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div className="no-print">
-                    <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">Laporan Penjualan</h1>
-                    <p className="text-sm text-slate-500">Pantau semua transaksi penjualan</p>
+                    <h1 className="text-2xl font-semibold">Laporan Penjualan</h1>
+                    <p className="text-sm text-muted-foreground">Pantau semua transaksi penjualan</p>
                 </div>
 
                 <div className="no-print">

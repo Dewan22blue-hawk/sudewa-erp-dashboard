@@ -107,8 +107,8 @@ export default function LaporanPenerimaanPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="no-print">
-          <h1 className="text-2xl font-semibold text-slate-950">Laporan Penerimaan</h1>
-          <p className="text-sm text-slate-500">Pantau semua transaksi penerimaan unit</p>
+          <h1 className="text-2xl font-semibold">Laporan Penerimaan</h1>
+          <p className="text-sm text-muted-foreground">Pantau semua transaksi penerimaan unit</p>
         </div>
 
         <LaporanPenerimaanFilter

@@ -212,12 +212,12 @@ export default function LaporanPembelianFilter({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={onPrint} className="gap-2 px-4 bg-white text-gray-700 shadow-sm border-slate-200 rounded-xl cursor-pointer">
-          <Printer className="h-4 w-4" /> Print
+      <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={onPrint} className="w-full sm:w-auto">
+          <Printer className="h-4 w-4 mr-2" /> Print
         </Button>
-        <Button onClick={onDownload} className="gap-2 px-4 shadow-sm bg-[#16a34a] hover:bg-[#15803d] text-white border-0 rounded-xl cursor-pointer">
-          <Download className="h-4 w-4" /> Download
+        <Button variant="outline" onClick={onDownload} className="w-full sm:w-auto">
+          <Download className="h-4 w-4 mr-2" /> Download
         </Button>
       </div>
     </div>

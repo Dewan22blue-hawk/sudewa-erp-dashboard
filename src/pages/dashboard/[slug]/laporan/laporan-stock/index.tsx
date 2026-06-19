@@ -62,13 +62,13 @@ export default function LaporanStockPage() {
                                 value={machineNumber}
                                 onChange={(event) => setMachineNumber(event.target.value)}
                                 placeholder="Masukkan nomor mesin"
-                                className="w-[240px] bg-white rounded-xl border-slate-200 shadow-sm"
+                                className="w-[240px] bg-white"
                             />
                         </div>
                         <div className="space-y-2">
                             <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
                             <Select value={String(stockDetailPerPage)} onValueChange={(value) => setStockDetailPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                                <SelectTrigger className="w-[120px] bg-white cursor-pointer">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -80,7 +80,7 @@ export default function LaporanStockPage() {
                         </div>
                         <Button
                             variant="outline"
-                            className="bg-[#f8f9fa] shadow-sm text-gray-700 hover:bg-slate-50 gap-2 border border-slate-200 rounded-xl px-4 h-9 mb-[1px]"
+                            className="gap-2 rounded-xl px-4 h-9 mb-[1px]"
                             onClick={() => setAppliedMachineNumber(machineNumber.trim())}
                         >
                             Show
@@ -99,7 +99,7 @@ export default function LaporanStockPage() {
                         <div className="space-y-2">
                             <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
                             <Select value={String(poPerPage)} onValueChange={(value) => setPoPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                                <SelectTrigger className="w-[120px] bg-white cursor-pointer">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -111,7 +111,7 @@ export default function LaporanStockPage() {
                         </div>
                         <Button
                             variant="outline"
-                            className="bg-[#f8f9fa] shadow-sm text-gray-700 hover:bg-slate-50 gap-2 border border-slate-200 rounded-xl px-4 h-9 mb-[1px]"
+                            className="gap-2 rounded-xl px-4 h-9 mb-[1px]"
                             onClick={() => setAppliedPoDateRange(poDateRange)}
                         >
                             Show
@@ -130,7 +130,7 @@ export default function LaporanStockPage() {
                         <div className="space-y-2">
                             <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
                             <Select value={String(soPerPage)} onValueChange={(value) => setSoPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                                <SelectTrigger className="w-[120px] bg-white cursor-pointer">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -142,7 +142,7 @@ export default function LaporanStockPage() {
                         </div>
                         <Button
                             variant="outline"
-                            className="bg-[#f8f9fa] shadow-sm text-gray-700 hover:bg-slate-50 gap-2 border border-slate-200 rounded-xl px-4 h-9 mb-[1px]"
+                            className="gap-2 rounded-xl px-4 h-9 mb-[1px]"
                             onClick={() => setAppliedSoDateRange(soDateRange)}
                         >
                             Show
@@ -154,7 +154,7 @@ export default function LaporanStockPage() {
                     <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                         <span>Show</span>
                         <Select value={String(stockPerPage)} onValueChange={(value) => setStockPerPage(Number(value))}>
-                            <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                            <SelectTrigger className="w-[80px] bg-white cursor-pointer">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -173,8 +173,8 @@ export default function LaporanStockPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div className="no-print">
-                    <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">{activeMeta.title}</h1>
-                    <p className="text-sm text-slate-500">{activeMeta.subtitle}</p>
+                    <h1 className="text-2xl font-semibold">{activeMeta.title}</h1>
+                    <p className="text-sm text-muted-foreground">{activeMeta.subtitle}</p>
                 </div>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="no-print flex w-full flex-col gap-4">
@@ -215,13 +215,13 @@ export default function LaporanStockPage() {
                             <Button
                                 variant="outline"
                                 onClick={() => currentActions?.print()}
-                                className="gap-2 rounded-xl px-4 border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
+                                className="gap-2 rounded-xl px-4"
                             >
                                 <Printer className="h-4 w-4" /> Print
                             </Button>
                             <Button
                                 onClick={() => currentActions?.download()}
-                                className="gap-2 rounded-xl px-4 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-sm border-0 cursor-pointer"
+                                className="gap-2 rounded-xl px-4 bg-green-600 hover:bg-green-700 text-white border-0"
                             >
                                 <Download className="h-4 w-4" /> Download
                             </Button>

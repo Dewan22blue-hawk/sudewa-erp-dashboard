@@ -10,6 +10,9 @@ import {
 import { CashFlowItem } from '@/services/cashFlow.service';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+
 interface LaporanKasTableProps {
     data: CashFlowItem[];
     totalPemasukan?: number;
@@ -33,11 +36,8 @@ export function LaporanKasTable({
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        if (Number.isNaN(date.getTime())) return dateString;
+        return format(date, 'dd MMM yyyy', { locale: id });
     };
 
     const renderSortHeader = (title: string, key: string, align: 'left' | 'right' | 'center' = 'left') => {
@@ -71,8 +71,8 @@ export function LaporanKasTable({
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
-                            <TableHead className="p-0 text-left w-[150px]">
-                                {renderSortHeader('Tanggal', 'date', 'left')}
+                            <TableHead className="p-0 text-center w-[150px]">
+                                {renderSortHeader('Tanggal', 'date', 'center')}
                             </TableHead>
                             <TableHead className="p-0 text-left w-[150px]">
                                 {renderSortHeader('Nota Reff', 'code', 'left')}
@@ -80,14 +80,14 @@ export function LaporanKasTable({
                             <TableHead className="p-0 text-left">
                                 {renderSortHeader('Keterangan', 'note', 'left')}
                             </TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-left">PEMASUKAN</TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-left">PENGELUARAN</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-center">PEMASUKAN</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-center">PENGELUARAN</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {data.map((item) => (
-                            <TableRow key={item.id} className="hover:bg-gray-50/50 bg-white border-b border-gray-100">
-                                <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium">
+                            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors bg-white border-b">
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-center">
                                     {formatDate(item.date)}
                                 </TableCell>
                                 <TableCell className="px-4 py-4 text-sm text-gray-600">
@@ -96,10 +96,10 @@ export function LaporanKasTable({
                                 <TableCell className="px-4 py-4 text-sm text-gray-600">
                                     {item.note || '-'}
                                 </TableCell>
-                                <TableCell className="px-4 py-4 text-sm font-semibold text-emerald-600">
+                                <TableCell className="px-4 py-4 text-sm font-semibold text-emerald-600 text-center">
                                     {item.debet > 0 ? formatCurrency(item.debet) : ''}
                                 </TableCell>
-                                <TableCell className="px-4 py-4 text-sm font-semibold text-rose-600">
+                                <TableCell className="px-4 py-4 text-sm font-semibold text-rose-600 text-center">
                                     {item.credit > 0 ? formatCurrency(item.credit) : ''}
                                 </TableCell>
                             </TableRow>
@@ -118,10 +118,10 @@ export function LaporanKasTable({
                                     <span className="text-sm font-semibold text-slate-900">Grand Total</span>
                                 </div>
                             </TableCell>
-                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900">
+                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
                                 {formatCurrency(totalPemasukan)}
                             </TableCell>
-                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900">
+                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
                                 {formatCurrency(totalPengeluaran)}
                             </TableCell>
                         </TableRow>

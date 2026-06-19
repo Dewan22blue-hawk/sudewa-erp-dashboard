@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -30,7 +31,7 @@ const formatDateLabel = (value: string): string => {
   if (!value) return '-';
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
-  return format(parsed, 'dd/MM/yyyy');
+  return format(parsed, 'dd MMM yyyy', { locale: id });
 };
 
 const toCsvLine = (cells: Array<string | number>): string =>
@@ -174,19 +175,19 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="w-12 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">{type === 'purchase' ? 'KODE PEMBELIAN' : 'KODE PENJUALAN'}</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">{type === 'purchase' ? 'TGL PEMBELIAN' : 'TGL JUAL'}</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center whitespace-nowrap">{type === 'purchase' ? 'TGL PEMBELIAN' : 'TGL JUAL'}</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">{type === 'purchase' ? 'SUPPLIER' : 'CUSTOMER'}</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase px-4 py-4">{type === 'purchase' ? 'QTY BELI' : 'QTY JUAL'}</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase px-4 py-4">{type === 'purchase' ? 'QTY TERIMA' : 'QTY KIRIM'}</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase px-4 py-4">KURANG</TableHead>
+                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">{type === 'purchase' ? 'QTY BELI' : 'QTY JUAL'}</TableHead>
+                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">{type === 'purchase' ? 'QTY TERIMA' : 'QTY KIRIM'}</TableHead>
+                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">KURANG</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -216,26 +217,26 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
               ) : (
                 <>
                   {pagedRows.map((item, index) => (
-                    <TableRow key={`${item.code}-${item.unit_type}-${index}`} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                    <TableRow key={`${item.code}-${item.unit_type}-${index}`} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                         {(safeTablePage - 1) * ROWS_PER_PAGE + index + 1}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left whitespace-nowrap">{item.code}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{formatDateLabel(item.date)}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatDateLabel(item.date)}</TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{(type === 'purchase' ? item.supplier_name : item.customer_name) || '-'}</TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{item.unit_type || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{formatNumber(item.order_qty)}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{formatNumber(type === 'purchase' ? (item.received_qty ?? 0) : (item.delivered_qty ?? 0))}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{formatNumber(item.remaining_qty)}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatNumber(item.order_qty)}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatNumber(type === 'purchase' ? (item.received_qty ?? 0) : (item.delivered_qty ?? 0))}</TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatNumber(item.remaining_qty)}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold print-hide-pagination">
                     <TableCell colSpan={5} className="px-4 py-4 text-center text-slate-900">
                       GRAND TOTAL
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-right text-slate-900">{formatNumber(summary.order)}</TableCell>
-                    <TableCell className="px-4 py-4 text-right text-slate-900">{formatNumber(summary.processed)}</TableCell>
-                    <TableCell className="px-4 py-4 text-right text-slate-900">{formatNumber(summary.remaining)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-slate-900">{formatNumber(summary.order)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-slate-900">{formatNumber(summary.processed)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-slate-900">{formatNumber(summary.remaining)}</TableCell>
                   </TableRow>
                 </>
               )}
