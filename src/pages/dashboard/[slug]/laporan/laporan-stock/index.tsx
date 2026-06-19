@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
@@ -42,6 +42,22 @@ export default function LaporanStockPage() {
     const [soDateRange, setSoDateRange] = useState<DateRange | undefined>();
     const [appliedSoDateRange, setAppliedSoDateRange] = useState<DateRange | undefined>();
 
+    // Trigger filters automatically
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAppliedMachineNumber(machineNumber.trim());
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [machineNumber]);
+
+    useEffect(() => {
+        setAppliedPoDateRange(poDateRange);
+    }, [poDateRange]);
+
+    useEffect(() => {
+        setAppliedSoDateRange(soDateRange);
+    }, [soDateRange]);
+
     const router = useRouter();
     const { companyId } = useCompany();
 
@@ -65,11 +81,11 @@ export default function LaporanStockPage() {
                                 className="w-[240px] bg-white"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                            <span>Show</span>
                             <Select value={String(stockDetailPerPage)} onValueChange={(value) => setStockDetailPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] bg-white cursor-pointer">
-                                    <SelectValue />
+                                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                    <SelectValue placeholder="50" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem className="cursor-pointer" value="25">25</SelectItem>
@@ -77,14 +93,8 @@ export default function LaporanStockPage() {
                                     <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <span>Page</span>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="gap-2 rounded-xl px-4 h-9 mb-[1px]"
-                            onClick={() => setAppliedMachineNumber(machineNumber.trim())}
-                        >
-                            Show
-                        </Button>
                     </div>
                 );
             case 'purchase-order':
@@ -96,11 +106,11 @@ export default function LaporanStockPage() {
                                 <DatePickerWithRange date={poDateRange} onChange={setPoDateRange} />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                            <span>Show</span>
                             <Select value={String(poPerPage)} onValueChange={(value) => setPoPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] bg-white cursor-pointer">
-                                    <SelectValue />
+                                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                    <SelectValue placeholder="50" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem className="cursor-pointer" value="25">25</SelectItem>
@@ -108,14 +118,8 @@ export default function LaporanStockPage() {
                                     <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <span>Page</span>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="gap-2 rounded-xl px-4 h-9 mb-[1px]"
-                            onClick={() => setAppliedPoDateRange(poDateRange)}
-                        >
-                            Show
-                        </Button>
                     </div>
                 );
             case 'sales-order':
@@ -127,11 +131,11 @@ export default function LaporanStockPage() {
                                 <DatePickerWithRange date={soDateRange} onChange={setSoDateRange} />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                            <span>Show</span>
                             <Select value={String(soPerPage)} onValueChange={(value) => setSoPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] bg-white cursor-pointer">
-                                    <SelectValue />
+                                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                    <SelectValue placeholder="50" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem className="cursor-pointer" value="25">25</SelectItem>
@@ -139,23 +143,17 @@ export default function LaporanStockPage() {
                                     <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <span>Page</span>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="gap-2 rounded-xl px-4 h-9 mb-[1px]"
-                            onClick={() => setAppliedSoDateRange(soDateRange)}
-                        >
-                            Show
-                        </Button>
                     </div>
                 );
             default:
                 return (
-                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
                         <span>Show</span>
                         <Select value={String(stockPerPage)} onValueChange={(value) => setStockPerPage(Number(value))}>
-                            <SelectTrigger className="w-[80px] bg-white cursor-pointer">
-                                <SelectValue />
+                            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                <SelectValue placeholder="50" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem className="cursor-pointer" value="25">25</SelectItem>
