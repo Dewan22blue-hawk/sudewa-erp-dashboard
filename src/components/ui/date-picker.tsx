@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 export function DatePicker({
   value,
   onChange,
-  placeholder = 'Select date',
+  placeholder = 'Pilih tanggal',
   disabled,
   className,
   id,
@@ -43,7 +43,7 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <Button type="button" id={id} variant={'outline'} className={cn('w-full justify-start text-left font-normal', !dateValue && 'text-muted-foreground', className)} disabled={disabled}>
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {dateValue ? format(dateValue, 'PPP') : <span>{placeholder}</span>}
+          {dateValue ? format(dateValue, 'dd MMM yyyy') : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 shadow-lg rounded-md" align="start" sideOffset={8}>
