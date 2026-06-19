@@ -18,7 +18,7 @@ export default function DataPPNPenjualanPage() {
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState('buy_date');
+  const [sortBy, setSortBy] = useState('sales_date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [selected, setSelected] = useState<PPNPenjualan | null>(null);
   const [openForm, setOpenForm] = useState(false);

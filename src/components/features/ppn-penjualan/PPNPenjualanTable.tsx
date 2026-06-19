@@ -101,7 +101,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
             <tr>
               <th className="p-0 text-left">{renderSortHeader('Kode Invoice', 'code', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('Tanggal Jual', 'sales_date', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('supplier', 'supplier', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('Customer', 'customer', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('Tanggal FPM', 'fpm_date', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('MASA NSFPM', 'nsfpm_age', 'center')}</th>
               <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Nomor NSFP</th>
@@ -147,8 +147,8 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
                 return (
                   <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                     <td className="px-4 py-4 text-left font-medium text-blue-600 whitespace-nowrap">{item.code}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.buy_date)}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.supplier}</td>
+                    <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.sales_date)}</td>
+                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.customer}</td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500">
                       <div className="space-y-1">
                         <div>{formatDate(item.fpm_date)}</div>
