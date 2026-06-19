@@ -12,6 +12,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
+import { cn } from '@/lib/utils';
 import {
   useGoodsIssueEquipments,
   useDeleteGoodsIssueEquipment,
@@ -124,10 +125,11 @@ export default function PengeluaranPerlengkapanIndex() {
     const showLastPage = totalPages > 5 && !pageNumbers.includes(totalPages);
 
     return (
-      <div className="flex flex-wrap items-center justify-end gap-2 text-[15px] text-slate-800">
+      <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
         <Button
           variant="ghost"
-          className="h-10 rounded-xl px-3"
+          size="sm"
+          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page <= 1 || transactionsQuery.isLoading}
           onClick={() => setPage(page - 1)}
         >
@@ -136,32 +138,36 @@ export default function PengeluaranPerlengkapanIndex() {
         {pageNumbers.map((pageNumber) => (
           <Button
             key={pageNumber}
-            variant={pageNumber === page ? 'outline' : 'ghost'}
-            className={
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
               pageNumber === page
-                ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white shadow-none font-semibold'
-                : 'h-10 min-w-10 rounded-xl'
-            }
+                ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+            )}
             disabled={transactionsQuery.isLoading}
             onClick={() => setPage(pageNumber)}
           >
             {pageNumber}
           </Button>
         ))}
-        {showLastPage ? <span className="px-1 text-slate-500">...</span> : null}
-        {showLastPage ? (
+        {showLastPage && <span className="px-1 text-slate-500">...</span>}
+        {showLastPage && (
           <Button
             variant="ghost"
-            className="h-10 min-w-10 rounded-xl"
+            size="sm"
+            className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
             disabled={transactionsQuery.isLoading}
             onClick={() => setPage(totalPages)}
           >
             {totalPages}
           </Button>
-        ) : null}
+        )}
         <Button
           variant="ghost"
-          className="h-10 rounded-xl px-3"
+          size="sm"
+          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page >= totalPages || totalData === 0 || transactionsQuery.isLoading}
           onClick={() => setPage(page + 1)}
         >
@@ -173,77 +179,79 @@ export default function PengeluaranPerlengkapanIndex() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 px-1">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">
+            <h1 className="text-2xl font-semibold">
               Data Pengeluaran Perlengkapan
             </h1>
-            <p className="mt-1 text-[16px] text-slate-500">
+            <p className="text-sm text-muted-foreground">
               Kelola dan lacak semua transaksi pengeluaran perlengkapan kendaraan
             </p>
           </div>
           <Button
             onClick={() => setFormOpen(true)}
-            className="h-11 rounded-xl bg-[#1f4163] px-5 text-[16px] font-medium hover:bg-[#183552]"
+            className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
           >
-            <Plus className="mr-2 h-5 w-5" /> Tambah
+            <Plus className="mr-2 h-4 w-4" /> Tambah
           </Button>
         </div>
 
-        {/* Filters and Search */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-[300px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-                placeholder="Search by code here"
-                className="pl-9 bg-white"
+        <div className="space-y-4">
+          {/* Filters and Search */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                  placeholder="Search by code here"
+                  className="pl-9 bg-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Table Card */}
+          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+            <div className="overflow-x-auto">
+              <GoodsIssueEquipmentTable
+                data={transactions}
+                isLoading={transactionsQuery.isLoading}
+                slug={slug}
+                onUploadInvoice={(item) => {
+                  setInvoiceTarget(item);
+                  setInvoiceOpen(true);
+                }}
+                onDelete={(item) => setDeleteTarget(item)}
               />
             </div>
-
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="w-[70px] bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
-            </div>
           </div>
-        </div>
 
-        {/* Table Card */}
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
-          <div className="overflow-x-auto">
-            <GoodsIssueEquipmentTable
-              data={transactions}
-              isLoading={transactionsQuery.isLoading}
-              slug={slug}
-              onUploadInvoice={(item) => {
-                setInvoiceTarget(item);
-                setInvoiceOpen(true);
-              }}
-              onDelete={(item) => setDeleteTarget(item)}
-            />
+          {/* Pagination Info */}
+          <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <p>
+              Showing {startData}-{endData} of {totalData} data
+            </p>
+            {renderPagination()}
           </div>
-        </Card>
-
-        {/* Pagination Info */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <p className="text-[14px] text-slate-500">
-            Showing {startData}-{endData} of {totalData} data
-          </p>
-          {renderPagination()}
         </div>
       </div>
 

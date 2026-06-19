@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTableSort } from '@/hooks/useTableSort';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface Props {
   data: PenerimaanUnit[];
@@ -47,11 +49,18 @@ export default function PenerimaanUnitTable({ data }: Props) {
     );
   };
 
+  const formatDate = (val: string) => {
+    if (!val) return '-';
+    const date = new Date(val);
+    if (Number.isNaN(date.getTime())) return val;
+    return format(date, 'dd MMM yyyy', { locale: id });
+  };
+
   return (
-    <div className="bg-white rounded-xl border overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
       <Table className="w-full text-sm">
         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-          <TableRow>
+          <TableRow className="hover:bg-[#f8f9fa]">
             {renderSortHeader('noPenerimaan', 'NO PENERIMAAN')}
             {renderSortHeader('tanggal', 'TANGGAL')}
             {renderSortHeader('supplier', 'SUPPLIER')}
@@ -62,21 +71,23 @@ export default function PenerimaanUnitTable({ data }: Props) {
 
         <TableBody>
           {sortedData.map((item) => (
-            <TableRow key={item.id} className="border-b hover:bg-gray-50/70 transition-colors">
+            <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
               <TableCell className="px-4 py-4 font-medium text-gray-900 text-left text-sm">{item.noPenerimaan}</TableCell>
-              <TableCell className="px-4 py-4 text-left text-sm">{new Date(item.tanggal).toLocaleDateString('id-ID')}</TableCell>
+              <TableCell className="px-4 py-4 text-left text-sm">{formatDate(item.tanggal)}</TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{item.supplier}</TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{item.keterangan || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>{slug ? <Link href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Edit</Link> : <span className="text-gray-400">Edit</span>}</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteId(item.id)} className="text-red-600">
+                  <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                      {slug ? <Link href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Edit</Link> : <span className="text-gray-400">Edit</span>}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDeleteId(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                       Hapus
                     </DropdownMenuItem>
                   </DropdownMenuContent>

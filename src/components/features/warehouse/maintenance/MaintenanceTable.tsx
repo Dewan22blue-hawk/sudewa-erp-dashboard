@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { MaintenanceItem } from '@/@types/maintenance.types';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface MaintenanceTableProps {
   data: MaintenanceItem[];
@@ -13,10 +15,7 @@ const formatDate = (value?: string) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  const d = date.getDate().toString().padStart(2, '0');
-  const m = (date.getMonth() + 1).toString().padStart(2, '0');
-  const y = date.getFullYear();
-  return `${d}/${m}/${y}`;
+  return format(date, 'dd MMM yyyy', { locale: id });
 };
 
 export function MaintenanceTable({
@@ -53,7 +52,7 @@ export function MaintenanceTable({
           </TableRow>
         ) : (
           data.map((item, index) => (
-            <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70 transition-colors">
+            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
               <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{startIndex + index}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 font-medium text-left">{item.driver?.name || '-'}</TableCell>

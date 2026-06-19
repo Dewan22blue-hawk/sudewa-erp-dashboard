@@ -140,7 +140,7 @@ export default function StockUnitTable({
         {statusTabs && <div className="flex-shrink-0 w-full sm:w-auto flex justify-end">{statusTabs}</div>}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
         <table className="w-full text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr className="hover:bg-[#f8f9fa]">

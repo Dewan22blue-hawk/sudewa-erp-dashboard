@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import PenerimaanUnitTable from '@/components/features/penerimaan-unit/PenerimaanUnitTable';
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
+import { cn } from '@/lib/utils';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
@@ -72,88 +73,104 @@ export default function PenerimaanUnitPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data Penerimaan Unit</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola dan lacak semua data penerimaan stock unit</p>
+          <h1 className="text-2xl font-semibold">Data Penerimaan Unit</h1>
+          <p className="text-sm text-muted-foreground">Kelola dan lacak semua data penerimaan stock unit</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search here"
-                className="pl-9 bg-white"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search here"
+                  className="pl-9 bg-white"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select
+                  value={itemsPerPage}
+                  onValueChange={(val) => {
+                    setItemsPerPage(val);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="10" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select
-                value={itemsPerPage}
-                onValueChange={(val) => {
-                  setItemsPerPage(val);
-                  setCurrentPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[70px] bg-white">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
-            </div>
+            <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => setOpenForm(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah
+            </Button>
           </div>
 
-          <Button className="h-10 rounded-xl bg-[#19355d] text-white hover:bg-[#152e52]" onClick={() => setOpenForm(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah
-          </Button>
-        </div>
+          {isLoading ? (
+            <div className="bg-white rounded-xl border p-8 text-center text-gray-500">Loading...</div>
+          ) : isError ? (
+            <div className="bg-white rounded-xl border p-8 text-center text-red-500">{apiErrorMessage}</div>
+          ) : (
+            <PenerimaanUnitTable data={data} />
+          )}
 
-        {isLoading ? (
-          <div className="bg-white rounded-xl border p-8 text-center text-gray-500">Loading...</div>
-        ) : isError ? (
-          <div className="bg-white rounded-xl border p-8 text-center text-red-500">{apiErrorMessage}</div>
-        ) : (
-          <PenerimaanUnitTable data={data} />
-        )}
-
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-1">
-          <p className="text-sm text-slate-500">
-            Showing {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} of {totalItems} data
-          </p>
-          <div className="flex items-center gap-1 text-[16px]">
-            <Button variant="ghost" className="text-slate-700" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
-              Previous
-            </Button>
-            {getPageNumbers().map((page, idx) => (
+          <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <p>
+              Showing {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} of {totalItems} data
+            </p>
+            <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
               <Button
-                key={idx}
-                variant={page === currentPage ? 'outline' : 'ghost'}
-                className={
-                  page === currentPage
-                    ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white font-semibold'
-                    : 'h-10 min-w-10 rounded-xl text-slate-700'
-                }
-                onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                disabled={typeof page !== 'number'}
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
               >
-                {page}
+                Previous
               </Button>
-            ))}
-            <Button variant="ghost" className="text-slate-700" disabled={currentPage === totalPages || totalItems === 0} onClick={() => setCurrentPage((p) => p + 1)}>
-              Next
-            </Button>
+              {getPageNumbers().map((page, idx) => (
+                <Button
+                  key={idx}
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    page === currentPage
+                      ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                      : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                  )}
+                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                  disabled={typeof page !== 'number'}
+                >
+                  {page}
+                </Button>
+              ))}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                disabled={currentPage === totalPages || totalItems === 0}
+                onClick={() => setCurrentPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
 

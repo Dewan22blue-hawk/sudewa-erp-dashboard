@@ -29,12 +29,15 @@ import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import type { MaterialTransactionFormValues } from '@/scheme/material-transaction.schema';
 import { getMaterialTransactionById } from '@/services/material-transaction.service';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID');
+  return format(date, 'dd MMM yyyy', { locale: id });
 };
 
 const getWarehouseName = (item: MaterialTransaction) => item.warehouse?.name ?? (item.warehouseId ? `Warehouse #${item.warehouseId}` : '-');
@@ -152,34 +155,10 @@ export default function MaterialReleaseListPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">Data Pengeluaran Perlengkapan</h1>
-          <p className="mt-1 text-[18px] text-slate-500">Kelola dan lacak semua data pengeluaran stock perlengkapan</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-[300px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="pl-9 bg-white" />
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="w-[70px] bg-white">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">5</SelectItem>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Data Pengeluaran Perlengkapan</h1>
+            <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock perlengkapan</p>
           </div>
 
           <Button
@@ -187,14 +166,41 @@ export default function MaterialReleaseListPage() {
               setEditingTransaction(null);
               setOpenForm(true);
             }}
-            className="h-[40px] rounded-xl bg-[#1f4163] px-6 text-[18px] font-medium hover:bg-[#183552]"
+            className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
           >
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="pl-9 bg-white" />
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="10" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
@@ -218,7 +224,7 @@ export default function MaterialReleaseListPage() {
                 </TableRow>
               ) : (
                 (transactionsQuery.data?.data ?? []).map((item) => (
-                  <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                  <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
                     {(() => {
                       const detail = detailMap.get(item.id);
                       const firstMaterial = detail?.materialTransactionDetails[0]?.material;
@@ -239,15 +245,15 @@ export default function MaterialReleaseListPage() {
                           <TableCell className="px-4 py-4 text-center">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-                                  <MoreVertical className="h-4 w-4 text-slate-700" />
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                  <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-44 rounded-2xl border-slate-200 p-2 shadow-lg">
-                                <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+                              <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                                   <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar/${item.id}/edit`}>Edit</Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+                                <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                                   <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar/${item.id}`}>Detail</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -255,11 +261,11 @@ export default function MaterialReleaseListPage() {
                                     setInvoiceTarget(item);
                                     setOpenInvoiceModal(true);
                                   }}
-                                  className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
+                                  className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                                 >
                                   Upload Invoice
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setDeleteTarget(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
+                                <DropdownMenuItem onClick={() => setDeleteTarget(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                                   Hapus
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -273,36 +279,43 @@ export default function MaterialReleaseListPage() {
               )}
             </TableBody>
           </Table>
-        </Card>
+        </div>
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <p className="text-[14px] text-slate-500">Showing {startData}-{endData} of {totalData} data</p>
-          <div className="flex items-center gap-1 text-[16px]">
-            <Button variant="ghost" onClick={() => setPage(page - 1)} disabled={page <= 1}>
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+          <p>Showing {startData}-{endData} of {totalData} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" onClick={() => setPage(page - 1)} disabled={page <= 1}>
               Previous
             </Button>
             {pageNumbers.map((pageNumber) => (
               <Button
                 key={pageNumber}
-                variant={pageNumber === page ? 'outline' : 'ghost'}
+                variant="ghost"
+                size="sm"
                 onClick={() => setPage(pageNumber)}
-                className={pageNumber === page ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white' : 'h-10 min-w-10 rounded-xl'}
+                className={cn(
+                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  pageNumber === page
+                    ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                    : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
               >
                 {pageNumber}
               </Button>
             ))}
-            {totalPages > 5 && !pageNumbers.includes(totalPages) ? <span className="px-2 text-slate-500">...</span> : null}
-            {totalPages > 5 && !pageNumbers.includes(totalPages) ? (
-              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-xl">
+            {totalPages > 5 && !pageNumbers.includes(totalPages) && <span className="px-2 text-slate-500">...</span>}
+            {totalPages > 5 && !pageNumbers.includes(totalPages) && (
+              <Button variant="ghost" size="sm" onClick={() => setPage(totalPages)} className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white">
                 {totalPages}
               </Button>
-            ) : null}
-            <Button variant="ghost" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
+            )}
+            <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
               Next
             </Button>
           </div>
         </div>
       </div>
+    </div>
 
       <MaterialReceiptFormModal
         open={openForm}
