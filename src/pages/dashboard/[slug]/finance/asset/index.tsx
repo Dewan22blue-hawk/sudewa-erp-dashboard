@@ -83,8 +83,8 @@ export default function FinanceAssetPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Aset</h1>
-                    <p className="text-sm text-gray-500 mt-1">Kelola seluruh aset dengan mudah</p>
+                    <h1 className="text-2xl font-semibold text-slate-950">Aset</h1>
+                    <p className="text-sm text-slate-500">Kelola seluruh aset dengan mudah</p>
                 </div>
 
                 <FinanceAssetTable

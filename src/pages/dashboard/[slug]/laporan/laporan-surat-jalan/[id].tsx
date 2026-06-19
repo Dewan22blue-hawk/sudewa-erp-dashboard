@@ -146,7 +146,7 @@ export default function LaporanSuratJalanDetailPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen">
+      <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center gap-3">
           <Button
@@ -158,27 +158,27 @@ export default function LaporanSuratJalanDetailPage() {
             <ArrowLeft className="h-5 w-5 text-slate-700" />
           </Button>
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Informasi Surat Jalan</h1>
-            <p className="text-[15px] text-gray-500">Informasi lengkap mengenai surat jalan</p>
+            <h1 className="text-2xl font-semibold text-slate-950">Informasi Surat Jalan</h1>
+            <p className="text-sm text-slate-500">Informasi lengkap mengenai surat jalan</p>
           </div>
         </div>
 
         {/* Filters and Search Row */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-[320px]">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search here"
-                className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm focus-visible:ring-1"
+                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
               />
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-700">
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
               <Select value={perPage} onValueChange={setPerPage}>
-                <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -195,7 +195,7 @@ export default function LaporanSuratJalanDetailPage() {
           <Button
             onClick={handleExport}
             variant="outline"
-            className="gap-2 rounded-xl h-11 px-4 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm text-slate-700"
+            className="gap-2 rounded-xl px-4 border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
           >
             <Download className="h-4 w-4" /> Export
           </Button>
@@ -213,22 +213,22 @@ export default function LaporanSuratJalanDetailPage() {
           </div>
         ) : filteredRows.length > 0 ? (
           <div className="space-y-6">
-            <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm w-full">
+            <Card className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none w-full">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-slate-50 border-b border-slate-200">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700">NO</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">CUSTOMER</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">LOKASI</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">LOADING IN</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">LOADING OUT</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UJ DRIVER</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UJ LAINNYA</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">INVOICE</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">INV TAMBAHAN</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">PPN</TableHead>
-                      <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">MUATAN</TableHead>
+                      <TableHead className="w-12 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">CUSTOMER</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">LOKASI</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">LOADING IN</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">LOADING OUT</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">UJ DRIVER</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">UJ LAINNYA</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">INVOICE</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">INV TAMBAHAN</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">PPN</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">MUATAN</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -273,32 +273,29 @@ export default function LaporanSuratJalanDetailPage() {
             </Card>
 
             {/* Pagination Footer */}
-            <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-4 px-1 py-4 sm:flex-row sm:items-center sm:justify-between no-print">
               <div className="text-sm text-slate-500">
                 Showing 1-{filteredRows.length} of {filteredRows.length} data
               </div>
-              <div className="flex items-center gap-1 text-sm text-slate-700">
+              <div className="flex items-center gap-1 text-slate-800">
                 <Button
                   variant="ghost"
-                  size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500 cursor-pointer"
                   disabled={true}
-                  className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] text-slate-400"
                 >
                   Previous
                 </Button>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="ghost"
+                  className="h-9 min-w-9 rounded-xl border border-slate-200 px-3 text-sm font-medium shadow-sm bg-white text-slate-950 cursor-pointer"
                   disabled={true}
-                  className="h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
                 >
                   1
                 </Button>
                 <Button
                   variant="ghost"
-                  size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500 cursor-pointer"
                   disabled={true}
-                  className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] text-slate-400"
                 >
                   Next
                 </Button>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { Plus } from 'lucide-react';
 import PengeluaranUnitTable from '@/components/features/pengeluaran-unit/PengeluaranUnitTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -55,14 +56,15 @@ export default function PengeluaranUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-start">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Data Pengeluaran Unit</h1>
-            <p className="text-sm text-gray-500 mt-1">Kelola dan lacak semua data pengeluaran stock unit</p>
+            <h1 className="text-2xl font-semibold">Data Pengeluaran Unit</h1>
+            <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock unit</p>
           </div>
 
-          <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="bg-[#132c4a] hover:bg-[#1e3256] text-white font-medium px-4 py-2 text-sm rounded-lg shadow-sm">
-            + Tambah
+          <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
           </Button>
         </div>
 

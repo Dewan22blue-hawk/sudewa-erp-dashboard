@@ -41,62 +41,64 @@ export function FinanceRefundPage({ title, description, transactionType }: Finan
         <title>{title} - Wajira Dashboard</title>
       </Head>
 
-      <div className="space-y-6 p-6">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-          <p className="text-sm text-slate-500 mt-1">{description}</p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-950">{title}</h1>
+          <p className="text-sm text-slate-500">{description}</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-1">
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search here"
-                className="pl-9 bg-white"
-              />
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-1">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search here"
+                  className="pl-9 bg-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
+                  <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                    <SelectValue placeholder="25" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[10, 25, 50, 100].map((option) => (
+                      <SelectItem key={option} value={String(option)}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="w-[70px] bg-white">
-                  <SelectValue placeholder="25" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[10, 25, 50, 100].map((option) => (
-                    <SelectItem key={option} value={String(option)}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <span>Page</span>
-            </div>
+            {search ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateQuery({ search: undefined, page: 1 })}
+                className="rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer h-9 text-xs px-3"
+              >
+                Reset
+              </Button>
+            ) : null}
           </div>
 
-          {search ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => updateQuery({ search: undefined, page: 1 })}
-              className="h-[38px] text-xs font-semibold px-3 text-slate-600 font-sans"
-            >
-              Reset
-            </Button>
-          ) : null}
+          <FinanceRefundTable
+            data={data}
+            meta={refundQuery.data?.meta}
+            page={page}
+            isLoading={refundQuery.isLoading}
+            transactionType={transactionType}
+            onPageChange={setPage}
+          />
         </div>
-
-        <FinanceRefundTable
-          data={data}
-          meta={refundQuery.data?.meta}
-          page={page}
-          isLoading={refundQuery.isLoading}
-          transactionType={transactionType}
-          onPageChange={setPage}
-        />
       </div>
     </DashboardLayout>
   );

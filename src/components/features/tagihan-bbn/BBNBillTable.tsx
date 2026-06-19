@@ -61,13 +61,13 @@ export function BBNBillTable({
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search here"
-              className="h-11 rounded-xl border-slate-200 bg-white pl-10"
+              className="rounded-xl border-slate-200 bg-white pl-10 shadow-sm"
             />
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-700">Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white">
+              <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -81,7 +81,7 @@ export function BBNBillTable({
           </div>
         </div>
 
-        <Button onClick={onAdd} className="h-11 rounded-xl bg-[#1f4163] px-5 text-sm font-medium hover:bg-[#183552]">
+        <Button onClick={onAdd} className="rounded-xl bg-[#1e3a5f] hover:bg-[#152e4d] px-5 text-sm font-medium">
           <Plus className="mr-2 h-4 w-4" />
           Tambah
         </Button>

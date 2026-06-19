@@ -23,9 +23,9 @@ export default function AccountingReportFilters({
   isDownloading = false,
 }: AccountingReportFiltersProps) {
   return (
-    <div className="print:hidden flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="print:hidden flex flex-col gap-4 sm:flex-row sm:items-end justify-between w-full">
       <div className="space-y-2">
-        <label className="text-sm font-semibold text-[#111827]">
+        <label className="text-[13px] font-medium text-slate-700">
           Periode Transaksi
         </label>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -33,13 +33,13 @@ export default function AccountingReportFilters({
             value={selectedDate}
             onChange={(date) => onDateChange(date ?? selectedDate)}
             placeholder="Jan 20, 2025"
-            className="h-11 w-full min-w-[260px] justify-start rounded-xl border-[#d1d5db] bg-white text-sm text-[#111827] shadow-none sm:w-[340px]"
+            className="w-full min-w-[260px] justify-start rounded-xl border-slate-200 bg-white text-sm text-slate-700 shadow-sm sm:w-[340px]"
           />
           <Button
             type="button"
             variant="outline"
             onClick={onShow}
-            className="h-11 rounded-xl border-transparent bg-[#f3f4f6] px-6 text-sm font-medium text-[#111827] shadow-none hover:bg-[#e5e7eb]"
+            className="bg-[#f8f9fa] shadow-sm text-slate-700 hover:bg-slate-50 gap-2 border border-slate-200 rounded-xl px-4 cursor-pointer"
           >
             <Eye className="h-4 w-4" />
             Show
@@ -47,12 +47,12 @@ export default function AccountingReportFilters({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 self-start lg:self-auto">
+      <div className="flex items-center gap-3 self-start sm:self-auto">
         <Button
           type="button"
           variant="outline"
           onClick={onPrint}
-          className="h-11 rounded-xl border-[#d1d5db] bg-white px-5 text-sm font-medium text-[#111827] shadow-none hover:bg-[#f9fafb]"
+          className="rounded-xl border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
         >
           <Printer className="h-4 w-4" />
           Print
@@ -61,7 +61,7 @@ export default function AccountingReportFilters({
           type="button"
           onClick={onDownload}
           disabled={isDownloading}
-          className="h-11 rounded-xl bg-[#06c755] px-5 text-sm font-medium text-white hover:bg-[#05b14c]"
+          className="rounded-xl bg-[#16a34a] hover:bg-[#15803d] px-5 text-sm font-medium text-white shadow-sm border-0 cursor-pointer"
         >
           <Download className="h-4 w-4" />
           {isDownloading ? 'Preparing...' : 'Download'}

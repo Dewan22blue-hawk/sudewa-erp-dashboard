@@ -12,6 +12,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { useKas } from '@/hooks/useKas';
+import { cn } from '@/lib/utils';
 
 // Import new hooks, types, components
 import {
@@ -166,100 +167,123 @@ export default function PerlengkapanMasukListPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">Penerimaan Perlengkapan Kendaraan</h1>
-          <p className="mt-1 text-[16px] text-slate-500">Kelola dan lacak semua transaksi perlengkapan masuk</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-[300px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-                placeholder="Search here"
-                className="pl-9 bg-white"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="w-[70px] bg-white">
-                  <SelectValue placeholder="25" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">5</SelectItem>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Penerimaan Perlengkapan Kendaraan</h1>
+            <p className="text-sm text-muted-foreground">Kelola dan lacak semua transaksi perlengkapan masuk</p>
           </div>
 
           <Button
             onClick={() => setOpenForm(true)}
-            className="h-[40px] rounded-xl bg-[#1f4163] px-6 text-[18px] font-medium hover:bg-[#183552]"
+            className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
           >
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
-           <GoodsReceiptEquipmentTable
-            data={transactionsQuery.data?.data ?? []}
-            isLoading={transactionsQuery.isLoading}
-            isFetching={transactionsQuery.isFetching}
-            slug={slug}
-            onUploadInvoice={(item) => {
-              setInvoiceTarget(item);
-              setOpenInvoice(true);
-            }}
-            onCreateBilling={handleCreateBilling}
-            onPayBilling={(item) => {
-              setPaymentTarget(item);
-              setOpenPayment(true);
-            }}
-            onDelete={setDeleteTarget}
-          />
-        </Card>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                  placeholder="Search here"
+                  className="pl-9 bg-white"
+                />
+              </div>
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <p className="text-[14px] text-slate-500">
-            Showing {startData}-{endData} of {totalData} data
-          </p>
-          <div className="flex items-center gap-1 text-[16px]">
-            <Button variant="ghost" onClick={() => setPage(page - 1)} disabled={page <= 1}>
-              Previous
-            </Button>
-            {pageNumbers.map((pageNumber) => (
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="25" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+            <GoodsReceiptEquipmentTable
+              data={transactionsQuery.data?.data ?? []}
+              isLoading={transactionsQuery.isLoading}
+              isFetching={transactionsQuery.isFetching}
+              slug={slug}
+              onUploadInvoice={(item) => {
+                setInvoiceTarget(item);
+                setOpenInvoice(true);
+              }}
+              onCreateBilling={handleCreateBilling}
+              onPayBilling={(item) => {
+                setPaymentTarget(item);
+                setOpenPayment(true);
+              }}
+              onDelete={setDeleteTarget}
+            />
+          </div>
+
+          <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <p>
+              Showing {startData}-{endData} of {totalData} data
+            </p>
+            <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
               <Button
-                key={pageNumber}
-                variant={pageNumber === page ? 'outline' : 'ghost'}
-                onClick={() => setPage(pageNumber)}
-                className={
-                  pageNumber === page
-                    ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white'
-                    : 'h-10 min-w-10 rounded-xl'
-                }
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                disabled={page <= 1}
+                onClick={() => setPage(page - 1)}
               >
-                {pageNumber}
+                Previous
               </Button>
-            ))}
-            {totalPages > 5 && !pageNumbers.includes(totalPages) ? <span className="px-2 text-slate-500">...</span> : null}
-            {totalPages > 5 && !pageNumbers.includes(totalPages) ? (
-              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-xl">
-                {totalPages}
+              {pageNumbers.map((pageNumber) => (
+                <Button
+                  key={pageNumber}
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    pageNumber === page
+                      ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                      : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                  )}
+                  onClick={() => setPage(pageNumber)}
+                >
+                  {pageNumber}
+                </Button>
+              ))}
+              {totalPages > 5 && !pageNumbers.includes(totalPages) && <span className="px-2 text-slate-500">...</span>}
+              {totalPages > 5 && !pageNumbers.includes(totalPages) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                  onClick={() => setPage(totalPages)}
+                >
+                  {totalPages}
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                disabled={page >= totalPages}
+                onClick={() => setPage(page + 1)}
+              >
+                Next
               </Button>
-            ) : null}
-            <Button variant="ghost" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
-              Next
-            </Button>
+            </div>
           </div>
         </div>
       </div>

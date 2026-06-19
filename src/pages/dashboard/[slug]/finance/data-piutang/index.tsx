@@ -34,19 +34,19 @@ export default function DataPiutangPage() {
             <div className="space-y-6">
 
                 {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-semibold">Data Piutang</h1>
-                    <p className="text-sm text-gray-500">
-                        Kelola data pembayaran piutang
-                    </p>
-                </div>
+                <div className="flex items-center justify-between gap-4 no-print">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-950">Data Piutang</h1>
+                        <p className="text-sm text-slate-500">Kelola data pembayaran piutang</p>
+                    </div>
 
-                {query.isFetching ? (
-                    <span className="inline-flex items-center gap-2 text-sm text-gray-500">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Memuat data...
-                    </span>
-                ) : null}
+                    {query.isFetching ? (
+                        <span className="inline-flex items-center gap-2 text-sm text-slate-500">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Memuat data...
+                        </span>
+                    ) : null}
+                </div>
 
                 {/* Table */}
                 <DataPiutangTable

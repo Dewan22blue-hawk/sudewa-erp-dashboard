@@ -82,15 +82,15 @@ export default function LaporanTransaksiKasPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 px-1">
+      <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Laporan Transaksi Kas</h1>
-          <p className="text-sm text-slate-500 mt-1">Pantau semua pemasukan dan pengeluaran</p>
+          <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">Laporan Transaksi Kas</h1>
+          <p className="text-sm text-slate-500">Pantau semua pemasukan dan pengeluaran</p>
         </div>
 
         {/* Filters */}
-        <div className="flex items-end justify-between w-full no-print gap-4 flex-wrap bg-white p-4 rounded-xl border border-slate-200">
+        <div className="flex items-end justify-between w-full no-print gap-4 flex-wrap mb-5">
           <div className="flex items-end gap-6 flex-wrap">
             <div className="flex flex-col space-y-2">
               <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
@@ -105,7 +105,7 @@ export default function LaporanTransaksiKasPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder="Search here"
-                  className="pl-9 bg-white"
+                  className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                 />
@@ -118,7 +118,7 @@ export default function LaporanTransaksiKasPage() {
                 value={String(pagination.perPage)}
                 onValueChange={(val) => setPerPage(Number(val))}
               >
-                <SelectTrigger className="w-[120px] bg-white">
+                <SelectTrigger className="w-[120px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -132,7 +132,7 @@ export default function LaporanTransaksiKasPage() {
 
             <Button
               variant="outline"
-              className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 shrink-0 h-10 px-4 mb-[1px]"
+              className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 shrink-0 border border-slate-200 rounded-xl px-4 cursor-pointer mb-[1px]"
               onClick={handleShowData}
               disabled={isLoadingDisplay}
             >

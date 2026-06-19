@@ -217,12 +217,12 @@ export default function AccountingReportPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 px-1">
+      <div className="space-y-6">
         <header className="print:hidden">
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-950">
             Laporan Akuntansi
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500">
             Pantau semua pemasukan dan pengeluaran
           </p>
         </header>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import LaporanBuktiPotongForm from '@/components/features/laporan-bukti-potong/LaporanBuktiPotongForm';
@@ -55,13 +56,18 @@ export default function EditLaporanBuktiPotongPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleBack}
-            className="p-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+            className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
           >
-            <ChevronLeft className="h-6 w-6 text-slate-600" />
-          </button>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-950">Edit Bukti Potong</h1>
+            <ArrowLeft className="h-5 w-5 text-slate-700" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Edit Bukti Potong</h1>
+            <p className="text-sm text-slate-500">Perbarui data laporan bukti potong</p>
+          </div>
         </div>
 
         <LaporanBuktiPotongForm

@@ -91,12 +91,12 @@ export default function LPJumlahPenyerahanPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 px-1">
+      <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex justify-between items-start no-print">
+        <div className="flex justify-between items-center no-print">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Laporan Jumlah Penyerahan</h1>
-            <p className="text-sm text-slate-500 mt-1">Laporan jumlah penyerahan dokumen ke customer</p>
+            <h1 className="text-2xl font-semibold text-slate-950">Laporan Jumlah Penyerahan</h1>
+            <p className="text-sm text-slate-500">Laporan jumlah penyerahan dokumen ke customer</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
             <Printer className="h-4.5 w-4.5 text-slate-700" /> Print

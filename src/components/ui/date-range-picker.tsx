@@ -18,12 +18,14 @@ interface DatePickerWithRangeProps {
     className?: string
     date?: DateRange | undefined
     onChange?: (date: DateRange | undefined) => void
+    placeholder?: string
 }
 
 export function DatePickerWithRange({
     className,
     date,
-    onChange
+    onChange,
+    placeholder = "Pilih rentang tanggal",
 }: DatePickerWithRangeProps) {
     return (
         <div className={cn("grid gap-2", className)}>
@@ -41,18 +43,18 @@ export function DatePickerWithRange({
                         {date?.from ? (
                             date.to ? (
                                 <>
-                                    {format(date.from, "LLL dd, y")} -{" "}
-                                    {format(date.to, "LLL dd, y")}
+                                    {format(date.from, "dd MMM yyyy")} -{" "}
+                                    {format(date.to, "dd MMM yyyy")}
                                 </>
                             ) : (
-                                format(date.from, "LLL dd, y")
+                                format(date.from, "dd MMM yyyy")
                             )
                         ) : (
-                            <span>Pick a date range</span>
+                            <span>{placeholder}</span>
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 shadow-lg rounded-md" align="start">
                     <Calendar
                         initialFocus
                         mode="range"

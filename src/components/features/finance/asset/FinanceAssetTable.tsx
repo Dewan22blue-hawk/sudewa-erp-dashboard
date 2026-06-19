@@ -50,20 +50,20 @@ export function FinanceAssetTable({
         <Card className="p-0 border-none shadow-none bg-transparent space-y-4">
             {/* Filters */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2">
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
                     <div className="relative w-full md:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder="Search here"
-                            className="pl-10 bg-white border-gray-200"
+                            className="pl-9 bg-white"
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
                         <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
-                            <SelectTrigger className="w-20 bg-white border-gray-200">
+                            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
                                 <SelectValue placeholder="10" />
                             </SelectTrigger>
                             <SelectContent>
@@ -73,14 +73,14 @@ export function FinanceAssetTable({
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
-                        className="flex items-center gap-2 border-gray-200 text-gray-600"
+                        className="flex items-center gap-2 rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer"
                         onClick={onExport}
                         disabled={isExporting}
                     >

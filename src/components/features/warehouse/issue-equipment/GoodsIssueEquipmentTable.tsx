@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { GoodsIssueEquipment } from '@/@types/goods-issue-equipment.types';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface GoodsIssueEquipmentTableProps {
   data: GoodsIssueEquipment[];
@@ -17,10 +19,7 @@ const formatDate = (value?: string) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  const d = date.getDate().toString().padStart(2, '0');
-  const m = (date.getMonth() + 1).toString().padStart(2, '0');
-  const y = date.getFullYear();
-  return `${d}/${m}/${y}`;
+  return format(date, 'dd MMM yyyy', { locale: id });
 };
 
 const getCategoryLabel = (category: string) => {
@@ -39,7 +38,7 @@ export function GoodsIssueEquipmentTable({
   return (
     <Table>
       <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-        <TableRow className="border-slate-200 hover:bg-transparent">
+        <TableRow className="hover:bg-[#f8f9fa]">
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE PENGELUARAN</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TANGGAL</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">DRIVER</TableHead>
@@ -63,7 +62,7 @@ export function GoodsIssueEquipmentTable({
           </TableRow>
         ) : (
           data.map((item) => (
-            <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70 transition-colors">
+            <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
               <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.code || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.driver?.name || '-'}</TableCell>
@@ -72,26 +71,26 @@ export function GoodsIssueEquipmentTable({
               <TableCell className="px-4 py-4 text-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-                      <MoreVertical className="h-4 w-4 text-slate-700" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44 rounded-2xl border-slate-200 p-2 shadow-lg">
-                    <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+                  <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                       <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan/${item.id}/edit`}>Edit</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                       <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan/${item.id}`}>Detail</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onUploadInvoice(item)}
-                      className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
+                      className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                     >
                       Upload Invoice
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDelete(item)}
-                      className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
+                      className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                     >
                       Hapus
                     </DropdownMenuItem>

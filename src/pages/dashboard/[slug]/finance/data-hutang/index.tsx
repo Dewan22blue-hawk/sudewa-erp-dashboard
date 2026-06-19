@@ -30,14 +30,14 @@ export default function DataHutangPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center justify-between gap-4 no-print">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900">Data Hutang</h1>
-                        <p className="text-sm text-gray-500">Kelola data hutang</p>
+                        <h1 className="text-2xl font-semibold text-slate-950">Data Hutang</h1>
+                        <p className="text-sm text-slate-500">Kelola data hutang</p>
                     </div>
 
                     {query.isFetching ? (
-                        <span className="inline-flex items-center gap-2 text-sm text-gray-500">
+                        <span className="inline-flex items-center gap-2 text-sm text-slate-500">
                             <Loader2 className="h-4 w-4 animate-spin" />
                             Memuat data...
                         </span>
