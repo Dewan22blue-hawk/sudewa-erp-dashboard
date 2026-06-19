@@ -52,13 +52,14 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
   // Filter states
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPerPage, setCurrentPerPage] = useState(10);
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>('2025-01-20');
+  const [endDate, setEndDate] = useState<string | null>('2025-02-09');
   const [currentSearch, setCurrentSearch] = useState('');
   const [sortKey, setSortKey] = useState<string>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const fetchData = useCallback(async () => {
+    if (!resolvedCompanyId) return;
     setIsLoading(true);
     setError(null);
     try {
