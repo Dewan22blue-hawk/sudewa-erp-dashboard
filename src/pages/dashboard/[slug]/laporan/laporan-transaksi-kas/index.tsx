@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LaporanKasTable } from '@/components/features/laporan-kas/LaporanKasTable';
-import { Eye, Loader2, Search } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -32,7 +32,6 @@ export default function LaporanTransaksiKasPage() {
     to: addDays(new Date(2025, 0, 20), 20),
   });
   const [searchInput, setSearchInput] = useState('');
-  const [isFiltering, setIsFiltering] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -42,13 +41,12 @@ export default function LaporanTransaksiKasPage() {
     return () => clearTimeout(timer);
   }, [searchInput, setSearch]);
 
-  const handleShowData = () => {
-    setIsFiltering(true);
+  // Trigger filter on date range change automatically
+  useEffect(() => {
     const startDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : null;
+    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDate;
     setDateRange(startDate, endDate);
-    setTimeout(() => setIsFiltering(false), 100);
-  };
+  }, [dateRange, setDateRange]);
 
   const getPageNumbers = () => {
     const { currentPage, lastPage } = pagination;
@@ -78,72 +76,67 @@ export default function LaporanTransaksiKasPage() {
     return rangeWithDots;
   };
 
-  const isLoadingDisplay = isLoading || isFiltering;
+  const isLoadingDisplay = isLoading;
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">Laporan Transaksi Kas</h1>
-          <p className="text-sm text-slate-500">Pantau semua pemasukan dan pengeluaran</p>
+          <h1 className="text-2xl font-semibold">Laporan Transaksi Kas</h1>
+          <p className="text-sm text-muted-foreground">Pantau semua pemasukan dan pengeluaran</p>
         </div>
 
-        {/* Filters */}
-        <div className="flex items-end justify-between w-full no-print gap-4 flex-wrap mb-5">
-          <div className="flex items-end gap-6 flex-wrap">
-            <div className="flex flex-col space-y-2">
-              <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
-              <div className="w-[280px]">
-                <DatePickerWithRange date={dateRange} onChange={setDateRangeState} />
+        <div className="space-y-4">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+            <div className="flex items-end gap-4 flex-wrap">
+              {/* Cari Transaksi */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-[13px] font-medium text-slate-700">Cari Transaksi</label>
+                <div className="relative w-full sm:w-[280px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Search here"
+                    className="pl-9 bg-white"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Periode Transaksi */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
+                <div className="w-[280px]">
+                  <DatePickerWithRange date={dateRange} onChange={setDateRangeState} />
+                </div>
+              </div>
+
+              {/* Tampilkan per halaman */}
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                <span>Show</span>
+                <Select
+                  value={String(pagination.perPage)}
+                  onValueChange={(val) => setPerPage(Number(val))}
+                >
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="10" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
               </div>
             </div>
-
-            <div className="flex flex-col space-y-2">
-              <label className="text-[13px] font-medium text-slate-700">Cari Transaksi</label>
-              <div className="relative w-full sm:w-[280px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search here"
-                  className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col space-y-2">
-              <label className="text-[13px] font-medium text-slate-700">Tampilkan per halaman</label>
-              <Select
-                value={String(pagination.perPage)}
-                onValueChange={(val) => setPerPage(Number(val))}
-              >
-                <SelectTrigger className="w-[120px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10 data</SelectItem>
-                  <SelectItem value="25">25 data</SelectItem>
-                  <SelectItem value="50">50 data</SelectItem>
-                  <SelectItem value="100">100 data</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              variant="outline"
-              className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 shrink-0 border border-slate-200 rounded-xl px-4 cursor-pointer mb-[1px]"
-              onClick={handleShowData}
-              disabled={isLoadingDisplay}
-            >
-              {isLoadingDisplay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-              Show
-            </Button>
           </div>
-        </div>
 
         {/* Main Table Content */}
-        <div className="pt-4">
+        <div>
           {isLoadingDisplay ? (
             <div className="flex justify-center items-center py-20 bg-white rounded-xl border border-gray-200 shadow-sm">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
@@ -161,17 +154,17 @@ export default function LaporanTransaksiKasPage() {
               
               {/* Pagination */}
               {data.length > 0 && (
-                <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between no-print">
-                  <div className="text-sm text-slate-500">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
+                  <p className="text-sm text-slate-500">
                     Showing {pagination.from || 0}–{pagination.to || 0} of {pagination.total} data
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-slate-700">
+                  </p>
+                  <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setPage(pagination.currentPage - 1)}
+                      className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                       disabled={pagination.currentPage === 1}
-                      className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
+                      onClick={() => setPage(pagination.currentPage - 1)}
                     >
                       Previous
                     </Button>
@@ -180,29 +173,29 @@ export default function LaporanTransaksiKasPage() {
                       typeof pageNumber === 'number' ? (
                         <Button
                           key={idx}
-                          variant={pageNumber === pagination.currentPage ? 'outline' : 'ghost'}
+                          variant="ghost"
                           size="sm"
-                          onClick={() => setPage(pageNumber)}
                           className={cn(
-                            "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                            'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
                             pageNumber === pagination.currentPage
-                              ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
-                              : "text-slate-600 hover:bg-slate-100"
+                              ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                              : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                           )}
+                          onClick={() => setPage(pageNumber)}
                         >
                           {pageNumber}
                         </Button>
                       ) : (
-                        <span key={idx} className="px-1.5 text-slate-400">...</span>
+                        <span key={idx} className="px-1 text-slate-500">...</span>
                       )
                     ))}
                     
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setPage(pagination.currentPage + 1)}
+                      className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                       disabled={pagination.currentPage === pagination.lastPage}
-                      className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
+                      onClick={() => setPage(pagination.currentPage + 1)}
                     >
                       Next
                     </Button>
@@ -212,6 +205,7 @@ export default function LaporanTransaksiKasPage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </DashboardLayout>
   );

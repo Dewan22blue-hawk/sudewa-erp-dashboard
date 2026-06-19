@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
+import { Printer, Download, ChevronsUpDown, Check } from 'lucide-react';
 import { getSuppliers, getUnitTypes } from '@/services/laporan-penerimaan.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -100,7 +100,7 @@ export default function LaporanPenerimaanFilter({
     option.name?.toLowerCase().includes(searchTermInside.toLowerCase())
   );
 
-  const handleApplyFilter = () => {
+  useEffect(() => {
     const appliedStartDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
@@ -128,7 +128,8 @@ export default function LaporanPenerimaanFilter({
       unitTypeId,
       perPage: parseInt(perPage, 10),
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, searchQuery, activeTab, perPage]);
 
   return (
     <div className="flex items-end justify-between w-full no-print gap-4">
@@ -153,7 +154,7 @@ export default function LaporanPenerimaanFilter({
                   variant="outline"
                   role="combobox"
                   aria-expanded={openBox}
-                  className="w-[260px] justify-between text-left font-normal bg-white rounded-xl border-slate-200 shadow-sm"
+                  className="w-[260px] justify-between text-left font-normal bg-white"
                 >
                   <span className="truncate">
                     {searchQuery
@@ -204,11 +205,11 @@ export default function LaporanPenerimaanFilter({
             </Popover>
           </div>
         )}
-
+ 
         <div className="flex flex-col space-y-2">
           <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
-            <SelectTrigger className="w-[130px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
+            <SelectTrigger className="w-[130px] bg-white cursor-pointer">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -219,30 +220,14 @@ export default function LaporanPenerimaanFilter({
             </SelectContent>
           </Select>
         </div>
-
-        <Button
-          variant="outline"
-          onClick={handleApplyFilter}
-          className="bg-[#f8f9fa] border border-slate-200 shadow-sm text-gray-700 hover:bg-slate-50 gap-2 px-4 whitespace-nowrap rounded-xl mb-[1px] cursor-pointer"
-        >
-          <Eye className="h-4 w-4" />
-          Show
-        </Button>
       </div>
-
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          onClick={onPrint}
-          className="gap-2 px-4 bg-white text-gray-700 shadow-sm border-slate-200 rounded-xl cursor-pointer"
-        >
-          <Printer className="h-4 w-4" /> Print
+ 
+      <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={onPrint} className="w-full sm:w-auto">
+          <Printer className="h-4 w-4 mr-2" /> Print
         </Button>
-        <Button
-          onClick={onDownload}
-          className="gap-2 px-4 shadow-sm bg-[#16a34a] hover:bg-[#15803d] text-white border-0 rounded-xl cursor-pointer"
-        >
-          <Download className="h-4 w-4" /> Download
+        <Button variant="outline" onClick={onDownload} className="w-full sm:w-auto">
+          <Download className="h-4 w-4 mr-2" /> Download
         </Button>
       </div>
     </div>

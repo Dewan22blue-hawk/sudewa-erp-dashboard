@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
 import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -72,7 +72,7 @@ export default function LaporanStockMaterialPage() {
     if (!value) return '-';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
-    return format(date, 'dd/MM/yyyy');
+    return format(date, 'dd MMM yyyy', { locale: id });
   };
 
   // Sorting handler
@@ -102,13 +102,13 @@ export default function LaporanStockMaterialPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex justify-between items-center no-print">
+        <div className="flex items-center justify-between no-print">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Laporan Stock Material</h1>
-            <p className="text-sm text-slate-500">Laporan stock material, penerimaan barang, dan pengeluaran barang</p>
+            <h1 className="text-2xl font-semibold">Laporan Stock Material</h1>
+            <p className="text-sm text-muted-foreground">Laporan stock material, penerimaan barang, dan pengeluaran barang</p>
           </div>
-          <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
-            <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
+          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+            <Printer className="mr-2 h-4 w-4" /> Print
           </Button>
         </div>
 
@@ -137,37 +137,37 @@ export default function LaporanStockMaterialPage() {
             </TabsList>
           </div>
 
-          {/* Filtering Block (Search and Show Page dropdown) */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
-            <div className="flex items-center gap-4 w-full sm:w-auto">
-              <div className="relative w-full sm:w-[300px]">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search here"
-                  className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
-                />
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                <span>Show</span>
-                <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                  <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem className="cursor-pointer" value="5">5</SelectItem>
-                    <SelectItem className="cursor-pointer" value="8">8</SelectItem>
-                    <SelectItem className="cursor-pointer" value="10">10</SelectItem>
-                    <SelectItem className="cursor-pointer" value="25">25</SelectItem>
-                    <SelectItem className="cursor-pointer" value="50">50</SelectItem>
-                    <SelectItem className="cursor-pointer" value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span>Page</span>
+          <div className="space-y-4">
+            {/* Filtering Block (Search and Show Page dropdown) */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print">
+              <div className="flex items-center gap-4 w-full sm:w-auto">
+                <div className="relative w-full sm:w-[300px]">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search here"
+                    className="pl-9 bg-white"
+                  />
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                  <span>Show</span>
+                  <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
+                    <SelectTrigger className="w-[70px] bg-white">
+                      <SelectValue placeholder="25" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span>Page</span>
+                </div>
               </div>
             </div>
-          </div>
 
           {/* Print Letter Wrapping Container */}
           <PrintLetterPage
@@ -200,7 +200,7 @@ export default function LaporanStockMaterialPage() {
                   <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
                 </div>
               ) : (
-                <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm w-full">
+                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -210,20 +210,20 @@ export default function LaporanStockMaterialPage() {
                             <TableHead onClick={() => handleSort('transaction_date')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">
                               <div className="flex items-center justify-center gap-1">
                                 <span>TANGGAL</span>
-                                <ArrowUpDown className="h-3 w-3 text-slate-400 shrink-0" />
+                                <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                               </div>
                             </TableHead>
                           )}
                           <TableHead onClick={() => handleSort('material_code')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
                             <div className="flex items-center justify-start gap-1">
                               <span>KODE BARANG</span>
-                              <ArrowUpDown className="h-3 w-3 text-slate-400 shrink-0" />
+                              <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             </div>
                           </TableHead>
                           <TableHead onClick={() => handleSort('material_name')} className="cursor-pointer select-none text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
                             <div className="flex items-center justify-start gap-1">
                               <span>NAMA BARANG</span>
-                              <ArrowUpDown className="h-3 w-3 text-slate-400 shrink-0" />
+                              <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             </div>
                           </TableHead>
                           <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">
@@ -262,12 +262,12 @@ export default function LaporanStockMaterialPage() {
                               : '-';
 
                             return (
-                              <TableRow key={item.uuid || idx} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                              <TableRow key={item.uuid || idx} className="border-slate-200 hover:bg-gray-50 transition-colors">
                                 <TableCell className="text-center px-4 py-4 text-sm text-slate-500">{indexNumber}</TableCell>
                                 {activeTab !== 'stock' && (
                                   <TableCell className="text-center px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{tgl}</TableCell>
                                 )}
-                                <TableCell className="text-left px-4 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{code}</TableCell>
+                                <TableCell className="text-left px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">{code}</TableCell>
                                 <TableCell className="text-left px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{name}</TableCell>
                                 <TableCell className="text-center px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{displayQty}</TableCell>
                                 <TableCell className="text-left px-4 py-4 text-sm text-slate-700 whitespace-nowrap">{satuan}</TableCell>
@@ -276,7 +276,7 @@ export default function LaporanStockMaterialPage() {
                           })
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={activeTab === 'stock' ? 5 : 6} className="h-28 text-center text-slate-500 font-medium px-4 py-4">
+                            <TableCell colSpan={activeTab === 'stock' ? 5 : 6} className="h-28 text-center text-slate-500 font-medium px-4 py-4 text-sm">
                               Tidak ada data laporan ditemukan.
                             </TableCell>
                           </TableRow>
@@ -284,57 +284,71 @@ export default function LaporanStockMaterialPage() {
                       </TableBody>
                     </Table>
                   </div>
-                </Card>
+                </div>
               )}
             </div>
           </PrintLetterPage>
 
           {/* Pagination Footer */}
           {!isLoading && !isError && pagination.total > 0 && (
-            <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between no-print">
-              <div className="text-sm text-slate-500">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
+              <p className="text-sm text-slate-500">
                 Showing {pagination.from}-{pagination.to} of {pagination.total} data
-              </div>
-              <div className="flex items-center gap-1 text-sm text-slate-700">
+              </p>
+              <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  disabled={page <= 1 || isLoading}
                   onClick={() => setPage(page - 1)}
-                  disabled={page <= 1}
-                  className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                 >
                   Previous
                 </Button>
-                {visiblePages[0] > 1 && <span className="px-1.5 text-slate-400">...</span>}
                 {visiblePages.map((pageNumber) => (
                   <Button
                     key={pageNumber}
-                    variant={pageNumber === page ? 'outline' : 'ghost'}
+                    variant="ghost"
                     size="sm"
-                    onClick={() => setPage(pageNumber)}
                     className={cn(
-                      "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
                       pageNumber === page
-                        ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
-                        : "text-slate-600 hover:bg-slate-100"
+                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                     )}
+                    disabled={isLoading}
+                    onClick={() => setPage(pageNumber)}
                   >
                     {pageNumber}
                   </Button>
                 ))}
-                {visiblePages[visiblePages.length - 1] < pagination.lastPage && <span className="px-1.5 text-slate-400">...</span>}
+                {pagination.lastPage > 5 && !visiblePages.includes(pagination.lastPage) && (
+                  <>
+                    <span className="px-1 text-slate-500">...</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                      disabled={isLoading}
+                      onClick={() => setPage(pagination.lastPage)}
+                    >
+                      {pagination.lastPage}
+                    </Button>
+                  </>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
                   onClick={() => setPage(page + 1)}
-                  disabled={page >= pagination.lastPage}
-                  className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                 >
                   Next
                 </Button>
               </div>
             </div>
           )}
+        </div>
         </Tabs>
       </div>
     </DashboardLayout>

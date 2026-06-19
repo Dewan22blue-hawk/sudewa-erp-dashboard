@@ -167,8 +167,8 @@ export default function LaporanPembelianPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="no-print">
-          <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">Laporan Pembelian</h1>
-          <p className="text-sm text-slate-500">Pantau semua transaksi pembelian</p>
+          <h1 className="text-2xl font-semibold">Laporan Pembelian</h1>
+          <p className="text-sm text-muted-foreground">Pantau semua transaksi pembelian</p>
         </div>
 
         {/* Filter Component */}

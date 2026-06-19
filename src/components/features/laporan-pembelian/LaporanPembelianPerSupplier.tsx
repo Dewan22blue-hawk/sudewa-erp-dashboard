@@ -2,6 +2,8 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PurchaseTransactionItem } from '@/services/laporan-pembelian.service';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface Props {
   data: PurchaseTransactionItem[];
@@ -11,7 +13,10 @@ interface Props {
 }
 
 const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')}`;
-const formatDate = (date: string) => new Date(date).toLocaleDateString('id-ID');
+const formatDate = (date: string) => {
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMM yyyy', { locale: id });
+};
 
 import { cn } from '@/lib/utils';
 
@@ -43,21 +48,21 @@ export default function LaporanPembelianPerSupplier({ data, pagination, isLoadin
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-16">NO</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO PEMBELIAN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TGL BELI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">TGL BELI</TableHead>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NAMA SUPPLIER</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">QTY</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">HARGA</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA BBN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA EKSPEDISI</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">BIAYA LAIN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">TOTAL BELI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">QTY</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">HARGA</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">BIAYA BBN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">BIAYA EKSPEDISI</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">BIAYA LAIN</TableHead>
+                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">TOTAL BELI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -70,17 +75,17 @@ export default function LaporanPembelianPerSupplier({ data, pagination, isLoadin
                 const biayaLain = items.reduce((acc, curr) => acc + curr.other_fee, 0);
 
                 return (
-                  <TableRow key={item.id} className="hover:bg-gray-50/50 border-b border-gray-100 bg-white">
+                  <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{idx + 1 + (pagination.currentPage - 1) * pagination.perPage}</TableCell>
                     <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left whitespace-nowrap">{item.code}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{formatDate(item.created_at)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatDate(item.created_at)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">{item.person?.name || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{qty}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(harga)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(biayaBbn)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(biayaEkspedisi)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">{formatCurrency(biayaLain)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm font-semibold text-slate-900 text-right whitespace-nowrap">{formatCurrency(item.transaction_bruto_total)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{qty}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(harga)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(biayaBbn)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(biayaEkspedisi)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">{formatCurrency(biayaLain)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm font-semibold text-slate-900 text-center whitespace-nowrap">{formatCurrency(item.transaction_bruto_total)}</TableCell>
                   </TableRow>
                 );
               })}
