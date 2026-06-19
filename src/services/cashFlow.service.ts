@@ -8,6 +8,7 @@ export interface CashFlowQueryParams {
   search?: string;
   sort_by?: string;
   sort_direction?: string;
+  company_id?: number;
 }
 
 export interface CashFlowItem {

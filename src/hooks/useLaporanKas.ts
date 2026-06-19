@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cashFlowService, CashFlowItem, CashFlowQueryParams } from '@/services/cashFlow.service';
 import { toast } from 'sonner';
+import { useRouter } from 'next/router';
+import { useCompany } from '@/contexts/CompanyContext';
+import { resolveCompanyId } from '@/lib/print-letterhead';
 
 interface UseLaporanKasReturn {
   data: CashFlowItem[];
@@ -27,6 +30,11 @@ interface UseLaporanKasReturn {
 }
 
 export const useLaporanKas = (): UseLaporanKasReturn => {
+  const router = useRouter();
+  const { companyId } = useCompany();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
+  const resolvedCompanyId = resolveCompanyId(slug, companyId);
+
   const [data, setData] = useState<CashFlowItem[]>([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -60,6 +68,7 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
         search: currentSearch || undefined,
         sort_by: sortKey,
         sort_direction: sortOrder,
+        company_id: resolvedCompanyId ?? undefined,
       };
       
       if (startDate) params.start_date = startDate;
@@ -89,7 +98,7 @@ export const useLaporanKas = (): UseLaporanKasReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, currentPerPage, startDate, endDate, currentSearch, sortKey, sortOrder]);
+  }, [currentPage, currentPerPage, startDate, endDate, currentSearch, sortKey, sortOrder, resolvedCompanyId]);
 
   useEffect(() => {
     fetchData();
