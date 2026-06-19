@@ -150,32 +150,32 @@ export default function KasHarianPage() {
         <title>Transaksi Kas Harian - Wajira Dashboard</title>
       </Head>
 
-      <div className="space-y-8 p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Arus Transaksi Kas Harian</h1>
-            <p className="mt-1 text-sm text-slate-500">Kelola arus transaksi kas harian</p>
+            <h1 className="text-2xl font-semibold text-slate-950">Arus Transaksi Kas Harian</h1>
+            <p className="text-sm text-slate-500">Kelola arus transaksi kas harian</p>
           </div>
 
-          <Button type="button" onClick={() => setIsAddOpen(true)} className="h-12 rounded-2xl bg-[#18385b] px-6 text-base hover:bg-[#102843]">
+          <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d] rounded-xl">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
         </div>
 
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative w-full md:w-[332px]">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap w-full sm:w-auto">
+            <div className="relative w-full sm:w-[332px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search here"
-                className="h-12 rounded-2xl border-slate-200 bg-white pl-11"
+                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
               />
             </div>
 
-            <div className="flex items-center gap-3 text-lg text-slate-700">
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
               <Select
                 value={String(perPage)}
@@ -184,8 +184,8 @@ export default function KasHarianPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="h-12 w-[92px] rounded-2xl border-slate-200 bg-white">
-                  <SelectValue />
+                <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
+                  <SelectValue placeholder="10" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="10">10</SelectItem>
@@ -201,14 +201,14 @@ export default function KasHarianPage() {
           <Button
             type="button"
             variant="outline"
-            className="h-12 rounded-2xl border-slate-200"
+            className="w-full sm:w-auto rounded-xl border-slate-200 gap-2 px-4 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
             onClick={() => {
               void kasHarianQuery.refetch();
             }}
             disabled={isFetching}
           >
-            <span className="mr-3 inline-block h-2.5 w-2.5 rounded-full bg-emerald-400" />
-            <RotateCw className="mr-2 h-4 w-4" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            <RotateCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             Live Update
           </Button>
         </div>
