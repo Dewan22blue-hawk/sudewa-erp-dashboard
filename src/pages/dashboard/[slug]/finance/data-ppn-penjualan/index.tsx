@@ -85,8 +85,8 @@ export default function DataPPNPenjualanPage() {
 
       <div className="space-y-6 p-6 grid grid-cols-1">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data PPN Penjualan</h1>
-          <p className="text-sm text-gray-500">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
+          <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">Data PPN Penjualan</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5 bg-white p-4 rounded-xl border border-slate-200">
@@ -98,11 +98,11 @@ export default function DataPPNPenjualanPage() {
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <div className="w-[150px]">
-                <DatePicker value={startDate} onChange={(date) => { setStartDate(date ?? null); setPage(1); }} placeholder="Mulai Tanggal" />
+                <DatePicker className="rounded-xl border-slate-200 bg-white shadow-sm" value={startDate} onChange={(date) => { setStartDate(date ?? null); setPage(1); }} placeholder="Mulai Tanggal" />
               </div>
               <span className="text-gray-500 text-sm">s/d</span>
               <div className="w-[150px]">
-                <DatePicker value={endDate} onChange={(date) => { setEndDate(date ?? null); setPage(1); }} placeholder="Sampai Tanggal" />
+                <DatePicker className="rounded-xl border-slate-200 bg-white shadow-sm" value={endDate} onChange={(date) => { setEndDate(date ?? null); setPage(1); }} placeholder="Sampai Tanggal" />
               </div>
             </div>
 
