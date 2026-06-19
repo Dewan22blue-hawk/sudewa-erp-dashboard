@@ -57,11 +57,11 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
   const canGoNext = isTotalExact ? page < meta.lastPage : hasNextPage;
   const pageNumbers = isTotalExact
     ? Array.from({ length: Math.min(5, meta.lastPage) }, (_, index) => {
-        if (meta.lastPage <= 5) return index + 1;
-        if (page <= 3) return index + 1;
-        if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
-        return page - 2 + index;
-      })
+      if (meta.lastPage <= 5) return index + 1;
+      if (page <= 3) return index + 1;
+      if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
+      return page - 2 + index;
+    })
     : [page];
 
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
@@ -99,8 +99,8 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
               <th className="p-0 text-left">{renderSortHeader('Kode Invoice', 'code', 'left')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Tanggal Beli', 'buy_date', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Customer', 'supplier', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('Tanggal Jual', 'sales_date', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('supplier', 'supplier', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('Tanggal FPM', 'fpm_date', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('MASA NSFPM', 'nsfpm_age', 'center')}</th>
               <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Nomor NSFP</th>

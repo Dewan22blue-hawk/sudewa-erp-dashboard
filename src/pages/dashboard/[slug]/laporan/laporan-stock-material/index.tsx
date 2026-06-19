@@ -100,7 +100,7 @@ export default function LaporanStockMaterialPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen laporan-penerimaan-page">
+      <div className="space-y-6 px-1">
         {/* Header Section */}
         <div className="flex justify-between items-start no-print">
           <div>

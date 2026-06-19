@@ -30,8 +30,8 @@ export default function LaporanAkuntansiLegacyTypePage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-8 text-sm text-[#6b7280]">
+      <div className="space-y-6 px-1">
+        <div className="rounded-xl border border-slate-200 bg-white p-8 text-sm text-slate-500 shadow-none">
           Mengalihkan ke tampilan laporan akuntansi terbaru...
         </div>
       </div>

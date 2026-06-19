@@ -217,31 +217,29 @@ export default function AccountingReportPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-full bg-[#ffffff] p-4 sm:p-6">
-        <div className="mx-auto max-w-[1500px] space-y-6">
-          <header className="space-y-1 print:hidden">
-            <h1 className="text-3xl font-semibold tracking-tight text-[#111827]">
-              Laporan Akuntansi
-            </h1>
-            <p className="text-base text-[#6b7280]">
-              Pantau semua pemasukan dan pengeluaran
-            </p>
-          </header>
+      <div className="space-y-6 px-1">
+        <header className="print:hidden">
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Laporan Akuntansi
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Pantau semua pemasukan dan pengeluaran
+          </p>
+        </header>
 
-          <AccountingReportFilters
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            onShow={handleShow}
-            onPrint={handlePrint}
-            onDownload={handleDownload}
-            isDownloading={isDownloading}
-          />
+        <AccountingReportFilters
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          onShow={handleShow}
+          onPrint={handlePrint}
+          onDownload={handleDownload}
+          isDownloading={isDownloading}
+        />
 
-          <AccountingReportTabs activeTab={activeTab} onChange={handleTabChange} />
+        <AccountingReportTabs activeTab={activeTab} onChange={handleTabChange} />
 
-          <div className="pt-2 print:pt-0">
-            {isLoading ? <LoadingState /> : renderActiveReport()}
-          </div>
+        <div className="pt-2 print:pt-0">
+          {isLoading ? <LoadingState /> : renderActiveReport()}
         </div>
       </div>
     </DashboardLayout>

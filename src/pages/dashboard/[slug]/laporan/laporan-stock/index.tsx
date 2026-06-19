@@ -171,10 +171,10 @@ export default function LaporanStockPage() {
 
     return (
         <DashboardLayout>
-            <div className="p-6 space-y-6 bg-white min-h-screen">
+            <div className="space-y-6 px-1">
                 <div className="no-print">
-                    <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">{activeMeta.title}</h1>
-                    <p className="text-[15px] text-gray-500">{activeMeta.subtitle}</p>
+                    <h1 className="text-2xl font-semibold text-slate-900">{activeMeta.title}</h1>
+                    <p className="text-sm text-slate-500 mt-1">{activeMeta.subtitle}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     {pageFilter}
