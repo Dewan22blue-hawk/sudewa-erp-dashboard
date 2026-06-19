@@ -83,10 +83,12 @@ export default function DataPPNPenjualanPage() {
         <title>Data PPN Penjualan - Wajira Dashboard</title>
       </Head>
 
-      <div className="space-y-6 p-6 grid grid-cols-1">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-955 text-slate-950">Data PPN Penjualan</h1>
-          <p className="text-sm text-slate-500 mt-1">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Data PPN Penjualan</h1>
+            <p className="text-sm text-slate-500">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5">

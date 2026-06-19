@@ -146,7 +146,7 @@ export default function LaporanSuratJalanDetailPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen">
+      <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center gap-3">
           <Button
