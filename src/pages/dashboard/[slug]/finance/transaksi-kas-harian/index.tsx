@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Plus, RotateCw, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import type { KasHarian, KasHarianListItem } from '@/@types/kas-harian.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
@@ -163,72 +163,61 @@ export default function KasHarianPage() {
           </Button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print mb-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap w-full sm:w-auto">
-            <div className="relative w-full sm:w-[332px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search here"
-                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-              />
-            </div>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap w-full sm:w-auto">
+              <div className="relative w-full sm:w-[332px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search here"
+                  className="pl-9 bg-white"
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                />
+              </div>
 
-            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-              <span>Show</span>
-              <Select
-                value={String(perPage)}
-                onValueChange={(value) => {
-                  setPerPage(Number(value));
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select
+                  value={String(perPage)}
+                  onValueChange={(value) => {
+                    setPerPage(Number(value));
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                    <SelectValue placeholder="10" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
             </div>
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full sm:w-auto rounded-xl border-slate-200 gap-2 px-4 bg-white text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer"
-            onClick={() => {
+          <KasHarianTable
+            data={paginatedData}
+            meta={meta}
+            hasNextPage={page < meta.lastPage}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            isError={isError}
+            errorMessage={errorMessage}
+            onRetry={() => {
               void kasHarianQuery.refetch();
             }}
-            disabled={isFetching}
-          >
-            <RotateCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+            onView={pushTo}
+            onPay={pushTo}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onPageChange={setPage}
+          />
         </div>
-
-        <KasHarianTable
-          data={paginatedData}
-          meta={meta}
-          hasNextPage={page < meta.lastPage}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          isError={isError}
-          errorMessage={errorMessage}
-          onRetry={() => {
-            void kasHarianQuery.refetch();
-          }}
-          onView={pushTo}
-          onPay={pushTo}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onPageChange={setPage}
-        />
       </div>
 
       <AddKasHarianDialog open={isAddOpen} onOpenChange={setIsAddOpen} />

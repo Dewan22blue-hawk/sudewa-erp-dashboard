@@ -91,100 +91,102 @@ export default function DataPPNPenjualanPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap no-print">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search here"
-              className="pl-9 bg-white"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap no-print">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-[240px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search here"
+                className="pl-9 bg-white"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
+            </div>
+
+            {/* Date Range Picker */}
+            <DatePickerWithRange
+              className="w-[240px]"
+              date={dateRange}
+              onChange={(range) => {
+                setDateRange(range);
+                setPage(1);
+              }}
             />
+
+            {/* Pagination Dropdown */}
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select
+                value={String(perPage)}
+                onValueChange={(value) => {
+                  setPerPage(Number(value));
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
+
+            {/* Reset Button (muncul hanya saat ada filter aktif) */}
+            {(searchInput || dateRange) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 px-3 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
+                onClick={() => {
+                  setSearchInput('');
+                  setSearch('');
+                  setDateRange(undefined);
+                  setPage(1);
+                }}
+              >
+                <X className="h-3.5 w-3.5" />
+                Reset Filter
+              </Button>
+            )}
           </div>
 
-          {/* Date Range Picker */}
-          <DatePickerWithRange
-            className="w-[240px]"
-            date={dateRange}
-            onChange={(range) => {
-              setDateRange(range);
+
+          <PPNPenjualanTable
+            data={data?.data ?? []}
+            meta={meta}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            hasNextPage={data?.hasNextPage ?? false}
+            isTotalExact={data?.isTotalExact ?? false}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            isError={isError}
+            errorMessage={errorMessage}
+            onRetry={() => void refetch()}
+            onPageChange={setPage}
+            onSortChange={(nextSortBy) => {
               setPage(1);
+              if (nextSortBy === sortBy) {
+                setSortDirection((current) => (current === 'asc' ? 'desc' : 'asc'));
+                return;
+              }
+
+              setSortBy(nextSortBy);
+              setSortDirection('asc');
+            }}
+            onEdit={(item) => {
+              setSelected(item);
+              setOpenForm(true);
             }}
           />
-
-          {/* Pagination Dropdown */}
-          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-            <span>Show</span>
-            <Select
-              value={String(perPage)}
-              onValueChange={(value) => {
-                setPerPage(Number(value));
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
-          </div>
-
-          {/* Reset Button (muncul hanya saat ada filter aktif) */}
-          {(searchInput || dateRange) && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-9 px-3 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
-              onClick={() => {
-                setSearchInput('');
-                setSearch('');
-                setDateRange(undefined);
-                setPage(1);
-              }}
-            >
-              <X className="h-3.5 w-3.5" />
-              Reset Filter
-            </Button>
-          )}
         </div>
-
-
-        <PPNPenjualanTable
-          data={data?.data ?? []}
-          meta={meta}
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          hasNextPage={data?.hasNextPage ?? false}
-          isTotalExact={data?.isTotalExact ?? false}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          isError={isError}
-          errorMessage={errorMessage}
-          onRetry={() => void refetch()}
-          onPageChange={setPage}
-          onSortChange={(nextSortBy) => {
-            setPage(1);
-            if (nextSortBy === sortBy) {
-              setSortDirection((current) => (current === 'asc' ? 'desc' : 'asc'));
-              return;
-            }
-
-            setSortBy(nextSortBy);
-            setSortDirection('asc');
-          }}
-          onEdit={(item) => {
-            setSelected(item);
-            setOpenForm(true);
-          }}
-        />
 
         <PPNPenjualanFormDialog
           open={openForm}

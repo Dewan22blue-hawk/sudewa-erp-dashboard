@@ -73,18 +73,18 @@ export default function LaporanBuktiPotongTable({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Laporan Bukti Potong</h1>
-        <p className="text-sm text-slate-500 mt-1">Kelola bukti potong dengan mudah</p>
+        <h1 className="text-2xl font-semibold text-slate-950">Laporan Bukti Potong</h1>
+        <p className="text-sm text-slate-500">Kelola bukti potong dengan mudah</p>
       </div>
 
       <div className="flex justify-start items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-slate-700">
-          <span className="font-medium">Show</span>
+        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+          <span>Show</span>
           <Select
             value={String(perPage)}
             onValueChange={(value) => onPerPageChange(Number(value))}
           >
-            <SelectTrigger className="h-10 w-[70px] bg-white border-slate-200">
+            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -94,7 +94,7 @@ export default function LaporanBuktiPotongTable({
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-          <span className="font-medium">Page</span>
+          <span>Page</span>
         </div>
 
         <div className="relative w-[300px]">
@@ -103,7 +103,7 @@ export default function LaporanBuktiPotongTable({
             placeholder="Search here"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            className="pl-9 h-10 bg-white border-slate-200 rounded-lg w-full"
+            className="pl-9 bg-white"
           />
         </div>
       </div>
