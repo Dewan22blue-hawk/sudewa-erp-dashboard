@@ -7,7 +7,6 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
 import { getLetterheadByCompanyId, resolveCompanyId } from '@/lib/print-letterhead';
 import { useSalesDetail } from '@/hooks/useSales';
-import { useUnitItemDetailsByTransactionId } from '@/hooks/useUnitItemDetail';
 import SalesPrintDocument from '@/components/features/sales/SalesPrintDocument';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +18,28 @@ export default function SalesPrintPage() {
   const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
   
   const detailQuery = useSalesDetail(id);
-  const detailsQuery = useUnitItemDetailsByTransactionId(id);
+
+  const items = React.useMemo(() => {
+    if (!detailQuery.data?.raw?.unit_transaction_items) return [];
+    const list: any[] = [];
+    detailQuery.data.raw.unit_transaction_items.forEach((item) => {
+      const typeName = item.unit_type?.name || '-';
+      const price = Number(item.price ?? 0);
+      if (item.unit_transaction_item_details && item.unit_transaction_item_details.length > 0) {
+        item.unit_transaction_item_details.forEach((detail) => {
+          list.push({
+            id: detail.id,
+            unit_type_name: typeName,
+            color: detail.color || '-',
+            chassis_number: detail.chassis_number || '-',
+            machine_number: detail.machine_number || '-',
+            price: price,
+          });
+        });
+      }
+    });
+    return list;
+  }, [detailQuery.data]);
 
   const printRef = React.useRef<HTMLDivElement>(null);
 
@@ -46,7 +66,7 @@ export default function SalesPrintPage() {
       .catch(() => undefined);
   }, [companyId, slug, router.isReady]);
 
-  if (!router.isReady || detailQuery.isLoading || detailsQuery.isLoading) {
+  if (!router.isReady || detailQuery.isLoading) {
     return (
       <DashboardLayout>
         <div className="py-20 text-center text-sm text-slate-500">Memuat data penjualan...</div>
@@ -100,7 +120,7 @@ export default function SalesPrintPage() {
         <div className="flex justify-center bg-slate-50 py-8 no-print">
           <SalesPrintDocument
             sales={detailQuery.data.ui}
-            items={detailsQuery.data ?? []}
+            items={items}
             letterheadUrl={letterheadUrl}
             companyName={companyName}
             hideControls
