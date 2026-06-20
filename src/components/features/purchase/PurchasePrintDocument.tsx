@@ -90,13 +90,13 @@ export default function PurchasePrintDocument({
     };
 
     const drawTableHeader = (y: number) => {
-      const columns = [
-        { label: 'NO', width: 10, align: 'center' as const },
-        { label: 'TIPE UNIT', width: 50, align: 'left' as const },
-        { label: 'WARNA', width: 30, align: 'left' as const },
-        { label: 'NO RANGKA', width: 45, align: 'left' as const },
-        { label: 'NO MESIN', width: 40, align: 'left' as const },
-        { label: 'HARGA', width: 25, align: 'center' as const },
+      const columns: { label: string; width: number; align: 'left' | 'center' | 'right' }[] = [
+        { label: 'NO', width: 10, align: 'center' },
+        { label: 'TIPE UNIT', width: 50, align: 'left' },
+        { label: 'WARNA', width: 30, align: 'left' },
+        { label: 'NO RANGKA', width: 45, align: 'left' },
+        { label: 'NO MESIN', width: 40, align: 'left' },
+        { label: 'HARGA', width: 25, align: 'center' },
       ];
 
       let x = 10;
