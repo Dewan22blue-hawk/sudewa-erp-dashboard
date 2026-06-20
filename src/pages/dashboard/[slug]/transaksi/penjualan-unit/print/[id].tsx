@@ -74,6 +74,7 @@ export default function SalesPrintPage() {
 
             return dataRows.map((detail) => ({
               id: String(detail.id ?? ''),
+              unit_transaction_item_id: itemId,
               unit_type_name: typeName,
               color: detail.color || '-',
               chassis_number: detail.chassis_number || '-',
