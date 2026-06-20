@@ -22,29 +22,44 @@ const mapPayment = (item: any): UnitTransactionRefundPayment => ({
 });
 
 const mapFinanceRefund = (item: any): FinanceRefundRecord => {
-  const transaction = item.transaction ?? item.unit_transaction ?? null;
-  const transactionType = normalizeRefundTransactionType(item.refund_type ?? transaction?.type);
-  const partner = item.customer ?? item.supplier ?? transaction?.person ?? null;
+  const refundDetail = item.unit_transaction_refund ?? item;
+  const transaction = refundDetail.transaction ?? refundDetail.unit_transaction ?? null;
+  const transactionType = normalizeRefundTransactionType(item.refund_type ?? refundDetail.refund_type ?? transaction?.type);
+  const partner = refundDetail.customer ?? refundDetail.supplier ?? transaction?.person ?? null;
 
   return {
     id: toString(item.id),
-    code: item.code || `FR-${toString(item.id)}`,
-    refundCode: item.refund_number || item.code || '-',
-    refundDate: item.refund_date || item.date || '',
-    refundAmount: toNumber(item.refund_amount ?? item.total_refund),
-    totalTransaction: toNumber(transaction?.grand_total ?? transaction?.total_amount ?? transaction?.total_price ?? item.total_transaction ?? item.total_price ?? item.refund_amount ?? item.total_refund),
-    note: item.note || '',
+    code: refundDetail.code || item.code || `FR-${toString(item.id)}`,
+    refundCode: refundDetail.refund_number || refundDetail.code || item.code || '-',
+    refundDate: refundDetail.refund_date || refundDetail.date || item.refund_date || item.date || '',
+    refundAmount: toNumber(refundDetail.refund_amount ?? refundDetail.total_refund ?? item.refund_amount ?? item.total_refund),
+    totalTransaction: toNumber(
+      transaction?.grand_total ??
+        transaction?.total_amount ??
+        transaction?.total_price ??
+        transaction?.bruto_amount ??
+        refundDetail.total_transaction ??
+        refundDetail.total_price ??
+        item.total_transaction ??
+        item.total_price ??
+        refundDetail.refund_amount ??
+        refundDetail.total_refund ??
+        item.refund_amount ??
+        item.total_refund
+    ),
+    note: refundDetail.note || item.note || '',
     status: normalizeRefundStatus(item.status),
     cashId: item.cash_id ? toString(item.cash_id) : undefined,
-    cashName: item.cash?.description || item.cash_account?.description || undefined,
-    transactionId: toString(item.unit_transaction_id ?? transaction?.id),
-    transactionCode: transaction?.code || item.sales_number || item.purchase_number || '-',
+    cashName: item.cash?.description || item.cash?.name || item.cash_account?.description || item.cash_account?.name || undefined,
+    transactionId: toString(refundDetail.unit_transaction_id ?? transaction?.id),
+    transactionCode: transaction?.code || refundDetail.sales_number || refundDetail.purchase_number || '-',
     transactionType,
     partnerName: partner?.name || '-',
     payments: Array.isArray(item.payments) ? item.payments.map(mapPayment) : [],
     createdAt: item.created_at || '',
   };
 };
+
 
 export const financeRefundService = {
   async getRefundList(params: FinanceRefundQueryParams = {}): Promise<FinanceRefundListResponse> {

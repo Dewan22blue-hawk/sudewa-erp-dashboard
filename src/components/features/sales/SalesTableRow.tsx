@@ -136,7 +136,7 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                         <DropdownMenuItem onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
                             {item.isRefunded ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}?print=true` : `/transaksi/penjualan-unit/${item.id}?print=true`, '_blank')}>
+                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')}>
                             Print
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-red-600">
