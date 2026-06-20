@@ -13,6 +13,7 @@ interface Props {
   letterheadUrl: string;
   companyName: string;
   hideControls?: boolean;
+  printRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 const formatLongDate = (dateStr?: string) => {
@@ -32,15 +33,16 @@ export default function SalesPrintDocument({
   letterheadUrl,
   companyName,
   hideControls = false,
+  printRef,
 }: Props) {
-  const printRef = useRef<HTMLDivElement>(null);
+  const localPrintRef = useRef<HTMLDivElement>(null);
 
   const totalBruto = Number(sales.totalJual ?? 0);
   const totalDpp = Number(sales.totalDpp ?? 0);
   const totalPpn = Number(sales.totalPpn ?? 0);
 
   const handlePrint = useReactToPrint({
-    contentRef: printRef,
+    contentRef: printRef || localPrintRef,
     documentTitle: `SalesInvoice-${sales.kodeJual}`,
     pageStyle: `
       @page { size: A4; margin: 0; }
@@ -84,7 +86,7 @@ export default function SalesPrintDocument({
         { label: 'WARNA', width: 30, align: 'left' as const },
         { label: 'NO RANGKA', width: 45, align: 'left' as const },
         { label: 'NO MESIN', width: 40, align: 'left' as const },
-        { label: 'HARGA', width: 25, align: 'right' as const },
+        { label: 'HARGA', width: 25, align: 'center' as const },
       ];
 
       let x = 10;
@@ -187,15 +189,15 @@ export default function SalesPrintDocument({
       pdf.setFont('helvetica', 'bold');
       pdf.rect(130, tableY + 2, 70, 7);
       pdf.text('TOTAL DPP', 133, tableY + 6.5);
-      pdf.text(formatCurrency(totalDpp), 198, tableY + 6.5, { align: 'right' });
+      pdf.text(formatCurrency(totalDpp), 182.5, tableY + 6.5, { align: 'center' });
 
       pdf.rect(130, tableY + 9, 70, 7);
       pdf.text('TOTAL PPN', 133, tableY + 13.5);
-      pdf.text(formatCurrency(totalPpn), 198, tableY + 13.5, { align: 'right' });
+      pdf.text(formatCurrency(totalPpn), 182.5, tableY + 13.5, { align: 'center' });
 
       pdf.rect(130, tableY + 16, 70, 7);
       pdf.text('TOTAL BRUTO', 133, tableY + 20.5);
-      pdf.text(formatCurrency(totalBruto), 198, tableY + 20.5, { align: 'right' });
+      pdf.text(formatCurrency(totalBruto), 182.5, tableY + 20.5, { align: 'center' });
 
       // Signatures
       let sigY = tableY + 20;
@@ -246,8 +248,8 @@ export default function SalesPrintDocument({
       )}
 
       <div
-        ref={printRef}
-        className="relative mx-auto overflow-hidden bg-white shadow-md border"
+        ref={printRef || localPrintRef}
+        className="relative mx-auto overflow-hidden bg-white shadow-md border print-letter-page"
         style={{ width: '210mm', minHeight: '297mm' }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -302,7 +304,7 @@ export default function SalesPrintDocument({
                     <th className="border border-white/20 px-3 py-2.5 text-left font-semibold">WARNA</th>
                     <th className="border border-white/20 px-3 py-2.5 text-left font-semibold">NO RANGKA</th>
                     <th className="border border-white/20 px-3 py-2.5 text-left font-semibold">NO MESIN</th>
-                    <th className="border border-white/20 px-3 py-2.5 text-right font-semibold">HARGA</th>
+                    <th className="border border-white/20 px-3 py-2.5 text-center font-semibold">HARGA</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -313,20 +315,20 @@ export default function SalesPrintDocument({
                       <td className="border border-slate-200 px-3 py-2">{row.color || '-'}</td>
                       <td className="border border-slate-200 px-3 py-2 font-mono">{row.chassis_number || '-'}</td>
                       <td className="border border-slate-200 px-3 py-2 font-mono">{row.machine_number || '-'}</td>
-                      <td className="border border-slate-200 px-3 py-2 text-right">{formatCurrency(row.price ?? 0)}</td>
+                      <td className="border border-slate-200 px-3 py-2 text-center">{formatCurrency(row.price ?? 0)}</td>
                     </tr>
                   ))}
                   <tr className="font-semibold text-slate-900 bg-slate-50">
                     <td colSpan={5} className="border border-slate-200 px-3 py-2 text-right">TOTAL DPP</td>
-                    <td className="border border-slate-200 px-3 py-2 text-right">{formatCurrency(totalDpp)}</td>
+                    <td className="border border-slate-200 px-3 py-2 text-center">{formatCurrency(totalDpp)}</td>
                   </tr>
                   <tr className="font-semibold text-slate-900 bg-slate-50">
                     <td colSpan={5} className="border border-slate-200 px-3 py-2 text-right">TOTAL PPN</td>
-                    <td className="border border-slate-200 px-3 py-2 text-right">{formatCurrency(totalPpn)}</td>
+                    <td className="border border-slate-200 px-3 py-2 text-center">{formatCurrency(totalPpn)}</td>
                   </tr>
                   <tr className="font-semibold text-slate-900 bg-emerald-50/50">
                     <td colSpan={5} className="border border-slate-200 px-3 py-2.5 text-right">TOTAL BRUTO</td>
-                    <td className="border border-slate-200 px-3 py-2.5 text-right">{formatCurrency(totalBruto)}</td>
+                    <td className="border border-slate-200 px-3 py-2.5 text-center">{formatCurrency(totalBruto)}</td>
                   </tr>
                 </tbody>
               </table>

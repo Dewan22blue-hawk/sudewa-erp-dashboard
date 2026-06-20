@@ -400,5 +400,105 @@ import { Button } from '@/components/ui/button';
 | Action trigger | `h-8 w-8 rounded-full` |
 | DropdownMenuContent | `rounded-xl border-slate-200 p-1.5 shadow-lg` |
 | DropdownMenuItem | `rounded-lg px-3 py-2` |
+---
+| Tambah button | `bg-[#1e3a5f] hover:bg-[#152e4d]` |
+
+---
+
+## 13. Standarisasi Layout Print A4 (Letterhead & Single Page)
+
+**Aturan**: Untuk halaman cetak surat/nota resmi (A4 dengan background kop surat), ikuti spesifikasi berikut agar layout presisi 1 halaman dan tidak menghasilkan halaman kosong tambahan:
+
+1. **Gunakan Class `.print-letter-page`**: Tempelkan class `.print-letter-page` pada div halaman A4 utama agar terintegrasi dengan visibilitas global dan pemotongan halaman (`overflow: hidden`).
+2. **Kop Surat (Background Image)**: Render background image kop surat menggunakan tag `<img>` absolut tanpa class `.print-letterhead` agar kop surat tetap terlihat baik di layar web (screen preview) maupun saat dicetak (print layout).
+3. **Konfigurasi Ref**: Pastikan `printRef` dipasang langsung di elemen kertas utama (lebar `210mm` dan tinggi minimal `297mm`), bukan di wrapper luarnya.
+4. **Perataan Sel Tabel (Cell Alignment)**:
+   - Kolom Nominal/Uang (Harga, DPP, PPN, Total): wajib Rata Tengah (`text-center` / `align: 'center'`).
+5. **Navigasi Tombol Aksi Print**: Tombol aksi print pada baris tabel (Action Dropdown) wajib membuka halaman print khusus di tab baru menggunakan `window.open` ke path `/dashboard/[slug]/[modul]/print/[id]`.
+
+### Contoh Dropdown Action Print:
+
+```tsx
+<DropdownMenuItem 
+  onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}
+>
+  Print
+</DropdownMenuItem>
+```
+
+### Struktur Kode Contoh:
+
+```tsx
+// Di Halaman Page (Trigger)
+const printRef = React.useRef<HTMLDivElement>(null);
+const handlePrint = useReactToPrint({
+  contentRef: printRef,
+  documentTitle: 'PurchaseOrder',
+  pageStyle: `
+    @page { size: A4; margin: 0; }
+    @media print {
+      html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+    }
+  `,
+});
+
+// Render Component Dokumen Utama
+<div 
+  ref={printRef} 
+  className="relative mx-auto overflow-hidden bg-white shadow-md border print-letter-page"
+  style={{ width: '210mm', minHeight: '297mm' }}
+>
+  {/* Kop Surat */}
+  <img src={letterheadUrl} className="absolute inset-0 h-full w-full object-cover" />
+  
+  {/* Konten Halaman */}
+  <div className="relative min-h-[297mm] px-[20mm] pt-[42mm] pb-[42mm]">
+    {/* Tabel Rata Tengah untuk Nominal */}
+    <table className="w-full text-[8.5pt]">
+      <thead>
+        <tr className="bg-[#1f4163] text-white">
+          <th className="text-center">NO</th>
+          <th className="text-left">DESKRIPSI</th>
+          <th className="text-center">HARGA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td className="text-center">1</td>
+          <td className="text-left">Tipe Unit A</td>
+          <td className="text-center">Rp17.000.000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+```
+
+---
+
+## Ringkasan Kelas Kunci
+
+| Elemen | Kelas |
+|--------|-------|
+| Root wrapper | `space-y-6` |
+| Toolbar ↔ Table gap | `space-y-4` (wrapper) |
+| H1 | `text-2xl font-semibold` |
+| Subheader | `text-sm text-muted-foreground` |
+| TabsList (Pills) | `flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl` |
+| TabsTrigger (Pills) | `rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm` |
+| Search Input | `pl-9 bg-white` |
+| Select pagination | `w-[70px] bg-white` |
+| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none` |
+| TableHeader | `bg-[#f8f9fa] border-b border-gray-200` |
+| TableHead / Cell | `px-4 py-4` |
+| TableRow hover | `hover:bg-gray-50 transition-colors` |
+| Pagination btn | `h-9 rounded-xl` |
+| Pagination active | `border-slate-200 bg-white text-slate-950 shadow-sm` |
+| Action trigger | `h-8 w-8 rounded-full` |
+| DropdownMenuContent | `rounded-xl border-slate-200 p-1.5 shadow-lg` |
+| DropdownMenuItem | `rounded-lg px-3 py-2` |
 | Back button | `h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50` |
 | Tambah button | `bg-[#1e3a5f] hover:bg-[#152e4d]` |
+| Container Cetak A4 | `print-letter-page` |
+| Background Kop Surat | `print-letterhead` |
