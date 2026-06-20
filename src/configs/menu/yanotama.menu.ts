@@ -115,15 +115,15 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             icon: Warehouse,
             children: [
                 {
-                    label: 'Stock Perlengkapan',
+                    label: 'Stock Material',
                     href: base('/warehouse/stock-perlengkapan'),
                 },
                 {
-                    label: 'Penerimaan Perlengkapan',
+                    label: 'Penerimaan Material',
                     href: base('/warehouse/penerimaan-material'),
                 },
                 {
-                    label: 'Pengeluaran Perlengkapan',
+                    label: 'Pengeluaran Material',
                     href: base('/warehouse/pengeluaran-material'),
                 },
             ],

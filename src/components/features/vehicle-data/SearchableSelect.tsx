@@ -58,11 +58,11 @@ export function SearchableSelect({
   }, [options, value]);
 
   React.useEffect(() => {
-    if (!open) {
+    if (!open && query !== '') {
       setQuery('');
       onSearchChange?.('');
     }
-  }, [open, onSearchChange]);
+  }, [open, query, onSearchChange]);
 
   const selectOption = React.useCallback((option: SearchableSelectOption) => {
     setPersistedSelectedOption(option);
