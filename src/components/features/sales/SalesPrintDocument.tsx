@@ -236,7 +236,7 @@ export default function SalesPrintDocument({
           </Button>
           <Button
             type="button"
-            onClick={() => handlePrint()}
+            onClick={() => window.print()}
             className="gap-2 rounded-xl bg-[#1f4163] hover:bg-[#183552]"
           >
             <Printer className="h-4 w-4" />
