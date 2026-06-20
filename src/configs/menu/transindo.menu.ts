@@ -89,15 +89,15 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: Warehouse,
       children: [
         {
-          label: 'Persediaan Barang',
+          label: 'Stok Perlengkapan',
           href: base('/warehouse/stock-perlengkapan'),
         },
         {
-          label: 'Penerimaan Barang',
+          label: 'Penerimaan Perlengkapan',
           href: base('/warehouse/perlengkapan-masuk'),
         },
         {
-          label: 'Pengeluaran Barang',
+          label: 'Pengeluaran Perlengkapan',
           href: base('/warehouse/pengeluaran-perlengkapan'),
         },
         {

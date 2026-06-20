@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccountTable } from '@/components/features/account/AccountTable';
@@ -93,24 +93,24 @@ export const AccountListPage = () => {
 
   const hasMoreGroups = accountGroupsData ? groupPage < accountGroupsData.meta.lastPage : false;
 
-  const handleGroupSearch = (query: string) => {
+  const handleGroupSearch = useCallback((query: string) => {
     setGroupSearch(query);
     setGroupPage(1);
     setAccumulatedGroups([]);
-  };
+  }, []);
 
-  const handleLoadMoreGroups = () => {
+  const handleLoadMoreGroups = useCallback(() => {
     if (hasMoreGroups) {
       setGroupPage((prev) => prev + 1);
     }
-  };
+  }, [hasMoreGroups]);
 
   const accountGroups = accumulatedGroups;
   const groupOptions = useMemo(
     () =>
       accountGroups.map((group) => ({
         value: String(group.id),
-        label: group.code || String(group.id),
+        label: group.code ? `${group.code} - ${group.name}` : group.name || String(group.id),
         subtitle: group.description ?? undefined,
       })),
     [accountGroups],

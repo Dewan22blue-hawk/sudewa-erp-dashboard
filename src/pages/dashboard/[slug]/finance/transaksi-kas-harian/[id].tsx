@@ -123,8 +123,8 @@ export default function KasHarianDetailPage() {
   const kasDropdownRef = useRef<HTMLDivElement | null>(null);
   const akunDropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const kasOptions = kasQuery.data?.data ?? [];
-  const akunOptions = accountQuery.data?.data ?? [];
+  const kasOptions = useMemo(() => kasQuery.data?.data ?? [], [kasQuery.data?.data]);
+  const akunOptions = useMemo(() => accountQuery.data?.data ?? [], [accountQuery.data?.data]);
 
   const selectedKas = useMemo(() => kasOptions.find((k) => k.id === selectedKasId) ?? null, [kasOptions, selectedKasId]);
   const selectedAkun = useMemo(() => akunOptions.find((a) => a.id === selectedAkunId) ?? null, [akunOptions, selectedAkunId]);
@@ -193,6 +193,7 @@ export default function KasHarianDetailPage() {
       setSelectedAkunId(cashFlowDetail.account_id ?? null);
       setTransactionNote(cashFlowDetail.note || '');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cashFlowDetail?.id]);
 
   const handleSaveData = async () => {
@@ -382,6 +383,8 @@ export default function KasHarianDetailPage() {
                     <button
                       type="button"
                       role="combobox"
+                      aria-expanded={akunOpen}
+                      aria-controls="akun-dropdown-list"
                       className={cn(
                         'flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 text-left text-sm font-normal hover:bg-slate-50 focus:outline-none focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-all',
                         !selectedAkunId && 'text-slate-400',
@@ -402,7 +405,7 @@ export default function KasHarianDetailPage() {
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-slate-400" />
                     </button>
                     {akunOpen ? (
-                      <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                      <div id="akun-dropdown-list" className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
                         <div className="border-b border-slate-100 p-2">
                           <Input placeholder="Cari akun..." value={akunSearch} onChange={(e) => setAkunSearch(e.target.value)} autoFocus />
                         </div>
@@ -459,6 +462,8 @@ export default function KasHarianDetailPage() {
                     <button
                       type="button"
                       role="combobox"
+                      aria-expanded={kasOpen}
+                      aria-controls="kas-dropdown-list"
                       className={cn(
                         'flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 text-left text-sm font-normal hover:bg-slate-50 focus:outline-none focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-all',
                         !selectedKasId && 'text-slate-400',
@@ -479,7 +484,7 @@ export default function KasHarianDetailPage() {
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-slate-400" />
                     </button>
                     {kasOpen ? (
-                      <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                      <div id="kas-dropdown-list" className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[120] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
                         <div className="border-b border-slate-100 p-2">
                           <Input placeholder="Cari kas..." value={kasSearch} onChange={(e) => setKasSearch(e.target.value)} autoFocus />
                         </div>

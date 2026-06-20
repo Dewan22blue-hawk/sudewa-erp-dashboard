@@ -45,7 +45,7 @@ type PaginatedAccountGroupResponse = LaravelApiResponse<{
   perPage?: number;
   total: number;
   last_page: number;
-}>;
+} | AccountGroupApiModel[]>;
 
 type AccountGroupItemResponse = LaravelApiResponse<AccountGroupApiModel>;
 
@@ -60,21 +60,24 @@ export const getAccountGroups = async (params: PaginationParams & { company_id?:
   });
 
   const data = ensureSuccess(response.data);
+  const isDirectArray = Array.isArray(data);
+  const items = isDirectArray ? data : (data.data ?? []);
+
   const scopedData = params.company_id
-    ? (data.data ?? []).filter((item) => {
+    ? items.filter((item) => {
         if (item.company_id === undefined || item.company_id === null) return true;
         return String(item.company_id) === String(params.company_id);
       })
-    : (data.data ?? []);
-  const isFrontendFallback = params.company_id ? (scopedData.length !== (data.data ?? []).length) : false;
+    : items;
+  const isFrontendFallback = params.company_id ? (scopedData.length !== items.length) : false;
 
   return toPaginatedResult(
     {
       data: scopedData,
-      current_page: data.current_page,
-      per_page: data.per_page ?? data.perPage ?? params.perPage ?? 10,
-      total: isFrontendFallback ? scopedData.length : data.total,
-      last_page: isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.per_page ?? data.perPage ?? params.perPage ?? 1, 1))) : data.last_page,
+      current_page: isDirectArray ? 1 : data.current_page,
+      per_page: isDirectArray ? items.length : (data.per_page ?? data.perPage ?? params.perPage ?? 10),
+      total: isDirectArray ? items.length : (isFrontendFallback ? scopedData.length : data.total),
+      last_page: isDirectArray ? 1 : (isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.per_page ?? data.perPage ?? params.perPage ?? 1, 1))) : data.last_page),
     },
     mapAccountGroup,
   );
