@@ -163,7 +163,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         },
         {
           label: 'Laporan Bukti Potong',
-          href: base('/finance/laporan-bukti-potong'),
+          href: base('/finance/bukti-potong'),
         },
       ],
     },

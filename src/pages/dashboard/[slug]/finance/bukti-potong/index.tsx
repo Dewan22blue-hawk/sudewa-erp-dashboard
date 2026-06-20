@@ -14,9 +14,10 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxes } from '@/hooks/useWithholdingTax';
 
 export default function BuktiPotongPage() {
-  const { companyId } = useCompany();
-  // Ensure we use the active companyId. The prompt mentions companyId 4 for Transindo.
+  const { companyId, company } = useCompany();
+  // Ensure we use the active companyId.
   const companyNumber = Number(companyId || 4);
+  const companyName = company?.name ? ` - ${company.name}` : '';
 
   const [searchInput, setSearchInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
@@ -25,9 +26,6 @@ export default function BuktiPotongPage() {
   const [orderBy, setOrderBy] = useState('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
   const [sourceFilter, setSourceFilter] = useState<'internal' | 'client_supplier'>('internal');
-  // the api uses 'internal' filter by default based on the prompt "source=internal" but the UI shows all or lets user tab? 
-  // We'll fetch all by default or pass 'internal' if we strictly want only internal, but let's fetch without strict source unless required. 
-  // Actually, the prompt says "Tampilkan semua data Bukti Potong... source=internal". I will add a filter state if needed, or just let backend handle it if omitted.
   
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -95,7 +93,7 @@ export default function BuktiPotongPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Laporan Bukti Potong - PT Wajira Transindo</title>
+        <title>Laporan Bukti Potong{companyName}</title>
       </Head>
 
       <div className="space-y-6">
