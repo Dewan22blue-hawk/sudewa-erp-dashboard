@@ -31,7 +31,7 @@ export default function SalesPrintPage() {
         '/wapi/transaction/unit-transaction/unit-transaction-item',
         { params: { unit_transaction_id: id, type: 'sales', per_page: 200 } }
       );
-      const itemsPayload = ensureSuccess(itemsRes.data);
+      const itemsPayload = ensureSuccess(itemsRes.data) as any;
       const itemRows: any[] = Array.isArray(itemsPayload)
         ? itemsPayload
         : Array.isArray(itemsPayload?.data)
@@ -63,7 +63,7 @@ export default function SalesPrintPage() {
               );
             }
             
-            const payload = ensureSuccess(res.data);
+            const payload = ensureSuccess(res.data) as any;
             const dataRows: any[] = Array.isArray(payload)
               ? payload
               : Array.isArray(payload?.data)
