@@ -110,14 +110,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Perlengkapan Masuk',
           href: base('/warehouse/perlengkapan-masuk'),
         },
-        {
-          label: 'Penerimaan Material',
-          href: base('/warehouse/penerimaan-material'),
-        },
-        {
-          label: 'Pengeluaran Material',
-          href: base('/warehouse/pengeluaran-material'),
-        },
+
         {
           label: 'Perlengkapan Keluar',
           href: base('/warehouse/perlengkapan-keluar'),
@@ -170,7 +163,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         },
         {
           label: 'Laporan Bukti Potong',
-          href: base('/finance/laporan-bukti-potong'),
+          href: base('/finance/bukti-potong'),
         },
       ],
     },

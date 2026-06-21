@@ -171,22 +171,8 @@ export default function PurchasePaymentPage() {
                 }
 
                 let billing = latestBilling ?? currentBilling;
-                if (!billing) {
-                    try {
-                        billing = await createBilling.mutateAsync({
-                            company_id: String(companyId),
-                            unit_transaction_id: purchaseId,
-                            is_paid: false,
-                        });
-                    } catch (err: any) {
-                        const statusCode = err?.statusCode ?? err?.response?.status;
-                        if (statusCode === 422) {
-                            const existing = await refetchCurrentBilling();
-                            billing = existing.data ?? null;
-                        } else {
-                            throw err;
-                        }
-                    }
+                if (!billing?.id) {
+                    throw new Error('Billing utama tidak ditemukan. Silakan buat billing terlebih dahulu.');
                 }
 
                 if (!billing?.id) {
@@ -273,9 +259,9 @@ export default function PurchasePaymentPage() {
                             histories={billingHistories}
                             onSubmitPayment={handleSubmitPayment}
                             onCancel={() => router.back()}
-                            loading={isSubmitting || createBilling.isPending || createBillingHistory.isPending}
-                            canSubmit={true}
-                            validationMessage={validationMessage}
+                            loading={isSubmitting || createBillingHistory.isPending}
+                            canSubmit={!!currentBilling?.id}
+                            validationMessage={!currentBilling?.id ? "Billing utama belum tersedia. Silakan buat billing terlebih dahulu." : validationMessage}
                         />
                     </CardContent>
                 </Card>

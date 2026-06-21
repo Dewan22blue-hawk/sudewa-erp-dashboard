@@ -322,22 +322,8 @@ export default function PaymentPage() {
         return;
       }
 
-      if (!billing) {
-        try {
-          billing = await createBilling.mutateAsync({
-            company_id: String(companyId),
-            unit_transaction_id: String(salesId),
-            is_paid: false,
-          });
-        } catch (error: any) {
-          const statusCode = error?.statusCode ?? error?.response?.status;
-          if (statusCode === 422) {
-            const existing = await refetchCurrentBilling();
-            billing = existing.data ?? null;
-          } else {
-            throw error;
-          }
-        }
+      if (!billing?.id) {
+         throw new Error('Billing utama tidak ditemukan. Silakan buat billing terlebih dahulu.');
       }
 
       if (!billing?.id) {
@@ -425,8 +411,10 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              {validationMessage && (
-                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">{validationMessage}</div>
+              {(!existingBilling?.id || validationMessage) && (
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+                  {!existingBilling?.id ? "Billing utama belum tersedia. Silakan buat billing terlebih dahulu." : validationMessage}
+                </div>
               )}
 
               <div className="rounded-lg border">
@@ -523,9 +511,9 @@ export default function PaymentPage() {
                       paymentBcaUsd: form.bca_usd,
                     })
                   }
-                  disabled={isSubmitting || createBilling.isPending || createBillingHistory.isPending}
+                  disabled={!existingBilling?.id || isSubmitting || createBillingHistory.isPending}
                 >
-                  {isSubmitting || createBilling.isPending || createBillingHistory.isPending ? (
+                  {isSubmitting || createBillingHistory.isPending ? (
                     'Menyimpan...'
                   ) : (
                     <>
@@ -568,7 +556,7 @@ export default function PaymentPage() {
                           return (
                             <TableRow key={item.id}>
                               <TableCell>{item.payment_at ? String(item.payment_at).slice(0, 10) : '-'}</TableCell>
-                              <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
+                              <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0), 'USD')}</TableCell>
                               <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                               <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
                               <TableCell>{methods}</TableCell>
