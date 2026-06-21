@@ -355,7 +355,7 @@ export function PurchasePaymentForm({
                                         return (
                                             <TableRow key={item.id}>
                                                 <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
-                                                <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
+                                                <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0), 'USD')}</TableCell>
                                                 <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
                                                 <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
                                                 <TableCell>{methods.length > 0 ? methods.join(', ') : '-'}</TableCell>
