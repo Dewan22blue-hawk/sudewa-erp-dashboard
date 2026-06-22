@@ -8,12 +8,7 @@ import type {
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
 import { ensureSuccess, toPaginatedResult, type LaravelApiResponse } from '@/lib/api/response';
-import type {
-  WithholdingTaxReport,
-  WithholdingTaxReportListParams,
-  WithholdingTaxReportListResponse,
-  UpdateWithholdingTaxReportPayload,
-} from '@/@types/laporan-bukti-potong.types';
+
 
 const basePath = '/wapi/finance/withholding-tax';
 

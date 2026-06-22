@@ -1,3 +1,5 @@
+import type { PaginatedResult } from './pagination.types';
+
 export interface WithholdingTaxReport {
   id: number;
   company_id: number;
@@ -31,14 +33,5 @@ export interface UpdateWithholdingTaxReportPayload {
   tgl_dibayar: string;
 }
 
-export interface WithholdingTaxReportListResponse {
-  data: WithholdingTaxReport[];
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    per_page: number;
-    to: number;
-    total: number;
-  };
-}
+export type WithholdingTaxReportListResponse = PaginatedResult<WithholdingTaxReport>;
+
