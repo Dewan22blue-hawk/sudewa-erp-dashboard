@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { SalesPaymentForm, PaymentFormData } from '@/components/features/sales/SalesPaymentForm';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Wallet, Trash } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSalesDetail } from '@/hooks/useSales';
@@ -19,24 +17,6 @@ import {
 } from '@/hooks/useUnitBilling';
 import { salesService } from '@/services/sales.service';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
-import { formatCurrency } from '@/lib/utils/currency';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-    getHistoryBcaIdrAmount, 
-    getHistoryCashIdrAmount, 
-    getHistoryUsdAmount, 
-    getHistoryTotalIdrEquivalent 
-} from '@/utils/payment-helpers';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 const readApiError = (error: any): string => {
   const stringifyDetail = (value: unknown): string => {
@@ -224,79 +204,10 @@ export default function PaymentPage() {
   // bukan agregasi item detail yang bisa berbeda kontrak datanya.
   const totalTagihan = Number(existingBilling?.grand_total ?? salesData?.totalJual ?? 0);
 
-  const [form, setForm] = useState<{
-    bca_idr: number;
-    bca_usd: number | string;
-    cash: number;
-    payment_date: string;
-    note: string;
-  }>({
-    bca_idr: 0,
-    bca_usd: 0,
-    cash: 0,
-    payment_date: '',
-    note: '',
-  });
+  const totalDpp = Number(salesData?.totalDpp ?? 0);
+  const totalPpn = Number(salesData?.totalPpn ?? 0);
 
-  useEffect(() => {
-    const usdVal = Number(existingBilling?.bca_payment_2 ?? 0);
-    setForm({
-      bca_idr: Number(existingBilling?.bca_payment ?? 0),
-      bca_usd: usdVal,
-      cash: Number(existingBilling?.cash_payment ?? 0),
-      payment_date: existingBilling?.payment_date ? String(existingBilling.payment_date).slice(0, 10) : new Date().toISOString().slice(0, 10),
-      note: '',
-    });
-  }, [existingBilling?.bca_payment, existingBilling?.bca_payment_2, existingBilling?.cash_payment, existingBilling?.payment_date]);
-
-  const totalPaidFromHistory = useMemo(
-    () =>
-      billingHistories.reduce(
-        (acc, item) =>
-          acc + getHistoryTotalIdrEquivalent(item),
-        0,
-      ),
-    [billingHistories],
-  );
-  const totalPaidFromBilling = Number(
-    existingBilling?.total_paid ??
-    Number(existingBilling?.bca_payment ?? 0) +
-    Number(existingBilling?.cash_payment ?? 0) +
-    Number(existingBilling?.bca_payment_2 ?? 0),
-  );
-  const totalPaid = existingBilling?.is_paid ? Math.max(totalPaidFromBilling, totalPaidFromHistory) : totalPaidFromHistory;
-
-  const totalBayarInput = useMemo(
-    () => Number(form.bca_idr || 0) + Number(form.cash || 0),
-    [form.bca_idr, form.cash],
-  );
-  const kurangBayar = useMemo(() => Math.max(0, totalTagihan - (totalPaid + totalBayarInput)), [totalTagihan, totalPaid, totalBayarInput]);
-  const isPaid = kurangBayar === 0 ? 1 : 0;
-
-  const totalPaidUsdFromHistory = useMemo(
-    () => billingHistories.reduce((acc, item) => acc + getHistoryUsdAmount(item), 0),
-    [billingHistories]
-  );
-  const projectedTotalPaidUsd = useMemo(
-    () => totalPaidUsdFromHistory + Number(form.bca_usd || 0),
-    [totalPaidUsdFromHistory, form.bca_usd]
-  );
-  const projectedRemainingUsd = useMemo(
-    () => Math.max(0, Number(existingBilling?.remaining_payment_usd || 0) - Number(form.bca_usd || 0)),
-    [existingBilling?.remaining_payment_usd, form.bca_usd]
-  );
-
-  const parseNumericInput = (value: string) => {
-    if (!value) return 0;
-    const normalized = Number(value.replace(/[^\d]/g, ''));
-    return Number.isFinite(normalized) ? normalized : 0;
-  };
-
-  const formatNumberWithDot = (value: number) => {
-    return Number(value || 0).toLocaleString('id-ID');
-  };
-
-  const handleSubmit = async (data: any) => {
+  const handleSubmitPayment = async (data: PaymentFormData) => {
     setIsSubmitting(true);
     try {
       if (!salesId) {
@@ -308,10 +219,7 @@ export default function PaymentPage() {
         return;
       }
 
-      const bcaPayment = Number(data.paymentBca ?? 0);
-      const cashPayment = Number(data.paymentCash ?? 0);
-      const bcaPayment2 = Number(data.paymentBcaUsd ?? 0);
-      const inputPayment = bcaPayment + cashPayment + bcaPayment2;
+      const inputPayment = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
 
       if (inputPayment <= 0) {
         toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
@@ -362,12 +270,12 @@ export default function PaymentPage() {
       let billing = refreshedBilling.data ?? existingBilling ?? null;
 
       const latestGrandTotal = Number(billing?.grand_total ?? totalTagihan);
-      const latestPaid = Number(billing?.total_paid ?? totalPaid);
+      const latestPaid = Number(billing?.total_paid ?? 0);
       const latestRemaining = billing?.is_paid
         ? 0
         : Math.max(0, Number(billing?.remaining_payment ?? (latestGrandTotal - latestPaid)));
 
-      if (inputPayment > latestRemaining) {
+      if (inputPayment > latestRemaining && latestRemaining > 0) {
         toast.error('Nominal pembayaran melebihi sisa tagihan saat ini.');
         return;
       }
@@ -399,18 +307,16 @@ export default function PaymentPage() {
 
       await createBillingHistory.mutateAsync({
         unit_transaction_billing_id: String(billing.id),
-        bca_payment_amount: bcaPayment,
-        cash_payment_amount: cashPayment,
-        bca_payment_usd_amount: bcaPayment2,
-        payment_at: form.payment_date,
+        bca_payment_amount: Number(data.bcaPayment2 ?? 0),
+        cash_payment_amount: Number(data.cashPayment ?? 0),
+        bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
+        payment_at: data.paymentDate,
+        note: data.note,
       });
 
       await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);
-      setForm((prev) => ({ ...prev, bca_idr: 0, bca_usd: 0, cash: 0 }));
 
       toast.success('Pembayaran berhasil disimpan!');
-      const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
-      router.push(`${basePath}/${salesId}`);
     } catch (error: any) {
       const message = readApiError(error);
       if (message.toLowerCase().includes('total payment exceeds grand total')) {
@@ -450,265 +356,23 @@ export default function PaymentPage() {
 
         <Card className="rounded-xl">
           <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold">Informasi Penjualan</h2>
-            <Separator className="my-4" />
-            <div className="space-y-6">
-              <div className="rounded-lg border">
-                <div className="border-b px-4 py-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Biaya</h3>
-                </div>
-                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Total Beli</p>
-                    <Input value={formatCurrency(Number(salesData.totalDpp ?? 0))} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Total PPN</p>
-                    <Input value={formatCurrency(Number(salesData.totalPpn ?? 0))} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Total Biaya</p>
-                    <Input value={formatCurrency(totalTagihan)} disabled />
-                  </div>
-                </div>
-              </div>
-
-              {validationMessage && (
-                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-                  {validationMessage}
-                </div>
-              )}
-
-              <div className="rounded-lg border">
-                <div className="border-b px-4 py-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Pembayaran</h3>
-                </div>
-                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">BCA USD</p>
-                    <Input
-                      type="text"
-                      inputMode="decimal"
-                      placeholder="BCA USD"
-                      value={form.bca_usd}
-                      onChange={(e) => {
-                         let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
-                         const parts = val.split('.');
-                         if (parts.length > 2) {
-                            val = parts[0] + '.' + parts.slice(1).join('');
-                         }
-                         setForm((prev) => ({ ...prev, bca_usd: val }));
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">BCA IDR</p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="BCA IDR"
-                      value={formatNumberWithDot(form.bca_idr)}
-                      onChange={(e) => setForm((prev) => ({ ...prev, bca_idr: parseNumericInput(e.target.value) }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">CASH IDR</p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="Cash"
-                      value={formatNumberWithDot(form.cash)}
-                      onChange={(e) => setForm((prev) => ({ ...prev, cash: parseNumericInput(e.target.value) }))}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-lg border">
-                <div className="border-b px-4 py-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Invoice</h3>
-                </div>
-                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Tanggal</p>
-                    <Input
-                      type="date"
-                      value={form.payment_date}
-                      onChange={(e) => setForm((prev) => ({ ...prev, payment_date: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Total Bayar</p>
-                    <Input value={formatCurrency(totalPaid + totalBayarInput)} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Kurang Bayar</p>
-                    <Input value={formatCurrency(kurangBayar)} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Tanggal (USD)</p>
-                    <Input value="-" disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Total Bayar (USD)</p>
-                    <Input value={formatCurrency(projectedTotalPaidUsd, 'USD')} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Kurang Bayar (USD)</p>
-                    <Input value={formatCurrency(projectedRemainingUsd, 'USD')} disabled />
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Section: Catatan ── */}
-              <div className="rounded-lg border">
-                <div className="border-b px-4 py-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Catatan</h3>
-                </div>
-                <div className="p-4">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Note</p>
-                    <Input
-                      placeholder="Catatan pembayaran (opsional)"
-                      value={form.note}
-                      onChange={(e) => setForm((prev) => ({ ...prev, note: e.target.value }))}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" onClick={() => router.back()}>
-                  Batal
-                </Button>
-                <Button
-
-                  className="bg-green-600 hover:bg-green-700"
-                  data-is-paid={isPaid}
-                  onClick={() =>
-                    handleSubmit({
-                      paymentBca: form.bca_idr,
-                      paymentCash: form.cash,
-                      paymentBcaUsd: form.bca_usd,
-                    })
-                  }
-                  disabled={isSubmitting || createBillingHistory.isPending}
-                >
-                  {isSubmitting || createBillingHistory.isPending ? (
-                    'Menyimpan...'
-                  ) : (
-                    <>
-                      <Wallet className="mr-2 h-4 w-4" />
-                      Bayar
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              <div className="rounded-lg border">
-                <div className="border-b px-4 py-3">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Histori Pembayaran</h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Tanggal</TableHead>
-                        <TableHead>BCA USD</TableHead>
-                        <TableHead>BCA IDR</TableHead>
-                        <TableHead>Cash</TableHead>
-                        <TableHead>Metode</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                        <TableHead>Note</TableHead>
-                        <TableHead>Bukti</TableHead>
-                        <TableHead className="w-10"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {billingHistories.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={9} className="h-20 text-center text-muted-foreground">
-                            Belum ada histori pembayaran
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        billingHistories.map((item) => {
-                          const rowTotal = getHistoryTotalIdrEquivalent(item);
-                          const usdAmount = getHistoryUsdAmount(item);
-                          const idrAmount = getHistoryBcaIdrAmount(item) + getHistoryCashIdrAmount(item);
-                          const isPureUsd = usdAmount > 0 && idrAmount === 0 && rowTotal === usdAmount;
-
-                          const methodsArr = [];
-                          if (getHistoryBcaIdrAmount(item) > 0) methodsArr.push('BCA IDR');
-                          if (usdAmount > 0) methodsArr.push('BCA USD');
-                          if (getHistoryCashIdrAmount(item) > 0) methodsArr.push('Cash');
-                          const methods = item.payment_methods?.length ? item.payment_methods.join(', ') : (methodsArr.length > 0 ? methodsArr.join(', ') : '-');
-                          
-                          return (
-                            <TableRow key={item.id}>
-                              <TableCell>{item.payment_at ? String(item.payment_at).slice(0, 10) : '-'}</TableCell>
-                              <TableCell>{formatCurrency(usdAmount, 'USD')}</TableCell>
-                              <TableCell>{formatCurrency(getHistoryBcaIdrAmount(item))}</TableCell>
-                              <TableCell>{formatCurrency(getHistoryCashIdrAmount(item))}</TableCell>
-                              <TableCell>{methods}</TableCell>
-                              <TableCell className="text-right font-medium">{formatCurrency(rowTotal, isPureUsd ? 'USD' : 'IDR')}</TableCell>
-                              <TableCell>{item.note || '-'}</TableCell>
-                              <TableCell>
-                                {item.payment_proof ? (
-                                  <a href={item.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                                    Lihat
-                                  </a>
-                                ) : (
-                                  '-'
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => setDeleteId(item.id)}
-                                  disabled={isSubmitting || deleteBillingHistory.isPending}
-                                  type="button"
-                                >
-                                  <Trash className="w-4 h-4 text-red-500" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            </div>
+            <SalesPaymentForm
+              salesCode={salesData.kodeJual}
+              totalTagihan={totalTagihan}
+              totalPpn={totalPpn}
+              totalDpp={totalDpp}
+              billing={existingBilling ?? null}
+              histories={billingHistories}
+              onSubmitPayment={handleSubmitPayment}
+              onDeleteHistory={handleDeleteHistory}
+              onCancel={() => router.back()}
+              loading={isSubmitting || createBillingHistory.isPending}
+              canSubmit={true}
+              validationMessage={validationMessage}
+            />
           </CardContent>
         </Card>
       </div>
-
-      <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent className="rounded-2xl border-slate-200">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Histori Pembayaran</AlertDialogTitle>
-            <AlertDialogDescription>
-              Data histori pembayaran ini akan dihapus secara permanen.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                if (deleteId) {
-                  handleDeleteHistory(deleteId);
-                }
-              }} 
-              className="rounded-xl bg-red-600 hover:bg-red-700"
-            >
-              Hapus
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </DashboardLayout>
   );
 }

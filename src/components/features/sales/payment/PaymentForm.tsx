@@ -25,6 +25,8 @@ const paymentSchema = z.object({
     // Read-only fields for validation if needed, but mostly for display
     totalBayar: z.number(),
     kurangBayar: z.number(),
+    totalBayarUsd: z.number(),
+    kurangBayarUsd: z.number(),
 })
 
 type PaymentFormData = z.infer<typeof paymentSchema>
@@ -35,7 +37,15 @@ interface Props {
     onCancel: () => void
 }
 
-function formatMoney(amount: number) {
+function formatMoney(amount: number, currency: 'IDR' | 'USD' = 'IDR') {
+    if (currency === 'USD') {
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(amount)
+    }
     return new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
@@ -47,6 +57,9 @@ function formatMoney(amount: number) {
 export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
     const [tanggalBayar, setTanggalBayar] = useState('')
 
+    // Generate a mock USD target since salesData doesn't have one
+    const mockTargetUsd = Math.round(salesData.totalJual / 15000)
+
     const form = useForm<PaymentFormData>({
         resolver: zodResolver(paymentSchema),
         defaultValues: {
@@ -55,6 +68,8 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
             paymentCash: 0,
             totalBayar: 0,
             kurangBayar: salesData.totalJual,
+            totalBayarUsd: 0,
+            kurangBayarUsd: mockTargetUsd,
         }
     })
 
@@ -64,11 +79,18 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
     const paymentCash = watch("paymentCash")
 
     useEffect(() => {
-        const total = (paymentBca || 0) + (paymentBcaUsd || 0) + (paymentCash || 0)
-        const kurang = salesData.totalJual - total
-        setValue("totalBayar", total)
-        setValue("kurangBayar", Math.max(0, kurang))
-    }, [paymentBca, paymentBcaUsd, paymentCash, salesData.totalJual, setValue])
+        // IDR Logic (exclude BCA USD)
+        const totalIdr = (paymentBca || 0) + (paymentCash || 0)
+        const kurangIdr = salesData.totalJual - totalIdr
+        setValue("totalBayar", totalIdr)
+        setValue("kurangBayar", Math.max(0, kurangIdr))
+
+        // USD Logic
+        const totalUsd = paymentBcaUsd || 0
+        const kurangUsd = mockTargetUsd - totalUsd
+        setValue("totalBayarUsd", totalUsd)
+        setValue("kurangBayarUsd", Math.max(0, kurangUsd))
+    }, [paymentBca, paymentBcaUsd, paymentCash, salesData.totalJual, mockTargetUsd, setValue])
 
     return (
         <Form {...form}>
@@ -122,6 +144,24 @@ export function PaymentForm({ salesData, onSubmit, onCancel }: Props) {
                                     className="col-span-2 bg-muted/50 font-semibold text-red-600"
                                     readOnly
                                     value={formatMoney(watch("kurangBayar"))}
+                                />
+                            </div>
+                            
+                            {/* USD Fields */}
+                            <div className="grid grid-cols-3 items-center gap-4 pt-2 border-t">
+                                <Label className="col-span-1">Total Bayar (USD)</Label>
+                                <Input
+                                    className="col-span-2 bg-muted/50"
+                                    readOnly
+                                    value={formatMoney(watch("totalBayarUsd"), 'USD')}
+                                />
+                            </div>
+                            <div className="grid grid-cols-3 items-center gap-4">
+                                <Label className="col-span-1">Kurang Bayar (USD)</Label>
+                                <Input
+                                    className="col-span-2 bg-muted/50 font-semibold text-blue-600"
+                                    readOnly
+                                    value={formatMoney(watch("kurangBayarUsd"), 'USD')}
                                 />
                             </div>
                         </div>

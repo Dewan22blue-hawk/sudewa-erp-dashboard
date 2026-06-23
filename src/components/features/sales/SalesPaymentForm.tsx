@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
-import { id as idLocale } from 'date-fns/locale/id';
 import { Wallet, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +7,6 @@ import { UnitBilling, UnitBillingHistory } from '@/@types/unit-billing.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -21,6 +18,9 @@ import {
     getHistoryUsdAmount, 
     getHistoryTotalIdrEquivalent 
 } from '@/utils/payment-helpers';
+import { Checkbox } from '@/components/ui/checkbox';
+import { format } from 'date-fns';
+import { id as idLocale } from 'date-fns/locale';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,9 +44,10 @@ const paymentSchema = z.object({
 export type PaymentFormData = z.input<typeof paymentSchema>;
 
 interface Props {
-    purchaseCode: string;
+    salesCode: string;
     totalTagihan: number;
     totalPpn: number;
+    totalDpp: number;
     billing: UnitBilling | null;
     histories: UnitBillingHistory[];
     onSubmitPayment: (data: PaymentFormData) => Promise<void>;
@@ -57,10 +58,11 @@ interface Props {
     validationMessage?: string;
 }
 
-export function PurchasePaymentForm({
-    purchaseCode,
+export function SalesPaymentForm({
+    salesCode,
     totalTagihan,
     totalPpn,
+    totalDpp,
     billing,
     histories,
     onSubmitPayment,
@@ -105,8 +107,6 @@ export function PurchasePaymentForm({
     const projectedTotalPaidUsd = useMemo(() => totalPaidUsdFromHistory + paymentBca, [totalPaidUsdFromHistory, paymentBca]);
     const projectedRemainingUsd = useMemo(() => Math.max(0, Number(billing?.remaining_payment_usd || 0) - paymentBca), [billing?.remaining_payment_usd, paymentBca]);
 
-    const totalDpp = Math.max(0, totalTagihan - totalPpn);
-
     useEffect(() => {
         const autoIsPaid = projectedTotalPaid >= totalTagihan && totalTagihan > 0;
         form.setValue('isPaid', autoIsPaid);
@@ -149,8 +149,8 @@ export function PurchasePaymentForm({
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Kode Beli: {purchaseCode || '-'}</p>
+                <h2 className="text-2xl font-semibold">Informasi Penjualan</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Kode Jual: {salesCode || '-'}</p>
                 <Separator className="my-4" />
             </div>
 
