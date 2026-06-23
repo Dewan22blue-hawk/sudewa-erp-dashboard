@@ -5,6 +5,7 @@ export interface UnitBilling {
   grand_total?: number;
   total_paid?: number;
   remaining_payment?: number;
+  remaining_payment_usd?: number;
   last_payment_at?: string;
   bca_payment: number;
   cash_payment: number;
@@ -26,11 +27,22 @@ export interface UnitBillingHistory {
   bca_payment_amount: number;
   cash_payment_amount: number;
   bca_payment_usd_amount: number;
+  bca_payment_usd_amount_original?: number;
   payment_methods?: string[];
   cashes?: Array<{
-    id: string;
+    id: string | number;
     code?: string;
+    cash_name?: string;
+    description?: string;
     amount: number;
+    type?: string;
+    pivot?: {
+      unit_transaction_billing_history_id: string | number;
+      cash_id: string | number;
+      amount: number;
+      original_amount: number;
+      exchange_amount: number;
+    };
   }>;
   payment_at: string;
   note?: string;

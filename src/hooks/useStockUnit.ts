@@ -9,6 +9,7 @@ export const useStockUnits = (
     machine_number?: string;
     chassis_number?: string;
     color?: string;
+    in_stock?: boolean;
   },
 ) =>
   useQuery({

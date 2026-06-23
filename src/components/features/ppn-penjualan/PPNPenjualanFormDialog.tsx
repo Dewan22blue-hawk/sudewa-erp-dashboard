@@ -73,7 +73,7 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
     form.reset({
       fpm_date: toDate(initialData.fpm_date),
       nsfpm_age: toDate(initialData.nsfpm_age),
-      amount: initialData.payment_amount || null,
+      amount: initialData.payment_amount ? Math.round(Number(initialData.payment_amount)) : null,
       nsfp_number: initialData.nsfp_number || '',
     });
   }, [form, initialData]);
@@ -189,7 +189,15 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
                       <FormItem>
                         <FormLabel>Jumlah Pembayaran</FormLabel>
                         <FormControl>
-                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan jumlah pembayaran" />
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Rp.</span>
+                            <MoneyInput 
+                              className="pl-9" 
+                              value={field.value ?? 0} 
+                              onChangeValue={(value) => field.onChange(value)} 
+                              placeholder="Masukkan jumlah pembayaran" 
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -5,6 +5,7 @@ import StockUnitFilterDropdown from '@/components/features/stock-unit/StockUnitF
 import { useStockUnits } from '@/hooks/useStockUnit';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Card } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { StockStatus } from '@/@types/stock-unit.types';
 
 export default function StockUnitPage() {
@@ -15,6 +16,7 @@ export default function StockUnitPage() {
   const [hookPage, setHookPage] = useState(1);
   const [hookPerPage, setHookPerPage] = useState(25);
   const [stockState, setStockState] = useState<StockStatus | undefined>(undefined);
+  const [inStock, setInStock] = useState<boolean | undefined>(undefined);
   const [machineNumber] = useState<string | undefined>(undefined);
   const [chassisNumber] = useState<string | undefined>(undefined);
   const [color] = useState<string | undefined>(undefined);
@@ -24,10 +26,11 @@ export default function StockUnitPage() {
     perPage: hookPerPage,
     search,
     stock_state: stockState,
+    in_stock: inStock,
     machine_number: machineNumber,
     chassis_number: chassisNumber,
     color: color,
-  }), [hookPage, hookPerPage, search, stockState, machineNumber, chassisNumber, color]);
+  }), [hookPage, hookPerPage, search, stockState, inStock, machineNumber, chassisNumber, color]);
 
   const { data, isLoading, isError } = useStockUnits(companyId, params);
 
@@ -93,15 +96,35 @@ export default function StockUnitPage() {
           perPage={tablePerPage} // Pass tablePerPage state
           totalData={tableTotalData} // Pass tableTotalData state
           statusTabs={(
-            <StockUnitFilterDropdown
-              active={(stockState as StockStatus) ?? 'all'}
-              onChange={(value) => {
-                const nextStatus = value === 'all' ? undefined : value;
-                setStockState(nextStatus);
-                setHookPage(1);
-                setTablePage(1);
-              }}
-            />
+            <div className="flex items-center gap-2">
+              <Select 
+                value={inStock === undefined ? 'all' : inStock ? 'true' : 'false'} 
+                onValueChange={(val) => {
+                  const nextInStock = val === 'all' ? undefined : val === 'true';
+                  setInStock(nextInStock);
+                  setHookPage(1);
+                  setTablePage(1);
+                }}
+              >
+                <SelectTrigger className="h-10 w-[160px] border-gray-300 bg-white text-gray-900 rounded-lg shadow-sm">
+                  <SelectValue placeholder="Semua Ketersediaan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Stok</SelectItem>
+                  <SelectItem value="true">Tersedia (In Stock)</SelectItem>
+                  <SelectItem value="false">Tidak Tersedia</SelectItem>
+                </SelectContent>
+              </Select>
+              <StockUnitFilterDropdown
+                active={(stockState as StockStatus) ?? 'all'}
+                onChange={(value) => {
+                  const nextStatus = value === 'all' ? undefined : value;
+                  setStockState(nextStatus);
+                  setHookPage(1);
+                  setTablePage(1);
+                }}
+              />
+            </div>
           )}
           onPageChange={(p) => {
             setHookPage(p); // Update hook's page state
