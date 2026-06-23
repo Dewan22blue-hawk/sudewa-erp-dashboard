@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
 import { Calendar, User, FileText, DollarSign, CreditCard } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
+import { getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
 
 interface Props {
   data: UnitTransactionDetail;
@@ -14,9 +15,9 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
   const totalDpp = Number(data.unit_transaction_item_total_dpp ?? 0);
   const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
 
-  const debetBankUsd = billingHistories.reduce((sum, item) => sum + Number(item.bca_payment_usd_amount ?? 0), 0);
-  const debetBankIdr = billingHistories.reduce((sum, item) => sum + Number(item.bca_payment_amount ?? 0), 0);
-  const debetCashIdr = billingHistories.reduce((sum, item) => sum + Number(item.cash_payment_amount ?? 0), 0);
+  const debetBankUsd = billingHistories.reduce((sum, item) => sum + getHistoryUsdAmount(item), 0);
+  const debetBankIdr = billingHistories.reduce((sum, item) => sum + getHistoryBcaIdrAmount(item), 0);
+  const debetCashIdr = billingHistories.reduce((sum, item) => sum + getHistoryCashIdrAmount(item), 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">

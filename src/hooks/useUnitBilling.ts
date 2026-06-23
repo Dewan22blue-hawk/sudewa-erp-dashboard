@@ -110,6 +110,27 @@ export const useCreateBillingHistory = () => {
   });
 };
 
+export const useDeleteBillingHistory = () => {
+  const queryClient = useQueryClient();
+  const { companyId } = useCompany();
+  return useMutation({
+    mutationFn: (id: string | number) => unitBillingService.deleteBillingHistory(id),
+    onSuccess: () => {
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-history'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-current'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billings'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-by-id'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
+    },
+  });
+};
+
 export const useUpdateBilling = () => {
   const queryClient = useQueryClient();
   const { companyId } = useCompany();

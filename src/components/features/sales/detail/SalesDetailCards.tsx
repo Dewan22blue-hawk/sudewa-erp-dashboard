@@ -3,6 +3,7 @@ import { FileText, DollarSign, ListChecks, Calendar, User } from 'lucide-react';
 import { SalesItem } from '../sales.data';
 import { Progress } from '@/components/ui/progress';
 import { formatCurrency } from '@/lib/utils/currency';
+import { getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
 
 interface Props {
   data: SalesItem;
@@ -21,9 +22,9 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
   const kurangBayar = Math.max(0, totalJual - totalPaid);
   const percentagePaid = totalJual > 0 ? Math.min(100, Math.max(0, Math.round((totalPaid / totalJual) * 100))) : 0;
 
-  const kreditBankUsd = billingHistories.reduce((sum, item) => sum + Number(item.bca_payment_usd_amount ?? 0), 0);
-  const kreditBankIdr = billingHistories.reduce((sum, item) => sum + Number(item.bca_payment_amount ?? 0), 0);
-  const kreditCashIdr = billingHistories.reduce((sum, item) => sum + Number(item.cash_payment_amount ?? 0), 0);
+  const kreditBankUsd = billingHistories.reduce((sum, item) => sum + getHistoryUsdAmount(item), 0);
+  const kreditBankIdr = billingHistories.reduce((sum, item) => sum + getHistoryBcaIdrAmount(item), 0);
+  const kreditCashIdr = billingHistories.reduce((sum, item) => sum + getHistoryCashIdrAmount(item), 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">

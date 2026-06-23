@@ -72,7 +72,7 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
     form.reset({
       fp_date: toDate(initialData.fp_date),
       nsfp_age: toDate(initialData.nsfp_age),
-      amount: initialData.payment_amount || null,
+      amount: initialData.payment_amount ? Math.round(Number(initialData.payment_amount)) : null,
       nsfp_number: initialData.nsfp_number || '',
     });
   }, [form, initialData]);
@@ -171,7 +171,15 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
                   <FormItem>
                     <FormLabel>Biaya</FormLabel>
                     <FormControl>
-                      <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Tambahkan biaya" />
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Rp.</span>
+                        <MoneyInput 
+                          className="pl-9" 
+                          value={field.value ?? 0} 
+                          onChangeValue={(value) => field.onChange(value)} 
+                          placeholder="Tambahkan biaya" 
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
