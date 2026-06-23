@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { FinanceSeriesPoint, FinanceSeriesValues } from '@/@types/dashboard';
+import { formatCompactNumber } from '@/lib/utils/format';
 
 interface FinanceChartProps {
   data: FinanceSeriesPoint[];
@@ -88,14 +89,10 @@ export function FinanceChart({ data, isLoading }: FinanceChartProps) {
   const [transactionType, setTransactionType] = useState<TransactionType>('sales');
 
   const chartData = useMemo(() => {
-    const sorted = [...(data || [])].sort(
-      (a, b) => MONTH_ORDER.indexOf(a.month.toLowerCase()) - MONTH_ORDER.indexOf(b.month.toLowerCase()),
-    );
-
-    return sorted.map((item) => {
+    return (data || []).map((item) => {
       const values = resolveSeriesValues(item, mode, transactionType);
       return {
-        month: monthLabel(item.month),
+        month: item.month, // Tampilkan label tanggal/hari secara langsung
         'BCA USD': values.bcaUsd,
         'BCA IDR': values.bcaIdr,
         'CASH IDR': values.cash,
@@ -163,7 +160,14 @@ export function FinanceChart({ data, isLoading }: FinanceChartProps) {
           <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} />
-            <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} width={32} domain={[0, 'auto']} />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: '#6B7280', fontSize: 12 }}
+              width={65}
+              domain={[0, 'auto']}
+              tickFormatter={(value) => formatCompactNumber(value)}
+            />
             <Tooltip content={<CustomTooltip />} />
             {SERIES_META.map((series) => (
               <Line key={series.key} type="monotone" dataKey={series.label} stroke={series.color} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />

@@ -12,12 +12,25 @@ import WithholdingTaxDetailModal from '@/components/features/finance/withholding
 import WithholdingTaxDeleteDialog from '@/components/features/finance/withholding-tax/WithholdingTaxDeleteDialog';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxes } from '@/hooks/useWithholdingTax';
+import { fetchUserCompanies } from '@/services/company.service';
 
 export default function BuktiPotongPage() {
-  const { companyId, company } = useCompany();
+  const { companyId } = useCompany();
   // Ensure we use the active companyId.
   const companyNumber = Number(companyId || 4);
-  const companyName = company?.name ? ` - ${company.name}` : '';
+  const [companyName, setCompanyName] = useState('');
+
+  useEffect(() => {
+    fetchUserCompanies()
+      .then((companies) => {
+        const found = companies.find((c) => String(c.id) === String(companyId));
+        if (found?.name) {
+          setCompanyName(` - ${found.name}`);
+        }
+      })
+      .catch(() => undefined);
+  }, [companyId]);
+
 
   const [searchInput, setSearchInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
