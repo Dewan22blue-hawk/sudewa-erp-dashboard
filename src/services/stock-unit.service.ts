@@ -49,6 +49,7 @@ export const getStockUnits = async (
     chassis_number?: string;
     color?: string;
     search?: string; // Added search param for consistency
+    in_stock?: boolean;
   },
 ) => {
   const response = await apiClient.get<PaginatedStockUnitResponse>(
@@ -63,6 +64,7 @@ export const getStockUnits = async (
         machine_number: params.machine_number,
         chassis_number: params.chassis_number,
         color: params.color,
+        in_stock: params.in_stock,
       },
     },
   );
