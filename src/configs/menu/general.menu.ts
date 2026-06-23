@@ -191,7 +191,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Laporan Penerimaan',
           href: base('/laporan/laporan-penerimaan'),
         },
-                {
+        {
           label: 'Laporan Pengiriman',
           href: base('/laporan/laporan-pengiriman'),
         },

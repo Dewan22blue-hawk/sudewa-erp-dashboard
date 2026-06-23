@@ -680,7 +680,6 @@ export default function PaymentPage() {
                     </TableBody>
                   </Table>
                 </div>
-                </div>
               </div>
             </div>
           </CardContent>

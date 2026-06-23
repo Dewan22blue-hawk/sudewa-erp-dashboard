@@ -41,7 +41,7 @@ const paymentSchema = z.object({
     isPaid: z.boolean(),
 });
 
-export type PaymentFormData = z.infer<typeof paymentSchema>;
+export type PaymentFormData = z.input<typeof paymentSchema>;
 
 interface Props {
     purchaseCode: string;
