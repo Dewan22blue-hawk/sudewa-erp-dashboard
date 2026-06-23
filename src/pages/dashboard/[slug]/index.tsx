@@ -120,7 +120,7 @@ function StatCard({
   value: number;
   accentColor: string;
   iconBg: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; color?: string }>;
 }) {
   return (
     <Card className="relative overflow-hidden rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between h-[150px]">
@@ -128,7 +128,7 @@ function StatCard({
 
       <div className="flex items-center justify-start mb-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ backgroundColor: iconBg }}>
-          <Icon className="h-5 w-5" style={{ color: accentColor }} />
+          <Icon className="h-5 w-5" color={accentColor} />
         </div>
       </div>
 
