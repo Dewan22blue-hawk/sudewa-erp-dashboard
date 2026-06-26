@@ -114,6 +114,8 @@ export default function PurchaseTable({
           return compareNumber(a.transaction_bbn_total, b.transaction_bbn_total);
         case 'transaction_other_fee':
           return compareNumber(a.transaction_other_fee, b.transaction_other_fee);
+        case 'expedition_fee_total':
+          return compareNumber(a.expedition_fee_total, b.expedition_fee_total);
         case 'transaction_dpp_total':
           return compareNumber(a.transaction_dpp_total, b.transaction_dpp_total);
         case 'transaction_ppn_total':
@@ -284,6 +286,7 @@ export default function PurchaseTable({
               {renderSortHeader('supplier', 'SUPPLIER', 'left')}
               {renderSortHeader('transaction_bruto_total', 'TOTAL BRUTO', 'center')}
               {renderSortHeader('transaction_bbn_total', 'BBN', 'center')}
+              {renderSortHeader('expedition_fee_total', 'BIAYA EKSPEDISI', 'center')}
               {renderSortHeader('transaction_other_fee', 'BIAYA LAIN', 'center')}
               {renderSortHeader('transaction_dpp_total', 'TOTAL DPP', 'center')}
               {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
@@ -295,7 +298,7 @@ export default function PurchaseTable({
           <TableBody>
             {processedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={11} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={12} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
                   Tidak ada data
                 </TableCell>
               </TableRow>
@@ -316,6 +319,7 @@ export default function PurchaseTable({
                   <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.expedition_fee_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>

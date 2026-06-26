@@ -506,6 +506,18 @@ const handlePrint = useReactToPrint({
 
 ---
 
+## 15. Standar Penampilan Kolom Biaya Ekspedisi pada Tabel Transaksi
+
+- Jika endpoint sudah menyediakan field biaya ekspedisi, maka data tersebut harus dapat ditampilkan pada tabel utama agar user tidak selalu perlu masuk ke halaman detail.
+- Pada halaman Pembelian Unit, kolom Biaya Ekspedisi wajib menggunakan field `expedition_fee_total`.
+- Kolom Biaya Ekspedisi harus ditampilkan dengan format currency / Rupiah yang konsisten.
+- Jika nilai biaya ekspedisi kosong, null, atau undefined, gunakan fallback tampilan yang rapi sesuai standar project.
+- Penambahan kolom baru tidak boleh membuat data kolom lain tertukar.
+- Penambahan kolom baru harus tetap menjaga konsistensi layout tabel, responsiveness, pagination, filter, search, dan action table.
+- Setiap penambahan kolom pada tabel transaksi wajib mengikuti Pattern UI Style yang tercantum di `template.md`.
+
+---
+
 ## Ringkasan Kelas Kunci
 
 | Elemen | Kelas |
