@@ -10,13 +10,7 @@ import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
 import { mapSalesDetailCard } from '@/services/sales.mapper';
-import {
-  isUsdPayment,
-  getPaymentCurrency,
-  getPaymentDisplayAmount,
-  getPaymentIdrValue,
-  getExchangeRateDisplay,
-} from '@/utils/payment-helpers';
+import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
 
 /**
  * Detail Data Penjualan Unit - Image 4

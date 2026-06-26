@@ -15,13 +15,7 @@ import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
 import { ArrowLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  isUsdPayment,
-  getPaymentCurrency,
-  getPaymentDisplayAmount,
-  getPaymentIdrValue,
-  getExchangeRateDisplay,
-} from '@/utils/payment-helpers';
+import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
