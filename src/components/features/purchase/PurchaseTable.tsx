@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
@@ -28,6 +28,8 @@ export interface PurchaseTableProps {
   mainTabs?: { id: string; label: string }[];
   activeMainTab?: string;
   onMainTabChange?: (id: string) => void;
+  search?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export default function PurchaseTable({
@@ -45,11 +47,27 @@ export default function PurchaseTable({
   mainTabs,
   activeMainTab,
   onMainTabChange,
+  search,
+  onSearchChange,
 }: PurchaseTableProps) {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [localSearch, setLocalSearch] = useState(search || '');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
+
+  // Debounce search
+  useEffect(() => {
+    setLocalSearch(search || '');
+  }, [search]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onSearchChange && localSearch !== (search || '')) {
+        onSearchChange(localSearch);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, onSearchChange, search]);
 
   const isRefunded = (item: UnitTransaction) => String(item.stock_state ?? '').toLowerCase() === 'inbound_return';
   const getBillingLabel = useCallback((item: UnitTransaction) => {
@@ -64,16 +82,7 @@ export default function PurchaseTable({
   };
 
   const processedData = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-
     const filtered = data.filter((item) => {
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        [item.code, item.supplier, item.warehouse, item.stock_state, getBillingLabel(item)]
-          .map((value) => String(value ?? '').toLowerCase())
-          .some((value) => value.includes(normalizedSearch));
-
-      if (!matchesSearch) return false;
       if (billingFilter === 'paid') return Boolean(item.isPaid);
       if (billingFilter === 'unpaid') return !Boolean(item.isPaid);
       return true;
@@ -122,7 +131,7 @@ export default function PurchaseTable({
     });
 
     return sorted;
-  }, [data, billingFilter, sortConfig, searchTerm, getBillingLabel]);
+  }, [data, billingFilter, sortConfig, getBillingLabel]);
 
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? 25;
@@ -175,8 +184,7 @@ export default function PurchaseTable({
   };
 
   const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    onPageChange?.(1);
+    setLocalSearch(value);
   };
 
   const renderPageButtons = () => {
@@ -218,7 +226,7 @@ export default function PurchaseTable({
           {/* 1. Search */}
           <div className="relative w-full sm:w-[240px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input type="text" placeholder="Search here..." className="pl-8 bg-white h-9 border-slate-300" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
+            <Input type="text" placeholder="Search No. Rangka / No. Mesin..." className="pl-8 bg-white h-9 border-slate-300" value={localSearch} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
           {/* 2. Main Status Dropdown */}

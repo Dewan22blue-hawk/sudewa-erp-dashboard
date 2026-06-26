@@ -264,18 +264,7 @@ const mapUnitTransactionsFromItems = (
 ): UnitTransactionResponse => {
   const allTransactions = buildUnitTransactionFromRows(rows);
 
-  const normalizedSearch = String(params.search ?? '')
-    .trim()
-    .toLowerCase();
-
-  const filtered =
-    normalizedSearch.length === 0
-      ? allTransactions
-      : allTransactions.filter((item) =>
-          [item.code, item.supplier, item.warehouse, item.stock_state]
-            .map((value) => String(value ?? '').toLowerCase())
-            .some((value) => value.includes(normalizedSearch)),
-        );
+  const filtered = allTransactions;
 
   const page = params.page ?? 1;
   const perPage = params.perPage ?? 10;
