@@ -15,7 +15,7 @@ export default function TarifPage() {
     const [searchInput, setSearchInput] = useState('');   // immediate input
     const [search, setSearch] = useState('');              // debounced
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+    const [perPage, setPerPage] = useState(25);
 
     // Live search debounce — 400ms
     useEffect(() => {

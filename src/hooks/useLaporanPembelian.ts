@@ -48,7 +48,7 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
 
   // Filter states
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPerPage, setCurrentPerPage] = useState(50);
+  const [currentPerPage, setCurrentPerPage] = useState(25);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<number | null>(null);

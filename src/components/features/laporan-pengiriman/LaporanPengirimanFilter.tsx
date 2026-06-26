@@ -61,7 +61,7 @@ export default function LaporanPengirimanFilter({
   const [openBox, setOpenBox] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTermInside, setSearchTermInside] = useState('');
-  const [perPage, setPerPage] = useState('50');
+  const [perPage, setPerPage] = useState('25');
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -245,10 +245,9 @@ export default function LaporanPengirimanFilter({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10 data</SelectItem>
-              <SelectItem value="25">25 data</SelectItem>
-              <SelectItem value="50">50 data</SelectItem>
-              <SelectItem value="100">100 data</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
         </div>

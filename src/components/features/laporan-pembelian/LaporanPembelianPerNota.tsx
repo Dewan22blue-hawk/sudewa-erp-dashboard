@@ -38,7 +38,7 @@ const toNumber = (val: unknown) => {
 const formatCurrency = (val: number) => `Rp ${toNumber(val).toLocaleString('id-ID')}`;
 const formatDate = (date: string) => {
   const parsed = new Date(date);
-  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMM yyyy', { locale: id });
+  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMMM yyyy', { locale: id });
 };
 
 export default function LaporanPembelianPerNota({ data, pagination, isLoading, onPageChange }: Props) {

@@ -36,7 +36,7 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
 
 export function KasTable({ data }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const enrichedData = useMemo(() => {
     return data.map((item) => ({
       ...item,
@@ -94,10 +94,9 @@ export function KasTable({ data }: Props) {
             <span>Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
               <SelectTrigger className="w-[70px] bg-white">
-                <SelectValue placeholder="10" />
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>

@@ -8,6 +8,7 @@ import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { formatDateUI } from '@/lib/utils/date';
 
 interface Props {
   data: PPNPenjualan[];
@@ -30,7 +31,7 @@ const formatDate = (value: string | null) => {
   if (!value) return '-';
 
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : format(parsed, 'dd MMM yyyy');
+  return Number.isNaN(parsed.getTime()) ? value : formatDateUI(parsed);
 };
 
 const renderStatusBadge = (hasValue: boolean, readyLabel: string, emptyLabel: string) => (

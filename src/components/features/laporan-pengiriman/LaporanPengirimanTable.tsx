@@ -21,7 +21,7 @@ interface Props {
 
 const formatDate = (date: string) => {
   const parsed = new Date(date);
-  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMM yyyy', { locale: id });
+  return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMMM yyyy', { locale: id });
 };
 
 import { cn } from '@/lib/utils';

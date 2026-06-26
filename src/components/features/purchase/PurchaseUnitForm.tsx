@@ -137,7 +137,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
         form.setValue('typeUnitId', String(created.id));
         // Inject the newly created type unit into the cached list so the select shows it immediately
         queryClient.setQueryData(['type-units'], (prev: any) => {
-          if (!prev) return { data: [created], meta: { total: 1, currentPage: 1, perPage: 10, lastPage: 1 } };
+          if (!prev) return { data: [created], meta: { total: 1, currentPage: 1, perPage: 25, lastPage: 1 } };
           const alreadyExist = prev.data?.some((item: any) => item.id === created.id);
           const mergedData = alreadyExist ? prev.data : [created, ...(prev.data ?? [])];
           return { ...prev, data: mergedData };

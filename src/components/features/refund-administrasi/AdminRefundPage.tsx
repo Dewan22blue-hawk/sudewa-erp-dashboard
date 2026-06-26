@@ -27,7 +27,7 @@ export function AdminRefundPage({ title, description, basePath, backHref, transa
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({
     defaultPage: 1,
-    defaultPerPage: 10,
+    defaultPerPage: 25,
   });
   const debouncedSearch = useDebouncedValue(search, 400);
 
