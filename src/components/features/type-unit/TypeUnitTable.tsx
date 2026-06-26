@@ -114,7 +114,7 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 onClick={() => handleSort('brand.name' as any)}
               >
                 <div className="flex items-center gap-1">
-                  MERK
+                  MEREK
                   <SortIcon sortKey="brand.name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
@@ -129,32 +129,6 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 <div className="flex items-center gap-1">
                   TIPE UNIT
                   <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* HARGA BELI */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-right text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
-                  sortKey === 'buyPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
-                )}
-                onClick={() => handleSort('buyPrice')}
-              >
-                <div className="flex items-center justify-end gap-1">
-                  HARGA BELI
-                  <SortIcon sortKey="buyPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* HARGA JUAL */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-right text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
-                  sortKey === 'sellPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
-                )}
-                onClick={() => handleSort('sellPrice')}
-              >
-                <div className="flex items-center justify-end gap-1">
-                  HARGA JUAL
-                  <SortIcon sortKey="sellPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
               {/* JENIS */}
@@ -211,6 +185,32 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <SortIcon sortKey="brutoWeight" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
+              {/* HARGA BELI */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
+                  sortKey === 'buyPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('buyPrice')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  HARGA BELI
+                  <SortIcon sortKey="buyPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
+              {/* HARGA JUAL */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
+                  sortKey === 'sellPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('sellPrice')}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  HARGA JUAL
+                  <SortIcon sortKey="sellPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
               {/* ACTION */}
               <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">ACTION</TableHead>
             </TableRow>
@@ -222,12 +222,12 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell className="px-4 py-4 text-right"><Skeleton className="h-4 w-20 ml-auto" /></TableCell>
-                  <TableCell className="px-4 py-4 text-right"><Skeleton className="h-4 w-20 ml-auto" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
                   <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
                   <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-20 mx-auto" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-20 mx-auto" /></TableCell>
                   <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
                 </TableRow>
               ))
@@ -243,12 +243,12 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.code}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.name}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{item.buyPrice !== null && item.buyPrice !== undefined ? formatCurrency(item.buyPrice) : '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">{item.sellPrice !== null && item.sellPrice !== undefined ? formatCurrency(item.sellPrice) : '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.unitType || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.unitModel || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.nettoWeight ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.brutoWeight ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.buyPrice !== null && item.buyPrice !== undefined ? formatCurrency(item.buyPrice) : '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.sellPrice !== null && item.sellPrice !== undefined ? formatCurrency(item.sellPrice) : '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-center">
                     <div className="flex justify-center">
                       <DropdownMenu>
