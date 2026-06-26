@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { VehicleData } from '@/@types/vehicle-data.types';
+import { formatDateUI } from '@/lib/utils/date';
 
 interface VehicleDataDetailProps {
   data: VehicleData;
@@ -14,7 +15,7 @@ const formatDate = (value?: string | null) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
-  return format(date, 'dd MMM yyyy');
+  return formatDateUI(date);
 };
 
 function DetailRow({ label, value }: { label: string; value?: string | number | null }) {

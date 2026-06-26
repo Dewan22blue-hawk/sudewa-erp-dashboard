@@ -52,7 +52,7 @@ const applyValidationErrors = (
 export function SupplierManagementPage() {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
   const { data: profile } = useAuthMe();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
   const deferredSearch = useDeferredValue(search);
 
   const { data, isLoading, isFetching, isError } = useSuppliers({

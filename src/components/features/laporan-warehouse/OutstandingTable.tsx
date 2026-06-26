@@ -31,7 +31,7 @@ const formatDateLabel = (value: string): string => {
   if (!value) return '-';
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
-  return format(parsed, 'dd MMM yyyy', { locale: id });
+  return format(parsed, 'dd MMMM yyyy', { locale: id });
 };
 
 const toCsvLine = (cells: Array<string | number>): string =>

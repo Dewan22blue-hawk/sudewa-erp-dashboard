@@ -255,6 +255,13 @@ import { Button } from '@/components/ui/button';
 
 **Aturan**: Pagination berada di bawah tabel, dalam wrapper `space-y-4` yang sama. Layout flex column → row di breakpoint `lg`.
 
+**Standar Show Table Row / Per Page**:
+- Semua tabel wajib menggunakan opsi show per page: 25, 50, dan 100.
+- Default show per page adalah 25.
+- Tidak boleh menggunakan opsi lain di luar 25, 50, dan 100.
+- Perubahan show per page harus melakukan fetch ulang data tabel.
+- Pagination wajib tetap konsisten setelah perubahan show per page.
+
 ```tsx
 <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
   <p>Showing {start}-{end} of {total} data</p>
@@ -332,9 +339,17 @@ import { Button } from '@/components/ui/button';
 
 ---
 
-## 11. Format Tanggal (Bug Fix)
+## 11. Format Tanggal
 
-- Gunakan format `"dd MMM yyyy"` (contoh: `19 Jun 2025`), **BUKAN** `"PPP"` atau `"LLL dd, y"`.
+**Standar Format Tanggal**:
+- Semua tampilan tanggal pada UI wajib menggunakan format: `DD Nama Bulan YYYY`.
+- Contoh format tanggal: `03 Juli 2026`.
+- Nama bulan wajib menggunakan Bahasa Indonesia.
+- Format untuk payload API boleh mengikuti kebutuhan backend, misalnya `YYYY-MM-DD`.
+- Format mentah dari API tidak boleh langsung ditampilkan ke user.
+- Gunakan helper / utility date formatter (`formatDateUI` dari `src/lib/utils/date.ts`) agar format tanggal konsisten di seluruh aplikasi.
+
+**Bug Fix Notes**:
 - `DatePickerWithRange` mendukung prop `placeholder` opsional. Default: `"Pilih rentang tanggal"`.
 - `DatePicker` default placeholder: `"Pilih tanggal"`.
 - **Jangan** gunakan placeholder bahasa Inggris: `"Pick a date"`, `"Select date"`, `"Pick a date range"`.
@@ -477,6 +492,77 @@ const handlePrint = useReactToPrint({
 
 ---
 
+## 14. Standar Search Data
+
+- Semua fitur search pada tabel wajib menggunakan placeholder yang jelas sesuai konteks data yang dapat dicari.
+- Search harus mencari data berdasarkan field yang relevan dengan kebutuhan user, bukan hanya berdasarkan satu field default.
+- Jika halaman memiliki kebutuhan search spesifik, seperti pencarian berdasarkan No. Rangka atau No. Mesin, maka logic search wajib mendukung field tersebut.
+- Search tidak boleh hanya menggunakan field yang tidak sesuai dengan kebutuhan user, misalnya hanya mencari berdasarkan Warehouse ketika user membutuhkan pencarian berdasarkan Detail Unit.
+- Search wajib tetap kompatibel dengan pagination, show table row / per page, filter, sorting, dan refresh data.
+- Ketika keyword search dikosongkan, tabel wajib kembali menampilkan data default.
+- Jika data tidak ditemukan, tampilkan empty state yang jelas dan mudah dipahami user.
+- Jika terjadi error saat search, tampilkan pesan error yang ramah dan tidak teknis.
+- Gunakan komponen search yang konsisten sesuai Pattern UI Style aplikasi.
+
+---
+
+## 15. Standar Penampilan Kolom Biaya Ekspedisi pada Tabel Transaksi
+
+- Jika endpoint sudah menyediakan field biaya ekspedisi, maka data tersebut harus dapat ditampilkan pada tabel utama agar user tidak selalu perlu masuk ke halaman detail.
+- Pada halaman Pembelian Unit, kolom Biaya Ekspedisi wajib menggunakan field `expedition_fee_total`.
+- Kolom Biaya Ekspedisi harus ditampilkan dengan format currency / Rupiah yang konsisten.
+- Jika nilai biaya ekspedisi kosong, null, atau undefined, gunakan fallback tampilan yang rapi sesuai standar project.
+- Penambahan kolom baru tidak boleh membuat data kolom lain tertukar.
+- Penambahan kolom baru harus tetap menjaga konsistensi layout tabel, responsiveness, pagination, filter, search, dan action table.
+- Setiap penambahan kolom pada tabel transaksi wajib mengikuti Pattern UI Style yang tercantum di `template.md`.
+
+---
+
+## 16. Standar Card Pembelian dan Penjualan Unit
+
+### Card Detail Transaksi (Pembelian / Penjualan)
+
+Card Detail Transaksi digunakan untuk menampilkan ringkasan nilai transaksi unit berdasarkan total DPP, total PPN, total HPP, total biaya, dan total transaksi (pembelian/penjualan).
+
+Urutan data wajib:
+1. Total DPP
+2. Total PPN
+3. Total HPP
+4. Total Biaya
+5. TOTAL PEMBELIAN / TOTAL PENJUALAN
+
+Ketentuan:
+- Total HPP ditampilkan dengan font lebih tebal.
+- TOTAL PEMBELIAN / TOTAL PENJUALAN ditampilkan menggunakan huruf kapital dan nominal tebal.
+- Gunakan divider untuk memisahkan bagian perhitungan utama.
+- Seluruh nominal wajib menggunakan format Rupiah.
+- Data tidak boleh hardcode dan harus berasal dari endpoint API real.
+- Jika field total belum tersedia dari API, frontend boleh melakukan kalkulasi berdasarkan data detail transaksi.
+
+### Card Rincian Nilai
+
+Card Rincian Nilai digunakan untuk menampilkan rincian nilai DPP, PPN, total transaksi, dan kurang bayar.
+
+Urutan data wajib:
+1. DPP
+2. PPN
+3. TOTAL PEMBELIAN / TOTAL PENJUALAN
+4. KURANG BAYAR
+
+Ketentuan:
+- TOTAL PEMBELIAN / TOTAL PENJUALAN ditampilkan menggunakan huruf kapital dan nominal tebal.
+- KURANG BAYAR wajib menggunakan warna merah dan nominal tebal.
+- Seluruh nominal wajib menggunakan format Rupiah.
+- Data tidak boleh hardcode dan harus berasal dari endpoint API real.
+- Jika field total belum tersedia dari API, frontend boleh melakukan kalkulasi berdasarkan data detail transaksi.
+
+### Ketentuan Styling Card
+
+- Font, ukuran teks, ketebalan teks, warna, spacing, padding, border radius, icon, divider, dan layout card wajib mengikuti Pattern UI Style pada `template.md`.
+- Card harus konsisten dengan card transaksi lain pada sistem.
+
+---
+
 ## Ringkasan Kelas Kunci
 
 | Elemen | Kelas |
@@ -502,3 +588,51 @@ const handlePrint = useReactToPrint({
 | Tambah button | `bg-[#1e3a5f] hover:bg-[#152e4d]` |
 | Container Cetak A4 | `print-letter-page` |
 | Background Kop Surat | `print-letterhead` |
+
+---
+
+## Standar Form Pembelian Unit
+
+Form Pembelian Unit digunakan untuk menginput data transaksi pembelian unit, termasuk biaya, harga satuan, dan total harga.
+
+### Sub Form Biaya
+
+Urutan field wajib:
+1. Biaya BBN
+2. Biaya Ekspedisi
+3. Biaya Lain
+
+Ketentuan:
+- Field biaya ditampilkan dalam satu baris dengan layout tiga kolom jika ruang layar mencukupi.
+- Semua field biaya wajib menggunakan format currency / Rupiah.
+- Field biaya harus berada di bawah bagian input QTY dan Harga sesuai struktur form transaksi.
+- Mapping data tidak boleh tertukar antara Biaya BBN, Biaya Ekspedisi, dan Biaya Lain.
+
+### Sub Form Harga
+
+Urutan field wajib:
+1. HPP Satuan
+2. DPP Satuan
+3. PPN Satuan
+
+Ketentuan:
+- Semua field harga satuan wajib menggunakan format currency / Rupiah.
+- Field harga satuan harus tetap mengikuti mapping data transaksi pembelian unit.
+- Jika nilai dihitung otomatis, pastikan hasil kalkulasi tetap tampil rapi.
+
+### Sub Form Total Harga
+
+Urutan field wajib:
+1. HPP Total
+2. DPP Total
+3. PPN Total
+
+Ketentuan:
+- Semua field total harga wajib menggunakan format currency / Rupiah.
+- Nilai total tidak boleh menampilkan NaN, undefined, atau format kosong yang tidak rapi.
+- Jika data belum tersedia, gunakan fallback sesuai standar project.
+
+### Ketentuan Styling Form
+
+- Font, ukuran teks, ketebalan teks, warna, spacing, padding, border radius, input, label, divider, dan layout wajib mengikuti Pattern UI Style pada `template.md`.
+- Struktur Form Pembelian Unit ini dapat dijadikan acuan untuk implementasi Form Penjualan Unit agar tampilan antar fitur transaksi tetap konsisten.

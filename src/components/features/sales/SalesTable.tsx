@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,9 @@ interface Props {
  */
 export function SalesTable({ onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
+  const [localSearch, setLocalSearch] = useState('');
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
 
@@ -82,9 +83,18 @@ export function SalesTable({ onAdd }: Props) {
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setCurrentPage(1);
+    setLocalSearch(term);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== localSearch) {
+        setSearchTerm(localSearch);
+        setCurrentPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchTerm]);
 
   const handleItemsPerPageChange = (val: string) => {
     setItemsPerPage(Number(val));
@@ -204,8 +214,8 @@ export function SalesTable({ onAdd }: Props) {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search here..."
-              value={searchTerm}
+              placeholder="Search No. Rangka / No. Mesin..."
+              value={localSearch}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-8 bg-white h-9 border-slate-300"
             />
@@ -244,10 +254,9 @@ export function SalesTable({ onAdd }: Props) {
             <span className="text-sm font-medium text-slate-700">Show</span>
             <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
               <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
-                <SelectValue placeholder="10" />
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
@@ -273,6 +282,7 @@ export function SalesTable({ onAdd }: Props) {
               {renderSortHeader('kodeJual', 'KODE JUAL', 'left')}
               {renderSortHeader('tanggal', 'TANGGAL', 'center')}
               {renderSortHeader('customer', 'CUSTOMER', 'left')}
+              {renderSortHeader('biayaEkspedisi', 'BIAYA EKSPEDISI', 'center')}
               {renderSortHeader('biaya', 'TOTAL BIAYA', 'center')}
               {renderSortHeader('totalDPP', 'TOTAL DPP', 'center')}
               {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
@@ -285,19 +295,19 @@ export function SalesTable({ onAdd }: Props) {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>
               </TableRow>

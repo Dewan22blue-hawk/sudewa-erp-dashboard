@@ -134,7 +134,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
         form.setValue('typeUnitId', String(created.id));
         // Inject the newly created type unit into the cached list so the select shows it immediately
         queryClient.setQueryData(['type-units'], (prev: any) => {
-          if (!prev) return { data: [created], meta: { total: 1, currentPage: 1, perPage: 10, lastPage: 1 } };
+          if (!prev) return { data: [created], meta: { total: 1, currentPage: 1, perPage: 25, lastPage: 1 } };
           const alreadyExist = prev.data?.some((item: any) => item.id === created.id);
           const mergedData = alreadyExist ? prev.data : [created, ...(prev.data ?? [])];
           return { ...prev, data: mergedData };
@@ -271,109 +271,115 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               )}
             />
           </div>
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground">Harga</h2>
+          {/* Sub Form Biaya */}
+          <div className="rounded-xl border border-slate-200 p-5 space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="font-semibold text-slate-500">Biaya</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="biayaBBN"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
+                    <FormControl>
+                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="biayaEkspedisi"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
+                    <FormControl>
+                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="biayaLain"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
+                    <FormControl>
+                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormItem>
-              <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+          {/* Sub Form Harga */}
+          <div className="rounded-xl border border-slate-200 p-5 space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="font-semibold text-slate-500">Harga</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormItem>
+                <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+                <FormControl>
+                  <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
+                </FormControl>
+              </FormItem>
 
-            <FormItem>
-              <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+              <FormItem>
+                <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+                <FormControl>
+                  <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
+                </FormControl>
+              </FormItem>
 
-            <FormItem>
-              <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+              <FormItem>
+                <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+                <FormControl>
+                  <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
+                </FormControl>
+              </FormItem>
+            </div>
           </div>
 
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground">Total Harga</h2>
+          {/* Sub Form Total Harga */}
+          <div className="rounded-xl border border-slate-200 p-5 space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="font-semibold text-slate-500">Total Harga</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormItem>
+                <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
+                <FormControl>
+                  <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
+                <FormControl>
+                  <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
+                <FormControl>
+                  <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
+                </FormControl>
+              </FormItem>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormItem>
-              <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-
-            <FormItem>
-              <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-
-            <FormItem>
-              <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-          </div>
-
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground">Biaya</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormField
-              control={form.control}
-              name="biayaBBN"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
-                  <FormControl>
-                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="biayaEkspedisi"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
-                  <FormControl>
-                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="biayaLain"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
-                  <FormControl>
-                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-8">
+          <div className="flex justify-center gap-3 pt-8">
             <Button type="button" variant="ghost" onClick={onCancel} disabled={loading} className="text-muted-foreground hover:text-foreground">
               Batal
             </Button>

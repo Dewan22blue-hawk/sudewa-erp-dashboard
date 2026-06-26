@@ -37,7 +37,7 @@ export function LaporanKasTable({
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         if (Number.isNaN(date.getTime())) return dateString;
-        return format(date, 'dd MMM yyyy', { locale: id });
+        return format(date, 'dd MMMM yyyy', { locale: id });
     };
 
     const renderSortHeader = (title: string, key: string, align: 'left' | 'right' | 'center' = 'left') => {

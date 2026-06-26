@@ -25,7 +25,7 @@ export default function DriverPage() {
     const [searchInput, setSearchInput] = useState('');   // immediate display value
     const [search, setSearch] = useState('');              // debounced (sent to API)
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+    const [perPage, setPerPage] = useState(25);
 
     // Live search debounce — 400ms
     useEffect(() => {

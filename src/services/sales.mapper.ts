@@ -19,6 +19,7 @@ export type SalesApiModel = {
   transaction_ppn_total?: string | number;
   transaction_bbn_total?: string | number;
   transaction_other_fee?: string | number;
+  expedition_fee_total?: string | number;
   person?: {
     id?: number | string;
     name?: string;
@@ -247,7 +248,7 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
     hargaSatuan: 0,
     qty: toNumber(item.max_capacity),
     biayaBbn: toNumber(item.transaction_bbn_total),
-    biayaEkspedisi: 0,
+    biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
     totalHpp: totalDpp,
     totalDpp,
@@ -310,12 +311,12 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
     hargaSatuan: toNumber(item.unit_transaction_items?.[0]?.price),
     qty,
     biayaBbn: toNumber(item.transaction_bbn_total),
-    biayaEkspedisi: item.unit_transaction_items?.reduce((acc, row) => acc + toNumber(row.expedition_fee), 0) ?? 0,
+    biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
     totalHpp: totalDpp,
     totalDpp,
     totalPpn,
-    totalBiaya: toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee),
+    totalBiaya: toNumber(item.transaction_bbn_total) + toNumber(item.expedition_fee_total) + toNumber(item.transaction_other_fee),
     totalJual,
     totalBayar,
     kurangBayar,

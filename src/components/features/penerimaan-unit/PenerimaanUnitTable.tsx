@@ -53,7 +53,7 @@ export default function PenerimaanUnitTable({ data }: Props) {
     if (!val) return '-';
     const date = new Date(val);
     if (Number.isNaN(date.getTime())) return val;
-    return format(date, 'dd MMM yyyy', { locale: id });
+    return format(date, 'dd MMMM yyyy', { locale: id });
   };
 
   return (

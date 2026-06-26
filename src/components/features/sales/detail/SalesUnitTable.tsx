@@ -142,7 +142,6 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
               <SelectValue placeholder="25" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10</SelectItem>
               <SelectItem value="25">25</SelectItem>
               <SelectItem value="50">50</SelectItem>
               <SelectItem value="100">100</SelectItem>
@@ -182,7 +181,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">QTY</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HARGA JUAL</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA BBN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA EXPEDISI</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA EKSPEDISI</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA LAIN</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HPP</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP</TableHead>

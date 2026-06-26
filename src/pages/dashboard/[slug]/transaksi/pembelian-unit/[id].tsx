@@ -15,13 +15,7 @@ import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
 import { ChevronLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  isUsdPayment,
-  getPaymentCurrency,
-  getPaymentDisplayAmount,
-  getPaymentIdrValue,
-  getExchangeRateDisplay,
-} from '@/utils/payment-helpers';
+import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -307,20 +301,16 @@ export default function PurchaseDetailPage() {
               <table className="w-full text-sm">
                 <thead className="bg-green-100 border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">No</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal Pembayaran</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Nama Kas/Bank</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Tipe Kas</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal</th>
-                    <th className="px-4 py-3 text-center font-semibold text-slate-700">Mata Uang</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Kurs</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nilai IDR</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Catatan</th>
+                    <th className="px-4 py-3 text-left font-semibold text-slate-700 w-12">No</th>
+                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA USD</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA IDR</th>
+                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran CASH IDR</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {resolvedBillingHistories.flatMap((history, hIndex) => {
+                  {resolvedBillingHistories.map((history, index) => {
                     const paymentDate = history.payment_at
                       ? new Date(history.payment_at).toLocaleDateString('id-ID', {
                         day: '2-digit',
@@ -329,66 +319,14 @@ export default function PurchaseDetailPage() {
                       })
                       : '-';
 
-                    if (history.cashes && history.cashes.length > 0) {
-                      return history.cashes.map((cash: any, cIndex: number) => {
-                        const isUsd = isUsdPayment(cash.pivot);
-                        return (
-                          <tr key={`${history.id}-${cash.id || cIndex}`} className="border-b border-slate-200 hover:bg-slate-50">
-                            <td className="px-4 py-3 text-slate-900">{hIndex + 1}.{cIndex + 1}</td>
-                            <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
-                            <td className="px-4 py-3 text-slate-900">{cash.cash_name}</td>
-                            <td className="px-4 py-3 text-slate-900 capitalize">{cash.type}</td>
-                            <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                              {getPaymentDisplayAmount(cash.pivot)}
-                            </td>
-                            <td className="px-4 py-3 text-center text-slate-900 font-medium">
-                              <Badge variant="outline" className={isUsd ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-blue-200 bg-blue-50 text-blue-700'}>
-                                {isUsd ? 'USD' : 'IDR'}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                              {getExchangeRateDisplay(cash.pivot)}
-                            </td>
-                            <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                              {getPaymentIdrValue(cash.pivot)}
-                            </td>
-                            <td className="px-4 py-3 text-slate-900 max-w-[150px] truncate" title={history.note || ''}>
-                              {history.note || '-'}
-                            </td>
-                            <td className="px-4 py-3 text-slate-900">
-                              {history.payment_proof ? (
-                                <a href={history.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs font-medium">
-                                  Lihat Bukti
-                                </a>
-                              ) : (
-                                <span className="text-slate-400">-</span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      });
-                    }
-
-                    // Fallback for legacy structure
                     const bcaPayment = Number(history.bca_payment_amount ?? 0);
                     const usdPayment = Number(history.bca_payment_usd_amount ?? 0);
                     const cashPayment = Number(history.cash_payment_amount ?? 0);
 
                     return (
-                      <tr key={history.id ?? hIndex} className="border-b border-slate-200 hover:bg-slate-50">
-                        <td className="px-4 py-3 text-slate-900">{hIndex + 1}</td>
+                      <tr key={history.id || index} className="border-b border-slate-200 hover:bg-slate-50">
+                        <td className="px-4 py-3 text-slate-900">{index + 1}</td>
                         <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
-                        <td colSpan={6} className="px-4 py-3">
-                          <div className="flex flex-col gap-1 text-sm">
-                            {usdPayment > 0 && <div>BCA USD: <span className="font-medium">$ {usdPayment.toLocaleString('id-ID')}</span></div>}
-                            {bcaPayment > 0 && <div>BCA IDR: <span className="font-medium">Rp {bcaPayment.toLocaleString('id-ID')}</span></div>}
-                            {cashPayment > 0 && <div>CASH IDR: <span className="font-medium">Rp {cashPayment.toLocaleString('id-ID')}</span></div>}
-                            {usdPayment === 0 && bcaPayment === 0 && cashPayment === 0 && <div className="text-slate-500 italic">Tidak ada detail nominal pembayaran lama.</div>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-slate-900 max-w-[150px] truncate" title={history.note || ''}>
-                          {history.note || '-'}
-                        </td>
                         <td className="px-4 py-3 text-slate-900">
                           {history.payment_proof ? (
                             <a href={history.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs font-medium">
@@ -398,6 +336,9 @@ export default function PurchaseDetailPage() {
                             <span className="text-slate-400">-</span>
                           )}
                         </td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">{usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}</td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">{bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}</td>
+                        <td className="px-4 py-3 text-right text-slate-900 font-medium">{cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}</td>
                       </tr>
                     );
                   })}

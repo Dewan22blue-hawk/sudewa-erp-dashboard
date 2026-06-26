@@ -241,10 +241,9 @@ export default function DetailDOEkspedisiPage() {
                 setPage(1);
               }}>
                 <SelectTrigger className="h-12 w-[88px] rounded-xl border-[#E5E7EB] bg-white">
-                  <SelectValue placeholder="10" />
+                  <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
                   <SelectItem value="100">100</SelectItem>

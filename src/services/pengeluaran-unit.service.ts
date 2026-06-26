@@ -178,7 +178,7 @@ const extractPagination = <T>(payload: unknown): PaginationLike<T> => {
     return {
       data: [],
       current_page: 1,
-      perPage: 10,
+      perPage: 25,
       total: 0,
       last_page: 1,
     };
@@ -199,7 +199,7 @@ const extractPagination = <T>(payload: unknown): PaginationLike<T> => {
   return {
     data: [],
     current_page: 1,
-    perPage: 10,
+    perPage: 25,
     total: 0,
     last_page: 1,
   };

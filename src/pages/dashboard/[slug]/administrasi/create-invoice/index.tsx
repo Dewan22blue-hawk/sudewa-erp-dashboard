@@ -20,7 +20,7 @@ export default function CreateInvoiceListPage() {
   const [search, setSearch] = React.useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 350);
   const [page, setPage] = React.useState(1);
-  const [perPage, setPerPage] = React.useState(10);
+  const [perPage, setPerPage] = React.useState(25);
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
   const [dateFilter, setDateFilter] = React.useState('');
   const [printFilter, setPrintFilter] = React.useState<'' | '0' | '1'>('');

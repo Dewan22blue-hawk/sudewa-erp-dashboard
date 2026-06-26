@@ -79,7 +79,7 @@ const toBoolValue = (value: unknown): boolean => {
 
 const extractPaginatedRows = <T>(payload: unknown): LaravelPaginationLike<T> => {
   if (!payload || typeof payload !== 'object') {
-    return { data: [], current_page: 1, perPage: 10, total: 0, last_page: 1 };
+    return { data: [], current_page: 1, perPage: 25, total: 0, last_page: 1 };
   }
 
   const source = payload as LaravelPaginationLike<T> & { data?: unknown };
@@ -94,7 +94,7 @@ const extractPaginatedRows = <T>(payload: unknown): LaravelPaginationLike<T> => 
     }
   }
 
-  return { data: [], current_page: 1, perPage: 10, total: 0, last_page: 1 };
+  return { data: [], current_page: 1, perPage: 25, total: 0, last_page: 1 };
 };
 
 const fetchPurchaseTransactions = async (

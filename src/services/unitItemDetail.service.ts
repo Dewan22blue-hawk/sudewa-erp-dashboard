@@ -214,7 +214,7 @@ export const unitItemDetailService = {
       data: [],
       meta: {
         currentPage: 1,
-        perPage: 10,
+        perPage: 25,
         total: 0,
         lastPage: 1,
       },

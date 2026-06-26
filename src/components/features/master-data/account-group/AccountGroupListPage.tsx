@@ -20,7 +20,7 @@ import { DataImportModal } from '@/components/features/master-data/DataImportMod
 
 export const AccountGroupListPage = () => {
   const { companyId } = useCompany();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const { data, isLoading, isError, isFetching } = useAccountGroups({
     page,
@@ -150,7 +150,6 @@ export const AccountGroupListPage = () => {
                     <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>

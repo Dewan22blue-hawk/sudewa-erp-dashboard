@@ -16,7 +16,7 @@ export default function AssetPage() {
   // Table state
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(100);
+  const [perPage, setPerPage] = useState(25);
 
   const { data: assetsData } = useAssets(companyId, { page, perPage, search });
   

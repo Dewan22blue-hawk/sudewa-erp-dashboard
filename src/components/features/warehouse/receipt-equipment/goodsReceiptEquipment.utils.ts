@@ -8,7 +8,7 @@ export const formatDate = (value?: string | null) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return format(date, 'dd MMM yyyy', { locale: id });
+  return format(date, 'dd MMMM yyyy', { locale: id });
 };
 
 export const formatLongDate = (value?: string | null) => {

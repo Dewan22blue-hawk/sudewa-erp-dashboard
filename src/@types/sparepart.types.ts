@@ -25,6 +25,11 @@ export interface Sparepart {
   category?: SparepartCategory | null;
   // For backward compatibility with the previous UI naming
   group?: string;
+  brandId?: number | null;
+  brand?: { name: string } | null;
+  unitModel?: string | null;
+  nettoWeight?: number | null;
+  brutoWeight?: number | null;
 }
 
 export interface SparepartPayload {

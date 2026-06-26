@@ -15,7 +15,7 @@ export default function FinanceAssetPage() {
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+    const [perPage, setPerPage] = useState(25);
 
     const { data: assetsData, isLoading } = useFinanceAssets(companyId, { page, perPage, search });
     const deleteMutation = useDeleteFinanceAsset();
