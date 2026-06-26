@@ -1,9 +1,9 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, DollarSign, ListChecks, Calendar, User } from 'lucide-react';
+import { FileText, DollarSign, CreditCard, Calendar, User } from 'lucide-react';
 import { SalesItem } from '../sales.data';
 import { Progress } from '@/components/ui/progress';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
+import { getHistoryTotalIdrEquivalent, getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
 
 interface Props {
   data: SalesItem;
@@ -21,6 +21,10 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
 
   const historyPaid = billingHistories.reduce((sum, item) => sum + getHistoryTotalIdrEquivalent(item), 0);
   const kurangBayar = Math.max(0, totalJual - historyPaid);
+
+  const debetBankUsd = billingHistories.reduce((sum, item) => sum + getHistoryUsdAmount(item), 0);
+  const debetBankIdr = billingHistories.reduce((sum, item) => sum + getHistoryBcaIdrAmount(item), 0);
+  const debetCashIdr = billingHistories.reduce((sum, item) => sum + getHistoryCashIdrAmount(item), 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -96,33 +100,28 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
         </CardContent>
       </Card>
 
-      {/* Card 3: Rincian Nilai */}
+      {/* Card 3: Riwayat Pembayaran */}
       <Card className="rounded-lg border border-slate-200 shadow-sm h-full">
         <CardContent className="p-5 flex flex-col h-full gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-50 rounded-md">
-              <ListChecks className="h-5 w-5 text-red-500" />
+            <div className="p-2 rounded-md bg-purple-50">
+              <CreditCard className="h-5 w-5 text-purple-500" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-700">Rincian Nilai</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Riwayat Pembayaran</h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-500 flex-1 flex flex-col">
             <div className="flex items-center justify-between">
-              <span>DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
+              <span>Debet Bank USD</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankUsd, 'USD')}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>PPN</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalPpn)}</span>
+              <span>Debet Bank IDR</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankIdr)}</span>
             </div>
-            <div className="border-t border-slate-100 my-1 mt-auto"></div>
-            <div className="flex items-center justify-between text-slate-900 pt-2">
-              <span className="font-bold uppercase text-sm">TOTAL PENJUALAN</span>
-              <span className="text-sm font-bold">{formatCurrency(totalJual)}</span>
-            </div>
-            <div className="flex items-center justify-between text-red-600">
-              <span className="font-bold uppercase text-sm">KURANG BAYAR</span>
-              <span className="text-sm font-bold">{formatCurrency(kurangBayar)}</span>
+            <div className="flex items-center justify-between">
+              <span>Debet Cash IDR</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetCashIdr)}</span>
             </div>
           </div>
         </CardContent>
