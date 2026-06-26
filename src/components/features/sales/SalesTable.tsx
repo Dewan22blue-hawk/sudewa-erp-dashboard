@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ export function SalesTable({ onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
+  const [localSearch, setLocalSearch] = useState('');
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
 
@@ -82,9 +83,18 @@ export function SalesTable({ onAdd }: Props) {
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setCurrentPage(1);
+    setLocalSearch(term);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== localSearch) {
+        setSearchTerm(localSearch);
+        setCurrentPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchTerm]);
 
   const handleItemsPerPageChange = (val: string) => {
     setItemsPerPage(Number(val));
@@ -204,8 +214,8 @@ export function SalesTable({ onAdd }: Props) {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search here..."
-              value={searchTerm}
+              placeholder="Search No. Rangka / No. Mesin..."
+              value={localSearch}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-8 bg-white h-9 border-slate-300"
             />
