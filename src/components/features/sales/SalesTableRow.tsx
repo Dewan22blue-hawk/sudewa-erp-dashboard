@@ -93,9 +93,14 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                 </div>
             </TableCell>
 
+            {/* Biaya Ekspedisi */}
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                {formatCurrency(item.biayaEkspedisi)}
+            </TableCell>
+
             {/* Total Biaya */}
             <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                {item.totalBiaya}
+                {formatCurrency(item.totalBiaya)}
             </TableCell>
 
             {/* Total DPP */}

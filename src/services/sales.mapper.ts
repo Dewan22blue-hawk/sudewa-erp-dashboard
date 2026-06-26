@@ -19,6 +19,7 @@ export type SalesApiModel = {
   transaction_ppn_total?: string | number;
   transaction_bbn_total?: string | number;
   transaction_other_fee?: string | number;
+  expedition_fee_total?: string | number;
   person?: {
     id?: number | string;
     name?: string;
@@ -249,7 +250,7 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
     hargaSatuan: 0,
     qty: toNumber(item.max_capacity),
     biayaBbn: toNumber(item.transaction_bbn_total),
-    biayaEkspedisi: 0,
+    biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
     totalHpp: totalDpp,
     totalDpp,

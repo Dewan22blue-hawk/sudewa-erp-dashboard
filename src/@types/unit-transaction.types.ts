@@ -70,6 +70,7 @@ export interface UnitTransaction {
   transaction_ppn_total: number;
   transaction_bbn_total: number;
   transaction_other_fee: number;
+  expedition_fee_total: number;
   stock_state: string;
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;

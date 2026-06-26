@@ -288,6 +288,7 @@ export function SalesTable({ onAdd }: Props) {
               {renderSortHeader('kodeJual', 'KODE JUAL', 'left')}
               {renderSortHeader('tanggal', 'TANGGAL', 'center')}
               {renderSortHeader('customer', 'CUSTOMER', 'left')}
+              {renderSortHeader('biayaEkspedisi', 'BIAYA EKSPEDISI', 'center')}
               {renderSortHeader('biaya', 'TOTAL BIAYA', 'center')}
               {renderSortHeader('totalDPP', 'TOTAL DPP', 'center')}
               {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
@@ -300,19 +301,19 @@ export function SalesTable({ onAdd }: Props) {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>
               </TableRow>
