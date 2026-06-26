@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Asset } from '@/@types/asset.types';
-import { format } from 'date-fns';
+import { formatDateUI } from '@/lib/utils/date';
 
 interface AssetTableProps {
     assets: Asset[];
@@ -184,10 +184,10 @@ export function AssetTable({
                             <TableRow>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">NO</TableHead>
                                 <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">KODE ASET</TableHead>
-                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">TGL BELI</TableHead>
-                                <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">NAMA BARANG</TableHead>
                                 <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">TIPE ASET</TableHead>
                                 <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">SERIAL NUMBER</TableHead>
+                                <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">NAMA BARANG</TableHead>
+                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap">TGL BELI</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">ACTION</TableHead>
                             </TableRow>
@@ -202,17 +202,17 @@ export function AssetTable({
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">
                                             {item.code || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
-                                            {item.purchase_date ? format(new Date(item.purchase_date), 'dd/MM/yyyy') : '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                                            {item.name || '-'}
-                                        </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                                             {formatAssetType(item.type)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">
                                             {item.serial_number || '-'}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                                            {item.name || '-'}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">
+                                            {formatDateUI(item.purchase_date)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">
                                             {formatCurrency(item.price)}
