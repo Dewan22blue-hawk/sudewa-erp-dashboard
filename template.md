@@ -492,6 +492,20 @@ const handlePrint = useReactToPrint({
 
 ---
 
+## 14. Standar Search Data
+
+- Semua fitur search pada tabel wajib menggunakan placeholder yang jelas sesuai konteks data yang dapat dicari.
+- Search harus mencari data berdasarkan field yang relevan dengan kebutuhan user, bukan hanya berdasarkan satu field default.
+- Jika halaman memiliki kebutuhan search spesifik, seperti pencarian berdasarkan No. Rangka atau No. Mesin, maka logic search wajib mendukung field tersebut.
+- Search tidak boleh hanya menggunakan field yang tidak sesuai dengan kebutuhan user, misalnya hanya mencari berdasarkan Warehouse ketika user membutuhkan pencarian berdasarkan Detail Unit.
+- Search wajib tetap kompatibel dengan pagination, show table row / per page, filter, sorting, dan refresh data.
+- Ketika keyword search dikosongkan, tabel wajib kembali menampilkan data default.
+- Jika data tidak ditemukan, tampilkan empty state yang jelas dan mudah dipahami user.
+- Jika terjadi error saat search, tampilkan pesan error yang ramah dan tidak teknis.
+- Gunakan komponen search yang konsisten sesuai Pattern UI Style aplikasi.
+
+---
+
 ## Ringkasan Kelas Kunci
 
 | Elemen | Kelas |

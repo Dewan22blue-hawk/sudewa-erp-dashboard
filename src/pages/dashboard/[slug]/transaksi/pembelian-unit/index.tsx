@@ -23,6 +23,7 @@ export default function PurchasePage() {
   const [perPage, setPerPage] = useState(25);
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
+  const [search, setSearch] = useState('');
 
   // Reset subtab when maintab changes
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function PurchasePage() {
   }, [mainTab]);
 
   const activeStatus = subTab === 'all' ? undefined : subTab;
-  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, status: activeStatus });
+  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, status: activeStatus, search });
   const deleteMutation = useDeletePurchase();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -113,6 +114,8 @@ export default function PurchasePage() {
               subTabs={(SUBTABS as any)[mainTab]}
               activeSubTab={subTab}
               onSubTabChange={(id) => { setSubTab(id); setPage(1); }}
+              search={search}
+              onSearchChange={(val) => { setSearch(val); setPage(1); }}
             />
           </div>
         )}
