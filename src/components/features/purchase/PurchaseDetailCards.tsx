@@ -1,8 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
-import { Calendar, User, FileText, DollarSign, CreditCard } from 'lucide-react';
+import { Calendar, User, FileText, DollarSign, ListChecks } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
+import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
 
 interface Props {
   data: UnitTransactionDetail;
@@ -10,14 +10,19 @@ interface Props {
 }
 
 export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
-  const totalBruto = Number(data.unit_transaction_bruto_total ?? data.unit_transaction_item_bruto_total ?? 0);
-  const totalHpp = Number(data.unit_transaction_item_total_hpp ?? 0);
   const totalDpp = Number(data.unit_transaction_item_total_dpp ?? 0);
   const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
+  const totalHpp = totalDpp + totalPpn;
 
-  const debetBankUsd = billingHistories.reduce((sum, item) => sum + getHistoryUsdAmount(item), 0);
-  const debetBankIdr = billingHistories.reduce((sum, item) => sum + getHistoryBcaIdrAmount(item), 0);
-  const debetCashIdr = billingHistories.reduce((sum, item) => sum + getHistoryCashIdrAmount(item), 0);
+  const biayaBbn = Number(data.transaction_bbn_total ?? 0);
+  const biayaEkspedisi = Number(data.expedition_fee_total ?? 0);
+  const biayaLainnya = Number(data.transaction_other_fee ?? 0);
+  const totalBiaya = biayaBbn + biayaEkspedisi + biayaLainnya;
+
+  const totalPembelian = totalHpp + totalBiaya;
+
+  const historyPaid = billingHistories.reduce((sum, item) => sum + getHistoryTotalIdrEquivalent(item), 0);
+  const kurangBayar = Math.max(0, totalPembelian - historyPaid);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -54,21 +59,17 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
         </CardContent>
       </Card>
 
-      {/* Card 2: Jumlah Pembelian */}
+      {/* Card 2: Detail Pembelian */}
       <Card className="rounded-lg border border-slate-200 shadow-sm h-full">
         <CardContent className="p-5 flex flex-col h-full gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-md bg-emerald-50">
               <DollarSign className="h-5 w-5 text-emerald-500" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-700">Jumlah Pembelian</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Detail Pembelian</h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-500">
-            <div className="flex items-center justify-between">
-              <span>Total HPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalHpp)}</span>
-            </div>
             <div className="flex items-center justify-between">
               <span>Total DPP</span>
               <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
@@ -77,36 +78,51 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
               <span>Total PPN</span>
               <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalPpn)}</span>
             </div>
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-900">
-              <span>Total Pembelian</span>
-              <span>{formatCurrency(totalBruto)}</span>
+            <div className="border-t border-slate-100 my-1"></div>
+            <div className="flex items-center justify-between text-slate-900">
+              <span className="font-bold text-sm">Total HPP</span>
+              <span className="text-sm font-bold">{formatCurrency(totalHpp)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Total Biaya</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalBiaya)}</span>
+            </div>
+            <div className="border-t border-slate-100 my-1"></div>
+            <div className="flex items-center justify-between text-slate-900">
+              <span className="font-bold uppercase text-sm">TOTAL PEMBELIAN</span>
+              <span className="text-sm font-bold">{formatCurrency(totalPembelian)}</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Card 3: Riwayat Pembayaran */}
+      {/* Card 3: Rincian Nilai */}
       <Card className="rounded-lg border border-slate-200 shadow-sm h-full">
         <CardContent className="p-5 flex flex-col h-full gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-md bg-purple-50">
-              <CreditCard className="h-5 w-5 text-purple-500" />
+            <div className="p-2 rounded-md bg-red-50">
+              <ListChecks className="h-5 w-5 text-red-500" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-700">Riwayat Pembayaran</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Rincian Nilai</h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
-              <span>Debet Bank USD</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankUsd, 'USD')}</span>
+              <span>DPP</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>Debet Bank IDR</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankIdr)}</span>
+              <span>PPN</span>
+              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalPpn)}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Debet Cash IDR</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetCashIdr)}</span>
+            <div className="border-t border-slate-100 my-1"></div>
+            <div className="flex items-center justify-between text-slate-900">
+              <span className="font-bold uppercase text-sm">TOTAL PEMBELIAN</span>
+              <span className="text-sm font-bold">{formatCurrency(totalPembelian)}</span>
+            </div>
+            <div className="flex items-center justify-between text-red-600">
+              <span className="font-bold uppercase text-sm">KURANG BAYAR</span>
+              <span className="text-sm font-bold">{formatCurrency(kurangBayar)}</span>
             </div>
           </div>
         </CardContent>

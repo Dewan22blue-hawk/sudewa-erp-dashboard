@@ -106,6 +106,9 @@ export interface UnitTransactionDetail {
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;
+  transaction_bbn_total: number;
+  transaction_other_fee: number;
+  expedition_fee_total: number;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];

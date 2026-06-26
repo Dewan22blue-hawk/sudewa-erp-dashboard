@@ -518,6 +518,51 @@ const handlePrint = useReactToPrint({
 
 ---
 
+## 16. Standar Card Pembelian dan Penjualan Unit
+
+### Card Detail Transaksi (Pembelian / Penjualan)
+
+Card Detail Transaksi digunakan untuk menampilkan ringkasan nilai transaksi unit berdasarkan total DPP, total PPN, total HPP, total biaya, dan total transaksi (pembelian/penjualan).
+
+Urutan data wajib:
+1. Total DPP
+2. Total PPN
+3. Total HPP
+4. Total Biaya
+5. TOTAL PEMBELIAN / TOTAL PENJUALAN
+
+Ketentuan:
+- Total HPP ditampilkan dengan font lebih tebal.
+- TOTAL PEMBELIAN / TOTAL PENJUALAN ditampilkan menggunakan huruf kapital dan nominal tebal.
+- Gunakan divider untuk memisahkan bagian perhitungan utama.
+- Seluruh nominal wajib menggunakan format Rupiah.
+- Data tidak boleh hardcode dan harus berasal dari endpoint API real.
+- Jika field total belum tersedia dari API, frontend boleh melakukan kalkulasi berdasarkan data detail transaksi.
+
+### Card Rincian Nilai
+
+Card Rincian Nilai digunakan untuk menampilkan rincian nilai DPP, PPN, total transaksi, dan kurang bayar.
+
+Urutan data wajib:
+1. DPP
+2. PPN
+3. TOTAL PEMBELIAN / TOTAL PENJUALAN
+4. KURANG BAYAR
+
+Ketentuan:
+- TOTAL PEMBELIAN / TOTAL PENJUALAN ditampilkan menggunakan huruf kapital dan nominal tebal.
+- KURANG BAYAR wajib menggunakan warna merah dan nominal tebal.
+- Seluruh nominal wajib menggunakan format Rupiah.
+- Data tidak boleh hardcode dan harus berasal dari endpoint API real.
+- Jika field total belum tersedia dari API, frontend boleh melakukan kalkulasi berdasarkan data detail transaksi.
+
+### Ketentuan Styling Card
+
+- Font, ukuran teks, ketebalan teks, warna, spacing, padding, border radius, icon, divider, dan layout card wajib mengikuti Pattern UI Style pada `template.md`.
+- Card harus konsisten dengan card transaksi lain pada sistem.
+
+---
+
 ## Ringkasan Kelas Kunci
 
 | Elemen | Kelas |

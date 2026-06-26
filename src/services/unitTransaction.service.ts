@@ -426,6 +426,9 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
     unit_transaction_item_total_dpp: itemDpp || toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
     unit_transaction_item_total_ppn: itemPpn || toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
     unit_transaction_item_bruto_total: itemBruto,
+    transaction_bbn_total: toNumber(item.transaction_bbn_total),
+    transaction_other_fee: toNumber(item.transaction_other_fee),
+    expedition_fee_total: toNumber(item.expedition_fee_total),
     billing_summary: item.billing_summary
       ? {
           grand_total: toNumber(item.billing_summary.grand_total),
