@@ -490,26 +490,85 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               )}
             />
           </div>
+        </div>
 
-          <div className="flex justify-end gap-3 pt-8">
-            <Button type="button" variant="ghost" onClick={onCancel} disabled={loading} className="text-muted-foreground hover:text-foreground">
-              Batal
-            </Button>
-            {!readOnly && (
-              <Button type="submit" disabled={loading} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
-                {loading ? (
-                  'Menyimpan...'
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Simpan
-                  </>
-                )}
-              </Button>
-            )}
+        {/* Sub Form Harga */}
+        <div className="rounded-xl border border-slate-200 p-5 space-y-4">
+          <div className="border-b border-slate-100 pb-3">
+            <h3 className="font-semibold text-slate-500">Harga</h3>
           </div>
-        </form>
-      </Form>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormItem>
+              <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+          </div>
+        </div>
+
+        {/* Sub Form Total Harga */}
+        <div className="rounded-xl border border-slate-200 p-5 space-y-4">
+          <div className="border-b border-slate-100 pb-3">
+            <h3 className="font-semibold text-slate-500">Total Harga</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormItem>
+              <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+          </div>
+        </div>
+
+        <div className="flex justify-center gap-3 pt-8">
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={loading} className="text-muted-foreground hover:text-foreground">
+            Batal
+          </Button>
+          {!readOnly && (
+            <Button type="submit" disabled={loading} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
+              {loading ? (
+                'Menyimpan...'
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Simpan
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </form>
+    </Form >
 
       <Dialog open={openTypeModal} onOpenChange={setOpenTypeModal}>
         <DialogContent className="sm:max-w-[480px]">
