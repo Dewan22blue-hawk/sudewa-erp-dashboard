@@ -588,3 +588,51 @@ Ketentuan:
 | Tambah button | `bg-[#1e3a5f] hover:bg-[#152e4d]` |
 | Container Cetak A4 | `print-letter-page` |
 | Background Kop Surat | `print-letterhead` |
+
+---
+
+## Standar Form Pembelian Unit
+
+Form Pembelian Unit digunakan untuk menginput data transaksi pembelian unit, termasuk biaya, harga satuan, dan total harga.
+
+### Sub Form Biaya
+
+Urutan field wajib:
+1. Biaya BBN
+2. Biaya Ekspedisi
+3. Biaya Lain
+
+Ketentuan:
+- Field biaya ditampilkan dalam satu baris dengan layout tiga kolom jika ruang layar mencukupi.
+- Semua field biaya wajib menggunakan format currency / Rupiah.
+- Field biaya harus berada di bawah bagian input QTY dan Harga sesuai struktur form transaksi.
+- Mapping data tidak boleh tertukar antara Biaya BBN, Biaya Ekspedisi, dan Biaya Lain.
+
+### Sub Form Harga
+
+Urutan field wajib:
+1. HPP Satuan
+2. DPP Satuan
+3. PPN Satuan
+
+Ketentuan:
+- Semua field harga satuan wajib menggunakan format currency / Rupiah.
+- Field harga satuan harus tetap mengikuti mapping data transaksi pembelian unit.
+- Jika nilai dihitung otomatis, pastikan hasil kalkulasi tetap tampil rapi.
+
+### Sub Form Total Harga
+
+Urutan field wajib:
+1. HPP Total
+2. DPP Total
+3. PPN Total
+
+Ketentuan:
+- Semua field total harga wajib menggunakan format currency / Rupiah.
+- Nilai total tidak boleh menampilkan NaN, undefined, atau format kosong yang tidak rapi.
+- Jika data belum tersedia, gunakan fallback sesuai standar project.
+
+### Ketentuan Styling Form
+
+- Font, ukuran teks, ketebalan teks, warna, spacing, padding, border radius, input, label, divider, dan layout wajib mengikuti Pattern UI Style pada `template.md`.
+- Struktur Form Pembelian Unit ini dapat dijadikan acuan untuk implementasi Form Penjualan Unit agar tampilan antar fitur transaksi tetap konsisten.
