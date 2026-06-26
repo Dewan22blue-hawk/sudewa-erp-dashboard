@@ -22,7 +22,7 @@ interface Props {
  */
 export function SalesTable({ onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
@@ -244,10 +244,9 @@ export function SalesTable({ onAdd }: Props) {
             <span className="text-sm font-medium text-slate-700">Show</span>
             <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
               <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
-                <SelectValue placeholder="10" />
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>

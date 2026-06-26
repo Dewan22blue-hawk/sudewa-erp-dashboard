@@ -35,7 +35,7 @@ export default function BuktiPotongPage() {
   const [searchInput, setSearchInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
   const [orderBy, setOrderBy] = useState('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
   const [sourceFilter, setSourceFilter] = useState<'internal' | 'client_supplier'>('internal');
@@ -151,8 +151,6 @@ export default function BuktiPotongPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>

@@ -28,17 +28,17 @@ const reportMeta = {
 export default function LaporanStockPage() {
     const [activeTab, setActiveTab] = useState('stock');
     const [currentActions, setCurrentActions] = useState<{ print: () => void; download: () => void } | null>(null);
-    const [stockPerPage, setStockPerPage] = useState(50);
+    const [stockPerPage, setStockPerPage] = useState(25);
 
-    const [stockDetailPerPage, setStockDetailPerPage] = useState(50);
+    const [stockDetailPerPage, setStockDetailPerPage] = useState(25);
     const [machineNumber, setMachineNumber] = useState('');
     const [appliedMachineNumber, setAppliedMachineNumber] = useState('');
 
-    const [poPerPage, setPoPerPage] = useState(50);
+    const [poPerPage, setPoPerPage] = useState(25);
     const [poDateRange, setPoDateRange] = useState<DateRange | undefined>();
     const [appliedPoDateRange, setAppliedPoDateRange] = useState<DateRange | undefined>();
 
-    const [soPerPage, setSoPerPage] = useState(50);
+    const [soPerPage, setSoPerPage] = useState(25);
     const [soDateRange, setSoDateRange] = useState<DateRange | undefined>();
     const [appliedSoDateRange, setAppliedSoDateRange] = useState<DateRange | undefined>();
 
@@ -85,7 +85,7 @@ export default function LaporanStockPage() {
                             <span>Show</span>
                             <Select value={String(stockDetailPerPage)} onValueChange={(value) => setStockDetailPerPage(Number(value))}>
                                 <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-                                    <SelectValue placeholder="50" />
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem className="cursor-pointer" value="25">25</SelectItem>
@@ -110,7 +110,7 @@ export default function LaporanStockPage() {
                             <span>Show</span>
                             <Select value={String(poPerPage)} onValueChange={(value) => setPoPerPage(Number(value))}>
                                 <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-                                    <SelectValue placeholder="50" />
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem className="cursor-pointer" value="25">25</SelectItem>
@@ -135,7 +135,7 @@ export default function LaporanStockPage() {
                             <span>Show</span>
                             <Select value={String(soPerPage)} onValueChange={(value) => setSoPerPage(Number(value))}>
                                 <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-                                    <SelectValue placeholder="50" />
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem className="cursor-pointer" value="25">25</SelectItem>
@@ -153,7 +153,7 @@ export default function LaporanStockPage() {
                         <span>Show</span>
                         <Select value={String(stockPerPage)} onValueChange={(value) => setStockPerPage(Number(value))}>
                             <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-                                <SelectValue placeholder="50" />
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem className="cursor-pointer" value="25">25</SelectItem>

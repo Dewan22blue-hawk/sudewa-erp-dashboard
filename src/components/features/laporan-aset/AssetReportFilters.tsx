@@ -47,10 +47,9 @@ export default function AssetReportFilters({
           <label className="text-[13px] font-bold text-gray-900">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
             <SelectTrigger className="w-full md:w-[80px] h-10 rounded-xl border-gray-200 bg-white">
-              <SelectValue placeholder="50" />
+              <SelectValue placeholder="25" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10</SelectItem>
               <SelectItem value="25">25</SelectItem>
               <SelectItem value="50">50</SelectItem>
               <SelectItem value="100">100</SelectItem>

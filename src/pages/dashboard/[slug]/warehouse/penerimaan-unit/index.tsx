@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState('10');
+  const [itemsPerPage, setItemsPerPage] = useState('25');
   const [currentPage, setCurrentPage] = useState(1);
   const [openForm, setOpenForm] = useState(false);
   const perPage = Number(itemsPerPage);
@@ -103,10 +103,9 @@ export default function PenerimaanUnitPage() {
                   }}
                 >
                   <SelectTrigger className="w-[70px] bg-white">
-                    <SelectValue placeholder="10" />
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>

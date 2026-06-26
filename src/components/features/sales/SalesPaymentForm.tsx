@@ -406,7 +406,7 @@ export function SalesPaymentForm({
                                         const methods = getPaymentMethods(item);
                                         return (
                                             <TableRow key={item.id}>
-                                                <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
+                                                <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMMM yyyy', { locale: idLocale }) : '-'}</TableCell>
                                                 <TableCell>{formatCurrency(usdAmount, 'USD')}</TableCell>
                                                 <TableCell>{formatCurrency(getHistoryBcaIdrAmount(item))}</TableCell>
                                                 <TableCell>{formatCurrency(getHistoryCashIdrAmount(item))}</TableCell>

@@ -15,7 +15,7 @@ export default function OrderListDetailPage() {
   const detailQuery = useOrderListDetail(id);
   const orderListLookupQuery = useOrderLists({
     page: 1,
-    perPage: 10,
+    perPage: 25,
     search: detailQuery.data?.code ?? '',
     order_by: 'created_at',
     order_sort: 'desc',

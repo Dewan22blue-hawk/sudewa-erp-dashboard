@@ -83,7 +83,7 @@ export default function GoodsReceiptListPage() {
   const { companyId } = useCompany();
   const companyIdValue = Number(companyId ?? '3') || 3;
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const listQuery = useGoodsReceipts({ page, perPage, supplier_name: search, companyId: companyIdValue });
   const suppliersQuery = useSuppliers(String(companyIdValue));

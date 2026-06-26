@@ -40,7 +40,7 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
   const [error, setError] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPerPage, setCurrentPerPage] = useState(50);
+  const [currentPerPage, setCurrentPerPage] = useState(25);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);

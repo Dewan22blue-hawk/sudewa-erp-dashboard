@@ -255,6 +255,13 @@ import { Button } from '@/components/ui/button';
 
 **Aturan**: Pagination berada di bawah tabel, dalam wrapper `space-y-4` yang sama. Layout flex column → row di breakpoint `lg`.
 
+**Standar Show Table Row / Per Page**:
+- Semua tabel wajib menggunakan opsi show per page: 25, 50, dan 100.
+- Default show per page adalah 25.
+- Tidak boleh menggunakan opsi lain di luar 25, 50, dan 100.
+- Perubahan show per page harus melakukan fetch ulang data tabel.
+- Pagination wajib tetap konsisten setelah perubahan show per page.
+
 ```tsx
 <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
   <p>Showing {start}-{end} of {total} data</p>
@@ -332,9 +339,17 @@ import { Button } from '@/components/ui/button';
 
 ---
 
-## 11. Format Tanggal (Bug Fix)
+## 11. Format Tanggal
 
-- Gunakan format `"dd MMM yyyy"` (contoh: `19 Jun 2025`), **BUKAN** `"PPP"` atau `"LLL dd, y"`.
+**Standar Format Tanggal**:
+- Semua tampilan tanggal pada UI wajib menggunakan format: `DD Nama Bulan YYYY`.
+- Contoh format tanggal: `03 Juli 2026`.
+- Nama bulan wajib menggunakan Bahasa Indonesia.
+- Format untuk payload API boleh mengikuti kebutuhan backend, misalnya `YYYY-MM-DD`.
+- Format mentah dari API tidak boleh langsung ditampilkan ke user.
+- Gunakan helper / utility date formatter (`formatDateUI` dari `src/lib/utils/date.ts`) agar format tanggal konsisten di seluruh aplikasi.
+
+**Bug Fix Notes**:
 - `DatePickerWithRange` mendukung prop `placeholder` opsional. Default: `"Pilih rentang tanggal"`.
 - `DatePicker` default placeholder: `"Pilih tanggal"`.
 - **Jangan** gunakan placeholder bahasa Inggris: `"Pick a date"`, `"Select date"`, `"Pick a date range"`.

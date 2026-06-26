@@ -137,7 +137,7 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
     setVehicleTypeValue(value as VehicleType);
   };
   const dealersQuery = useDealers(null, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' }, { enabled: true });
-  const regionsQuery = useRegions({ page: 1, perPage: 10, search: regionSearch, sort_order: 'asc' });
+  const regionsQuery = useRegions({ page: 1, perPage: 25, search: regionSearch, sort_order: 'asc' });
   const vendorLookup = useVendorLookup(vendorSearch);
   const { control, register, handleSubmit } = useForm<FormValues>({
     defaultValues: {

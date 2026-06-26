@@ -12,7 +12,7 @@ export default function VehicleEquipmentPage() {
     // Table state
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(10); // Standard default show 10 entries as in mockup
+    const [perPage, setPerPage] = useState(25); // Standard default show 10 entries as in mockup
 
     // React query operations
     const { data: listData, isLoading, isError } = useVehicleEquipments({ page, perPage, search });

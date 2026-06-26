@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { format } from "date-fns"
+import { formatDateUI } from '@/lib/utils/date';
 
 interface Props {
     data: {
@@ -56,7 +57,7 @@ export default function SOOutstandingView({ data }: Props) {
                             <td className="py-2.5 px-4 text-gray-600 text-right">{item.totalType}</td>
                             <td className="py-2.5 px-4 text-gray-600 text-right">{item.totalQty}</td>
                             <td className="py-2.5 px-4 text-gray-600">
-                                {format(new Date(item.estimatedDelivery), "dd MMM yyyy")}
+                                {formatDateUI(new Date(item.estimatedDelivery))}
                             </td>
                         </tr>
                     ))}

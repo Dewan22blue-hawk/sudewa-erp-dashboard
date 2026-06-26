@@ -20,7 +20,7 @@ export default function PurchasePage() {
   const { companyId } = useCompany();
   const { slug } = router.query;
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
 

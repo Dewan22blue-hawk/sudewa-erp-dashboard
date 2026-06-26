@@ -107,7 +107,7 @@ export default function LPJumlahTerimaPage() {
     if (!value) return '-';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
-    return format(date, 'dd MMM yyyy', { locale: id });
+    return format(date, 'dd MMMM yyyy', { locale: id });
   };
 
   // Sorting handler
@@ -158,8 +158,6 @@ export default function LPJumlahTerimaPage() {
                   <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="5">5</SelectItem>
-                  <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
                   <SelectItem value="100">100</SelectItem>

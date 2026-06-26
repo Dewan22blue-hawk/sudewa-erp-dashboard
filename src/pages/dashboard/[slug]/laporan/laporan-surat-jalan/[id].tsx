@@ -19,7 +19,7 @@ export default function LaporanSuratJalanDetailPage() {
 
   // Search and page state (kept for layout consistency)
   const [searchTerm, setSearchTerm] = useState('');
-  const [perPage, setPerPage] = useState('10');
+  const [perPage, setPerPage] = useState('25');
 
   // Fetch detail data
   const { data: detailData, isLoading, isError, error } = useExpeditionReportDetail(id as string);

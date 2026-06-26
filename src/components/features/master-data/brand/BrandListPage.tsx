@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 
 export const BrandListPage = () => {
-    const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+    const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
     const { data, isLoading, isError, isFetching } = useBrands({ page, perPage, search });
     const createMutation = useCreateBrand();

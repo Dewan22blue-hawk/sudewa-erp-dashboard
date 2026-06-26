@@ -31,7 +31,7 @@ export default function LaporanInvoicePage() {
 
   // States
   const [page, setPage] = useState<number>(1);
-  const [perPage, setPerPage] = useState<number>(10);
+  const [perPage, setPerPage] = useState<number>(25);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('created_at');
@@ -63,7 +63,7 @@ export default function LaporanInvoicePage() {
     if (!value) return '-';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
-    return format(date, 'dd MMM yyyy', { locale: id });
+    return format(date, 'dd MMMM yyyy', { locale: id });
   };
 
   // Sorting handler
@@ -117,8 +117,6 @@ export default function LaporanInvoicePage() {
                     <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>

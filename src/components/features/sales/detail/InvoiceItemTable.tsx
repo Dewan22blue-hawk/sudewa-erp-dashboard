@@ -29,7 +29,7 @@ import { formatCurrency } from "@/lib/utils/currency"
 export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 10
+    const itemsPerPage = 25
 
     const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
         data: items,

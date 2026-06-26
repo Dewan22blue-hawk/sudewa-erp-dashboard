@@ -37,7 +37,7 @@ const formatDate = (value?: string) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return format(date, 'dd MMM yyyy', { locale: id });
+  return format(date, 'dd MMMM yyyy', { locale: id });
 };
 
 const getWarehouseName = (item: MaterialTransaction) => item.warehouse?.name ?? (item.warehouseId ? `Warehouse #${item.warehouseId}` : '-');
@@ -45,7 +45,7 @@ const getWarehouseName = (item: MaterialTransaction) => item.warehouse?.name ?? 
 export default function MaterialReleaseListPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const transactionsQuery = useMaterialTransactions({
     page,
@@ -185,11 +185,9 @@ export default function MaterialReleaseListPage() {
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
                   <SelectTrigger className="w-[70px] bg-white">
-                    <SelectValue placeholder="10" />
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>

@@ -19,7 +19,7 @@ const formatDate = (value?: string) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return format(date, 'dd MMM yyyy', { locale: id });
+  return format(date, 'dd MMMM yyyy', { locale: id });
 };
 
 const getCategoryLabel = (category: string) => {
