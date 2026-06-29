@@ -47,11 +47,13 @@ const normalizeFinanceBillingItem = (item: any): FinanceBillingItem => ({
 const normalizeFinanceBillingListItem = (item: any): FinanceBillingListItem => ({
   id: toNumber(item?.id),
   uuid: item?.uuid,
-  unit_transaction_billing_id: toNumber(item?.unit_transaction_billing_id),
+  unit_transaction_billing_id: item?.unit_transaction_billing_id ? toNumber(item?.unit_transaction_billing_id) : null,
   last_payment_at: item?.last_payment_at ?? '',
   is_valid: toBoolean(item?.is_valid),
   created_at: item?.created_at ?? '',
-  unit_transaction_billing: {
+  remaining_payment: toNumber(item?.remaining_payment),
+  remaining_payment_usd: toNumber(item?.remaining_payment_usd),
+  unit_transaction_billing: item?.unit_transaction_billing ? {
     id: toNumber(item?.unit_transaction_billing?.id),
     uuid: item?.unit_transaction_billing?.uuid,
     unit_transaction_id: toNumber(item?.unit_transaction_billing?.unit_transaction_id),
@@ -61,23 +63,26 @@ const normalizeFinanceBillingListItem = (item: any): FinanceBillingListItem => (
       id: toNumber(item?.unit_transaction_billing?.unit_transaction?.id),
       code: item?.unit_transaction_billing?.unit_transaction?.code ?? '-',
     },
-  },
+  } : null,
 });
 
 const normalizeFinanceBillingDetail = (item: any): FinanceBillingDetail => ({
   id: toNumber(item?.id),
   uuid: item?.uuid,
-  unit_transaction_billing_id: toNumber(item?.unit_transaction_billing_id),
+  unit_transaction_billing_id: item?.unit_transaction_billing_id ? toNumber(item?.unit_transaction_billing_id) : null,
   last_payment_at: item?.last_payment_at ?? '',
   is_valid: toBoolean(item?.is_valid),
   created_at: item?.created_at ?? '',
   total_cash_payment: toNumber(item?.total_cash_payment),
   total_bca_payment: toNumber(item?.total_bca_payment),
   total_usd_payment: toNumber(item?.total_usd_payment),
+  total_usd_payment_original: toNumber(item?.total_usd_payment_original),
   total_paid: toNumber(item?.total_paid),
   remaining_payment: toNumber(item?.remaining_payment),
+  remaining_payment_usd: toNumber(item?.remaining_payment_usd),
   total_payment_count: toNumber(item?.total_payment_count),
-  unit_transaction_billing: {
+  grand_total: toNumber(item?.grand_total),
+  unit_transaction_billing: item?.unit_transaction_billing ? {
     id: toNumber(item?.unit_transaction_billing?.id),
     uuid: item?.unit_transaction_billing?.uuid,
     unit_transaction_id: toNumber(item?.unit_transaction_billing?.unit_transaction_id),
@@ -105,7 +110,7 @@ const normalizeFinanceBillingDetail = (item: any): FinanceBillingDetail => ({
       created_at: history?.created_at ?? '',
       updated_at: history?.updated_at ?? '',
     })),
-  },
+  } : null,
   finance_billing_items: (item?.finance_billing_items ?? []).map(normalizeFinanceBillingItem),
 });
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { DoInvoice, DoInvoiceListResponse } from '@/@types/create-invoice.types';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -25,7 +26,7 @@ interface Props {
 const formatDate = (value: string | null | undefined) => {
   if (!value) return '-';
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : format(parsed, 'dd/MM/yyyy');
+  return Number.isNaN(parsed.getTime()) ? value : format(parsed, 'dd MMM yyyy');
 };
 
 const SkeletonRow = () => (
@@ -232,13 +233,17 @@ export default function FinanceInvoiceTable({
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-        <div>
-          Showing {startIndex}-{endIndex} of {total} data
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={!canGoPrevious}>
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+        <p>Showing {startIndex}-{endIndex} of {total} data</p>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            onClick={() => onPageChange(page - 1)}
+            disabled={!canGoPrevious}
+          >
             Previous
           </Button>
           {pageNumbers.map((pageNumber, index) =>
@@ -246,9 +251,14 @@ export default function FinanceInvoiceTable({
               <Button
                 key={`${pageNumber}-${index}`}
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className={pageNumber === page ? 'border-slate-300 bg-white shadow-sm' : 'border-transparent'}
+                className={cn(
+                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  pageNumber === page
+                    ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                    : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                )}
                 onClick={() => onPageChange(pageNumber)}
                 disabled={pageNumber === page}
               >
@@ -260,7 +270,14 @@ export default function FinanceInvoiceTable({
               </span>
             ),
           )}
-          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={!canGoNext}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            onClick={() => onPageChange(page + 1)}
+            disabled={!canGoNext}
+          >
             Next
           </Button>
         </div>

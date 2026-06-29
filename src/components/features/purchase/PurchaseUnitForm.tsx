@@ -43,6 +43,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const [openTypeModal, setOpenTypeModal] = useState(false);
   const [typeImage, setTypeImage] = useState<File | null>(null);
   const [openTypeSelect, setOpenTypeSelect] = useState(false);
+  const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.price_usd && Number(defaultValues.price_usd) > 0));
 
   const form = useForm<CreatePurchaseUnitFormValues>({
     resolver: zodResolver(createPurchaseUnitSchema),
@@ -272,138 +273,306 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               )}
             />
           </div>
-          {/* Sub Form Biaya */}
-          <div className="rounded-xl border border-slate-200 p-5 space-y-4">
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="font-semibold text-slate-500">Biaya</h3>
+
+          {/* USD Transaction Toggle */}
+          <div className="flex items-center space-x-2 py-1">
+            <input
+              type="checkbox"
+              id="is_usd"
+              checked={isUsd}
+              onChange={(e) => {
+                setIsUsd(e.target.checked);
+                if (!e.target.checked) {
+                  form.setValue('price_usd', 0);
+                  form.setValue('price_per_unit_usd', 0);
+                }
+              }}
+              disabled={readOnly}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+            />
+            <Label htmlFor="is_usd" className="text-sm font-medium cursor-pointer">
+              Transaksi USD (Gunakan mata uang asing USD)
+            </Label>
+          </div>
+
+          {/* USD Inputs */}
+          {isUsd && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+              <FormField
+                control={form.control}
+                name="price_usd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-amber-900">Total Harga (USD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const num = Number(val);
+                          if (Number.isNaN(num)) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          if (/^0+[1-9]/.test(val)) {
+                            const stripped = val.replace(/^0+/, '');
+                            e.target.value = stripped;
+                            field.onChange(Number(stripped));
+                          } else if (/^0+0/.test(val)) {
+                            const stripped = '0';
+                            e.target.value = stripped;
+                            field.onChange(0);
+                          } else {
+                            field.onChange(num);
+                          }
+                        }}
+                        disabled={readOnly}
+                        className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price_per_unit_usd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-amber-900">Harga Satuan (USD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const num = Number(val);
+                          if (Number.isNaN(num)) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          if (/^0+[1-9]/.test(val)) {
+                            const stripped = val.replace(/^0+/, '');
+                            e.target.value = stripped;
+                            field.onChange(Number(stripped));
+                          } else if (/^0+0/.test(val)) {
+                            const stripped = '0';
+                            e.target.value = stripped;
+                            field.onChange(0);
+                          } else {
+                            field.onChange(num);
+                          }
+                        }}
+                        disabled={readOnly}
+                        className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FormField
-                control={form.control}
-                name="biayaBBN"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
-                    <FormControl>
-                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          )}
 
-              <FormField
-                control={form.control}
-                name="biayaEkspedisi"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
-                    <FormControl>
-                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <div className="pt-2">
+            <h2 className="text-sm font-semibold text-foreground">Harga</h2>
+          </div>
 
-              <FormField
-                control={form.control}
-                name="biayaLain"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium flex flex-row justify-between">
-                      Biaya Lain
-                    </FormLabel>
-                    <FormControl>
-                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormItem>
+              <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
 
-            <div className="pt-2">
-              <h2 className="text-sm font-semibold text-foreground flex flex-row">
-                Biaya USD
-                <Tooltip>
-                  <TooltipTrigger>
-                    <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Grub Form dibawah hanya diperlukan untuk proses Print non-domestik</p>
-                  </TooltipContent>
-                </Tooltip>
-              </h2>
-            </div>
+            <FormItem>
+              <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FormField
-                control={form.control}
-                name="pricePerUnitUsd"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium flex flex-row justify-between">
-                      HPP Satuan (USD)
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Harga unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </FormLabel>
-                    <FormControl>
-                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormItem>
+              <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+          </div>
 
-              <FormField
-                control={form.control}
-                name="priceUsd"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium flex flex-row justify-between">
-                      HPP Total (USD)
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Total biaya unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </FormLabel>
-                    <FormControl>
-                      <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <div className="pt-2">
+            <h2 className="text-sm font-semibold text-foreground">Total Harga</h2>
+          </div>
 
-            <div className="flex justify-center gap-3 pt-8">
-              <Button type="button" variant="ghost" onClick={onCancel} disabled={loading} className="text-muted-foreground hover:text-foreground">
-                Batal
-              </Button>
-              {!readOnly && (
-                <Button type="submit" disabled={loading} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
-                  {loading ? (
-                    'Menyimpan...'
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Simpan
-                    </>
-                  )}
-                </Button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormItem>
+              <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+          </div>
+
+          <div className="pt-2">
+            <h2 className="text-sm font-semibold text-foreground">Biaya</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              control={form.control}
+              name="biayaBBN"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Biaya BBN</FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
+
+            <FormField
+              control={form.control}
+              name="biayaEkspedisi"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Biaya Ekspedisi</FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="biayaLain"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
+                    Biaya Lain
+                  </FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="pt-2">
+            <h2 className="text-sm font-semibold text-foreground flex flex-row">
+              Biaya USD
+              <Tooltip>
+                <TooltipTrigger>
+                  <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Grub Form dibawah hanya diperlukan untuk proses Print non-domestik</p>
+                </TooltipContent>
+              </Tooltip>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              control={form.control}
+              name="pricePerUnitUsd"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
+                    HPP Satuan (USD)
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Harga unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="priceUsd"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
+                    HPP Total (USD)
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Total biaya unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex justify-center gap-3 pt-8">
+            <Button type="button" variant="ghost" onClick={onCancel} disabled={loading} className="text-muted-foreground hover:text-foreground">
+              Batal
+            </Button>
+            {!readOnly && (
+              <Button type="submit" disabled={loading} className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-25">
+                {loading ? (
+                  'Menyimpan...'
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Simpan
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </form>
       </Form>
 

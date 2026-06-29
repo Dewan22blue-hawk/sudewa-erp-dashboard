@@ -33,9 +33,12 @@ export interface KasHarian {
   date: string;
   note: string;
   debet: number;
+  debet_original?: number;
   credit: number;
+  credit_original?: number;
   transaction_category?: string;
   payment_proof?: string | null;
+  is_paid?: boolean;
   created_at?: string;
   updated_at?: string;
   cash: KasHarianCash;
@@ -45,7 +48,8 @@ export interface KasHarian {
     id: number;
     uuid?: string;
     cash_flow_id?: number;
-    unit_transaction_billing_id?: number;
+    unit_transaction_billing_id?: number | null;
+    goods_transaction_billing_id?: number | null;
     last_payment_at?: string;
     grand_total?: number;
     is_valid?: boolean;
@@ -76,6 +80,7 @@ export interface CashFlowPayload {
   credit: number;
   transaction_category: string;
   payment_proof?: File | null;
+  is_paid?: boolean;
 }
 
 export interface CashFlowFilterParams {
@@ -123,4 +128,5 @@ export interface KasHarianListItem {
   cashFlowId?: number;
   financeBillingId?: number;
   transaction_category?: string;
+  is_paid?: boolean;
 }

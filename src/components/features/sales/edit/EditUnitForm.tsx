@@ -2,9 +2,10 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
 import { formatMoneyInput } from '@/lib/utils/money-input';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,8 @@ export function EditUnitForm({
   searchableTypeUnit = false,
   hideItemFields = false,
 }: EditUnitFormProps) {
+  const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.hargaUsd && Number(defaultValues.hargaUsd) > 0));
+
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
     defaultValues,
@@ -233,6 +236,120 @@ export function EditUnitForm({
                 )}
               />
             </div>
+
+            {/* USD Transaction Toggle */}
+            <div className="flex items-center space-x-2 py-1">
+              <input
+                type="checkbox"
+                id="sales_is_usd"
+                checked={isUsd}
+                onChange={(e) => {
+                  setIsUsd(e.target.checked);
+                  if (!e.target.checked) {
+                    form.setValue('hargaUsd', 0);
+                    form.setValue('hargaPerUnitUsd', 0);
+                  }
+                }}
+                disabled={readOnly}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <Label htmlFor="sales_is_usd" className="text-sm font-medium cursor-pointer">
+                Transaksi USD (Gunakan mata uang asing USD)
+              </Label>
+            </div>
+
+            {/* USD Inputs */}
+            {isUsd && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+                <FormField
+                  control={form.control}
+                  name="hargaUsd"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-amber-900">Total Harga (USD)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={field.value ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '') {
+                              field.onChange(undefined);
+                              return;
+                            }
+                            const num = Number(val);
+                            if (Number.isNaN(num)) {
+                              field.onChange(undefined);
+                              return;
+                            }
+                            if (/^0+[1-9]/.test(val)) {
+                              const stripped = val.replace(/^0+/, '');
+                              e.target.value = stripped;
+                              field.onChange(Number(stripped));
+                            } else if (/^0+0/.test(val)) {
+                              const stripped = '0';
+                              e.target.value = stripped;
+                              field.onChange(0);
+                            } else {
+                              field.onChange(num);
+                            }
+                          }}
+                          disabled={readOnly}
+                          className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="hargaPerUnitUsd"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-amber-900">Harga Satuan (USD)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={field.value ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '') {
+                              field.onChange(undefined);
+                              return;
+                            }
+                            const num = Number(val);
+                            if (Number.isNaN(num)) {
+                              field.onChange(undefined);
+                              return;
+                            }
+                            if (/^0+[1-9]/.test(val)) {
+                              const stripped = val.replace(/^0+/, '');
+                              e.target.value = stripped;
+                              field.onChange(Number(stripped));
+                            } else if (/^0+0/.test(val)) {
+                              const stripped = '0';
+                              e.target.value = stripped;
+                              field.onChange(0);
+                            } else {
+                              field.onChange(num);
+                            }
+                          }}
+                          disabled={readOnly}
+                          className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
             {/* ROW 2: Biaya BBN, Biaya Ekspedisi, Biaya Lain */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

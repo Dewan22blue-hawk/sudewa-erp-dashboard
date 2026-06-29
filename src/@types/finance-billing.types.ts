@@ -3,10 +3,12 @@ import type { LaravelPagination, PaginationMeta } from '@/@types/pagination.type
 export interface FinanceBillingListItem {
   id: number;
   uuid?: string;
-  unit_transaction_billing_id: number;
+  unit_transaction_billing_id: number | null;
   last_payment_at: string;
   is_valid: boolean;
   created_at?: string;
+  remaining_payment: number;
+  remaining_payment_usd: number;
   unit_transaction_billing: {
     id: number;
     uuid?: string;
@@ -17,7 +19,7 @@ export interface FinanceBillingListItem {
       id: number;
       code: string;
     };
-  };
+  } | null;
 }
 
 export interface FinanceBillingItem {
@@ -36,16 +38,19 @@ export interface FinanceBillingItem {
 export interface FinanceBillingDetail {
   id: number;
   uuid?: string;
-  unit_transaction_billing_id: number;
+  unit_transaction_billing_id: number | null;
   last_payment_at: string;
   is_valid: boolean;
   created_at?: string;
   total_cash_payment: number;
   total_bca_payment: number;
   total_usd_payment: number;
+  total_usd_payment_original?: number;
   total_paid: number;
   remaining_payment: number;
+  remaining_payment_usd?: number;
   total_payment_count: number;
+  grand_total?: number;
   unit_transaction_billing: {
     id: number;
     uuid?: string;
@@ -74,7 +79,7 @@ export interface FinanceBillingDetail {
       created_at?: string;
       updated_at?: string;
     }>;
-  };
+  } | null;
   finance_billing_items: FinanceBillingItem[];
 }
 

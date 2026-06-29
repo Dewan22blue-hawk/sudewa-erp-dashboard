@@ -88,6 +88,8 @@ export default function CreatePurchaseUnitPage() {
         bbn_price: bbn,
         expedition_fee: expedition,
         other_fee: other,
+        price_usd: data.price_usd ? Number(data.price_usd) : undefined,
+        price_per_unit_usd: data.price_per_unit_usd ? Number(data.price_per_unit_usd) : undefined,
       });
       toast.success('Unit berhasil ditambahkan');
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${id}`);

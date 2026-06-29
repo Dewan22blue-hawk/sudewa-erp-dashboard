@@ -252,7 +252,14 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                       </TableCell>
                       <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{item.qty_total}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                        <div>{formatCurrency(item.price)}</div>
+                        {item.price_usd ? (
+                          <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga USD">
+                            {formatCurrency(item.price_usd, 'USD')}
+                          </div>
+                        ) : null}
+                      </TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>

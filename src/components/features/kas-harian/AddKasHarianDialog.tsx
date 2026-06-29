@@ -35,6 +35,7 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
       credit: 0,
       transaction_category: 'general',
       payment_proof: null,
+      is_paid: false,
     },
   });
 
@@ -65,6 +66,7 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
         credit: 0,
         transaction_category: 'general',
         payment_proof: null,
+        is_paid: false,
       });
     }
   }, [form, open, selectedCompanyId]);
@@ -81,6 +83,7 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
         credit: data.credit,
         transaction_category: data.transaction_category,
         payment_proof: data.payment_proof,
+        is_paid: data.is_paid,
       });
 
       toast.success('Transaksi kas harian berhasil ditambahkan');
@@ -96,9 +99,9 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-[520px] overflow-hidden rounded-[28px] border-0 p-0 shadow-2xl">
         <div className="flex max-h-[92vh] flex-col rounded-[28px] border border-slate-200 bg-white">
-          <DialogHeader className="space-y-2 px-6 pt-6 text-left sm:px-8 sm:pt-8">
-            <DialogTitle className="text-[24px] font-semibold text-slate-950">Tambah Transaksi KAS</DialogTitle>
-            <p className="text-lg text-slate-500">Masukkan detail transaksi baru</p>
+          <DialogHeader className="space-y-1 px-6 pt-6 text-left sm:px-8 sm:pt-8">
+            <DialogTitle className="text-xl font-semibold text-slate-950">Tambah Transaksi KAS</DialogTitle>
+            <p className="text-sm text-muted-foreground">Masukkan detail transaksi baru</p>
           </DialogHeader>
 
           <div className="mt-6 flex-1 overflow-y-auto px-6 pb-6 sm:px-8">
@@ -115,12 +118,12 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
           </div>
 
           <div className="border-t border-slate-100 px-6 py-5 sm:px-8">
-            <div className="flex flex-col gap-4">
-              <Button type="submit" className="h-12 rounded-2xl bg-[#18385b] text-base hover:bg-[#102843]" form="add-kas-form" disabled={isPending}>
-                {isPending ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-              <Button type="button" variant="outline" className="h-12 rounded-2xl border-slate-200 text-base" onClick={() => onOpenChange(false)} disabled={isPending}>
+            <div className="flex items-center justify-end gap-3">
+              <Button type="button" variant="outline" className="border-slate-200" onClick={() => onOpenChange(false)} disabled={isPending}>
                 Batal
+              </Button>
+              <Button type="submit" className="bg-[#1e3a5f] hover:bg-[#152e4d]" form="add-kas-form" disabled={isPending}>
+                {isPending ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </div>
           </div>

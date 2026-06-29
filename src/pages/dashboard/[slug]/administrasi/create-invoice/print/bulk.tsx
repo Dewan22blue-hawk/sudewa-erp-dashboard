@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronLeft, Printer } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useQueries } from '@tanstack/react-query';
 import { useReactToPrint } from 'react-to-print';
@@ -108,13 +108,14 @@ export default function BulkCreateInvoicePrintPage() {
       <div className="space-y-6">
         <div className="no-print flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
           <div className="flex items-center gap-3">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice`)}
-              className="rounded-md p-1 transition-colors hover:bg-slate-100"
+              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
             >
-              <ChevronLeft className="h-5 w-5 text-slate-500" />
-            </button>
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
             <div>
               <h1 className="text-2xl font-semibold text-slate-900">Cetak Massal Invoice</h1>
               <p className="text-sm text-slate-500">Total terpilih: {invoices.length} dokumen</p>

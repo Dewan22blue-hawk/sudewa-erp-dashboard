@@ -142,6 +142,11 @@ export default function EditNestedUnitPage() {
         unit?.expedition_fee ?? 0
       );
       const currentOther = Number(unit?.other_fee ?? 0);
+      const currentPriceUsd = Number(unit?.price_usd ?? 0);
+      const currentPricePerUnitUsd = Number(unit?.price_per_unit_usd ?? 0);
+
+      const priceUsd = Number(data.price_usd ?? 0);
+      const pricePerUnitUsd = Number(data.price_per_unit_usd ?? 0);
 
       const isSame = (a: number, b: number) =>
         Math.abs(a - b) < 0.000001;
@@ -205,6 +210,14 @@ export default function EditNestedUnitPage() {
 
       if (!isSame(other, currentOther)) {
         payload.other_fee = other;
+      }
+
+      if (!isSame(priceUsd, currentPriceUsd)) {
+        payload.price_usd = priceUsd;
+      }
+
+      if (!isSame(pricePerUnitUsd, currentPricePerUnitUsd)) {
+        payload.price_per_unit_usd = pricePerUnitUsd;
       }
 
       // ======================
@@ -305,6 +318,8 @@ export default function EditNestedUnitPage() {
                 biayaBBN: unit.bbn_price,
                 biayaEkspedisi: unit.expedition_fee,
                 biayaLain: unit.other_fee,
+                price_usd: unit.price_usd,
+                price_per_unit_usd: unit.price_per_unit_usd,
               }}
               onSubmit={handleSubmit}
               onCancel={() => router.back()}
