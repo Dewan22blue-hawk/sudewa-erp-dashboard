@@ -35,9 +35,12 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
   date: payload.date ?? '',
   note: payload.note ?? '',
   debet: toNumber(payload.debet),
+  debet_original: toNumber(payload.debet_original),
   credit: toNumber(payload.credit),
+  credit_original: toNumber(payload.credit_original),
   transaction_category: payload.transaction_category ?? '',
   payment_proof: payload.payment_proof ?? null,
+  is_paid: toBoolean(payload.is_paid),
   created_at: payload.created_at ?? '',
   updated_at: payload.updated_at ?? '',
   cash: {
@@ -66,7 +69,8 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
         id: toNumber(payload.finance_billing.id),
         uuid: payload.finance_billing.uuid,
         cash_flow_id: toNumber(payload.finance_billing.cash_flow_id),
-        unit_transaction_billing_id: toNumber(payload.finance_billing.unit_transaction_billing_id),
+        unit_transaction_billing_id: payload.finance_billing.unit_transaction_billing_id ? toNumber(payload.finance_billing.unit_transaction_billing_id) : null,
+        goods_transaction_billing_id: payload.finance_billing.goods_transaction_billing_id ? toNumber(payload.finance_billing.goods_transaction_billing_id) : null,
         last_payment_at: payload.finance_billing.last_payment_at ?? '',
         grand_total: toNumber(payload.finance_billing.grand_total),
         is_valid: toBoolean(payload.finance_billing.is_valid),
@@ -110,6 +114,9 @@ const buildCashFlowFormData = (payload: CashFlowPayload) => {
   }
   if (payload.payment_proof) {
     formData.append('payment_proof', payload.payment_proof);
+  }
+  if (payload.is_paid !== undefined) {
+    formData.append('is_paid', payload.is_paid ? '1' : '0');
   }
   return formData;
 };
@@ -158,4 +165,28 @@ export async function updateCashFlow(id: number | string, payload: CashFlowPaylo
 
 export async function deleteCashFlow(id: number | string) {
   await apiClient.delete(`${BASE_PATH}/${id}`);
+}
+
+export async function toggleCashFlowPaymentStatus(id: number | string, isPaid: boolean) {
+  // Fetch item first to guarantee that no validation error occurs
+  const currentItem = await fetchCashFlowDetail(id);
+  const formData = new FormData();
+  formData.append('_method', 'PUT');
+  formData.append('company_id', String(currentItem.company_id));
+  formData.append('cash_id', String(currentItem.cash_id));
+  formData.append('account_id', String(currentItem.account_id ?? ''));
+  formData.append('date', currentItem.date.slice(0, 10));
+  formData.append('note', currentItem.note);
+  formData.append('transaction_category', currentItem.transaction_category ?? 'general');
+  if (currentItem.debet > 0) {
+    formData.append('debet', String(currentItem.debet));
+  }
+  if (currentItem.credit > 0) {
+    formData.append('credit', String(currentItem.credit));
+  }
+  formData.append('is_paid', isPaid ? '1' : '0');
+
+  const response = await apiClient.post<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
+  const item = ensureSuccess(toSuccessPayload(response.data));
+  return normalizeCashFlow(item);
 }

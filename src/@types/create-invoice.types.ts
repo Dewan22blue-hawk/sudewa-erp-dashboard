@@ -176,6 +176,8 @@ export interface CreateInvoiceProcessValues {
   customerName: string;
   description: string;
   attachmentFile: File | null;
+  isUsd?: boolean;
+  rateUsd?: number;
 }
 
 export interface InvoiceProcessDraft {
@@ -190,6 +192,8 @@ export interface InvoiceProcessDraft {
   customerName: string;
   description: string;
   savedAt: string;
+  isUsd?: boolean;
+  rateUsd?: number;
 }
 
 export interface CreateInvoicePrintPayload {

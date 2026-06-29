@@ -27,6 +27,7 @@ export const kasHarianSchema = z
     credit: z.number().min(0, 'Kredit tidak valid'),
     transaction_category: z.string({ required_error: 'Kategori transaksi wajib dipilih' }).min(1, 'Kategori transaksi wajib dipilih'),
     payment_proof: fileField,
+    is_paid: z.boolean().optional(),
   })
   .superRefine((value, ctx) => {
     const hasDebet = value.debet > 0;

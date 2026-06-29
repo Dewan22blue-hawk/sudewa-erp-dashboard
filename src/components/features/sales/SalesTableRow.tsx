@@ -126,20 +126,20 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                             <MoreVertical className="h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={handleEdit}>
+                    <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleEdit}>
                             Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDetail}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleDetail}>
                             Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
                             {item.isRefunded ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')}>
                             Print
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-red-600">
+                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>

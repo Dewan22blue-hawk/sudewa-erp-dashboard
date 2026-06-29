@@ -246,10 +246,22 @@ export default function UnitPurchaseDetailPage() {
                 <span className="font-medium text-slate-700">Total Pembelian</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(totalPembelian)}</span>
               </div> */}
-                            <div className="flex items-center justify-between text-sm text-slate-600">
+              <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>Total HPP</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(totalHpp)}</span>
               </div>
+              {unitItem?.price_usd ? (
+                <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100 mt-2">
+                  <span className="font-medium">Total Harga (USD)</span>
+                  <span className="font-bold">{formatCurrency(Number(unitItem.price_usd), 'USD')}</span>
+                </div>
+              ) : null}
+              {unitItem?.price_per_unit_usd ? (
+                <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100">
+                  <span className="font-medium">Harga Satuan (USD)</span>
+                  <span className="font-bold">{formatCurrency(Number(unitItem.price_per_unit_usd), 'USD')}</span>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
 

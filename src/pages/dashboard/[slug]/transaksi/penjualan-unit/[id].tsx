@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Wallet } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Wallet } from 'lucide-react';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
 import { useEffect } from 'react';
@@ -116,25 +116,35 @@ export default function SalesDetailPage() {
 
         {/* Header Section */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Data Penjualan</h1>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <span>Kode Jual:</span>
-              <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
-              {isPaid ? (
-                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
-                  Lunas
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
-                  Belum Lunas
-                </Badge>
-              )}
-              {isRefunded ? (
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
-                  Sudah Refund
-                </Badge>
-              ) : null}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}
+              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+            >
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Data Penjualan</h1>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Kode Jual:</span>
+                <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
+                {isPaid ? (
+                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                    Lunas
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                    Belum Lunas
+                  </Badge>
+                )}
+                {isRefunded ? (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                    Sudah Refund
+                  </Badge>
+                ) : null}
+              </div>
             </div>
           </div>
 

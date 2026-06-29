@@ -13,7 +13,7 @@ import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ChevronLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   isUsdPayment,
@@ -234,11 +234,20 @@ export default function PurchaseDetailPage() {
 
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Data Pembelian</h1>
-            <div className="text-sm text-slate-500 flex items-center gap-2">
-              <span>Kode Beli:</span>
-              <span className="text-blue-600 font-semibold">{purchase.code}</span>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+            >
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Data Pembelian</h1>
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{purchase.code}</span>
               {isPaid ? (
                 <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
                   Lunas
@@ -260,6 +269,7 @@ export default function PurchaseDetailPage() {
               ) : null}
             </div>
           </div>
+        </div>
 
           <div className="flex gap-2">
             <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>

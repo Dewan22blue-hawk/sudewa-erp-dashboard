@@ -55,6 +55,8 @@ export default function EditNestedUnitPage() {
             totalDpp: Number(item.dpp_total_price ?? 0),
             ppnSatuan: qty > 0 ? Number(item.ppn_total_price ?? 0) / qty : 0,
             totalPpn: Number(item.ppn_total_price ?? 0),
+            hargaUsd: item.price_usd ? Number(item.price_usd) : undefined,
+            hargaPerUnitUsd: item.price_per_unit_usd ? Number(item.price_per_unit_usd) : undefined,
         };
     }, [item, salesDetail?.ui?.customer]);
 
@@ -79,6 +81,8 @@ export default function EditNestedUnitPage() {
                     bbn_price: Number(values.biayaBbn ?? 0),
                     expedition_fee: Number(values.biayaEkspedisi ?? 0),
                     other_fee: Number(values.biayaLain ?? 0),
+                    price_usd: values.hargaUsd ? Number(values.hargaUsd) : undefined,
+                    price_per_unit_usd: values.hargaPerUnitUsd ? Number(values.hargaPerUnitUsd) : undefined,
                 },
             });
 

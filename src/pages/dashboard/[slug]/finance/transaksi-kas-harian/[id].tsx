@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useFinanceBillingDetail, useCreateFinanceBillingItem } from '@/hooks/useFinanceBilling';
-import { useKasHarianDetail, useUpdateKasHarian } from '@/hooks/useKasHarian';
+import { useKasHarianDetail, useUpdateKasHarian, useToggleKasHarianPaymentStatus } from '@/hooks/useKasHarian';
+import TogglePaymentStatusDialog from '@/components/features/kas-harian/TogglePaymentStatusDialog';
 import { formatCurrency } from '@/lib/utils/currency';
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { getAccountCategoryLabel } from '@/lib/account';
@@ -69,9 +70,12 @@ export default function KasHarianDetailPage() {
   const { slug, id: rawId } = router.query;
   const cashFlowId = typeof rawId === 'string' ? Number(rawId) : undefined;
 
+  const [isToggleOpen, setIsToggleOpen] = useState(false);
+  const [targetStatus, setTargetStatus] = useState(false);
+
   const cashFlowQuery = useKasHarianDetail(cashFlowId, {
     enabled: typeof cashFlowId === 'number' && Number.isFinite(cashFlowId),
-    refetchInterval: LIVE_UPDATE_INTERVAL,
+    refetchInterval: !isToggleOpen ? LIVE_UPDATE_INTERVAL : false,
   });
 
   const cashFlowDetail = cashFlowQuery.data;
@@ -167,7 +171,7 @@ export default function KasHarianDetailPage() {
   }, [kasOpen, akunOpen]);
 
   // Billing Calculations
-  const totalBeli = Number(financeBillingDetail?.unit_transaction_billing?.grand_total || cashFlowDetail?.finance_billing?.grand_total || 0);
+  const totalBeli = Number(financeBillingDetail?.grand_total || financeBillingDetail?.unit_transaction_billing?.grand_total || cashFlowDetail?.finance_billing?.grand_total || 0);
   const totalPpn = 0;
   const totalBiaya = totalBeli + totalPpn;
   const totalCashPayment = Number(financeBillingDetail?.total_cash_payment || 0);
@@ -308,16 +312,46 @@ export default function KasHarianDetailPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Link href={typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard'} className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800">
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </Link>
-            <div>
-              <h1 className="text-[36px] font-semibold tracking-tight text-slate-955">
-                {isBillingFlow ? (remainingPayment > 0 ? 'Pembayaran Kas Harian' : 'Detail Pembayaran') : 'Detail Transaksi'}
-              </h1>
-              <p className="text-sm text-slate-500">{isBillingFlow ? 'Detail transaksi kas dan form pembayaran tagihan' : 'Detail transaksi kas harian'}</p>
+          <div className="flex items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')}
+                className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+              >
+                <ArrowLeft className="h-5 w-5 text-slate-700" />
+              </Button>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-semibold">
+                    {isBillingFlow ? (remainingPayment > 0 ? 'Pembayaran Kas Harian' : 'Detail Pembayaran') : 'Detail Transaksi'}
+                  </h1>
+                  <span className={cn(
+                    "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
+                    cashFlowDetail.is_paid
+                      ? "bg-green-50 text-green-700 border border-green-200"
+                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  )}>
+                    {cashFlowDetail.is_paid ? 'Lunas' : 'Belum Lunas'}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">{isBillingFlow ? 'Detail transaksi kas dan form pembayaran tagihan' : 'Detail transaksi kas harian'}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 rounded-xl px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50 transition-all"
+                onClick={() => {
+                  setTargetStatus(!cashFlowDetail.is_paid);
+                  setIsToggleOpen(true);
+                }}
+              >
+                {cashFlowDetail.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
+              </Button>
             </div>
           </div>
 
@@ -688,6 +722,7 @@ export default function KasHarianDetailPage() {
               Kembali ke Daftar Kas Harian
             </Button>
           </div>
+          <TogglePaymentStatusDialog open={isToggleOpen} onOpenChange={setIsToggleOpen} data={cashFlowDetail} targetStatus={targetStatus} />
         </div>
       )}
     </DashboardLayout>

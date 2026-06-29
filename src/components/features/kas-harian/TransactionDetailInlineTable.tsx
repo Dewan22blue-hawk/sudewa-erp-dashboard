@@ -173,22 +173,21 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
     <div className="rounded-[22px] border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-[30px] font-semibold text-slate-950">Detail Transaksi</h2>
-          <p className="text-sm text-slate-500">Rincian lengkap unit yang dibeli</p>
+          <h2 className="text-lg font-semibold text-slate-900">Detail Transaksi</h2>
+          <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dibeli</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Button
             type="button"
             variant="destructive"
-            className="h-11 rounded-xl bg-[#ec2f2f] px-4 hover:bg-[#d62828]"
             disabled={disabled || isBusy || selectedIds.length === 0}
             onClick={() => void handleDeleteSelected()}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete ({selectedIds.length})
           </Button>
-          <Button type="button" variant="outline" className="h-11 rounded-xl border-slate-200 bg-slate-50 px-4 hover:bg-slate-100" disabled={disabled || isBusy || editingId === 'new'} onClick={handleAddRow}>
+          <Button type="button" variant="outline" disabled={disabled || isBusy || editingId === 'new'} onClick={handleAddRow}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Transaksi
           </Button>
@@ -276,11 +275,11 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-2xl p-2">
-                          <DropdownMenuItem onClick={() => handleEditRow(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem onClick={() => handleEditRow(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => void handleDeleteOne(item.id)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-700">
+                          <DropdownMenuItem onClick={() => void handleDeleteOne(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>

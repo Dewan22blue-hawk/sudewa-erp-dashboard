@@ -248,16 +248,16 @@ export function CreateInvoiceTable({
                             <MoreVertical className="h-4 w-4 text-slate-600" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[200px] rounded-xl">
-                          <DropdownMenuItem onSelect={() => onDetail(row)} className="cursor-pointer">
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem onSelect={() => onDetail(row)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             <Eye className="mr-2 h-4 w-4" />
                             Detail
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => onPrint(row)} className="cursor-pointer">
+                          <DropdownMenuItem onSelect={() => onPrint(row)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             <Printer className="mr-2 h-4 w-4" />
                             Print Invoice
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => onDelete(row)} className="cursor-pointer text-red-600 focus:text-red-600">
+                          <DropdownMenuItem onSelect={() => onDelete(row)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Hapus
                           </DropdownMenuItem>

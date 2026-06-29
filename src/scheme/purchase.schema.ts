@@ -29,6 +29,8 @@ export const createPurchaseUnitSchema = z.object({
   biayaBBN: z.number().min(0),
   biayaEkspedisi: z.number().min(0),
   biayaLain: z.number().min(0),
+  price_usd: z.number().min(0).optional(),
+  price_per_unit_usd: z.number().min(0).optional(),
 });
 
 export type CreatePurchaseFormValues = z.infer<typeof createPurchaseSchema>;

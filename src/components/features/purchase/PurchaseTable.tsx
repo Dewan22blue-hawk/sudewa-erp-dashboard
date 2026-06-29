@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatCurrency } from '@/lib/utils/currency';
 import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -190,9 +191,20 @@ export default function PurchaseTable({
       buttons.push(currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2);
     }
 
-    return buttons.map((page) => (
-      <Button key={page} variant={currentPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-[#1f304f] hover:bg-[#1a2842] text-white' : ''}`}>
-        {page}
+    return buttons.map((pageNumber) => (
+      <Button
+        key={pageNumber}
+        variant="ghost"
+        size="sm"
+        className={cn(
+          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          pageNumber === currentPage
+            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+        )}
+        onClick={() => handlePageChange(pageNumber)}
+      >
+        {pageNumber}
       </Button>
     ));
   };
@@ -261,7 +273,7 @@ export default function PurchaseTable({
 
         {/* RIGHT CONTROLS */}
         {onAdd && (
-          <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -305,7 +317,7 @@ export default function PurchaseTable({
                       {item.code || '-'}
                     </button>
                   </TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd MMM yyyy') : '-'}</TableCell>
                   <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
@@ -336,14 +348,14 @@ export default function PurchaseTable({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
+                      <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
                           {isRefunded(item) ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                           Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -359,17 +371,27 @@ export default function PurchaseTable({
 
       {/* Pagination */}
       {processedData.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="text-sm text-slate-500">
-            Showing {startIndex} to {endIndex} of {totalEntries} data
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="sm" onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="h-8 px-3">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+          <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={currentPage <= 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
               Previous
             </Button>
             {renderPageButtons()}
 
-            <Button variant="outline" size="sm" onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="h-8 px-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={currentPage >= totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
               Next
             </Button>
           </div>

@@ -52,6 +52,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const [openTypeModal, setOpenTypeModal] = useState(false);
   const [typeImage, setTypeImage] = useState<File | null>(null);
   const [openTypeSelect, setOpenTypeSelect] = useState(false);
+  const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.price_usd && Number(defaultValues.price_usd) > 0));
 
   const form = useForm<CreatePurchaseUnitFormValues>({
     resolver: zodResolver(createPurchaseUnitSchema),
@@ -62,6 +63,8 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
       biayaBBN: defaultValues?.biayaBBN || 0,
       biayaEkspedisi: defaultValues?.biayaEkspedisi || 0,
       biayaLain: defaultValues?.biayaLain || 0,
+      price_usd: defaultValues?.price_usd || 0,
+      price_per_unit_usd: defaultValues?.price_per_unit_usd || 0,
       ...defaultValues,
     },
   });
@@ -271,6 +274,121 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               )}
             />
           </div>
+
+          {/* USD Transaction Toggle */}
+          <div className="flex items-center space-x-2 py-1">
+            <input
+              type="checkbox"
+              id="is_usd"
+              checked={isUsd}
+              onChange={(e) => {
+                setIsUsd(e.target.checked);
+                if (!e.target.checked) {
+                  form.setValue('price_usd', 0);
+                  form.setValue('price_per_unit_usd', 0);
+                }
+              }}
+              disabled={readOnly}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+            />
+            <Label htmlFor="is_usd" className="text-sm font-medium cursor-pointer">
+              Transaksi USD (Gunakan mata uang asing USD)
+            </Label>
+          </div>
+
+          {/* USD Inputs */}
+          {isUsd && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+              <FormField
+                control={form.control}
+                name="price_usd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-amber-900">Total Harga (USD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const num = Number(val);
+                          if (Number.isNaN(num)) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          if (/^0+[1-9]/.test(val)) {
+                            const stripped = val.replace(/^0+/, '');
+                            e.target.value = stripped;
+                            field.onChange(Number(stripped));
+                          } else if (/^0+0/.test(val)) {
+                            const stripped = '0';
+                            e.target.value = stripped;
+                            field.onChange(0);
+                          } else {
+                            field.onChange(num);
+                          }
+                        }}
+                        disabled={readOnly}
+                        className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price_per_unit_usd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-amber-900">Harga Satuan (USD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const num = Number(val);
+                          if (Number.isNaN(num)) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          if (/^0+[1-9]/.test(val)) {
+                            const stripped = val.replace(/^0+/, '');
+                            e.target.value = stripped;
+                            field.onChange(Number(stripped));
+                          } else if (/^0+0/.test(val)) {
+                            const stripped = '0';
+                            e.target.value = stripped;
+                            field.onChange(0);
+                          } else {
+                            field.onChange(num);
+                          }
+                        }}
+                        disabled={readOnly}
+                        className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
           <div className="pt-2">
             <h2 className="text-sm font-semibold text-foreground">Harga</h2>
           </div>
