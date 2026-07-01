@@ -123,10 +123,9 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                         <span>Show</span>
                         <Select value={itemsPerPage} onValueChange={(val) => setItemsPerPage(val)}>
                             <SelectTrigger className="w-[70px] bg-white">
-                                <SelectValue placeholder="10" />
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
                                 <SelectItem value="25">25</SelectItem>
                                 <SelectItem value="50">50</SelectItem>
                                 <SelectItem value="100">100</SelectItem>

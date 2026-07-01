@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatCurrency } from '@/lib/utils/currency';
 import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -27,6 +28,8 @@ export interface PurchaseTableProps {
   mainTabs?: { id: string; label: string }[];
   activeMainTab?: string;
   onMainTabChange?: (id: string) => void;
+  search?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export default function PurchaseTable({
@@ -44,11 +47,27 @@ export default function PurchaseTable({
   mainTabs,
   activeMainTab,
   onMainTabChange,
+  search,
+  onSearchChange,
 }: PurchaseTableProps) {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [localSearch, setLocalSearch] = useState(search || '');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
+
+  // Debounce search
+  useEffect(() => {
+    setLocalSearch(search || '');
+  }, [search]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onSearchChange && localSearch !== (search || '')) {
+        onSearchChange(localSearch);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, onSearchChange, search]);
 
   const isRefunded = (item: UnitTransaction) => String(item.stock_state ?? '').toLowerCase() === 'inbound_return';
   const getBillingLabel = useCallback((item: UnitTransaction) => {
@@ -63,16 +82,7 @@ export default function PurchaseTable({
   };
 
   const processedData = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-
     const filtered = data.filter((item) => {
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        [item.code, item.supplier, item.warehouse, item.stock_state, getBillingLabel(item)]
-          .map((value) => String(value ?? '').toLowerCase())
-          .some((value) => value.includes(normalizedSearch));
-
-      if (!matchesSearch) return false;
       if (billingFilter === 'paid') return Boolean(item.isPaid);
       if (billingFilter === 'unpaid') return !Boolean(item.isPaid);
       return true;
@@ -105,6 +115,8 @@ export default function PurchaseTable({
           return compareNumber(a.transaction_bbn_total, b.transaction_bbn_total);
         case 'transaction_other_fee':
           return compareNumber(a.transaction_other_fee, b.transaction_other_fee);
+        case 'expedition_fee_total':
+          return compareNumber(a.expedition_fee_total, b.expedition_fee_total);
         case 'transaction_dpp_total':
           return compareNumber(a.transaction_dpp_total, b.transaction_dpp_total);
         case 'transaction_ppn_total':
@@ -121,7 +133,7 @@ export default function PurchaseTable({
     });
 
     return sorted;
-  }, [data, billingFilter, sortConfig, searchTerm, getBillingLabel]);
+  }, [data, billingFilter, sortConfig, getBillingLabel]);
 
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? 25;
@@ -174,8 +186,7 @@ export default function PurchaseTable({
   };
 
   const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    onPageChange?.(1);
+    setLocalSearch(value);
   };
 
   const renderPageButtons = () => {
@@ -190,9 +201,20 @@ export default function PurchaseTable({
       buttons.push(currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2);
     }
 
-    return buttons.map((page) => (
-      <Button key={page} variant={currentPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-[#1f304f] hover:bg-[#1a2842] text-white' : ''}`}>
-        {page}
+    return buttons.map((pageNumber) => (
+      <Button
+        key={pageNumber}
+        variant="ghost"
+        size="sm"
+        className={cn(
+          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          pageNumber === currentPage
+            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+        )}
+        onClick={() => handlePageChange(pageNumber)}
+      >
+        {pageNumber}
       </Button>
     ));
   };
@@ -206,7 +228,7 @@ export default function PurchaseTable({
           {/* 1. Search */}
           <div className="relative w-full sm:w-[240px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input type="text" placeholder="Search here..." className="pl-8 bg-white h-9 border-slate-300" value={searchTerm} onChange={(e) => handleSearch(e.target.value)} />
+            <Input type="text" placeholder="Search No. Rangka / No. Mesin..." className="pl-8 bg-white h-9 border-slate-300" value={localSearch} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
           {/* 2. Main Status Dropdown */}
@@ -249,7 +271,6 @@ export default function PurchaseTable({
                 <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
@@ -261,7 +282,7 @@ export default function PurchaseTable({
 
         {/* RIGHT CONTROLS */}
         {onAdd && (
-          <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -277,6 +298,7 @@ export default function PurchaseTable({
               {renderSortHeader('supplier', 'SUPPLIER', 'left')}
               {renderSortHeader('transaction_bruto_total', 'TOTAL BRUTO', 'center')}
               {renderSortHeader('transaction_bbn_total', 'BBN', 'center')}
+              {renderSortHeader('expedition_fee_total', 'BIAYA EKSPEDISI', 'center')}
               {renderSortHeader('transaction_other_fee', 'BIAYA LAIN', 'center')}
               {renderSortHeader('transaction_dpp_total', 'TOTAL DPP', 'center')}
               {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
@@ -288,7 +310,7 @@ export default function PurchaseTable({
           <TableBody>
             {processedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={11} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={12} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
                   Tidak ada data
                 </TableCell>
               </TableRow>
@@ -305,10 +327,11 @@ export default function PurchaseTable({
                       {item.code || '-'}
                     </button>
                   </TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy') : '-'}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd MMM yyyy') : '-'}</TableCell>
                   <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.expedition_fee_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
@@ -336,14 +359,14 @@ export default function PurchaseTable({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
+                      <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
                           {isRefunded(item) ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item.id)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                           Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -359,17 +382,27 @@ export default function PurchaseTable({
 
       {/* Pagination */}
       {processedData.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="text-sm text-slate-500">
-            Showing {startIndex} to {endIndex} of {totalEntries} data
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="sm" onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="h-8 px-3">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+          <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={currentPage <= 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
               Previous
             </Button>
             {renderPageButtons()}
 
-            <Button variant="outline" size="sm" onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="h-8 px-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={currentPage >= totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
               Next
             </Button>
           </div>

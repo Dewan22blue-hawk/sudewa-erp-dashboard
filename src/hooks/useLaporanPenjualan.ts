@@ -38,7 +38,7 @@ export const useLaporanPenjualan = (): UseLaporanPenjualanReturn => {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     lastPage: 1,
-    perPage: 10,
+    perPage: 25,
     total: 0,
     from: 0,
     to: 0,
@@ -48,7 +48,7 @@ export const useLaporanPenjualan = (): UseLaporanPenjualanReturn => {
 
   // Filter states
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPerPage, setCurrentPerPage] = useState(10);
+  const [currentPerPage, setCurrentPerPage] = useState(25);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);

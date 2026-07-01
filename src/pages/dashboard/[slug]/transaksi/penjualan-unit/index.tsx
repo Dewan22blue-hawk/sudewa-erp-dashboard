@@ -16,7 +16,7 @@ export default function SalesPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <PageHeader title="Penjualan Unit" description="Kelola dan lacak semua penjualan unit" />
           <div className="flex gap-2"></div>
         </div>

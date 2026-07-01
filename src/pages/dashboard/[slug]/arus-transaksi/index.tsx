@@ -23,7 +23,7 @@ export default function TransactionListPage() {
 
     // Local State
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(25);
     const [localSearch, setLocalSearch] = useState('');
 
     // Query Hooks
@@ -68,10 +68,9 @@ export default function TransactionListPage() {
                             <span>Show</span>
                             <Select value={String(limit)} onValueChange={(v) => setLimit(Number(v))}>
                                 <SelectTrigger className="h-9 w-[70px] bg-white">
-                                    <SelectValue placeholder="10" />
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
                                     <SelectItem value="25">25</SelectItem>
                                     <SelectItem value="50">50</SelectItem>
                                     <SelectItem value="100">100</SelectItem>

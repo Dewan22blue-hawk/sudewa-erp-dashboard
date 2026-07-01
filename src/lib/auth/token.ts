@@ -67,15 +67,31 @@ export const markTokenCheckAttempt = (): void => {
  */
 export const checkTokenValidity = async (): Promise<TokenValidityStatus> => {
   try {
-    const { apiClient } = await import('@/lib/api/client');
-    const response = await apiClient.get('/wapi/auth/check-token');
+    const token = getAccessToken();
+    if (!token) return 'invalid';
 
-    return response.data?.status === true ? 'valid' : 'invalid';
-  } catch (error: any) {
-    if (error?.statusCode === 401) {
+    const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL ?? 'https://wajirabackend.hawk-dev.com').replace(/\/$/, '');
+    const url = `${apiBaseUrl}/wapi/auth/check-token`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
       return 'invalid';
     }
 
+    if (!response.ok) {
+      return 'unknown';
+    }
+
+    const data = await response.json();
+    return data?.status === true ? 'valid' : 'invalid';
+  } catch (error: any) {
     console.error('[Token Validation] Error checking token validity:', error);
     return 'unknown';
   }

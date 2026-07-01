@@ -13,6 +13,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Props {
   form: UseFormReturn<KasHarianFormInput, unknown, KasHarianFormValues>;
@@ -395,6 +396,30 @@ export default function KasHarianForm({
               </FormControl>
               {lockAmounts ? <p className="text-xs text-slate-500">Nominal kredit transaksi otomatis mengikuti data billing dan tidak bisa diubah di sini.</p> : null}
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="is_paid"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-2xl border border-slate-200 p-4 bg-white">
+              <FormControl>
+                <Checkbox
+                  checked={Boolean(field.value)}
+                  onCheckedChange={field.onChange}
+                  className="h-5 w-5 rounded-md"
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel className="text-sm font-semibold text-slate-900 cursor-pointer">
+                  Status Pembayaran (Lunas)
+                </FormLabel>
+                <p className="text-xs text-slate-500">
+                  Tandai jika transaksi kas harian ini sudah lunas/terbayar.
+                </p>
+              </div>
             </FormItem>
           )}
         />

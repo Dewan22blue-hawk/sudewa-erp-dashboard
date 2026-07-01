@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { AlertCircle } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -13,23 +14,13 @@ import { useTypeUnits, useCreateTypeUnit } from '@/hooks/useTypeUnit';
 import { useBrands } from '@/hooks/useBrand';
 import { TypeUnit } from '@/@types/type-unit.types';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { useUnitFormula } from '@/hooks/useUnitFormula';
-
-// Extending the schema type for the form, or similar
-// For now we map to any for simplicity in this step, but ideal is strict typing.
-// The schema `createPurchaseUnitSchema` has snake_case/camelCase mix.
-// We need to match the form fields to the schema.
-// Schema: typeUnitId, typeUnitName, qty, price, biayaBBN, biayaEkspedisi, biayaLain
-// UI Sales: tipeUnit, qty, harga, biayaBbn, biayaEkspedisi, biayaLain, totalHpp, etc.
-
-// We will use a local interface that matches the UI for the form state,
-// and then map it to the submission format if needed.
-// But for parity, let's try to match valid keys.
 
 interface Props {
   onSubmit: (data: CreatePurchaseUnitFormValues) => void;
@@ -52,6 +43,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const [openTypeModal, setOpenTypeModal] = useState(false);
   const [typeImage, setTypeImage] = useState<File | null>(null);
   const [openTypeSelect, setOpenTypeSelect] = useState(false);
+  const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.price_usd && Number(defaultValues.price_usd) > 0));
 
   const form = useForm<CreatePurchaseUnitFormValues>({
     resolver: zodResolver(createPurchaseUnitSchema),
@@ -62,6 +54,8 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
       biayaBBN: defaultValues?.biayaBBN || 0,
       biayaEkspedisi: defaultValues?.biayaEkspedisi || 0,
       biayaLain: defaultValues?.biayaLain || 0,
+      priceUsd: defaultValues?.priceUsd || (defaultValues as any)?.price_usd || 0,
+      pricePerUnitUsd: defaultValues?.pricePerUnitUsd || (defaultValues as any)?.price_per_unit_usd || 0,
       ...defaultValues,
     },
   });
@@ -134,7 +128,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
         form.setValue('typeUnitId', String(created.id));
         // Inject the newly created type unit into the cached list so the select shows it immediately
         queryClient.setQueryData(['type-units'], (prev: any) => {
-          if (!prev) return { data: [created], meta: { total: 1, currentPage: 1, perPage: 10, lastPage: 1 } };
+          if (!prev) return { data: [created], meta: { total: 1, currentPage: 1, perPage: 25, lastPage: 1 } };
           const alreadyExist = prev.data?.some((item: any) => item.id === created.id);
           const mergedData = alreadyExist ? prev.data : [created, ...(prev.data ?? [])];
           return { ...prev, data: mergedData };
@@ -150,10 +144,18 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     }
   };
 
+  const handleFormSubmit = (values: CreatePurchaseUnitFormValues) => {
+    onSubmit({
+      ...values,
+      price_usd: Number(values.priceUsd) || 0,
+      price_per_unit_usd: Number(values.pricePerUnitUsd) || 0,
+    } as any);
+  };
+
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
           <div>
             <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Pembelian</h2>
             <p className="text-sm text-gray-500 mt-1">Kelola detail informasi pembelian unit dan biaya-biaya terkait</p>
@@ -271,6 +273,121 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               )}
             />
           </div>
+
+          {/* USD Transaction Toggle */}
+          <div className="flex items-center space-x-2 py-1">
+            <input
+              type="checkbox"
+              id="is_usd"
+              checked={isUsd}
+              onChange={(e) => {
+                setIsUsd(e.target.checked);
+                if (!e.target.checked) {
+                  form.setValue('price_usd', 0);
+                  form.setValue('price_per_unit_usd', 0);
+                }
+              }}
+              disabled={readOnly}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+            />
+            <Label htmlFor="is_usd" className="text-sm font-medium cursor-pointer">
+              Transaksi USD (Gunakan mata uang asing USD)
+            </Label>
+          </div>
+
+          {/* USD Inputs */}
+          {isUsd && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+              <FormField
+                control={form.control}
+                name="price_usd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-amber-900">Total Harga (USD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const num = Number(val);
+                          if (Number.isNaN(num)) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          if (/^0+[1-9]/.test(val)) {
+                            const stripped = val.replace(/^0+/, '');
+                            e.target.value = stripped;
+                            field.onChange(Number(stripped));
+                          } else if (/^0+0/.test(val)) {
+                            const stripped = '0';
+                            e.target.value = stripped;
+                            field.onChange(0);
+                          } else {
+                            field.onChange(num);
+                          }
+                        }}
+                        disabled={readOnly}
+                        className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price_per_unit_usd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-amber-900">Harga Satuan (USD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const num = Number(val);
+                          if (Number.isNaN(num)) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          if (/^0+[1-9]/.test(val)) {
+                            const stripped = val.replace(/^0+/, '');
+                            e.target.value = stripped;
+                            field.onChange(Number(stripped));
+                          } else if (/^0+0/.test(val)) {
+                            const stripped = '0';
+                            e.target.value = stripped;
+                            field.onChange(0);
+                          } else {
+                            field.onChange(num);
+                          }
+                        }}
+                        disabled={readOnly}
+                        className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
           <div className="pt-2">
             <h2 className="text-sm font-semibold text-foreground">Harga</h2>
           </div>
@@ -363,7 +480,9 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="biayaLain"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Biaya Lain</FormLabel>
+                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
+                    Biaya Lain
+                  </FormLabel>
                   <FormControl>
                     <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
                   </FormControl>
@@ -373,7 +492,71 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-8">
+          <div className="pt-2">
+            <h2 className="text-sm font-semibold text-foreground flex flex-row">
+              Biaya USD
+              <Tooltip>
+                <TooltipTrigger>
+                  <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Grub Form dibawah hanya diperlukan untuk proses Print non-domestik</p>
+                </TooltipContent>
+              </Tooltip>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              control={form.control}
+              name="pricePerUnitUsd"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
+                    HPP Satuan (USD)
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Harga unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="priceUsd"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
+                    HPP Total (USD)
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Total biaya unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+                  <FormControl>
+                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex justify-center gap-3 pt-8">
             <Button type="button" variant="ghost" onClick={onCancel} disabled={loading} className="text-muted-foreground hover:text-foreground">
               Batal
             </Button>

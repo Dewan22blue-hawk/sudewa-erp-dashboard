@@ -3,7 +3,7 @@ import { getFinanceAssets, getFinanceAssetById, updateFinanceAsset, deleteFinanc
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { FinanceAssetPayload } from '@/@types/finance-asset.types';
 
-export function useFinanceAssets(companyId: string | number | null, params: PaginationParams & { search?: string } = { page: 1, perPage: 10 }) {
+export function useFinanceAssets(companyId: string | number | null, params: PaginationParams & { search?: string } = { page: 1, perPage: 25 }) {
     return useQuery({
         queryKey: ['finance-assets', companyId, params.page, params.perPage, params.search],
         queryFn: () => getFinanceAssets({

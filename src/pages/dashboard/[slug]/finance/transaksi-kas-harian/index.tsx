@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AddKasHarianDialog from '@/components/features/kas-harian/AddKasHarianDialog';
 import DeleteKasHarianDialog from '@/components/features/kas-harian/DeleteKasHarianDialog';
 import EditKasHarianDialog from '@/components/features/kas-harian/EditKasHarianDialog';
+import TogglePaymentStatusDialog from '@/components/features/kas-harian/TogglePaymentStatusDialog';
 import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKasHarian } from '@/hooks/useKasHarian';
@@ -31,6 +32,7 @@ const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   cashFlowId: item.id,
   financeBillingId: item.finance_billing?.id,
   transaction_category: item.transaction_category,
+  is_paid: item.is_paid,
 });
 
 export default function KasHarianPage() {
@@ -46,6 +48,8 @@ export default function KasHarianPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isToggleOpen, setIsToggleOpen] = useState(false);
+  const [targetStatus, setTargetStatus] = useState(false);
   const [selectedItem, setSelectedItem] = useState<KasHarian | null>(null);
 
   useEffect(() => {
@@ -65,7 +69,7 @@ export default function KasHarianPage() {
     },
     {
       enabled: !isCompanyLoading && companyNumber > 0,
-      refetchInterval: !isAddOpen && !isEditOpen && !isDeleteOpen ? LIVE_UPDATE_INTERVAL : false,
+      refetchInterval: !isAddOpen && !isEditOpen && !isDeleteOpen && !isToggleOpen ? LIVE_UPDATE_INTERVAL : false,
     },
   );
 
@@ -138,6 +142,14 @@ export default function KasHarianPage() {
     setIsDeleteOpen(true);
   };
 
+  const handleToggleStatus = (item: KasHarianListItem) => {
+    const manualItem = (kasHarianQuery.data?.data ?? []).find((cashFlow) => cashFlow.id === item.cashFlowId);
+    if (!manualItem) return;
+    setSelectedItem(manualItem);
+    setTargetStatus(!manualItem.is_paid);
+    setIsToggleOpen(true);
+  };
+
   const pushTo = (item: KasHarianListItem) => {
     const targetId = item.cashFlowId || item.id;
     if (!targetId) return;
@@ -153,11 +165,11 @@ export default function KasHarianPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Arus Transaksi Kas Harian</h1>
-            <p className="text-sm text-slate-500">Kelola arus transaksi kas harian</p>
+            <h1 className="text-2xl font-semibold">Arus Transaksi Kas Harian</h1>
+            <p className="text-sm text-muted-foreground">Kelola arus transaksi kas harian</p>
           </div>
 
-          <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d] rounded-xl">
+          <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -186,10 +198,9 @@ export default function KasHarianPage() {
                   }}
                 >
                   <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-                    <SelectValue placeholder="10" />
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>
@@ -215,6 +226,7 @@ export default function KasHarianPage() {
             onPay={pushTo}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
             onPageChange={setPage}
           />
         </div>
@@ -223,6 +235,7 @@ export default function KasHarianPage() {
       <AddKasHarianDialog open={isAddOpen} onOpenChange={setIsAddOpen} />
       <EditKasHarianDialog open={isEditOpen} onOpenChange={setIsEditOpen} data={selectedItem} />
       <DeleteKasHarianDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen} data={selectedItem} />
+      <TogglePaymentStatusDialog open={isToggleOpen} onOpenChange={setIsToggleOpen} data={selectedItem} targetStatus={targetStatus} />
     </DashboardLayout>
   );
 }

@@ -20,7 +20,7 @@ interface FinanceRefundPageProps {
 export function FinanceRefundPage({ title, description, transactionType }: FinanceRefundPageProps) {
   const { page, perPage, search, getParam, updateQuery, setPage, setPerPage, setSearch } = useQueryParamsTable({
     defaultPage: 1,
-    defaultPerPage: 10,
+    defaultPerPage: 25,
   });
   const status = getParam('status', 'all') as 'all' | 'waiting' | 'approve' | 'reject';
   const debouncedSearch = useDebouncedValue(search, 400);

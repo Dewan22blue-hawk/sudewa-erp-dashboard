@@ -70,6 +70,7 @@ export interface UnitTransaction {
   transaction_ppn_total: number;
   transaction_bbn_total: number;
   transaction_other_fee: number;
+  expedition_fee_total: number;
   stock_state: string;
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;
@@ -105,6 +106,9 @@ export interface UnitTransactionDetail {
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;
+  transaction_bbn_total: number;
+  transaction_other_fee: number;
+  expedition_fee_total: number;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
@@ -124,6 +128,8 @@ export interface UnitTransactionItem {
   hpp_total_price?: number;
   dpp_total_price: number;
   ppn_total_price: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemListResponse {
@@ -142,6 +148,8 @@ export interface CreateUnitTransactionItemPayload {
   other_fee: number;
   company_id?: string | number;
   type?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UpdateUnitTransactionItemPayload {
@@ -153,6 +161,8 @@ export interface UpdateUnitTransactionItemPayload {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemSummary {
@@ -171,6 +181,8 @@ export interface UnitTransactionItemSummary {
   hpp_total_price?: number;
   dpp_total_price?: number;
   ppn_total_price?: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemDetail {

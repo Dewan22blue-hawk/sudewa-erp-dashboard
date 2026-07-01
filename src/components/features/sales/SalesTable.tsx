@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTableSort } from '@/hooks/useTableSort';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -22,8 +23,9 @@ interface Props {
  */
 export function SalesTable({ onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
+  const [localSearch, setLocalSearch] = useState('');
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
 
@@ -82,9 +84,18 @@ export function SalesTable({ onAdd }: Props) {
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setCurrentPage(1);
+    setLocalSearch(term);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== localSearch) {
+        setSearchTerm(localSearch);
+        setCurrentPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchTerm]);
 
   const handleItemsPerPageChange = (val: string) => {
     setItemsPerPage(Number(val));
@@ -155,15 +166,20 @@ export function SalesTable({ onAdd }: Props) {
       buttons.push(activePage - 2, activePage - 1, activePage, activePage + 1, activePage + 2);
     }
 
-    return buttons.map((page) => (
+    return buttons.map((pageNumber) => (
       <Button
-        key={page}
-        variant={activePage === page ? 'default' : 'outline'}
+        key={pageNumber}
+        variant="ghost"
         size="sm"
-        onClick={() => handlePageChange(page)}
-        className={`h-8 w-8 p-0 ${activePage === page ? 'bg-[#1f304f] hover:bg-[#1a2842] text-white' : ''}`}
+        className={cn(
+          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          pageNumber === activePage
+            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+        )}
+        onClick={() => handlePageChange(pageNumber)}
       >
-        {page}
+        {pageNumber}
       </Button>
     ));
   };
@@ -204,8 +220,8 @@ export function SalesTable({ onAdd }: Props) {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search here..."
-              value={searchTerm}
+              placeholder="Search No. Rangka / No. Mesin..."
+              value={localSearch}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-8 bg-white h-9 border-slate-300"
             />
@@ -244,10 +260,9 @@ export function SalesTable({ onAdd }: Props) {
             <span className="text-sm font-medium text-slate-700">Show</span>
             <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
               <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
-                <SelectValue placeholder="10" />
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
@@ -259,7 +274,7 @@ export function SalesTable({ onAdd }: Props) {
 
         {/* RIGHT CONTROLS */}
         {onAdd && (
-          <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -273,6 +288,7 @@ export function SalesTable({ onAdd }: Props) {
               {renderSortHeader('kodeJual', 'KODE JUAL', 'left')}
               {renderSortHeader('tanggal', 'TANGGAL', 'center')}
               {renderSortHeader('customer', 'CUSTOMER', 'left')}
+              {renderSortHeader('biayaEkspedisi', 'BIAYA EKSPEDISI', 'center')}
               {renderSortHeader('biaya', 'TOTAL BIAYA', 'center')}
               {renderSortHeader('totalDPP', 'TOTAL DPP', 'center')}
               {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
@@ -285,19 +301,19 @@ export function SalesTable({ onAdd }: Props) {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>
               </TableRow>
@@ -313,28 +329,26 @@ export function SalesTable({ onAdd }: Props) {
 
       {/* Pagination */}
       {currentData.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="text-sm text-slate-500">
-            Showing {startIndex} to {endIndex} of {totalEntries} data
-          </div>
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+          <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(Math.max(1, activePage - 1))}
-              disabled={activePage === 1}
-              className="h-8 px-3"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={activePage <= 1}
+              onClick={() => handlePageChange(activePage - 1)}
             >
               Previous
             </Button>
             {renderPageButtons()}
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(Math.min(safeTotalPages, activePage + 1))}
-              disabled={activePage === safeTotalPages}
-              className="h-8 px-3"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={activePage >= safeTotalPages}
+              onClick={() => handlePageChange(activePage + 1)}
             >
               Next
             </Button>

@@ -4,7 +4,7 @@ import { Download, Printer } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import type { CreateInvoicePrintPayload } from '@/@types/create-invoice.types';
 import { Button } from '@/components/ui/button';
-import { formatDisplayDate, formatLongDate, formatMoney } from './create-invoice.utils';
+import { formatDisplayDate, formatLongDate, formatMoney, formatInvoiceMoney } from './create-invoice.utils';
 
 interface Props {
   payload: CreateInvoicePrintPayload;
@@ -18,6 +18,8 @@ const COMPANY_CONFIRMATION_NUMBER = '0878-8353-1313';
 
 export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControls = false }: Props) {
   const printRef = useRef<HTMLDivElement>(null);
+  const isUsd = Boolean(payload.draft?.isUsd);
+  const rateUsd = Number(payload.draft?.rateUsd ?? 16000);
   const totalInvoice = useMemo(() => payload.rows.reduce((sum, row) => sum + row.invoiceExpedition, 0), [payload.rows]);
   const totalPpn = useMemo(() => payload.rows.reduce((sum, row) => sum + row.ppn, 0), [payload.rows]);
   const totalAmount = useMemo(() => payload.rows.reduce((sum, row) => sum + row.totalAmount, 0), [payload.rows]);
@@ -57,21 +59,21 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
     };
 
     const drawTableHeader = (y: number) => {
-      const columns = [
-        { label: 'NO', width: 6, align: 'center' as const },
-        { label: 'TGL', width: 12, align: 'center' as const },
-        { label: 'NOPOL', width: 14, align: 'left' as const },
-        { label: 'TYPE', width: 10, align: 'left' as const },
-        { label: 'DRIVER', width: 18, align: 'left' as const },
-        { label: 'MUAT', width: 14, align: 'left' as const },
-        { label: 'TUJUAN', width: 18, align: 'left' as const },
-        { label: 'BONGKAR', width: 14, align: 'left' as const },
-        { label: 'NO DO', width: 14, align: 'left' as const },
-        { label: 'DESKRIPSI', width: 18, align: 'left' as const },
-        { label: 'QTY', width: 8, align: 'center' as const },
-        { label: 'INV', width: 18, align: 'right' as const },
-        { label: 'PPN', width: 14, align: 'right' as const },
-        { label: 'TOTAL', width: 18, align: 'right' as const },
+      const columns: Array<{ label: string; width: number; align: 'left' | 'center' | 'right' }> = [
+        { label: 'NO', width: 6, align: 'center' },
+        { label: 'TGL', width: 12, align: 'center' },
+        { label: 'NOPOL', width: 14, align: 'left' },
+        { label: 'TYPE', width: 10, align: 'left' },
+        { label: 'DRIVER', width: 18, align: 'left' },
+        { label: 'MUAT', width: 14, align: 'left' },
+        { label: 'TUJUAN', width: 18, align: 'left' },
+        { label: 'BONGKAR', width: 14, align: 'left' },
+        { label: 'NO DO', width: 14, align: 'left' },
+        { label: 'DESKRIPSI', width: 18, align: 'left' },
+        { label: 'QTY', width: 8, align: 'center' },
+        { label: isUsd ? 'INV ($)' : 'INV', width: 18, align: 'center' },
+        { label: isUsd ? 'PPN ($)' : 'PPN', width: 14, align: 'center' },
+        { label: isUsd ? 'TOTAL ($)' : 'TOTAL', width: 18, align: 'center' },
       ];
 
       let x = 8;
@@ -133,6 +135,10 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
       pdf.text(`No. REK BCA : ${COMPANY_BANK_ACCOUNT}`, 26, y + 3);
       pdf.text(`Nama : ${COMPANY_BANK_NAME}`, 26, y + 8);
       pdf.text(`Konfirmasi transfer : ${COMPANY_CONFIRMATION_NUMBER}`, 26, y + 13);
+      if (isUsd) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Kurs Konversi : 1 USD = ${formatInvoiceMoney(rateUsd, false)}`, 26, y + 18);
+      }
 
       let tableY = y + 20;
       let columns = drawTableHeader(tableY);
@@ -154,9 +160,9 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
           row.noSuratDo,
           row.description,
           String(row.qty),
-          formatMoney(row.invoiceExpedition),
-          formatMoney(row.ppn),
-          formatMoney(row.totalAmount),
+          formatInvoiceMoney(row.invoiceExpedition, isUsd, rateUsd),
+          formatInvoiceMoney(row.ppn, isUsd, rateUsd),
+          formatInvoiceMoney(row.totalAmount, isUsd, rateUsd),
         ];
 
         const rowHeight = 8;
@@ -181,13 +187,13 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
 
       pdf.setFont('helvetica', 'bold');
       pdf.rect(152, tableY + 2, 48, 7);
-      pdf.text('TOTAL INVOICE', 174, tableY + 6.5, { align: 'center' });
+      pdf.text(isUsd ? 'TOTAL INV (USD)' : 'TOTAL INVOICE', 174, tableY + 6.5, { align: 'center' });
       pdf.rect(152, tableY + 9, 48, 7);
-      pdf.text(formatMoney(totalInvoice), 198, tableY + 13.5, { align: 'right' });
+      pdf.text(formatInvoiceMoney(totalInvoice, isUsd, rateUsd), 198, tableY + 13.5, { align: 'right' });
       pdf.rect(152, tableY + 16, 48, 7);
-      pdf.text(formatMoney(totalPpn), 198, tableY + 20.5, { align: 'right' });
+      pdf.text(formatInvoiceMoney(totalPpn, isUsd, rateUsd), 198, tableY + 20.5, { align: 'right' });
       pdf.rect(152, tableY + 23, 48, 7);
-      pdf.text(formatMoney(totalAmount), 198, tableY + 27.5, { align: 'right' });
+      pdf.text(formatInvoiceMoney(totalAmount, isUsd, rateUsd), 198, tableY + 27.5, { align: 'right' });
 
       pdf.save(`Invoice-${payload.invoiceCode}.pdf`);
     } catch (error) {
@@ -210,7 +216,7 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
         </div>
       )}
 
-      <div ref={printRef} className="relative mx-auto overflow-hidden bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
+      <div ref={printRef} className="relative mx-auto overflow-hidden bg-white shadow-md border print-letter-page" style={{ width: '210mm', minHeight: '297mm' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={letterheadUrl} alt="Letterhead" className="absolute inset-0 h-full w-full object-cover" />
 
@@ -236,17 +242,30 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
 
           <div className="mt-7 whitespace-pre-line text-[9pt] leading-6 text-slate-900">{payload.draft.letterContent}</div>
 
-          <div className="mt-5 text-[9pt] leading-6 text-slate-900">
-            <div>No. REK BCA : {COMPANY_BANK_ACCOUNT}</div>
-            <div>Nama : {COMPANY_BANK_NAME}</div>
-            <div>Konfirmasi transfer : {COMPANY_CONFIRMATION_NUMBER}</div>
+          <div className="mt-5 text-[9pt] leading-6 text-slate-900 flex justify-between items-end">
+            <div>
+              <div>No. REK BCA : {COMPANY_BANK_ACCOUNT}</div>
+              <div>Nama : {COMPANY_BANK_NAME}</div>
+              <div>Konfirmasi transfer : {COMPANY_CONFIRMATION_NUMBER}</div>
+              {isUsd && (
+                <div className="font-semibold text-amber-950 mt-1">
+                  Kurs Konversi: 1 USD = {formatInvoiceMoney(rateUsd, false)}
+                </div>
+              )}
+            </div>
+            {isUsd && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl px-4 py-2.5 text-xs font-semibold text-right">
+                <div>INVOICE MATA UANG: USD</div>
+                <div>KURS ACUAN: 1 USD = {formatInvoiceMoney(rateUsd, false)}</div>
+              </div>
+            )}
           </div>
 
           <div className="mt-5 overflow-hidden rounded-[16px] border border-slate-200">
             <table className="w-full border-collapse text-[7.2pt]">
               <thead>
                 <tr className="bg-[#1f4163] text-white">
-                  {['NO', 'TANGGAL', 'NO POLISI', 'TYPE', 'DRIVER', 'LOADING IN', 'TUJUAN KIRIM', 'LOADING OUT', 'NO SURAT DO', 'DESKRIPSI', 'QTY', 'INV EKSPEDISI', 'PPN', 'TOTAL'].map((header) => (
+                  {['NO', 'TANGGAL', 'NO POLISI', 'TYPE', 'DRIVER', 'LOADING IN', 'TUJUAN KIRIM', 'LOADING OUT', 'NO SURAT DO', 'DESKRIPSI', 'QTY', isUsd ? 'INV EKSPEDISI (USD)' : 'INV EKSPEDISI', isUsd ? 'PPN (USD)' : 'PPN', isUsd ? 'TOTAL (USD)' : 'TOTAL'].map((header) => (
                     <th key={header} className="border border-white/20 px-1 py-2 text-center font-semibold">{header}</th>
                   ))}
                 </tr>
@@ -265,16 +284,16 @@ export function CreateInvoicePrintDocument({ payload, letterheadUrl, hideControl
                     <td className="border border-slate-200 px-1 py-2">{row.noSuratDo}</td>
                     <td className="border border-slate-200 px-1 py-2">{row.description}</td>
                     <td className="border border-slate-200 px-1 py-2 text-center">{row.qty}</td>
-                    <td className="border border-slate-200 px-1 py-2 text-right">{formatMoney(row.invoiceExpedition)}</td>
-                    <td className="border border-slate-200 px-1 py-2 text-right">{formatMoney(row.ppn)}</td>
-                    <td className="border border-slate-200 px-1 py-2 text-right">{formatMoney(row.totalAmount)}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-center">{formatInvoiceMoney(row.invoiceExpedition, isUsd, rateUsd)}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-center">{formatInvoiceMoney(row.ppn, isUsd, rateUsd)}</td>
+                    <td className="border border-slate-200 px-1 py-2 text-center">{formatInvoiceMoney(row.totalAmount, isUsd, rateUsd)}</td>
                   </tr>
                 ))}
                 <tr className="bg-[#effaf3] font-semibold text-slate-900">
-                  <td colSpan={11} className="border border-slate-200 px-2 py-3 text-center">TOTAL PAYMENT</td>
-                  <td className="border border-slate-200 px-2 py-3 text-right">{formatMoney(totalInvoice)}</td>
-                  <td className="border border-slate-200 px-2 py-3 text-right">{formatMoney(totalPpn)}</td>
-                  <td className="border border-slate-200 px-2 py-3 text-right">{formatMoney(totalAmount)}</td>
+                  <td colSpan={11} className="border border-slate-200 px-2 py-3 text-center">TOTAL PAYMENT {isUsd ? '(USD)' : ''}</td>
+                  <td className="border border-slate-200 px-2 py-3 text-right">{formatInvoiceMoney(totalInvoice, isUsd, rateUsd)}</td>
+                  <td className="border border-slate-200 px-2 py-3 text-right">{formatInvoiceMoney(totalPpn, isUsd, rateUsd)}</td>
+                  <td className="border border-slate-200 px-2 py-3 text-right">{formatInvoiceMoney(totalAmount, isUsd, rateUsd)}</td>
                 </tr>
               </tbody>
             </table>

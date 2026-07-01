@@ -32,7 +32,7 @@ const initialBulkFormValues: BulkFormValues = {
 
 export const AccountListPage = () => {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const { data, isLoading, isError, isFetching } = useAccounts({
     page,

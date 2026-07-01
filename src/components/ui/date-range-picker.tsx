@@ -13,6 +13,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { formatDateUI } from '@/lib/utils/date';
 
 interface DatePickerWithRangeProps {
     className?: string
@@ -43,11 +44,11 @@ export function DatePickerWithRange({
                         {date?.from ? (
                             date.to ? (
                                 <>
-                                    {format(date.from, "dd MMM yyyy")} -{" "}
-                                    {format(date.to, "dd MMM yyyy")}
+                                    {formatDateUI(date.from)} -{" "}
+                                    {formatDateUI(date.to)}
                                 </>
                             ) : (
-                                format(date.from, "dd MMM yyyy")
+                                formatDateUI(date.from)
                             )
                         ) : (
                             <span>{placeholder}</span>

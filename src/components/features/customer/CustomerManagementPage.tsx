@@ -51,7 +51,7 @@ const applyValidationErrors = (
 
 export function CustomerManagementPage() {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
   const deferredSearch = useDeferredValue(search);
 
   const { data, isLoading, isFetching, isError } = useCustomers({

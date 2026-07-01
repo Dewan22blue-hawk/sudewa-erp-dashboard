@@ -108,7 +108,7 @@ export default function SalesUnitDetailPage() {
 
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const assignMutation = useAssignUnitItemSales();

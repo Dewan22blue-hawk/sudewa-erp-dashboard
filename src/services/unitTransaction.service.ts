@@ -17,6 +17,7 @@ type UnitTransactionApiModel = {
   transaction_ppn_total?: string | number;
   transaction_bbn_total?: string | number;
   transaction_other_fee?: string | number;
+  expedition_fee_total?: string | number;
   person?: {
     id?: number | string;
     name?: string;
@@ -89,6 +90,7 @@ type UnitTransactionItemListApiModel = {
     warehouse_id?: number | string;
     code?: string;
     stock_state?: string;
+    expedition_fee_total?: string | number;
     created_at?: string;
     person?: {
       id?: number | string;
@@ -177,6 +179,7 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   transaction_ppn_total: toNumber(item.transaction_ppn_total),
   transaction_bbn_total: toNumber(item.transaction_bbn_total),
   transaction_other_fee: toNumber(item.transaction_other_fee),
+  expedition_fee_total: toNumber(item.expedition_fee_total),
   stock_state: item.stock_state ?? '-',
   unit_transaction_billing: item.unit_transaction_billing
     ? {
@@ -209,12 +212,14 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
     const dppFallback = toNumber(row.dpp_total_price);
     const ppnFallback = toNumber(row.ppn_total_price);
     const bbnPerUnit = toNumber(row.bbn_price);
+    const expeditionFee = toNumber(row.expedition_fee);
     const otherFee = toNumber(row.other_fee);
 
     const transactionBruto = brutoPerUnit * qty;
     const transactionDpp = dppPerUnit > 0 ? dppPerUnit * qty : dppFallback;
     const transactionPpn = ppnPerUnit > 0 ? ppnPerUnit * qty : ppnFallback;
     const transactionBbn = bbnPerUnit * qty;
+    const transactionExpedition = expeditionFee * qty;
 
     const existing = grouped.get(transactionId);
     if (!existing) {
@@ -232,6 +237,7 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
         transaction_ppn_total: transactionPpn,
         transaction_bbn_total: transactionBbn,
         transaction_other_fee: otherFee,
+        expedition_fee_total: toNumber(row.unit_transaction?.expedition_fee_total) || transactionExpedition,
         stock_state: row.unit_transaction?.stock_state ?? '-',
         unit_transaction_billing: null,
         isPaid: false,
@@ -246,6 +252,7 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
     existing.transaction_ppn_total += transactionPpn;
     existing.transaction_bbn_total += transactionBbn;
     existing.transaction_other_fee += otherFee;
+    existing.expedition_fee_total += transactionExpedition;
     if (existing.stock_state === '-' && row.unit_transaction?.stock_state) {
       existing.stock_state = row.unit_transaction.stock_state;
     }
@@ -264,18 +271,7 @@ const mapUnitTransactionsFromItems = (
 ): UnitTransactionResponse => {
   const allTransactions = buildUnitTransactionFromRows(rows);
 
-  const normalizedSearch = String(params.search ?? '')
-    .trim()
-    .toLowerCase();
-
-  const filtered =
-    normalizedSearch.length === 0
-      ? allTransactions
-      : allTransactions.filter((item) =>
-          [item.code, item.supplier, item.warehouse, item.stock_state]
-            .map((value) => String(value ?? '').toLowerCase())
-            .some((value) => value.includes(normalizedSearch)),
-        );
+  const filtered = allTransactions;
 
   const page = params.page ?? 1;
   const perPage = params.perPage ?? 10;
@@ -430,6 +426,9 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
     unit_transaction_item_total_dpp: itemDpp || toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),
     unit_transaction_item_total_ppn: itemPpn || toNumber(item.unit_transaction_item_total_ppn ?? item.transaction_ppn_total),
     unit_transaction_item_bruto_total: itemBruto,
+    transaction_bbn_total: toNumber(item.transaction_bbn_total),
+    transaction_other_fee: toNumber(item.transaction_other_fee),
+    expedition_fee_total: toNumber(item.expedition_fee_total),
     billing_summary: item.billing_summary
       ? {
           grand_total: toNumber(item.billing_summary.grand_total),

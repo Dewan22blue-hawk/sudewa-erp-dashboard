@@ -20,9 +20,10 @@ export default function PurchasePage() {
   const { companyId } = useCompany();
   const { slug } = router.query;
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
   const [mainTab, setMainTab] = useState('common');
   const [subTab, setSubTab] = useState('all');
+  const [search, setSearch] = useState('');
 
   // Reset subtab when maintab changes
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function PurchasePage() {
   }, [mainTab]);
 
   const activeStatus = subTab === 'all' ? undefined : subTab;
-  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, status: activeStatus });
+  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, status: activeStatus, search });
   const deleteMutation = useDeletePurchase();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -86,7 +87,7 @@ export default function PurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <PageHeader title="Pembelian Unit" description="Kelola dan lacak semua pembelian unit" />
           <div className="flex gap-2"></div>
         </div>
@@ -113,6 +114,8 @@ export default function PurchasePage() {
               subTabs={(SUBTABS as any)[mainTab]}
               activeSubTab={subTab}
               onSubTabChange={(id) => { setSubTab(id); setPage(1); }}
+              search={search}
+              onSearchChange={(val) => { setSearch(val); setPage(1); }}
             />
           </div>
         )}

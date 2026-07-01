@@ -22,6 +22,8 @@ export type SalesPayload = {
   expedition_fee?: number;
   other_fee?: number;
   transaction_date?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 };
 
 const appendIfDefined = (form: FormData, key: string, value: string | number | undefined) => {
@@ -46,6 +48,8 @@ const appendPayload = (form: FormData, payload: SalesPayload) => {
   appendIfDefined(form, 'expedition_fee', payload.expedition_fee);
   appendIfDefined(form, 'other_fee', payload.other_fee);
   appendIfDefined(form, 'transaction_date', payload.transaction_date);
+  appendIfDefined(form, 'price_usd', payload.price_usd);
+  appendIfDefined(form, 'price_per_unit_usd', payload.price_per_unit_usd);
 };
 
 const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
@@ -82,6 +86,12 @@ const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
   }
   if (payload.transaction_date) {
     params.append('transaction_date', payload.transaction_date);
+  }
+  if (payload.price_usd !== undefined && payload.price_usd !== null) {
+    params.append('price_usd', String(payload.price_usd));
+  }
+  if (payload.price_per_unit_usd !== undefined && payload.price_per_unit_usd !== null) {
+    params.append('price_per_unit_usd', String(payload.price_per_unit_usd));
   }
   return params;
 };

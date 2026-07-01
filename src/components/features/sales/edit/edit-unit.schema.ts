@@ -25,6 +25,10 @@ export const editUnitSchema = z.object({
   biayaBbn: z.number().min(0),
   biayaEkspedisi: z.number().min(0),
   biayaLain: z.number().min(0),
+
+  // USD section
+  hargaUsd: z.number().min(0).optional(),
+  hargaPerUnitUsd: z.number().min(0).optional(),
 });
 
 export type EditUnitFormData = z.infer<typeof editUnitSchema>;

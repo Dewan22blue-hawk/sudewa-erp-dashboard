@@ -31,7 +31,7 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
 export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Props) {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   const filteredData = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -82,10 +82,9 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
             <span>Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
               <SelectTrigger className="w-[70px] bg-white">
-                <SelectValue placeholder="10" />
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
@@ -115,68 +114,108 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
-              {/* KODE SPAREPART */}
+              {/* KODE */}
               <TableHead
                 className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[180px]',
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
                   sortKey === 'code' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('code')}
               >
                 <div className="flex items-center gap-1">
-                  KODE SPAREPART
+                  KODE
                   <SortIcon sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
-              {/* NAMA SPAREPART */}
+              {/* MEREK */}
               <TableHead
                 className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[250px]',
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[150px]',
+                  sortKey === ('brand.name' as any) ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('brand.name' as any)}
+              >
+                <div className="flex items-center gap-1">
+                  MEREK
+                  <SortIcon sortKey="brand.name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
+              {/* TIPE UNIT */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[180px]',
                   sortKey === 'name' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center gap-1">
-                  NAMA SPAREPART
+                  TIPE UNIT
                   <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
-              {/* GRUP SPAREPART */}
+              {/* JENIS */}
               <TableHead
                 className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[180px]',
-                  sortKey === ('category.name' as any) ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
-                )}
-                onClick={() => handleSort('category.name' as any)}
-              >
-                <div className="flex items-center gap-1">
-                  GRUP SPAREPART
-                  <SortIcon sortKey="category.name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* SATUAN */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[120px]',
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
                   sortKey === 'unitType' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('unitType')}
               >
+                <div className="flex items-center gap-1">
+                  JENIS
+                  <SortIcon sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
+              {/* MODEL */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
+                  sortKey === 'unitModel' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('unitModel')}
+              >
+                <div className="flex items-center gap-1">
+                  MODEL
+                  <SortIcon sortKey="unitModel" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
+              {/* NETTO */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
+                  sortKey === 'nettoWeight' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('nettoWeight')}
+              >
                 <div className="inline-flex items-center">
                   <span className="w-3 shrink-0" />
-                  <span>SATUAN</span>
-                  <SortIcon sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                  <span>NETTO (KG)</span>
+                  <SortIcon sortKey="nettoWeight" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
+              {/* BRUTO */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[110px]',
+                  sortKey === 'brutoWeight' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('brutoWeight')}
+              >
+                <div className="inline-flex items-center">
+                  <span className="w-3 shrink-0" />
+                  <span>BRUTO (KG)</span>
+                  <SortIcon sortKey="brutoWeight" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
               {/* HARGA BELI */}
               <TableHead
                 className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[150px]',
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
                   sortKey === 'purchasePrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('purchasePrice')}
               >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-center gap-1">
                   HARGA BELI
                   <SortIcon sortKey="purchasePrice" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
@@ -184,12 +223,12 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               {/* HARGA JUAL */}
               <TableHead
                 className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[150px]',
+                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[130px]',
                   sortKey === 'sellingPrice' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 )}
                 onClick={() => handleSort('sellingPrice')}
               >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-center gap-1">
                   HARGA JUAL
                   <SortIcon sortKey="sellingPrice" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
@@ -201,7 +240,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
           <TableBody>
             {currentData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-gray-505 py-10 text-sm">
+                <TableCell colSpan={10} className="text-center text-gray-505 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
@@ -209,11 +248,14 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               currentData.map((item) => (
                 <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.code}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">{item.name}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.category?.name || item.group || '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center uppercase">{item.unitType}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{formatCurrency(item.purchasePrice ?? item.price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{formatCurrency(item.sellingPrice ?? item.price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.brand?.name ?? item.brandId ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.name}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.unitType || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.unitModel || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.nettoWeight ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.brutoWeight ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatCurrency(item.purchasePrice ?? item.price ?? 0)}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatCurrency(item.sellingPrice ?? item.price ?? 0)}</TableCell>
                   <TableCell className="px-4 py-4 text-center">
                     <div className="flex justify-center">
                       <DropdownMenu>

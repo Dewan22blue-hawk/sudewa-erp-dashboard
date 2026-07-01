@@ -46,7 +46,7 @@ const normalizePagination = (payload: any) => {
   return {
     data: [],
     current_page: 1,
-    per_page: 10,
+    per_page: 25,
     total: 0,
     last_page: 1,
   };
