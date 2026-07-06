@@ -79,30 +79,6 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         <p className="text-xs text-gray-500">Opsional. Jika dikosongkan, kode aset akan dibuat otomatis oleh backend.</p>
                     </div>
 
-                    {/* Tanggal Beli */}
-                    <div className="space-y-2">
-                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
-                        <Input
-                            id="purchase_date"
-                            type="date"
-                            {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
-                            className={errors.purchase_date ? 'border-red-500' : ''}
-                        />
-                        {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
-                    </div>
-
-                    {/* Nama Barang */}
-                    <div className="space-y-2">
-                        <Label htmlFor="name" className="text-gray-900 font-medium">Nama Barang</Label>
-                        <Input
-                            id="name"
-                            placeholder="Contoh: Sapu"
-                            {...register('name', { required: 'Nama barang wajib diisi' })}
-                            className={errors.name ? 'border-red-500' : ''}
-                        />
-                        {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
-                    </div>
-
                     {/* Tipe Aset */}
                     <div className="space-y-2">
                         <Label htmlFor="type" className="text-gray-900 font-medium">Tipe Aset</Label>
@@ -127,6 +103,40 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
                     </div>
 
+                    {/* Serial Number */}
+                    <div className="space-y-2">
+                        <Label htmlFor="serial_number" className="text-gray-900 font-medium">Serial Number</Label>
+                        <Input
+                            id="serial_number"
+                            placeholder="Contoh: AWS0001"
+                            {...register('serial_number')}
+                        />
+                    </div>
+
+                    {/* Nama Barang */}
+                    <div className="space-y-2">
+                        <Label htmlFor="name" className="text-gray-900 font-medium">Nama Barang</Label>
+                        <Input
+                            id="name"
+                            placeholder="Contoh: Sapu"
+                            {...register('name', { required: 'Nama barang wajib diisi' })}
+                            className={errors.name ? 'border-red-500' : ''}
+                        />
+                        {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+                    </div>
+
+                    {/* Tanggal Beli */}
+                    <div className="space-y-2">
+                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
+                        <Input
+                            id="purchase_date"
+                            type="date"
+                            {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
+                            className={errors.purchase_date ? 'border-red-500' : ''}
+                        />
+                        {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
+                    </div>
+
                     {/* Harga Beli */}
                     <div className="space-y-2">
                         <Label htmlFor="price" className="text-gray-900 font-medium">Harga Beli</Label>
@@ -145,16 +155,6 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                             )}
                         />
                         {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
-                    </div>
-
-                    {/* Serial Number */}
-                    <div className="space-y-2">
-                        <Label htmlFor="serial_number" className="text-gray-900 font-medium">Serial Number</Label>
-                        <Input
-                            id="serial_number"
-                            placeholder="Contoh: AWS0001"
-                            {...register('serial_number')}
-                        />
                     </div>
 
                     <div className="flex flex-col space-y-2 pt-2">
