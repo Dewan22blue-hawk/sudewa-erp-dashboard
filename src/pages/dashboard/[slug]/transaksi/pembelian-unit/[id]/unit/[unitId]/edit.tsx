@@ -145,8 +145,8 @@ export default function EditNestedUnitPage() {
       const currentPriceUsd = Number(unit?.price_usd ?? 0);
       const currentPricePerUnitUsd = Number(unit?.price_per_unit_usd ?? 0);
 
-      const priceUsd = Number(data.price_usd ?? 0);
-      const pricePerUnitUsd = Number(data.price_per_unit_usd ?? 0);
+      const priceUsd = Number(data.priceUsd ?? 0);
+      const pricePerUnitUsd = Number(data.pricePerUnitUsd ?? 0);
 
       const isSame = (a: number, b: number) =>
         Math.abs(a - b) < 0.000001;
@@ -318,8 +318,8 @@ export default function EditNestedUnitPage() {
                 biayaBBN: unit.bbn_price,
                 biayaEkspedisi: unit.expedition_fee,
                 biayaLain: unit.other_fee,
-                price_usd: unit.price_usd,
-                price_per_unit_usd: unit.price_per_unit_usd,
+                priceUsd: unit.price_usd,
+                pricePerUnitUsd: unit.price_per_unit_usd,
               }}
               onSubmit={handleSubmit}
               onCancel={() => router.back()}
