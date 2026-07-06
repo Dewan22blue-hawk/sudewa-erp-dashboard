@@ -55,7 +55,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
       biayaEkspedisi: defaultValues?.biayaEkspedisi || 0,
       biayaLain: defaultValues?.biayaLain || 0,
       priceUsd: defaultValues?.priceUsd || (defaultValues as any)?.priceUsd || 0,
-      pricePerUnitUsd: defaultValues?.pricePerUnitUsd || (defaultValues as any)?.price_per_unit_usd || 0,
+      pricePerUnitUsd: defaultValues?.pricePerUnitUsd || (defaultValues as any)?.pricePerUnitUsd || 0,
       ...defaultValues,
     },
   });
@@ -148,7 +148,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     onSubmit({
       ...values,
       priceUsd: Number(values.priceUsd) || 0,
-      price_per_unit_usd: Number(values.pricePerUnitUsd) || 0,
+      pricePerUnitUsd: Number(values.pricePerUnitUsd) || 0,
     } as any);
   };
 
@@ -284,7 +284,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                 setIsUsd(e.target.checked);
                 if (!e.target.checked) {
                   form.setValue('priceUsd', 0);
-                  form.setValue('price_per_unit_usd', 0);
+                  form.setValue('pricePerUnitUsd', 0);
                 }
               }}
               disabled={readOnly}
@@ -344,7 +344,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
 
               <FormField
                 control={form.control}
-                name="price_per_unit_usd"
+                name="pricePerUnitUsd"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-amber-900">Harga Satuan (USD)</FormLabel>
