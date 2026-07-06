@@ -209,14 +209,14 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
               </div>
             </div>
 
-            {/* Section 2: Dimensi & Berat */}
+            {/* Section 2: Informasi Tambahan */}
             <div className="space-y-6">
               <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-semibold text-slate-900">Dimensi & Berat</h3>
-                <p className="text-xs text-slate-500">Informasi berat bersih (netto) dan kotor (bruto) unit</p>
+                <h3 className="text-sm font-semibold text-slate-900">Informasi Tambahan</h3>
+                <p className="text-xs text-slate-500">Informasi berat bersih, berat kotor, harga beli, dan harga jual unit</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 <FormField
                   control={form.control}
                   name="nettoWeight"
@@ -256,17 +256,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
 
-            {/* Section 3: Informasi Harga */}
-            <div className="space-y-6">
-              <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-semibold text-slate-900">Informasi Harga</h3>
-                <p className="text-xs text-slate-500">Harga beli dan harga jual unit dalam Rupiah</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="buyPrice"
