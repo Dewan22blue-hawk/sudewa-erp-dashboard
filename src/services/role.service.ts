@@ -11,6 +11,7 @@ type RoleApiModel = {
   updated_at?: string;
   users_count?: number;
   permissions?: PermissionApiModel[];
+  users?: any[];
 };
 
 type PermissionApiModel = {
@@ -50,6 +51,7 @@ const mapRoleDetail = (payload: RoleApiModel): Role => ({
     created_at: p.created_at,
     updated_at: p.updated_at,
   })),
+  users: payload.users,
 });
 
 export const getRoles = async (search?: string): Promise<UserRoleItem[]> => {
@@ -91,5 +93,13 @@ export const assignRolePermissions = async (id: number | string, permissions: st
   const payload = response.data;
   if (!payload.status) {
     throw new ApiResponseError(payload.message ?? 'Failed to assign permissions');
+  }
+};
+
+export const deleteRole = async (id: number | string): Promise<void> => {
+  const response = await apiClient.delete<LaravelApiResponse<null>>(`${basePath}/${id}`);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to delete role');
   }
 };

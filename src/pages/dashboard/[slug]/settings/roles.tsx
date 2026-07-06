@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useRoles, useRoleDetail, useCreateRole, useAssignRolePermissions } from '@/hooks/useRole';
+import { useRoles, useRoleDetail, useCreateRole, useAssignRolePermissions, useDeleteRole } from '@/hooks/useRole';
 import { usePermissions } from '@/hooks/usePermission';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { Role } from '@/@types/role.types';
 import { toast } from 'sonner';
-import { Search, Plus, MoreVertical } from "lucide-react";
+import { Search, Plus, MoreVertical, CircleAlert } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ApiResponseError } from '@/lib/api/response';
 
 export default function RolesPage() {
   const { hasPermission } = usePermissionGuard();
@@ -24,6 +27,7 @@ export default function RolesPage() {
   const { data: permissions = [] } = usePermissions();
   const createMutation = useCreateRole();
   const assignMutation = useAssignRolePermissions();
+  const deleteMutation = useDeleteRole();
 
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -34,6 +38,14 @@ export default function RolesPage() {
   const [itemsPerPage, setItemsPerPage] = useState("25");
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Detail Modal State
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [viewingRoleId, setViewingRoleId] = useState<number | string | null>(null);
+  const detailRoleQuery = useRoleDetail(viewingRoleId ?? undefined, { withoutPermission: false });
+
+  // Delete State
+  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+
   const detailQuery = useRoleDetail(selectedRole?.id, { withoutPermission: false });
   const currentPerms = useMemo(() => detailQuery.data?.permissions?.map((p) => p.name) ?? [], [detailQuery.data]);
 
@@ -41,6 +53,18 @@ export default function RolesPage() {
     setName('');
     setSelectedPerms([]);
     setSelectedRole(null);
+  };
+
+  const handleDeleteRole = async () => {
+    if (!roleToDelete) return;
+    try {
+      await deleteMutation.mutateAsync(roleToDelete.id);
+      toast.success('Role berhasil dihapus');
+      setRoleToDelete(null);
+    } catch (error) {
+      const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus role';
+      toast.error(message);
+    }
   };
 
   const openCreate = () => {
@@ -178,21 +202,48 @@ export default function RolesPage() {
                     <td className="px-4 py-3">{(role as any).guard_name || '-'}</td>
                     <td className="px-4 py-3">{(role as any).users_count}</td>
                     <td className="px-4 py-3 text-center">
-                      <div className="relative group">
-                        <MoreVertical size={18} className="cursor-pointer mx-auto" />
-                        <div className="absolute right-0 hidden group-hover:block bg-white shadow-md rounded-md border text-sm z-10 w-32">
-                          {hasPermission('roles:edit') ? (
-                            <button
-                              onClick={() => openAssign(role)}
-                              className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
-                            >
-                              Atur Permissions
-                            </button>
-                          ) : (
-                            <div className="px-4 py-2 text-gray-400 text-left">Akses ditolak</div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900 mx-auto p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem
+                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                            onClick={() => {
+                              setViewingRoleId(role.id);
+                              setDetailOpen(true);
+                            }}
+                          >
+                            Lihat Detail
+                          </DropdownMenuItem>
+
+                          {role.name.toLowerCase() !== 'admin' && (
+                            <>
+                              {hasPermission('roles:edit') ? (
+                                <DropdownMenuItem
+                                  className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                                  onClick={() => openAssign(role)}
+                                >
+                                  Atur Permissions
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-gray-400 cursor-not-allowed" disabled>
+                                  Atur Permissions
+                                </DropdownMenuItem>
+                              )}
+                              
+                              <DropdownMenuItem
+                                className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                                onClick={() => setRoleToDelete(role)}
+                              >
+                                Hapus
+                              </DropdownMenuItem>
+                            </>
                           )}
-                        </div>
-                      </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))
@@ -272,6 +323,171 @@ export default function RolesPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Detail Dialog */}
+      <Dialog
+        open={detailOpen}
+        onOpenChange={(val) => {
+          setDetailOpen(val);
+          if (!val) setViewingRoleId(null);
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detail Peran</DialogTitle>
+            <DialogDescription>
+              Informasi lengkap mengenai peran dan pengguna yang terdaftar.
+            </DialogDescription>
+          </DialogHeader>
+
+          {detailRoleQuery.isLoading ? (
+            <div className="py-8 text-center text-gray-500">Memuat detail peran...</div>
+          ) : detailRoleQuery.isError ? (
+            <div className="py-8 text-center text-red-500">Gagal memuat detail peran.</div>
+          ) : !detailRoleQuery.data ? (
+            <div className="py-8 text-center text-gray-500">Data tidak ditemukan.</div>
+          ) : (
+            <div className="space-y-6">
+              {/* Role General Info */}
+              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama Peran</span>
+                  <span className="text-base font-semibold text-gray-900 capitalize">{detailRoleQuery.data.name}</span>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Guard Name</span>
+                  <span className="text-base text-gray-700">{detailRoleQuery.data.guard_name || '-'}</span>
+                </div>
+              </div>
+
+              {/* Users list */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span>Daftar Pengguna</span>
+                  <span className="bg-slate-100 text-slate-800 text-xs px-2 py-0.5 rounded-full font-normal">
+                    {detailRoleQuery.data.users?.length ?? 0}
+                  </span>
+                </h3>
+                
+                {!detailRoleQuery.data.users || detailRoleQuery.data.users.length === 0 ? (
+                  <div className="text-sm text-gray-500 bg-gray-50/50 rounded-lg p-4 text-center border border-dashed">
+                    Tidak ada pengguna dengan peran ini.
+                  </div>
+                ) : (
+                  <div className="border rounded-xl overflow-hidden bg-white max-h-60 overflow-y-auto">
+                    <table className="min-w-full text-xs text-left">
+                      <thead className="bg-slate-50 border-b">
+                        <tr>
+                          <th className="px-4 py-2.5 font-semibold text-gray-700">Nama</th>
+                          <th className="px-4 py-2.5 font-semibold text-gray-700">Username / Email</th>
+                          <th className="px-4 py-2.5 font-semibold text-gray-700">Status</th>
+                          <th className="px-4 py-2.5 font-semibold text-gray-700">Login Terakhir</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {detailRoleQuery.data.users.map((user) => (
+                          <tr key={user.id} className="hover:bg-slate-50/50">
+                            <td className="px-4 py-3">
+                              <div className="font-semibold text-gray-900">{user.name}</div>
+                              <div className="text-gray-500 text-[10px]">
+                                {user.firstname || ''} {user.lastname || ''}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="text-gray-700">{user.username}</div>
+                              <div className="text-gray-500">{user.email}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
+                                user.is_active === 1 
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                  : 'bg-slate-50 text-slate-700 border border-slate-200'
+                              }`}>
+                                {user.is_active === 1 ? 'Aktif' : 'Non-aktif'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-gray-500">
+                              {user.last_login 
+                                ? new Date(user.last_login).toLocaleString('id-ID', {
+                                    dateStyle: 'medium',
+                                    timeStyle: 'short'
+                                  })
+                                : '-'
+                              }
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Permissions list */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span>Izin Akses (Permissions)</span>
+                  <span className="bg-slate-100 text-slate-800 text-xs px-2 py-0.5 rounded-full font-normal">
+                    {detailRoleQuery.data.permissions?.length ?? 0}
+                  </span>
+                </h3>
+
+                {!detailRoleQuery.data.permissions || detailRoleQuery.data.permissions.length === 0 ? (
+                  <div className="text-sm text-gray-500 bg-gray-50/50 rounded-lg p-4 text-center border border-dashed">
+                    Tidak ada izin akses untuk peran ini.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
+                    {detailRoleQuery.data.permissions.map((perm) => (
+                      <div key={perm.id} className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/50 flex flex-col gap-0.5">
+                        <span className="font-mono text-xs font-semibold text-indigo-700">{perm.name}</span>
+                        <span className="text-[11px] text-gray-500">{perm.description || 'Tidak ada deskripsi'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end pt-4 border-t">
+            <Button onClick={() => setDetailOpen(false)}>Tutup</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Alert Dialog */}
+      <AlertDialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>
+        <AlertDialogContent className="max-w-[440px] rounded-[28px] border-0 p-0 shadow-2xl">
+          <div className="px-8 pb-8 pt-10 text-center">
+            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border-[6px] border-red-500/90 text-red-500">
+              <CircleAlert className="h-12 w-12" strokeWidth={2.5} />
+            </div>
+
+            <AlertDialogHeader className="mt-8 space-y-4 text-center">
+              <AlertDialogTitle className="text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-slate-950">
+                Hapus peran ini?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-lg leading-8 text-slate-500">
+                Peran "{roleToDelete?.name}" yang dihapus tidak bisa dikembalikan lagi.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
+              <AlertDialogAction
+                className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]"
+                onClick={handleDeleteRole}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? 'Menghapus...' : 'Ya'}
+              </AlertDialogAction>
+              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
+                Tidak
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
