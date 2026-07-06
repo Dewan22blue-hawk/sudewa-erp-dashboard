@@ -124,6 +124,16 @@ export const assignRole = async (id: number | string, role: string): Promise<voi
   }
 };
 
+export const revokeRole = async (id: number | string, role: string): Promise<void> => {
+  const body = new FormData();
+  body.append('roles', role);
+  const response = await apiClient.post<UserItemResponse>(`${basePath}/${id}/revoke-role`, body);
+  const payload = response.data;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to revoke role');
+  }
+};
+
 export const activateUser = async (id: number | string): Promise<void> => {
   const response = await apiClient.put<UserItemResponse>(`${basePath}/${id}/activate-user`);
   const payload = response.data;

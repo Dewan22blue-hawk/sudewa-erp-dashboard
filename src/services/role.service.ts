@@ -103,3 +103,12 @@ export const deleteRole = async (id: number | string): Promise<void> => {
     throw new ApiResponseError(payload.message ?? 'Failed to delete role');
   }
 };
+
+export const updateRole = async (id: number | string, payload: RolePayload): Promise<Role> => {
+  const response = await apiClient.put<RoleItemResponse>(`${basePath}/${id}`, {
+    name: payload.name,
+    permissions: payload.permissions ? payload.permissions.join(',') : '',
+  });
+  const data = ensureSuccess(response.data);
+  return mapRoleDetail(data);
+};

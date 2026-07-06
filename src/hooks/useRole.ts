@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { assignRolePermissions, createRole, getRoleDetail, getRoles, deleteRole } from '@/services/role.service';
+import { assignRolePermissions, createRole, getRoleDetail, getRoles, deleteRole, updateRole } from '@/services/role.service';
 import { UserRoleItem } from '@/@types/user.types';
 import { Role, RolePayload } from '@/@types/role.types';
 
@@ -52,6 +52,17 @@ export function useDeleteRole() {
     mutationFn: (id: number | string) => deleteRole(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: roleKeys.all });
+    },
+  });
+}
+
+export function useUpdateRole() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number | string; payload: RolePayload }) => updateRole(id, payload),
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: roleKeys.all });
+      qc.invalidateQueries({ queryKey: roleKeys.detail(variables.id) });
     },
   });
 }

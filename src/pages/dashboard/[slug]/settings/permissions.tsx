@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { usePermissions, usePermission } from '@/hooks/usePermission';
-import { usePermissionGuard } from '@/hooks/usePermissionGuard';
-import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import {
   Dialog,
   DialogContent,
@@ -29,23 +27,20 @@ import { id as localeId } from 'date-fns/locale';
 import type { Permission } from '@/@types/permission.types';
 
 export default function PermissionsPage() {
-  const { hasPermission } = usePermissionGuard();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
   const { data: permissions = [], isLoading } = usePermissions();
+
+  const [search, setSearch] = useState('');
+  const [perPage, setPerPage] = useState(25);
+  const [page, setPage] = useState(1);
 
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
   const { data: detail, isLoading: detailLoading } = usePermission(selectedId ?? undefined);
 
-  if (!hasPermission('permissions:list')) {
-    return (
-      <DashboardLayout>
-        <div className="p-6 text-sm text-muted-foreground">Anda tidak memiliki akses ke halaman ini.</div>
-      </DashboardLayout>
-    );
-  }
-
-  const filtered = permissions.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()),
+  const filtered = useMemo(
+    () => permissions.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()),
+    ),
+    [permissions, search],
   );
 
   const totalItems = filtered.length;
@@ -56,6 +51,16 @@ export default function PermissionsPage() {
 
   const handleRowClick = (perm: Permission) => {
     setSelectedId(perm.id);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handlePerPageChange = (value: string) => {
+    setPerPage(Number(value));
+    setPage(1);
   };
 
   return (
@@ -76,21 +81,12 @@ export default function PermissionsPage() {
                 placeholder="Search here"
                 className="pl-9 bg-white"
                 value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
+                onChange={(e) => handleSearchChange(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
-              <Select
-                value={String(perPage)}
-                onValueChange={(val) => {
-                  setPerPage(Number(val));
-                  setPage(1);
-                }}
-              >
+              <Select value={String(perPage)} onValueChange={handlePerPageChange}>
                 <SelectTrigger className="w-[70px] bg-white">
                   <SelectValue placeholder="25" />
                 </SelectTrigger>
