@@ -43,7 +43,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const [openTypeModal, setOpenTypeModal] = useState(false);
   const [typeImage, setTypeImage] = useState<File | null>(null);
   const [openTypeSelect, setOpenTypeSelect] = useState(false);
-  const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.price_usd && Number(defaultValues.price_usd) > 0));
+  const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.priceUsd && Number(defaultValues.priceUsd) > 0));
 
   const form = useForm<CreatePurchaseUnitFormValues>({
     resolver: zodResolver(createPurchaseUnitSchema),
@@ -54,7 +54,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
       biayaBBN: defaultValues?.biayaBBN || 0,
       biayaEkspedisi: defaultValues?.biayaEkspedisi || 0,
       biayaLain: defaultValues?.biayaLain || 0,
-      priceUsd: defaultValues?.priceUsd || (defaultValues as any)?.price_usd || 0,
+      priceUsd: defaultValues?.priceUsd || (defaultValues as any)?.priceUsd || 0,
       pricePerUnitUsd: defaultValues?.pricePerUnitUsd || (defaultValues as any)?.price_per_unit_usd || 0,
       ...defaultValues,
     },
@@ -147,7 +147,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const handleFormSubmit = (values: CreatePurchaseUnitFormValues) => {
     onSubmit({
       ...values,
-      price_usd: Number(values.priceUsd) || 0,
+      priceUsd: Number(values.priceUsd) || 0,
       price_per_unit_usd: Number(values.pricePerUnitUsd) || 0,
     } as any);
   };
@@ -283,7 +283,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               onChange={(e) => {
                 setIsUsd(e.target.checked);
                 if (!e.target.checked) {
-                  form.setValue('price_usd', 0);
+                  form.setValue('priceUsd', 0);
                   form.setValue('price_per_unit_usd', 0);
                 }
               }}
@@ -300,7 +300,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
               <FormField
                 control={form.control}
-                name="price_usd"
+                name="priceUsd"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-amber-900">Total Harga (USD)</FormLabel>
