@@ -105,10 +105,13 @@ export const deleteRole = async (id: number | string): Promise<void> => {
 };
 
 export const updateRole = async (id: number | string, payload: RolePayload): Promise<Role> => {
-  const response = await apiClient.put<RoleItemResponse>(`${basePath}/${id}`, {
-    name: payload.name,
-    permissions: payload.permissions ? payload.permissions.join(',') : '',
-  });
+  const body = new FormData();
+  body.append('_method', 'PUT');
+  body.append('name', payload.name);
+  if (payload.permissions && payload.permissions.length > 0) {
+    body.append('permissions', payload.permissions.join(','));
+  }
+  const response = await apiClient.post<RoleItemResponse>(`${basePath}/${id}`, body);
   const data = ensureSuccess(response.data);
   return mapRoleDetail(data);
 };
