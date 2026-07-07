@@ -30,7 +30,8 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
     sort_by: 'name',
     sort_order: 'asc' 
   });
-  const brands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const rawBrands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const brands = Array.from(new Map(rawBrands.map((b) => [b.id, b])).values());
   const [openBrandDialog, setOpenBrandDialog] = useState(false);
   const [openBrandSelect, setOpenBrandSelect] = useState(false);
   const [brandSearch, setBrandSearch] = useState('');
@@ -53,6 +54,24 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Kode<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan Kode"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="brandId"
@@ -127,36 +146,18 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1.5">
-                      <FormLabel className="text-xs font-semibold text-slate-700">Kode<RequiredMark /></FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan Kode"
-                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="unitType"
+                  name="name"
                   render={({ field }) => (
                     <FormItem className="space-y-1.5">
-                      <FormLabel className="text-xs font-semibold text-slate-700">Jenis<RequiredMark /></FormLabel>
+                      <FormLabel className="text-xs font-semibold text-slate-700">Tipe Unit<RequiredMark /></FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Masukkan Jenis"
+                          placeholder="Masukkan Tipe"
                           className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
                           {...field}
                           value={field.value || ''}
@@ -169,13 +170,13 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
 
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="unitType"
                   render={({ field }) => (
                     <FormItem className="space-y-1.5">
-                      <FormLabel className="text-xs font-semibold text-slate-700">Tipe Unit<RequiredMark /></FormLabel>
+                      <FormLabel className="text-xs font-semibold text-slate-700">Jenis<RequiredMark /></FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Masukkan Tipe"
+                          placeholder="Masukkan Jenis"
                           className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
                           {...field}
                           value={field.value || ''}
