@@ -91,7 +91,15 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                   <FormItem className="space-y-2">
                     <FormLabel className="text-[14px] font-medium text-[#171717]">Nomer NPWP</FormLabel>
                     <FormControl>
-                      <Input placeholder="Tambahkan NPWP" maxLength={15} className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]" {...field} />
+                      <Input
+                        placeholder="Tambahkan NPWP"
+                        maxLength={16}
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e.target.value.replace(/[^\d]/g, ''));
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

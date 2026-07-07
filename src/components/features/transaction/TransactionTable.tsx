@@ -73,8 +73,8 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
               <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500 border-r">Kredit BCA IDR</th>
 
               {/* CASH SUBHEADER */}
-              <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">Debet</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500 border-r">Kredit</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500">DEBET CASH</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-slate-500 border-r">KREDIT CASH</th>
             </tr>
           </thead>
           <tbody>

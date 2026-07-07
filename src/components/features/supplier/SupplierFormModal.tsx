@@ -109,8 +109,11 @@ export function SupplierFormModal({
                       <Input
                         {...field}
                         placeholder="Tambahkan NPWP"
-                        maxLength={15}
+                        maxLength={16}
                         className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        onChange={(e) => {
+                          field.onChange(e.target.value.replace(/[^\d]/g, ''));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
