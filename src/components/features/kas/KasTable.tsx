@@ -7,7 +7,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 const KAS_NAME_MAP: Record<string, string> = {
   bca_usd: 'BANK BCA USD',
@@ -150,6 +150,19 @@ export function KasTable({ data }: Props) {
                   <SortIcon sortKey="description" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
+              {/* Jumlah Nominal */}
+              <TableHead
+                className={cn(
+                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors w-[35%]',
+                  sortKey === 'amount' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                )}
+                onClick={() => handleSort('amount')}
+              >
+                <div className="flex items-center gap-1">
+                  Jumlah Nominal
+                  <SortIcon sortKey="amount" currentSortKey={sortKey as string} sortOrder={sortOrder} />
+                </div>
+              </TableHead>
               {/* Jenis */}
               <TableHead
                 className={cn(
@@ -178,6 +191,9 @@ export function KasTable({ data }: Props) {
                   <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">{item.code}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">{item.name}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.description || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-semibold text-gray-600 text-left">
+                    {item.code === 'bca_usd' ? currenciesFormat('usd', item.amount ? Number(item.amount) : 0) : currenciesFormat('idr', item.amount ? Number(item.amount) : 0)}
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.type === 'cash' ? 'Cash' : 'Bank'}</TableCell>
                 </TableRow>
               ))

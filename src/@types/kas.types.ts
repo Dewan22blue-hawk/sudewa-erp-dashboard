@@ -8,6 +8,7 @@ export interface Kas {
   code: string;
   description: string;
   type: KasType;
+  amount: number | string;
   companyId?: number | string | null;
   createdAt?: string;
   updatedAt?: string;
