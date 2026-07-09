@@ -4,9 +4,11 @@ import type { PaginationMeta } from '@/@types/pagination.types';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
 import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
+import { CopyBox } from '@/components/ui/copy-box';
+import { TextTruncate } from '@/components/ui/text-truncate';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -166,10 +168,10 @@ export default function KasHarianTable({
               sortedData.map((item) => (
                 <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
-                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code}</td>
-                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.note || '-'}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{formatCurrency(item.debet)}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{formatCurrency(item.credit)}</td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900"><CopyBox text={`${item.code || '-'}`} /></td>
+                  <td className="px-4 py-4 text-left text-sm text-slate-700"><TextTruncate text={item.note || '-'} maxLength={15} /></td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{currenciesFormat('idr', item.debet)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.credit)}</td>
                   <td className="px-4 py-4 text-center">
                     <span className={cn(
                       "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",

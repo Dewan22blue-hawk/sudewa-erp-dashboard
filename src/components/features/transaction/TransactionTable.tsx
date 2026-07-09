@@ -2,9 +2,9 @@ import { Transaction } from '@/@types/transaction.types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreVertical, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils/currency';
 import { useTableSort } from '@/hooks/useTableSort';
 import { formatDate } from '@/lib/utils/format';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface Props {
   data: Transaction[];
@@ -85,14 +85,14 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
                   <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{trx.name}</td>
 
                   {/* BANK */}
-                  <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? formatCurrency(trx.debitUSD, 'USD') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm ${trx.creditUSD ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditUSD ? formatCurrency(trx.creditUSD, 'USD') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm ${trx.debitIDR ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitIDR ? formatCurrency(trx.debitIDR, 'IDR') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditIDR ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditIDR ? formatCurrency(trx.creditIDR, 'IDR') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? currenciesFormat('usd', trx.debitUSD, 'USD') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.creditUSD ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditUSD ? currenciesFormat('usd', trx.creditUSD, 'USD') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitIDR ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitIDR ? currenciesFormat('idr', trx.debitIDR, 'IDR') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditIDR ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditIDR ? currenciesFormat('idr', trx.creditIDR, 'IDR') : '0'}</td>
 
                   {/* CASH */}
-                  <td className={`px-4 py-4 text-center text-sm ${trx.debitCash ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitCash ? formatCurrency(trx.debitCash, 'IDR') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditCash ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditCash ? formatCurrency(trx.creditCash, 'IDR') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitCash ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitCash ? currenciesFormat('idr', trx.debitCash) : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditCash ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditCash ? currenciesFormat('idr', trx.creditCash) : '0'}</td>
 
                   <td className="px-4 py-4 text-left text-sm text-slate-500 max-w-[150px] truncate" title={trx.description}>
                     {trx.description || '-'}

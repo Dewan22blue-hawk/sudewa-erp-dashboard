@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -329,13 +329,13 @@ export default function PurchaseTable({
                   </TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd MMM yyyy') : '-'}</TableCell>
                   <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bruto_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_bbn_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.expedition_fee_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_other_fee)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_dpp_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{formatCurrency(item.transaction_ppn_total)}</TableCell>
-                  <TableCell className={`text-center text-sm px-4 py-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{formatCurrency(getRemainingPayment(item))}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bruto_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bbn_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.expedition_fee_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_other_fee)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_dpp_total)}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_ppn_total)}</TableCell>
+                  <TableCell className={`text-center text-sm px-4 py-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{currenciesFormat('idr', getRemainingPayment(item))}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">
                     {isRefunded(item) ? (
                       <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">

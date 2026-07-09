@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreVertical } from "lucide-react"
 import { SalesItem } from "./sales.data"
-import { formatCurrency } from "@/lib/utils/currency"
+import { currenciesFormat } from "@/components/ui/currenciesFormat"
 import { Badge } from "@/components/ui/badge"
 
 interface Props {
@@ -95,32 +95,32 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
 
             {/* Biaya Ekspedisi */}
             <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                {formatCurrency(item.biayaEkspedisi)}
+                {currenciesFormat('idr', item.biayaEkspedisi)}
             </TableCell>
 
             {/* Total Biaya */}
             <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                {formatCurrency(item.totalBiaya)}
+                {currenciesFormat('idr', item.totalBiaya)}
             </TableCell>
 
             {/* Total DPP */}
             <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                {formatCurrency(item.totalDpp)}
+                {currenciesFormat('idr', item.totalDpp)}
             </TableCell>
 
             {/* Total PPN */}
             <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                {formatCurrency(item.totalPpn)}
+                {currenciesFormat('idr', item.totalPpn)}
             </TableCell>
 
             {/* Total Jual */}
             <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">
-                {formatCurrency(item.totalJual)}
+                {currenciesFormat('idr', item.totalJual)}
             </TableCell>
 
             {/* Kurang Bayar - MERAH */}
             <TableCell className="px-4 py-4 text-center text-sm text-red-600 font-semibold">
-                {formatCurrency(item.kurangBayar)}
+                {currenciesFormat('idr', item.kurangBayar)}
             </TableCell>
 
             {/* Action Dropdown */}
