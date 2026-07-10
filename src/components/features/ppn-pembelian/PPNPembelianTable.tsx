@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateUI } from '@/lib/utils/date';
@@ -176,11 +176,11 @@ export default function PPNPembelianTable({ data, meta, sortBy, sortDirection, h
                     </td>
                     <td className="px-4 py-4 text-left text-sm text-slate-700">{item.unit_transaction_item_detail.machine_number}</td>
                     <td className="px-4 py-4 text-left text-sm text-slate-700">{item.unit_transaction_item_detail.chassis_number}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.unit_price)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.total_price)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.dpp_amount)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.ppn_11)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.payment_amount)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.unit_price)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.total_price)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.dpp_amount)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.ppn_11)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.payment_amount)}</td>
                     <td className="px-4 py-4 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

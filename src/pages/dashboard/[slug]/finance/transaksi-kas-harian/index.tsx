@@ -21,7 +21,7 @@ const LIVE_UPDATE_INTERVAL = 5000;
 
 const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   id: item.id,
-  source: item.finance_billing?.id ? 'billing' : 'manual',
+  source: (item.finance_billings ?? []).length > 0 ? 'billing' : 'manual',
   date: item.date,
   code: item.code,
   note: item.note || 'Transaksi kas harian',
@@ -30,7 +30,7 @@ const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   accountName: item.account ? `${item.account.code ?? '-'} - ${item.account.name ?? '-'}` : '-',
   cashName: item.cash?.description || item.cash?.code || '-',
   cashFlowId: item.id,
-  financeBillingId: item.finance_billing?.id,
+  financeBillingId: (item.finance_billings ?? [])[0]?.id,
   transaction_category: item.transaction_category,
   is_paid: item.is_paid,
 });

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';

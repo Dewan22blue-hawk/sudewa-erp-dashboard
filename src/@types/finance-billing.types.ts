@@ -1,5 +1,40 @@
 import type { LaravelPagination, PaginationMeta } from '@/@types/pagination.types';
 
+export interface FinanceBillingCash {
+  id: number;
+  uuid?: string;
+  company_id?: number;
+  code: string;
+  cash_name: string;
+}
+
+export interface FinanceBilling {
+  id: number;
+  uuid?: string;
+  cash_flow_id: number;
+  cash_id: number;
+  account_id: number;
+  amount: number;
+  amount_original: number;
+  payment_proof: string | null;
+  payment_at: string;
+  note: string;
+  created_at?: string;
+  updated_at?: string;
+  cash: FinanceBillingCash;
+}
+
+export interface FinanceBillingPayload {
+  cash_flow_id: number;
+  cash_id: number;
+  account_id: number;
+  amount: number;
+  amount_original?: number;
+  payment_at: string;
+  note: string;
+  payment_proof?: File | null;
+}
+
 export interface FinanceBillingListItem {
   id: number;
   uuid?: string;

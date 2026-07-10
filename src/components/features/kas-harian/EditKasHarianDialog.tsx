@@ -22,7 +22,7 @@ interface Props {
 
 export default function EditKasHarianDialog({ open, onOpenChange, data }: Props) {
   const { mutateAsync: updateKasHarian, isPending } = useUpdateKasHarian();
-  const lockAmounts = Boolean(data?.finance_billing?.id);
+  const lockAmounts = (data?.finance_billings ?? []).length > 0;
   const form = useForm<KasHarianFormInput, unknown, KasHarianFormValues>({
     resolver: zodResolver(kasHarianSchema) as Resolver<KasHarianFormInput, unknown, KasHarianFormValues>,
     defaultValues: {

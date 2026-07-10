@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SortableHeader } from '@/components/ui/sortable-header';
 import type { SortOrder } from '@/hooks/useTableSort';
 import { MoreVertical } from 'lucide-react';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import FinanceRefundApprovalModal from './FinanceRefundApprovalModal';
@@ -20,13 +21,6 @@ interface Props {
   onSort: (key: keyof RefundBeli) => void;
   onPageChange: (page: number) => void;
 }
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(value);
 
 const formatDate = (value: string) => {
   if (!value) return '-';
@@ -122,8 +116,8 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
                   <td className="px-4 py-3 font-medium">{item.noPembelian}</td>
                   <td className="px-4 py-3">{formatDate(item.tanggal)}</td>
                   <td className="px-4 py-3">{item.namaSupplier}</td>
-                  <td className="px-4 py-3 text-right">{formatCurrency(item.totalPembelian)}</td>
-                  <td className="px-4 py-3 text-right font-medium text-red-600">{formatCurrency(item.totalRefund)}</td>
+                  <td className="px-4 py-3 text-right">{currenciesFormat('idr', item.totalPembelian)}</td>
+                  <td className="px-4 py-3 text-right font-medium text-red-600">{currenciesFormat('idr', item.totalRefund)}</td>
                   <td className="px-4 py-3">{item.kasMasuk}</td>
                   <td className="px-4 py-3 text-gray-500">{item.keterangan}</td>
                   <td className="px-4 py-3 text-right">

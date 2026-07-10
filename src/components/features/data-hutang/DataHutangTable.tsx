@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { LiabilityListItem, LiabilityListMeta } from '@/types/pembayaran-hutang.types';
 
 type Props = {
@@ -178,9 +178,9 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
                   <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code}</td>
                   <td className="px-4 py-4 text-center text-sm text-slate-500">{item.date}</td>
                   <td className="px-4 py-4 text-left text-sm text-slate-700">{item.supplier_name}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.grand_total)}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.total_paid)}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{formatCurrency(item.remaining_payment)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.grand_total)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.total_paid)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.remaining_payment)}</td>
                   <td className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

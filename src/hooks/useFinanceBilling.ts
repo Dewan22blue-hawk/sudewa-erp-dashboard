@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { FinanceBillingItemPayload } from '@/@types/finance-billing.types';
-import { createFinanceBillingItem, deleteFinanceBillingItem, fetchFinanceBilling, fetchFinanceBillingDetail, updateFinanceBillingItem } from '@/services/financeBilling.service';
+import type { FinanceBillingItemPayload, FinanceBillingPayload } from '@/@types/finance-billing.types';
+import { createFinanceBilling, createFinanceBillingItem, deleteFinanceBilling, deleteFinanceBillingItem, fetchFinanceBilling, fetchFinanceBillingDetail, updateFinanceBilling, updateFinanceBillingItem } from '@/services/financeBilling.service';
 
 const FINANCE_BILLING_KEY = 'finance-billing';
 
@@ -73,6 +73,42 @@ export function useDeleteFinanceBillingItem() {
 
   return useMutation({
     mutationFn: (id: number | string) => deleteFinanceBillingItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['cash-flow'] });
+    },
+  });
+}
+
+export function useCreateFinanceBilling() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: FinanceBillingPayload) => createFinanceBilling(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['cash-flow'] });
+    },
+  });
+}
+
+export function useUpdateFinanceBilling() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number | string; payload: FinanceBillingPayload }) => updateFinanceBilling(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['cash-flow'] });
+    },
+  });
+}
+
+export function useDeleteFinanceBilling() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => deleteFinanceBilling(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: financeBillingKeys.all });
       queryClient.invalidateQueries({ queryKey: ['cash-flow'] });

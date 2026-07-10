@@ -1,0 +1,424 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { Loader2, Plus, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useCreateFinanceBilling, useUpdateFinanceBilling, useDeleteFinanceBilling } from '@/hooks/useFinanceBilling';
+import { useKas } from '@/hooks/useKas';
+import { useAccounts } from '@/hooks/useAccount';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import type { FinanceBilling, FinanceBillingPayload } from '@/@types/finance-billing.types';
+import type { KasHarian } from '@/@types/kas-harian.types';
+
+const formatDate = (value?: string) => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const formatMoneyInput = (value: string) => {
+  const digits = value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  if (!digits) return '';
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
+
+const parseMoneyInput = (value: string) => {
+  const normalized = value.replace(/\D/g, '');
+  if (!normalized) return 0;
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? amount : 0;
+};
+
+interface FormState {
+  cash_id: number;
+  account_id: number;
+  amount: string;
+  payment_at: string;
+  note: string;
+}
+
+const EMPTY_FORM: FormState = {
+  cash_id: 0,
+  account_id: 0,
+  amount: '',
+  payment_at: '',
+  note: '',
+};
+
+interface Props {
+  financeBillings: FinanceBilling[];
+  cashFlowDetail: KasHarian;
+  companyId: number;
+  disabled?: boolean;
+}
+
+export default function FinanceBillingTable({ financeBillings, cashFlowDetail, companyId, disabled = false }: Props) {
+  const createMutation = useCreateFinanceBilling();
+  const updateMutation = useUpdateFinanceBilling();
+  const deleteMutation = useDeleteFinanceBilling();
+
+  const kasQuery = useKas(companyId > 0 ? companyId : undefined);
+  const accountQuery = useAccounts({
+    page: 1,
+    perPage: 1000,
+    search: '',
+    company_id: companyId > 0 ? companyId : undefined,
+    enabled: companyId > 0,
+  });
+
+  const kasOptions = useMemo(() => kasQuery.data?.data ?? [], [kasQuery.data?.data]);
+  const akunOptions = useMemo(() => accountQuery.data?.data ?? [], [accountQuery.data?.data]);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
+  const [deleteTarget, setDeleteTarget] = useState<FinanceBilling | null>(null);
+
+  const totalPaid = useMemo(
+    () => financeBillings.reduce((sum, fb) => sum + Number(fb.amount || 0), 0),
+    [financeBillings],
+  );
+  const grandTotal = Number(cashFlowDetail.grand_total || cashFlowDetail.unit_transaction_billing?.grand_total || 0);
+  const remainingPayment = Number(cashFlowDetail.remaining_payment ?? Math.max(0, grandTotal - totalPaid));
+
+  const isLoading = createMutation.isPending || updateMutation.isPending;
+
+  const openAddForm = () => {
+    setEditingId(null);
+    setForm({
+      ...EMPTY_FORM,
+      cash_id: cashFlowDetail.cash_id,
+      account_id: cashFlowDetail.account_id ?? 0,
+      payment_at: cashFlowDetail.date?.slice(0, 10) || '',
+    });
+    setIsFormOpen(true);
+  };
+
+  const openEditForm = (fb: FinanceBilling) => {
+    setEditingId(fb.id);
+    setForm({
+      cash_id: fb.cash_id,
+      account_id: fb.account_id,
+      amount: String(fb.amount || ''),
+      payment_at: fb.payment_at?.slice(0, 10) || '',
+      note: fb.note || '',
+    });
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM });
+  };
+
+  const handleSubmitForm = async () => {
+    if (isLoading) return;
+
+    if (!form.cash_id) {
+      toast.error('Kas wajib dipilih');
+      return;
+    }
+    if (!form.account_id) {
+      toast.error('Akun wajib dipilih');
+      return;
+    }
+    const amount = parseMoneyInput(form.amount);
+    if (amount <= 0) {
+      toast.error('Nominal pembayaran harus lebih dari 0');
+      return;
+    }
+    if (!form.payment_at) {
+      toast.error('Tanggal bayar wajib diisi');
+      return;
+    }
+
+    const payload: FinanceBillingPayload = {
+      cash_flow_id: cashFlowDetail.id,
+      cash_id: form.cash_id,
+      account_id: form.account_id,
+      amount,
+      amount_original: amount,
+      payment_at: form.payment_at,
+      note: form.note,
+    };
+
+    try {
+      if (editingId) {
+        await updateMutation.mutateAsync({ id: editingId, payload });
+        toast.success('Pembayaran berhasil diperbarui');
+      } else {
+        await createMutation.mutateAsync(payload);
+        toast.success('Pembayaran berhasil ditambahkan');
+      }
+      closeForm();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Gagal menyimpan pembayaran');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget || deleteMutation.isPending) return;
+    try {
+      await deleteMutation.mutateAsync(deleteTarget.id);
+      toast.success('Pembayaran berhasil dihapus');
+      setDeleteTarget(null);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Gagal menghapus pembayaran');
+    }
+  };
+
+  const getKasLabel = (cashId: number) => {
+    const kas = kasOptions.find((k) => Number(k.id) === cashId);
+    return kas ? `${kas.code} - ${kas.description}` : '-';
+  };
+
+  return (
+    <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">Rincian Pembayaran</h3>
+          <p className="text-sm text-slate-500 mt-1">Daftar finance billing yang terkait dengan transaksi ini</p>
+        </div>
+        {!disabled && (
+          <Button
+            type="button"
+            className="h-10 rounded-xl bg-[#18385b] px-4 text-white text-xs font-semibold hover:bg-[#102843] transition-colors"
+            onClick={openAddForm}
+          >
+            <Plus className="mr-1.5 h-4 w-4" />
+            Tambah Pembayaran
+          </Button>
+        )}
+      </div>
+
+      {financeBillings.length === 0 && !isFormOpen ? (
+        <div className="flex min-h-32 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-slate-500">
+          Belum ada data pembayaran.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-12 text-center">No</TableHead>
+                <TableHead>Tanggal Bayar</TableHead>
+                <TableHead>Kas</TableHead>
+                <TableHead className="text-right">Nominal</TableHead>
+                <TableHead>Catatan</TableHead>
+                <TableHead className="w-12 text-center">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {financeBillings.map((fb, index) => (
+                <TableRow key={fb.id}>
+                  <TableCell className="text-center text-slate-500">{index + 1}</TableCell>
+                  <TableCell className="text-slate-800">{formatDate(fb.payment_at)}</TableCell>
+                  <TableCell className="text-slate-800">{getKasLabel(fb.cash_id)}</TableCell>
+                  <TableCell className="text-right font-semibold text-slate-900">
+                    {currenciesFormat('idr', fb.amount)}
+                  </TableCell>
+                  <TableCell className="text-slate-600 max-w-[200px] truncate">{fb.note || '-'}</TableCell>
+                  <TableCell className="text-center">
+                    {!disabled && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEditForm(fb)} className="cursor-pointer">
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setDeleteTarget(fb)} className="cursor-pointer text-red-600 focus:text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {/* Summary */}
+      <div className="flex flex-col items-end gap-2 border-t border-slate-100 pt-4 text-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-slate-500">Total Pembayaran:</span>
+          <span className="font-bold text-slate-900">{currenciesFormat('idr', totalPaid)}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-slate-500">Grand Total:</span>
+          <span className="font-semibold text-slate-800">{currenciesFormat('idr', grandTotal)}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-slate-500">Sisa Tagihan:</span>
+          <span className={`font-bold ${remainingPayment > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+            {currenciesFormat('idr', remainingPayment)}
+          </span>
+        </div>
+      </div>
+
+      {/* Add / Edit Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={(open) => { if (!open) closeForm(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingId ? 'Edit Pembayaran' : 'Tambah Pembayaran Baru'}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Kas */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-800">Kas</label>
+                <Select
+                  value={form.cash_id ? String(form.cash_id) : ''}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, cash_id: Number(v) }))}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="w-full h-11">
+                    <SelectValue placeholder="Pilih kas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {kasOptions.map((k) => (
+                      <SelectItem key={k.id} value={String(k.id)}>
+                        {k.code} - {k.description}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Akun */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-800">Akun</label>
+                <Select
+                  value={form.account_id ? String(form.account_id) : ''}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, account_id: Number(v) }))}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="w-full h-11">
+                    <SelectValue placeholder="Pilih akun" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {akunOptions.map((a) => (
+                      <SelectItem key={a.id} value={String(a.id)}>
+                        {a.code} - {a.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Nominal */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-800">Nominal</label>
+                <Input
+                  value={form.amount}
+                  onChange={(e) => setForm((prev) => ({ ...prev, amount: formatMoneyInput(e.target.value) }))}
+                  placeholder="Rp 0"
+                  className="h-11"
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Tanggal Bayar */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-800">Tanggal Bayar</label>
+                <Input
+                  type="date"
+                  value={form.payment_at}
+                  onChange={(e) => setForm((prev) => ({ ...prev, payment_at: e.target.value }))}
+                  className="h-11"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {/* Catatan */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-800">Catatan</label>
+              <Textarea
+                value={form.note}
+                onChange={(e) => setForm((prev) => ({ ...prev, note: e.target.value }))}
+                placeholder="Catatan pembayaran..."
+                className="min-h-20 resize-none rounded-xl"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={closeForm} disabled={isLoading}>
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="bg-[#18385b] text-white hover:bg-[#102843]"
+              disabled={isLoading}
+              onClick={() => void handleSubmitForm()}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Pembayaran?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Anda yakin ingin menghapus pembayaran sebesar{' '}
+              <span className="font-semibold">{deleteTarget ? currenciesFormat('idr', deleteTarget.amount) : ''}</span>?
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 text-white hover:bg-red-700"
+              disabled={deleteMutation.isPending}
+              onClick={() => void handleDelete()}
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Menghapus...
+                </>
+              ) : (
+                'Hapus'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

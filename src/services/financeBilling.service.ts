@@ -1,4 +1,5 @@
 import type {
+  FinanceBilling,
   FinanceBillingDetail,
   FinanceBillingDetailResponse,
   FinanceBillingItem,
@@ -6,12 +7,14 @@ import type {
   FinanceBillingListItem,
   FinanceBillingListResponse,
   FinanceBillingListResult,
+  FinanceBillingPayload,
 } from '@/@types/finance-billing.types';
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, mapLaravelPaginationMeta, type LaravelApiResponse } from '@/lib/api/response';
 
 const BILLING_PATH = '/wapi/finance/finance-billing';
 const BILLING_ITEM_PATH = '/wapi/finance/finance-billing-item';
+const FINANCE_BILLING_CRUD_PATH = '/wapi/finance/finance-billings';
 
 const toNumber = (value: unknown): number => {
   const parsed = Number(value ?? 0);
@@ -212,4 +215,79 @@ export async function updateFinanceBillingItem(id: number | string, payload: Fin
 
 export async function deleteFinanceBillingItem(id: number | string) {
   await apiClient.delete(`${BILLING_ITEM_PATH}/${id}`);
+}
+
+const normalizeFinanceBilling = (item: any): FinanceBilling => ({
+  id: toNumber(item?.id),
+  uuid: item?.uuid,
+  cash_flow_id: toNumber(item?.cash_flow_id),
+  cash_id: toNumber(item?.cash_id),
+  account_id: toNumber(item?.account_id),
+  amount: toNumber(item?.amount),
+  amount_original: toNumber(item?.amount_original),
+  payment_proof: item?.payment_proof ?? null,
+  payment_at: item?.payment_at ?? '',
+  note: item?.note ?? '',
+  created_at: item?.created_at ?? '',
+  updated_at: item?.updated_at ?? '',
+  cash: {
+    id: toNumber(item?.cash?.id),
+    uuid: item?.cash?.uuid,
+    company_id: item?.cash?.company_id ? toNumber(item?.cash.company_id) : undefined,
+    code: item?.cash?.code ?? '-',
+    cash_name: item?.cash?.cash_name ?? '-',
+  },
+});
+
+export async function createFinanceBilling(payload: FinanceBillingPayload): Promise<FinanceBilling> {
+  const formData = new FormData();
+  formData.append('cash_flow_id', String(payload.cash_flow_id));
+  formData.append('cash_id', String(payload.cash_id));
+  formData.append('account_id', String(payload.account_id));
+  formData.append('amount', String(payload.amount));
+  if (payload.amount_original != null) {
+    formData.append('amount_original', String(payload.amount_original));
+  }
+  formData.append('payment_at', payload.payment_at);
+  formData.append('note', payload.note);
+  if (payload.payment_proof) {
+    formData.append('payment_proof', payload.payment_proof);
+  }
+
+  const response = await apiClient.post<{ status: boolean; message?: string; errors: Record<string, string[]> | null; data: FinanceBilling }>(
+    FINANCE_BILLING_CRUD_PATH,
+    formData,
+  );
+
+  const data = ensureSuccess(toSuccessPayload(response.data));
+  return normalizeFinanceBilling(data);
+}
+
+export async function updateFinanceBilling(id: number | string, payload: FinanceBillingPayload): Promise<FinanceBilling> {
+  const formData = new FormData();
+  formData.append('_method', 'PUT');
+  formData.append('cash_flow_id', String(payload.cash_flow_id));
+  formData.append('cash_id', String(payload.cash_id));
+  formData.append('account_id', String(payload.account_id));
+  formData.append('amount', String(payload.amount));
+  if (payload.amount_original != null) {
+    formData.append('amount_original', String(payload.amount_original));
+  }
+  formData.append('payment_at', payload.payment_at);
+  formData.append('note', payload.note);
+  if (payload.payment_proof) {
+    formData.append('payment_proof', payload.payment_proof);
+  }
+
+  const response = await apiClient.post<{ status: boolean; message?: string; errors: Record<string, string[]> | null; data: FinanceBilling }>(
+    `${FINANCE_BILLING_CRUD_PATH}/${id}`,
+    formData,
+  );
+
+  const data = ensureSuccess(toSuccessPayload(response.data));
+  return normalizeFinanceBilling(data);
+}
+
+export async function deleteFinanceBilling(id: number | string) {
+  await apiClient.delete(`${FINANCE_BILLING_CRUD_PATH}/${id}`);
 }
