@@ -85,10 +85,10 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
                   <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{trx.name}</td>
 
                   {/* BANK */}
-                  <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? currenciesFormat('usd', trx.debitUSD, 'USD') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm ${trx.creditUSD ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditUSD ? currenciesFormat('usd', trx.creditUSD, 'USD') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm ${trx.debitIDR ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitIDR ? currenciesFormat('idr', trx.debitIDR, 'IDR') : '0'}</td>
-                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditIDR ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditIDR ? currenciesFormat('idr', trx.creditIDR, 'IDR') : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? currenciesFormat('usd', trx.debitUSD) : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.creditUSD ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditUSD ? currenciesFormat('usd', trx.creditUSD) : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm ${trx.debitIDR ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitIDR ? currenciesFormat('idr', trx.debitIDR) : '0'}</td>
+                  <td className={`px-4 py-4 text-center text-sm border-r ${trx.creditIDR ? 'text-red-600 font-medium' : 'text-slate-400'}`}>{trx.creditIDR ? currenciesFormat('idr', trx.creditIDR) : '0'}</td>
 
                   {/* CASH */}
                   <td className={`px-4 py-4 text-center text-sm ${trx.debitCash ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitCash ? currenciesFormat('idr', trx.debitCash) : '0'}</td>
