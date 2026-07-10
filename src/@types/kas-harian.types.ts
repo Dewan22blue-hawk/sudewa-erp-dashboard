@@ -52,7 +52,7 @@ export interface KasHarian {
   credit_original?: number;
   transaction_category?: string;
   payment_proof?: string | null;
-  is_paid?: boolean;
+  is_paid?: boolean | string | null;
   is_valid?: boolean;
   created_at?: string;
   updated_at?: string;
@@ -69,8 +69,8 @@ export interface KasHarian {
 
 export interface CashFlowPayload {
   company_id: number;
-  cash_id: number;
-  account_id: number;
+  cash_id?: number;
+  account_id?: number;
   date: string;
   note: string;
   debet: number;

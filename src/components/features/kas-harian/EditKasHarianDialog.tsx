@@ -6,9 +6,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useAccounts } from '@/hooks/useAccount';
 import { fetchUserCompanies } from '@/services/company.service';
-import { useKas } from '@/hooks/useKas';
 import { useUpdateKasHarian } from '@/hooks/useKasHarian';
 import { kasHarianSchema, type KasHarianFormInput, type KasHarianFormValues } from '@/scheme/kas-harian.schema';
 import type { KasHarian } from '@/@types/kas-harian.types';
@@ -27,15 +25,12 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
     resolver: zodResolver(kasHarianSchema) as Resolver<KasHarianFormInput, unknown, KasHarianFormValues>,
     defaultValues: {
       company_id: 0,
-      cash_id: 0,
-      account_id: 0,
       date: new Date(),
       note: '',
       debet: 0,
       credit: 0,
       transaction_category: 'general',
       payment_proof: null,
-      is_paid: false,
     },
   });
 
@@ -45,28 +40,16 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
     staleTime: 10 * 60 * 1000,
   });
 
-  const cashQuery = useKas(data?.company_id);
-  const accountQuery = useAccounts({
-    page: 1,
-    perPage: 1000,
-    search: '',
-    company_id: data?.company_id,
-    enabled: open && Number(data?.company_id ?? 0) > 0,
-  });
-
   useEffect(() => {
     if (data && open) {
       form.reset({
         company_id: data.company_id,
-        cash_id: data.cash_id,
-        account_id: data.account_id ?? 0,
         date: data.date ? new Date(data.date) : new Date(),
         note: data.note,
         debet: data.debet,
         credit: data.credit,
         transaction_category: data.transaction_category || 'general',
         payment_proof: null,
-        is_paid: Boolean(data.is_paid),
       });
     }
   }, [data, open, form]);
@@ -79,15 +62,12 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
         id: data.id,
         payload: {
           company_id: values.company_id,
-          cash_id: values.cash_id,
-          account_id: values.account_id,
           date: format(values.date, 'yyyy-MM-dd'),
           note: values.note,
           debet: values.debet,
           credit: values.credit,
           transaction_category: values.transaction_category,
           payment_proof: values.payment_proof,
-          is_paid: values.is_paid,
         },
       });
 
@@ -115,13 +95,7 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
               onSubmit={onSubmit}
               id="edit-kas-form"
               companies={companyQuery.data ?? []}
-              cashOptions={cashQuery.data?.data ?? []}
-              accountOptions={accountQuery.data?.data ?? []}
-              isLoadingCash={cashQuery.isLoading}
-              isLoadingAccount={accountQuery.isLoading}
               lockAmounts={lockAmounts}
-              initialCash={data?.cash}
-              initialAccount={data?.account}
             />
           </div>
 

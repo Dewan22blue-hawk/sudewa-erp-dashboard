@@ -10,6 +10,7 @@ interface KasApiModel {
   code: string;
   description: string;
   type: KasType;
+  cash_name?: string;
   amount?: number | string;
   created_at?: string;
   updated_at?: string;
@@ -25,6 +26,7 @@ const mapKas = (payload: KasApiModel): Kas => ({
   id: payload.id,
   uuid: payload.uuid,
   code: payload.code,
+  cash_name: payload.cash_name,
   description: payload.description,
   type: payload.type,
   amount: payload.amount ?? 0,

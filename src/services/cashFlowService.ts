@@ -113,8 +113,12 @@ const toSuccessPayload = <T>(payload: { status: boolean; message?: string; error
 const buildCashFlowFormData = (payload: CashFlowPayload) => {
   const formData = new FormData();
   formData.append('company_id', String(payload.company_id));
-  formData.append('cash_id', String(payload.cash_id));
-  formData.append('account_id', String(payload.account_id));
+  if (payload.cash_id !== undefined && payload.cash_id !== null) {
+    formData.append('cash_id', String(payload.cash_id));
+  }
+  if (payload.account_id !== undefined && payload.account_id !== null) {
+    formData.append('account_id', String(payload.account_id));
+  }
   formData.append('date', payload.date);
   formData.append('note', payload.note);
   formData.append('transaction_category', payload.transaction_category);
@@ -127,8 +131,9 @@ const buildCashFlowFormData = (payload: CashFlowPayload) => {
   if (payload.payment_proof) {
     formData.append('payment_proof', payload.payment_proof);
   }
-  if (payload.is_paid !== undefined) {
-    formData.append('is_paid', payload.is_paid ? '1' : '0');
+  if (payload.is_paid !== undefined && payload.is_paid !== null) {
+    const isPaidBool = payload.is_paid === true || String(payload.is_paid).toLowerCase() === 'true' || String(payload.is_paid) === '1';
+    formData.append('is_paid', isPaidBool ? 'true' : 'false');
   }
   return formData;
 };
@@ -180,23 +185,9 @@ export async function deleteCashFlow(id: number | string) {
 }
 
 export async function toggleCashFlowPaymentStatus(id: number | string, isPaid: boolean) {
-  // Fetch item first to guarantee that no validation error occurs
-  const currentItem = await fetchCashFlowDetail(id);
   const formData = new FormData();
   formData.append('_method', 'PUT');
-  formData.append('company_id', String(currentItem.company_id));
-  formData.append('cash_id', String(currentItem.cash_id));
-  formData.append('account_id', String(currentItem.account_id ?? ''));
-  formData.append('date', currentItem.date.slice(0, 10));
-  formData.append('note', currentItem.note);
-  formData.append('transaction_category', currentItem.transaction_category ?? 'general');
-  if (currentItem.debet > 0) {
-    formData.append('debet', String(currentItem.debet));
-  }
-  if (currentItem.credit > 0) {
-    formData.append('credit', String(currentItem.credit));
-  }
-  formData.append('is_paid', isPaid ? '1' : '0');
+  formData.append('is_paid', isPaid ? 'true' : 'false');
 
   const response = await apiClient.post<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
   const item = ensureSuccess(toSuccessPayload(response.data));

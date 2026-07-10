@@ -43,8 +43,6 @@ export default function TransactionCategoryModal({ open, onOpenChange, cashFlowD
         id: cashFlowDetail.id,
         payload: {
           company_id: cashFlowDetail.company_id,
-          cash_id: cashFlowDetail.cash_id,
-          account_id: cashFlowDetail.account_id ?? 0,
           date: cashFlowDetail.date.slice(0, 10),
           note: cashFlowDetail.note || '',
           debet: cashFlowDetail.debet,

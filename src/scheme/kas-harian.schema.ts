@@ -19,15 +19,12 @@ const dateField = z.preprocess((value) => {
 export const kasHarianSchema = z
   .object({
     company_id: z.number({ required_error: 'Perusahaan wajib dipilih' }).min(1, 'Perusahaan wajib dipilih'),
-    cash_id: z.number({ required_error: 'Kas wajib dipilih' }).min(1, 'Kas wajib dipilih'),
-    account_id: z.number({ required_error: 'Akun wajib dipilih' }).min(1, 'Akun wajib dipilih'),
     date: dateField,
     note: z.string().trim().min(3, 'Keterangan minimal 3 karakter'),
     debet: z.number().min(0, 'Debet tidak valid'),
     credit: z.number().min(0, 'Kredit tidak valid'),
     transaction_category: z.string({ required_error: 'Kategori transaksi wajib dipilih' }).min(1, 'Kategori transaksi wajib dipilih'),
     payment_proof: fileField,
-    is_paid: z.boolean().optional(),
   })
   .superRefine((value, ctx) => {
     const hasDebet = value.debet > 0;

@@ -1,14 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Loader2, Plus, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useCreateFinanceBilling, useUpdateFinanceBilling, useDeleteFinanceBilling } from '@/hooks/useFinanceBilling';
@@ -45,6 +45,116 @@ interface FormState {
   amount: string;
   payment_at: string;
   note: string;
+}
+
+interface SearchableSelectProps<T> {
+  value: number;
+  onValueChange: (val: number) => void;
+  options: T[];
+  placeholder: string;
+  searchPlaceholder: string;
+  getLabel: (option: T) => string;
+  getSearchText: (option: T) => string;
+  disabled?: boolean;
+}
+
+function SearchableSelect<T extends { id: number | string }>({
+  value,
+  onValueChange,
+  options,
+  placeholder,
+  searchPlaceholder,
+  getLabel,
+  getSearchText,
+  disabled,
+}: SearchableSelectProps<T>) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const selectedOption = useMemo(() => {
+    return options.find((opt) => Number(opt.id) === value) || null;
+  }, [options, value]);
+
+  const filteredOptions = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((opt) => getSearchText(opt).toLowerCase().includes(q));
+  }, [options, search, getSearchText]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+        setSearch('');
+      }
+    };
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
+
+  return (
+    <div ref={dropdownRef} className="relative w-full">
+      <Button
+        type="button"
+        variant="outline"
+        role="combobox"
+        className={cn(
+          'h-11 w-full justify-between rounded-xl border-slate-200 bg-white px-3 text-left font-normal hover:bg-white text-sm',
+          !value && 'text-slate-400',
+        )}
+        disabled={disabled}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span className="truncate">
+          {selectedOption ? getLabel(selectedOption) : placeholder}
+        </span>
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-slate-400" />
+      </Button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-[calc(100%+0.25rem)] z-[130] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+          <div className="border-b border-slate-100 p-2">
+            <Input
+              placeholder={searchPlaceholder}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 text-sm"
+              autoFocus
+            />
+          </div>
+          <div className="max-h-60 overflow-y-auto p-1">
+            {filteredOptions.length === 0 ? (
+              <div className="px-3 py-4 text-center text-xs text-slate-500">Data tidak ditemukan.</div>
+            ) : (
+              filteredOptions.map((opt) => {
+                const isSelected = Number(opt.id) === value;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-slate-50 transition-colors"
+                    onClick={() => {
+                      onValueChange(Number(opt.id));
+                      setOpen(false);
+                      setSearch('');
+                    }}
+                  >
+                    <Check className={cn('h-4 w-4 shrink-0', isSelected ? 'opacity-100 text-slate-800' : 'opacity-0')} />
+                    <span className="truncate font-medium text-slate-700">{getLabel(opt)}</span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 const EMPTY_FORM: FormState = {
@@ -180,7 +290,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
 
   const getKasLabel = (cashId: number) => {
     const kas = kasOptions.find((k) => Number(k.id) === cashId);
-    return kas ? `${kas.code} - ${kas.description}` : '-';
+    return kas ? (kas.cash_name || `${kas.code} - ${kas.description}`) : '-';
   };
 
   return (
@@ -277,7 +387,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
 
       {/* Add / Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={(open) => { if (!open) closeForm(); }}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-2xl max-h-[600px] overflow-y-auto w-full" id='finance-billing-form'>
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit Pembayaran' : 'Tambah Pembayaran Baru'}</DialogTitle>
           </DialogHeader>
@@ -287,43 +397,31 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
               {/* Kas */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-800">Kas</label>
-                <Select
-                  value={form.cash_id ? String(form.cash_id) : ''}
-                  onValueChange={(v) => setForm((prev) => ({ ...prev, cash_id: Number(v) }))}
+                <SearchableSelect
+                  value={form.cash_id}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, cash_id: v }))}
+                  options={kasOptions}
+                  placeholder="Pilih kas"
+                  searchPlaceholder="Cari kas..."
+                  getLabel={(k) => k.cash_name || `${k.code} - ${k.description}`}
+                  getSearchText={(k) => `${k.cash_name || ''} ${k.code} ${k.description}`}
                   disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full h-11">
-                    <SelectValue placeholder="Pilih kas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {kasOptions.map((k) => (
-                      <SelectItem key={k.id} value={String(k.id)}>
-                        {k.code} - {k.description}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
 
               {/* Akun */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-800">Akun</label>
-                <Select
-                  value={form.account_id ? String(form.account_id) : ''}
-                  onValueChange={(v) => setForm((prev) => ({ ...prev, account_id: Number(v) }))}
+                <SearchableSelect
+                  value={form.account_id}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, account_id: v }))}
+                  options={akunOptions}
+                  placeholder="Pilih akun"
+                  searchPlaceholder="Cari akun..."
+                  getLabel={(a) => `${a.code} - ${a.name}`}
+                  getSearchText={(a) => `${a.code} ${a.name}`}
                   disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full h-11">
-                    <SelectValue placeholder="Pilih akun" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {akunOptions.map((a) => (
-                      <SelectItem key={a.id} value={String(a.id)}>
-                        {a.code} - {a.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
             </div>
 

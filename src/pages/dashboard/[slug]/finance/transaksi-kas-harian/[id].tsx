@@ -52,7 +52,7 @@ export default function KasHarianDetailPage() {
 
   const cashFlowQuery = useKasHarianDetail(cashFlowId, {
     enabled: typeof cashFlowId === 'number' && Number.isFinite(cashFlowId),
-    refetchInterval: !isToggleOpen ? LIVE_UPDATE_INTERVAL : false,
+    refetchInterval: false,
   });
 
   const cashFlowDetail = cashFlowQuery.data;
@@ -62,8 +62,6 @@ export default function KasHarianDetailPage() {
 
   const updateMutation = useUpdateKasHarian();
   const [transactionNote, setTransactionNote] = useState('');
-  const [selectedKasId, setSelectedKasId] = useState<number | null>(null);
-  const [selectedAkunId, setSelectedAkunId] = useState<number | null>(null);
 
   const isLoading = cashFlowQuery.isLoading || router.isFallback;
   const errorMessage = cashFlowQuery.error instanceof Error ? cashFlowQuery.error.message : null;
@@ -78,8 +76,6 @@ export default function KasHarianDetailPage() {
 
   useEffect(() => {
     if (cashFlowDetail) {
-      setSelectedKasId(cashFlowDetail.cash_id);
-      setSelectedAkunId(cashFlowDetail.account_id ?? null);
       setTransactionNote(cashFlowDetail.note || '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,16 +83,6 @@ export default function KasHarianDetailPage() {
 
   const handleSaveData = async () => {
     if (!cashFlowDetail) return;
-
-    if (!selectedKasId) {
-      toast.error('Kas terkait wajib dipilih');
-      return;
-    }
-
-    if (!selectedAkunId) {
-      toast.error('Nama akun wajib dipilih');
-      return;
-    }
 
     if (!transactionNote || transactionNote.trim().length < 3) {
       toast.error('Catatan transaksi minimal 3 karakter');
@@ -108,8 +94,6 @@ export default function KasHarianDetailPage() {
         id: cashFlowDetail.id,
         payload: {
           company_id: companyId,
-          cash_id: selectedKasId,
-          account_id: selectedAkunId,
           date: cashFlowDetail.date.slice(0, 10),
           note: transactionNote.trim(),
           debet: cashFlowDetail.debet,
@@ -189,7 +173,7 @@ export default function KasHarianDetailPage() {
           </div>
 
           {/* 1. GENERAL INFO CARD */}
-          <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-6">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kode Transaksi</label>
@@ -224,40 +208,11 @@ export default function KasHarianDetailPage() {
                 <p className="text-base font-bold text-slate-900">{currenciesFormat('idr', remainingPayment)}</p>
               </div>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 mt-6 pt-6 border-t border-slate-100 text-xs text-slate-400">
-              <div>Dibuat: {formatDate(cashFlowDetail.created_at)}</div>
-              <div>Diupdate: {formatDate(cashFlowDetail.updated_at)}</div>
-            </div>
-          </div>
 
-          {/* 2. KLASIFIKASI & CATATAN TRANSAKSI */}
-          <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-            <div className="border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Klasifikasi & Catatan Transaksi</h3>
-              <p className="text-sm text-slate-500 mt-1">Rincian klasifikasi akun pembukuan dan catatan transaksi.</p>
-            </div>
+            {/* Divider */}
+            <div className="border-t border-slate-100 pt-6" />
 
-            <div className="grid gap-5 md:grid-cols-3">
-              {/* KAS */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Kas Terkait</label>
-                <Input
-                  value={cashFlowDetail.cash ? `${cashFlowDetail.cash.code ?? '-'} - ${cashFlowDetail.cash.description ?? '-'}` : '-'}
-                  readOnly
-                  className="h-12 rounded-xl border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
-                />
-              </div>
-
-              {/* AKUN */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Nama Akun</label>
-                <Input
-                  value={cashFlowDetail.account ? `${cashFlowDetail.account.code ?? '-'} - ${cashFlowDetail.account.name ?? '-'}` : '-'}
-                  readOnly
-                  className="h-12 rounded-xl border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
-                />
-              </div>
-
+            <div className="grid gap-6 md:grid-cols-3">
               {/* TRANSACTION CATEGORY - Clickable */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-800">Kategori Transaksi</label>
@@ -273,39 +228,45 @@ export default function KasHarianDetailPage() {
                   <span className="flex-1 truncate font-medium text-slate-800">
                     {TRANSACTION_CATEGORY_MAP[cashFlowDetail.transaction_category || ''] || cashFlowDetail.transaction_category || '-'}
                   </span>
-                  <span className="text-xs text-slate-400">Ubah</span>
+                  <span className="text-xs font-semibold text-[#18385b] hover:underline">Ubah</span>
                 </button>
+              </div>
+
+              {/* CATATAN TRANSAKSI */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-slate-800">Catatan Transaksi</label>
+                <div className="flex gap-4 items-start">
+                  <Textarea
+                    value={transactionNote}
+                    onChange={(event) => setTransactionNote(event.target.value)}
+                    placeholder="Masukkan catatan transaksi..."
+                    className="min-h-12 h-12 py-3 resize-none rounded-xl border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors flex-1"
+                  />
+                  <Button
+                    type="button"
+                    className="h-12 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843] transition-colors shrink-0"
+                    disabled={updateMutation.isPending}
+                    onClick={() => void handleSaveData()}
+                  >
+                    {updateMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Menyimpan...
+                      </>
+                    ) : (
+                      'Simpan Catatan'
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 
-            {/* CATATAN TRANSAKSI */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-800">Catatan Transaksi</label>
-              <Textarea
-                value={transactionNote}
-                onChange={(event) => setTransactionNote(event.target.value)}
-                placeholder="Masukkan catatan transaksi..."
-                className="min-h-24 resize-none rounded-xl border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors"
-              />
-            </div>
+            {/* Divider */}
+            <div className="border-t border-slate-100 pt-6" />
 
-            {/* SIMPAN DATA KLASIFIKASI */}
-            <div className="flex justify-end pt-2">
-              <Button
-                type="button"
-                className="h-11 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843] transition-colors"
-                disabled={updateMutation.isPending}
-                onClick={() => void handleSaveData()}
-              >
-                {updateMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Menyimpan...
-                  </>
-                ) : (
-                  'Simpan Data'
-                )}
-              </Button>
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 text-xs text-slate-400">
+              <div>Dibuat: {formatDate(cashFlowDetail.created_at)}</div>
+              <div>Diupdate: {formatDate(cashFlowDetail.updated_at)}</div>
             </div>
           </div>
 
