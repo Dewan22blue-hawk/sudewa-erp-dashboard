@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, Tag } from 'lucide-react';
+import { ArrowLeft, Loader2, Tag, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import FinanceBillingTable from '@/components/features/kas-harian/FinanceBillingTable';
 import TransactionCategoryModal from '@/components/features/kas-harian/TransactionCategoryModal';
@@ -50,6 +50,9 @@ export default function KasHarianDetailPage() {
   const [targetStatus, setTargetStatus] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const cashFlowQuery = useKasHarianDetail(cashFlowId, {
     enabled: typeof cashFlowId === 'number' && Number.isFinite(cashFlowId),
     refetchInterval: false,
@@ -65,6 +68,33 @@ export default function KasHarianDetailPage() {
 
   const isLoading = cashFlowQuery.isLoading || router.isFallback;
   const errorMessage = cashFlowQuery.error instanceof Error ? cashFlowQuery.error.message : null;
+
+  const handleUploadProof = async (file: File) => {
+    if (!cashFlowDetail) return;
+    setIsUploading(true);
+
+    try {
+      await updateMutation.mutateAsync({
+        id: cashFlowDetail.id,
+        payload: {
+          company_id: companyId,
+          date: cashFlowDetail.date.slice(0, 10),
+          note: transactionNote.trim() || cashFlowDetail.note || '',
+          debet: cashFlowDetail.debet,
+          credit: cashFlowDetail.credit,
+          transaction_category: cashFlowDetail.transaction_category || 'general',
+          payment_proof: file,
+        },
+      });
+      toast.success('Bukti pembayaran utama berhasil disimpan');
+      setSelectedFile(null);
+      void cashFlowQuery.refetch();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Gagal menyimpan bukti pembayaran utama');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const grandTotal = Number(cashFlowDetail?.grand_total || cashFlowDetail?.unit_transaction_billing?.grand_total || 0);
   const totalPaid = useMemo(
@@ -290,14 +320,62 @@ export default function KasHarianDetailPage() {
 
           {/* 5. BUKTI PEMBAYARAN UTAMA */}
           <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Bukti Pembayaran Utama</h3>
-            <div className="flex min-h-32 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-slate-500">
-              {proofUrl ? (
-                <a href={proofUrl} target="_blank" rel="noreferrer" className="font-semibold text-[#18385b] hover:text-[#102843] underline transition-colors">
-                  Lihat bukti pembayaran utama
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-slate-900">Bukti Pembayaran Utama</h3>
+              {proofUrl && (
+                <a href={proofUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#18385b] hover:text-[#102843] underline transition-colors">
+                  Lihat bukti pembayaran utama saat ini
                 </a>
-              ) : (
-                <span className="text-sm">Belum ada bukti pembayaran utama yang diunggah.</span>
+              )}
+            </div>
+            
+            <div className="space-y-3">
+              <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center hover:bg-slate-100/50 transition-colors">
+                <Upload className="mb-3 h-7 w-7 text-slate-500" />
+                <span className="text-sm font-medium text-slate-700">
+                  {selectedFile ? selectedFile.name : (proofUrl ? 'Klik untuk ganti bukti pembayaran' : 'Klik untuk upload bukti pembayaran')}
+                </span>
+                <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null;
+                    if (file) {
+                      setSelectedFile(file);
+                    }
+                  }}
+                />
+              </label>
+
+              {selectedFile && (
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 rounded-xl px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50"
+                    onClick={() => setSelectedFile(null)}
+                    disabled={isUploading}
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="button"
+                    className="h-10 rounded-xl bg-[#18385b] px-4 text-xs font-semibold text-white hover:bg-[#102843] transition-colors cursor-pointer"
+                    onClick={() => void handleUploadProof(selectedFile)}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Mengunggah...
+                      </>
+                    ) : (
+                      'Simpan Bukti Pembayaran'
+                    )}
+                  </Button>
+                </div>
               )}
             </div>
           </div>
