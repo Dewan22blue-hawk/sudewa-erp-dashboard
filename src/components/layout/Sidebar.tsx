@@ -1,4 +1,5 @@
 import { ChevronDown, Check, Menu, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -59,9 +60,15 @@ export function Sidebar() {
 
   const sidebarContent = (
     <aside className={cn("flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB] transition-[width] duration-300 ease-in-out", isDesktopCollapsed ? "w-[72px]" : "w-64")}>
-      <div className="flex h-16 shrink-0 items-center px-4 border-b border-gray-200">
+      <div className={cn("flex h-16 shrink-0 items-center border-b border-gray-200", isDesktopCollapsed ? "px-0 justify-center" : "px-4")}>
         <div className="flex w-full items-center gap-2">
-          {!isDesktopCollapsed && (
+          {isDesktopCollapsed ? (
+            <div className="flex items-center justify-center w-full">
+              <div className="relative w-8 h-8">
+                <Image src="/assets/login_banner.png" alt="Logo" fill className="object-contain" sizes="32px" />
+              </div>
+            </div>
+          ) : (
             <CompanySelector
               companies={companies}
               companyId={companyId}
@@ -71,7 +78,7 @@ export function Sidebar() {
 
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden ml-1 shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-gray-200 transition-colors"
+            className={cn("md:hidden shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-gray-200 transition-colors", !isDesktopCollapsed && "ml-1")}
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
