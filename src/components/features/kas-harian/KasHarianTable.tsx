@@ -94,6 +94,8 @@ export default function KasHarianTable({
     });
   }, [data, sortBy, sortDirection]);
 
+  console.log(sortedData);
+
   const pageNumbers = (() => {
     if (meta.lastPage <= 5) return Array.from({ length: meta.lastPage }, (_, index) => index + 1);
     if (page <= 3) return [1, 2, 3, 4, '...', meta.lastPage];
@@ -136,9 +138,7 @@ export default function KasHarianTable({
               <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('STATUS', 'is_paid', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('AKUN', 'accountName', 'left')}</th>
-              <th className="p-0 text-left">{renderSortHeader('KAS', 'cashName', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('STATUS BAYAR', 'is_paid', 'center')}</th>
               <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
             </tr>
           </thead>
@@ -179,11 +179,9 @@ export default function KasHarianTable({
                         ? "bg-green-50 text-green-700 border border-green-200"
                         : "bg-amber-50 text-amber-700 border border-amber-200"
                     )}>
-                      {item.is_paid ? 'Lunas' : 'Belum'}
+                      {item.is_paid ? 'Lunas' : 'Belum Lunas'}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.accountName}</td>
-                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.cashName || '-'}</td>
                   <td className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -1,8 +1,9 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,8 @@ const formatMoneyInput = (value: string) => {
   if (!digits) return '';
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
+
+const formatMoneyValue = (value: number) => formatMoneyInput(String(Math.max(0, Math.floor(value))));
 
 const parseMoneyInput = (value: string) => {
   const normalized = value.replace(/\D/g, '');
@@ -199,7 +202,21 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     [financeBillings],
   );
   const grandTotal = Number(cashFlowDetail.grand_total || cashFlowDetail.unit_transaction_billing?.grand_total || 0);
+  const cashFlowAmount = Number(cashFlowDetail.amount || cashFlowDetail.debet || cashFlowDetail.credit || grandTotal || 0);
+  const editingAmount = useMemo(() => {
+    if (!editingId) return 0;
+    return Number(financeBillings.find((fb) => fb.id === editingId)?.amount || 0);
+  }, [editingId, financeBillings]);
+  const maxPaymentAmount = Math.max(0, cashFlowAmount - totalPaid + editingAmount);
+  const hasPaymentLimit = cashFlowAmount > 0;
   const remainingPayment = Number(cashFlowDetail.remaining_payment ?? Math.max(0, grandTotal - totalPaid));
+  const selectedKas = useMemo(
+    () => kasOptions.find((kas) => Number(kas.id) === Number(form.cash_id)) ?? null,
+    [form.cash_id, kasOptions],
+  );
+  const selectedCurrency = selectedKas?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr';
+  const selectedCurrencySymbol = selectedCurrency === 'usd' ? '$' : 'Rp';
+  const formatSelectedCurrency = (value: number) => currenciesFormat(selectedCurrency, value);
 
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
@@ -207,7 +224,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     setEditingId(null);
     setForm({
       ...EMPTY_FORM,
-      cash_id: cashFlowDetail.cash_id,
+      cash_id: cashFlowDetail.cash_id ?? 0,
       account_id: cashFlowDetail.account_id ?? 0,
       payment_at: cashFlowDetail.date?.slice(0, 10) || '',
     });
@@ -246,6 +263,10 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     const amount = parseMoneyInput(form.amount);
     if (amount <= 0) {
       toast.error('Nominal pembayaran harus lebih dari 0');
+      return;
+    }
+    if (hasPaymentLimit && amount > maxPaymentAmount) {
+      toast.error(`Nominal pembayaran maksimal ${formatSelectedCurrency(maxPaymentAmount)}`);
       return;
     }
     if (!form.payment_at) {
@@ -297,7 +318,26 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Rincian Pembayaran</h3>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h3 className="text-lg font-semibold text-slate-900">Rincian Pembayaran</h3>
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2 py-0.5 text-xs text-slate-600 font-medium">
+              {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id) ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="cursor-help text-[#18385b] hover:text-[#102843] transition-colors flex items-center">
+                        <Info className="h-3.5 w-3.5 mr-0.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                      Data Arus Transaksi Kas Harian ini terhubung dengan data Administrasi
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : null}
+              <span>Ref: {cashFlowDetail.code}</span>
+            </div>
+          </div>
           <p className="text-sm text-slate-500 mt-1">Daftar finance billing yang terkait dengan transaksi ini</p>
         </div>
         {!disabled && (
@@ -375,10 +415,6 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           <span className="font-bold text-slate-900">{currenciesFormat('idr', totalPaid)}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-slate-500">Grand Total:</span>
-          <span className="font-semibold text-slate-800">{currenciesFormat('idr', grandTotal)}</span>
-        </div>
-        <div className="flex items-center gap-3">
           <span className="text-slate-500">Sisa Tagihan:</span>
           <span className={`font-bold ${remainingPayment > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
             {currenciesFormat('idr', remainingPayment)}
@@ -429,11 +465,23 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             <div className="grid gap-4 md:grid-cols-2">
               {/* Nominal */}
               <div className="space-y-2">
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                  <div className="font-semibold">Maksimal nominal: {formatSelectedCurrency(maxPaymentAmount)}</div>
+                  <div className="mt-0.5 text-amber-700">
+                    Total transaksi {formatSelectedCurrency(cashFlowAmount)} - total terbayar {formatSelectedCurrency(totalPaid)}
+                    {editingId ? ` + nominal pembayaran ini ${formatSelectedCurrency(editingAmount)}` : ''}.
+                  </div>
+                </div>
                 <label className="text-sm font-medium text-slate-800">Nominal</label>
                 <Input
                   value={form.amount}
-                  onChange={(e) => setForm((prev) => ({ ...prev, amount: formatMoneyInput(e.target.value) }))}
-                  placeholder="Rp 0"
+                  onChange={(e) => {
+                    const nextAmount = parseMoneyInput(e.target.value);
+                    const clampedAmount = hasPaymentLimit ? Math.min(nextAmount, maxPaymentAmount) : nextAmount;
+                    setForm((prev) => ({ ...prev, amount: clampedAmount > 0 ? formatMoneyValue(clampedAmount) : '' }));
+                  }}
+                  placeholder={`${selectedCurrencySymbol} 0`}
+                  inputMode="numeric"
                   className="h-11"
                   disabled={isLoading}
                 />

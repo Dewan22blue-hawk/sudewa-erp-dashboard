@@ -8,7 +8,6 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 
 interface Props {
   form: UseFormReturn<KasHarianFormInput, unknown, KasHarianFormValues>;
@@ -27,6 +26,10 @@ export default function KasHarianForm({
 }: Props) {
   const selectedCompanyId = form.watch('company_id');
   const paymentProof = form.watch('payment_proof');
+  const debetAmount = Number(form.watch('debet') ?? 0);
+  const creditAmount = Number(form.watch('credit') ?? 0);
+  const isDebetDisabled = lockAmounts || creditAmount > 0;
+  const isCreditDisabled = lockAmounts || debetAmount > 0;
 
   const selectedCompany = useMemo(
     () => companies.find((company) => Number(company.id) === Number(selectedCompanyId)),
@@ -132,18 +135,19 @@ export default function KasHarianForm({
                 <MoneyInput
                   value={field.value ?? 0}
                   onChangeValue={(value) => {
-                    if (lockAmounts) return;
+                    if (isDebetDisabled) return;
                     field.onChange(value);
                     if (value > 0) {
-                      form.setValue('credit', 0, { shouldValidate: true });
+                      form.setValue('credit', 0, { shouldDirty: true, shouldValidate: true });
                     }
                   }}
                   placeholder="Tambahkan nominal"
                   className="h-12 rounded-2xl border-slate-200 px-4"
-                  disabled={lockAmounts}
+                  disabled={isDebetDisabled}
                 />
               </FormControl>
               {lockAmounts ? <p className="text-xs text-slate-500">Nominal debet transaksi otomatis mengikuti data billing dan tidak bisa diubah di sini.</p> : null}
+              {!lockAmounts && isDebetDisabled ? <p className="text-xs text-slate-500">Kosongkan kredit untuk mengisi debet.</p> : null}
               <FormMessage />
             </FormItem>
           )}
@@ -159,18 +163,19 @@ export default function KasHarianForm({
                 <MoneyInput
                   value={field.value ?? 0}
                   onChangeValue={(value) => {
-                    if (lockAmounts) return;
+                    if (isCreditDisabled) return;
                     field.onChange(value);
                     if (value > 0) {
-                      form.setValue('debet', 0, { shouldValidate: true });
+                      form.setValue('debet', 0, { shouldDirty: true, shouldValidate: true });
                     }
                   }}
                   placeholder="Tambahkan nominal"
                   className="h-12 rounded-2xl border-slate-200 px-4"
-                  disabled={lockAmounts}
+                  disabled={isCreditDisabled}
                 />
               </FormControl>
               {lockAmounts ? <p className="text-xs text-slate-500">Nominal kredit transaksi otomatis mengikuti data billing dan tidak bisa diubah di sini.</p> : null}
+              {!lockAmounts && isCreditDisabled ? <p className="text-xs text-slate-500">Kosongkan debet untuk mengisi kredit.</p> : null}
               <FormMessage />
             </FormItem>
           )}

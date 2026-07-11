@@ -14,7 +14,7 @@ import { ensureSuccess, mapLaravelPaginationMeta, type LaravelApiResponse } from
 
 const BILLING_PATH = '/wapi/finance/finance-billing';
 const BILLING_ITEM_PATH = '/wapi/finance/finance-billing-item';
-const FINANCE_BILLING_CRUD_PATH = '/wapi/finance/finance-billings';
+const FINANCE_BILLING_CRUD_PATH = '/wapi/finance/finance-billing';
 
 const toNumber = (value: unknown): number => {
   const parsed = Number(value ?? 0);
