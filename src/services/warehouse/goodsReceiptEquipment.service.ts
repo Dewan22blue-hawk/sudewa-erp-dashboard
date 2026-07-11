@@ -42,6 +42,7 @@ const mapCash = (item: any) => {
     code: item.code || '',
     description: item.description || '',
     type: item.type || 'cash',
+    amount: item.amount ?? 0,
     companyId: item.company_id ?? null,
   };
 };

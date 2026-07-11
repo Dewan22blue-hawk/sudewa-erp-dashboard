@@ -35,6 +35,7 @@ interface CashApiModel {
   code: string;
   description: string;
   type: 'cash' | 'bank';
+  amount?: number | string;
   created_at?: string;
   updated_at?: string;
 }
@@ -185,6 +186,7 @@ const mapBilling = (payload: MaterialTransactionBillingApiModel): MaterialTransa
         code: payload.cash.code,
         description: payload.cash.description,
         type: payload.cash.type,
+        amount: payload.cash.amount ?? 0,
         companyId: payload.cash.company_id ?? null,
         createdAt: payload.cash.created_at,
         updatedAt: payload.cash.updated_at,

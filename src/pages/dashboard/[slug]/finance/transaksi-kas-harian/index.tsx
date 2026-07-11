@@ -32,7 +32,7 @@ const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   cashFlowId: item.id,
   financeBillingId: (item.finance_billings ?? [])[0]?.id,
   transaction_category: item.transaction_category,
-  is_paid: item.is_paid,
+  is_paid: item.is_paid === true || item.is_paid === '1' ? true : item.is_paid === false || item.is_paid === '0' ? false : undefined,
 });
 
 export default function KasHarianPage() {
