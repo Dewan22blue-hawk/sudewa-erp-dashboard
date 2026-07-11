@@ -35,9 +35,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     if (!token || !companyId) return null
 
     return (
-        <div className="flex h-screen w-full overflow-hidden">
+        <div className="flex h-screen w-full overflow-hidden bg-[#F5F6F8]">
             {/* ── Desktop Sidebar (hidden on mobile) ── */}
-            <div className="print:hidden hidden md:flex shrink-0 w-64 h-full overflow-hidden">
+            <div className="print:hidden hidden md:flex shrink-0 h-full overflow-hidden z-20">
                 <Sidebar />
             </div>
 

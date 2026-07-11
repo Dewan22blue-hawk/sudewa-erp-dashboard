@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText, Shield } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Archive, Warehouse, Landmark, ListChecks, Shield } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getGeneralMenus = (slug: string): MenuItem[] => {
@@ -20,7 +20,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Master Data',
-      icon: Database,
+      icon: ClipboardList,
       children: [
         {
           label: 'Akun',
@@ -70,7 +70,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Administrasi',
-      icon: FileText,
+      icon: Archive,
       children: [
         {
           label: 'Arus Transaksi',
@@ -126,7 +126,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Finance',
-      icon: DollarSign,
+      icon: Landmark,
       children: [
         {
           label: 'Transaksi Kas Harian',
@@ -172,7 +172,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Laporan',
-      icon: ScrollText,
+      icon: ListChecks,
       children: [
         {
           label: 'Laporan Transaksi Kas',

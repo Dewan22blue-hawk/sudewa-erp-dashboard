@@ -21,14 +21,14 @@ export default function DashboardIndex() {
               router.replace(`/dashboard/${company.slug}`);
             } else {
               // Fallback if company not found or no slug
-              router.replace('/select-company');
+              router.replace('/dashboard/1');
             }
           } catch (error) {
             console.error('Failed to fetch companies for redirect', error);
-            router.replace('/select-company');
+            router.replace('/dashboard/1');
           }
         } else {
-          router.replace('/select-company');
+          router.replace('/dashboard/1');
         }
       }
     }

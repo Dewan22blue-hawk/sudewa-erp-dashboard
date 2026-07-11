@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useLogin } from '@/features/auth/hooks/use-login';
+import { useCompany } from '@/contexts/CompanyContext';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setCompanyId } = useCompany();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +24,8 @@ export default function LoginPage() {
       const response = await login({ login: userId, email: userId, password });
       if (response?.status) {
         // Successfully logged in
-        router.push('/select-company');
+        setCompanyId('1');
+        router.push('/dashboard/1');
       }
     } catch (err) {
       // Error is handled by useLogin and accessible via `error` state
@@ -107,14 +110,26 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Aurora Gradient & Logo */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden bg-[#F5F6F8]">
-        {/* Aurora Gradient Background */}
-        <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_85%_10%,#f64c0e_0%,#f47233_20%,#f08d5c_35%,#a85f71_55%,transparent_70%),radial-gradient(circle_at_80%_90%,#64a5db_0%,#7993c4_25%,#5a6d9f_45%,#4c6697_65%,transparent_75%)]" />
+      {/* Right Side - Premium Modern Gradient & Banner */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center relative overflow-hidden bg-slate-50">
+        {/* Elegant Ambient Mesh Gradients */}
+        <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-rose-400/40 blur-[120px] mix-blend-multiply opacity-80" />
+        <div className="absolute -bottom-[10%] -right-[10%] w-[70%] h-[70%] rounded-full bg-orange-400/30 blur-[120px] mix-blend-multiply opacity-80" />
+        <div className="absolute top-[30%] left-[20%] w-[50%] h-[50%] rounded-full bg-indigo-400/20 blur-[100px] mix-blend-multiply opacity-70" />
+        
+        {/* Subtle grid pattern overlay for texture */}
+        <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-        {/* Centered Logo */}
-        <div className="relative z-10 w-[400px] h-[400px] animate-fade-in">
-          <Image src="/wajira-logo.png" alt="Wajira Logo" fill className="object-contain drop-shadow-lg" priority />
+        {/* Centered Banner with modern floating effect */}
+        <div className="relative z-10 w-[75%] max-w-[550px] aspect-square animate-fade-in transition-all duration-700 ease-in-out hover:scale-[1.02] hover:-translate-y-2">
+          <Image 
+            src="/assets/login_banner.png" 
+            alt="Login Banner" 
+            fill 
+            className="object-contain drop-shadow-[0_20px_50px_rgba(225,29,72,0.15)]" 
+            priority 
+            sizes="(max-width: 1024px) 100vw, 50vw" 
+          />
         </div>
       </div>
     </div>
