@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, Tag, Upload } from 'lucide-react';
+import { ArrowLeft, Loader2, Tag, Upload, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FinanceBillingTable from '@/components/features/kas-harian/FinanceBillingTable';
 import TransactionCategoryModal from '@/components/features/kas-harian/TransactionCategoryModal';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -207,7 +208,23 @@ export default function KasHarianDetailPage() {
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kode Transaksi</label>
-                <p className="text-base font-bold text-slate-900">{cashFlowDetail.code || '-'}</p>
+                <div className="flex items-center gap-1.5">
+                  {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id) ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button type="button" className="cursor-help text-[#18385b] hover:text-[#102843] transition-colors flex items-center">
+                            <Info className="h-4 w-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" align="start" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                          Data Arus Transaksi Kas Harian ini terhubung dengan data Administrasi
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : null}
+                  <p className="text-base font-bold text-slate-900">{cashFlowDetail.code || '-'}</p>
+                </div>
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tanggal Transaksi</label>
@@ -216,10 +233,6 @@ export default function KasHarianDetailPage() {
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Company</label>
                 <p className="text-base font-medium text-slate-800">{cashFlowDetail.company?.name || '-'}</p>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Grand Total Billing</label>
-                <p className="text-base font-bold text-[#18385b]">{currenciesFormat('idr', grandTotal)}</p>
               </div>
               <div className="space-y-1 pt-4 border-t border-slate-100 md:border-t-0 md:pt-0">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Debet (Uang Masuk)</label>
