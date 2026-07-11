@@ -209,7 +209,7 @@ export default function KasHarianDetailPage() {
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kode Transaksi</label>
                 <div className="flex items-center gap-1.5">
-                  {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id) ? (
+                  {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id || cashFlowDetail.unit_transaction_billing || cashFlowDetail.goods_transaction_billing) ? (
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>

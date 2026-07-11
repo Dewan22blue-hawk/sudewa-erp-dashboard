@@ -29,8 +29,12 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
   company_id: toNumber(payload.company_id),
   cash_id: toNumber(payload.cash_id),
   account_id: payload.account_id == null ? null : toNumber(payload.account_id),
-  unit_transaction_billing_id: payload.unit_transaction_billing_id ? toNumber(payload.unit_transaction_billing_id) : null,
-  goods_transaction_billing_id: payload.goods_transaction_billing_id ? toNumber(payload.goods_transaction_billing_id) : null,
+  unit_transaction_billing_id: payload.unit_transaction_billing_id
+    ? toNumber(payload.unit_transaction_billing_id)
+    : (payload.unit_transaction_billing?.id ? toNumber(payload.unit_transaction_billing.id) : null),
+  goods_transaction_billing_id: payload.goods_transaction_billing_id
+    ? toNumber(payload.goods_transaction_billing_id)
+    : (payload.goods_transaction_billing?.id ? toNumber(payload.goods_transaction_billing.id) : null),
   cash_flow_type: payload.cash_flow_type ?? '',
   code: payload.code ?? '-',
   date: payload.date ?? '',
@@ -103,7 +107,19 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
         updated_at: payload.unit_transaction_billing.updated_at ?? '',
       }
     : null,
-  goods_transaction_billing: payload.goods_transaction_billing ?? null,
+  goods_transaction_billing: payload.goods_transaction_billing
+    ? {
+        id: toNumber(payload.goods_transaction_billing.id),
+        uuid: payload.goods_transaction_billing.uuid,
+        goods_transaction_id: toNumber(payload.goods_transaction_billing.goods_transaction_id),
+        grand_total: toNumber(payload.goods_transaction_billing.grand_total),
+        last_payment_at: payload.goods_transaction_billing.last_payment_at ?? '',
+        is_paid: toBoolean(payload.goods_transaction_billing.is_paid),
+        is_valid: toBoolean(payload.goods_transaction_billing.is_valid),
+        created_at: payload.goods_transaction_billing.created_at ?? '',
+        updated_at: payload.goods_transaction_billing.updated_at ?? '',
+      }
+    : null,
 });
 
 const toSuccessPayload = <T>(payload: { status: boolean; message?: string; errors: Record<string, string[]> | null; data: T }) =>

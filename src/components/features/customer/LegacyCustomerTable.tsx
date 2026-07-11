@@ -49,6 +49,22 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
     setCurrentPage(1);
   };
 
+  const renderActionMenu = (customer: Customer) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="icon" variant="ghost" className="h-8 w-8">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onEdit(customer)}>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(customer)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+          Hapus
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -89,8 +105,9 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <Table>
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div className={currentData.length > 0 ? 'pr-24' : undefined}>
+        <Table className="min-w-[1040px]">
           <TableHeader className="bg-slate-50">
             <TableRow>
               <TableHead className="font-semibold uppercase text-slate-700">Kode Customer</TableHead>
@@ -100,7 +117,6 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
               <TableHead className="font-semibold uppercase text-slate-700">PIC</TableHead>
               <TableHead className="font-semibold uppercase text-slate-700">Phone</TableHead>
               <TableHead className="font-semibold uppercase text-slate-700">Maps</TableHead>
-              <TableHead className="text-right font-semibold uppercase text-slate-700">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,7 +128,7 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
               </TableRow>
             ) : (
               currentData.map((customer) => (
-                <TableRow key={customer.id} className="hover:bg-slate-50/50">
+                <TableRow key={customer.id} className="group hover:bg-slate-50/50">
                   <TableCell className="font-medium text-slate-800">{customer.code ?? '-'}</TableCell>
                   <TableCell className="text-slate-700">{customer.name}</TableCell>
                   <TableCell className="max-w-75 truncate text-slate-700" title={customer.address ?? undefined}>
@@ -130,26 +146,31 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
                       '-'
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(customer)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(customer)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
+        </div>
+
+        {currentData.length > 0 ? (
+          <div className="absolute right-0 top-0 z-30 w-24 bg-white shadow-[-8px_0_12px_-10px_rgba(15,23,42,0.45)]">
+            <table className="w-full caption-bottom text-sm">
+              <thead className="bg-slate-50">
+                <tr className="border-b">
+                  <th className="h-10 px-2 text-right align-middle font-semibold uppercase text-slate-700 whitespace-nowrap">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentData.map((customer) => (
+                  <tr key={customer.id} className="border-b transition-colors hover:bg-slate-50/50">
+                    <td className="p-2 text-right align-middle whitespace-nowrap">{renderActionMenu(customer)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
 
       {filteredData.length > 0 && (

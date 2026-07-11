@@ -6,10 +6,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from '@/components/ui/skeleton';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Info } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Props {
   data: KasHarianListItem[];
@@ -168,7 +169,25 @@ export default function KasHarianTable({
               sortedData.map((item) => (
                 <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
-                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900"><CopyBox text={`${item.code || '-'}`} /></td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">
+                    <div className="flex items-center gap-2">
+                      <CopyBox text={`${item.code || '-'}`} />
+                      {(item.unitTransactionBillingId || item.goodsTransactionBillingId) ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="cursor-help text-[#18385b] hover:text-[#102843] transition-colors flex items-center shrink-0">
+                                <Info className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                              Data Arus Transaksi Kas Harian ini terhubung dengan data Administrasi
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : null}
+                    </div>
+                  </td>
                   <td className="px-4 py-4 text-left text-sm text-slate-700"><TextTruncate text={item.note || '-'} maxLength={15} /></td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{currenciesFormat('idr', item.debet)}</td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.credit)}</td>

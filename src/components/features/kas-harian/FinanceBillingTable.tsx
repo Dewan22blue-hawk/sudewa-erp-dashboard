@@ -321,7 +321,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           <div className="flex items-center gap-3 flex-wrap">
             <h3 className="text-lg font-semibold text-slate-900">Rincian Pembayaran</h3>
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2 py-0.5 text-xs text-slate-600 font-medium">
-              {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id) ? (
+              {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id || cashFlowDetail.unit_transaction_billing || cashFlowDetail.goods_transaction_billing) ? (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -370,7 +370,6 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
               </TableRow>
             </TableHeader>
             <TableBody>
-              {console.log(financeBillings)}
               {financeBillings.map((fb, index) => (
                 <TableRow key={fb.id}>
                   <TableCell className="text-center text-slate-500">{index + 1}</TableCell>
