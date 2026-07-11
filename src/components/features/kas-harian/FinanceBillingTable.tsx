@@ -330,7 +330,6 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
               </TableRow>
             </TableHeader>
             <TableBody>
-              {console.log(financeBillings)}
               {financeBillings.map((fb, index) => (
                 <TableRow key={fb.id}>
                   <TableCell className="text-center text-slate-500">{index + 1}</TableCell>

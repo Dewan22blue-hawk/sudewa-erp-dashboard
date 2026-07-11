@@ -1,4 +1,5 @@
 import { ApiValidationError } from '@/lib/api/response';
+import { handleBackendError } from './errorLibrary';
 
 type BackendErrorResponse = {
   status?: boolean;
@@ -86,30 +87,8 @@ export const translateValidationMessage = (message: string, field?: string): str
   return message;
 };
 
-export const translateBackendMessage = (message: string): string => {
-  const lowerMessage = message.toLowerCase();
-
-  if (lowerMessage.includes("billing utama tidak ditemukan")) {
-    return "Billing utama tidak ditemukan. Silakan buat billing terlebih dahulu sebelum melakukan pembayaran.";
-  }
-
-  if (lowerMessage.includes("not found")) {
-    return "Data tidak ditemukan.";
-  }
-
-  if (lowerMessage.includes("unauthenticated")) {
-    return "Sesi Anda telah berakhir. Silakan login kembali.";
-  }
-
-  if (lowerMessage.includes("unauthorized") || lowerMessage.includes("forbidden")) {
-    return "Anda tidak memiliki akses untuk melakukan aksi ini.";
-  }
-
-  if (lowerMessage.includes("validation error")) {
-    return "Data yang dikirim belum valid. Periksa kembali input Anda.";
-  }
-
-  return message;
+export const translateBackendMessage = (message: string, code?: string | number | null): string => {
+  return handleBackendError(code, message);
 };
 
 export const getApiErrorMessage = (error: unknown): string => {
@@ -126,6 +105,8 @@ export const getApiErrorMessage = (error: unknown): string => {
     request?: unknown;
     message?: string;
     fieldErrors?: Record<string, string[]>;
+    code?: string;
+    statusCode?: number;
   };
 
   // If there's an explicit ApiValidationError instance
@@ -146,13 +127,14 @@ export const getApiErrorMessage = (error: unknown): string => {
   }
 
   // Check for response status and backend payload
-  const statusCode = err?.response?.status;
+  const statusCode = err?.response?.status || err?.statusCode;
   const responseData = err?.response?.data;
-  const backendMessage = responseData?.message;
+  const backendMessage = responseData?.message || err?.message;
   const backendErrors = responseData?.errors;
+  const errorCode = err?.code || (responseData as any)?.code || (err as any)?.response?.data?.code;
 
   // Handle Network Error
-  if (!err?.response && (err?.request || err?.message)) {
+  if (!err?.response && (err?.request || err?.message) && !err?.statusCode) {
     return "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
   }
 
@@ -187,8 +169,8 @@ export const getApiErrorMessage = (error: unknown): string => {
     return `Data belum valid:\n${errorMessages.map((msg) => `- ${msg}`).join("\n")}`;
   }
 
-  if (backendMessage && backendMessage !== "Validation error") {
-    return translateBackendMessage(backendMessage);
+  if (backendMessage && backendMessage !== "Validation error" && backendMessage !== "Request failed") {
+    return translateBackendMessage(backendMessage, errorCode);
   }
 
   // Handle custom status fallback
@@ -210,7 +192,7 @@ export const getApiErrorMessage = (error: unknown): string => {
 
   // Fallback to error.message if present
   if (err.message && err.message !== "Validation error" && err.message !== "Request failed") {
-    return translateBackendMessage(err.message);
+    return translateBackendMessage(err.message, errorCode);
   }
 
   return "Terjadi kesalahan. Silakan coba lagi.";
