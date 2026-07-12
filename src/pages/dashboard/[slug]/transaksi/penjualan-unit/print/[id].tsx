@@ -80,6 +80,7 @@ export default function SalesPrintPage() {
               chassis_number: detail.chassis_number || '-',
               machine_number: detail.machine_number || '-',
               price: price,
+              price_usd: row.price_usd ? Number(row.price_usd) : undefined,
             }));
           } catch (err) {
             console.error('Failed to fetch details for item', itemId, err);

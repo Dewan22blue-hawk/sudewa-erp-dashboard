@@ -30,7 +30,8 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
     sort_by: 'name',
     sort_order: 'asc' 
   });
-  const brands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const rawBrands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const brands = Array.from(new Map(rawBrands.map((b) => [b.id, b])).values());
   const [openBrandDialog, setOpenBrandDialog] = useState(false);
   const [openBrandSelect, setOpenBrandSelect] = useState(false);
   const [brandSearch, setBrandSearch] = useState('');
@@ -53,6 +54,24 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Kode<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan Kode"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="brandId"
@@ -127,36 +146,18 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1.5">
-                      <FormLabel className="text-xs font-semibold text-slate-700">Kode<RequiredMark /></FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan Kode"
-                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="unitType"
+                  name="name"
                   render={({ field }) => (
                     <FormItem className="space-y-1.5">
-                      <FormLabel className="text-xs font-semibold text-slate-700">Jenis<RequiredMark /></FormLabel>
+                      <FormLabel className="text-xs font-semibold text-slate-700">Tipe Unit<RequiredMark /></FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Masukkan Jenis"
+                          placeholder="Masukkan Tipe"
                           className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
                           {...field}
                           value={field.value || ''}
@@ -169,13 +170,13 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
 
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="unitType"
                   render={({ field }) => (
                     <FormItem className="space-y-1.5">
-                      <FormLabel className="text-xs font-semibold text-slate-700">Tipe Unit<RequiredMark /></FormLabel>
+                      <FormLabel className="text-xs font-semibold text-slate-700">Jenis<RequiredMark /></FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Masukkan Tipe"
+                          placeholder="Masukkan Jenis"
                           className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
                           {...field}
                           value={field.value || ''}
@@ -209,14 +210,14 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
               </div>
             </div>
 
-            {/* Section 2: Dimensi & Berat */}
+            {/* Section 2: Informasi Tambahan */}
             <div className="space-y-6">
               <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-semibold text-slate-900">Dimensi & Berat</h3>
-                <p className="text-xs text-slate-500">Informasi berat bersih (netto) dan kotor (bruto) unit</p>
+                <h3 className="text-sm font-semibold text-slate-900">Informasi Tambahan</h3>
+                <p className="text-xs text-slate-500">Informasi berat bersih, berat kotor, harga beli, dan harga jual unit</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 <FormField
                   control={form.control}
                   name="nettoWeight"
@@ -256,17 +257,7 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
 
-            {/* Section 3: Informasi Harga */}
-            <div className="space-y-6">
-              <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-semibold text-slate-900">Informasi Harga</h3>
-                <p className="text-xs text-slate-500">Harga beli dan harga jual unit dalam Rupiah</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="buyPrice"

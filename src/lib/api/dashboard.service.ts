@@ -66,44 +66,44 @@ export const dashboardService = {
     });
 
     // Mapping dari customer response
-    const customers: CustomerOverview = { 
-      totalCustomers: customerStats.summary?.total_customer || 0, 
-      totalRevenue: { 
-        idr: customerStats.summary?.total_revenue || 0, 
+    const customers: CustomerOverview = {
+      totalCustomers: customerStats.summary?.total_customer || 0,
+      totalRevenue: {
+        idr: customerStats.summary?.total_revenue || 0,
         usd: 0 // Tidak tersedia di API, default 0
-      }, 
-      averageRevenue: customerStats.summary?.average_revenue_per_customer || 0, 
+      },
+      averageRevenue: customerStats.summary?.average_revenue_per_customer || 0,
       topCustomers: (customerStats.customers?.data || []).map((c: any) => ({
         name: c.name || c.customer_name || 'Unknown',
         revenue: c.total_revenue || c.revenue || 0,
       }))
     };
-    
+
     // Mapping dari product response
-    const products: ProductOverview = { 
-      totalProducts: productStats.summary?.total_unit_type || 0, 
-      totalSold: (productStats.data?.data || []).reduce((acc: number, curr: any) => acc + (curr.total_sold || 0), 0), 
+    const products: ProductOverview = {
+      totalProducts: productStats.summary?.total_unit_type || 0,
+      totalSold: (productStats.data?.data || []).reduce((acc: number, curr: any) => acc + (curr.total_sold || 0), 0),
       topProducts: (productStats.data?.data || []).map((p: any) => ({
         name: p.unit_type_name || p.name || 'Unknown',
         quantity: p.total_sold || 0
-      })) 
+      }))
     };
     const kpis: any[] = [];
     const monthlyRevenue: any[] = [];
     const incomeBreakdown: any[] = [];
     const cashflow: CashflowSummary = { incomes: [], outcomes: [] };
 
-    return { 
-      kpis, 
-      monthlyRevenue, 
-      incomeBreakdown, 
-      accounts, 
-      financeSeries, 
-      customers, 
-      products, 
-      cashflow, 
-      transactions, 
-      lastUpdated: new Date().toISOString() 
+    return {
+      kpis,
+      monthlyRevenue,
+      incomeBreakdown,
+      accounts,
+      financeSeries,
+      customers,
+      products,
+      cashflow,
+      transactions,
+      lastUpdated: new Date().toISOString()
     };
   },
 
@@ -112,7 +112,7 @@ export const dashboardService = {
       return [];
     }
     const { opening_balance, mutation } = stats;
-    
+
     const openingBcaUsd = opening_balance.debet.bca_usd || 0;
     const mutationDebetBcaUsd = mutation.debet.bca_usd || 0;
     const mutationKreditBcaUsd = mutation.kredit.bca_usd || 0;
@@ -152,7 +152,7 @@ export const dashboardService = {
       },
       {
         id: 'cash',
-        name: 'Cash',
+        name: 'CASH IDR',
         subtitle: 'Saldo Kas Tunai',
         type: 'cash',
         currency: 'IDR',
@@ -194,12 +194,12 @@ export const dashboardService = {
           const y = parseInt(parts[0], 10);
           const m = parseInt(parts[1], 10) - 1;
           const d = parseInt(parts[2], 10);
-          
+
           const singleDate = new Date(y, m, d);
-          
+
           const yesterday = new Date(singleDate);
           yesterday.setDate(singleDate.getDate() - 1);
-          
+
           const tomorrow = new Date(singleDate);
           tomorrow.setDate(singleDate.getDate() + 1);
 

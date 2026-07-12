@@ -1,15 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useRoles, useRoleDetail, useCreateRole, useAssignRolePermissions } from '@/hooks/useRole';
-import { usePermissions } from '@/hooks/usePermission';
-import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { useRoles, useDeleteRole } from '@/hooks/useRole';
 import { Role } from '@/@types/role.types';
 import { toast } from 'sonner';
-import { Search, Plus, MoreVertical } from "lucide-react";
+import { Search, Plus, MoreVertical, CircleAlert } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,71 +14,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ApiResponseError } from '@/lib/api/response';
 
 export default function RolesPage() {
-  const { hasPermission } = usePermissionGuard();
+  const router = useRouter();
+  const { slug } = router.query;
   const { data: roles = [], isLoading } = useRoles();
-  const { data: permissions = [] } = usePermissions();
-  const createMutation = useCreateRole();
-  const assignMutation = useAssignRolePermissions();
-
-  const [open, setOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [name, setName] = useState('');
-  const [selectedPerms, setSelectedPerms] = useState<string[]>([]);
+  const deleteMutation = useDeleteRole();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState("25");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const detailQuery = useRoleDetail(selectedRole?.id, { withoutPermission: false });
-  const currentPerms = useMemo(() => detailQuery.data?.permissions?.map((p) => p.name) ?? [], [detailQuery.data]);
 
-  const resetForm = () => {
-    setName('');
-    setSelectedPerms([]);
-    setSelectedRole(null);
-  };
 
-  const openCreate = () => {
-    resetForm();
-    setOpen(true);
-  };
+  // Delete State
+  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
-  const openAssign = (role: Role) => {
-    setSelectedRole(role);
-    setName(role.name);
-    setSelectedPerms([]); // akan diisi ulang setelah detail role selesai dimuat
-    setOpen(true);
-  };
-
-  useEffect(() => {
-    if (selectedRole && currentPerms.length) {
-      setSelectedPerms(currentPerms);
-    }
-  }, [selectedRole, currentPerms]);
-
-  const togglePerm = (perm: string) => {
-    setSelectedPerms((prev) => (prev.includes(perm) ? prev.filter((p) => p !== perm) : [...prev, perm]));
-  };
-
-  const handleSubmit = async () => {
+  const handleDeleteRole = async () => {
+    if (!roleToDelete) return;
     try {
-      if (selectedRole) {
-        await assignMutation.mutateAsync({ id: selectedRole.id, permissions: selectedPerms });
-        toast.success('Permissions berhasil diperbarui');
-      } else {
-        await createMutation.mutateAsync({ name, permissions: selectedPerms });
-        toast.success('Role berhasil dibuat');
-      }
-      setOpen(false);
-      resetForm();
-    } catch (err: any) {
-      toast.error(err?.message || 'Gagal menyimpan role');
+      await deleteMutation.mutateAsync(roleToDelete.id);
+      toast.success('Role berhasil dihapus');
+      setRoleToDelete(null);
+    } catch (error) {
+      const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus role';
+      toast.error(message);
     }
   };
 
-  const disabled = createMutation.isPending || assignMutation.isPending;
+  const handleAdd = () => {
+    router.push(`/dashboard/${slug}/settings/roles/create`);
+  };
+
+  const handleEdit = (role: Role) => {
+    router.push(`/dashboard/${slug}/settings/roles/${role.id}/edit`);
+  };
 
   // Filter Logic
   const filteredData = roles.filter(role =>
@@ -140,16 +110,14 @@ export default function RolesPage() {
             </div>
           </div>
 
-          {hasPermission('roles:create') && (
-            <Button
-              className="bg-[#1e293b] hover:bg-[#0f172a]"
-              onClick={openCreate}
-              disabled={isLoading}
-            >
-              <Plus size={16} className="mr-2" />
-              Tambah Role
-            </Button>
-          )}
+          <Button
+            className="bg-[#1e293b] hover:bg-[#0f172a]"
+            onClick={handleAdd}
+            disabled={isLoading}
+          >
+            <Plus size={16} className="mr-2" />
+            Tambah Role
+          </Button>
         </div>
 
         <div className="bg-white rounded-xl border overflow-x-auto">
@@ -178,21 +146,39 @@ export default function RolesPage() {
                     <td className="px-4 py-3">{(role as any).guard_name || '-'}</td>
                     <td className="px-4 py-3">{(role as any).users_count}</td>
                     <td className="px-4 py-3 text-center">
-                      <div className="relative group">
-                        <MoreVertical size={18} className="cursor-pointer mx-auto" />
-                        <div className="absolute right-0 hidden group-hover:block bg-white shadow-md rounded-md border text-sm z-10 w-32">
-                          {hasPermission('roles:edit') ? (
-                            <button
-                              onClick={() => openAssign(role)}
-                              className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
-                            >
-                              Atur Permissions
-                            </button>
-                          ) : (
-                            <div className="px-4 py-2 text-gray-400 text-left">Akses ditolak</div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900 mx-auto p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem
+                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                            onClick={() => router.push(`/dashboard/${slug}/settings/roles/${role.id}`)}
+                          >
+                            Lihat Detail
+                          </DropdownMenuItem>
+
+                          {role.name.toLowerCase() !== 'admin' && (
+                            <>
+                              <DropdownMenuItem
+                                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                                onClick={() => handleEdit(role)}
+                              >
+                                Atur Permissions
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                                onClick={() => setRoleToDelete(role)}
+                              >
+                                Hapus
+                              </DropdownMenuItem>
+                            </>
                           )}
-                        </div>
-                      </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))
@@ -230,48 +216,42 @@ export default function RolesPage() {
         </div>
       </div>
 
-      <Dialog
-        open={open}
-        onOpenChange={(val) => {
-          setOpen(val);
-          if (!val) resetForm();
-        }}
-      >
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>{selectedRole ? 'Atur Permissions' : 'Buat Role Baru'}</DialogTitle>
-            <DialogDescription>Role menentukan akses pengguna.</DialogDescription>
-          </DialogHeader>
 
-          {!selectedRole && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nama Role</label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="misal: manager" />
+
+
+
+      {/* Delete Confirmation Alert Dialog */}
+      <AlertDialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>
+        <AlertDialogContent className="max-w-[440px] rounded-[28px] border-0 p-0 shadow-2xl">
+          <div className="px-8 pb-8 pt-10 text-center">
+            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border-[6px] border-red-500/90 text-red-500">
+              <CircleAlert className="h-12 w-12" strokeWidth={2.5} />
             </div>
-          )}
 
-          <div className="mt-4 space-y-2 max-h-80 overflow-y-auto">
-            <p className="text-sm font-medium">Permissions</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {permissions.map((perm) => (
-                <label key={perm.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox checked={selectedPerms.includes(perm.name)} onCheckedChange={() => togglePerm(perm.name)} />
-                  <span>{perm.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+            <AlertDialogHeader className="mt-8 space-y-4 text-center">
+              <AlertDialogTitle className="text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-slate-950">
+                Hapus peran ini?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-lg leading-8 text-slate-500">
+                Peran &quot;{roleToDelete?.name}&quot; yang dihapus tidak bisa dikembalikan lagi.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
 
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={disabled}>
-              Batal
-            </Button>
-            <Button onClick={handleSubmit} disabled={disabled || (!selectedRole && !name)}>
-              {disabled ? 'Menyimpan...' : 'Simpan'}
-            </Button>
+            <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
+              <AlertDialogAction
+                className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]"
+                onClick={handleDeleteRole}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? 'Menghapus...' : 'Ya'}
+              </AlertDialogAction>
+              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
+                Tidak
+              </AlertDialogCancel>
+            </AlertDialogFooter>
           </div>
-        </DialogContent>
-      </Dialog>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

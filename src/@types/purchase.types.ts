@@ -82,6 +82,8 @@ export interface CreatePurchaseRequest {
   expedition_fee?: number;
   other_fee?: number;
   transaction_date?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UpdatePurchaseRequest {

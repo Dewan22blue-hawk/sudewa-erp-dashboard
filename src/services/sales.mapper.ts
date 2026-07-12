@@ -81,6 +81,8 @@ export type SalesApiModel = {
     hpp_total_price?: string | number;
     dpp_total_price?: string | number;
     ppn_total_price?: string | number;
+    price_usd?: string | number;
+    price_per_unit_usd?: string | number;
     unit_transaction_item_details?: Array<{
       id?: number | string;
       color?: string;
@@ -205,7 +207,7 @@ const formatDate = (value?: string): string => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID');
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
 export function mapSalesToUI(item: SalesApiModel): SalesListUI {
@@ -284,6 +286,8 @@ const mapSalesLineItem = (item: NonNullable<SalesApiModel['unit_transaction_item
     dpp,
     ppn,
     jumlah: hpp + ppn + biayaBbn + biayaEkspedisi + biayaLain,
+    price_usd: item.price_usd !== undefined ? toNumber(item.price_usd) : undefined,
+    price_per_unit_usd: item.price_per_unit_usd !== undefined ? toNumber(item.price_per_unit_usd) : undefined,
   };
 };
 
@@ -322,6 +326,8 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
     kurangBayar,
     lineItems: (item.unit_transaction_items ?? []).map(mapSalesLineItem),
     units: [],
+    price_usd: item.unit_transaction_items?.[0]?.price_usd ? toNumber(item.unit_transaction_items[0].price_usd) : undefined,
+    price_per_unit_usd: item.unit_transaction_items?.[0]?.price_per_unit_usd ? toNumber(item.unit_transaction_items[0].price_per_unit_usd) : undefined,
   };
 };
 

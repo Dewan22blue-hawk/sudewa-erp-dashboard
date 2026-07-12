@@ -44,6 +44,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+# docs
+/docs/
+
 # ignored files
 pembahasan_skripsi_erp_wajira.md
-docs/

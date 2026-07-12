@@ -128,6 +128,8 @@ export interface UnitTransactionItem {
   hpp_total_price?: number;
   dpp_total_price: number;
   ppn_total_price: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemListResponse {
@@ -146,6 +148,8 @@ export interface CreateUnitTransactionItemPayload {
   other_fee: number;
   company_id?: string | number;
   type?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UpdateUnitTransactionItemPayload {
@@ -157,6 +161,8 @@ export interface UpdateUnitTransactionItemPayload {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemSummary {
@@ -175,6 +181,8 @@ export interface UnitTransactionItemSummary {
   hpp_total_price?: number;
   dpp_total_price?: number;
   ppn_total_price?: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemDetail {

@@ -65,12 +65,16 @@ export function KasFormDialog({ open, onOpenChange, kas, companyId, title, descr
       if (isEdit && kas) {
         await updateMutation.mutateAsync({
           id: kas.id,
-          payload: values,
+          payload: {
+            ...values,
+            cash_name: kas.cash_name ?? '',
+          },
         });
         toast.success('Data berhasil diperbarui');
       } else {
         await createMutation.mutateAsync({
           ...values,
+          cash_name: '',
           companyId,
         });
         toast.success('Data berhasil ditambahkan');

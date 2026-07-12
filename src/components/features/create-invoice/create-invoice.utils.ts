@@ -19,7 +19,7 @@ const toDate = (value?: string | null) => {
 export const formatDisplayDate = (value?: string | null) => {
   const date = toDate(value);
   if (!date) return '-';
-  return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+  return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
 };
 
 export const formatLongDate = (value?: string | null) => {
@@ -35,6 +35,30 @@ export const formatMoney = (value?: number | null, minimumFractionDigits = 0) =>
     minimumFractionDigits,
     maximumFractionDigits: minimumFractionDigits,
   }).format(Number(value ?? 0));
+
+export const formatInvoiceMoney = (
+  value?: number | null,
+  isUsd = false,
+  rateUsd = 16000,
+  decimals?: number
+) => {
+  const amount = Number(value ?? 0);
+  if (isUsd) {
+    const converted = amount / (rateUsd || 16000);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: decimals ?? 2,
+      maximumFractionDigits: decimals ?? 2,
+    }).format(converted);
+  }
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: decimals ?? 0,
+    maximumFractionDigits: decimals ?? 0,
+  }).format(amount);
+};
 
 export const getPrintStatusLabel = (value: boolean) => (value ? 'Sudah diprint' : 'Belum diprint');
 
@@ -121,6 +145,8 @@ export const buildProcessDefaults = (invoice: DoInvoice, draft?: InvoiceProcessD
   customerName: draft?.customerName ?? invoice.customer?.name ?? invoice.expeditions[0]?.customer?.name ?? '-',
   description: draft?.description ?? invoice.description ?? '',
   attachmentFile: null,
+  isUsd: draft?.isUsd ?? false,
+  rateUsd: draft?.rateUsd ?? 16000,
 });
 
 const readDraftMap = (): Record<string, InvoiceProcessDraft> => {
@@ -165,6 +191,8 @@ export const createProcessDraftPayload = (
   customerName: values.customerName,
   description: values.description,
   savedAt: new Date().toISOString(),
+  isUsd: values.isUsd,
+  rateUsd: values.rateUsd,
 });
 
 export const createBulkProcessDraftPayload = (
@@ -185,6 +213,8 @@ export const createBulkProcessDraftPayload = (
   customerName: values.customerName,
   description: values.description,
   savedAt: new Date().toISOString(),
+  isUsd: values.isUsd,
+  rateUsd: values.rateUsd,
 });
 
 export const buildPrintPayload = (

@@ -48,6 +48,8 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
       hpp_total_price: Number(item.hpp ?? 0),
       dpp_total_price: Number(item.dpp ?? 0),
       ppn_total_price: Number(item.ppn ?? 0),
+      price_usd: item.price_usd ? Number(item.price_usd) : undefined,
+      price_per_unit_usd: item.price_per_unit_usd ? Number(item.price_per_unit_usd) : undefined,
     }));
   }, [unitItemsData?.data, lineItems, salesId]);
   const totalPages = Math.max(1, Math.ceil(items.length / perPage));
@@ -206,7 +208,14 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
                   </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.qty_total}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                    <div>{formatCurrency(item.price)}</div>
+                    {item.price_usd ? (
+                      <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga Jual USD">
+                        {formatCurrency(item.price_usd, 'USD')}
+                      </div>
+                    ) : null}
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>

@@ -4,9 +4,12 @@ import type { PaginationMeta } from '@/@types/pagination.types';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
 import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
+import { CopyBox } from '@/components/ui/copy-box';
+import { TextTruncate } from '@/components/ui/text-truncate';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data: KasHarianListItem[];
@@ -21,17 +24,18 @@ interface Props {
   onPay: (item: KasHarianListItem) => void;
   onEdit: (item: KasHarianListItem) => void;
   onDelete: (item: KasHarianListItem) => void;
+  onToggleStatus?: (item: KasHarianListItem) => void;
   onPageChange: (page: number) => void;
 }
 
 const formatDate = (value: string) => {
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : format(parsed, 'dd/MM/yyyy');
+  return Number.isNaN(parsed.getTime()) ? value : format(parsed, 'dd MMM yyyy');
 };
 
 const SkeletonRow = () => (
   <tr className="border-b border-slate-200">
-    {Array.from({ length: 8 }).map((_, index) => (
+    {Array.from({ length: 9 }).map((_, index) => (
       <td key={index} className="px-6 py-5">
         <Skeleton className="h-4 w-full max-w-[120px]" />
       </td>
@@ -51,6 +55,7 @@ export default function KasHarianTable({
   onPay,
   onEdit,
   onDelete,
+  onToggleStatus,
   onPageChange,
 }: Props) {
   const page = meta.currentPage;
@@ -131,6 +136,7 @@ export default function KasHarianTable({
               <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
+              <th className="p-0 text-left">{renderSortHeader('STATUS', 'is_paid', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('AKUN', 'accountName', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('KAS', 'cashName', 'left')}</th>
               <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
@@ -141,7 +147,7 @@ export default function KasHarianTable({
               Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
             ) : isError ? (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center">
+                <td colSpan={9} className="px-4 py-10 text-center">
                   <div className="space-y-3">
                     <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data transaksi kas harian'}</p>
                     {onRetry ? (
@@ -154,7 +160,7 @@ export default function KasHarianTable({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-slate-500">
+                <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
                   Belum ada data transaksi kas harian.
                 </td>
               </tr>
@@ -162,10 +168,20 @@ export default function KasHarianTable({
               sortedData.map((item) => (
                 <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
-                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code}</td>
-                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.note || '-'}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{formatCurrency(item.debet)}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{formatCurrency(item.credit)}</td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900"><CopyBox text={`${item.code || '-'}`} /></td>
+                  <td className="px-4 py-4 text-left text-sm text-slate-700"><TextTruncate text={item.note || '-'} maxLength={15} /></td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{currenciesFormat('idr', item.debet)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.credit)}</td>
+                  <td className="px-4 py-4 text-center">
+                    <span className={cn(
+                      "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
+                      item.is_paid
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                    )}>
+                      {item.is_paid ? 'Lunas' : 'Belum'}
+                    </span>
+                  </td>
                   <td className="px-4 py-4 text-left text-sm text-slate-700">{item.accountName}</td>
                   <td className="px-4 py-4 text-left text-sm text-slate-700">{item.cashName || '-'}</td>
                   <td className="px-4 py-4 text-center">
@@ -175,23 +191,28 @@ export default function KasHarianTable({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[170px] rounded-2xl p-2">
+                      <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                         {item.source === 'billing' ? (
-                          <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                          <DropdownMenuItem onClick={() => onPay(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Bayar
                           </DropdownMenuItem>
                         ) : (
-                          <DropdownMenuItem onClick={() => onView(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                          <DropdownMenuItem onClick={() => onView(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Detail
                           </DropdownMenuItem>
                         )}
                         {item.cashFlowId ? (
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+                          <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Edit
                           </DropdownMenuItem>
                         ) : null}
+                        {item.cashFlowId && onToggleStatus ? (
+                          <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
+                            {item.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
+                          </DropdownMenuItem>
+                        ) : null}
                         {item.source === 'manual' ? (
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-700">
+                          <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                           </DropdownMenuItem>
                         ) : null}
@@ -205,13 +226,17 @@ export default function KasHarianTable({
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-        <div>
-          Showing {startIndex}-{endIndex} of {meta.total} data
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={!canGoPrevious}>
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+        <p>Showing {startIndex}-{endIndex} of {meta.total} data</p>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            onClick={() => onPageChange(page - 1)}
+            disabled={!canGoPrevious}
+          >
             Previous
           </Button>
           {pageNumbers.map((pageNumber, index) =>
@@ -219,9 +244,13 @@ export default function KasHarianTable({
               <Button
                 key={`${pageNumber}-${index}`}
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className={pageNumber === page ? 'border-slate-300 bg-white shadow-sm' : 'border-transparent'}
+                className={
+                  pageNumber === page
+                    ? 'h-9 min-w-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-950 shadow-sm'
+                    : 'h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white'
+                }
                 onClick={() => onPageChange(pageNumber)}
                 disabled={pageNumber === page}
               >
@@ -233,7 +262,14 @@ export default function KasHarianTable({
               </span>
             ),
           )}
-          <Button type="button" variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={!canGoNext}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            onClick={() => onPageChange(page + 1)}
+            disabled={!canGoNext}
+          >
             Next
           </Button>
         </div>

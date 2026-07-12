@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTableSort } from '@/hooks/useTableSort';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -165,15 +166,20 @@ export function SalesTable({ onAdd }: Props) {
       buttons.push(activePage - 2, activePage - 1, activePage, activePage + 1, activePage + 2);
     }
 
-    return buttons.map((page) => (
+    return buttons.map((pageNumber) => (
       <Button
-        key={page}
-        variant={activePage === page ? 'default' : 'outline'}
+        key={pageNumber}
+        variant="ghost"
         size="sm"
-        onClick={() => handlePageChange(page)}
-        className={`h-8 w-8 p-0 ${activePage === page ? 'bg-[#1f304f] hover:bg-[#1a2842] text-white' : ''}`}
+        className={cn(
+          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          pageNumber === activePage
+            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+        )}
+        onClick={() => handlePageChange(pageNumber)}
       >
-        {page}
+        {pageNumber}
       </Button>
     ));
   };
@@ -268,7 +274,7 @@ export function SalesTable({ onAdd }: Props) {
 
         {/* RIGHT CONTROLS */}
         {onAdd && (
-          <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -323,28 +329,26 @@ export function SalesTable({ onAdd }: Props) {
 
       {/* Pagination */}
       {currentData.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="text-sm text-slate-500">
-            Showing {startIndex} to {endIndex} of {totalEntries} data
-          </div>
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+          <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(Math.max(1, activePage - 1))}
-              disabled={activePage === 1}
-              className="h-8 px-3"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={activePage <= 1}
+              onClick={() => handlePageChange(activePage - 1)}
             >
               Previous
             </Button>
             {renderPageButtons()}
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(Math.min(safeTotalPages, activePage + 1))}
-              disabled={activePage === safeTotalPages}
-              className="h-8 px-3"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={activePage >= safeTotalPages}
+              onClick={() => handlePageChange(activePage + 1)}
             >
               Next
             </Button>

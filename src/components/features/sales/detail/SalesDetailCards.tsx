@@ -96,6 +96,18 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
               <span className="font-bold uppercase text-sm">TOTAL PENJUALAN</span>
               <span className="text-sm font-bold">{formatCurrency(totalJual)}</span>
             </div>
+            {data.price_usd ? (
+              <div className="flex items-center justify-between text-xs text-amber-800 bg-amber-50/50 px-2 py-1 rounded border border-amber-100 mt-2">
+                <span className="font-medium">Total Harga (USD)</span>
+                <span className="font-bold">{formatCurrency(data.price_usd, 'USD')}</span>
+              </div>
+            ) : null}
+            {data.price_per_unit_usd ? (
+              <div className="flex items-center justify-between text-xs text-amber-800 bg-amber-50/50 px-2 py-1 rounded border border-amber-100">
+                <span className="font-medium">Harga Satuan (USD)</span>
+                <span className="font-bold">{formatCurrency(data.price_per_unit_usd, 'USD')}</span>
+              </div>
+            ) : null}
           </div>
         </CardContent>
       </Card>

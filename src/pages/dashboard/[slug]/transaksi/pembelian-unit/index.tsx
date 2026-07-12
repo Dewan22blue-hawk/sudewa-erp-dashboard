@@ -87,7 +87,7 @@ export default function PurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <PageHeader title="Pembelian Unit" description="Kelola dan lacak semua pembelian unit" />
           <div className="flex gap-2"></div>
         </div>

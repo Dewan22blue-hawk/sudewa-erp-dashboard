@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { WithholdingTaxReport } from '@/@types/laporan-bukti-potong.types';
 
 const formatDate = (dateStr: string) => {
@@ -143,8 +143,8 @@ export default function LaporanBuktiPotongTable({
                     <td className="px-4 py-4 text-left text-sm text-slate-700">{item.nama_customer}</td>
                     <td className="px-4 py-4 text-left text-sm text-slate-700">{item.no_bukpot || '-'}</td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500">{item.masa_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.nominal_invoice)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatCurrency(item.pph)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.nominal_invoice)}</td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.pph)}</td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500">{item.uang_muka_pph || '-'}</td>
                     <td className="px-4 py-4 text-center">
                       <DropdownMenu>

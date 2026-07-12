@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { Search } from 'lucide-react';
 import type { DoInvoice } from '@/@types/create-invoice.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -13,7 +12,6 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useDoInvoices } from '@/hooks/useDoInvoice';
 
 export default function FinanceInvoicePage() {
-  const router = useRouter();
   const { companyId } = useCompany();
   const companyNumber = Number(companyId || 0);
 
@@ -76,8 +74,8 @@ export default function FinanceInvoicePage() {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Invoice Terbuat</h1>
-          <p className="text-sm text-slate-500">Kelola invoice ekspedisi dengan mudah</p>
+          <h1 className="text-2xl font-semibold">Invoice Terbuat</h1>
+          <p className="text-sm text-muted-foreground">Kelola invoice ekspedisi dengan mudah</p>
         </div>
 
         <div className="space-y-4">
@@ -111,7 +109,7 @@ export default function FinanceInvoicePage() {
             <Button
               type="button"
               variant="outline"
-              className="flex items-center gap-2 rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer w-full sm:w-auto"
+              className="flex items-center gap-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer w-full sm:w-auto"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>
               Export

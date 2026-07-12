@@ -78,6 +78,7 @@ type UnitTransactionItemListApiModel = {
   qty_total?: number | string;
   price?: number | string;
   bbn_price?: number | string;
+  expedition_fee?: number | string;
   other_fee?: number | string;
   dpp_per_unit_price?: number | string;
   ppn_per_unit_price?: number | string;

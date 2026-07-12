@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { Search } from 'lucide-react';
 import type { UJDriverItem } from '@/@types/uj-driver.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -12,7 +11,6 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useUJDriverList } from '@/hooks/finance/useUJDriver';
 
 export default function UJDriverPage() {
-  const router = useRouter();
   const { companyId } = useCompany();
   const companyNumber = Number(companyId || 0);
 

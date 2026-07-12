@@ -19,8 +19,6 @@ const dateField = z.preprocess((value) => {
 export const kasHarianSchema = z
   .object({
     company_id: z.number({ required_error: 'Perusahaan wajib dipilih' }).min(1, 'Perusahaan wajib dipilih'),
-    cash_id: z.number({ required_error: 'Kas wajib dipilih' }).min(1, 'Kas wajib dipilih'),
-    account_id: z.number({ required_error: 'Akun wajib dipilih' }).min(1, 'Akun wajib dipilih'),
     date: dateField,
     note: z.string().trim().min(3, 'Keterangan minimal 3 karakter'),
     debet: z.number().min(0, 'Debet tidak valid'),

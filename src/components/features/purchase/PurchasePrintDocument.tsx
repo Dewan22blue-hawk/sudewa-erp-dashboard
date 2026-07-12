@@ -92,11 +92,11 @@ export default function PurchasePrintDocument({
     const drawTableHeader = (y: number) => {
       const columns: { label: string; width: number; align: 'left' | 'center' | 'right' }[] = [
         { label: 'NO', width: 10, align: 'center' },
-        { label: 'TIPE UNIT', width: 50, align: 'left' },
-        { label: 'WARNA', width: 30, align: 'left' },
+        { label: 'TIPE UNIT', width: 45, align: 'left' },
+        { label: 'WARNA', width: 28, align: 'left' },
         { label: 'NO RANGKA', width: 45, align: 'left' },
-        { label: 'NO MESIN', width: 40, align: 'left' },
-        { label: 'HARGA', width: 25, align: 'center' },
+        { label: 'NO MESIN', width: 35, align: 'left' },
+        { label: 'HARGA', width: 32, align: 'center' },
       ];
 
       let x = 10;
@@ -161,13 +161,18 @@ export default function PurchasePrintDocument({
 
       for (let index = 0; index < items.length; index += 1) {
         const row = items[index];
+        const priceUsdVal = Number((row as any).price_usd || 0);
+        const priceDisplay = priceUsdVal > 0
+          ? `${formatCurrency(row.price ?? 0)} / ${formatCurrency(priceUsdVal, 'USD')}`
+          : formatCurrency(row.price ?? 0);
+
         const values = [
           String(index + 1),
           row.unit_type_name || '-',
           row.color || '-',
           row.chassis_number || '-',
           row.machine_number || '-',
-          formatCurrency(row.price ?? 0),
+          priceDisplay,
         ];
 
         const rowHeight = 8;
@@ -208,6 +213,14 @@ export default function PurchasePrintDocument({
       pdf.rect(130, tableY + 16, 70, 7);
       pdf.text('TOTAL BRUTO', 133, tableY + 20.5);
       pdf.text(formatCurrency(totalBruto), 182.5, tableY + 20.5, { align: 'center' });
+
+      const totalPriceUsd = items.reduce((sum, item) => sum + Number((item as any).price_usd || 0), 0);
+      if (totalPriceUsd > 0) {
+        pdf.rect(130, tableY + 23, 70, 7);
+        pdf.text('TOTAL BRUTO (USD)', 133, tableY + 27.5);
+        pdf.text(formatCurrency(totalPriceUsd, 'USD'), 182.5, tableY + 27.5, { align: 'center' });
+        tableY += 7;
+      }
 
       // Signatures
       let sigY = tableY + 20;
@@ -325,7 +338,14 @@ export default function PurchasePrintDocument({
                       <td className="border border-slate-200 px-3 py-2">{row.color || '-'}</td>
                       <td className="border border-slate-200 px-3 py-2 font-mono">{row.chassis_number || '-'}</td>
                       <td className="border border-slate-200 px-3 py-2 font-mono">{row.machine_number || '-'}</td>
-                      <td className="border border-slate-200 px-3 py-2 text-center">{formatCurrency(row.price ?? 0)}</td>
+                      <td className="border border-slate-200 px-3 py-2 text-center">
+                        <div>{formatCurrency(row.price ?? 0)}</div>
+                        {(row as any).price_usd ? (
+                          <div className="text-[7.5pt] text-amber-700 font-semibold mt-0.5" title="Harga USD">
+                            {formatCurrency(Number((row as any).price_usd), 'USD')}
+                          </div>
+                        ) : null}
+                      </td>
                     </tr>
                   ))}
                   <tr className="font-semibold text-slate-900 bg-slate-50">
@@ -340,6 +360,15 @@ export default function PurchasePrintDocument({
                     <td colSpan={5} className="border border-slate-200 px-3 py-2.5 text-right">TOTAL BRUTO</td>
                     <td className="border border-slate-200 px-3 py-2.5 text-center">{formatCurrency(totalBruto)}</td>
                   </tr>
+                  {(() => {
+                    const totalPriceUsd = items.reduce((sum, item) => sum + Number((item as any).price_usd || 0), 0);
+                    return totalPriceUsd > 0 ? (
+                      <tr className="font-bold text-amber-900 bg-amber-50/50">
+                        <td colSpan={5} className="border border-slate-200 px-3 py-2.5 text-right">TOTAL BRUTO (USD)</td>
+                        <td className="border border-slate-200 px-3 py-2.5 text-center">{formatCurrency(totalPriceUsd, 'USD')}</td>
+                      </tr>
+                    ) : null;
+                  })()}
                 </tbody>
               </table>
             </div>

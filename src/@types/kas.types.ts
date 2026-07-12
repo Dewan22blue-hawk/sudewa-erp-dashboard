@@ -6,8 +6,10 @@ export interface Kas {
   id: number | string;
   uuid?: string;
   code: string;
+  cash_name?: string;
   description: string;
   type: KasType;
+  amount: number | string;
   companyId?: number | string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -15,6 +17,7 @@ export interface Kas {
 
 export interface KasPayload {
   code: string;
+  cash_name: string;
   description: string;
   type: KasType;
   companyId?: number | string;
