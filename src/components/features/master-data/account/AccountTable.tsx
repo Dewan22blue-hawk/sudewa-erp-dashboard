@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Pencil, Plus, Trash } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { MoreVertical, Pencil, Plus, Trash, Lock, Search } from 'lucide-react';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
+import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AccountTableProps {
   data: Account[];
@@ -30,50 +33,76 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
     () => [
       {
         accessorKey: 'code',
-        header: 'Kode',
-        cell: ({ row }) => <span className="font-semibold text-sm text-foreground">{row.original.code}</span>,
+        header: 'KODE',
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1.5 text-left">
+            <span className="font-semibold text-sm text-gray-900">{row.original.code}</span>
+            {row.original.is_lock && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex cursor-help p-0.5">
+                    <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Akun ini merupakan data default yang tidak bisa dihapus!
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        ),
       },
       {
         accessorKey: 'name',
-        header: 'Nama Akun',
-        cell: ({ row }) => <span className="text-sm text-foreground">{row.original.name}</span>,
+        header: 'NAMA AKUN',
+        cell: ({ row }) => <span className="text-sm text-gray-900 text-left">{row.original.name}</span>,
       },
       {
         accessorKey: 'accountGroupCode',
-        header: 'Grup',
-        cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.accountGroupCode ?? '-'}</span>,
+        header: 'GRUP',
+        cell: ({ row }) => <span className="text-sm text-gray-600 text-left">{row.original.accountGroupCode ?? '-'}</span>,
       },
       {
         accessorKey: 'description',
-        header: 'Deskripsi',
-        cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.description ?? '-'}</span>,
+        header: 'DESKRIPSI',
+        cell: ({ row }) => <span className="text-sm text-gray-600 text-left">{row.original.description ?? '-'}</span>,
       },
       {
         accessorKey: 'isActive',
-        header: 'Status',
+        header: 'STATUS',
         cell: ({ row }) => (
-          <Badge variant={row.original.isActive ? 'default' : 'secondary'} className={row.original.isActive ? '' : 'bg-gray-200 text-gray-700'}>
-            {row.original.isActive ? 'Aktif' : 'Nonaktif'}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={row.original.isActive ? 'default' : 'secondary'} className={row.original.isActive ? '' : 'bg-gray-200 text-gray-700'}>
+              {row.original.isActive ? 'Aktif' : 'Nonaktif'}
+            </Badge>
+          </div>
         ),
       },
       {
         id: 'actions',
-        header: () => <div className="text-right">Aksi</div>,
+        header: 'ACTION',
         cell: ({ row }) => (
-          <div className="flex justify-end">
+          <div className="flex justify-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                <Button variant="ghost" size="icon" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(row.original)}>
+              <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                <DropdownMenuItem
+                  onClick={() => onEdit(row.original)}
+                  disabled={row.original.is_lock}
+                  className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                >
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                <DropdownMenuItem
+                  onClick={() => onDelete(row.original)}
+                  className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                  disabled={row.original.is_lock}
+                >
                   <Trash className="mr-2 h-4 w-4" />
                   Hapus
                 </DropdownMenuItem>
@@ -106,61 +135,96 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <Input value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Cari akun" className="w-64" />
-          <Button onClick={onAdd} className="gap-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Cari akun"
+              className="pl-9 bg-white"
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
+
+          {/* Show Page Pagination Dropdown */}
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+            <span>Tampilkan</span>
+            <select className="rounded border px-3 py-2 text-sm bg-white border-slate-200 text-slate-700" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
+              {[10, 25, 50].map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <span>data</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-10 gap-2 rounded-xl">
             <Plus className="h-4 w-4" />
             Tambah
           </Button>
         </div>
-
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Tampilkan</span>
-          <select className="rounded border px-3 py-2 text-sm" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
-            {[10, 25, 50].map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <span>data</span>
-        </div>
       </div>
 
-      <div className="rounded-xl border bg-white">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-[#F9FAFB] hover:bg-[#F9FAFB]">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-xs font-semibold text-muted-foreground">
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
+              <TableRow key={headerGroup.id} className="hover:bg-[#f8f9fa]">
+                {headerGroup.headers.map((header) => {
+                  const columnId = header.id;
+                  const isAction = columnId === 'actions';
+                  const isStatus = columnId === 'isActive';
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        'px-4 py-4 text-xs font-semibold text-slate-500 uppercase select-none transition-colors',
+                        (isAction || isStatus) ? 'text-center text-slate-500' : 'text-left',
+                        isAction && 'w-[80px]'
+                      )}
+                    >
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  Memuat data...
-                </TableCell>
-              </TableRow>
+              [...Array(perPage)].map((_, i) => (
+                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
+                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
+                </TableRow>
+              ))
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-muted/50">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-4 text-sm">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                <TableRow key={row.id} className="hover:bg-gray-50 transition-colors">
+                  {row.getVisibleCells().map((cell) => {
+                    const isAction = cell.column.id === 'actions';
+                    const isStatus = cell.column.id === 'isActive';
+                    return (
+                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", (isAction || isStatus) ? "text-center" : "text-left")}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
@@ -169,22 +233,33 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
         </Table>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <div>
           Menampilkan {start}-{end} dari {total} data
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(Math.max(1, page - 1))}>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(Math.max(1, page - 1))}>
             Sebelumnya
           </Button>
           <div className="flex items-center gap-1">
             {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
-              <Button key={pageNumber} variant={pageNumber === page ? 'outline' : 'ghost'} size="sm" onClick={() => onPageChange(pageNumber)} className="w-9">
+              <Button
+                key={pageNumber}
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  pageNumber === page
+                    ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                    : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
+                onClick={() => onPageChange(pageNumber)}
+              >
                 {pageNumber}
               </Button>
             ))}
           </div>
-          <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : false} onClick={() => onPageChange(page + 1)}>
+          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={meta ? page >= meta.lastPage : false} onClick={() => onPageChange(page + 1)}>
             Selanjutnya
           </Button>
         </div>

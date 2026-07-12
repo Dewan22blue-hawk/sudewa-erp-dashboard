@@ -7,9 +7,10 @@ import { useCompany } from "@/contexts/CompanyContext"
 
 interface DashboardLayoutProps {
     children: ReactNode
+    minimal?: boolean
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, minimal = false }: DashboardLayoutProps) {
     const router = useRouter()
     const { companyId, isLoading } = useCompany()
 
@@ -33,6 +34,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const token = getToken()
     if (!token || !companyId) return null
+
+    if (minimal) {
+        return (
+            <div className="flex h-screen w-full overflow-hidden bg-[#fafafa]">
+                <main className="flex-1 overflow-y-auto bg-[#fafafa]">
+                    <div className="mx-auto w-full max-w-[950px] px-4 sm:px-6 py-10 space-y-6 box-border">
+                        {children}
+                    </div>
+                </main>
+            </div>
+        )
+    }
 
     return (
         <div className="flex h-screen w-full overflow-hidden bg-[#F5F6F8]">

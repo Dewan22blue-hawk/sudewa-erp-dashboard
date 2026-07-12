@@ -45,10 +45,14 @@ export function VehicleEquipmentTable({
             return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
                     key={p}
-                    variant={p === page ? "outline" : "ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={() => onPageChange(p)}
-                    className={p === page ? "border-gray-200 bg-white font-medium h-9 w-9 p-0" : "text-gray-500 font-medium h-9 w-9 p-0"}
+                    className={
+                        p === page
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                    }
                 >
                     {p}
                 </Button>
@@ -75,11 +79,17 @@ export function VehicleEquipmentTable({
         return pages.map((p, idx) => (
             <Button
                 key={idx}
-                variant={p === page ? "outline" : "ghost"}
+                variant="ghost"
                 size="sm"
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
-                className={p === page ? "border-gray-200 bg-white font-medium h-9 w-9 p-0" : "text-gray-500 font-medium h-9 w-9 p-0"}
+                className={
+                    p === page
+                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                        : p === '...'
+                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                }
             >
                 {p}
             </Button>
@@ -95,62 +105,58 @@ export function VehicleEquipmentTable({
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search here"
-                            className="pl-9 bg-white border border-gray-200 rounded-lg text-sm"
+                            className="pl-9 bg-white"
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
-                            <SelectTrigger className="w-[70px] bg-white border border-gray-200 rounded-lg text-sm">
-                                <SelectValue placeholder="10" />
+                            <SelectTrigger className="w-[70px] bg-white">
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
                                 <SelectItem value="25">25</SelectItem>
                                 <SelectItem value="50">50</SelectItem>
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
-                <div className="w-full sm:w-auto flex justify-end">
-                    <Button 
-                        onClick={onAdd} 
-                        className="w-full sm:w-auto bg-[#15305B] hover:bg-[#0E2140] font-semibold text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2"
-                    >
-                        <Plus className="h-4 w-4" />
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                        <Plus className="h-4 w-4 mr-2" />
                         Tambah
                     </Button>
                 </div>
             </div>
 
             {/* Table Card */}
-            <Card className="rounded-2xl overflow-hidden border border-gray-200 bg-white">
+            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
-                                <TableHead className="text-sm font-bold text-gray-800 uppercase px-6 py-4 text-center">KODE BARANG</TableHead>
-                                <TableHead className="text-sm font-bold text-gray-800 uppercase px-6 py-4 text-center">NAMA BARANG</TableHead>
-                                <TableHead className="text-sm font-bold text-gray-800 uppercase px-6 py-4 text-center w-[120px]">ACTION</TableHead>
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">NAMA BARANG</TableHead>
+                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-[120px]">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {equipments.length > 0 ? (
                                 equipments.map((item) => (
                                     <TableRow key={item.uuid} className="hover:bg-gray-50/50 border-b border-gray-100">
-                                        <TableCell className="px-6 py-4 text-sm text-gray-600 font-medium text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-center">
                                             {item.code || '-'}
                                         </TableCell>
-                                        <TableCell className="px-6 py-4 text-sm text-gray-800 text-center font-medium">
+                                        <TableCell className="px-4 py-4 text-sm text-gray-800 text-center font-medium">
                                             {item.name || '-'}
                                         </TableCell>
-                                        <TableCell className="px-6 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full">
@@ -188,19 +194,19 @@ export function VehicleEquipmentTable({
             </Card>
 
             {/* Bottom Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 pt-2">
-                <div className="text-sm text-gray-500 font-medium">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+                <div>
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500 font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Previous
                         </Button>
@@ -212,7 +218,7 @@ export function VehicleEquipmentTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500 font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Next
                         </Button>

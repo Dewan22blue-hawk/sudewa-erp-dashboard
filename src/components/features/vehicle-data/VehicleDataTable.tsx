@@ -28,19 +28,18 @@ interface VehicleDataTableProps {
   onAdd: () => void;
   onImport: () => void;
   onExport: () => void;
-  onAssign: () => void;
   onDetail: (item: VehicleData) => void;
   onEdit: (item: VehicleData) => void;
   onDelete: (item: VehicleData) => void;
   isExporting?: boolean;
-  filterDealerId: string;
-  onFilterDealerIdChange: (value: string) => void;
-  dealerOptions: SearchableSelectOption[];
-  onDealerSearchChange: (value: string) => void;
-  filterInvoiceDate?: Date;
-  onFilterInvoiceDateChange: (value?: Date) => void;
-  onApplyFilters: () => void;
-  onResetFilters: () => void;
+  vendorId: string;
+  onVendorIdChange: (value: string) => void;
+  vendorOptions: SearchableSelectOption[];
+  onVendorSearchChange: (value: string) => void;
+  processDate?: Date;
+  onProcessDateChange: (value?: Date) => void;
+  onSubmitAssign: () => void;
+  isAssigning?: boolean;
 }
 
 const formatDate = (value?: string | null) => {
@@ -66,19 +65,18 @@ export function VehicleDataTable({
   onAdd,
   onImport,
   onExport,
-  onAssign,
   onDetail,
   onEdit,
   onDelete,
   isExporting = false,
-  filterDealerId,
-  onFilterDealerIdChange,
-  dealerOptions,
-  onDealerSearchChange,
-  filterInvoiceDate,
-  onFilterInvoiceDateChange,
-  onApplyFilters,
-  onResetFilters,
+  vendorId,
+  onVendorIdChange,
+  vendorOptions,
+  onVendorSearchChange,
+  processDate,
+  onProcessDateChange,
+  onSubmitAssign,
+  isAssigning = false,
 }: VehicleDataTableProps) {
   const totalPages = Math.max(1, Math.ceil(totalData / perPage));
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
@@ -108,33 +106,38 @@ export function VehicleDataTable({
     onSelectedIdsChange(selectedIds.filter((value) => value !== id));
   };
 
+  const handleResetAssign = () => {
+    onVendorIdChange('');
+    onProcessDateChange(undefined);
+  };
+
   return (
     <div className="space-y-6">
       <Card className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="grid gap-5 lg:grid-cols-[1.15fr_1.15fr_auto] lg:items-end">
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-800">Tanggal Faktur</label>
-            <DatePicker value={filterInvoiceDate} onChange={onFilterInvoiceDateChange} placeholder="Pilih tanggal faktur" className="h-11 rounded-xl bg-white" />
+            <label className="text-sm font-semibold text-slate-800">Tanggal Proses</label>
+            <DatePicker value={processDate} onChange={onProcessDateChange} placeholder="Pilih tanggal proses" className="h-11 rounded-xl bg-white" />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-800">Nama Dealer</label>
+            <label className="text-sm font-semibold text-slate-800">Nama Vendor</label>
             <SearchableSelect
-              value={filterDealerId}
-              onChange={onFilterDealerIdChange}
-              options={dealerOptions}
-              onSearchChange={onDealerSearchChange}
-              placeholder="Pilih dealer"
-              searchPlaceholder="Cari dealer..."
-              emptyText="Dealer tidak ditemukan."
+              value={vendorId}
+              onChange={onVendorIdChange}
+              options={vendorOptions}
+              onSearchChange={onVendorSearchChange}
+              placeholder="Pilih vendor"
+              searchPlaceholder="Cari vendor..."
+              emptyText="Vendor tidak ditemukan."
               className="h-11 rounded-xl bg-white"
             />
           </div>
           <div className="flex flex-wrap gap-2 lg:justify-end">
-            <Button variant="outline" onClick={onResetFilters} className="h-11 rounded-xl px-5">
+            <Button variant="outline" onClick={handleResetAssign} className="h-11 rounded-xl px-5">
               Reset
             </Button>
-            <Button onClick={onApplyFilters} className="h-11 rounded-xl bg-[#22c55e] px-5 hover:bg-[#16a34a]">
-              Serahkan
+            <Button onClick={onSubmitAssign} disabled={isAssigning} className="h-11 rounded-xl bg-[#22c55e] px-5 hover:bg-[#16a34a]">
+              {isAssigning ? 'Memproses...' : 'Serahkan'}
             </Button>
           </div>
         </div>
@@ -143,25 +146,24 @@ export function VehicleDataTable({
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          <div className="relative w-full md:w-[325px]">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-10" />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <span>Show</span>
-            <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
-          </div>
+            <div className="relative w-full md:w-[325px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-10" />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-700">
+              <span>Show</span>
+              <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
+                <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -189,9 +191,6 @@ export function VehicleDataTable({
             <Download className="mr-2 h-4 w-4" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button variant="outline" onClick={onAssign} className="h-11 rounded-xl px-4" disabled={selectedPendingCount === 0}>
-            Assign Ditlantas
-          </Button>
           <Button onClick={onAdd} className="h-11 rounded-xl border border-slate-200 bg-white px-5 text-slate-900 shadow-none hover:bg-slate-50">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
@@ -202,27 +201,28 @@ export function VehicleDataTable({
       <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-[#eef3fa]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200 hover:bg-transparent">
-                <TableHead className="w-14 px-4 py-4">
+                <TableHead className="w-14 px-4 py-4 text-center">
                   <Checkbox checked={allSelected} onCheckedChange={handleSelectAll} aria-label="Pilih semua data kendaraan" />
                 </TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Dealer</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Nama STNK</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Wilayah</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Tipe Motor</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">No Mesin</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">No Rangka</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Tgl Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-xs font-semibold uppercase text-slate-800">Tgl Terima Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-800">Action</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Ditlantas</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Dealer</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Nama STNK</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Wilayah</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Tipe Motor</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Mesin</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Rangka</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Faktur</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Terima Faktur</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: Math.min(perPage, 6) }).map((_, index) => (
                   <TableRow key={`loading-${index}`} className="animate-pulse border-slate-100">
-                    {Array.from({ length: 10 }).map((__, cellIndex) => (
+                    {Array.from({ length: 11 }).map((__, cellIndex) => (
                       <TableCell key={cellIndex} className="px-4 py-4">
                         <div className="h-4 rounded bg-slate-100" />
                       </TableCell>
@@ -231,8 +231,8 @@ export function VehicleDataTable({
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60' : 'border-slate-200 hover:bg-slate-50/60'}>
-                    <TableCell className="px-4 py-4">
+                  <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}>
+                    <TableCell className="px-4 py-4 text-center">
                       <Checkbox
                         checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
                         disabled={assignedIds.includes(item.id)}
@@ -240,9 +240,12 @@ export function VehicleDataTable({
                         aria-label={`Pilih data kendaraan ${item.invoiceNumber}`}
                       />
                     </TableCell>
-                    <TableCell className="max-w-[220px] px-4 py-4 text-sm font-medium text-slate-700">
+                    <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">
+                      {item.ditlantasProcess?.[0]?.code || '-'}
+                    </TableCell>
+                    <TableCell className="max-w-[220px] px-4 py-4 text-sm text-slate-700 text-left">
                       <div className="space-y-2">
-                        <div className="line-clamp-2 uppercase">{item.dealer?.namaDealer || '-'}</div>
+                        <div className="line-clamp-2 uppercase font-medium text-slate-900">{item.dealer?.namaDealer || '-'}</div>
                         {assignedIds.includes(item.id) ? (
                           <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
                             Sudah assign Ditlantas
@@ -254,13 +257,13 @@ export function VehicleDataTable({
                         ) : null}
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.stnkName || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.region?.name || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.motorcycleType || item.motorcycleModel || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.machineNumber || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{item.chassisNumber || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{formatDate(item.invoiceDate)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700">{formatDate(item.invoiceReceiveDate)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.stnkName || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.region?.name || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.motorcycleType || item.motorcycleModel || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left font-medium">{item.machineNumber || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.chassisNumber || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceDate)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceReceiveDate)}</TableCell>
                     <TableCell className="px-4 py-4 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -279,7 +282,7 @@ export function VehicleDataTable({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={10} className="h-28 text-center text-sm text-slate-500">
+                  <TableCell colSpan={11} className="h-28 text-center text-sm text-slate-500">
                     Belum ada data kendaraan.
                   </TableCell>
                 </TableRow>

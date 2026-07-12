@@ -16,7 +16,7 @@ export default function MaterialPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const { data: materialsData, isLoading } = useMaterials({ page, perPage, search });
+  const { data: materialsData } = useMaterials({ page, perPage, search });
   
   const createMutation = useCreateMaterial();
   const updateMutation = useUpdateMaterial();
@@ -102,9 +102,11 @@ export default function MaterialPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data Material</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data material dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Data Material</h1>
+            <p className="text-sm text-muted-foreground">Kelola data material dengan mudah</p>
+          </div>
         </div>
 
         {/* Content */}

@@ -16,7 +16,7 @@ export default function BBNPage() {
   const [searchInput, setSearchInput] = useState('');  // immediate input value (for display)
   const [search, setSearch] = useState('');            // debounced value (sent to API)
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
 
   // Live search debounce — wait 400ms after user stops typing before firing API request
   useEffect(() => {
@@ -91,9 +91,11 @@ export default function BBNPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data Biaya</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data biaya dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Data Biaya</h1>
+            <p className="text-sm text-muted-foreground">Kelola data biaya dengan mudah</p>
+          </div>
         </div>
 
         {/* Content */}

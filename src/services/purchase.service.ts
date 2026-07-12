@@ -67,6 +67,8 @@ type UnitTransactionListApiModel = {
     code?: string;
     name?: string;
     type?: string;
+    address?: string | null;
+    npwp?: string | null;
   };
   unit_transaction_billing?: {
     total_dpp?: string | number;
@@ -171,11 +173,14 @@ const mapDetailToPurchase = (detail: UnitTransactionDetailApiModel): Purchase =>
     code: detail.code ?? '-',
     date: detail.created_at ?? '',
     supplierName: detail.person?.name ?? '-',
+    supplierAddress: detail.person?.address ?? null,
+    supplierNpwp: detail.person?.npwp ?? null,
     companyId: String(detail.person_id ?? ''),
     stockState: detail.stock_state,
     maxCapacity: detail.max_capacity !== undefined && detail.max_capacity !== null ? Number(detail.max_capacity) : undefined,
     warehouseName: detail.warehouse?.name,
     warehouseId: detail.warehouse?.id ? String(detail.warehouse.id) : undefined,
+    transaction_date: (detail as any).transaction_date ?? detail.created_at ?? '',
     ...billingTotals,
     units: mapUnits(detail),
     totalPaid: billingTotals.totalPaid ?? 0,
@@ -214,6 +219,7 @@ const mapListItemToPurchase = (item: UnitTransactionListApiModel): Purchase => {
     maxCapacity: item.max_capacity !== undefined && item.max_capacity !== null ? Number(item.max_capacity) : undefined,
     warehouseName: item.warehouse?.name,
     warehouseId: item.warehouse?.id ? String(item.warehouse.id) : undefined,
+    transaction_date: (item as any).transaction_date ?? item.created_at ?? '',
     ...billingTotals,
     units: [],
     createdAt: item.created_at ?? '',
@@ -434,6 +440,7 @@ export const purchaseService = {
     form.append('stock_state', payload.stock_state);
     form.append('max_capacity', payload.max_capacity);
     if (payload.code) form.append('code', payload.code);
+    if (payload.transaction_date) form.append('transaction_date', payload.transaction_date);
     if (payload.unit_type_id !== undefined) form.append('unit_type_id', String(payload.unit_type_id));
     if (payload.sparepart_id !== undefined) form.append('sparepart_id', String(payload.sparepart_id));
     if (payload.qty_total !== undefined) form.append('qty_total', String(payload.qty_total));
@@ -460,19 +467,26 @@ export const purchaseService = {
   },
 
   async updatePurchase(id: string, payload: UpdatePurchaseRequest): Promise<Purchase> {
-    purchases = purchases.map((p) =>
-      p.id === id
-        ? {
-            ...p,
-            ...payload,
-            updatedAt: new Date().toISOString(),
-          }
-        : p,
-    );
+    const form = new FormData();
+    form.append('_method', 'PUT');
+    form.append('company_id', String(payload.company_id));
+    form.append('person_id', String(payload.person_id));
+    form.append('code', payload.code);
+    form.append('type', payload.type);
+    form.append('max_capacity', String(payload.max_capacity));
+    form.append('stock_state', payload.stock_state);
+    if (payload.transaction_date) {
+      form.append('transaction_date', payload.transaction_date);
+    }
 
-    const updated = purchases.find((p) => p.id === id);
-    if (!updated) throw new Error('Purchase not found');
-    return updated;
+    const response = await apiClient.post<LaravelApiResponse<UnitTransactionDetailApiModel>>(`${basePath}/${id}`, form);
+    const data = ensureSuccess(response.data);
+    const mapped = mapDetailToPurchase(data);
+
+    // Sync in-memory store
+    purchases = purchases.map((p) => (p.id === id ? mapped : p));
+
+    return mapped;
   },
 
   async deletePurchase(id: string): Promise<void> {

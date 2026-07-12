@@ -89,6 +89,27 @@ export function PurchaseMaterialTable({
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = Math.min(page * perPage, totalData);
 
+  const renderActionMenu = (item: MaterialTransaction) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
+          <MoreVertical className="h-4 w-4 text-slate-700" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40 rounded-2xl border-slate-200 p-2 shadow-lg">
+        <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+          <Link href={`/dashboard/${slug}/${routeBasePath}/${item.id}`}>Detail</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
+          Hapus
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -115,7 +136,6 @@ export function PurchaseMaterialTable({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
@@ -131,8 +151,9 @@ export function PurchaseMaterialTable({
         </Button>
       </div>
 
-      <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <Table>
+      <Card className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className={!isLoading && data.length > 0 ? 'pr-24' : undefined}>
+        <Table className="min-w-[820px]">
           <TableHeader className="bg-slate-100">
             <TableRow className="border-slate-200">
               <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{codeHeader}</TableHead>
@@ -140,19 +161,18 @@ export function PurchaseMaterialTable({
               <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{counterpartyHeader}</TableHead>
               <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">NOMINAL</TableHead>
               <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">STATUS</TableHead>
-              <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-28 text-center text-slate-500">
+                <TableCell colSpan={5} className="h-28 text-center text-slate-500">
                   {loadingText}
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-28 text-center text-slate-500">
+                <TableCell colSpan={5} className="h-28 text-center text-slate-500">
                   {emptyText}
                 </TableCell>
               </TableRow>
@@ -160,7 +180,7 @@ export function PurchaseMaterialTable({
               data.map((item) => {
                 const statusMeta = getPaymentStatusMeta(item);
                 return (
-                <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70">
+                <TableRow key={item.id} className="group border-slate-200 hover:bg-slate-50/70">
                   <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.code}</TableCell>
                   <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatDate(item.transactionDate)}</TableCell>
                   <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.supplierName}</TableCell>
@@ -170,31 +190,31 @@ export function PurchaseMaterialTable({
                       {statusMeta.label}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-                          <MoreVertical className="h-4 w-4 text-slate-700" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40 rounded-2xl border-slate-200 p-2 shadow-lg">
-                        <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
-                          <Link href={`/dashboard/${slug}/${routeBasePath}/${item.id}`}>Detail</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
                 </TableRow>
               )})
             )}
           </TableBody>
         </Table>
+        </div>
+
+        {!isLoading && data.length > 0 ? (
+          <div className="absolute right-0 top-0 z-30 w-24 bg-white shadow-[-8px_0_12px_-10px_rgba(15,23,42,0.45)]">
+            <table className="w-full caption-bottom text-sm">
+              <thead className="bg-slate-100">
+                <tr className="border-b border-slate-200">
+                  <th className="h-10 px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((item) => (
+                  <tr key={item.id} className="border-b border-slate-200 transition-colors hover:bg-slate-50/70">
+                    <td className="px-5 py-4 text-right">{renderActionMenu(item)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </Card>
 
       <div className="flex flex-col gap-4 px-2 lg:flex-row lg:items-center lg:justify-between">

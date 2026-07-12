@@ -10,8 +10,17 @@ import { unitTransactionItemService } from '@/services/unitTransactionItem.servi
 export const usePurchaseUnitItems = (purchaseId?: string) => {
   return useQuery({
     queryKey: ['purchase-unit-items', purchaseId],
-    queryFn: () => unitTransactionItemService.getItems(purchaseId as string),
+    queryFn: () => unitTransactionItemService.getItems(purchaseId as string, { type: 'purchase' }),
     enabled: !!purchaseId,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useSalesUnitItems = (salesId?: string) => {
+  return useQuery({
+    queryKey: ['sales-unit-items', salesId],
+    queryFn: () => unitTransactionItemService.getItems(salesId as string, { type: 'sales' }),
+    enabled: !!salesId,
     staleTime: 1000 * 60 * 2,
   });
 };
@@ -35,6 +44,7 @@ export const useCreateUnitItem = () => {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
       }
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', data.unit_transaction_id] });
+      queryClient.invalidateQueries({ queryKey: ['sales-unit-items', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction', data.unit_transaction_id] });
@@ -59,6 +69,7 @@ export const useUpdateUnitItem = () => {
         queryClient.invalidateQueries({ queryKey: ['purchase-by-id', transactionId] });
         queryClient.invalidateQueries({ queryKey: ['unit-transaction', transactionId] });
         queryClient.invalidateQueries({ queryKey: ['sales-transaction', transactionId] });
+        queryClient.invalidateQueries({ queryKey: ['sales-unit-items', transactionId] });
       }
 
       queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
@@ -76,6 +87,7 @@ export const useDeleteUnitItem = () => {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
       }
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['sales-unit-items', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction', purchaseId] });
@@ -94,6 +106,7 @@ export const useBulkDeleteUnitItem = () => {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
       }
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', purchaseId] });
+      queryClient.invalidateQueries({ queryKey: ['sales-unit-items', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction', purchaseId] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction', purchaseId] });

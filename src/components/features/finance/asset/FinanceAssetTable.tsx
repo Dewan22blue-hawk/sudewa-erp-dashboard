@@ -50,37 +50,36 @@ export function FinanceAssetTable({
         <Card className="p-0 border-none shadow-none bg-transparent space-y-4">
             {/* Filters */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2">
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
                     <div className="relative w-full md:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder="Search here"
-                            className="pl-10 bg-white border-gray-200"
+                            className="pl-9 bg-white"
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
                         <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
-                            <SelectTrigger className="w-20 bg-white border-gray-200">
-                                <SelectValue placeholder="10" />
+                            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
                                 <SelectItem value="25">25</SelectItem>
                                 <SelectItem value="50">50</SelectItem>
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500 whitespace-nowrap">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
-                        className="flex items-center gap-2 border-gray-200 text-gray-600"
+                        className="flex items-center gap-2 rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer"
                         onClick={onExport}
                         disabled={isExporting}
                     >
@@ -91,30 +90,30 @@ export function FinanceAssetTable({
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-gray-100 bg-white overflow-hidden">
+            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-none">
                 <div className="overflow-x-auto">
                     <Table>
-                        <TableHeader className="bg-gray-50/50">
+                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-transparent border-gray-100">
-                                <TableHead className="w-12 font-semibold text-gray-900">NO</TableHead>
-                                <TableHead className="font-semibold text-gray-900">KODE ASET</TableHead>
-                                <TableHead className="font-semibold text-gray-900">TGL BELI</TableHead>
-                                <TableHead className="font-semibold text-gray-900">NAMA BARANG</TableHead>
-                                <TableHead className="font-semibold text-gray-900">TIPE ASET</TableHead>
-                                <TableHead className="font-semibold text-gray-900">SERIAL NUMBER</TableHead>
-                                <TableHead className="font-semibold text-gray-900">HARGA BELI</TableHead>
-                                <TableHead className="font-semibold text-gray-900">UMUR EKONOMIS</TableHead>
-                                <TableHead className="font-semibold text-gray-900">PENYUSUTAN/BULAN</TableHead>
-                                <TableHead className="font-semibold text-gray-900">NILAI AKHIR</TableHead>
-                                <TableHead className="w-12 font-semibold text-gray-900">ACTION</TableHead>
+                                <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NO</TableHead>
+                                <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">KODE ASET</TableHead>
+                                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">TGL BELI</TableHead>
+                                <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">NAMA BARANG</TableHead>
+                                <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">TIPE ASET</TableHead>
+                                <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">SERIAL NUMBER</TableHead>
+                                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">HARGA BELI</TableHead>
+                                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UMUR EKONOMIS</TableHead>
+                                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PENYUSUTAN/BULAN</TableHead>
+                                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NILAI AKHIR</TableHead>
+                                <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i} className="hover:bg-transparent border-gray-100 last:border-0">
+                                    <TableRow key={i} className="border-b border-slate-100 last:border-0">
                                         {Array.from({ length: 11 }).map((_, j) => (
-                                            <TableCell key={j}>
+                                            <TableCell key={j} className="px-4 py-4">
                                                 <Skeleton className="h-4 w-full" />
                                             </TableCell>
                                         ))}
@@ -122,40 +121,40 @@ export function FinanceAssetTable({
                                 ))
                             ) : assets.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={11} className="h-24 text-center text-gray-500">
+                                    <TableCell colSpan={11} className="h-24 text-center text-slate-500">
                                         No data found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 assets.map((asset, index) => (
-                                    <TableRow key={asset.id} className="hover:bg-gray-50/50 border-gray-100 last:border-0">
-                                        <TableCell className="text-gray-600">{(page - 1) * perPage + index + 1}</TableCell>
-                                        <TableCell className="font-medium text-gray-900 uppercase">{asset.code}</TableCell>
-                                        <TableCell className="text-gray-600">
+                                    <TableRow key={asset.id} className="border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
+                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(page - 1) * perPage + index + 1}</TableCell>
+                                        <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">{asset.code}</TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
                                             {asset.purchase_date ? format(new Date(asset.purchase_date), 'dd/MM/yyyy') : '-'}
                                         </TableCell>
-                                        <TableCell className="text-gray-600">{asset.name}</TableCell>
-                                        <TableCell className="text-gray-600 uppercase">{asset.type}</TableCell>
-                                        <TableCell className="text-gray-600 uppercase">{asset.serial_number || '-'}</TableCell>
-                                        <TableCell className="text-gray-600">{formatMoney(asset.price, 'IDR')}</TableCell>
-                                        <TableCell className="text-gray-600">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
-                                        <TableCell className="text-gray-600">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
-                                        <TableCell className="text-gray-600">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
-                                        <TableCell>
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{asset.name}</TableCell>
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">{asset.type}</TableCell>
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">{asset.serial_number || '-'}</TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.price, 'IDR')}</TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
+                                        <TableCell className="px-4 py-4 text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-32">
-                                                    <DropdownMenuItem className="cursor-pointer" onClick={() => onDetail?.(asset)}>
+                                                <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                                                    <DropdownMenuItem className="cursor-pointer rounded-xl px-3 py-2.5" onClick={() => onDetail?.(asset)}>
                                                         Detail
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(asset)}>
+                                                    <DropdownMenuItem className="cursor-pointer rounded-xl px-3 py-2.5" onClick={() => onEdit(asset)}>
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={() => onDelete(asset)}>
+                                                    <DropdownMenuItem className="text-red-600 cursor-pointer rounded-xl px-3 py-2.5" onClick={() => onDelete(asset)}>
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>

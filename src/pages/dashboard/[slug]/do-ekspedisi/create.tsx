@@ -97,7 +97,7 @@ export default function CreateDOEkspedisiPage() {
             <ChevronLeft className="h-5 w-5 text-slate-500" />
           </button>
           <div>
-            <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">Form Data Ekspedisi</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">Form Data Ekspedisi</h1>
             <p className="text-sm text-slate-500">Nomor Polisi akan mengikuti armada yang dipilih</p>
           </div>
         </div>

@@ -51,7 +51,7 @@ const applyValidationErrors = (
 
 export function CustomerManagementPage() {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
   const deferredSearch = useDeferredValue(search);
 
   const { data, isLoading, isFetching, isError } = useCustomers({
@@ -140,6 +140,9 @@ export function CustomerManagementPage() {
       }
 
       handleCloseForm();
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       if (error instanceof ApiValidationError) {
         applyValidationErrors(error, form);
@@ -159,6 +162,9 @@ export function CustomerManagementPage() {
       await deleteCustomer.mutateAsync({ id: deleteTarget.id, companyId });
       toast.success('Data customer berhasil dihapus');
       setDeleteTarget(null);
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus data customer';
       toast.error(message);
@@ -198,9 +204,11 @@ export function CustomerManagementPage() {
   return (
     <>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-[40px] font-semibold leading-tight tracking-[-0.02em] text-[#171717]">Customer</h1>
-          <p className="mt-1 text-[24px] text-[#71717A]">Kelola data customer dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Customer</h1>
+            <p className="text-sm text-muted-foreground">Kelola data customer dengan mudah</p>
+          </div>
         </div>
 
         <CustomerTable

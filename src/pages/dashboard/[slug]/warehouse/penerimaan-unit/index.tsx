@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import PenerimaanUnitTable from '@/components/features/penerimaan-unit/PenerimaanUnitTable';
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
+import { cn } from '@/lib/utils';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState('10');
+  const [itemsPerPage, setItemsPerPage] = useState('25');
   const [currentPage, setCurrentPage] = useState(1);
   const [openForm, setOpenForm] = useState(false);
   const perPage = Number(itemsPerPage);
@@ -22,7 +23,7 @@ export default function PenerimaanUnitPage() {
     perPage: 10000,
   });
 
-  const allData = activities?.data ?? [];
+  const allData = useMemo(() => activities?.data ?? [], [activities?.data]);
 
   const filteredData = useMemo(() => {
     if (!search) return allData;
@@ -71,21 +72,19 @@ export default function PenerimaanUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Data Penerimaan Unit</h1>
-            <p className="text-sm text-gray-500">Kelola dan lacak semua data penerimaan stock unit</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold">Data Penerimaan Unit</h1>
+          <p className="text-sm text-muted-foreground">Kelola dan lacak semua data penerimaan stock unit</p>
         </div>
 
-        <div className="bg-white rounded-xl border p-4 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative w-64">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search here"
-                  className="pl-9"
+                  className="pl-9 bg-white"
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -94,7 +93,7 @@ export default function PenerimaanUnitPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-gray-700">
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                 <span>Show</span>
                 <Select
                   value={itemsPerPage}
@@ -103,48 +102,71 @@ export default function PenerimaanUnitPage() {
                     setCurrentPage(1);
                   }}
                 >
-                  <SelectTrigger className="h-9 w-20">
-                    <SelectValue />
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
                   </SelectContent>
                 </Select>
                 <span>Page</span>
               </div>
             </div>
 
-            <Button className="bg-[#19355d]" onClick={() => setOpenForm(true)}>
+            <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => setOpenForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Tambah
             </Button>
           </div>
 
-          {isLoading ? <div className="p-8 text-center text-gray-500">Loading...</div> : isError ? <div className="p-8 text-center text-red-500">{apiErrorMessage}</div> : <PenerimaanUnitTable data={data} />}
+          {isLoading ? (
+            <div className="bg-white rounded-xl border p-8 text-center text-gray-500">Loading...</div>
+          ) : isError ? (
+            <div className="bg-white rounded-xl border p-8 text-center text-red-500">{apiErrorMessage}</div>
+          ) : (
+            <PenerimaanUnitTable data={data} />
+          )}
 
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <div>
+          <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+            <p>
               Showing {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} of {totalItems} data
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
+            </p>
+            <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+              >
                 Previous
               </Button>
               {getPageNumbers().map((page, idx) => (
                 <Button
                   key={idx}
-                  variant={page === currentPage ? 'outline' : 'ghost'}
+                  variant="ghost"
                   size="sm"
-                  className={page === currentPage ? 'bg-gray-100' : ''}
+                  className={cn(
+                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    page === currentPage
+                      ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                      : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                  )}
                   onClick={() => typeof page === 'number' && setCurrentPage(page)}
                   disabled={typeof page !== 'number'}
                 >
                   {page}
                 </Button>
               ))}
-              <Button variant="outline" size="sm" disabled={currentPage === totalPages || totalItems === 0} onClick={() => setCurrentPage((p) => p + 1)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                disabled={currentPage === totalPages || totalItems === 0}
+                onClick={() => setCurrentPage((p) => p + 1)}
+              >
                 Next
               </Button>
             </div>

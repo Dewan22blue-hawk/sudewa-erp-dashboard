@@ -8,6 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { PaginationMeta } from '@/@types/pagination.types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface Props {
   data: PengeluaranUnit[];
@@ -28,11 +32,7 @@ const formatDate = (value: string): string => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(date);
+  return format(date, 'dd MMMM yyyy', { locale: id });
 };
 
 export default function PengeluaranUnitTable({
@@ -97,23 +97,23 @@ export default function PengeluaranUnitTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-4 text-sm mb-4">
-        <div className="flex items-center gap-4">
-          <div className="relative w-60 sm:w-64 text-gray-400 focus-within:text-gray-900">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
-            <Input placeholder="Search here" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 h-10 border-gray-200 rounded-lg text-gray-900" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input placeholder="Search here" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 bg-white" />
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-700">
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-10 w-20 border-gray-200 rounded-lg bg-white">
-                <SelectValue />
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
             <span>Page</span>
@@ -121,89 +121,100 @@ export default function PengeluaranUnitTable({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700 uppercase">
-            <tr>
-              <th className="px-4 py-3 text-left">NO PENGELUARAN</th>
-              <th className="px-4 py-3 text-left">TANGGAL</th>
-              <th className="px-4 py-3 text-left">CUSTOMER</th>
-              <th className="px-4 py-3 text-left">WAREHOUSE</th>
-              <th className="px-4 py-3 text-left">KETERANGAN</th>
-              <th className="px-4 py-3 text-center w-15">ACTION</th>
-            </tr>
-          </thead>
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+        <Table className="w-full text-sm">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow className="hover:bg-[#f8f9fa]">
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO PENGELUARAN</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TANGGAL</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">CUSTOMER</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">WAREHOUSE</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KETERANGAN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-15 whitespace-nowrap">ACTION</TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody className="divide-y divide-gray-100">
+          <TableBody>
             {isLoading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Loading...
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : isError ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-red-600">
+              <TableRow>
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-red-600 text-sm">
                   <div className="space-y-2">
                     <p>{errorMessage ?? 'Gagal memuat data pengeluaran unit'}</p>
                     <Button variant="outline" size="sm" onClick={onRetry}>
                       Coba Lagi
                     </Button>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Tidak ada data.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               data.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 text-gray-900 font-medium">{item.activityNumber}</td>
-                  <td className="px-4 py-4 text-gray-600">{formatDate(item.activityDate)}</td>
-                  <td className="px-4 py-4 text-gray-600">{item.person?.name ?? '-'}</td>
-                  <td className="px-4 py-4 text-gray-600">{item.warehouse?.name ?? '-'}</td>
-                  <td className="px-4 py-4 text-gray-600">{item.description || '-'}</td>
-                  <td className="px-4 py-4 text-center">
+                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <TableCell className="px-4 py-4 text-gray-900 font-medium text-left text-sm">{item.activityNumber}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{formatDate(item.activityDate)}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.person?.name ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.warehouse?.name ?? '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.description || '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button type="button" className="p-1 outline-none text-gray-400 hover:text-gray-700 transition" aria-label="Aksi data pengeluaran unit">
-                          <MoreVertical size={18} className="mx-auto" />
-                        </button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36 rounded-lg shadow-lg border-gray-100 p-1 font-medium text-[13px]">
-                        <DropdownMenuItem onClick={() => navigateToDetail(item.id)} className="cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md py-2.5 px-3">
+                      <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuItem onClick={() => navigateToDetail(item.id)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                           Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigateToEdit(item.id)} className="cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md py-2.5 px-3">
+                        <DropdownMenuItem onClick={() => navigateToEdit(item.id)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                           Edit
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
-      <div className="flex justify-between items-center text-sm text-gray-500 mt-4 px-1">
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
         <div>
           Showing {startIndex === 0 && endIndex === 0 ? '0' : `${startIndex}-${endIndex}`} of {meta.total} data
         </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="text-gray-600 font-medium hover:bg-transparent hover:text-gray-900 px-3 disabled:opacity-50" disabled={page === 1} onClick={() => onPageChange(page - 1)}>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            disabled={page === 1}
+            onClick={() => onPageChange(page - 1)}
+          >
             Previous
           </Button>
           {getPageNumbers().map((pageNumber, index) => (
             <Button
               key={`${String(pageNumber)}-${index}`}
-              variant={pageNumber === page ? 'outline' : 'ghost'}
+              variant="ghost"
               size="sm"
-              className={`w-9 h-9 p-0 rounded-lg border-gray-200 font-medium ${pageNumber === page ? 'text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-transparent'}`}
+              className={cn(
+                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                pageNumber === page
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+              )}
               onClick={() => {
                 if (typeof pageNumber === 'number') onPageChange(pageNumber);
               }}
@@ -215,7 +226,7 @@ export default function PengeluaranUnitTable({
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-600 font-medium hover:bg-transparent hover:text-gray-900 px-3 disabled:opacity-50"
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
             disabled={page >= totalPages || meta.total === 0}
             onClick={() => onPageChange(page + 1)}
           >

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { BBNBillVehicleFeeForm } from '@/components/features/tagihan-bbn/BBNBillVehicleFeeForm';
 import { useBBNBillDetail, useUpdateBBNBillVehicleData } from '@/hooks/useBBNBill';
@@ -34,14 +35,19 @@ export default function EditBBNBillVehiclePage() {
           isSubmitting={updateMutation.isPending}
           onCancel={() => router.push(`/dashboard/${slug}/tagihan-bbn/${id}`)}
           onSubmit={async (payload) => {
-            if (!vehicleDataId) return;
+            if (!vehicle) return;
+            const vehicleRegistrationId = vehicle.vehicleRegistration?.id;
+            if (!vehicleRegistrationId) {
+              toast.error('ID Registrasi Kendaraan tidak ditemukan');
+              return;
+            }
 
             try {
-              await updateMutation.mutateAsync({ vehicleDataId, payload });
+              await updateMutation.mutateAsync({ vehicleRegistrationId, payload });
               toast.success('Data detail STNK/BPKB berhasil diperbarui');
               router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
             } catch (error: any) {
-              toast.error(error.message || 'Gagal memperbarui detail STNK/BPKB');
+              toast.error(getApiErrorMessage(error));
             }
           }}
         />

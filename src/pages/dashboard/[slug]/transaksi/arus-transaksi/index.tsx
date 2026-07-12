@@ -16,7 +16,6 @@ import { Transaction } from '@/@types/transaction.types';
 
 // This page implements the List view
 export default function TransactionListPage() {
-  const LIVE_REFRESH_SECONDS = 10;
   const router = useRouter();
   const { slug } = router.query;
   const { companyId } = useCompany();
@@ -25,25 +24,16 @@ export default function TransactionListPage() {
 
   // Local State
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(25);
   const [localSearch, setLocalSearch] = useState('');
 
   // Query Hooks
-  const { data, isLoading: isListLoading, isFetching: isListFetching, dataUpdatedAt } = useTransactions(safeCompanyId, page, limit, localSearch);
-  const { data: summary, isLoading: isSummaryLoading, isFetching: isSummaryFetching } = useTransactionSummary(safeCompanyId);
+  const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);
+  const { data: summary, isLoading: isSummaryLoading } = useTransactionSummary(safeCompanyId);
 
   // Dialog State
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
-
-  const lastUpdatedLabel = useMemo(() => {
-    if (!dataUpdatedAt) return 'Menunggu sinkronisasi data terbaru...';
-
-    return new Intl.DateTimeFormat('id-ID', {
-      dateStyle: 'medium',
-      timeStyle: 'medium',
-    }).format(new Date(dataUpdatedAt));
-  }, [dataUpdatedAt]);
 
   // Handlers
   const handleEdit = (trx: Transaction) => {
@@ -59,16 +49,11 @@ export default function TransactionListPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* HEADLINE */}
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Arus Transaksi Operasional</h1>
-          {/* <p className="text-muted-foreground">Kelola arus transaksi operasional perusahaan</p> */}
-          <p className="mt-2 text-sm text-muted-foreground">
-            Data diperbarui otomatis setiap {LIVE_REFRESH_SECONDS} detik dan akan sinkron lagi saat tab aktif kembali.
-            {' '}
-            <span className={isListFetching || isSummaryFetching ? 'text-emerald-600 font-medium' : 'font-medium'}>
-              {isListFetching || isSummaryFetching ? 'Menyinkronkan data...' : `Update terakhir ${lastUpdatedLabel}`}
-            </span>
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Arus Transaksi Operasional</h1>
+            <p className="text-sm text-muted-foreground">Kelola arus transaksi operasional perusahaan</p>
+          </div>
         </div>
 
         <TransactionSummaryCards
@@ -89,10 +74,9 @@ export default function TransactionListPage() {
               <span>Show</span>
               <Select value={String(limit)} onValueChange={(v) => setLimit(Number(v))}>
                 <SelectTrigger className="h-9 w-[70px] bg-white">
-                  <SelectValue placeholder="10" />
+                  <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
                   <SelectItem value="100">100</SelectItem>
@@ -102,7 +86,7 @@ export default function TransactionListPage() {
             </div>
           </div>
 
-          <Button className="bg-[#1e293b] text-white hover:bg-[#0f172a]" onClick={() => router.push(`${basePath}/create`)}>
+          <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => router.push(`${basePath}/create`)}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -119,19 +103,39 @@ export default function TransactionListPage() {
 
         {/* PAGINATION INFO */}
         {!isListLoading && data && (
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
+          <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+            <div>
               Showing {(page - 1) * limit + 1}-{Math.min(page * limit, data.total)} of {data.total} data
-            </span>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>
-                Previous
-              </Button>
-              <div className="bg-white border text-black font-medium px-3 py-1 rounded-md text-sm">{page}</div>
-              <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page * limit >= data.total}>
-                Next
-              </Button>
             </div>
+            {data.total > limit && (
+              <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-slate-200 bg-white text-slate-950 shadow-sm"
+                >
+                  {page}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page * limit >= data.total}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         )}
 

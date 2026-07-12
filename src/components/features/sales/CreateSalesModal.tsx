@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
@@ -8,6 +8,12 @@ import { useCustomers } from '@/hooks/useCustomer';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useRouter } from 'next/router';
 import { generateSalesCode } from '@/lib/utils/sales';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 interface CreateSalesModalProps {
     isOpen: boolean;
@@ -27,13 +33,22 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
     });
     const generatedCode = generateSalesCode(router.query.slug);
 
-    const handleSubmit = async (data: EditUnitFormData) => {
-        const selectedCustomer =
-            (customerData?.data ?? []).find((item) => String(item.name).trim().toLowerCase() === String(data.customer ?? '').trim().toLowerCase()) ?? null;
+    const [selectedCustomer, setSelectedCustomer] = useState<{ id: string | number; name: string; code?: string } | null>(null);
+    const [isCustomerOpen, setIsCustomerOpen] = useState(false);
 
+    const customerOptions = useMemo(() => {
+        return (customerData?.data ?? []).map((item) => ({
+            id: item.id,
+            name: item.name,
+            code: item.code,
+            keyword: `${item.code ?? ''} ${item.name}`.toLowerCase(),
+        }));
+    }, [customerData?.data]);
+
+    const handleSubmit = async (data: EditUnitFormData) => {
         const customerId = Number(selectedCustomer?.id ?? 0);
         if (!customerId) {
-            toast.error('Customer tidak valid. Silakan isi nama customer sesuai data master.');
+            toast.error('Customer wajib dipilih');
             return;
         }
 
@@ -45,6 +60,12 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
             type: 'sales' as const,
             max_capacity: Number(data.qty ?? 0),
             stock_state: 'draft',
+            unit_type_id: Number(data.tipeUnit || 0),
+            qty_total: Number(data.qty ?? 0),
+            price: Number(data.harga ?? 0),
+            bbn_price: Number(data.biayaBbn ?? 0),
+            expedition_fee: Number(data.biayaEkspedisi ?? 0),
+            other_fee: Number(data.biayaLain ?? 0),
         };
 
         if (!payload.max_capacity || payload.max_capacity <= 0) {
@@ -56,6 +77,8 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
             await createSalesMutation.mutateAsync(payload);
             toast.success('Penjualan unit berhasil ditambahkan');
             onClose();
+            // Reset customer selection state
+            setSelectedCustomer(null);
             if (onSuccess) onSuccess();
         } catch {
             toast.error('Gagal menambahkan penjualan unit');
@@ -81,8 +104,9 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
 
                 <div className="mt-2">
                     <EditUnitForm
+                        hideCustomerField={true}
                         defaultValues={{
-                            customer: 'PT XX',
+                            customer: selectedCustomer?.name ?? '',
                             tipeUnit: '',
                             qty: 1,
                             harga: 0,
@@ -96,6 +120,52 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
                             biayaEkspedisi: 0,
                             biayaLain: 0,
                         }}
+                        prependFields={
+                            <div className="grid grid-cols-1 gap-6 mb-6">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">Customer</Label>
+                                    <Popover open={isCustomerOpen} onOpenChange={setIsCustomerOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={isCustomerOpen}
+                                                className="w-full justify-between bg-transparent font-normal border border-input h-10 px-3"
+                                            >
+                                                <span className={cn('truncate', !selectedCustomer && 'text-muted-foreground')}>
+                                                    {selectedCustomer ? `${selectedCustomer.code ?? ''} - ${selectedCustomer.name}` : 'Pilih customer'}
+                                                </span>
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                            <Command>
+                                                <CommandInput placeholder="Cari customer (kode/nama)..." />
+                                                <CommandList>
+                                                    <CommandEmpty>Customer tidak ditemukan.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {customerOptions.map((option) => (
+                                                            <CommandItem
+                                                                key={option.id}
+                                                                value={option.keyword}
+                                                                onSelect={() => {
+                                                                    setSelectedCustomer(option);
+                                                                    setIsCustomerOpen(false);
+                                                                }}
+                                                            >
+                                                                <Check className={cn('mr-2 h-4 w-4', selectedCustomer?.id === option.id ? 'opacity-100' : 'opacity-0')} />
+                                                                {option.code ? `${option.code} - ` : ''}{option.name}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                            </div>
+                        }
                         onSubmit={handleSubmit}
                         onCancel={onClose}
                         showAddUnitButton

@@ -71,7 +71,6 @@ export function VehicleDocumentTable({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
@@ -100,21 +99,25 @@ export function VehicleDocumentTable({
       <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-[#eef3fa]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200 hover:bg-transparent">
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-800">Kode Penerimaan</TableHead>
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-800">Vendor</TableHead>
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-800">Tgl Terima</TableHead>
-                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-800">Keterangan</TableHead>
-                <TableHead className="px-6 py-4 text-center text-xs font-semibold uppercase text-slate-800">Action</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Dokumen</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Ditlantas</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Vendor</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tanggal Terima</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Processed</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Unprocessed</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Deskripsi</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tanggal Dibuat</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: Math.min(perPage, 6) }).map((_, rowIndex) => (
                   <TableRow key={rowIndex} className="animate-pulse border-slate-100">
-                    {Array.from({ length: 5 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="px-6 py-4">
+                    {Array.from({ length: 9 }).map((__, cellIndex) => (
+                      <TableCell key={cellIndex} className="px-4 py-4">
                         <div className="h-4 rounded bg-slate-100" />
                       </TableCell>
                     ))}
@@ -122,12 +125,16 @@ export function VehicleDocumentTable({
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70">
-                    <TableCell className="px-6 py-4 text-sm font-medium text-slate-800">{item.code || '-'}</TableCell>
-                    <TableCell className="px-6 py-4 text-sm text-slate-700">{item.vendor?.name || '-'}</TableCell>
-                    <TableCell className="px-6 py-4 text-sm text-slate-700">{formatDate(item.receiptDate)}</TableCell>
-                    <TableCell className="max-w-[320px] px-6 py-4 text-sm text-slate-700">{item.description || '-'}</TableCell>
-                    <TableCell className="px-6 py-4 text-center">
+                  <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50/70 transition-colors">
+                    <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.code || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.ditlantasProcess?.code || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.ditlantasProcess?.vendor?.name || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.receiptDate)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm font-semibold text-emerald-600">{item.processedCount}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm font-semibold text-amber-600">{item.unprocessedCount}</TableCell>
+                    <TableCell className="max-w-[220px] truncate px-4 py-4 text-sm text-slate-700 text-left">{item.description || '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.createdAt)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -135,7 +142,7 @@ export function VehicleDocumentTable({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[160px]">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">Detail / Edit</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -144,7 +151,7 @@ export function VehicleDocumentTable({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-28 text-center text-sm text-slate-500">
+                  <TableCell colSpan={9} className="h-28 text-center text-sm text-slate-500 px-4 py-4">
                     Belum ada data penerimaan BPKB/STNK.
                   </TableCell>
                 </TableRow>

@@ -1,25 +1,53 @@
 import { PaginationMeta } from '@/@types/pagination.types';
 
+export interface UnitTransactionBillingHistoryCashPivot {
+  unit_transaction_billing_history_id: string | number;
+  cash_id: string | number;
+  amount: number;
+  original_amount: number;
+  exchange_amount: number;
+}
+
+export interface UnitTransactionBillingHistoryCash {
+  id: string | number;
+  uuid?: string;
+  company_id?: string | number;
+  account_id?: string | number | null;
+  code: string;
+  cash_name: string;
+  description?: string | null;
+  amount: number;
+  type: string;
+  created_at?: string;
+  updated_at?: string;
+  pivot: UnitTransactionBillingHistoryCashPivot;
+}
+
+export interface UnitTransactionBillingHistory {
+  id?: string;
+  uuid?: string;
+  unit_transaction_billing_id?: string;
+  payment_proof?: string | null;
+  bca_payment_amount?: number;
+  cash_payment_amount?: number;
+  bca_payment_usd_amount?: number;
+  payment_at?: string;
+  note?: string;
+  created_at?: string;
+  updated_at?: string;
+  cashes?: UnitTransactionBillingHistoryCash[];
+}
+
 export interface UnitTransactionBilling {
   id?: string;
+  uuid?: string;
   unit_transaction_id?: string;
   is_paid?: boolean;
   payment_at?: string | null;
   grand_total?: number;
   total_paid?: number;
   remaining_payment?: number;
-  unit_transaction_billing_histories?: Array<{
-    id?: string;
-    unit_transaction_billing_id?: string;
-    payment_proof?: string | null;
-    bca_payment_amount?: number;
-    cash_payment_amount?: number;
-    bca_payment_usd_amount?: number;
-    payment_at?: string;
-    note?: string;
-    created_at?: string;
-    updated_at?: string;
-  }>;
+  unit_transaction_billing_histories?: UnitTransactionBillingHistory[];
 }
 
 export interface UnitTransactionBillingSummary {
@@ -42,6 +70,7 @@ export interface UnitTransaction {
   transaction_ppn_total: number;
   transaction_bbn_total: number;
   transaction_other_fee: number;
+  expedition_fee_total: number;
   stock_state: string;
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;
@@ -77,6 +106,9 @@ export interface UnitTransactionDetail {
   unit_transaction_item_total_dpp: number;
   unit_transaction_item_total_ppn: number;
   unit_transaction_item_bruto_total: number;
+  transaction_bbn_total: number;
+  transaction_other_fee: number;
+  expedition_fee_total: number;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
@@ -96,6 +128,8 @@ export interface UnitTransactionItem {
   hpp_total_price?: number;
   dpp_total_price: number;
   ppn_total_price: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemListResponse {
@@ -112,6 +146,10 @@ export interface CreateUnitTransactionItemPayload {
   bbn_price: number;
   expedition_fee: number;
   other_fee: number;
+  company_id?: string | number;
+  type?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UpdateUnitTransactionItemPayload {
@@ -123,6 +161,8 @@ export interface UpdateUnitTransactionItemPayload {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemSummary {
@@ -141,6 +181,8 @@ export interface UnitTransactionItemSummary {
   hpp_total_price?: number;
   dpp_total_price?: number;
   ppn_total_price?: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UnitTransactionItemDetail {

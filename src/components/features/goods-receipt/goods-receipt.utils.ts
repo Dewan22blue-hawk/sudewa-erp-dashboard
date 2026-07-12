@@ -1,11 +1,14 @@
 import type { GoodsReceipt, GoodsReceiptBilling, GoodsReceiptDetail } from '@/@types/goods-receipt.types';
 import type { Kas } from '@/@types/kas.types';
 
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+
 export const formatDate = (value?: string | null) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return format(date, 'dd MMMM yyyy', { locale: id });
 };
 
 export const formatLongDate = (value?: string | null) => {

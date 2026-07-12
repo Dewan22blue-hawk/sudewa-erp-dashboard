@@ -19,6 +19,7 @@ export type SalesApiModel = {
   transaction_ppn_total?: string | number;
   transaction_bbn_total?: string | number;
   transaction_other_fee?: string | number;
+  expedition_fee_total?: string | number;
   person?: {
     id?: number | string;
     name?: string;
@@ -28,6 +29,7 @@ export type SalesApiModel = {
     name?: string;
   };
   unit_transaction_billing?: {
+    id?: string | number;
     is_paid?: boolean;
     total_paid?: string | number;
     total_payment?: string | number;
@@ -39,9 +41,17 @@ export type SalesApiModel = {
     bca_payment_2?: string | number;
     bca_payment_usd_amount?: string | number;
     unit_transaction_billing_histories?: Array<{
+      id?: number | string;
+      unit_transaction_billing_id?: number | string;
+      unit_transaction_id?: number | string;
+      payment_proof?: string | null;
       bca_payment_amount?: string | number;
       cash_payment_amount?: string | number;
       bca_payment_usd_amount?: string | number;
+      payment_at?: string;
+      note?: string;
+      created_at?: string;
+      updated_at?: string;
     }>;
   } | null;
   billing_summary?: {
@@ -71,6 +81,8 @@ export type SalesApiModel = {
     hpp_total_price?: string | number;
     dpp_total_price?: string | number;
     ppn_total_price?: string | number;
+    price_usd?: string | number;
+    price_per_unit_usd?: string | number;
     unit_transaction_item_details?: Array<{
       id?: number | string;
       color?: string;
@@ -195,7 +207,7 @@ const formatDate = (value?: string): string => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID');
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
 export function mapSalesToUI(item: SalesApiModel): SalesListUI {
@@ -238,7 +250,7 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
     hargaSatuan: 0,
     qty: toNumber(item.max_capacity),
     biayaBbn: toNumber(item.transaction_bbn_total),
-    biayaEkspedisi: 0,
+    biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
     totalHpp: totalDpp,
     totalDpp,
@@ -274,6 +286,8 @@ const mapSalesLineItem = (item: NonNullable<SalesApiModel['unit_transaction_item
     dpp,
     ppn,
     jumlah: hpp + ppn + biayaBbn + biayaEkspedisi + biayaLain,
+    price_usd: item.price_usd !== undefined ? toNumber(item.price_usd) : undefined,
+    price_per_unit_usd: item.price_per_unit_usd !== undefined ? toNumber(item.price_per_unit_usd) : undefined,
   };
 };
 
@@ -301,17 +315,19 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
     hargaSatuan: toNumber(item.unit_transaction_items?.[0]?.price),
     qty,
     biayaBbn: toNumber(item.transaction_bbn_total),
-    biayaEkspedisi: item.unit_transaction_items?.reduce((acc, row) => acc + toNumber(row.expedition_fee), 0) ?? 0,
+    biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
     totalHpp: totalDpp,
     totalDpp,
     totalPpn,
-    totalBiaya: toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee),
+    totalBiaya: toNumber(item.transaction_bbn_total) + toNumber(item.expedition_fee_total) + toNumber(item.transaction_other_fee),
     totalJual,
     totalBayar,
     kurangBayar,
     lineItems: (item.unit_transaction_items ?? []).map(mapSalesLineItem),
     units: [],
+    price_usd: item.unit_transaction_items?.[0]?.price_usd ? toNumber(item.unit_transaction_items[0].price_usd) : undefined,
+    price_per_unit_usd: item.unit_transaction_items?.[0]?.price_per_unit_usd ? toNumber(item.unit_transaction_items[0].price_per_unit_usd) : undefined,
   };
 };
 

@@ -9,50 +9,8 @@ import { matchesInvoiceSearch, toDoInvoiceTableRow } from '@/components/features
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useCreateDoInvoice, useDeleteDoInvoice, useDoInvoices } from '@/hooks/useDoInvoice';
-import { ApiValidationError } from '@/lib/api/response';
-import type { ApiError } from '@/@types/api';
 
-const extractValidationMessages = (error: unknown) => {
-  if (error instanceof ApiValidationError) {
-    const messages = Object.entries(error.fieldErrors ?? {}).flatMap(([field, fieldMessages]) =>
-      (fieldMessages ?? []).map((message) => `${field}: ${message}`),
-    );
-
-    return {
-      title: error.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  const apiError = error as ApiError & {
-    fieldErrors?: Record<string, string[]>;
-    response?: { data?: { errors?: Record<string, string[]>; message?: string } };
-  };
-
-  const rawFieldErrors =
-    apiError?.fieldErrors ??
-    apiError?.response?.data?.errors ??
-    (typeof apiError?.details === 'object' && apiError.details ? (apiError.details as Record<string, string[]>) : undefined);
-
-  if (rawFieldErrors && typeof rawFieldErrors === 'object') {
-    const messages = Object.entries(rawFieldErrors).flatMap(([field, fieldMessages]) => {
-      if (Array.isArray(fieldMessages)) {
-        return fieldMessages.map((message) => `${field}: ${message}`);
-      }
-      return [`${field}: ${String(fieldMessages)}`];
-    });
-
-    return {
-      title: apiError?.message || apiError?.response?.data?.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  return {
-    title: apiError?.message || 'Gagal menambahkan create invoice',
-    description: '',
-  };
-};
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 export default function CreateInvoiceListPage() {
   const router = useRouter();
@@ -62,7 +20,7 @@ export default function CreateInvoiceListPage() {
   const [search, setSearch] = React.useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 350);
   const [page, setPage] = React.useState(1);
-  const [perPage, setPerPage] = React.useState(10);
+  const [perPage, setPerPage] = React.useState(25);
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
   const [dateFilter, setDateFilter] = React.useState('');
   const [printFilter, setPrintFilter] = React.useState<'' | '0' | '1'>('');
@@ -97,10 +55,7 @@ export default function CreateInvoiceListPage() {
       toast.success('Create invoice berhasil ditambahkan');
       setCreateOpen(false);
     } catch (error: any) {
-      const validation = extractValidationMessages(error);
-      toast.error(validation.title, {
-        description: validation.description || undefined,
-      });
+      toast.error(getApiErrorMessage(error));
     }
   };
 
@@ -113,7 +68,7 @@ export default function CreateInvoiceListPage() {
       setSelectedRow(null);
       setSelectedIds((current) => current.filter((item) => item !== selectedRow.id));
     } catch (error: any) {
-      toast.error(error.message || 'Gagal menghapus create invoice');
+      toast.error(getApiErrorMessage(error));
     }
   };
 
@@ -173,7 +128,7 @@ export default function CreateInvoiceListPage() {
           setSelectedIds((current) => (checked ? Array.from(new Set([...current, id])) : current.filter((item) => item !== id)))
         }
         onToggleAll={(checked) => setSelectedIds(checked ? filteredRows.map((item) => item.id) : [])}
-        onProcessSelected={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/process?ids=${selectedIds.join(',')}`)}
+        onProcessSelected={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/print/bulk?ids=${selectedIds.join(',')}`)}
       />
 
       <CreateInvoiceModal open={createOpen} onOpenChange={setCreateOpen} onSubmit={handleCreate} isSubmitting={createMutation.isPending} />

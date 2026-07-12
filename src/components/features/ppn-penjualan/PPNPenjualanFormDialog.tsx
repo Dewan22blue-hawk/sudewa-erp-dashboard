@@ -54,8 +54,8 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
     defaultValues: {
       fpm_date: null,
       nsfpm_age: null,
-      nsfp_amount: null,
       amount: null,
+      nsfp_number: '',
     },
   });
 
@@ -64,8 +64,8 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
       form.reset({
         fpm_date: null,
         nsfpm_age: null,
-        nsfp_amount: null,
         amount: null,
+        nsfp_number: '',
       });
       return;
     }
@@ -73,8 +73,8 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
     form.reset({
       fpm_date: toDate(initialData.fpm_date),
       nsfpm_age: toDate(initialData.nsfpm_age),
-      nsfp_amount: initialData.nsfpm_input || null,
-      amount: initialData.payment_amount || null,
+      amount: initialData.payment_amount ? Math.round(Number(initialData.payment_amount)) : null,
+      nsfp_number: initialData.nsfp_number || '',
     });
   }, [form, initialData]);
 
@@ -87,8 +87,8 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
         payload: {
           fpm_date: values.fpm_date ? format(values.fpm_date, 'yyyy-MM-dd') : undefined,
           nsfpm_age: values.nsfpm_age ? format(values.nsfpm_age, 'yyyy-MM-dd') : undefined,
-          nsfp_amount: values.nsfp_amount ?? undefined,
           amount: values.amount ?? undefined,
+          nsfp_number: values.nsfp_number || undefined,
         },
       });
 
@@ -123,7 +123,7 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
               </div>
               <div>
                 <div className="text-xs uppercase text-slate-500">Customer</div>
-                <div className="font-medium text-slate-900">{initialData.supplier}</div>
+                <div className="font-medium text-slate-900">{initialData.customer}</div>
               </div>
               <div>
                 <div className="text-xs uppercase text-slate-500">Tipe Unit</div>
@@ -170,12 +170,12 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="nsfp_amount"
+                    name="nsfp_number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nilai NSFPM</FormLabel>
+                        <FormLabel>Nomor NSFP</FormLabel>
                         <FormControl>
-                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan nilai NSFPM" />
+                          <Input {...field} value={field.value ?? ''} placeholder="Masukkan nomor NSFP" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -189,7 +189,15 @@ export default function PPNPenjualanFormDialog({ open, onClose, initialData }: P
                       <FormItem>
                         <FormLabel>Jumlah Pembayaran</FormLabel>
                         <FormControl>
-                          <MoneyInput value={field.value ?? 0} onChangeValue={(value) => field.onChange(value)} placeholder="Masukkan jumlah pembayaran" />
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Rp.</span>
+                            <MoneyInput 
+                              className="pl-9" 
+                              value={field.value ?? 0} 
+                              onChangeValue={(value) => field.onChange(value)} 
+                              placeholder="Masukkan jumlah pembayaran" 
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

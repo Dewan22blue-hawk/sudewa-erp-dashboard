@@ -19,7 +19,9 @@ export default function TypeUnitPage() {
   const { data, isLoading, isError, refetch } = useTypeUnits();
   const filteredData = useMemo(() => {
     const term = search.toLowerCase();
-    return (data?.data || []).filter((item) => [item.code, item.name, item.unitType, item.unitModel, item.brand?.name].filter(Boolean).some((value) => value!.toString().toLowerCase().includes(term)));
+    const result = data?.data || [];
+
+    return result.filter((item) => [item.code, item.name, item.unitType, item.unitModel, item.brand?.name].filter(Boolean).some((value) => value!.toString().toLowerCase().includes(term)));
   }, [data?.data, search]);
 
   const paginatedData = useMemo(() => {

@@ -7,20 +7,24 @@ import { DashboardApiResponse, BillingStatsRaw, CustomerStatsRaw, ProductStatsRa
 import { apiClient } from './client';
 
 export const dashboardService = {
-  async getDashboardData(companyId: string): Promise<DashboardApiResponse> {
+  async getDashboardData(companyId: string, startDate?: string | null, endDate?: string | null): Promise<DashboardApiResponse> {
+    const defaultParams: any = { company_id: companyId };
+    if (startDate) defaultParams.start_date = startDate;
+    if (endDate) defaultParams.end_date = endDate;
+
     // Fetch real data dari API secara paralel
     const [statsResponse, customerResponse, productResponse, transactionResponse] = await Promise.all([
-      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: { company_id: companyId } }),
-      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: { company_id: companyId } }),
-      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: { company_id: companyId } }),
+      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: defaultParams }),
+      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: defaultParams }),
+      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: defaultParams }),
       apiClient.get<{ status: boolean; data: TransactionStatsRaw }>('/wapi/transaction/unit-transaction/unit-transaction', {
         params: {
           sort_order: 'desc',
           per_page: 5,
-          type: 'purchase',
+          // type: 'purchase', // Removed to get all transactions for history
           page: 1,
           is_paid: true,
-          company_id: companyId,
+          ...defaultParams,
         },
       })
     ]);
@@ -62,62 +66,77 @@ export const dashboardService = {
     });
 
     // Mapping dari customer response
-    const customers: CustomerOverview = { 
-      totalCustomers: customerStats.summary?.total_customer || 0, 
-      totalRevenue: { 
-        idr: customerStats.summary?.total_revenue || 0, 
+    const customers: CustomerOverview = {
+      totalCustomers: customerStats.summary?.total_customer || 0,
+      totalRevenue: {
+        idr: customerStats.summary?.total_revenue || 0,
         usd: 0 // Tidak tersedia di API, default 0
-      }, 
-      averageRevenue: customerStats.summary?.average_revenue_per_customer || 0, 
+      },
+      averageRevenue: customerStats.summary?.average_revenue_per_customer || 0,
       topCustomers: (customerStats.customers?.data || []).map((c: any) => ({
         name: c.name || c.customer_name || 'Unknown',
         revenue: c.total_revenue || c.revenue || 0,
       }))
     };
-    
+
     // Mapping dari product response
-    const products: ProductOverview = { 
-      totalProducts: productStats.summary?.total_unit_type || 0, 
-      totalSold: (productStats.data?.data || []).reduce((acc: number, curr: any) => acc + (curr.total_sold || 0), 0), 
+    const products: ProductOverview = {
+      totalProducts: productStats.summary?.total_unit_type || 0,
+      totalSold: (productStats.data?.data || []).reduce((acc: number, curr: any) => acc + (curr.total_sold || 0), 0),
       topProducts: (productStats.data?.data || []).map((p: any) => ({
         name: p.unit_type_name || p.name || 'Unknown',
         quantity: p.total_sold || 0
-      })) 
+      }))
     };
     const kpis: any[] = [];
     const monthlyRevenue: any[] = [];
     const incomeBreakdown: any[] = [];
     const cashflow: CashflowSummary = { incomes: [], outcomes: [] };
 
-    return { 
-      kpis, 
-      monthlyRevenue, 
-      incomeBreakdown, 
-      accounts, 
-      financeSeries, 
-      customers, 
-      products, 
-      cashflow, 
-      transactions, 
-      lastUpdated: new Date().toISOString() 
+    return {
+      kpis,
+      monthlyRevenue,
+      incomeBreakdown,
+      accounts,
+      financeSeries,
+      customers,
+      products,
+      cashflow,
+      transactions,
+      lastUpdated: new Date().toISOString()
     };
   },
 
   transformToAccounts(stats: BillingStatsRaw): AccountOverview[] {
+    if (!stats || !stats.opening_balance || !stats.mutation) {
+      return [];
+    }
     const { opening_balance, mutation } = stats;
-    
+
+    const openingBcaUsd = opening_balance.debet.bca_usd || 0;
+    const mutationDebetBcaUsd = mutation.debet.bca_usd || 0;
+    const mutationKreditBcaUsd = mutation.kredit.bca_usd || 0;
+
+    const openingBcaIdr = opening_balance.debet.bca_idr || 0;
+    const mutationDebetBcaIdr = mutation.debet.bca_idr || 0;
+    const mutationKreditBcaIdr = mutation.kredit.bca_idr || 0;
+
+    const openingCash = opening_balance.debet.cash_idr ?? opening_balance.debet.cash ?? 0;
+    const mutationDebetCash = mutation.debet.cash_idr ?? mutation.debet.cash ?? 0;
+    const mutationKreditCash = mutation.kredit.cash_idr ?? mutation.kredit.cash ?? 0;
+
     return [
       {
-        id: 'cash',
-        name: 'Cash',
-        subtitle: 'Saldo Kas Tunai',
-        type: 'cash',
-        currency: 'IDR',
-        openingBalance: opening_balance.debet.cash || 0,
-        debit: mutation.debet.cash || 0,
-        credit: mutation.kredit.cash || 0,
-        closingBalance: (opening_balance.debet.cash || 0) + (mutation.debet.cash || 0) - (mutation.kredit.cash || 0),
-        accentColor: '#16a34a' // unused but required by type if we extend or something, wait, accentColor is required
+        id: 'bca_usd',
+        name: 'BCA USD',
+        subtitle: 'Bank BCA Dollar',
+        type: 'bank',
+        currency: 'USD',
+        openingBalance: openingBcaUsd,
+        debit: mutationDebetBcaUsd,
+        credit: mutationKreditBcaUsd,
+        closingBalance: openingBcaUsd + mutationDebetBcaUsd - mutationKreditBcaUsd,
+        accentColor: '#2563eb'
       },
       {
         id: 'bca_idr',
@@ -125,68 +144,188 @@ export const dashboardService = {
         subtitle: 'Bank BCA Rupiah',
         type: 'bank',
         currency: 'IDR',
-        openingBalance: opening_balance.debet.bca_idr || 0,
-        debit: mutation.debet.bca_idr || 0,
-        credit: mutation.kredit.bca_idr || 0,
-        closingBalance: (opening_balance.debet.bca_idr || 0) + (mutation.debet.bca_idr || 0) - (mutation.kredit.bca_idr || 0),
+        openingBalance: openingBcaIdr,
+        debit: mutationDebetBcaIdr,
+        credit: mutationKreditBcaIdr,
+        closingBalance: openingBcaIdr + mutationDebetBcaIdr - mutationKreditBcaIdr,
         accentColor: '#dc2626'
       },
       {
-        id: 'bca_usd',
-        name: 'BCA USD',
-        subtitle: 'Bank BCA Dollar',
-        type: 'bank',
-        currency: 'USD',
-        openingBalance: opening_balance.debet.bca_usd || 0,
-        debit: mutation.debet.bca_usd || 0,
-        credit: mutation.kredit.bca_usd || 0,
-        closingBalance: (opening_balance.debet.bca_usd || 0) + (mutation.debet.bca_usd || 0) - (mutation.kredit.bca_usd || 0),
-        accentColor: '#2563eb'
+        id: 'cash',
+        name: 'CASH IDR',
+        subtitle: 'Saldo Kas Tunai',
+        type: 'cash',
+        currency: 'IDR',
+        openingBalance: openingCash,
+        debit: mutationDebetCash,
+        credit: mutationKreditCash,
+        closingBalance: openingCash + mutationDebetCash - mutationKreditCash,
+        accentColor: '#16a34a'
       },
     ];
   },
 
   generateChartData(stats: BillingStatsRaw): FinanceSeriesPoint[] {
+    if (!stats) {
+      return [];
+    }
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const formatDateLabel = (dateStr: string) => {
+      const parts = dateStr.split('-');
+      if (parts.length < 3) return dateStr;
+      const day = parseInt(parts[2], 10);
+      const monthNum = parseInt(parts[1], 10);
+      if (isNaN(day) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) return dateStr;
+      return `${day} ${monthsShort[monthNum - 1]}`;
+    };
+
+    // Jika response API memiliki data `percentage` harian, tampilkan per tanggal/hari
+    if (stats.percentage && Array.isArray(stats.percentage) && stats.percentage.length > 0) {
+      let percentageItems = stats.percentage;
+
+      // Jika hanya terdapat 1 data (misal untuk hari ini saja), buat data dummy kemarin dan besok dengan nilai 0
+      // agar membentuk grafik gunung (peak)
+      if (percentageItems.length === 1) {
+        const singleItem = percentageItems[0];
+        const parts = singleItem.date.split('-');
+        if (parts.length === 3) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const d = parseInt(parts[2], 10);
+
+          const singleDate = new Date(y, m, d);
+
+          const yesterday = new Date(singleDate);
+          yesterday.setDate(singleDate.getDate() - 1);
+
+          const tomorrow = new Date(singleDate);
+          tomorrow.setDate(singleDate.getDate() + 1);
+
+          const formatDateString = (dt: Date) => {
+            const year = dt.getFullYear();
+            const month = String(dt.getMonth() + 1).padStart(2, '0');
+            const day = String(dt.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          };
+
+          const zeroData = {
+            cash_idr: 0,
+            bca_idr: 0,
+            bca_usd: 0
+          };
+
+          percentageItems = [
+            {
+              date: formatDateString(yesterday),
+              debet: zeroData,
+              kredit: zeroData,
+              debet_percentage: zeroData,
+              kredit_percentage: zeroData
+            },
+            singleItem,
+            {
+              date: formatDateString(tomorrow),
+              debet: zeroData,
+              kredit: zeroData,
+              debet_percentage: zeroData,
+              kredit_percentage: zeroData
+            }
+          ];
+        }
+      }
+
+      // Urutkan item secara kronologis berdasarkan string tanggal YYYY-MM-DD
+      const sortedPercentageItems = [...percentageItems].sort((a, b) => a.date.localeCompare(b.date));
+
+      return sortedPercentageItems.map((item) => {
+        const itemDebet = item.debet || {};
+        const itemKredit = item.kredit || {};
+        const debetBcaUsd = itemDebet.bca_usd || 0;
+        const debetBcaIdr = itemDebet.bca_idr || 0;
+        const debetCash = itemDebet.cash_idr ?? itemDebet.cash ?? 0;
+
+        const kreditBcaUsd = itemKredit.bca_usd || 0;
+        const kreditBcaIdr = itemKredit.bca_idr || 0;
+        const kreditCash = itemKredit.cash_idr ?? itemKredit.cash ?? 0;
+
+        return {
+          month: formatDateLabel(item.date),
+          income: {
+            bcaUsd: debetBcaUsd,
+            bcaIdr: debetBcaIdr,
+            cash: debetCash,
+            sales: {
+              bcaUsd: debetBcaUsd,
+              bcaIdr: debetBcaIdr,
+              cash: debetCash,
+            },
+            purchase: {
+              bcaUsd: 0,
+              bcaIdr: 0,
+              cash: 0,
+            }
+          },
+          expense: {
+            bcaUsd: kreditBcaUsd,
+            bcaIdr: kreditBcaIdr,
+            cash: kreditCash,
+            sales: {
+              bcaUsd: 0,
+              bcaIdr: 0,
+              cash: 0,
+            },
+            purchase: {
+              bcaUsd: kreditBcaUsd,
+              bcaIdr: kreditBcaIdr,
+              cash: kreditCash,
+            }
+          }
+        };
+      });
+    }
+
+    // Fallback: Generate data secara sintetis menggunakan total mutation jika data `percentage` tidak tersedia
+    if (!stats.mutation) {
+      return [];
+    }
     const { mutation } = stats;
     const currentMonth = new Date().getMonth() + 1; // Jan=1, Dec=12
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    // Total mutation per kategori
-    const totalCashDebit = mutation.debet.cash || 0;
+
+    const totalCashDebit = mutation.debet.cash_idr ?? mutation.debet.cash ?? 0;
     const totalBcaIdrDebit = mutation.debet.bca_idr || 0;
     const totalBcaUsdDebit = mutation.debet.bca_usd || 0;
-    const totalCashCredit = mutation.kredit.cash || 0;
+    const totalCashCredit = mutation.kredit.cash_idr ?? mutation.kredit.cash ?? 0;
     const totalBcaIdrCredit = mutation.kredit.bca_idr || 0;
     const totalBcaUsdCredit = mutation.kredit.bca_usd || 0;
-    
-    // Asumsikan 60% dari mutation adalah sales, 40% purchase
+
     const salesRatio = 0.6;
     const purchaseRatio = 0.4;
-    
+
     const series: FinanceSeriesPoint[] = [];
-    
+
     for (let i = 0; i < currentMonth; i++) {
-      const progress = (i + 1) / currentMonth; // 0.08, 0.16, dst
-      
-      // Cumulative values up to current month
+      const progress = (i + 1) / currentMonth;
+
       const cumulativeCashSales = totalCashDebit * salesRatio * progress;
       const cumulativeBcaIdrSales = totalBcaIdrDebit * salesRatio * progress;
       const cumulativeBcaUsdSales = totalBcaUsdDebit * salesRatio * progress;
-      
+
       const cumulativeCashPurchase = totalCashCredit * purchaseRatio * progress;
       const cumulativeBcaIdrPurchase = totalBcaIdrCredit * purchaseRatio * progress;
       const cumulativeBcaUsdPurchase = totalBcaUsdCredit * purchaseRatio * progress;
-      
+
       series.push({
         month: months[i],
         income: {
-          bcaUsd: cumulativeBcaUsdSales, // backward compatibility
+          bcaUsd: cumulativeBcaUsdSales,
           bcaIdr: cumulativeBcaIdrSales,
           cash: cumulativeCashSales,
           sales: {
+            bcaUsd: cumulativeBcaUsdSales,
             cash: cumulativeCashSales,
             bcaIdr: cumulativeBcaIdrSales,
-            bcaUsd: cumulativeBcaUsdSales,
           },
           purchase: {
             cash: cumulativeCashPurchase,
@@ -199,7 +338,7 @@ export const dashboardService = {
           bcaIdr: cumulativeBcaIdrSales * 0.8,
           cash: cumulativeCashSales * 0.8,
           sales: {
-            cash: cumulativeCashSales * 0.8, // Expense lebih kecil
+            cash: cumulativeCashSales * 0.8,
             bcaIdr: cumulativeBcaIdrSales * 0.8,
             bcaUsd: cumulativeBcaUsdSales * 0.8,
           },
@@ -211,11 +350,11 @@ export const dashboardService = {
         },
       });
     }
-    
+
     return series;
   },
 
-  async refreshDashboard(companyId: string): Promise<DashboardApiResponse> {
-    return dashboardService.getDashboardData(companyId);
+  async refreshDashboard(companyId: string, startDate?: string | null, endDate?: string | null): Promise<DashboardApiResponse> {
+    return dashboardService.getDashboardData(companyId, startDate, endDate);
   },
 };

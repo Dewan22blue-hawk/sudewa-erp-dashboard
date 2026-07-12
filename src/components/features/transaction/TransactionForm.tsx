@@ -7,7 +7,6 @@ import { transactionSchema, TransactionFormValues } from '@/scheme/transaction.s
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Save } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -202,7 +201,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
           <Button type="button" variant="outline" onClick={onCancel} disabled={isBusy}>
             Batal
           </Button>
-          <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isBusy}>
+          <Button type="submit" className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white" disabled={isBusy}>
             {isBusy ? (
               <>Menyimpan...</>
             ) : (

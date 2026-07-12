@@ -1,25 +1,24 @@
-import { useEffect, useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccountTable } from '@/components/features/account/AccountTable';
-import { AccountFormModal } from '@/components/features/account/AccountFormModal';
 import { AccountImportModal } from '@/components/features/account/AccountImportModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAccounts, useCreateAccount, useDeleteAccount, useUpdateAccount } from '@/hooks/useAccount';
+import { useAccounts, useDeleteAccount, useUpdateAccount, useBulkUpdateAccounts } from '@/hooks/useAccount';
 import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { useCompany } from '@/contexts/CompanyContext';
-import { accountSchema, type AccountFormValues } from '@/scheme/account-master.schema';
 import type { Account } from '@/@types/account.types';
+import type { AccountGroup } from '@/@types/account-group.types';
 import { ACCOUNT_CATEGORY_OPTIONS, getAccountTypeFromCategory } from '@/lib/account';
-import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
+import { ApiResponseError } from '@/lib/api/response';
 import { toast } from 'sonner';
 import { CircleAlert, Download, PencilLine, Plus, Search, Upload } from 'lucide-react';
+import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 
 type BulkFormValues = {
   accountGroupId: string;
@@ -33,7 +32,7 @@ const initialBulkFormValues: BulkFormValues = {
 
 export const AccountListPage = () => {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const { data, isLoading, isError, isFetching } = useAccounts({
     page,
@@ -43,41 +42,79 @@ export const AccountListPage = () => {
     enabled: !isLoadingCompany && !!companyId,
   });
 
-  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
-    page: 1,
-    perPage: 100,
-    search: '',
-    company_id: companyId ?? undefined,
-    enabled: !isLoadingCompany && !!companyId,
-  });
-
-  const createMutation = useCreateAccount();
   const updateMutation = useUpdateAccount();
+  const bulkUpdateMutation = useBulkUpdateAccounts();
   const deleteMutation = useDeleteAccount();
+  const router = useRouter();
 
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [editing, setEditing] = useState<Account | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [openForm, setOpenForm] = useState(false);
   const [openImport, setOpenImport] = useState(false);
   const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
   const [openBulkConfirm, setOpenBulkConfirm] = useState(false);
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
   const [bulkForm, setBulkForm] = useState<BulkFormValues>(initialBulkFormValues);
 
-  const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountSchema),
-    defaultValues: {
-      accountGroupId: undefined,
-      code: '',
-      name: '',
-      description: '',
-      category: undefined,
-      isActive: true,
-    },
+  // Group Account search and scroll pagination state
+  const [groupSearch, setGroupSearch] = useState('');
+  const [groupPage, setGroupPage] = useState(1);
+  const [accumulatedGroups, setAccumulatedGroups] = useState<AccountGroup[]>([]);
+
+  const { data: accountGroupsData, isLoading: isLoadingGroups } = useAccountGroups({
+    page: groupPage,
+    perPage: 20, // Load 20 groups per request
+    search: groupSearch,
+    company_id: companyId ?? undefined,
+    enabled: !isLoadingCompany && !!companyId && openBulkUpdate,
   });
 
-  const accountGroups = accountGroupsData?.data ?? [];
+  // Reset pagination state when bulk update modal is closed
+  useEffect(() => {
+    if (!openBulkUpdate) {
+      setGroupSearch('');
+      setGroupPage(1);
+      setAccumulatedGroups([]);
+    }
+  }, [openBulkUpdate]);
+
+  // Accumulate groups
+  useEffect(() => {
+    if (accountGroupsData?.data && openBulkUpdate) {
+      setAccumulatedGroups((prev) => {
+        if (groupPage === 1) {
+          return accountGroupsData.data;
+        }
+        const existingIds = new Set(prev.map((g) => g.id));
+        const newItems = accountGroupsData.data.filter((g) => !existingIds.has(g.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [accountGroupsData, groupPage, openBulkUpdate]);
+
+  const hasMoreGroups = accountGroupsData ? groupPage < accountGroupsData.meta.lastPage : false;
+
+  const handleGroupSearch = useCallback((query: string) => {
+    setGroupSearch(query);
+    setGroupPage(1);
+    setAccumulatedGroups([]);
+  }, []);
+
+  const handleLoadMoreGroups = useCallback(() => {
+    if (hasMoreGroups) {
+      setGroupPage((prev) => prev + 1);
+    }
+  }, [hasMoreGroups]);
+
+  const accountGroups = accumulatedGroups;
+  const groupOptions = useMemo(
+    () =>
+      accountGroups.map((group) => ({
+        value: String(group.id),
+        label: group.code ? `${group.code} - ${group.name}` : group.name || String(group.id),
+        subtitle: group.description ?? undefined,
+      })),
+    [accountGroups],
+  );
   const accounts = data?.data;
   const accountRows = accounts ?? [];
   const totalAccounts = data?.meta.total ?? 0;
@@ -87,110 +124,18 @@ export const AccountListPage = () => {
     setSelectedIds((previous) => new Set(Array.from(previous).filter((id) => availableIds.has(id))));
   }, [accounts]);
 
-  const resetForm = () => {
-    form.reset({
-      accountGroupId: undefined,
-      code: '',
-      name: '',
-      description: '',
-      category: undefined,
-      isActive: true,
-    });
-  };
-
   const resetBulkForm = () => {
     setBulkForm(initialBulkFormValues);
   };
 
-  const translateValidationMessage = (message: string, field: string): string => {
-    const msg = message.toLowerCase();
-    if (msg.includes('already been taken')) {
-      if (field === 'code') return 'Kode akun sudah digunakan.';
-      return 'Nilai ini sudah digunakan.';
-    }
-    if (msg.includes('required')) {
-      if (field === 'code') return 'Kode akun wajib diisi.';
-      if (field === 'name') return 'Nama akun wajib diisi.';
-      if (field === 'account_group_id' || field === 'accountGroupId') return 'Grup akun wajib dipilih.';
-      if (field === 'category') return 'Kategori laporan wajib dipilih.';
-      return 'Kolom ini wajib diisi.';
-    }
-    if (msg.includes('invalid') || msg.includes('must be')) {
-      if (field === 'category') return 'Kategori laporan yang dipilih tidak valid.';
-      if (field === 'account_group_id' || field === 'accountGroupId') return 'Grup akun yang dipilih tidak valid.';
-      return 'Nilai yang dimasukkan tidak valid.';
-    }
-    return message;
-  };
-
-  const mapValidationErrors = (error: ApiValidationError) => {
-    Object.entries(error.fieldErrors).forEach(([field, messages]) => {
-      const mappedField = field === 'account_group_id' ? 'accountGroupId' : field;
-      const originalMessage = messages?.[0] || 'Validasi gagal';
-      const translatedMessage = translateValidationMessage(originalMessage, field);
-      form.setError(mappedField as keyof AccountFormValues, { message: translatedMessage });
-    });
-  };
-
   const handleAdd = () => {
-    setEditing(null);
-    resetForm();
-    setOpenForm(true);
+    const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
+    router.push(`${basePath}/create`);
   };
 
   const handleEdit = (account: Account) => {
-    setEditing(account);
-    form.reset({
-      accountGroupId: Number(account.accountGroupId),
-      code: account.code,
-      name: account.name,
-      description: account.description ?? '',
-      category: (account.category as AccountFormValues['category']) ?? undefined,
-      isActive: account.isActive,
-    });
-    setOpenForm(true);
-  };
-
-  const handleSubmit = async (values: AccountFormValues) => {
-    const payload = {
-      accountGroupId: values.accountGroupId,
-      code: values.code,
-      name: values.name,
-      description: values.description,
-      category: values.category,
-      type: getAccountTypeFromCategory(values.category),
-    };
-
-    try {
-      if (editing) {
-        await updateMutation.mutateAsync({ id: editing.id, payload });
-        toast.success('Data akun berhasil diperbarui');
-      } else {
-        await createMutation.mutateAsync(payload);
-        toast.success('Data akun berhasil ditambahkan');
-      }
-
-      setOpenForm(false);
-      setEditing(null);
-      resetForm();
-    } catch (error) {
-      console.error('[Create/Update Account Error]:', error);
-      if (error instanceof ApiValidationError) {
-        mapValidationErrors(error);
-        let mainMessage = error.message;
-        if (mainMessage.toLowerCase().includes('validation') || mainMessage.toLowerCase().includes('given data was invalid')) {
-          mainMessage = 'Gagal menyimpan data karena validasi tidak terpenuhi.';
-        }
-        toast.error(mainMessage);
-        return;
-      }
-
-      const apiErrorMessage = (error as any)?.message || (error as any)?.details;
-      const message = error instanceof ApiResponseError 
-        ? error.message 
-        : (typeof apiErrorMessage === 'string' ? apiErrorMessage : 'Gagal menyimpan akun');
-      toast.error(message);
-    }
+    const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
+    router.push(`${basePath}/${account.id}/edit`);
   };
 
   const handleDelete = async () => {
@@ -204,6 +149,9 @@ export const AccountListPage = () => {
         next.delete(String(selectedAccount.id));
         return next;
       });
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 100);
     } catch (error) {
       const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus akun';
       toast.error(message);
@@ -279,19 +227,12 @@ export const AccountListPage = () => {
     setBulkSubmitting(true);
 
     try {
-      for (const account of selectedRows) {
-        await updateMutation.mutateAsync({
-          id: account.id,
-          payload: {
-            accountGroupId: Number(bulkForm.accountGroupId),
-            code: account.code,
-            name: account.name,
-            description: account.description ?? '',
-            category: bulkForm.category,
-            type: getAccountTypeFromCategory(bulkForm.category),
-          },
-        });
-      }
+      const accountIds = selectedRows.map((account) => account.id);
+      await bulkUpdateMutation.mutateAsync({
+        accountIds,
+        accountGroupId: Number(bulkForm.accountGroupId),
+        category: bulkForm.category,
+      });
 
       toast.success(`${selectedRows.length} akun berhasil diperbarui`);
       setOpenBulkConfirm(false);
@@ -337,32 +278,34 @@ export const AccountListPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Akun</h1>
-          <p className="text-sm text-muted-foreground">Kelola akun finance dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Akun</h1>
+            <p className="text-sm text-muted-foreground">Kelola akun finance dengan mudah</p>
+          </div>
         </div>
 
         <div className="space-y-4">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:items-center">
-              <div className="relative w-full max-w-[320px]">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Cari akun..."
+                  placeholder="Search here"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  className="h-10 rounded-xl border-gray-200 bg-white pl-9 text-sm text-gray-900 shadow-none focus-visible:ring-slate-300"
+                  className="pl-9 bg-white"
                 />
               </div>
 
-              <div className="flex items-center gap-2.5 text-sm text-slate-500">
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                 <span>Show</span>
                 <Select value={String(perPage)} onValueChange={(value) => {
                   setPerPage(Number(value));
                   setPage(1);
                 }}>
-                  <SelectTrigger className="h-10 w-[80px] rounded-xl border-gray-200 bg-white px-3 text-sm text-slate-900 shadow-none focus:ring-slate-300">
-                    <SelectValue />
+                  <SelectTrigger className="w-[70px] bg-white">
+                    <SelectValue placeholder="25" />
                   </SelectTrigger>
                   <SelectContent>
                     {[10, 25, 50, 100].map((option) => (
@@ -372,21 +315,21 @@ export const AccountListPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <span>entries</span>
+                <span>Page</span>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="ghost" className="h-10 rounded-xl px-3.5 text-sm font-medium text-slate-700 hover:bg-slate-100" onClick={handleExport}>
-                <Upload className="mr-1.5 h-4 w-4" />
+              <Button variant="outline" className="w-full sm:w-auto" onClick={handleExport}>
+                <Upload className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button variant="outline" className="h-10 rounded-xl border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50" onClick={() => setOpenImport(true)}>
-                <Download className="mr-1.5 h-4 w-4" />
+              <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpenImport(true)}>
+                <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
-              <Button className="h-10 rounded-xl bg-[#1F3B5B] px-4 text-sm font-medium text-white hover:bg-[#1B3450]" onClick={handleAdd}>
-                <Plus className="mr-1.5 h-4 w-4" />
+              <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={handleAdd}>
+                <Plus className="h-4 w-4 mr-2" />
                 Tambah
               </Button>
             </div>
@@ -455,24 +398,7 @@ export const AccountListPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AccountFormModal
-        open={openForm}
-        onOpenChange={(open) => {
-          setOpenForm(open);
-          if (!open) {
-            setEditing(null);
-            resetForm();
-          }
-        }}
-        form={form}
-        onSubmit={handleSubmit}
-        title={editing ? 'Ubah Data Akun Transaksi' : 'Tambah Data Akun Transaksi'}
-        description={editing ? 'Ubah detail akun dengan cepat dan mudah' : 'Masukkan detail akun baru'}
-        submitLabel="Simpan"
-        isSubmitting={createMutation.isPending || updateMutation.isPending}
-        accountGroups={accountGroups}
-        isLoadingGroups={isLoadingGroups}
-      />
+
 
       <Dialog open={openBulkUpdate} onOpenChange={(open) => {
         setOpenBulkUpdate(open);
@@ -490,18 +416,19 @@ export const AccountListPage = () => {
             <div className="mt-8 space-y-6">
               <div className="space-y-2.5">
                 <label className="block text-base font-semibold text-slate-900">Grup Akun</label>
-                <Select value={bulkForm.accountGroupId} onValueChange={(value) => setBulkForm((previous) => ({ ...previous, accountGroupId: value }))}>
-                  <SelectTrigger className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300">
-                    <SelectValue placeholder="Select an item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accountGroups.map((group) => (
-                      <SelectItem key={group.id} value={String(group.id)}>
-                        {group.code || group.id}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  value={bulkForm.accountGroupId}
+                  onChange={(value) => setBulkForm((previous) => ({ ...previous, accountGroupId: value }))}
+                  options={groupOptions}
+                  placeholder={isLoadingGroups ? 'Memuat...' : 'Select an item'}
+                  searchPlaceholder="Cari grup akun..."
+                  emptyText="Grup akun tidak ditemukan."
+                  loading={isLoadingGroups}
+                  onSearchChange={handleGroupSearch}
+                  onLoadMore={handleLoadMoreGroups}
+                  hasMore={hasMoreGroups}
+                  className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300 bg-white"
+                />
               </div>
 
               <div className="space-y-2.5">

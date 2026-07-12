@@ -13,7 +13,7 @@ export default function LPJPerjalananPage() {
   const [lpjRecords, setLpjRecords] = useState<LPJRecord[]>(DUMMY_LPJ_RECORDS);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
 
   const [selectedItem, setSelectedItem] = useState<LPJRecord | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);

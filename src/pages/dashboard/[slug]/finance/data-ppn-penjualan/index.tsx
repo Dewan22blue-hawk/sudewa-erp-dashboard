@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
-import { Search, RotateCw } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import type { PPNPenjualan } from '@/@types/ppn-penjualan.types';
 import PPNPenjualanFormDialog from '@/components/features/ppn-penjualan/PPNPenjualanFormDialog';
@@ -10,20 +10,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePPNPenjualan } from '@/hooks/usePPNPenjualan';
-import { DatePicker } from '@/components/ui/date-picker';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 
 export default function DataPPNPenjualanPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState('buy_date');
+  const [sortBy, setSortBy] = useState('sales_date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [selected, setSelected] = useState<PPNPenjualan | null>(null);
   const [openForm, setOpenForm] = useState(false);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -39,12 +39,12 @@ export default function DataPPNPenjualanPage() {
       page,
       per_page: perPage,
       search: search || undefined,
-      start_date: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
-      end_date: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
+      start_date: dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
+      end_date: dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
       sort_by: sortBy,
       sort_direction: sortDirection,
     }),
-    [page, perPage, search, startDate, endDate, sortBy, sortDirection],
+    [page, perPage, search, dateRange, sortBy, sortDirection],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } = usePPNPenjualan(query);
@@ -83,47 +83,40 @@ export default function DataPPNPenjualanPage() {
         <title>Data PPN Penjualan - Wajira Dashboard</title>
       </Head>
 
-      <div className="space-y-6 p-6 grid grid-cols-1">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data PPN Penjualan</h1>
-          <p className="text-sm text-gray-500">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Data PPN Penjualan</h1>
+            <p className="text-sm text-slate-500">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap">
-            <div className="relative w-full md:w-[280px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <Input placeholder="Cari kode invoice, customer, atau tipe unit" className="pl-10 bg-white" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} />
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap no-print">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-[240px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search here"
+                className="pl-9 bg-white"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <div className="w-[150px]">
-                <DatePicker value={startDate} onChange={(date) => { setStartDate(date ?? null); setPage(1); }} placeholder="Mulai Tanggal" />
-              </div>
-              <span className="text-gray-500 text-sm">s/d</span>
-              <div className="w-[150px]">
-                <DatePicker value={endDate} onChange={(date) => { setEndDate(date ?? null); setPage(1); }} placeholder="Sampai Tanggal" />
-              </div>
-            </div>
+            {/* Date Range Picker */}
+            <DatePickerWithRange
+              className="w-[240px]"
+              date={dateRange}
+              onChange={(range) => {
+                setDateRange(range);
+                setPage(1);
+              }}
+            />
 
-            {searchInput || startDate || endDate ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setSearchInput('');
-                  setSearch('');
-                  setStartDate(null);
-                  setEndDate(null);
-                  setPage(1);
-                }}
-              >
-                Reset
-              </Button>
-            ) : null}
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Show</span>
+            {/* Pagination Dropdown */}
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
               <Select
                 value={String(perPage)}
                 onValueChange={(value) => {
@@ -131,54 +124,68 @@ export default function DataPPNPenjualanPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[80px] bg-white">
-                  <SelectValue placeholder="10" />
+                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-gray-500">Page</span>
+              <span>Page</span>
             </div>
+
+            {/* Reset Button (muncul hanya saat ada filter aktif) */}
+            {(searchInput || dateRange) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 px-3 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
+                onClick={() => {
+                  setSearchInput('');
+                  setSearch('');
+                  setDateRange(undefined);
+                  setPage(1);
+                }}
+              >
+                <X className="h-3.5 w-3.5" />
+                Reset Filter
+              </Button>
+            )}
           </div>
 
-          <Button type="button" variant="outline" className="w-full xl:w-auto" onClick={() => void refetch()} disabled={isFetching}>
-            <RotateCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+
+          <PPNPenjualanTable
+            data={data?.data ?? []}
+            meta={meta}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            hasNextPage={data?.hasNextPage ?? false}
+            isTotalExact={data?.isTotalExact ?? false}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            isError={isError}
+            errorMessage={errorMessage}
+            onRetry={() => void refetch()}
+            onPageChange={setPage}
+            onSortChange={(nextSortBy) => {
+              setPage(1);
+              if (nextSortBy === sortBy) {
+                setSortDirection((current) => (current === 'asc' ? 'desc' : 'asc'));
+                return;
+              }
+
+              setSortBy(nextSortBy);
+              setSortDirection('asc');
+            }}
+            onEdit={(item) => {
+              setSelected(item);
+              setOpenForm(true);
+            }}
+          />
         </div>
-
-        <PPNPenjualanTable
-          data={data?.data ?? []}
-          meta={meta}
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          hasNextPage={data?.hasNextPage ?? false}
-          isTotalExact={data?.isTotalExact ?? false}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          isError={isError}
-          errorMessage={errorMessage}
-          onRetry={() => void refetch()}
-          onPageChange={setPage}
-          onSortChange={(nextSortBy) => {
-            setPage(1);
-            if (nextSortBy === sortBy) {
-              setSortDirection((current) => (current === 'asc' ? 'desc' : 'asc'));
-              return;
-            }
-
-            setSortBy(nextSortBy);
-            setSortDirection('asc');
-          }}
-          onEdit={(item) => {
-            setSelected(item);
-            setOpenForm(true);
-          }}
-        />
 
         <PPNPenjualanFormDialog
           open={openForm}

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { PenerimaanPiutang } from '@/@types/penerimaan-piutang.types';
 import type { LiabilityListMeta } from '@/types/pembayaran-hutang.types';
 
@@ -85,23 +85,24 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
     const endIndex = meta?.to ?? (data.length > 0 ? startIndex + data.length - 1 : 0);
     const totalItems = meta?.total ?? 0;
 
-    const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' = 'left') => {
+    const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
         const isSorted = sortBy === sortKey;
+        const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
         return (
             <button
                 type="button"
-                className={`flex items-center gap-1.5 font-semibold text-gray-900 cursor-pointer ${align === 'right' ? 'justify-end w-full' : 'justify-start'}`}
+                className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
                 onClick={() => handleSort(sortKey)}
             >
                 <span>{title}</span>
                 {isSorted ? (
                     sortDirection === 'asc' ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+                        <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
                     ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+                        <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
                     )
                 ) : (
-                    <ArrowUpDown className="h-3.5 w-3.5 opacity-50 text-slate-400" />
+                    <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
                 )}
             </button>
         );
@@ -109,31 +110,32 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center">
-                <div className="relative w-full md:max-w-md">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <Input placeholder="Cari kode transaksi atau customer" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 h-10" />
-                </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-[300px]">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <Input placeholder="Search here" value={search} onChange={(event) => onSearchChange(event.target.value)} className="pl-9 bg-white" />
+                    </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600 md:shrink-0">
-                    <span>Show</span>
-                    <Select
-                        value={String(perPage)}
-                        onValueChange={(value) => {
-                            onPerPageChange(Number(value));
-                        }}
-                    >
-                        <SelectTrigger className="h-9 w-20">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="25">25</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <span>Page</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
+                        <Select
+                            value={String(perPage)}
+                            onValueChange={(value) => {
+                                onPerPageChange(Number(value));
+                            }}
+                        >
+                            <SelectTrigger className="w-[70px] bg-white">
+                                <SelectValue placeholder="25" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <span>Page</span>
+                    </div>
                 </div>
             </div>
 
@@ -150,25 +152,25 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                 </div>
             ) : null}
 
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
                 <table className="w-full text-sm">
-                    <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal border-b border-gray-200">
+                    <thead className="bg-[#f8f9fa] border-b border-gray-200">
                         <tr>
-                            <th className="px-4 py-3 text-left">No</th>
-                            <th className="py-2.5 px-4 text-left">{renderSortHeader('No. Transaksi', 'code')}</th>
-                            <th className="py-2.5 px-4 text-left">{renderSortHeader('Tanggal', 'date')}</th>
-                            <th className="py-2.5 px-4 text-left">{renderSortHeader('Customer', 'supplier_name')}</th>
-                            <th className="py-2.5 px-4 text-right">{renderSortHeader('Total Piutang', 'grand_total', 'right')}</th>
-                            <th className="py-2.5 px-4 text-right">{renderSortHeader('Total Diterima', 'total_paid', 'right')}</th>
-                            <th className="py-2.5 px-4 text-right">{renderSortHeader('Sisa Piutang', 'remaining_payment', 'right')}</th>
-                            <th className="px-4 py-3 text-left">Status</th>
-                            {showActions ? <th className="px-4 py-3 text-center">Aksi</th> : null}
+                            <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">No</th>
+                            <th className="p-0 text-left">{renderSortHeader('No. Transaksi', 'code', 'left')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Tanggal', 'date', 'center')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Customer', 'supplier_name', 'left')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Total Piutang', 'grand_total', 'center')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Total Diterima', 'total_paid', 'center')}</th>
+                            <th className="p-0 text-left">{renderSortHeader('Sisa Piutang', 'remaining_payment', 'center')}</th>
+                            <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Status</th>
+                            {showActions ? <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Aksi</th> : null}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody>
                         {loading && data.length === 0 ? (
                             <tr>
-                                <td colSpan={showActions ? 9 : 8} className="px-4 py-12 text-center text-gray-500">
+                                <td colSpan={showActions ? 9 : 8} className="px-4 py-12 text-center text-slate-500">
                                     <span className="inline-flex items-center gap-2">
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                         Memuat data...
@@ -180,17 +182,17 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                                 const percentage = Math.max(0, Math.min(100, item.paid_percentage));
 
                                 return (
-                                    <tr key={item.id} className="transition-colors hover:bg-gray-50/70">
-                                        <td className="px-4 py-4 text-gray-600">{startIndex + index}</td>
-                                        <td className="px-4 py-4 font-medium text-gray-900">{item.code}</td>
-                                        <td className="px-4 py-4 text-gray-600">{formatDate(item.date)}</td>
-                                        <td className="px-4 py-4 text-gray-700">{item.supplier_name}</td>
-                                        <td className="px-4 py-4 text-right font-medium text-gray-900">{formatCurrency(item.grand_total)}</td>
-                                        <td className="px-4 py-4 text-right font-medium text-emerald-600">{formatCurrency(item.total_paid)}</td>
-                                        <td className="px-4 py-4 text-right font-medium text-orange-600">{formatCurrency(item.remaining_payment)}</td>
-                                        <td className="px-4 py-4">
+                                    <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                                        <td className="px-4 py-4 text-center text-sm text-slate-500">{startIndex + index}</td>
+                                        <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.code}</td>
+                                        <td className="px-4 py-4 text-center text-sm text-slate-500">{formatDate(item.date)}</td>
+                                        <td className="px-4 py-4 text-left text-sm text-slate-700">{item.supplier_name}</td>
+                                        <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.grand_total)}</td>
+                                        <td className="px-4 py-4 text-center text-sm font-medium text-emerald-600">{currenciesFormat('idr', item.total_paid)}</td>
+                                        <td className="px-4 py-4 text-center text-sm font-medium text-orange-600">{currenciesFormat('idr', item.remaining_payment)}</td>
+                                        <td className="px-4 py-4 text-center text-sm text-slate-500">
                                             <div className="space-y-2">
-                                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                                <div className="flex items-center justify-between text-xs text-slate-500">
                                                     <span>{percentage.toFixed(0)}% diterima</span>
                                                     <span>{item.remaining_payment <= 0 ? 'Lunas' : 'Belum lunas'}</span>
                                                 </div>
@@ -203,15 +205,15 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                                             <td className="px-4 py-4 text-center">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                                                             <MoreVertical className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem asChild>
-                                                            {slug ? <Link href={`/dashboard/${slug}/finance/data-penerimaan-piutang/${item.id}`}>Detail</Link> : <span className="cursor-not-allowed text-gray-400">Detail</span>}
+                                                    <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                                                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2.5">
+                                                            {slug ? <Link href={`/dashboard/${slug}/finance/data-penerimaan-piutang/${item.id}`}>Detail</Link> : <span className="cursor-not-allowed text-slate-400">Detail</span>}
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onSelect={() => onDelete?.(item)} className="text-orange-600 focus:text-orange-700">
+                                                        <DropdownMenuItem onSelect={() => onDelete?.(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-orange-600 focus:text-orange-700">
                                                             Hapus
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>

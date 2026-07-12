@@ -1,55 +1,15 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
-import type { ApiError } from '@/@types/api';
+
 import type { CreateInvoiceProcessValues } from '@/@types/create-invoice.types';
 import { CreateInvoiceProcessForm } from '@/components/features/create-invoice/CreateInvoiceProcessForm';
 import { buildDetailRows, buildProcessDefaults, createProcessDraftPayload, getInvoiceProcessDraft, saveInvoiceProcessDraft } from '@/components/features/create-invoice/create-invoice.utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useDoInvoiceDetail, useProcessDoInvoice } from '@/hooks/useDoInvoice';
-import { ApiValidationError } from '@/lib/api/response';
 
-const extractValidationMessages = (error: unknown) => {
-  if (error instanceof ApiValidationError) {
-    const messages = Object.entries(error.fieldErrors ?? {}).flatMap(([field, fieldMessages]) =>
-      (fieldMessages ?? []).map((message) => `${field}: ${message}`),
-    );
 
-    return {
-      title: error.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  const apiError = error as ApiError & {
-    fieldErrors?: Record<string, string[]>;
-    response?: { data?: { errors?: Record<string, string[]>; message?: string } };
-  };
-
-  const rawFieldErrors =
-    apiError?.fieldErrors ??
-    apiError?.response?.data?.errors ??
-    (typeof apiError?.details === 'object' && apiError.details ? (apiError.details as Record<string, string[]>) : undefined);
-
-  if (rawFieldErrors && typeof rawFieldErrors === 'object') {
-    const messages = Object.entries(rawFieldErrors).flatMap(([field, fieldMessages]) => {
-      if (Array.isArray(fieldMessages)) {
-        return fieldMessages.map((message) => `${field}: ${message}`);
-      }
-      return [`${field}: ${String(fieldMessages)}`];
-    });
-
-    return {
-      title: apiError?.message || apiError?.response?.data?.message || 'Validation error',
-      description: messages.join('\n'),
-    };
-  }
-
-  return {
-    title: apiError?.message || 'Validation error',
-    description: '',
-  };
-};
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 export default function CreateInvoiceDetailPage() {
   const router = useRouter();
@@ -75,7 +35,8 @@ export default function CreateInvoiceDetailPage() {
     const draft = getInvoiceProcessDraft(detailQuery.data.id);
     setValues(buildProcessDefaults(detailQuery.data, draft));
     const rows = buildDetailRows([detailQuery.data]);
-    const selectable = rows.filter((row) => row.expeditionId > 0 && !row.isPrinted).map((row) => row.expeditionId);
+    const isAlreadyPrint = Boolean(detailQuery.data.isAlreadyPrint);
+    const selectable = rows.filter((row) => row.expeditionId > 0 && (!row.isPrinted || isAlreadyPrint)).map((row) => row.expeditionId);
     const draftSelection = (draft?.selectedExpeditionIds ?? []).filter((id) => selectable.includes(id));
     setSelectedExpeditionIds(draftSelection.length ? draftSelection : selectable);
   }, [detailQuery.data]);
@@ -105,10 +66,7 @@ export default function CreateInvoiceDetailPage() {
     }, {
       onSuccess: () => toast.success('Invoice berhasil diproses'),
       onError: (error: unknown) => {
-        const validation = extractValidationMessages(error);
-        toast.error(validation.title, {
-          description: validation.description || 'Sinkronisasi proses invoice gagal, namun print preview tetap dibuka',
-        });
+        toast.error(getApiErrorMessage(error));
       },
     });
 
@@ -141,7 +99,7 @@ export default function CreateInvoiceDetailPage() {
           )
         }
         onToggleAllExpeditions={(checked) =>
-          setSelectedExpeditionIds(checked ? rows.filter((row) => row.expeditionId > 0 && !row.isPrinted).map((row) => row.expeditionId) : [])
+          setSelectedExpeditionIds(checked ? rows.filter((row) => row.expeditionId > 0 && (!row.isPrinted || Boolean(detailQuery.data?.isAlreadyPrint))).map((row) => row.expeditionId) : [])
         }
         isSubmitting={processInvoiceMutation.isPending}
       />

@@ -72,9 +72,11 @@ export default function ArmadaPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Armada</h1>
-          <p className="mt-1 text-sm text-gray-500">Kelola data armada dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Armada</h1>
+            <p className="text-sm text-muted-foreground">Kelola data armada dengan mudah</p>
+          </div>
         </div>
 
         <ArmadaTable

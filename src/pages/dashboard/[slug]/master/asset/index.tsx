@@ -16,7 +16,7 @@ export default function AssetPage() {
   // Table state
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(100);
+  const [perPage, setPerPage] = useState(25);
 
   const { data: assetsData } = useAssets(companyId, { page, perPage, search });
   
@@ -104,9 +104,11 @@ export default function AssetPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Data Aset</h1>
-          <p className="text-sm text-gray-500 mt-1">Kelola data aset perusahaan dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Data Aset</h1>
+            <p className="text-sm text-muted-foreground">Kelola data aset perusahaan dengan mudah</p>
+          </div>
         </div>
 
         {/* Content */}

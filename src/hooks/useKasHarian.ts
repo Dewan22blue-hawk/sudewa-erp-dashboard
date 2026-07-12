@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { CashFlowFilterParams, CashFlowPayload } from '@/@types/kas-harian.types';
-import { createCashFlow, deleteCashFlow, fetchCashFlow, fetchCashFlowDetail, updateCashFlow } from '@/services/cashFlowService';
+import { createCashFlow, deleteCashFlow, fetchCashFlow, fetchCashFlowDetail, updateCashFlow, toggleCashFlowPaymentStatus } from '@/services/cashFlowService';
 
 const CASH_FLOW_KEY = 'cash-flow';
 
@@ -77,6 +77,18 @@ export function useDeleteKasHarian() {
     mutationFn: (id: number | string) => deleteCashFlow(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cashFlowKeys.all });
+    },
+  });
+}
+
+export function useToggleKasHarianPaymentStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, isPaid }: { id: number | string; isPaid: boolean }) => toggleCashFlowPaymentStatus(id, isPaid),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: cashFlowKeys.all });
+      queryClient.invalidateQueries({ queryKey: cashFlowKeys.detail(variables.id) });
     },
   });
 }

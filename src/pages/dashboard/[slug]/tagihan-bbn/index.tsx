@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
-import { useDealers } from '@/hooks/useDealer';
 import { useKas } from '@/hooks/useKas';
 import {
   useBBNBillList,
@@ -12,9 +12,10 @@ import {
   useCreateBBNBillBillingItem,
   useDeleteBBNBill,
 } from '@/hooks/useBBNBill';
+import { useDitlantasProcessOptions } from '@/hooks/useVehicleDocument';
 import { BBNBillFormDialog, BBNBillPaymentDialog, DeleteBBNBillDialog } from '@/components/features/tagihan-bbn/BBNBillDialogs';
 import { BBNBillTable } from '@/components/features/tagihan-bbn/BBNBillTable';
-import type { BBNBill } from '@/@types/bbn-bill.types';
+import type { BBNBill, BBNBillPayload } from '@/@types/bbn-bill.types';
 import { getCashLabel } from '@/components/features/tagihan-bbn/utils';
 
 export default function BBNBillListPage() {
@@ -27,7 +28,7 @@ export default function BBNBillListPage() {
   const [search, setSearch] = React.useState('');
   const [page, setPage] = React.useState(1);
   const [perPage, setPerPage] = React.useState(25);
-  const [dealerSearch, setDealerSearch] = React.useState('');
+  const [ditlantasSearch, setDitlantasSearch] = React.useState('');
   const [createOpen, setCreateOpen] = React.useState(false);
   const [paymentOpen, setPaymentOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
@@ -43,21 +44,27 @@ export default function BBNBillListPage() {
   }, [searchInput]);
 
   const listQuery = useBBNBillList({ page, perPage, search });
-  const dealersQuery = useDealers(safeCompanyId, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' });
+  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch, false);
   const kasQuery = useKas(safeCompanyId);
   const createMutation = useCreateBBNBill();
   const deleteMutation = useDeleteBBNBill();
   const createBillingMutation = useCreateBBNBillBilling();
   const createBillingItemMutation = useCreateBBNBillBillingItem();
 
-  const dealerOptions = React.useMemo(
+  const ditlantasOptions = React.useMemo(
     () =>
-      (dealersQuery.data?.data ?? []).map((dealer) => ({
-        value: String(dealer.id),
-        label: dealer.namaDealer || dealer.code || `Dealer ID ${dealer.id}`,
-        subtitle: dealer.code || undefined,
-      })),
-    [dealersQuery.data?.data],
+      (ditlantasQuery.data ?? [])
+        .filter((item) => {
+          if (item.isAlreadyProcessed === true) return false;
+          if (item.unprocessedCount === 0) return false;
+          return true;
+        })
+        .map((item) => ({
+          value: String(item.id),
+          label: `${item.code} - ${item.vendorName || ''}`,
+          subtitle: item.vendorName || undefined,
+        })),
+    [ditlantasQuery.data],
   );
 
   const cashOptions = React.useMemo(() => {
@@ -74,13 +81,13 @@ export default function BBNBillListPage() {
     return Array.from(unique.values()).sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label));
   }, [kasQuery.data?.data]);
 
-  const handleCreate = async (payload: { dealerId: number | string; billDate: string; paidDate?: string }) => {
+  const handleCreate = async (payload: BBNBillPayload) => {
     try {
       await createMutation.mutateAsync(payload);
       toast.success('Tagihan BBN berhasil ditambahkan');
       setCreateOpen(false);
     } catch (error: any) {
-      toast.error(error.message || 'Gagal menambahkan tagihan BBN');
+      toast.error(getApiErrorMessage(error));
     }
   };
 
@@ -109,7 +116,7 @@ export default function BBNBillListPage() {
           // noop
         }
       }
-      toast.error(error.message || 'Gagal menambahkan pembayaran');
+      toast.error(getApiErrorMessage(error));
     }
   };
 
@@ -122,16 +129,18 @@ export default function BBNBillListPage() {
       setDeleteOpen(false);
       setSelectedBill(null);
     } catch (error: any) {
-      toast.error(error.message || 'Gagal menghapus tagihan BBN');
+      toast.error(getApiErrorMessage(error));
     }
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-[38px] font-semibold tracking-[-0.03em] text-slate-950">Data Tagihan BBN</h1>
-          <p className="mt-1 text-base text-slate-500">Kelola data bbn dengan mudah</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-950">Data Tagihan BBN</h1>
+            <p className="text-sm text-slate-500">Kelola data tagihan BBN dengan mudah</p>
+          </div>
         </div>
 
         <BBNBillTable
@@ -154,7 +163,7 @@ export default function BBNBillListPage() {
             setSelectedBill(item);
             setPaymentOpen(true);
           }}
-          onPrint={(item) => window.open(`/dashboard/${slug}/tagihan-bbn/${item.id}?print=1`, '_blank', 'noopener,noreferrer')}
+          onPrint={(item) => router.push(`/dashboard/${slug}/tagihan-bbn/print/${item.id}`)}
           onDelete={(item) => {
             setSelectedBill(item);
             setDeleteOpen(true);
@@ -167,8 +176,8 @@ export default function BBNBillListPage() {
         onOpenChange={setCreateOpen}
         onSubmit={handleCreate}
         isSubmitting={createMutation.isPending}
-        dealerOptions={dealerOptions}
-        onDealerSearchChange={setDealerSearch}
+        ditlantasOptions={ditlantasOptions}
+        onDitlantasSearchChange={setDitlantasSearch}
       />
 
       <BBNBillPaymentDialog

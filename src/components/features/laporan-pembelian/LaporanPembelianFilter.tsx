@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
+import { Printer, Download, ChevronsUpDown, Check } from 'lucide-react';
 import { getSuppliers, getUnitTypes } from '@/services/laporan-pembelian.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -31,18 +31,23 @@ export default function LaporanPembelianFilter({
   onPrint,
   onDownload,
 }: LaporanPembelianFilterProps) {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    if (startDate && endDate) return { from: new Date(startDate), to: new Date(endDate) };
-    if (startDate) return { from: new Date(startDate), to: undefined };
-    return undefined;
-  });
-
-  useEffect(() => {
-    if (!startDate && !endDate) {
-      setDateRange(undefined);
-    } else if (startDate && endDate && (!dateRange?.from || !dateRange?.to)) {
-      setDateRange({ from: new Date(startDate), to: new Date(endDate) });
+  const dateRange = useMemo(() => {
+    if (startDate && endDate) {
+      const from = new Date(startDate);
+      const to = new Date(endDate);
+      return { 
+        from: Number.isNaN(from.getTime()) ? undefined : from, 
+        to: Number.isNaN(to.getTime()) ? undefined : to 
+      };
     }
+    if (startDate) {
+      const from = new Date(startDate);
+      return { 
+        from: Number.isNaN(from.getTime()) ? undefined : from, 
+        to: undefined 
+      };
+    }
+    return undefined;
   }, [startDate, endDate]);
   const [suppliers, setSuppliers] = useState<Array<{ id: number; name: string }>>([]);
   const [unitTypes, setUnitTypes] = useState<Array<{ id: number; name: string }>>([]);
@@ -92,9 +97,9 @@ export default function LaporanPembelianFilter({
   const rawOptions = activeTab === 'per-supplier' ? suppliers : unitTypes;
   const currentOptions = Array.isArray(rawOptions) ? rawOptions : [];
 
-  const handleApplyFilter = () => {
-    const startDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDate;
+  useEffect(() => {
+    const startDateVal = startDate;
+    const endDateVal = endDate;
 
     let supplierId: number | null = null;
     let search = '';
@@ -111,8 +116,35 @@ export default function LaporanPembelianFilter({
     }
 
     onApplyFilters({
-      startDate,
-      endDate,
+      startDate: startDateVal,
+      endDate: endDateVal,
+      supplierId,
+      search,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, activeTab]);
+
+  const handleDateChange = (newRange: DateRange | undefined) => {
+    const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
+    const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
+
+    let supplierId: number | null = null;
+    let search = '';
+
+    if (activeTab === 'per-supplier') {
+      const matchedSupplier = currentOptions.find(s => s.name?.toLowerCase() === searchQuery.trim().toLowerCase());
+      if (matchedSupplier) {
+        supplierId = matchedSupplier.id;
+      } else {
+        search = searchQuery.trim();
+      }
+    } else if (activeTab === 'per-tipe') {
+      search = searchQuery.trim();
+    }
+
+    onApplyFilters({
+      startDate: appliedStartDate,
+      endDate: appliedEndDate,
       supplierId,
       search,
     });
@@ -123,21 +155,21 @@ export default function LaporanPembelianFilter({
   );
 
   return (
-    <div className="flex items-end justify-between w-full">
-      <div className="flex items-end gap-6">
+    <div className="flex items-end justify-between w-full no-print gap-4">
+      <div className="flex items-end gap-6 flex-wrap">
         
         {/* Periode Transaksi */}
         <div className="flex flex-col space-y-2">
-          <label className="text-[13px] font-bold text-gray-900">Periode Transaksi</label>
+          <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
           <div className="w-[280px]">
-            <DatePickerWithRange date={dateRange} onChange={setDateRange} />
+            <DatePickerWithRange date={dateRange} onChange={handleDateChange} />
           </div>
         </div>
 
         {/* Dynamic Searchable Select Field (Hidden for 'per-nota') */}
         {activeTab !== 'per-nota' && (
           <div className="flex flex-col space-y-2">
-            <label className="text-[13px] font-bold text-gray-900">
+            <label className="text-[13px] font-medium text-slate-700">
               {activeTab === 'per-tipe' ? 'Masukkan Tipe ' : 'Masukkan Supplier '} 
               <span className="text-red-500">*</span>
             </label>
@@ -148,7 +180,7 @@ export default function LaporanPembelianFilter({
                   variant="outline" 
                   role="combobox"
                   aria-expanded={openBox}
-                  className="w-[250px] justify-between text-left font-normal bg-white"
+                  className="w-[250px] justify-between text-left font-normal bg-white rounded-xl border-slate-200 shadow-sm"
                 >
                   <span className="truncate">
                     {searchQuery 
@@ -199,25 +231,15 @@ export default function LaporanPembelianFilter({
             </Popover>
           </div>
         )}
-
-        {/* Tombol Show (Dipindah ke paling kanan filter group) */}
-        <Button 
-          variant="outline" 
-          onClick={handleApplyFilter} 
-          className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 px-4 whitespace-nowrap mb-[1px]"
-        >
-          <Eye className="h-4 w-4" />
-          Show
-        </Button>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={onPrint} className="gap-2 px-4 bg-white text-gray-700 shadow-sm border-gray-200">
-          <Printer className="h-4 w-4" /> Print
+      <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={onPrint} className="w-full sm:w-auto">
+          <Printer className="h-4 w-4 mr-2" /> Print
         </Button>
-        <Button onClick={onDownload} className="gap-2 px-4 shadow-sm bg-[#16a34a] hover:bg-[#15803d] text-white border-0">
-          <Download className="h-4 w-4" /> Download
+        <Button variant="outline" onClick={onDownload} className="w-full sm:w-auto">
+          <Download className="h-4 w-4 mr-2" /> Download
         </Button>
       </div>
     </div>

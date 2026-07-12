@@ -27,7 +27,7 @@ interface GoodsStockMaterialPaginationApiModel {
   last_page?: number | string;
 }
 
-const basePath = '/wapi/warehouse/goods-transaction-stock-material';
+const basePath = '/wapi/warehouse/goods-transaction-stock';
 
 const toNumber = (value: string | number | null | undefined) => Number(value ?? 0) || 0;
 
@@ -50,7 +50,7 @@ export async function getGoodsTransactionStockMaterial(params: GoodsStockMateria
   const response = await apiClient.get<LaravelApiResponse<GoodsStockMaterialPaginationApiModel>>(basePath, {
     params: {
       company_id: params.company_id,
-      in_stock: typeof params.in_stock === 'boolean' ? params.in_stock : undefined,
+      in_stock: (params.in_stock === true || String(params.in_stock) === 'true') ? 'true' : (params.in_stock === false || String(params.in_stock) === 'false') ? 'false' : undefined,
       code: params.code?.trim() ? params.code.trim() : undefined,
       name: params.name?.trim() ? params.name.trim() : undefined,
       search: params.search?.trim() ? params.search.trim() : undefined,

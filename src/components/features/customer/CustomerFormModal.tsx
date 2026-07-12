@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import RequiredMark from '@/components/ui/required-mark';
 import { Textarea } from '@/components/ui/textarea';
 import type { UseFormReturn } from 'react-hook-form';
+import { sanitizePhone } from '@/lib/utils/format';
 
 interface CustomerFormModalProps {
   open: boolean;
@@ -30,15 +31,15 @@ export function CustomerFormModal({
 }: CustomerFormModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[410px] rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[410px]">
-        <div className="px-6 py-6">
-          <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="text-[18px] font-semibold text-[#171717]">{title}</DialogTitle>
-            <DialogDescription className="text-[15px] text-[#71717A]">{description}</DialogDescription>
-          </DialogHeader>
+      <DialogContent className="w-full max-w-md sm:max-w-[425px] max-h-[90vh] overflow-hidden flex flex-col rounded-2xl border-0 bg-white p-0 shadow-2xl">
+        <DialogHeader className="px-6 py-5 border-b shrink-0 text-left">
+          <DialogTitle className="text-[18px] font-semibold text-[#171717]">{title}</DialogTitle>
+          <DialogDescription className="text-[15px] text-[#71717A]">{description}</DialogDescription>
+        </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -79,15 +80,17 @@ export function CustomerFormModal({
 
               <FormField
                 control={form.control}
-                name="address"
+                name="phone"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Alamat</FormLabel>
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">
+                      Phone<RequiredMark />
+                    </FormLabel>
                     <FormControl>
-                      <Textarea
+                      <Input
                         {...field}
-                        placeholder="Tambahkan Alamat"
-                        className="min-h-[112px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
+                        placeholder="Tambahkan nomer telepon"
+                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -97,14 +100,16 @@ export function CustomerFormModal({
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="npwp"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Phone</FormLabel>
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">
+                      NPWP<RequiredMark />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Tambahkan nomer telepon"
+                        placeholder="Tambahkan NPWP"
                         className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                       />
                     </FormControl>
@@ -133,33 +138,35 @@ export function CustomerFormModal({
 
               <FormField
                 control={form.control}
-                name="npwp"
+                name="address"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">NPWP</FormLabel>
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">
+                      Alamat<RequiredMark />
+                    </FormLabel>
                     <FormControl>
-                      <Input
+                      <Textarea
                         {...field}
-                        placeholder="Tambahkan NPWP"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        placeholder="Tambahkan Alamat"
+                        className="min-h-[100px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
 
-              <div className="flex flex-col gap-3 pt-2">
-                <Button type="submit" className="h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
-                  {isSubmitting ? 'Menyimpan...' : submitLabel}
-                </Button>
-                <Button type="button" variant="outline" className="h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
-                  Batal
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
+            <div className="shrink-0 flex gap-3 px-6 py-4 border-t bg-gray-50">
+              <Button type="button" variant="outline" className="flex-1 h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
+                Batal
+              </Button>
+              <Button type="submit" className="flex-1 h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
+                {isSubmitting ? 'Menyimpan...' : submitLabel}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

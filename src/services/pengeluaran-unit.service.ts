@@ -178,7 +178,7 @@ const extractPagination = <T>(payload: unknown): PaginationLike<T> => {
     return {
       data: [],
       current_page: 1,
-      perPage: 10,
+      perPage: 25,
       total: 0,
       last_page: 1,
     };
@@ -199,7 +199,7 @@ const extractPagination = <T>(payload: unknown): PaginationLike<T> => {
   return {
     data: [],
     current_page: 1,
-    perPage: 10,
+    perPage: 25,
     total: 0,
     last_page: 1,
   };
@@ -316,8 +316,8 @@ const fetchItemDetails = async (itemId: number): Promise<SalesItemDetailApiModel
 const mapPengeluaranUnit = (raw: z.infer<typeof pengeluaranUnitSchema>): PengeluaranUnit => ({
   id: raw.id,
   uuid: raw.uuid,
-  personId: raw.person_id,
-  warehouseId: raw.warehouse_id,
+  personId: raw.person_id ?? 0,
+  warehouseId: raw.warehouse_id ?? 0,
   activityNumber: raw.activity_number,
   activityType: raw.activity_type,
   activityDate: toIsoDate(raw.activity_date),

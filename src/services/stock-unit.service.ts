@@ -19,6 +19,7 @@ interface StockUnitApiModel {
   chassis_number: string;
   stock_state: string; // Keep stock_state for API request params
   status: string; // Use 'status' directly from API response
+  stock_status?: string; // Field from BE
   in_stock: boolean;
   type_unit_name?: string;
 }
@@ -29,7 +30,7 @@ const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
   warna: payload.color,
   noMesin: payload.machine_number,
   noRangka: payload.chassis_number,
-  status: payload.status as StockStatus, // Map from payload.status
+  status: (payload.stock_status ?? payload.status) as StockStatus, // Map from payload.stock_status, fallback to payload.status
 });
 
 type PaginatedStockUnitResponse = LaravelApiResponse<{
@@ -48,6 +49,7 @@ export const getStockUnits = async (
     chassis_number?: string;
     color?: string;
     search?: string; // Added search param for consistency
+    in_stock?: boolean;
   },
 ) => {
   const response = await apiClient.get<PaginatedStockUnitResponse>(
@@ -62,6 +64,7 @@ export const getStockUnits = async (
         machine_number: params.machine_number,
         chassis_number: params.chassis_number,
         color: params.color,
+        in_stock: params.in_stock,
       },
     },
   );

@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { ArrowLeft, MoreVertical, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,15 +10,17 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { GoodsIssueFormModal } from '@/components/features/goods-issue/GoodsIssueFormModal';
 import { GoodsIssueItemModal } from '@/components/features/goods-issue/GoodsIssueItemModal';
-import { formatCurrency, formatLongDate } from '@/components/features/goods-issue/goods-issue.utils';
+import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
+import { formatCurrency } from '@/components/features/goods-issue/goods-issue.utils';
 import type { GoodsIssueItem } from '@/@types/goods-issue.types';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useCustomers } from '@/hooks/useCustomer';
@@ -28,7 +33,13 @@ import {
 } from '@/hooks/useGoodsIssue';
 import { useMaterials } from '@/hooks/useMaterial';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
-import type { GoodsIssueFormValues, GoodsIssueItemFormValues } from '@/scheme/goods-issue.schema';
+import { goodsIssueSchema, type GoodsIssueFormValues, type GoodsIssueItemFormValues } from '@/scheme/goods-issue.schema';
+
+const toDateValue = (value?: string) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+};
 
 export default function GoodsIssueEditPage() {
   const router = useRouter();
@@ -46,7 +57,6 @@ export default function GoodsIssueEditPage() {
   const updateItemMutation = useUpdateGoodsIssueItem();
   const deleteItemMutation = useDeleteGoodsIssueItem();
 
-  const [headerOpen, setHeaderOpen] = useState(false);
   const [itemOpen, setItemOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GoodsIssueItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<GoodsIssueItem | null>(null);
@@ -58,12 +68,45 @@ export default function GoodsIssueEditPage() {
   const [materialSearch, setMaterialSearch] = useState('');
 
   const issue = query.data;
+
+  const customerOptions = useMemo(
+    () =>
+      (customersQuery.data?.data ?? []).map((customer) => ({
+        value: String(customer.id),
+        label: customer.name,
+        subtitle: [customer.code, customer.phone].filter(Boolean).join(' • '),
+      })),
+    [customersQuery.data],
+  );
+
+  const form = useForm<GoodsIssueFormValues>({
+    resolver: zodResolver(goodsIssueSchema),
+    defaultValues: {
+      customerId: 0,
+      transactionDate: '',
+      description: '',
+    },
+  });
+
+  useEffect(() => {
+    if (!issue) return;
+    form.reset({
+      customerId: issue.customerId ?? 0,
+      transactionDate: issue.transactionDate ?? '',
+      description: issue.description ?? '',
+    });
+  }, [form, issue]);
+
   const filteredItems = useMemo(() => {
     const source = issue?.goodsTransactionDetails ?? [];
     const term = search.trim().toLowerCase();
     if (!term) return source;
-    return source.filter((item) => [item.material?.code, item.material?.name, item.type, item.description, String(item.qty)].filter(Boolean).join(' ').toLowerCase().includes(term));
+    return source.filter((item) =>
+      [item.material?.code, item.material?.name, item.type, item.description, String(item.qty)]
+        .filter(Boolean).join(' ').toLowerCase().includes(term),
+    );
   }, [issue?.goodsTransactionDetails, search]);
+
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / perPage));
   const safePage = Math.min(page, totalPages);
   const pageItems = filteredItems.slice((safePage - 1) * perPage, safePage * perPage);
@@ -79,10 +122,15 @@ export default function GoodsIssueEditPage() {
     try {
       await updateIssueMutation.mutateAsync({
         id: issue.id,
-        payload: { customerId: values.customerId, transactionDate: values.transactionDate, description: values.description, location: issue.location, companyId: issue.companyId || companyIdValue },
+        payload: {
+          customerId: values.customerId,
+          transactionDate: values.transactionDate,
+          description: values.description,
+          location: issue.location,
+          companyId: issue.companyId || companyIdValue,
+        },
       });
-      toast.success('Header pengeluaran material berhasil diperbarui');
-      setHeaderOpen(false);
+      toast.success('Informasi pengeluaran berhasil diperbarui');
     } catch (error) {
       const message = error instanceof ApiValidationError || error instanceof ApiResponseError ? error.message : 'Gagal memperbarui data pengeluaran material';
       toast.error(message);
@@ -93,10 +141,15 @@ export default function GoodsIssueEditPage() {
     if (!issue) return;
     try {
       if (editingItem) {
-        await updateItemMutation.mutateAsync({ id: editingItem.id, payload: { goodsTransactionId: issue.id, materialId: values.materialId, qty: values.qty, type: values.type, price: values.price, description: values.description } });
+        await updateItemMutation.mutateAsync({
+          id: editingItem.id,
+          payload: { goodsTransactionId: issue.id, materialId: values.materialId, qty: values.qty, type: values.type, price: values.price, description: values.description },
+        });
         toast.success('Detail material berhasil diperbarui');
       } else {
-        await createItemMutation.mutateAsync({ goodsTransactionId: issue.id, materialId: values.materialId, qty: values.qty, type: values.type, price: values.price, description: values.description });
+        await createItemMutation.mutateAsync({
+          goodsTransactionId: issue.id, materialId: values.materialId, qty: values.qty, type: values.type, price: values.price, description: values.description,
+        });
         toast.success('Detail material berhasil ditambahkan');
       }
       setItemOpen(false);
@@ -134,38 +187,91 @@ export default function GoodsIssueEditPage() {
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
           </Button>
-          <h1 className="text-[24px] font-semibold text-slate-900">Data Pengeluaran Material</h1>
+          <div>
+            <h1 className="text-[24px] font-semibold text-slate-900">Data Pengeluaran Material</h1>
+            <p className="text-[13px] text-slate-400">Edit</p>
+          </div>
         </div>
 
         <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleUpdateHeader)} className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-6">
-              <h2 className="text-[18px] font-semibold text-slate-900">Infromasi Pengeluaran</h2>
-              <Button onClick={() => setHeaderOpen(true)} className="h-10 rounded-[10px] bg-[#1f4163] px-5 text-[16px] hover:bg-[#183552]">Simpan Header</Button>
+              <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
+              <Button
+                type="submit"
+                disabled={updateIssueMutation.isPending}
+                className="h-10 rounded-[10px] bg-[#1f4163] px-5 text-[16px] hover:bg-[#183552]"
+              >
+                {updateIssueMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+              </Button>
             </div>
+
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-[15px] font-medium text-slate-900">Kode Pengeluaran</label>
+                <Label className="text-[15px] font-medium text-slate-900">Kode Pengeluaran</Label>
                 <Input value={issue.code} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500" />
               </div>
+
               <div className="space-y-2">
-                <label className="text-[15px] font-medium text-slate-900">Tanggal Pengeluaran</label>
-                <Input value={formatLongDate(issue.transactionDate)} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
+                <Label className="text-[15px] font-medium text-slate-900">Tanggal Pengeluaran</Label>
+                <Controller
+                  control={form.control}
+                  name="transactionDate"
+                  render={({ field }) => (
+                    <DatePicker
+                      value={toDateValue(field.value)}
+                      onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                      placeholder="Pick a Date"
+                      className="h-11 rounded-xl border-slate-200 px-3 text-[16px]"
+                    />
+                  )}
+                />
+                {form.formState.errors.transactionDate ? (
+                  <p className="text-xs text-red-600">{form.formState.errors.transactionDate.message}</p>
+                ) : null}
               </div>
+
               <div className="space-y-2">
-                <label className="text-[15px] font-medium text-slate-900">Customer</label>
-                <Input value={issue.customer?.name ?? '-'} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
+                <Label className="text-[15px] font-medium text-slate-900">Customer</Label>
+                <Controller
+                  control={form.control}
+                  name="customerId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value ? String(field.value) : ''}
+                      onChange={(value) => field.onChange(Number(value))}
+                      options={customerOptions}
+                      placeholder={customersQuery.isLoading ? 'Memuat customer...' : 'Pilih customer'}
+                      searchPlaceholder="Cari customer..."
+                      emptyText="Customer tidak ditemukan."
+                      loading={customersQuery.isLoading}
+                      onSearchChange={setCustomerSearch}
+                      className="h-11 rounded-xl border-slate-200 bg-white px-3 text-[16px]"
+                    />
+                  )}
+                />
+                {form.formState.errors.customerId ? (
+                  <p className="text-xs text-red-600">{form.formState.errors.customerId.message}</p>
+                ) : null}
+                {customerSearch ? <p className="text-xs text-slate-500">Pencarian: {customerSearch}</p> : null}
               </div>
+
               <div className="space-y-2">
-                <label className="text-[15px] font-medium text-slate-900">Total Harga Penjualan</label>
+                <Label className="text-[15px] font-medium text-slate-900">Total Harga Penjualan</Label>
                 <Input value={formatCurrency(issue.totalBrutto)} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
               </div>
             </div>
+
             <div className="space-y-2">
-              <label className="text-[15px] font-medium text-slate-900">Keterangan</label>
-              <Textarea value={issue.description ?? ''} readOnly rows={4} className="rounded-xl border-slate-200 text-[16px]" />
+              <Label className="text-[15px] font-medium text-slate-900">Keterangan</Label>
+              <Textarea
+                {...form.register('description')}
+                rows={4}
+                placeholder="Contoh: Barang sudah dikeluarkan"
+                className="rounded-xl border-slate-200 text-[16px]"
+              />
             </div>
-          </div>
+          </form>
         </Card>
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -179,15 +285,18 @@ export default function GoodsIssueEditPage() {
               <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
                 <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white shadow-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
               <span>Page</span>
             </div>
           </div>
-          <Button onClick={() => { setEditingItem(null); setItemOpen(true); }} className="h-11 rounded-xl bg-[#0ec447] px-6 text-[18px] font-medium hover:bg-[#0ba63b]"><Plus className="mr-2 h-4 w-4" />Tambah</Button>
+          <Button onClick={() => { setEditingItem(null); setItemOpen(true); }} className="h-11 rounded-xl bg-[#0ec447] px-6 text-[18px] font-medium hover:bg-[#0ba63b]">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
+          </Button>
         </div>
 
         <div className="flex items-center justify-between">
@@ -199,7 +308,14 @@ export default function GoodsIssueEditPage() {
           <Table>
             <TableHeader className="bg-slate-100">
               <TableRow className="border-slate-200">
-                <TableHead className="w-10 px-3 py-4"><Checkbox checked={pageItems.length > 0 && pageItems.every((item) => selectedIds.includes(item.id))} onCheckedChange={(checked) => checked ? setSelectedIds(Array.from(new Set([...selectedIds, ...pageItems.map((item) => item.id)]))) : setSelectedIds((current) => current.filter((item) => !pageItems.some((pageItem) => pageItem.id === item)))} /></TableHead>
+                <TableHead className="w-10 px-3 py-4">
+                  <Checkbox
+                    checked={pageItems.length > 0 && pageItems.every((item) => selectedIds.includes(item.id))}
+                    onCheckedChange={(checked) => checked
+                      ? setSelectedIds(Array.from(new Set([...selectedIds, ...pageItems.map((item) => item.id)])))
+                      : setSelectedIds((current) => current.filter((item) => !pageItems.some((pageItem) => pageItem.id === item)))}
+                  />
+                </TableHead>
                 <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">NO</TableHead>
                 <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">KODE BARANG</TableHead>
                 <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">NAMA BARANG</TableHead>
@@ -215,12 +331,14 @@ export default function GoodsIssueEditPage() {
                 <TableRow><TableCell colSpan={9} className="h-24 text-center text-slate-500">Belum ada detail material.</TableCell></TableRow>
               ) : pageItems.map((item, index) => (
                 <TableRow key={item.id} className="border-slate-200">
-                  <TableCell className="px-3 py-4"><Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => setSelectedIds((current) => checked ? [...current, item.id] : current.filter((value) => value !== item.id))} /></TableCell>
+                  <TableCell className="px-3 py-4">
+                    <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => setSelectedIds((current) => checked ? [...current, item.id] : current.filter((value) => value !== item.id))} />
+                  </TableCell>
                   <TableCell className="px-5 py-4 text-[15px]">{(safePage - 1) * perPage + index + 1}</TableCell>
                   <TableCell className="px-5 py-4 text-[15px]">{item.material?.code ?? '-'}</TableCell>
                   <TableCell className="px-5 py-4 text-[15px]">{item.material?.name ?? '-'}</TableCell>
                   <TableCell className="px-5 py-4 text-[15px]">{item.qty}</TableCell>
-                  <TableCell className="px-5 py-4 text-[15px]">{item.type}</TableCell>
+                  <TableCell className="px-5 py-4 text-[15px]">{item.type.toUpperCase()}</TableCell>
                   <TableCell className="px-5 py-4 text-[15px]">{formatCurrency(item.price)}</TableCell>
                   <TableCell className="px-5 py-4 text-[15px]">{formatCurrency(item.total)}</TableCell>
                   <TableCell className="px-5 py-4 text-right">
@@ -248,8 +366,17 @@ export default function GoodsIssueEditPage() {
         </div>
       </div>
 
-      <GoodsIssueFormModal open={headerOpen} onOpenChange={setHeaderOpen} onSubmit={handleUpdateHeader} isSubmitting={updateIssueMutation.isPending} initialData={issue} customers={customersQuery.data?.data ?? []} isLoadingCustomers={customersQuery.isLoading} customerSearch={customerSearch} onCustomerSearchChange={setCustomerSearch} />
-      <GoodsIssueItemModal open={itemOpen} onOpenChange={(open) => { setItemOpen(open); if (!open) setEditingItem(null); }} onSubmit={handleSaveItem} isSubmitting={createItemMutation.isPending || updateItemMutation.isPending} initialData={editingItem} materials={materialsQuery.data?.data ?? []} isLoadingMaterials={materialsQuery.isLoading} materialSearch={materialSearch} onMaterialSearchChange={setMaterialSearch} />
+      <GoodsIssueItemModal
+        open={itemOpen}
+        onOpenChange={(open) => { setItemOpen(open); if (!open) setEditingItem(null); }}
+        onSubmit={handleSaveItem}
+        isSubmitting={createItemMutation.isPending || updateItemMutation.isPending}
+        initialData={editingItem}
+        materials={materialsQuery.data?.data ?? []}
+        isLoadingMaterials={materialsQuery.isLoading}
+        materialSearch={materialSearch}
+        onMaterialSearchChange={setMaterialSearch}
+      />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>

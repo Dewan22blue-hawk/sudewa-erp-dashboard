@@ -10,15 +10,15 @@ import { MoneyInput } from '@/components/ui/money-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { BBNBill, BBNBillPayload } from '@/@types/bbn-bill.types';
 import type { SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';
-import { formatBillCode, formatCurrency, toDateValue, toPayloadDate } from '@/components/features/tagihan-bbn/utils';
+import { calculateOutstanding, formatBillCode, formatCurrency, toDateValue, toPayloadDate } from '@/components/features/tagihan-bbn/utils';
 
 interface BillFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (payload: BBNBillPayload) => Promise<void> | void;
   isSubmitting?: boolean;
-  dealerOptions: SearchableSelectOption[];
-  onDealerSearchChange: (value: string) => void;
+  ditlantasOptions: SearchableSelectOption[];
+  onDitlantasSearchChange: (value: string) => void;
   initialData?: BBNBill | null;
 }
 
@@ -40,7 +40,7 @@ interface DeleteDialogProps {
 }
 
 type BillFormValues = {
-  dealerId: string;
+  ditlantasProcessId: string;
   billDate?: Date;
   paidDate?: Date;
 };
@@ -56,13 +56,13 @@ export function BBNBillFormDialog({
   onOpenChange,
   onSubmit,
   isSubmitting = false,
-  dealerOptions,
-  onDealerSearchChange,
+  ditlantasOptions,
+  onDitlantasSearchChange,
   initialData,
 }: BillFormDialogProps) {
   const form = useForm<BillFormValues>({
     defaultValues: {
-      dealerId: '',
+      ditlantasProcessId: '',
       billDate: undefined,
       paidDate: undefined,
     },
@@ -72,7 +72,11 @@ export function BBNBillFormDialog({
     if (!open) return;
 
     form.reset({
-      dealerId: initialData?.dealerId ? String(initialData.dealerId) : '',
+      ditlantasProcessId: initialData?.ditlantasProcess?.id
+        ? String(initialData.ditlantasProcess.id)
+        : initialData?.dealerId
+        ? String(initialData.dealerId)
+        : '',
       billDate: toDateValue(initialData?.billDate),
       paidDate: toDateValue(initialData?.paidDate),
     });
@@ -80,10 +84,10 @@ export function BBNBillFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="max-w-[390px] rounded-2xl border border-slate-200 p-0">
-        <div className="px-6 py-7">
-          <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold text-slate-900">
+      <DialogContent showCloseButton={false} className="max-w-[420px] rounded-[24px] border border-slate-200 p-6 bg-white shadow-lg">
+        <div>
+          <DialogHeader className="mb-5">
+            <DialogTitle className="text-[18px] font-bold text-slate-900">
               {initialData ? 'Ubah Data Tagihan' : 'Tambah Data Tagihan'}
             </DialogTitle>
           </DialogHeader>
@@ -91,62 +95,62 @@ export function BBNBillFormDialog({
           <form
             onSubmit={form.handleSubmit(async (values) => {
               await onSubmit({
-                dealerId: values.dealerId,
+                ditlantasProcessId: values.ditlantasProcessId,
                 billDate: toPayloadDate(values.billDate),
                 paidDate: toPayloadDate(values.paidDate),
               });
             })}
-            className="space-y-4 pt-6"
+            className="space-y-4"
           >
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Dealer</Label>
+              <Label className="text-sm font-medium text-slate-950">Kode Ditlantas</Label>
               <Controller
-                name="dealerId"
+                name="ditlantasProcessId"
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
                   <SearchableSelect
                     value={field.value}
                     onChange={field.onChange}
-                    options={dealerOptions}
-                    onSearchChange={onDealerSearchChange}
-                    placeholder="Masukkan dealer"
-                    searchPlaceholder="Cari dealer..."
-                    emptyText="Dealer tidak ditemukan."
-                    className="h-12 rounded-xl border-slate-200"
+                    options={ditlantasOptions}
+                    onSearchChange={onDitlantasSearchChange}
+                    placeholder="Masukkan Kode Ditlantas"
+                    searchPlaceholder="Cari proses Ditlantas..."
+                    emptyText="Proses Ditlantas tidak ditemukan."
+                    className="h-11 rounded-xl border-slate-200"
                   />
                 )}
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Tanggal Tagihan</Label>
+              <Label className="text-sm font-medium text-slate-950">Tanggal Tagihan</Label>
               <Controller
                 name="billDate"
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-12 rounded-xl border-slate-200" />
+                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200 w-full" />
                 )}
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Tanggal Bayar</Label>
+              <Label className="text-sm font-medium text-slate-950">Tanggal Bayar</Label>
               <Controller
                 name="paidDate"
                 control={form.control}
                 render={({ field }) => (
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-12 rounded-xl border-slate-200" />
+                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200 w-full" />
                 )}
               />
             </div>
 
-            <div className="flex flex-col gap-3 pt-2">
-              <Button type="submit" disabled={isSubmitting} className="h-11 rounded-xl bg-[#1f4163] text-[16px] hover:bg-[#183552]">
+            <div className="flex flex-col gap-3 pt-3">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-sm font-medium text-white hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 rounded-xl border-slate-200 text-[16px]">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-200 text-sm font-medium text-slate-700 bg-white">
                 Batal
               </Button>
             </div>
@@ -156,6 +160,8 @@ export function BBNBillFormDialog({
     </Dialog>
   );
 }
+
+
 
 export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmitting = false, bill, cashOptions }: PaymentDialogProps) {
   const form = useForm<PaymentDialogValues>({
@@ -168,21 +174,25 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
 
   React.useEffect(() => {
     if (!open || !bill) return;
+    const outstanding = calculateOutstanding(bill.bruttoAmount, bill.paidAmount);
     form.reset({
       paidDate: undefined,
       cashId: cashOptions[0] ? String(cashOptions[0].id) : '',
-      amount: Math.max(Number(bill.bruttoAmount || 0) - Number(bill.paidAmount || 0), 0),
+      amount: outstanding,
     });
-  }, [bill, cashOptions, form, open]);
+  }, [open, bill, cashOptions, form]);
 
-  const outstanding = bill ? Math.max(Number(bill.bruttoAmount || 0) - Number(bill.paidAmount || 0), 0) : 0;
+  const outstanding = React.useMemo(() => {
+    if (!bill) return 0;
+    return calculateOutstanding(bill.bruttoAmount, bill.paidAmount);
+  }, [bill]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="max-w-[410px] rounded-2xl border border-slate-200 p-0">
-        <div className="px-6 py-7">
-          <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold text-slate-900">Tambah Data Tagihan</DialogTitle>
+      <DialogContent showCloseButton={false} className="max-w-[420px] rounded-[24px] border border-slate-200 p-6 bg-white shadow-lg">
+        <div>
+          <DialogHeader className="mb-5">
+            <DialogTitle className="text-[18px] font-bold text-slate-900">Tambah Data Tagihan</DialogTitle>
           </DialogHeader>
 
           <form
@@ -193,34 +203,34 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
                 amount: Number(values.amount || 0),
               });
             })}
-            className="space-y-4 pt-6"
+            className="space-y-4"
           >
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Nomor Tagihan</Label>
-              <Input value={bill ? formatBillCode(bill.id) : ''} readOnly className="h-12 rounded-xl border-slate-200 text-[16px] text-slate-500" />
+              <Label className="text-sm font-medium text-slate-950">Nomor Tagihan</Label>
+              <Input value={bill ? (bill.code || formatBillCode(bill.id)) : ''} readOnly className="h-11 rounded-xl border-slate-200 bg-white text-slate-500" />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Tanggal Bayar</Label>
+              <Label className="text-sm font-medium text-slate-950">Tanggal Bayar</Label>
               <Controller
                 name="paidDate"
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-12 rounded-xl border-slate-200" />
+                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />
                 )}
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Kas Masuk</Label>
+              <Label className="text-sm font-medium text-slate-950">Kas Masuk</Label>
               <Controller
                 name="cashId"
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-12 rounded-xl border-slate-200 text-[16px]">
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
                       <SelectValue placeholder="Select an item" />
                     </SelectTrigger>
                     <SelectContent>
@@ -236,32 +246,27 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Total Tagihan</Label>
-              <Input value={bill ? formatCurrency(bill.bruttoAmount) : ''} readOnly className="h-12 rounded-xl border-slate-200 text-[16px] text-slate-500" />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Kurang Bayar</Label>
-              <Input value={formatCurrency(outstanding)} readOnly className="h-12 rounded-xl border-slate-200 text-[16px] text-slate-500" />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[16px] font-medium text-slate-900">Nominal Bayar</Label>
+              <Label className="text-sm font-medium text-slate-950">Total Tagihan</Label>
               <Controller
                 name="amount"
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-12 rounded-xl border-slate-200 text-[16px]" />
+                  <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-11 rounded-xl border-slate-200" />
                 )}
               />
             </div>
 
-            <div className="flex flex-col gap-3 pt-2">
-              <Button type="submit" disabled={isSubmitting} className="h-11 rounded-xl bg-[#1f4163] text-[16px] hover:bg-[#183552]">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-950">Kurang Bayar</Label>
+              <Input value={formatCurrency(outstanding)} readOnly className="h-11 rounded-xl border-slate-200 bg-white text-slate-500" />
+            </div>
+
+            <div className="flex flex-col gap-3 pt-3">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-sm font-medium text-white hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 rounded-xl border-slate-200 text-[16px]">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-200 text-sm font-medium text-slate-700 bg-white">
                 Batal
               </Button>
             </div>

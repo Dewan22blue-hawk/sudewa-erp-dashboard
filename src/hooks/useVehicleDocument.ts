@@ -11,6 +11,7 @@ import {
   importVehicleDocument,
   updateVehicleDocument,
   updateVehicleRegistration,
+  getDitlantasProcessOptions,
 } from '@/services/vehicle-document.service';
 
 export function useVehicleDocuments(params: PaginationParams & VehicleDocumentFilters) {
@@ -89,5 +90,12 @@ export function useUpdateVehicleRegistration() {
       queryClient.invalidateQueries({ queryKey: ['vehicle-document'] });
       queryClient.invalidateQueries({ queryKey: ['vehicle-registration'] });
     },
+  });
+}
+
+export function useDitlantasProcessOptions(search?: string, isAlreadyProcessed?: boolean) {
+  return useQuery({
+    queryKey: ['ditlantas-process-options', search, isAlreadyProcessed],
+    queryFn: () => getDitlantasProcessOptions(search, isAlreadyProcessed),
   });
 }

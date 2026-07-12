@@ -29,14 +29,24 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
   company_id: toNumber(payload.company_id),
   cash_id: toNumber(payload.cash_id),
   account_id: payload.account_id == null ? null : toNumber(payload.account_id),
-  unit_transaction_billing_history_id:
-    payload.unit_transaction_billing_history_id == null ? null : toNumber(payload.unit_transaction_billing_history_id),
+  unit_transaction_billing_id: payload.unit_transaction_billing_id
+    ? toNumber(payload.unit_transaction_billing_id)
+    : (payload.unit_transaction_billing?.id ? toNumber(payload.unit_transaction_billing.id) : null),
+  goods_transaction_billing_id: payload.goods_transaction_billing_id
+    ? toNumber(payload.goods_transaction_billing_id)
+    : (payload.goods_transaction_billing?.id ? toNumber(payload.goods_transaction_billing.id) : null),
+  cash_flow_type: payload.cash_flow_type ?? '',
   code: payload.code ?? '-',
   date: payload.date ?? '',
   note: payload.note ?? '',
+  amount: toNumber(payload.amount),
   debet: toNumber(payload.debet),
+  debet_original: toNumber(payload.debet_original),
   credit: toNumber(payload.credit),
+  credit_original: toNumber(payload.credit_original),
+  transaction_category: payload.transaction_category ?? '',
   payment_proof: payload.payment_proof ?? null,
+  is_paid: toBoolean(payload.is_paid),
   created_at: payload.created_at ?? '',
   updated_at: payload.updated_at ?? '',
   cash: {
@@ -60,29 +70,54 @@ const normalizeCashFlow = (payload: Partial<KasHarian>): KasHarian => ({
     uuid: payload.company?.uuid,
     name: payload.company?.name ?? '-',
   },
-  finance_billing: payload.finance_billing
+  finance_billings: (payload.finance_billings ?? []).map((fb) => ({
+    id: toNumber(fb.id),
+    uuid: fb.uuid,
+    cash_flow_id: toNumber(fb.cash_flow_id),
+    cash_id: toNumber(fb.cash_id),
+    account_id: toNumber(fb.account_id),
+    amount: toNumber(fb.amount),
+    amount_original: toNumber(fb.amount_original),
+    payment_proof: fb.payment_proof ?? null,
+    payment_at: fb.payment_at ?? '',
+    note: fb.note ?? '',
+    created_at: fb.created_at ?? '',
+    updated_at: fb.updated_at ?? '',
+    cash: {
+      id: toNumber(fb.cash?.id),
+      uuid: fb.cash?.uuid,
+      company_id: fb.cash?.company_id ? toNumber(fb.cash.company_id) : undefined,
+      code: fb.cash?.code ?? '-',
+      cash_name: fb.cash?.cash_name ?? '-',
+    },
+  })),
+  grand_total: toNumber(payload.grand_total),
+  remaining_payment: toNumber(payload.remaining_payment),
+  remaining_payment_usd: toNumber(payload.remaining_payment_usd),
+  unit_transaction_billing: payload.unit_transaction_billing
     ? {
-        id: toNumber(payload.finance_billing.id),
-        uuid: payload.finance_billing.uuid,
-        cash_flow_id: toNumber(payload.finance_billing.cash_flow_id),
-        unit_transaction_billing_id: toNumber(payload.finance_billing.unit_transaction_billing_id),
-        last_payment_at: payload.finance_billing.last_payment_at ?? '',
-        grand_total: toNumber(payload.finance_billing.grand_total),
-        is_valid: toBoolean(payload.finance_billing.is_valid),
-        created_at: payload.finance_billing.created_at ?? '',
-        updated_at: payload.finance_billing.updated_at ?? '',
-        finance_billing_items: (payload.finance_billing.finance_billing_items ?? []).map((item) => ({
-          id: toNumber(item.id),
-          finance_billing_id: toNumber(item.finance_billing_id),
-          bca_payment_amount: toNumber(item.bca_payment_amount),
-          bca_payment_usd_amount: toNumber(item.bca_payment_usd_amount),
-          cash_payment_amount: toNumber(item.cash_payment_amount),
-          payment_proof: item.payment_proof ?? null,
-          payment_at: item.payment_at ?? '',
-          note: item.note ?? '',
-          created_at: item.created_at ?? '',
-          updated_at: item.updated_at ?? '',
-        })),
+        id: toNumber(payload.unit_transaction_billing.id),
+        uuid: payload.unit_transaction_billing.uuid,
+        unit_transaction_id: toNumber(payload.unit_transaction_billing.unit_transaction_id),
+        grand_total: toNumber(payload.unit_transaction_billing.grand_total),
+        last_payment_at: payload.unit_transaction_billing.last_payment_at ?? '',
+        is_paid: toBoolean(payload.unit_transaction_billing.is_paid),
+        is_valid: toBoolean(payload.unit_transaction_billing.is_valid),
+        created_at: payload.unit_transaction_billing.created_at ?? '',
+        updated_at: payload.unit_transaction_billing.updated_at ?? '',
+      }
+    : null,
+  goods_transaction_billing: payload.goods_transaction_billing
+    ? {
+        id: toNumber(payload.goods_transaction_billing.id),
+        uuid: payload.goods_transaction_billing.uuid,
+        goods_transaction_id: toNumber(payload.goods_transaction_billing.goods_transaction_id),
+        grand_total: toNumber(payload.goods_transaction_billing.grand_total),
+        last_payment_at: payload.goods_transaction_billing.last_payment_at ?? '',
+        is_paid: toBoolean(payload.goods_transaction_billing.is_paid),
+        is_valid: toBoolean(payload.goods_transaction_billing.is_valid),
+        created_at: payload.goods_transaction_billing.created_at ?? '',
+        updated_at: payload.goods_transaction_billing.updated_at ?? '',
       }
     : null,
 });
@@ -96,8 +131,12 @@ const toSuccessPayload = <T>(payload: { status: boolean; message?: string; error
 const buildCashFlowFormData = (payload: CashFlowPayload) => {
   const formData = new FormData();
   formData.append('company_id', String(payload.company_id));
-  formData.append('cash_id', String(payload.cash_id));
-  formData.append('account_id', String(payload.account_id));
+  if (payload.cash_id !== undefined && payload.cash_id !== null) {
+    formData.append('cash_id', String(payload.cash_id));
+  }
+  if (payload.account_id !== undefined && payload.account_id !== null) {
+    formData.append('account_id', String(payload.account_id));
+  }
   formData.append('date', payload.date);
   formData.append('note', payload.note);
   formData.append('transaction_category', payload.transaction_category);
@@ -109,6 +148,10 @@ const buildCashFlowFormData = (payload: CashFlowPayload) => {
   }
   if (payload.payment_proof) {
     formData.append('payment_proof', payload.payment_proof);
+  }
+  if (payload.is_paid !== undefined && payload.is_paid !== null) {
+    const isPaidBool = payload.is_paid === true || String(payload.is_paid).toLowerCase() === 'true' || String(payload.is_paid) === '1';
+    formData.append('is_paid', isPaidBool ? 'true' : 'false');
   }
   return formData;
 };
@@ -157,4 +200,14 @@ export async function updateCashFlow(id: number | string, payload: CashFlowPaylo
 
 export async function deleteCashFlow(id: number | string) {
   await apiClient.delete(`${BASE_PATH}/${id}`);
+}
+
+export async function toggleCashFlowPaymentStatus(id: number | string, isPaid: boolean) {
+  const formData = new FormData();
+  formData.append('_method', 'PUT');
+  formData.append('is_paid', isPaid ? 'true' : 'false');
+
+  const response = await apiClient.post<CashFlowItemResponse>(`${BASE_PATH}/${id}`, formData);
+  const item = ensureSuccess(toSuccessPayload(response.data));
+  return normalizeCashFlow(item);
 }

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUsers, createUser, updateUser, deleteUser, fetchUsersOptions, type UserOption, activateUser, deactivateUser, assignRole } from '@/services/user.service';
+import { getUsers, createUser, updateUser, deleteUser, fetchUsersOptions, type UserOption, activateUser, deactivateUser, assignRole, revokeRole } from '@/services/user.service';
 import { CreateUserRequest, UpdateUserRequest, UserListParams } from '@/@types/user.types';
 
 // Strict Query Keys
@@ -78,6 +78,20 @@ export function useAssignRole() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, role }: { id: number | string; role: string }) => assignRole(id, role),
-    onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.list() }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: userKeys.list() });
+      qc.invalidateQueries({ queryKey: ['roles'] });
+    },
+  });
+}
+
+export function useRevokeRole() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, role }: { id: number | string; role: string }) => revokeRole(id, role),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: userKeys.list() });
+      qc.invalidateQueries({ queryKey: ['roles'] });
+    },
   });
 }

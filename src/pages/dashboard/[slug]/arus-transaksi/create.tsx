@@ -56,8 +56,8 @@ export default function CreateTransactionPage() {
                 </div>
 
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Tambahkan Transaksi</h1>
-                    <p className="text-muted-foreground">Masukkan detail transaksi operasional baru</p>
+                    <h1 className="text-2xl font-semibold text-slate-900">Tambahkan Transaksi</h1>
+                    <p className="text-sm text-muted-foreground">Masukkan detail transaksi operasional baru</p>
                 </div>
 
                 <div className="rounded-xl border bg-white p-6 md:p-8">

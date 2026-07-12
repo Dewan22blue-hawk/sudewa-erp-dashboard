@@ -46,3 +46,9 @@ next-env.d.ts
 
 # custom folders
 /skill/
+
+# docs
+/docs/
+
+# ignored files
+pembahasan_skripsi_erp_wajira.md

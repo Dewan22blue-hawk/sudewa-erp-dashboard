@@ -28,6 +28,8 @@ type UnitTransactionItemApiModel = {
   hpp_total_price?: number | string;
   dpp_total_price?: number | string;
   ppn_total_price?: number | string;
+  price_usd?: number | string;
+  price_per_unit_usd?: number | string;
 };
 
 export type UnitFormulaInput = {
@@ -111,6 +113,8 @@ const mapItem = (item: UnitTransactionItemApiModel): UnitTransactionItem => {
     hpp_total_price: hppTotal,
     dpp_total_price: dppTotal,
     ppn_total_price: ppnTotal,
+    price_usd: item.price_usd !== undefined ? toNumber(item.price_usd) : undefined,
+    price_per_unit_usd: item.price_per_unit_usd !== undefined ? toNumber(item.price_per_unit_usd) : undefined,
   };
 };
 
@@ -184,14 +188,14 @@ export const unitTransactionItemService = {
   // ======================
   async getItems(
     purchaseId: string,
-    params: PaginationParams = {}
+    params: PaginationParams & { type?: 'purchase' | 'sales' } = {}
   ): Promise<UnitTransactionItemListResponse> {
     const response = await apiClient.get<LaravelApiResponse<any>>(
       basePath,
       {
         params: {
           unit_transaction_id: purchaseId,
-          type: 'purchase',
+          type: params.type ?? 'purchase',
           page: params.page ?? 1,
           per_page: params.perPage ?? 50,
         },
@@ -224,7 +228,7 @@ export const unitTransactionItemService = {
       data: [],
       meta: {
         currentPage: 1,
-        perPage: 10,
+        perPage: 25,
         total: 0,
         lastPage: 1,
       },
@@ -247,6 +251,13 @@ export const unitTransactionItemService = {
       'unit_type_id',
       toIntegerString(payload.unit_type_id)
     );
+
+    if (payload.company_id) {
+      form.append('company_id', String(payload.company_id));
+    }
+    if (payload.type) {
+      form.append('type', payload.type);
+    }
 
     appendIfDefined(
       form,
@@ -279,6 +290,18 @@ export const unitTransactionItemService = {
       payload.other_fee,
       toDecimalString
     );
+    appendIfDefined(
+      form,
+      'price_usd',
+      payload.price_usd,
+      toDecimalString
+    );
+    appendIfDefined(
+      form,
+      'price_per_unit_usd',
+      payload.price_per_unit_usd,
+      toDecimalString
+    );
 
     const response = await apiClient.post<
       LaravelApiResponse<UnitTransactionItemApiModel>
@@ -296,15 +319,20 @@ async updateItem(
 ): Promise<UnitTransactionItem> {
   const params = new URLSearchParams();
 
-  if (payload.unit_transaction_id !== undefined) {
+  if (payload.unit_transaction_id !== undefined && String(payload.unit_transaction_id) !== 'null') {
     params.append('unit_transaction_id', String(payload.unit_transaction_id));
   }
 
-  if (payload.unit_type_id !== undefined) {
+  if (payload.unit_type_id !== undefined && String(payload.unit_type_id) !== 'null') {
     params.append('unit_type_id', String(payload.unit_type_id));
   }
 
-  if (payload.sparepart_id !== undefined && payload.sparepart_id !== null && String(payload.sparepart_id).length > 0) {
+  if (
+    payload.sparepart_id !== undefined &&
+    payload.sparepart_id !== null &&
+    String(payload.sparepart_id) !== 'null' &&
+    String(payload.sparepart_id).trim().length > 0
+  ) {
     params.append('sparepart_id', String(payload.sparepart_id));
   }
 
@@ -326,6 +354,14 @@ async updateItem(
 
   if (payload.other_fee !== undefined) {
     params.append('other_fee', Number(payload.other_fee).toFixed(2));
+  }
+
+  if (payload.price_usd !== undefined) {
+    params.append('price_usd', Number(payload.price_usd).toFixed(2));
+  }
+
+  if (payload.price_per_unit_usd !== undefined) {
+    params.append('price_per_unit_usd', Number(payload.price_per_unit_usd).toFixed(2));
   }
 
   const response = await apiClient.put(

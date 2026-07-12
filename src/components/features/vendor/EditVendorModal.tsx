@@ -20,18 +20,18 @@ export function EditVendorModal({ isOpen, onClose, onSave, initialData }: EditVe
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Edit Data Vendor</DialogTitle>
-                    <DialogDescription>
+            <DialogContent className="w-full max-w-md sm:max-w-[425px] max-h-[90vh] overflow-hidden flex flex-col rounded-2xl border-0 bg-white p-0 shadow-2xl">
+                <DialogHeader className="px-6 py-5 border-b shrink-0 text-left">
+                    <DialogTitle className="text-[18px] font-semibold text-[#171717]">Edit Data Vendor</DialogTitle>
+                    <DialogDescription className="text-[15px] text-[#71717A]">
                         Edit data vendor baru
                     </DialogDescription>
                 </DialogHeader>
-                
-                <EditVendorInnerForm 
-                    initialData={initialData} 
-                    onClose={onClose} 
-                    onSave={onSave} 
+
+                <EditVendorInnerForm
+                    initialData={initialData}
+                    onClose={onClose}
+                    onSave={onSave}
                 />
             </DialogContent>
         </Dialog>
@@ -59,55 +59,57 @@ function EditVendorInnerForm({ initialData, onClose, onSave }: InnerProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
-            <div className="space-y-2">
-                <Label htmlFor="edit-name" className="text-gray-900 font-medium">Nama Dealer</Label>
-                <Input
-                    id="edit-name"
-                    placeholder="Masukkan nama dealer"
-                    {...register('name', { required: 'Nama Vendor wajib diisi' })}
-                    className={errors.name ? 'border-red-500' : ''}
-                />
-                {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="edit-name" className="text-gray-900 font-medium">Nama Vendor</Label>
+                    <Input
+                        id="edit-name"
+                        placeholder="Masukkan nama vendor"
+                        {...register('name', { required: 'Nama Vendor wajib diisi' })}
+                        className={errors.name ? 'border-red-500' : ''}
+                    />
+                    {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="edit-address" className="text-gray-900 font-medium">Alamat</Label>
+                    <Textarea
+                        id="edit-address"
+                        placeholder="Masukkan alamat"
+                        rows={3}
+                        {...register('address', { required: 'Alamat wajib diisi' })}
+                        className={errors.address ? 'border-red-500 resize-none' : 'resize-none'}
+                    />
+                    {errors.address && <p className="text-red-500 text-xs">{errors.address.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="edit-picName" className="text-gray-900 font-medium">PIC</Label>
+                    <Input
+                        id="edit-picName"
+                        placeholder="Masukkan PIC"
+                        {...register('picName', { required: 'PIC wajib diisi' })}
+                        className={errors.picName ? 'border-red-500' : ''}
+                    />
+                    {errors.picName && <p className="text-red-500 text-xs">{errors.picName.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="edit-phone" className="text-gray-900 font-medium">PHONE</Label>
+                    <Input
+                        id="edit-phone"
+                        placeholder="Masukkan nomor handphone"
+                        {...register('phone', { required: 'Nomor Handphone wajib diisi' })}
+                        className={errors.phone ? 'border-red-500' : ''}
+                    />
+                    {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
+                </div>
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="edit-address" className="text-gray-900 font-medium">Alamat</Label>
-                <Textarea
-                    id="edit-address"
-                    placeholder="Masukkan alamat"
-                    rows={3}
-                    {...register('address', { required: 'Alamat wajib diisi' })}
-                    className={errors.address ? 'border-red-500 resize-none' : 'resize-none'}
-                />
-                {errors.address && <p className="text-red-500 text-xs">{errors.address.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="edit-picName" className="text-gray-900 font-medium">PIC</Label>
-                <Input
-                    id="edit-picName"
-                    placeholder="Masukkan PIC"
-                    {...register('picName', { required: 'PIC wajib diisi' })}
-                    className={errors.picName ? 'border-red-500' : ''}
-                />
-                {errors.picName && <p className="text-red-500 text-xs">{errors.picName.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="edit-phone" className="text-gray-900 font-medium">Handphone</Label>
-                <Input
-                    id="edit-phone"
-                    placeholder="Masukkan nomor handphone"
-                    {...register('phone', { required: 'Nomor Handphone wajib diisi' })}
-                    className={errors.phone ? 'border-red-500' : ''}
-                />
-                {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
-            </div>
-
-            <div className="flex flex-col space-y-2 pt-4">
-                <Button type="submit" className="w-full bg-[#1e3a5f] hover:bg-[#152e4d]">Simpan</Button>
-                <Button type="button" variant="outline" className="w-full" onClick={onClose}>Batal</Button>
+            <div className="shrink-0 flex gap-3 px-6 py-4 border-t bg-gray-50">
+                <Button type="button" variant="outline" className="flex-1 h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={onClose}>Batal</Button>
+                <Button type="submit" className="flex-1 h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]">Simpan</Button>
             </div>
         </form>
     );

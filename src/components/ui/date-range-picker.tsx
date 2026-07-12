@@ -13,17 +13,20 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { formatDateUI } from '@/lib/utils/date';
 
 interface DatePickerWithRangeProps {
     className?: string
     date?: DateRange | undefined
     onChange?: (date: DateRange | undefined) => void
+    placeholder?: string
 }
 
 export function DatePickerWithRange({
     className,
     date,
-    onChange
+    onChange,
+    placeholder = "Pilih rentang tanggal",
 }: DatePickerWithRangeProps) {
     return (
         <div className={cn("grid gap-2", className)}>
@@ -41,18 +44,18 @@ export function DatePickerWithRange({
                         {date?.from ? (
                             date.to ? (
                                 <>
-                                    {format(date.from, "LLL dd, y")} -{" "}
-                                    {format(date.to, "LLL dd, y")}
+                                    {formatDateUI(date.from)} -{" "}
+                                    {formatDateUI(date.to)}
                                 </>
                             ) : (
-                                format(date.from, "LLL dd, y")
+                                formatDateUI(date.from)
                             )
                         ) : (
-                            <span>Pick a date range</span>
+                            <span>{placeholder}</span>
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 shadow-lg rounded-md" align="start" sideOffset={8}>
                     <Calendar
                         initialFocus
                         mode="range"

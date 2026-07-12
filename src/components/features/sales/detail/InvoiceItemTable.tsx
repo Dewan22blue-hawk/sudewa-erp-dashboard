@@ -19,9 +19,8 @@ import {
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { InvoiceItem } from "./invoice.types"
-import { MoreVertical } from "lucide-react"
+import { MoreVertical, ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { useTableSort } from "@/hooks/useTableSort"
-import { SortableHeader } from "@/components/ui/sortable-header"
 import { formatCurrency } from "@/lib/utils/currency"
 
 /**
@@ -30,7 +29,7 @@ import { formatCurrency } from "@/lib/utils/currency"
 export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 10
+    const itemsPerPage = 25
 
     const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
         data: items,
@@ -96,6 +95,31 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
         }
     }
 
+    const renderSortHeader = (key: string, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
+        const isSorted = sortKey === key;
+        const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
+        const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
+        return (
+            <TableHead
+                onClick={() => handleSort(key as any)}
+                className={`px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap ${textAlignment}`}
+            >
+                <div className={`flex items-center gap-1 ${justifyClass}`}>
+                    <span>{label}</span>
+                    {isSorted ? (
+                        sortOrder === 'asc' ? (
+                            <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+                        ) : (
+                            <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+                        )
+                    ) : (
+                        <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+                    )}
+                </div>
+            </TableHead>
+        );
+    };
+
     return (
         <Card className="rounded-xl" style={{ border: '1px solid #E5E5E5' }}>
             {/* Card Header */}
@@ -111,78 +135,58 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
             {/* Table */}
             <CardContent className="p-0">
                 <Table>
-                    <TableHeader>
-                        <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        <TableRow>
                             {/* Bulk Select Checkbox */}
-                            <TableHead className="w-12">
+                            <TableHead className="w-12 px-4 py-4 text-center">
                                 <Checkbox
                                     checked={allCurrentPageSelected}
                                     onCheckedChange={handleBulkSelect}
                                 />
                             </TableHead>
-                            <TableHead className="font-semibold text-center">No</TableHead>
-                            <TableHead className="p-0 font-semibold">
-                                <SortableHeader title="TIPE UNIT" sortKey="unitType" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-center">
-                                <SortableHeader title="QTY" sortKey="qty" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-center text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="HARGA JUAL" sortKey="hargaJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="BIAYA BBN" sortKey="biayaBbn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="BIAYA EKSPEDISI" sortKey="biayaEkspedisi" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="BIAYA LAIN" sortKey="biayaLain" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="HPP" sortKey="hpp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="DPP" sortKey="dpp" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="PPN" sortKey="ppn" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="p-0 font-semibold text-right">
-                                <SortableHeader title="JUMLAH" sortKey="jumlah" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-                            </TableHead>
-                            <TableHead className="font-semibold text-center">ACTION</TableHead>
+                            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[60px]">No</TableHead>
+                            {renderSortHeader('unitType', 'TIPE UNIT', 'left')}
+                            {renderSortHeader('qty', 'QTY', 'center')}
+                            {renderSortHeader('hargaJual', 'HARGA JUAL', 'center')}
+                            {renderSortHeader('biayaBbn', 'BIAYA BBN', 'center')}
+                            {renderSortHeader('biayaEkspedisi', 'BIAYA EKSPEDISI', 'center')}
+                            {renderSortHeader('biayaLain', 'BIAYA LAIN', 'center')}
+                            {renderSortHeader('hpp', 'HPP', 'center')}
+                            {renderSortHeader('dpp', 'DPP', 'center')}
+                            {renderSortHeader('ppn', 'PPN', 'center')}
+                            {renderSortHeader('jumlah', 'JUMLAH', 'center')}
+                            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
                         {currentData.map((item, i) => (
-                            <TableRow key={item.id} className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 hover:bg-accent/50">
+                            <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                                 {/* Checkbox */}
-                                <TableCell className="w-12 transition-all duration-200 group-hover:translate-x-0.5">
+                                <TableCell className="px-4 py-4 text-center">
                                     <Checkbox
                                         checked={selectedIds.has(item.id)}
                                         onCheckedChange={() => handleToggle(item.id)}
                                     />
                                 </TableCell>
 
-                                <TableCell className="font-medium text-center transition-all duration-200">{startIndex + i + 1}</TableCell>
-                                <TableCell className="font-medium transition-all duration-200">{item.unitType}</TableCell>
-                                <TableCell className="text-center transition-all duration-200">{item.qty}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.hargaJual)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.biayaBbn)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.biayaEkspedisi)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.biayaLain)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.hpp)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.dpp)}</TableCell>
-                                <TableCell className="text-right transition-all duration-200">{formatCurrency(item.ppn)}</TableCell>
-                                <TableCell className="text-right font-semibold transition-all duration-200">{formatCurrency(item.jumlah)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-500">{startIndex + i + 1}</TableCell>
+                                <TableCell className="text-left px-4 py-4 text-sm font-medium text-slate-900">{item.unitType}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{item.qty}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.hargaJual)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.biayaBbn)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.biayaEkspedisi)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.biayaLain)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.hpp)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.dpp)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm text-slate-700">{formatCurrency(item.ppn)}</TableCell>
+                                <TableCell className="text-center px-4 py-4 text-sm font-semibold text-slate-900">{formatCurrency(item.jumlah)}</TableCell>
 
                                 {/* Action Dropdown */}
-                                <TableCell className="text-center transition-all duration-200">
+                                <TableCell className="px-4 py-4 text-center">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="rounded-md p-1 hover:bg-muted transition-colors duration-200 hover:scale-110 active:scale-95 transform">
+                                            <button className="rounded-md p-1 hover:bg-slate-100 transition-colors duration-200 hover:scale-110 active:scale-95 transform">
                                                 <MoreVertical className="h-4 w-4 text-muted-foreground" />
                                             </button>
                                         </DropdownMenuTrigger>

@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -22,9 +23,44 @@ interface Props {
  */
 export function SalesTable({ onAdd }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
-  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
+  const [localSearch, setLocalSearch] = useState('');
+  const [mainTab, setMainTab] = useState('common');
+  const [subTab, setSubTab] = useState('all');
+
+  const TABS = [
+    { id: 'common', label: 'Common' },
+    { id: 'inbound', label: 'Inbound' },
+    { id: 'outbound', label: 'Outbound' },
+  ];
+
+  const SUBTABS = {
+    common: [
+      { id: 'all', label: 'All' },
+      { id: 'draft', label: 'Draft' },
+      { id: 'cancel', label: 'Cancel' },
+      { id: 'rejected', label: 'Rejected' },
+      { id: 'prepare', label: 'Prepare' },
+    ],
+    inbound: [
+      { id: 'all', label: 'All' },
+      { id: 'inbound_purcase_order', label: 'Purchase Order' },
+      { id: 'inbound_incoming_goods', label: 'Incoming Goods' },
+      { id: 'inbound_receipt', label: 'Receipt' },
+      { id: 'inbound_return', label: 'Return' },
+    ],
+    outbound: [
+      { id: 'all', label: 'All' },
+      { id: 'outbound_reserved', label: 'Reserved' },
+      { id: 'outbound_in_transit', label: 'In Transit' },
+      { id: 'outbound_delivered', label: 'Delivered' },
+      { id: 'outbound_return', label: 'Return' },
+    ]
+  };
+
+  const activeStatus = subTab === 'all' ? undefined : subTab;
+  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm, status: activeStatus });
   const deleteMutation = useDeleteSales();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const salesData = data?.data ?? [];
@@ -39,17 +75,27 @@ export function SalesTable({ onAdd }: Props) {
   const safeTotalPages = Math.max(1, totalPages);
   const activePage = meta?.currentPage ?? currentPage;
   const activePerPage = meta?.perPage ?? itemsPerPage;
-  const startIndex = (activePage - 1) * activePerPage;
-  const endIndex = startIndex + sortedData.length;
+  const totalEntries = meta?.total ?? sortedData.length;
+  const startIndex = totalEntries === 0 ? 0 : (activePage - 1) * activePerPage + 1;
+  const endIndex = startIndex === 0 ? 0 : startIndex + sortedData.length - 1;
   const currentData = sortedData;
   const isDataEmpty = salesData.length === 0;
   const isSearchEmpty = !isLoading && !isDataEmpty && currentData.length === 0;
 
   // Reset page when search changes
   const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setCurrentPage(1);
+    setLocalSearch(term);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== localSearch) {
+        setSearchTerm(localSearch);
+        setCurrentPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchTerm]);
 
   const handleItemsPerPageChange = (val: string) => {
     setItemsPerPage(Number(val));
@@ -104,105 +150,170 @@ export function SalesTable({ onAdd }: Props) {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPageButtons = () => {
+    const buttons = [] as number[];
+    if (safeTotalPages <= 5) {
+      for (let i = 1; i <= safeTotalPages; i++) buttons.push(i);
+    } else if (activePage <= 3) {
+      buttons.push(1, 2, 3, 4, 5);
+    } else if (activePage >= safeTotalPages - 2) {
+      for (let i = safeTotalPages - 4; i <= safeTotalPages; i++) buttons.push(i);
+    } else {
+      buttons.push(activePage - 2, activePage - 1, activePage, activePage + 1, activePage + 2);
+    }
+
+    return buttons.map((pageNumber) => (
+      <Button
+        key={pageNumber}
+        variant="ghost"
+        size="sm"
+        className={cn(
+          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          pageNumber === activePage
+            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+        )}
+        onClick={() => handlePageChange(pageNumber)}
+      >
+        {pageNumber}
+      </Button>
+    ));
+  };
+
+  const renderSortHeader = (key: string, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
+    const isSorted = sortKey === key;
+    const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
+    const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
+    return (
+      <TableHead
+        onClick={() => handleSort(key as any)}
+        className={`px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap ${textAlignment}`}
+      >
+        <div className={`flex items-center gap-1 ${justifyClass}`}>
+          <span>{label}</span>
+          {isSorted ? (
+            sortOrder === 'asc' ? (
+              <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+            ) : (
+              <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+            )
+          ) : (
+            <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+          )}
+        </div>
+      </TableHead>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-72">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </span>
-            <input
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* LEFT CONTROLS */}
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* 1. Search */}
+          <div className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <Input
               type="text"
-              placeholder="Search here"
-              value={searchTerm}
+              placeholder="Search No. Rangka / No. Mesin..."
+              value={localSearch}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-white"
+              className="pl-8 bg-white h-9 border-slate-300"
             />
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <span>Show</span>
-            <Select value={String(itemsPerPage)} onValueChange={(val) => handleItemsPerPageChange(val)}>
-              <SelectTrigger className="h-9 w-[70px] bg-white">
-                <SelectValue placeholder="10" />
+          {/* 2. Main Status Dropdown */}
+          <Select value={mainTab} onValueChange={(val) => { setMainTab(val); setSubTab('all'); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {TABS.map((tab) => (
+                <SelectItem key={tab.id} value={tab.id}>
+                  {tab.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* 3. Sub Status Dropdown */}
+          <Select value={subTab} onValueChange={(val) => { setSubTab(val); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
+              <SelectValue placeholder="Detail Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {SUBTABS[mainTab as keyof typeof SUBTABS].map((sub) => (
+                <SelectItem key={sub.id} value={sub.id}>
+                  {sub.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* 4. Show + Page limit */}
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <span className="text-sm font-medium text-slate-700">Show</span>
+            <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
+              <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
                 <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
-            <span>Page</span>
+            <span className="text-sm font-medium text-slate-700">Page</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {onAdd && (
-            <Button size="sm" onClick={onAdd} className="bg-[#1e293b] hover:bg-[#0f172a] text-white">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        {/* RIGHT CONTROLS */}
+        {onAdd && (
+          <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
+          </Button>
+        )}
       </div>
 
-      <div className="rounded-sm border bg-card shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
-          <TableHeader>
-            <TableRow style={{ backgroundColor: '#F9FAFB' }} className="animate-in fade-in-0 duration-500">
-              <TableHead className="w-12">
-                <Checkbox checked={allCurrentPageSelected && currentPageIds.length > 0} onCheckedChange={handleBulkSelect} />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-foreground">
-                <SortableHeader title="KODE JUAL" sortKey="kodeJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-foreground">
-                <SortableHeader title="TANGGAL" sortKey="tanggal" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-foreground">
-                <SortableHeader title="CUSTOMER" sortKey="customer" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL BIAYA" sortKey="biaya" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL DPP" sortKey="totalDPP" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL PPN" sortKey="totalPPN" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="TOTAL JUAL" sortKey="totalJual" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="p-0 font-semibold text-right text-foreground">
-                <SortableHeader title="KURANG BAYAR" sortKey="kurangBayar" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-end text-foreground px-4" />
-              </TableHead>
-              <TableHead className="font-semibold text-right text-foreground">ACTION</TableHead>
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow>
+              {renderSortHeader('kodeJual', 'KODE JUAL', 'left')}
+              {renderSortHeader('tanggal', 'TANGGAL', 'center')}
+              {renderSortHeader('customer', 'CUSTOMER', 'left')}
+              {renderSortHeader('biayaEkspedisi', 'BIAYA EKSPEDISI', 'center')}
+              {renderSortHeader('biaya', 'TOTAL BIAYA', 'center')}
+              {renderSortHeader('totalDPP', 'TOTAL DPP', 'center')}
+              {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
+              {renderSortHeader('totalJual', 'TOTAL JUAL', 'center')}
+              {renderSortHeader('kurangBayar', 'KURANG BAYAR', 'center')}
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
               <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
               <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>
               </TableRow>
@@ -213,59 +324,37 @@ export function SalesTable({ onAdd }: Props) {
             )}
           </TableBody>
         </Table>
+        {isLoading && <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-sm text-muted-foreground">Memuat data...</div>}
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {sortedData.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, meta?.total ?? sortedData.length)} of {meta?.total ?? sortedData.length} entries
+      {currentData.length > 0 && (
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+          <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={activePage <= 1}
+              onClick={() => handlePageChange(activePage - 1)}
+            >
+              Previous
+            </Button>
+            {renderPageButtons()}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={activePage >= safeTotalPages}
+              onClick={() => handlePageChange(activePage + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={activePage === 1}>
-            Previous
-          </Button>
-
-          {/* Page numbers */}
-          {Array.from({ length: Math.min(5, safeTotalPages) }, (_, i) => {
-            let pageNum: number;
-
-            if (safeTotalPages <= 5) {
-              pageNum = i + 1;
-            } else if (activePage <= 3) {
-              pageNum = i + 1;
-            } else if (activePage >= safeTotalPages - 2) {
-              pageNum = safeTotalPages - 4 + i;
-            } else {
-              pageNum = activePage - 2 + i;
-            }
-
-            return (
-              <Button key={pageNum} variant={activePage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className="w-10">
-                {pageNum}
-              </Button>
-            );
-          })}
-
-          {safeTotalPages > 5 && (
-            <>
-              <span className="text-muted-foreground">...</span>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(safeTotalPages)} className="w-10">
-                {safeTotalPages}
-              </Button>
-            </>
-          )}
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((prev) => Math.min(safeTotalPages, prev + 1))}
-            disabled={activePage >= safeTotalPages}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

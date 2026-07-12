@@ -56,6 +56,7 @@ interface CashApiModel {
   code?: string;
   description?: string;
   type?: 'cash' | 'bank';
+  amount?: number | string;
   created_at?: string;
   updated_at?: string;
 }
@@ -198,6 +199,7 @@ const mapCash = (payload?: CashApiModel | null) =>
         code: payload.code ?? '',
         description: payload.description ?? '',
         type: payload.type ?? 'cash',
+        amount: payload.amount ?? 0,
         companyId: payload.company_id ?? null,
         createdAt: payload.created_at,
         updatedAt: payload.updated_at,

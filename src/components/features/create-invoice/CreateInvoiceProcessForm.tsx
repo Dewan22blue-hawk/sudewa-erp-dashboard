@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronLeft, Printer } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
 import type { CreateInvoiceDetailRow, CreateInvoiceProcessValues } from '@/@types/create-invoice.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { formatDisplayDate, formatMoney } from './create-invoice.utils';
+import { formatDisplayDate, formatMoney, formatInvoiceMoney } from './create-invoice.utils';
 
 interface Props {
   title: string;
@@ -45,31 +45,37 @@ export function CreateInvoiceProcessForm({
   onToggleAllExpeditions,
   isSubmitting = false,
 }: Props) {
+  const isPrintedInvoice = Boolean(statusLabel?.includes('Sudah'));
   const totalInvoice = rows.reduce((sum, row) => sum + row.invoiceExpedition, 0);
   const totalPpn = rows.reduce((sum, row) => sum + row.ppn, 0);
   const totalAmount = rows.reduce((sum, row) => sum + row.totalAmount, 0);
-  const selectableRows = rows.filter((row) => !row.isPrinted);
+  const selectableRows = rows.filter((row) => !row.isPrinted || isPrintedInvoice);
   const allSelectableChecked = selectableRows.length > 0 && selectableRows.every((row) => selectedExpeditionIds.includes(row.expeditionId));
   const partialSelectableChecked = selectableRows.some((row) => selectedExpeditionIds.includes(row.expeditionId)) && !allSelectableChecked;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-3">
-        <button type="button" onClick={onBack} className="rounded-md p-1 transition-colors hover:bg-slate-100">
-          <ChevronLeft className="h-5 w-5 text-slate-500" />
-        </button>
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onBack}
+          className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+        >
+          <ArrowLeft className="h-5 w-5 text-slate-700" />
+        </Button>
         <div>
-          <h1 className="text-[18px] font-semibold text-slate-900 md:text-[20px]">{title}</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">{title}</h1>
           <p className="mt-1 text-sm text-slate-500">
             {mode === 'bulk' ? `${selectedInvoiceCount} invoice dipilih untuk diproses` : 'Kelola informasi invoice dan expedisi'}
           </p>
         </div>
       </div>
 
-      <Card className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+      <Card className="rounded-xl border border-gray-200 bg-white p-6 shadow-none md:p-8">
         <div className="space-y-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <h2 className="text-[18px] font-semibold text-slate-900">Informasi Ekspedisi</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Informasi Ekspedisi</h2>
             {statusLabel ? (
               <Badge className={statusLabel.includes('Sudah') ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-red-400 bg-red-50 text-red-500'}>
                 {statusLabel}
@@ -90,7 +96,7 @@ export function CreateInvoiceProcessForm({
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Tanggal</Label>
-              <DatePicker value={values.date} onChange={(date) => onChange('date', date ? date.toISOString().slice(0, 10) : '')} placeholder="Pick a date" className="h-12 rounded-xl border-slate-200 bg-white" />
+              <DatePicker value={values.date} onChange={(date) => onChange('date', date ? date.toISOString().slice(0, 10) : '')} placeholder="Pilih tanggal" className="h-12 rounded-xl border-slate-200 bg-white" />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Perihal</Label>
@@ -121,10 +127,46 @@ export function CreateInvoiceProcessForm({
             <Textarea value={values.letterContent} onChange={(event) => onChange('letterContent', event.target.value)} placeholder="Masukkan isi surat invoice" className="min-h-[140px] rounded-xl border-slate-200" />
           </div>
 
-          <div className="overflow-hidden rounded-[20px] border border-slate-200">
+          <div className="flex items-center space-x-2 py-1">
+            <Checkbox
+              id="is_usd"
+              checked={values.isUsd ?? false}
+              onCheckedChange={(checked) => {
+                onChange('isUsd', Boolean(checked));
+              }}
+            />
+            <Label htmlFor="is_usd" className="text-sm font-medium cursor-pointer text-slate-700 select-none">
+              Transaksi USD
+            </Label>
+          </div>
+
+          {values.isUsd && (
+            <div className="grid gap-5 md:grid-cols-2 border border-amber-100 bg-amber-50/20 p-5 rounded-xl">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-amber-900">Kurs USD (1 USD = Rp ...)</Label>
+                <Input
+                  type="number"
+                  step="1"
+                  value={values.rateUsd ?? 16000}
+                  onChange={(event) => onChange('rateUsd', Number(event.target.value))}
+                  placeholder="Masukkan kurs USD"
+                  className="h-12 rounded-xl border-amber-200 bg-white focus-visible:ring-amber-500 text-slate-800"
+                />
+              </div>
+            </div>
+          )}
+
+          {values.isUsd && (
+            <div className="bg-amber-50/50 border border-amber-100 text-amber-900 rounded-xl p-4 text-xs font-semibold flex items-center justify-between">
+              <span>MATA UANG INVOICE: USD (UNITED STATES DOLLAR)</span>
+              <span>KURS: 1 USD = {formatInvoiceMoney(values.rateUsd ?? 16000, false)}</span>
+            </div>
+          )}
+
+          <div className="overflow-hidden rounded-xl border border-gray-200">
             <div className="max-h-[460px] overflow-auto">
               <Table>
-                <TableHeader className="sticky top-0 z-10 bg-[#eef3f8]">
+                <TableHeader className="sticky top-0 z-10 bg-[#f8f9fa] border-b border-gray-200">
                   <TableRow className="border-slate-200">
                     <TableHead className="w-[54px] px-4 py-4 text-center">
                       <Checkbox
@@ -134,7 +176,7 @@ export function CreateInvoiceProcessForm({
                       />
                     </TableHead>
                     {['NO', 'TANGGAL', 'NO POLISI', 'TYPE', 'DRIVER', 'LOADING IN', 'TUJUAN KIRIM', 'LOADING OUT', 'NO SURAT DO', 'DESKRIPSI', 'QTY', 'INV EKSPEDISI', 'PPN', 'STATUS'].map((header) => (
-                      <TableHead key={header} className="whitespace-nowrap px-4 py-4 text-center text-sm font-semibold text-slate-900">
+                      <TableHead key={header} className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
                         {header}
                       </TableHead>
                     ))}
@@ -147,7 +189,7 @@ export function CreateInvoiceProcessForm({
                         <Checkbox
                           checked={selectedExpeditionIds.includes(row.expeditionId)}
                           onCheckedChange={(checked) => onToggleExpedition?.(row.expeditionId, Boolean(checked))}
-                          disabled={row.isPrinted}
+                          disabled={row.isPrinted && !isPrintedInvoice}
                         />
                       </TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{index + 1}</TableCell>
@@ -161,8 +203,8 @@ export function CreateInvoiceProcessForm({
                       <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{row.noSuratDo}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{row.description}</TableCell>
                       <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{row.qty}</TableCell>
-                      <TableCell className="px-4 py-3 text-right text-sm text-slate-700">{formatMoney(row.invoiceExpedition)}</TableCell>
-                      <TableCell className="px-4 py-3 text-right text-sm text-slate-700">{formatMoney(row.ppn)}</TableCell>
+                      <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{formatInvoiceMoney(row.invoiceExpedition, values.isUsd, values.rateUsd)}</TableCell>
+                      <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{formatInvoiceMoney(row.ppn, values.isUsd, values.rateUsd)}</TableCell>
                       <TableCell className="px-4 py-3 text-center">
                         <Badge variant="outline" className={row.isPrinted ? 'rounded-full border-emerald-300 bg-emerald-50 text-emerald-700' : 'rounded-full border-slate-300 bg-white text-slate-700'}>
                           {row.isPrinted ? 'Sudah di Print' : row.status}
@@ -174,9 +216,9 @@ export function CreateInvoiceProcessForm({
                     <TableCell colSpan={12} className="px-4 py-4 text-center text-[16px] font-semibold text-slate-900">
                       PAYMENT DITRANSFER KE REKENING PT XXXXX
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-right text-sm font-semibold text-slate-900">{formatMoney(totalInvoice)}</TableCell>
-                    <TableCell className="px-4 py-4 text-right text-sm font-semibold text-slate-900">{formatMoney(totalPpn)}</TableCell>
-                    <TableCell className="px-4 py-4 text-right text-sm font-semibold text-slate-900">{formatMoney(totalAmount)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{formatInvoiceMoney(totalInvoice, values.isUsd, values.rateUsd)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{formatInvoiceMoney(totalPpn, values.isUsd, values.rateUsd)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{formatInvoiceMoney(totalAmount, values.isUsd, values.rateUsd)}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -189,7 +231,7 @@ export function CreateInvoiceProcessForm({
         <Button type="button" variant="ghost" onClick={onCancel} className="text-base text-slate-700 hover:bg-transparent hover:text-slate-900">
           Batal
         </Button>
-        <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="h-12 rounded-xl bg-[#1f4163] px-6 text-base font-medium hover:bg-[#183552]">
+        <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="h-10 rounded-xl bg-[#1e3a5f] px-6 text-sm font-semibold text-white hover:bg-[#152e4d]">
           <Printer className="mr-2 h-4 w-4" />
           {isSubmitting ? 'Memproses...' : 'Print Invoice'}
         </Button>

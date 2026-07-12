@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Asset } from '@/@types/asset.types';
-import { format } from 'date-fns';
+import { formatDateUI } from '@/lib/utils/date';
 
 interface AssetTableProps {
     assets: Asset[];
@@ -52,10 +52,14 @@ export function AssetTable({
             return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
                     key={p}
-                    variant={p === page ? "outline" : "ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={() => onPageChange(p)}
-                    className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                    className={
+                        p === page
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                    }
                 >
                     {p}
                 </Button>
@@ -82,11 +86,17 @@ export function AssetTable({
         return pages.map((p, idx) => (
             <Button
                 key={idx}
-                variant={p === page ? "outline" : "ghost"}
+                variant="ghost"
                 size="sm"
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
-                className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                className={
+                    p === page
+                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                        : p === '...'
+                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                }
             >
                 {p}
             </Button>
@@ -104,10 +114,10 @@ export function AssetTable({
 
     const formatAssetType = (type: string) => {
         const types: Record<string, string> = {
-            inventory: 'Inventory',
-            vehicles: 'Vehicles',
-            buildings: 'Buildings',
-            land: 'Land'
+            inventory: 'Inventaris Kantor',
+            vehicles: 'Kendaraan',
+            buildings: 'Bangunan',
+            land: 'Tanah'
         };
         return types[type] || type;
     };
@@ -126,20 +136,19 @@ export function AssetTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
-                            <SelectTrigger className="w-[80px] bg-white">
-                                <SelectValue placeholder="100" />
+                            <SelectTrigger className="w-[70px] bg-white">
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
                                 <SelectItem value="25">25</SelectItem>
                                 <SelectItem value="50">50</SelectItem>
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
@@ -151,7 +160,7 @@ export function AssetTable({
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
-                            <Download className="h-4 w-4 mr-2" />
+                            <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
@@ -168,58 +177,58 @@ export function AssetTable({
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white">
+            <Card className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-none">
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 w-12">NO</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">KODE ASET</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">TGL BELI</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">NAMA BARANG</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">TIPE ASET</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">SERIAL NUMBER</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">HARGA BELI</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">ACTION</TableHead>
+                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">NO</TableHead>
+                                <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">KODE ASET</TableHead>
+                                <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">TIPE ASET</TableHead>
+                                <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">SERIAL NUMBER</TableHead>
+                                <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">NAMA BARANG</TableHead>
+                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap">TGL BELI</TableHead>
+                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
+                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {assets.length > 0 ? (
                                 assets.map((item, index) => (
-                                    <TableRow key={item.uuid} className="hover:bg-gray-50/50">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-500">
+                                    <TableRow key={item.uuid} className="border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
+                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
                                             {(page - 1) * perPage + index + 1}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium uppercase">
+                                        <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">
                                             {item.code || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                            {item.purchase_date ? format(new Date(item.purchase_date), 'dd/MM/yyyy') : '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-900">
-                                            {item.name || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                                             {formatAssetType(item.type)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase">
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">
                                             {item.serial_number || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                                            {item.name || '-'}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">
+                                            {formatDateUI(item.purchase_date)}
+                                        </TableCell>
+                                        <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">
                                             {formatCurrency(item.price)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500">
+                                                        <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer text-gray-700">
+                                                <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                                                    <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-slate-700">
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600 cursor-pointer focus:text-red-600">
+                                                    <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600">
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -229,7 +238,7 @@ export function AssetTable({
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="h-32 text-center text-gray-500">
+                                    <TableCell colSpan={8} className="h-32 text-center text-slate-500">
                                         Tidak ada data aset ditemukan
                                     </TableCell>
                                 </TableRow>
@@ -239,19 +248,19 @@ export function AssetTable({
                 </div>
             </Card>
 
-            <div className="flex items-center justify-between px-2 pt-2">
-                <div className="text-sm text-gray-500">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+                <div>
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Previous
                         </Button>
@@ -263,7 +272,7 @@ export function AssetTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Next
                         </Button>

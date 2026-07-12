@@ -1,19 +1,31 @@
+import { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import TransactionDetailInlineTable from '@/components/features/kas-harian/TransactionDetailInlineTable';
-import { useAccount } from '@/hooks/useAccount';
+import { ArrowLeft, Loader2, Tag, Upload, Info } from 'lucide-react';
+import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import FinanceBillingTable from '@/components/features/kas-harian/FinanceBillingTable';
+import TransactionCategoryModal from '@/components/features/kas-harian/TransactionCategoryModal';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { useKas } from '@/hooks/useKas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useFinanceBillingDetail } from '@/hooks/useFinanceBilling';
-import { useKasHarianDetail } from '@/hooks/useKasHarian';
-import { formatCurrency } from '@/lib/utils/currency';
+import { useKasHarianDetail, useUpdateKasHarian } from '@/hooks/useKasHarian';
+import TogglePaymentStatusDialog from '@/components/features/kas-harian/TogglePaymentStatusDialog';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { cn } from '@/lib/utils';
 
 const LIVE_UPDATE_INTERVAL = 5000;
+
+const TRANSACTION_CATEGORY_MAP: Record<string, string> = {
+  general: 'Umum (General)',
+  operational: 'Operasional (Operational)',
+  director_receivable: 'Piutang Direktur (Director Receivable)',
+  shareholder_receivable: 'Piutang Pemegang Saham (Shareholder Receivable)',
+  receivable: 'Piutang Usaha (Receivable)',
+  inventory: 'Persediaan (Inventory)',
+};
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -35,55 +47,102 @@ export default function KasHarianDetailPage() {
   const { slug, id: rawId } = router.query;
   const cashFlowId = typeof rawId === 'string' ? Number(rawId) : undefined;
 
+  const [isToggleOpen, setIsToggleOpen] = useState(false);
+  const [targetStatus, setTargetStatus] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const cashFlowQuery = useKasHarianDetail(cashFlowId, {
     enabled: typeof cashFlowId === 'number' && Number.isFinite(cashFlowId),
-    refetchInterval: LIVE_UPDATE_INTERVAL,
+    refetchInterval: false,
   });
 
   const cashFlowDetail = cashFlowQuery.data;
-  const financeBillingId = cashFlowDetail?.finance_billing?.id;
-  const accountId = cashFlowDetail?.account_id ?? null;
-  const cashId = cashFlowDetail?.cash_id ?? null;
   const companyId = cashFlowDetail?.company_id ?? 0;
+  const financeBillings = useMemo(() => cashFlowDetail?.finance_billings ?? [], [cashFlowDetail?.finance_billings]);
+  const hasBillings = financeBillings.length > 0;
 
-  const accountQuery = useAccount(accountId && accountId > 0 ? accountId : undefined);
-  const cashQuery = useKas(companyId > 0 ? companyId : undefined);
+  const updateMutation = useUpdateKasHarian();
+  const [transactionNote, setTransactionNote] = useState('');
 
-  const financeBillingQuery = useFinanceBillingDetail(financeBillingId, {
-    enabled: typeof financeBillingId === 'number' && Number.isFinite(financeBillingId),
-    refetchInterval: typeof financeBillingId === 'number' ? LIVE_UPDATE_INTERVAL : false,
-  });
+  const isLoading = cashFlowQuery.isLoading || router.isFallback;
+  const errorMessage = cashFlowQuery.error instanceof Error ? cashFlowQuery.error.message : null;
 
-  const financeBillingDetail = financeBillingQuery.data;
-  const isBillingFlow = Boolean(financeBillingId);
-  const isLoading = cashFlowQuery.isLoading || (isBillingFlow && financeBillingQuery.isLoading) || router.isFallback;
-  const errorMessage =
-    cashFlowQuery.error instanceof Error
-      ? cashFlowQuery.error.message
-      : financeBillingQuery.error instanceof Error
-        ? financeBillingQuery.error.message
-        : null;
+  const handleUploadProof = async (file: File) => {
+    if (!cashFlowDetail) return;
+    setIsUploading(true);
 
-  const totalNominal = Number(cashFlowDetail?.finance_billing?.grand_total || 0) || Number(cashFlowDetail?.debet || 0) + Number(cashFlowDetail?.credit || 0);
-  const totalRincian = Number(financeBillingDetail?.total_paid || 0) || totalNominal;
+    try {
+      await updateMutation.mutateAsync({
+        id: cashFlowDetail.id,
+        payload: {
+          company_id: companyId,
+          date: cashFlowDetail.date.slice(0, 10),
+          note: transactionNote.trim() || cashFlowDetail.note || '',
+          debet: cashFlowDetail.debet,
+          credit: cashFlowDetail.credit,
+          transaction_category: cashFlowDetail.transaction_category || 'general',
+          payment_proof: file,
+        },
+      });
+      toast.success('Bukti pembayaran utama berhasil disimpan');
+      setSelectedFile(null);
+      void cashFlowQuery.refetch();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Gagal menyimpan bukti pembayaran utama');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const grandTotal = Number(cashFlowDetail?.grand_total || cashFlowDetail?.unit_transaction_billing?.grand_total || 0);
+  const totalPaid = useMemo(
+    () => financeBillings.reduce((sum, fb) => sum + Number(fb.amount || 0), 0),
+    [financeBillings],
+  );
+  const remainingPayment = Number(cashFlowDetail?.remaining_payment ?? Math.max(0, grandTotal - totalPaid));
   const proofUrl = buildProofUrl(cashFlowDetail?.payment_proof);
-  const fallbackCash = (cashQuery.data?.data ?? []).find((item) => Number(item.id) === Number(cashId));
-  const accountValue = cashFlowDetail?.account
-    ? `${cashFlowDetail.account.code ?? '-'} - ${cashFlowDetail.account.name ?? '-'}`
-    : accountQuery.data
-      ? `${accountQuery.data.code ?? '-'} - ${accountQuery.data.name ?? '-'}`
-      : '-';
-  const cashValue =
-    cashFlowDetail?.cash && (cashFlowDetail.cash.code !== '-' || cashFlowDetail.cash.description !== '-')
-      ? `${cashFlowDetail.cash.code ?? '-'} - ${cashFlowDetail.cash.description ?? '-'}`
-      : fallbackCash
-        ? `${fallbackCash.code ?? '-'} - ${fallbackCash.description ?? '-'}`
-        : '-';
+
+  useEffect(() => {
+    if (cashFlowDetail) {
+      setTransactionNote(cashFlowDetail.note || '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cashFlowDetail?.id]);
+
+  const handleSaveData = async () => {
+    if (!cashFlowDetail) return;
+
+    if (!transactionNote || transactionNote.trim().length < 3) {
+      toast.error('Catatan transaksi minimal 3 karakter');
+      return;
+    }
+
+    try {
+      await updateMutation.mutateAsync({
+        id: cashFlowDetail.id,
+        payload: {
+          company_id: companyId,
+          date: cashFlowDetail.date.slice(0, 10),
+          note: transactionNote.trim(),
+          debet: cashFlowDetail.debet,
+          credit: cashFlowDetail.credit,
+          transaction_category: cashFlowDetail.transaction_category || 'general',
+        },
+      });
+      toast.success('Data transaksi berhasil disimpan');
+      void cashFlowQuery.refetch();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) || 'Gagal menyimpan data transaksi');
+    }
+  };
 
   return (
     <DashboardLayout>
       <Head>
-        <title>Detail Transaksi Kas Harian - Wajira Dashboard</title>
+        <title>Detail & Pembayaran Kas Harian - Wajira Dashboard</title>
       </Head>
 
       {isLoading ? (
@@ -100,117 +159,254 @@ export default function KasHarianDetailPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Link href={typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard'} className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800">
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </Link>
-            <div>
-              <h1 className="text-[36px] font-semibold tracking-tight text-slate-950">{isBillingFlow ? 'Detail Pembayaran' : 'Detail Transaksi'}</h1>
-              <p className="text-sm text-slate-500">{isBillingFlow ? 'Detail transaksi kas dan finance billing terkait' : 'Detail transaksi kas harian'}</p>
+          {/* HEADER */}
+          <div className="flex items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')}
+                className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+              >
+                <ArrowLeft className="h-5 w-5 text-slate-700" />
+              </Button>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-semibold">
+                    {hasBillings ? (remainingPayment > 0 ? 'Pembayaran Kas Harian' : 'Detail Pembayaran') : 'Detail Transaksi'}
+                  </h1>
+                  <span className={cn(
+                    "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
+                    cashFlowDetail.is_paid
+                      ? "bg-green-50 text-green-700 border border-green-200"
+                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  )}>
+                    {cashFlowDetail.is_paid ? 'Lunas' : 'Belum Lunas'}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">{hasBillings ? 'Detail transaksi kas dan pembayaran tagihan' : 'Detail transaksi kas harian'}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 rounded-xl px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50 transition-all"
+                onClick={() => {
+                  setTargetStatus(!cashFlowDetail.is_paid);
+                  setIsToggleOpen(true);
+                }}
+              >
+                {cashFlowDetail.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
+              </Button>
             </div>
           </div>
 
-          <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="grid gap-5 md:grid-cols-3">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Kode Transaksi</label>
-                <Input value={cashFlowDetail.code || '-'} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Tanggal</label>
-                <Input value={formatDate(cashFlowDetail.date)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Kategori</label>
-                <Input value={cashFlowDetail.transaction_category || '-'} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Kas</label>
-                <Input value={cashValue} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Akun</label>
-                <Input value={accountValue} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Company</label>
-                <Input value={cashFlowDetail.company?.name || '-'} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Debet</label>
-                <Input value={formatCurrency(Number(cashFlowDetail.debet || 0))} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Kredit</label>
-                <Input value={formatCurrency(Number(cashFlowDetail.credit || 0))} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Grand Total Billing</label>
-                <Input value={formatCurrency(totalNominal)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Dibuat</label>
-                <Input value={formatDate(cashFlowDetail.created_at)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Diupdate</label>
-                <Input value={formatDate(cashFlowDetail.updated_at)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-800">Total Rincian Pembayaran</label>
-                <Input value={formatCurrency(totalRincian)} readOnly className="h-12 rounded-xl border-slate-200 bg-white" />
-              </div>
-            </div>
-
-            <div className="mt-8 space-y-6">
-              {isBillingFlow ? (
-                <TransactionDetailInlineTable
-                  items={financeBillingDetail?.finance_billing_items ?? cashFlowDetail.finance_billing?.finance_billing_items ?? []}
-                  financeBillingId={financeBillingId}
-                  paymentAt={cashFlowDetail.date?.slice(0, 10)}
-                  disabled={false}
-                />
-              ) : null}
-
-              <div className="mt-6 space-y-2">
-                <label className="text-sm font-medium text-slate-800">Catatan</label>
-                <Textarea value={cashFlowDetail.note || ''} readOnly className="min-h-28 resize-none rounded-2xl border-slate-200 bg-white" />
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-slate-200 p-4">
-                <p className="text-sm font-medium text-slate-800">Bukti Pembayaran (opsional)</p>
-                <div className="mt-4 flex min-h-32 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-slate-500">
-                  {proofUrl ? (
-                    <a href={proofUrl} target="_blank" rel="noreferrer" className="font-medium text-[#18385b] underline">
-                      Lihat bukti pembayaran
-                    </a>
-                  ) : (
-                    <span>Belum ada bukti pembayaran yang diunggah.</span>
-                  )}
+          {/* 1. GENERAL INFO CARD */}
+          <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kode Transaksi</label>
+                <div className="flex items-center gap-1.5">
+                  {(cashFlowDetail.unit_transaction_billing_id || cashFlowDetail.goods_transaction_billing_id || cashFlowDetail.unit_transaction_billing || cashFlowDetail.goods_transaction_billing) ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button type="button" className="cursor-help text-[#18385b] hover:text-[#102843] transition-colors flex items-center">
+                            <Info className="h-4 w-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" align="start" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                          Data Arus Transaksi Kas Harian ini terhubung dengan data Administrasi
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : null}
+                  <p className="text-base font-bold text-slate-900">{cashFlowDetail.code || '-'}</p>
                 </div>
               </div>
-
-              <div className="mt-8 flex items-center justify-center gap-4">
-                <Button type="button" variant="ghost" onClick={() => router.back()}>
-                  Batal
-                </Button>
-                {isBillingFlow ? (
-                  <Button
-                    type="button"
-                    className="h-11 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843]"
-                    onClick={() => {
-                      if (typeof slug === 'string' && cashFlowId) {
-                        void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${cashFlowId}/bayar?source=billing`);
-                      }
-                    }}
-                  >
-                    Bayar
-                  </Button>
-                ) : null}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tanggal Transaksi</label>
+                <p className="text-base font-medium text-slate-800">{formatDate(cashFlowDetail.date)}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Company</label>
+                <p className="text-base font-medium text-slate-800">{cashFlowDetail.company?.name || '-'}</p>
+              </div>
+              <div className="space-y-1 pt-4 border-t border-slate-100 md:border-t-0 md:pt-0">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Debet (Uang Masuk)</label>
+                <p className="text-base font-semibold text-emerald-600">{currenciesFormat('idr', Number(cashFlowDetail.debet || 0))}</p>
+              </div>
+              <div className="space-y-1 pt-4 border-t border-slate-100 md:border-t-0 md:pt-0">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kredit (Uang Keluar)</label>
+                <p className="text-base font-semibold text-rose-600">{currenciesFormat('idr', Number(cashFlowDetail.credit || 0))}</p>
+              </div>
+              <div className="space-y-1 pt-4 border-t border-slate-100 md:border-t-0 md:pt-0">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Terbayar</label>
+                <p className="text-base font-medium text-slate-800">{currenciesFormat('idr', totalPaid)}</p>
+              </div>
+              <div className="space-y-1 pt-4 border-t border-slate-100 md:border-t-0 md:pt-0">
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sisa Tagihan</label>
+                <p className="text-base font-bold text-slate-900">{currenciesFormat('idr', remainingPayment)}</p>
               </div>
             </div>
+
+            {/* Divider */}
+            <div className="border-t border-slate-100 pt-6" />
+
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* TRANSACTION CATEGORY - Clickable */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-800">Kategori Transaksi</label>
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(true)}
+                  className={cn(
+                    'flex h-12 w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-left text-sm transition-all',
+                    'hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] cursor-pointer',
+                  )}
+                >
+                  <Tag className="h-4 w-4 text-slate-400 shrink-0" />
+                  <span className="flex-1 truncate font-medium text-slate-800">
+                    {TRANSACTION_CATEGORY_MAP[cashFlowDetail.transaction_category || ''] || cashFlowDetail.transaction_category || '-'}
+                  </span>
+                  <span className="text-xs font-semibold text-[#18385b] hover:underline">Ubah</span>
+                </button>
+              </div>
+
+              {/* CATATAN TRANSAKSI */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-slate-800">Catatan Transaksi</label>
+                <div className="flex gap-4 items-start">
+                  <Textarea
+                    value={transactionNote}
+                    onChange={(event) => setTransactionNote(event.target.value)}
+                    placeholder="Masukkan catatan transaksi..."
+                    className="min-h-12 h-12 py-3 resize-none rounded-xl border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors flex-1"
+                  />
+                  <Button
+                    type="button"
+                    className="h-12 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843] transition-colors shrink-0"
+                    disabled={updateMutation.isPending}
+                    onClick={() => void handleSaveData()}
+                  >
+                    {updateMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Menyimpan...
+                      </>
+                    ) : (
+                      'Simpan Catatan'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-slate-100 pt-6" />
+
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 text-xs text-slate-400">
+              <div>Dibuat: {formatDate(cashFlowDetail.created_at)}</div>
+              <div>Diupdate: {formatDate(cashFlowDetail.updated_at)}</div>
+            </div>
           </div>
+
+          {/* 3. STATUS LUNAS */}
+          {remainingPayment === 0 && financeBillings.length > 0 ? (
+            <div className="rounded-[26px] border border-emerald-200 bg-emerald-50/50 p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-base font-semibold text-emerald-800">Tagihan telah Lunas</span>
+              </div>
+              <p className="text-sm text-emerald-600 mt-1">Seluruh rincian pembayaran untuk transaksi ini telah diselesaikan.</p>
+            </div>
+          ) : null}
+
+          {/* 4. TABEL PEMBAYARAN (FinanceBillings) */}
+          <FinanceBillingTable
+            financeBillings={financeBillings}
+            cashFlowDetail={cashFlowDetail}
+            companyId={companyId}
+          />
+
+          {/* 5. BUKTI PEMBAYARAN UTAMA */}
+          <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-slate-900">Bukti Pembayaran Utama</h3>
+              {proofUrl && (
+                <a href={proofUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#18385b] hover:text-[#102843] underline transition-colors">
+                  Lihat bukti pembayaran utama saat ini
+                </a>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center hover:bg-slate-100/50 transition-colors">
+                <Upload className="mb-3 h-7 w-7 text-slate-500" />
+                <span className="text-sm font-medium text-slate-700">
+                  {selectedFile ? selectedFile.name : (proofUrl ? 'Klik untuk ganti bukti pembayaran' : 'Klik untuk upload bukti pembayaran')}
+                </span>
+                <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null;
+                    if (file) {
+                      setSelectedFile(file);
+                    }
+                  }}
+                />
+              </label>
+
+              {selectedFile && (
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 rounded-xl px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50"
+                    onClick={() => setSelectedFile(null)}
+                    disabled={isUploading}
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="button"
+                    className="h-10 rounded-xl bg-[#18385b] px-4 text-xs font-semibold text-white hover:bg-[#102843] transition-colors cursor-pointer"
+                    onClick={() => void handleUploadProof(selectedFile)}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Mengunggah...
+                      </>
+                    ) : (
+                      'Simpan Bukti Pembayaran'
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 6. FOOTER */}
+          <div className="flex justify-center pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 rounded-xl border-slate-200 bg-white px-8 text-slate-700 hover:bg-slate-50 transition-colors"
+              onClick={() => router.back()}
+            >
+              Kembali ke Daftar Kas Harian
+            </Button>
+          </div>
+
+          <TogglePaymentStatusDialog open={isToggleOpen} onOpenChange={setIsToggleOpen} data={cashFlowDetail} targetStatus={targetStatus} />
+          <TransactionCategoryModal open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} cashFlowDetail={cashFlowDetail} />
         </div>
       )}
     </DashboardLayout>

@@ -76,14 +76,16 @@ export function GoodsReceiptItemModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="rounded-[20px] border-none p-0 shadow-2xl sm:max-w-[398px]">
-        <div className="px-6 py-7">
+      <DialogContent showCloseButton={false} className="flex max-h-[90dvh] flex-col rounded-[20px] border-none p-0 shadow-2xl sm:max-w-[398px]">
+        <div className="shrink-0 px-6 pt-7">
           <DialogHeader className="space-y-1 text-left">
             <DialogTitle className="text-[18px] font-semibold text-slate-950">Input Penerimaan Material</DialogTitle>
             <p className="text-sm text-slate-500">Masukkan detail penerimaan material</p>
           </DialogHeader>
+        </div>
 
-          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
+        <div className="overflow-y-auto px-6 pb-7">
+          <form id="goods-receipt-item-form" onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">Kode Barang</Label>
               <Input value={selectedMaterial?.code ?? ''} readOnly placeholder="Masukkan kode barang" className="h-10 rounded-[10px] border-slate-200 px-3 text-[15px]" />
@@ -155,15 +157,16 @@ export function GoodsReceiptItemModal({
               <Textarea {...form.register('description')} rows={3} placeholder="Keterangan item" className="rounded-[10px] border-slate-200 px-3 py-2 text-[15px]" />
             </div>
 
-            <div className="space-y-3 pt-2">
-              <Button type="submit" disabled={isSubmitting} className="h-10 w-full rounded-[8px] bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
-                {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-10 w-full rounded-[8px] border-slate-300 text-[16px] font-medium">
-                Batal
-              </Button>
-            </div>
           </form>
+        </div>
+
+        <div className="shrink-0 space-y-3 border-t border-slate-100 px-6 pb-7 pt-4">
+          <Button type="submit" form="goods-receipt-item-form" disabled={isSubmitting} className="h-10 w-full rounded-[8px] bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
+            {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+          </Button>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-10 w-full rounded-[8px] border-slate-300 text-[16px] font-medium">
+            Batal
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

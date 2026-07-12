@@ -13,10 +13,12 @@ import {
     useCreateBillingHistory,
     useCreateBillingV2,
     useCurrentBilling,
+    useDeleteBillingHistory,
 } from '@/hooks/useUnitBilling';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
 
 const readApiError = (error: any): string => {
     const stringifyDetail = (value: unknown): string => {
@@ -118,6 +120,7 @@ export default function PurchasePaymentPage() {
         const { data: billingHistories = [], isLoading: historyLoading, refetch: refetchBillingHistory } = useBillingHistory(billingId || undefined, purchaseId);
         const createBilling = useCreateBillingV2();
         const createBillingHistory = useCreateBillingHistory();
+        const deleteBillingHistory = useDeleteBillingHistory();
         const [isSubmitting, setIsSubmitting] = useState(false);
         const [validationMessage, setValidationMessage] = useState<string | undefined>(undefined);
 
@@ -127,7 +130,7 @@ export default function PurchasePaymentPage() {
         const totalPpn = Number((purchase as any)?.unit_transaction_item_total_ppn ?? (purchase as any)?.transaction_ppn_total ?? (purchase as any)?.unit_transaction_ppn_total ?? 0);
 
         const historyPaid = (billingHistories ?? []).reduce(
-            (acc, item) => acc + Number(item.bca_payment_amount ?? 0) + Number(item.cash_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0),
+            (acc, item) => acc + getHistoryTotalIdrEquivalent(item),
             0,
         );
         const totalPaidFromBilling = Number(currentBilling?.total_paid ?? (Number(currentBilling?.bca_payment ?? 0) + Number(currentBilling?.cash_payment ?? 0) + Number(currentBilling?.bca_payment_2 ?? 0)));
@@ -143,6 +146,16 @@ export default function PurchasePaymentPage() {
                 return false;
             }
             return true;
+        };
+
+        const handleDeleteHistory = async (id: string | number) => {
+            try {
+                await deleteBillingHistory.mutateAsync(id);
+                toast.success('Histori pembayaran berhasil dihapus');
+                await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);
+            } catch (error: any) {
+                toast.error(readApiError(error));
+            }
         };
 
         const handleSubmitPayment = async (data: PaymentFormData) => {
@@ -168,56 +181,39 @@ export default function PurchasePaymentPage() {
                 if (validationResult.error) {
                     const message = readCheckRightAmountError(validationResult.error);
                     setValidationMessage(message);
-                    const invalidItemIds = getInvalidItemIds(validationResult.error);
-
-                    if (invalidItemIds.length > 0) {
-                        toast.error(message, {
-                            action: {
-                                label: 'Lengkapi Detail',
-                                onClick: () => {
-                                    router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${invalidItemIds[0]}`);
-                                },
-                            },
-                        });
-                        return;
-                    }
-
-                    throw new Error(message);
                 }
 
                 let billing = latestBilling ?? currentBilling;
-                if (!billing) {
-                    try {
-                        billing = await createBilling.mutateAsync({
-                            company_id: String(companyId),
-                            unit_transaction_id: purchaseId,
-                            is_paid: false,
-                        });
-                    } catch (err: any) {
-                        const statusCode = err?.statusCode ?? err?.response?.status;
-                        if (statusCode === 422) {
-                            const existing = await refetchCurrentBilling();
-                            billing = existing.data ?? null;
-                        } else {
-                            throw err;
-                        }
-                    }
-                }
-
                 if (!billing?.id) {
+                    const newBillingResponse = await createBilling.mutateAsync({
+                        company_id: String(companyId),
+                        unit_transaction_id: purchaseId,
+                    });
+
                     const createdSnapshot = await refetchCurrentBilling();
-                    billing = createdSnapshot.data ?? billing ?? null;
+                    billing = createdSnapshot.data ?? (newBillingResponse as any)?.data ?? newBillingResponse ?? null;
                 }
 
                 if (!billing?.id) {
-                    throw new Error('Billing utama tidak ditemukan.');
+                    throw new Error('Gagal membuat billing otomatis. Silakan coba lagi atau buat billing manual.');
+                }
+
+                // RE-CHECK against the actual billing generated by backend
+                const actualRemaining = billing?.is_paid
+                    ? 0
+                    : Math.max(0, Number(billing?.remaining_payment ?? billing?.grand_total ?? 0));
+
+                if (inputPayment > actualRemaining) {
+                    await Promise.all([refetchCurrentBilling(), refetchBillingHistory()]);
+                    toast.error(`Nominal pembayaran melebihi sisa tagihan aktual (Rp ${actualRemaining.toLocaleString('id-ID')}). Halaman telah diperbarui, silakan sesuaikan nominal.`);
+                    return;
                 }
 
                 await createBillingHistory.mutateAsync({
                     unit_transaction_billing_id: String(billing.id),
-                    bca_payment_amount: Number(data.bcaPayment ?? 0),
+                    bca_payment_amount: Number(data.bcaPayment2 ?? 0),
                     cash_payment_amount: Number(data.cashPayment ?? 0),
-                    bca_payment_usd_amount: Number(data.bcaPayment2 ?? 0),
+                    bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
                     payment_at: data.paymentDate,   
                     note: data.note,
                 });
@@ -287,8 +283,9 @@ export default function PurchasePaymentPage() {
                             billing={currentBilling ?? null}
                             histories={billingHistories}
                             onSubmitPayment={handleSubmitPayment}
+                            onDeleteHistory={handleDeleteHistory}
                             onCancel={() => router.back()}
-                            loading={isSubmitting || createBilling.isPending || createBillingHistory.isPending}
+                            loading={isSubmitting || createBillingHistory.isPending}
                             canSubmit={true}
                             validationMessage={validationMessage}
                         />

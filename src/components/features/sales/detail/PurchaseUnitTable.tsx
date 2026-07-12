@@ -1,24 +1,21 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable, PaginationState } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { MoreVertical, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { UnitItem } from '@/types/sales';
 import { toast } from 'sonner';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 
 interface Props {
   units: UnitItem[];
   salesId: string;
 }
 
-export function PurchaseUnitTable({ units, salesId }: Props) {
-  const router = useRouter();
+export function PurchaseUnitTable({ units }: Props) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -38,34 +35,55 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
     }
   };
 
+  const renderSortHeader = (key: keyof UnitItem, label: string) => {
+    const isSorted = sortKey === key;
+    return (
+      <div
+        onClick={() => handleSort(key as any)}
+        className="px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap text-left flex items-center gap-1 justify-start w-full"
+      >
+        <span>{label}</span>
+        {isSorted ? (
+          sortOrder === 'asc' ? (
+            <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+          ) : (
+            <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+        )}
+      </div>
+    );
+  };
+
   const columns: ColumnDef<UnitItem>[] = [
     {
       id: 'no',
-      header: () => <div className="text-center font-semibold text-foreground px-4">No</div>,
-      cell: ({ row }) => <div className="text-center px-4">{row.index + 1 + pagination.pageIndex * pagination.pageSize}</div>,
+      header: () => <div className="text-center font-semibold text-slate-500 uppercase px-4 py-4 text-xs">No</div>,
+      cell: ({ row }) => <div className="text-center px-4 py-4 text-sm text-slate-500">{row.index + 1 + pagination.pageIndex * pagination.pageSize}</div>,
     },
     {
       accessorKey: 'color',
-      header: () => <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
-      cell: ({ row }) => <div className="px-4">{row.original.color}</div>,
+      header: () => renderSortHeader('color', 'WARNA'),
+      cell: ({ row }) => <div className="px-4 py-4 text-sm text-slate-700 text-left">{row.original.color}</div>,
     },
     {
       accessorKey: 'engineNumber',
-      header: () => <SortableHeader title="NOMOR MESIN" sortKey="engineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
-      cell: ({ row }) => <div className="px-4">{row.original.engineNumber}</div>,
+      header: () => renderSortHeader('engineNumber', 'NOMOR MESIN'),
+      cell: ({ row }) => <div className="px-4 py-4 text-sm text-slate-700 text-left font-medium">{row.original.engineNumber}</div>,
     },
     {
       accessorKey: 'chassisNumber',
-      header: () => <SortableHeader title="NOMOR RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="w-full justify-start font-semibold text-foreground px-4" />,
-      cell: ({ row }) => <div className="px-4">{row.original.chassisNumber}</div>,
+      header: () => renderSortHeader('chassisNumber', 'NOMOR RANGKA'),
+      cell: ({ row }) => <div className="px-4 py-4 text-sm text-slate-700 text-left">{row.original.chassisNumber}</div>,
     },
     {
       id: 'actions',
-      header: () => <div className="text-right font-semibold text-foreground px-4">ACTION</div>,
+      header: () => <div className="text-center font-semibold text-slate-500 uppercase px-4 py-4 text-xs w-[80px]">ACTION</div>,
       cell: ({ row }) => {
         const unit = row.original;
         return (
-          <div className="flex justify-end">
+          <div className="flex justify-center px-4 py-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -129,9 +147,9 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
 
       <div className="rounded-md border bg-white">
         <Table>
-          <TableHeader className="bg-muted/50">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-b border-gray-200">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className="p-0">
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -143,9 +161,9 @@ export function PurchaseUnitTable({ units, salesId }: Props) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="hover:bg-muted/50">
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-4 p-0">
+                    <TableCell key={cell.id} className="p-0">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

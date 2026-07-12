@@ -5,8 +5,7 @@ import {
 } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { FinanceAsset } from '@/@types/finance-asset.types';
-import { formatCurrency } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { useMemo } from 'react';
 
 interface AssetReportTableProps {
@@ -58,7 +57,7 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
       accessorKey: 'price',
       header: () => <div className="text-right">HARGA BELI</div>,
       cell: (info) => (
-        <div className="text-right">{formatCurrency(info.getValue() as number)}</div>
+        <div className="text-right">{currenciesFormat('idr', info.getValue() as number)}</div>
       ),
       size: 150,
     },
@@ -74,7 +73,7 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
       accessorKey: 'depreciation_per_month',
       header: () => <div className="text-right">PENYUSUTAN/BULAN</div>,
       cell: (info) => (
-        <div className="text-right">{formatCurrency(info.getValue() as number)}</div>
+        <div className="text-right">{currenciesFormat('idr', info.getValue() as number)}</div>
       ),
       size: 180,
     },
@@ -82,7 +81,7 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
       accessorKey: 'final_value',
       header: () => <div className="text-right">NILAI AKHIR</div>,
       cell: (info) => (
-        <div className="text-right">{formatCurrency(info.getValue() as number)}</div>
+        <div className="text-right">{currenciesFormat('idr', info.getValue() as number)}</div>
       ),
       size: 150,
     }
@@ -110,9 +109,9 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </th>
                 ))}
               </tr>
@@ -121,7 +120,7 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
           <tbody className="divide-y divide-gray-100 bg-white print:bg-transparent print:divide-none">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <tr 
+                <tr
                   key={row.id}
                   className="hover:bg-[#fcfdfd] transition-colors duration-150 ease-in-out print:hover:bg-transparent print:border-b print:border-gray-800 print:break-inside-avoid"
                 >
@@ -140,8 +139,8 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
               ))
             ) : (
               <tr>
-                <td 
-                  colSpan={columns.length} 
+                <td
+                  colSpan={columns.length}
                   className="px-6 py-12 text-center text-gray-500 font-medium"
                 >
                   Tidak ada data yang ditemukan.

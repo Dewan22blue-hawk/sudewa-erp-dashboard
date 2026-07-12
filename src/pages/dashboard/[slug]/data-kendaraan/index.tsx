@@ -10,14 +10,14 @@ import type { Armada } from '@/@types/armada.types';
 import { useCompany } from '@/contexts/CompanyContext';
 import { VehicleDataTable } from '@/components/features/vehicle-data/VehicleDataTable';
 import { DeleteVehicleDataDialog } from '@/components/features/vehicle-data/DeleteVehicleDataDialog';
-import { AssignVehicleDataDialog } from '@/components/features/vehicle-data/AssignVehicleDataDialog';
 import {
   useVehicleDataList,
   useDeleteVehicleData,
   useImportVehicleData,
   useExportVehicleData,
+  useVendorLookup,
+  useAssignVehicleData,
 } from '@/hooks/useVehicleData';
-import { useDealers } from '@/hooks/useDealer';
 import type { VehicleData } from '@/@types/vehicle-data.types';
 
 export default function VehicleFleetPage() {
@@ -35,13 +35,10 @@ export default function VehicleFleetPage() {
 
   // Vehicle data states
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [filterDealerId, setFilterDealerId] = useState('');
-  const [dealerSearch, setDealerSearch] = useState('');
-  const [filterInvoiceDate, setFilterInvoiceDate] = useState<Date>();
-  const [appliedDealerId, setAppliedDealerId] = useState('');
-  const [appliedInvoiceDate, setAppliedInvoiceDate] = useState<Date>();
+  const [assignVendorId, setAssignVendorId] = useState('');
+  const [vendorSearch, setVendorSearch] = useState('');
+  const [assignProcessDate, setAssignProcessDate] = useState<Date>();
 
-  const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [isDeleteVehicleOpen, setIsDeleteVehicleOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleData | null>(null);
 
@@ -67,31 +64,30 @@ export default function VehicleFleetPage() {
   const importMutation = useImportArmada();
 
   // Vehicle Data Hooks (enabled only when companyId is '3')
-  const dealersQuery = useDealers(companyId, { page: 1, perPage: 100, search: dealerSearch }, { enabled: companyId === '3' });
-  const dealerOptions = React.useMemo(() => {
-    return (dealersQuery.data?.data ?? []).map((dealer) => ({
-      value: String(dealer.id),
-      label: dealer.namaDealer,
-      subtitle: dealer.code || undefined,
+  const vendorLookup = useVendorLookup(vendorSearch);
+  const vendorOptions = React.useMemo(() => {
+    return (vendorLookup.data ?? []).map((item) => ({
+      value: String(item.id),
+      label: item.label,
+      subtitle: item.vendor.phone || item.vendor.code || undefined,
     }));
-  }, [dealersQuery.data?.data]);
+  }, [vendorLookup.data]);
 
   const vehicleParams = {
     page,
     perPage,
     search,
-    dealerId: appliedDealerId || undefined,
-    invoiceDate: formatDateValue(appliedInvoiceDate) || undefined,
   };
   const { data: vehicleDataResponse, isLoading: isVehicleLoading } = useVehicleDataList(vehicleParams, { enabled: companyId === '3' });
 
   const deleteVehicleMutation = useDeleteVehicleData();
   const importVehicleMutation = useImportVehicleData();
   const exportVehicleMutation = useExportVehicleData();
+  const assignMutation = useAssignVehicleData();
 
   const assignedIds = React.useMemo(() => {
     return (vehicleDataResponse?.data ?? [])
-      .filter((item) => !!item.vehicleRegistration)
+      .filter((item) => !!item.vehicleRegistration || (item.ditlantasProcess && item.ditlantasProcess.length > 0))
       .map((item) => item.id);
   }, [vehicleDataResponse?.data]);
 
@@ -143,18 +139,36 @@ export default function VehicleFleetPage() {
   };
 
   // Vehicle data action handlers
-  const handleApplyFilters = () => {
-    setAppliedDealerId(filterDealerId);
-    setAppliedInvoiceDate(filterInvoiceDate);
-    setPage(1);
-  };
+  const handleAssignSubmit = async () => {
+    const pendingIds = selectedIds.filter((id) => !assignedIds.includes(id));
+    if (!pendingIds.length) {
+      toast.error('Pilih minimal satu data kendaraan yang belum di-assign');
+      return;
+    }
 
-  const handleResetFilters = () => {
-    setFilterDealerId('');
-    setFilterInvoiceDate(undefined);
-    setAppliedDealerId('');
-    setAppliedInvoiceDate(undefined);
-    setPage(1);
+    if (!assignVendorId) {
+      toast.error('Vendor wajib dipilih');
+      return;
+    }
+
+    if (!assignProcessDate) {
+      toast.error('Tanggal proses wajib diisi');
+      return;
+    }
+
+    try {
+      await assignMutation.mutateAsync({
+        vehicleDataIds: pendingIds,
+        vendorId: Number(assignVendorId),
+        processDate: formatDateValue(assignProcessDate),
+      });
+      toast.success('Data kendaraan berhasil diserahkan ke ditlantas');
+      setSelectedIds([]);
+      setAssignVendorId('');
+      setAssignProcessDate(undefined);
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal menyerahkan data kendaraan');
+    }
   };
 
   const handleDetailVehicleClick = (item: VehicleData) => {
@@ -207,10 +221,6 @@ export default function VehicleFleetPage() {
     }
   };
 
-  const handleAssignClick = () => {
-    setIsAssignOpen(true);
-  };
-
   const armadas = armadaData?.data ?? [];
   const totalData = companyId === '3' ? (vehicleDataResponse?.meta.total ?? 0) : (armadaData?.meta.total ?? 0);
   const totalPages = companyId === '3' ? (vehicleDataResponse?.meta.lastPage ?? 1) : (armadaData?.meta.lastPage ?? 1);
@@ -243,19 +253,18 @@ export default function VehicleFleetPage() {
             onAdd={handleAddClick}
             onImport={() => setIsImportOpen(true)}
             onExport={handleExportVehicle}
-            onAssign={handleAssignClick}
             onDetail={handleDetailVehicleClick}
             onEdit={handleEditVehicleClick}
             onDelete={handleDeleteVehicleClick}
             isExporting={exportVehicleMutation.isPending}
-            filterDealerId={filterDealerId}
-            onFilterDealerIdChange={setFilterDealerId}
-            dealerOptions={dealerOptions}
-            onDealerSearchChange={setDealerSearch}
-            filterInvoiceDate={filterInvoiceDate}
-            onFilterInvoiceDateChange={setFilterInvoiceDate}
-            onApplyFilters={handleApplyFilters}
-            onResetFilters={handleResetFilters}
+            vendorId={assignVendorId}
+            onVendorIdChange={setAssignVendorId}
+            vendorOptions={vendorOptions}
+            onVendorSearchChange={setVendorSearch}
+            processDate={assignProcessDate}
+            onProcessDateChange={setAssignProcessDate}
+            onSubmitAssign={handleAssignSubmit}
+            isAssigning={assignMutation.isPending}
           />
         ) : (
           <ArmadaTable
@@ -294,15 +303,6 @@ export default function VehicleFleetPage() {
         onConfirm={handleConfirmDeleteVehicle}
         isDeleting={deleteVehicleMutation.isPending}
         itemName={selectedVehicle ? `${selectedVehicle.invoiceNumber} - ${selectedVehicle.stnkName}` : undefined}
-      />
-
-      <AssignVehicleDataDialog
-        open={isAssignOpen}
-        onOpenChange={setIsAssignOpen}
-        initialVehicleIds={selectedIds.filter((id) => !assignedIds.includes(id))}
-        onAssigned={() => {
-          setSelectedIds([]);
-        }}
       />
 
       <DataImportModal

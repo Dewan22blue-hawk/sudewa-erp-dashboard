@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LaporanKasTable } from '@/components/features/laporan-kas/LaporanKasTable';
-import { Eye, Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -9,6 +10,11 @@ import { addDays, format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLaporanKas } from '@/hooks/useLaporanKas';
+import { cn } from '@/lib/utils';
+import { useCompany } from '@/contexts/CompanyContext';
+import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
+import { PrintLetterPage } from '@/components/common/PrintLetterPage';
+import { formatDate } from '@/lib/utils/format';
 
 export default function LaporanTransaksiKasPage() {
   const {
@@ -21,14 +27,31 @@ export default function LaporanTransaksiKasPage() {
     setPerPage,
     setDateRange,
     setSearch,
+    setSort,
+    sortKey,
+    sortOrder,
   } = useLaporanKas();
 
-  const [dateRange, setDateRangeState] = useState<DateRange | undefined>({
-    from: new Date(2025, 0, 20),
-    to: addDays(new Date(2025, 0, 20), 20),
-  });
+  const router = useRouter();
+  const { companyId } = useCompany();
+  const slugParam = router.query.slug;
+
+  const resolvedCompanyId = resolveCompanyId(slugParam, companyId) || 3;
+  const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
+
+  const getCompanyName = (coId: number) => {
+    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
+    if (coId === 3) return 'PT WAJIRA YANOTAMA';
+    if (coId === 4) return 'PT WAJIRA TRANSINDO';
+    return 'PT WAJIRA JAGRATARA';
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const [dateRange, setDateRangeState] = useState<DateRange | undefined>(undefined);
   const [searchInput, setSearchInput] = useState('');
-  const [isFiltering, setIsFiltering] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -38,13 +61,12 @@ export default function LaporanTransaksiKasPage() {
     return () => clearTimeout(timer);
   }, [searchInput, setSearch]);
 
-  const handleShowData = () => {
-    setIsFiltering(true);
+  // Trigger filter on date range change automatically
+  useEffect(() => {
     const startDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : null;
+    const endDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : startDate;
     setDateRange(startDate, endDate);
-    setTimeout(() => setIsFiltering(false), 100);
-  };
+  }, [dateRange, setDateRange]);
 
   const getPageNumbers = () => {
     const { currentPage, lastPage } = pagination;
@@ -74,66 +96,66 @@ export default function LaporanTransaksiKasPage() {
     return rangeWithDots;
   };
 
-  const isLoadingDisplay = isLoading || isFiltering;
+  const isLoadingDisplay = isLoading;
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Laporan Transaksi Kas</h1>
-          <p className="text-sm text-gray-500 mt-1">Pantau semua pemasukan dan pengeluaran</p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div>
+            <h1 className="text-2xl font-semibold">Laporan Transaksi Kas</h1>
+            <p className="text-sm text-muted-foreground">Pantau semua pemasukan dan pengeluaran</p>
+          </div>
+          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+            <Printer className="h-4 w-4 mr-2" />
+            Print
+          </Button>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-900">Periode Transaksi</label>
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div className="flex items-end gap-4 flex-wrap">
+            {/* Cari Transaksi */}
+            <div className="flex flex-col space-y-2">
+              <label className="text-[13px] font-medium text-slate-700">Cari Transaksi</label>
+              <div className="relative w-full sm:w-[280px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search here"
+                  className="pl-9 bg-white"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Periode Transaksi */}
+            <div className="flex flex-col space-y-2">
+              <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
+              <div className="w-[280px]">
                 <DatePickerWithRange date={dateRange} onChange={setDateRangeState} />
               </div>
-              <Button
-                variant="outline"
-                className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 shrink-0"
-                onClick={handleShowData}
-                disabled={isLoadingDisplay}
+            </div>
+
+            {/* Tampilkan per halaman */}
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+              <span>Show</span>
+              <Select
+                value={String(pagination.perPage)}
+                onValueChange={(val) => setPerPage(Number(val))}
               >
-                {isLoadingDisplay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-                Show
-              </Button>
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-900">Cari Transaksi</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Cari berdasarkan nota atau keterangan..."
-                className="pl-9"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-900">Tampilkan per halaman</label>
-            <Select
-              value={String(pagination.perPage)}
-              onValueChange={(val) => setPerPage(Number(val))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10 data</SelectItem>
-                <SelectItem value="25">25 data</SelectItem>
-                <SelectItem value="50">50 data</SelectItem>
-                <SelectItem value="100">100 data</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
@@ -145,49 +167,81 @@ export default function LaporanTransaksiKasPage() {
             </div>
           ) : (
             <>
-              <LaporanKasTable 
-                data={data} 
-                totalPemasukan={totalPemasukan}
-                totalPengeluaran={totalPengeluaran}
-              />
+              {/* Print Letter Wrapping Container */}
+              <PrintLetterPage
+                id="laporan-transaksi-kas-print"
+                className="laporan-penerimaan-print-area"
+                letterheadSrc={selectedPrintBackground}
+              >
+                <div className="laporan-penerimaan-print-content print-letter-content">
+                  {/* Cover Letter Heading - Visible only in Print */}
+                  <div className="hidden print:flex flex-col items-center justify-center text-center space-y-1 mb-8 w-full">
+                    <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
+                      Laporan Transaksi Kas
+                    </h2>
+                    <p className="text-[13px] font-bold text-gray-900 tracking-wide">
+                      {getCompanyName(resolvedCompanyId)}
+                    </p>
+                    <p className="text-[11px] text-gray-600">
+                      Tanggal Cetak: {formatDate(new Date())}
+                    </p>
+                  </div>
+
+                  <LaporanKasTable 
+                    data={data} 
+                    totalPemasukan={totalPemasukan}
+                    totalPengeluaran={totalPengeluaran}
+                    onSort={(key) => setSort(key, sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc')}
+                    sortKey={sortKey}
+                    sortOrder={sortOrder}
+                  />
+                </div>
+              </PrintLetterPage>
               
               {/* Pagination */}
               {data.length > 0 && (
-                <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                  <div>
+                <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between no-print">
+                  <div className="text-sm text-slate-500">
                     Showing {pagination.from || 0}–{pagination.to || 0} of {pagination.total} data
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex items-center gap-1 text-sm text-slate-700">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => setPage(pagination.currentPage - 1)}
                       disabled={pagination.currentPage === 1}
+                      className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                     >
                       Previous
                     </Button>
                     
-                    {getPageNumbers().map((page, idx) => (
-                      typeof page === 'number' ? (
+                    {getPageNumbers().map((pageNumber, idx) => (
+                      typeof pageNumber === 'number' ? (
                         <Button
                           key={idx}
-                          variant={pagination.currentPage === page ? "default" : "outline"}
+                          variant={pageNumber === pagination.currentPage ? 'outline' : 'ghost'}
                           size="sm"
-                          onClick={() => setPage(page)}
-                          className={pagination.currentPage === page ? "bg-primary" : ""}
+                          onClick={() => setPage(pageNumber)}
+                          className={cn(
+                            "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                            pageNumber === pagination.currentPage
+                              ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
+                              : "text-slate-600 hover:bg-slate-100"
+                          )}
                         >
-                          {page}
+                          {pageNumber}
                         </Button>
                       ) : (
-                        <span key={idx} className="px-2 py-1">...</span>
+                        <span key={idx} className="px-1.5 text-slate-400">...</span>
                       )
                     ))}
                     
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => setPage(pagination.currentPage + 1)}
                       disabled={pagination.currentPage === pagination.lastPage}
+                      className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                     >
                       Next
                     </Button>

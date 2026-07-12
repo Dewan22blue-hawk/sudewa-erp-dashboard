@@ -9,7 +9,7 @@ import { Eye, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { SalesLineItem } from '../sales.data';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useBulkDeleteUnitItem, useDeleteUnitItem, usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
+import { useBulkDeleteUnitItem, useDeleteUnitItem, useSalesUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { toast } from 'sonner';
 
@@ -21,7 +21,7 @@ interface Props {
 
 export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
   const router = useRouter();
-  const { data: unitItemsData, isLoading, isError } = usePurchaseUnitItems(salesId);
+  const { data: unitItemsData, isLoading, isError } = useSalesUnitItems(salesId);
   const { data: typeUnits } = useTypeUnits();
   const deleteMutation = useDeleteUnitItem();
   const bulkDeleteMutation = useBulkDeleteUnitItem();
@@ -33,7 +33,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
 
   const slugQuery = router.query.slug;
   const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
-  const basePath = slug ? `/dashboard/${slug}/sales` : '/sales';
+  const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
 
   const items = useMemo(() => {
     return unitItemsData?.data ?? lineItems.map((item) => ({
@@ -48,6 +48,8 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
       hpp_total_price: Number(item.hpp ?? 0),
       dpp_total_price: Number(item.dpp ?? 0),
       ppn_total_price: Number(item.ppn ?? 0),
+      price_usd: item.price_usd ? Number(item.price_usd) : undefined,
+      price_per_unit_usd: item.price_per_unit_usd ? Number(item.price_per_unit_usd) : undefined,
     }));
   }, [unitItemsData?.data, lineItems, salesId]);
   const totalPages = Math.max(1, Math.ceil(items.length / perPage));
@@ -142,7 +144,6 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
               <SelectValue placeholder="25" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10</SelectItem>
               <SelectItem value="25">25</SelectItem>
               <SelectItem value="50">50</SelectItem>
               <SelectItem value="100">100</SelectItem>
@@ -172,50 +173,57 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
 
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-[#f5f6f8]">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
-              <TableHead className="px-4">No</TableHead>
-              <TableHead className="px-4 text-center">
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[60px]">No</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[50px]">
                 <Checkbox checked={allPageSelected} onCheckedChange={(checked) => toggleAllPage(Boolean(checked))} aria-label="Pilih semua" />
               </TableHead>
-              <TableHead className="px-4">TIPE UNIT</TableHead>
-              <TableHead className="px-4">QTY</TableHead>
-              <TableHead className="px-4">HARGA JUAL</TableHead>
-              <TableHead className="px-4">BIAYA BBN</TableHead>
-              <TableHead className="px-4">BIAYA EXPEDISI</TableHead>
-              <TableHead className="px-4">BIAYA LAIN</TableHead>
-              <TableHead className="px-4">HPP</TableHead>
-              <TableHead className="px-4">DPP</TableHead>
-              <TableHead className="px-4">PPN</TableHead>
-              <TableHead className="px-4">JUMLAH</TableHead>
-              <TableHead className="px-4 text-right">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE UNIT</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">QTY</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HARGA JUAL</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA BBN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA EKSPEDISI</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA LAIN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HPP</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">JUMLAH</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={13} className="h-20 text-center text-muted-foreground">
+                <TableCell colSpan={12} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   {isError ? 'Gagal memuat data' : isLoading ? 'Loading data...' : 'Tidak ada data'}
                 </TableCell>
               </TableRow>
             ) : (
               pagedData.map((item, idx) => (
-                <TableRow key={item.id}>
-                  <TableCell className="px-4">{(currentPage - 1) * perPage + idx + 1}</TableCell>
-                  <TableCell className="px-4 text-center">
+                <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
+                  <TableCell className="px-4 py-4 text-center">
                     <Checkbox checked={selectedIds.has(item.id)} onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))} aria-label="Pilih baris" />
                   </TableCell>
-                  <TableCell className="px-4">{getUnitTypeName(item.unit_type_id)}</TableCell>
-                  <TableCell className="px-4">{item.qty_total}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.price)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.bbn_price)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.expedition_fee)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.other_fee)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.hpp_total_price ?? 0)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.dpp_total_price)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency(item.ppn_total_price)}</TableCell>
-                  <TableCell className="px-4">{formatCurrency((item.hpp_total_price ?? 0) + item.ppn_total_price + item.bbn_price + item.expedition_fee + item.other_fee)}</TableCell>
-                  <TableCell className="px-4 text-right">
+                  <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.qty_total}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                    <div>{formatCurrency(item.price)}</div>
+                    {item.price_usd ? (
+                      <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga Jual USD">
+                        {formatCurrency(item.price_usd, 'USD')}
+                      </div>
+                    ) : null}
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.hpp_total_price ?? 0)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.dpp_total_price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppn_total_price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{formatCurrency((item.hpp_total_price ?? 0) + item.ppn_total_price + item.bbn_price + item.expedition_fee + item.other_fee)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale/id';
-import { Wallet } from 'lucide-react';
+import { Wallet, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,22 +14,34 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { toast } from 'sonner';
+import { 
+    getHistoryBcaIdrAmount, 
+    getHistoryCashIdrAmount, 
+    getHistoryUsdAmount, 
+    getHistoryTotalIdrEquivalent 
+} from '@/utils/payment-helpers';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
-const paymentSchema = z
-    .object({
-        bcaPayment: z.number().min(0, 'Tidak boleh negatif'),
-        cashPayment: z.number().min(0, 'Tidak boleh negatif'),
-        bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
-        paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
-        note: z.string().max(255, 'Maksimal 255 karakter'),
-        isPaid: z.boolean(),
-    })
-    .refine((value) => (value.bcaPayment || 0) + (value.cashPayment || 0) + (value.bcaPayment2 || 0) > 0, {
-        path: ['bcaPayment'],
-        message: 'Minimal salah satu nominal pembayaran harus lebih dari 0',
-    });
+const paymentSchema = z.object({
+    bcaPayment: z.union([z.string(), z.number()]).transform(v => Number(v) || 0).pipe(z.number().min(0, 'Tidak boleh negatif')),
+    cashPayment: z.number().min(0, 'Tidak boleh negatif'),
+    bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
+    paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
+    note: z.string().max(255, 'Maksimal 255 karakter'),
+    isPaid: z.boolean(),
+});
 
-export type PaymentFormData = z.infer<typeof paymentSchema>;
+export type PaymentFormData = z.input<typeof paymentSchema>;
 
 interface Props {
     purchaseCode: string;
@@ -38,6 +50,7 @@ interface Props {
     billing: UnitBilling | null;
     histories: UnitBillingHistory[];
     onSubmitPayment: (data: PaymentFormData) => Promise<void>;
+    onDeleteHistory?: (id: string | number) => Promise<void>;
     onCancel: () => void;
     loading?: boolean;
     canSubmit?: boolean;
@@ -51,11 +64,14 @@ export function PurchasePaymentForm({
     billing,
     histories,
     onSubmitPayment,
+    onDeleteHistory,
     onCancel,
     loading,
     canSubmit = true,
     validationMessage,
 }: Props) {
+    const [deleteId, setDeleteId] = useState<string | number | null>(null);
+
     const form = useForm<PaymentFormData>({
         resolver: zodResolver(paymentSchema),
         defaultValues: {
@@ -69,21 +85,27 @@ export function PurchasePaymentForm({
     });
 
     const historyPaid = (histories ?? []).reduce(
-        (acc, item) => acc + Number(item.bca_payment_amount ?? 0) + Number(item.cash_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0),
+        (acc, item) => acc + getHistoryTotalIdrEquivalent(item),
         0,
     );
     const totalPaidFromBilling = Number(billing?.total_paid ?? (Number(billing?.bca_payment ?? 0) + Number(billing?.cash_payment ?? 0) + Number(billing?.bca_payment_2 ?? 0)));
-    const totalPaid = billing?.is_paid ? Math.max(totalPaidFromBilling, historyPaid) : historyPaid;
+    const totalPaid = Math.max(totalPaidFromBilling, historyPaid);
     const billingRemaining = Number(billing?.remaining_payment ?? 0);
     const remainingPayment = billing?.is_paid ? 0 : billingRemaining > 0 ? billingRemaining : Math.max(0, totalTagihan - totalPaid);
 
-    const paymentBca = Number(form.watch('bcaPayment') ?? 0);
-    const paymentCash = Number(form.watch('cashPayment') ?? 0);
-    const paymentBca2 = Number(form.watch('bcaPayment2') ?? 0);
-    const totalPaymentInput = paymentBca + paymentCash + paymentBca2;
+    const paymentBca = Number(form.watch('bcaPayment') ?? 0); // BCA USD
+    const paymentCash = Number(form.watch('cashPayment') ?? 0); // CASH IDR
+    const paymentBca2 = Number(form.watch('bcaPayment2') ?? 0); // BCA IDR
+    const totalPaymentInputIdr = paymentCash + paymentBca2;
 
-    const projectedTotalPaid = useMemo(() => totalPaid + totalPaymentInput, [totalPaid, totalPaymentInput]);
+    const projectedTotalPaid = useMemo(() => totalPaid + totalPaymentInputIdr, [totalPaid, totalPaymentInputIdr]);
     const projectedRemaining = Math.max(0, totalTagihan - projectedTotalPaid);
+
+    const totalPaidUsdFromHistory = useMemo(() => (histories ?? []).reduce((acc, item) => acc + getHistoryUsdAmount(item), 0), [histories]);
+    const projectedTotalPaidUsd = useMemo(() => totalPaidUsdFromHistory + paymentBca, [totalPaidUsdFromHistory, paymentBca]);
+    const projectedRemainingUsd = useMemo(() => Math.max(0, Number(billing?.remaining_payment_usd || 0) - paymentBca), [billing?.remaining_payment_usd, paymentBca]);
+
+    const totalDpp = Math.max(0, totalTagihan - totalPpn);
 
     useEffect(() => {
         const autoIsPaid = projectedTotalPaid >= totalTagihan && totalTagihan > 0;
@@ -102,6 +124,11 @@ export function PurchasePaymentForm({
     };
 
     const handleSubmit = async (values: PaymentFormData) => {
+        const total = Number(values.bcaPayment || 0) + (values.cashPayment || 0) + (values.bcaPayment2 || 0);
+        if (total <= 0) {
+            toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
+            return;
+        }
         await onSubmitPayment(values);
         resetForm();
     };
@@ -112,9 +139,9 @@ export function PurchasePaymentForm({
         }
 
         const methods: string[] = [];
-        if (Number(item.bca_payment_amount ?? 0) > 0) methods.push('BCA IDR');
-        if (Number(item.bca_payment_usd_amount ?? 0) > 0) methods.push('BCA USD');
-        if (Number(item.cash_payment_amount ?? 0) > 0) methods.push('Cash');
+        if (getHistoryBcaIdrAmount(item) > 0) methods.push('BCA IDR');
+        if (getHistoryUsdAmount(item) > 0) methods.push('BCA USD');
+        if (getHistoryCashIdrAmount(item) > 0) methods.push('Cash');
         return methods;
     };
 
@@ -136,7 +163,7 @@ export function PurchasePaymentForm({
                     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Beli</p>
-                            <Input value={formatCurrency(totalTagihan)} disabled />
+                            <Input value={formatCurrency(totalDpp)} disabled />
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total PPN</p>
@@ -144,7 +171,7 @@ export function PurchasePaymentForm({
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Biaya</p>
-                            <Input value={formatCurrency(remainingPayment)} disabled />
+                            <Input value={formatCurrency(totalTagihan)} disabled />
                         </div>
                     </div>
                 </div>
@@ -172,10 +199,18 @@ export function PurchasePaymentForm({
                                         <FormItem className="space-y-2">
                                             <FormLabel className="text-sm font-medium">BCA USD</FormLabel>
                                             <FormControl>
-                                                <MoneyInput
-                                                    name={field.name}
-                                                    value={Number(field.value) || 0}
-                                                    onChangeValue={field.onChange}
+                                                <Input
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    value={field.value}
+                                                    onChange={(e) => {
+                                                        let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+                                                        const parts = val.split('.');
+                                                        if (parts.length > 2) {
+                                                            val = parts[0] + '.' + parts.slice(1).join('');
+                                                        }
+                                                        field.onChange(val);
+                                                    }}
                                                     onBlur={field.onBlur}
                                                 />
                                             </FormControl>
@@ -229,32 +264,38 @@ export function PurchasePaymentForm({
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                                 {/* Tanggal */}
-                                <FormField
-                                    control={form.control}
-                                    name="paymentDate"
-                                    render={({ field }) => (
-                                        <FormItem className="space-y-2">
-                                            <FormLabel className="text-sm font-medium">Tanggal</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="date"
-                                                    value={field.value}
-                                                    onChange={(e) => field.onChange(e.target.value)}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Tanggal</p>
+                                    <Input
+                                        type="date"
+                                        value={form.watch('paymentDate')}
+                                        onChange={(e) => form.setValue('paymentDate', e.target.value)}
+                                    />
+                                </div>
                                 {/* Total Bayar */}
                                 <div className="space-y-2">
                                     <p className="text-sm font-medium">Total Bayar</p>
-                                    <Input value={formatCurrency(totalPaymentInput)} disabled />
+                                    <Input value={formatCurrency(projectedTotalPaid)} disabled />
                                 </div>
                                 {/* Kurang Bayar */}
                                 <div className="space-y-2">
                                     <p className="text-sm font-medium">Kurang Bayar</p>
                                     <Input value={formatCurrency(projectedRemaining)} disabled />
+                                </div>
+                                {/* Tanggal USD */}
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Tanggal (USD)</p>
+                                    <Input value="-" disabled />
+                                </div>
+                                {/* Total Bayar USD */}
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Total Bayar (USD)</p>
+                                    <Input value={formatCurrency(projectedTotalPaidUsd, 'USD')} disabled />
+                                </div>
+                                {/* Kurang Bayar USD */}
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Kurang Bayar (USD)</p>
+                                    <Input value={formatCurrency(projectedRemainingUsd, 'USD')} disabled />
                                 </div>
                             </div>
                         </div>
@@ -338,34 +379,39 @@ export function PurchasePaymentForm({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Tanggal</TableHead>
-                                    <TableHead>BCA IDR</TableHead>
                                     <TableHead>BCA USD</TableHead>
+                                    <TableHead>BCA IDR</TableHead>
                                     <TableHead>Cash</TableHead>
                                     <TableHead>Metode</TableHead>
                                     <TableHead className="text-right">Total</TableHead>
                                     <TableHead>Note</TableHead>
                                     <TableHead>Bukti</TableHead>
+                                    <TableHead className="w-10"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {histories.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={8} className="h-20 text-center text-muted-foreground">
+                                        <TableCell colSpan={9} className="h-20 text-center text-muted-foreground">
                                             Belum ada histori pembayaran
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     histories.map((item) => {
-                                        const total = Number(item.bca_payment_amount ?? 0) + Number(item.cash_payment_amount ?? 0) + Number(item.bca_payment_usd_amount ?? 0);
+                                        const total = getHistoryTotalIdrEquivalent(item);
+                                        const usdAmount = getHistoryUsdAmount(item);
+                                        const idrAmount = getHistoryBcaIdrAmount(item) + getHistoryCashIdrAmount(item);
+                                        const isPureUsd = usdAmount > 0 && idrAmount === 0 && total === usdAmount;
+                                        
                                         const methods = getPaymentMethods(item);
                                         return (
                                             <TableRow key={item.id}>
-                                                <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMM yyyy', { locale: idLocale }) : '-'}</TableCell>
-                                                <TableCell>{formatCurrency(Number(item.bca_payment_amount ?? 0))}</TableCell>
-                                                <TableCell>{formatCurrency(Number(item.bca_payment_usd_amount ?? 0))}</TableCell>
-                                                <TableCell>{formatCurrency(Number(item.cash_payment_amount ?? 0))}</TableCell>
+                                                <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMMM yyyy', { locale: idLocale }) : '-'}</TableCell>
+                                                <TableCell>{formatCurrency(usdAmount, 'USD')}</TableCell>
+                                                <TableCell>{formatCurrency(getHistoryBcaIdrAmount(item))}</TableCell>
+                                                <TableCell>{formatCurrency(getHistoryCashIdrAmount(item))}</TableCell>
                                                 <TableCell>{methods.length > 0 ? methods.join(', ') : '-'}</TableCell>
-                                                <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
+                                                <TableCell className="text-right font-medium">{formatCurrency(total, isPureUsd ? 'USD' : 'IDR')}</TableCell>
                                                 <TableCell>{item.note || '-'}</TableCell>
                                                 <TableCell>
                                                     {item.payment_proof ? (
@@ -374,6 +420,19 @@ export function PurchasePaymentForm({
                                                         </a>
                                                     ) : (
                                                         '-'
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {onDeleteHistory && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => setDeleteId(item.id)}
+                                                            disabled={loading}
+                                                            type="button"
+                                                        >
+                                                            <Trash className="w-4 h-4 text-red-500" />
+                                                        </Button>
                                                     )}
                                                 </TableCell>
                                             </TableRow>
@@ -385,6 +444,31 @@ export function PurchasePaymentForm({
                     </div>
                 </div>
             </div>
+
+            <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+                <AlertDialogContent className="rounded-2xl border-slate-200">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Histori Pembayaran</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Data histori pembayaran ini akan dihapus secara permanen.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
+                        <AlertDialogAction 
+                            onClick={() => {
+                                if (deleteId && onDeleteHistory) {
+                                    onDeleteHistory(deleteId);
+                                    setDeleteId(null);
+                                }
+                            }} 
+                            className="rounded-xl bg-red-600 hover:bg-red-700"
+                        >
+                            Hapus
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

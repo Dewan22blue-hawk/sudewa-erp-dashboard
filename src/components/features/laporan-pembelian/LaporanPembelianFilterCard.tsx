@@ -15,6 +15,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { FileText } from "lucide-react"
+import { formatDateUI } from '@/lib/utils/date';
 
 export default function LaporanPembelianFilterCard() {
     const router = useRouter()
@@ -74,7 +75,7 @@ export default function LaporanPembelianFilterCard() {
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal bg-white border-gray-200">
-                                    {awal ? format(awal, "PPP") : "Pilih tanggal"}
+                                    {awal ? formatDateUI(awal) : "Pilih tanggal"}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
@@ -98,7 +99,7 @@ export default function LaporanPembelianFilterCard() {
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal bg-white border-gray-200">
-                                    {akhir ? format(akhir, "PPP") : "Pilih tanggal"}
+                                    {akhir ? formatDateUI(akhir) : "Pilih tanggal"}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">

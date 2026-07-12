@@ -12,7 +12,7 @@ export default function VehicleEquipmentPage() {
     // Table state
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(10); // Standard default show 10 entries as in mockup
+    const [perPage, setPerPage] = useState(25); // Standard default show 10 entries as in mockup
 
     // React query operations
     const { data: listData, isLoading, isError } = useVehicleEquipments({ page, perPage, search });
@@ -77,27 +77,25 @@ export default function VehicleEquipmentPage() {
 
     return (
         <DashboardLayout>
-            <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="space-y-6">
                 {/* Header Title */}
-                <div>
-                    <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none">
-                        Perlengkapan
-                    </h1>
-                    <p className="text-[15px] text-gray-500 mt-2 font-medium">
-                        Kelola data perlengkapan dengan mudah
-                    </p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold">Perlengkapan</h1>
+                        <p className="text-sm text-muted-foreground">Kelola data perlengkapan dengan mudah</p>
+                    </div>
                 </div>
 
                 {/* Loading / Error States */}
                 {isLoading ? (
-                    <Card className="rounded-2xl border border-gray-200 bg-white p-12 shadow-sm">
+                    <Card className="rounded-xl border border-gray-200 bg-white p-12 shadow-none">
                         <div className="flex flex-col items-center justify-center space-y-3">
                             <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#15305B]"></div>
                             <p className="text-sm font-semibold text-gray-500">Memuat data perlengkapan...</p>
                         </div>
                     </Card>
                 ) : isError ? (
-                    <Card className="rounded-2xl border border-red-100 bg-red-50/50 p-12 text-center shadow-sm">
+                    <Card className="rounded-xl border border-red-100 bg-red-50/50 p-12 text-center shadow-none">
                         <p className="text-sm font-semibold text-red-600">Gagal memuat data perlengkapan</p>
                     </Card>
                 ) : (

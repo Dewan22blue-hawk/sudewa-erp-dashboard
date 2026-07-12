@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { VehicleData } from '@/@types/vehicle-data.types';
+import { formatDateUI } from '@/lib/utils/date';
 
 interface VehicleDataDetailProps {
   data: VehicleData;
@@ -14,7 +15,7 @@ const formatDate = (value?: string | null) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
-  return format(date, 'dd MMM yyyy');
+  return formatDateUI(date);
 };
 
 function DetailRow({ label, value }: { label: string; value?: string | number | null }) {
@@ -74,11 +75,11 @@ export function VehicleDataDetail({ data, slug }: VehicleDataDetailProps) {
           <DetailRow label="Pekerjaan" value={data.occupation} />
           <DetailRow label="Nama STNK" value={data.stnkName} />
           <DetailRow label="Alamat STNK" value={data.stnkAddress} />
-          <DetailRow label="Kelurahan" value={data.village} />
+          <DetailRow label="RT / RW" value={data.subVillage} />
+          <DetailRow label="Desa / Kelurahan" value={data.village} />
           <DetailRow label="Kecamatan" value={data.district} />
-          <DetailRow label="RW / Sub Village" value={data.subVillage} />
-          <DetailRow label="Sub District" value={data.subDistrict} />
-          <DetailRow label="Kabupaten" value={data.regency} />
+          <DetailRow label="Kabupaten / Kota" value={data.regency} />
+          <DetailRow label="Provinsi" value={data.subDistrict} />
           <DetailRow label="Kode Pos" value={data.postalCode} />
         </div>
       </Section>

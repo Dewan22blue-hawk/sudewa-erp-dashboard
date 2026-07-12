@@ -1,65 +1,39 @@
-'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-import { useParams, useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import LaporanHeaderAction from '@/components/features/laporan/LaporanHeaderAction';
-import LaporanRugiLabaView from '@/components/features/laporan/LaporanRugiLabaView';
-import LaporanNeracaView from '@/components/features/laporan/LaporanNeracaView';
+import { ACCOUNTING_REPORT_TAB_QUERY_MAP } from '@/components/features/laporan-akuntansi/laporan-akuntansi.constants';
 
-export default function LaporanAkuntansiPage() {
-  const params = useParams();
+export default function LaporanAkuntansiLegacyTypePage() {
   const router = useRouter();
-  const type = params?.type as string;
-  const slug = params?.slug as string;
 
-  // Map URL slug to readable title
-  const getReportTitle = () => {
-    switch (type) {
-      case 'rugi-laba':
-        return 'Laporan Rugi Laba';
-      case 'neraca':
-        return 'Neraca';
-      case 'ppn-masukan-perbulan':
-        return 'Laporan PPN Masukan Perbulan';
-      case 'ppn-keluaran-perbulan':
-        return 'Laporan PPN Keluaran Perbulan';
-      case 'ppn-pertahun':
-        return 'Laporan PPN Pertahun';
-      default:
-        return 'Laporan Akuntansi';
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
     }
-  };
 
-  const renderReportView = () => {
-    if (type === 'rugi-laba') {
-      return <LaporanRugiLabaView />;
-    }
-    if (type === 'neraca') {
-      return <LaporanNeracaView />;
-    }
-    return <div className="bg-white border rounded-xl p-8 text-center text-gray-500">Silahkan pilih laporan dari menu sebelumnya atau sedang dalam pengembangan.</div>;
-  };
+    const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
+    const type = typeof router.query.type === 'string' ? router.query.type : '';
+    const mappedTab = ACCOUNTING_REPORT_TAB_QUERY_MAP[type] ?? 'profit-loss';
+    const month = typeof router.query.bulan === 'string' ? router.query.bulan.padStart(2, '0') : '01';
+    const year = typeof router.query.tahun === 'string' ? router.query.tahun : '2025';
+
+    void router.replace({
+      pathname: '/dashboard/[slug]/laporan/laporan-akuntansi',
+      query: {
+        slug,
+        tab: mappedTab,
+        period: `${year}-${month}-01`,
+      },
+    });
+  }, [router]);
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.push(`/dashboard/${slug}/laporan/laporan-akuntansi`)} className="text-gray-500 hover:text-gray-900 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-2xl font-semibold">{getReportTitle()}</h1>
-              <p className="text-sm text-gray-500">Lihat detail laporan akuntansi</p>
-            </div>
-          </div>
-
-          <LaporanHeaderAction />
+      <div className="space-y-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-8 text-sm text-slate-500 shadow-none">
+          Mengalihkan ke tampilan laporan akuntansi terbaru...
         </div>
-
-        {renderReportView()}
       </div>
     </DashboardLayout>
   );

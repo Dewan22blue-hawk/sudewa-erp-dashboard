@@ -137,7 +137,7 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
     setVehicleTypeValue(value as VehicleType);
   };
   const dealersQuery = useDealers(null, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' }, { enabled: true });
-  const regionsQuery = useRegions({ page: 1, perPage: 10, search: regionSearch, sort_order: 'asc' });
+  const regionsQuery = useRegions({ page: 1, perPage: 25, search: regionSearch, sort_order: 'asc' });
   const vendorLookup = useVendorLookup(vendorSearch);
   const { control, register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -242,20 +242,20 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
                 tnkbReceivedDate: toPayloadDate(values.tnkbReceivedDate),
                 tnkbNumber: values.tnkbNumber.trim(),
                 tnkbPhysicalStatus: values.tnkbPhysicalStatus === 'true',
-                stckFee: String(values.stckFee || 0),
-                bbnRegistrationFee: String(values.bbnRegistrationFee || 0),
-                noticeFee: String(values.noticeFee || 0),
-                pmiFee: String(values.pmiFee || 0),
-                physicalCheckFee: String(values.physicalCheckFee || 0),
-                nikValidationFee: String(values.nikValidationFee || 0),
-                garwilFee: String(values.garwilFee || 0),
-                builtUpFee: String(values.builtUpFee || 0),
-                accelerationFee: String(values.accelerationFee || 0),
-                plateRecommendationFee: String(values.plateRecommendationFee || 0),
-                serviceFee: String(values.serviceFee || 0),
-                skpdFee: String(values.skpdFee || 0),
-                stampFee: String(values.stampFee || 0),
-                pnbpBpkb: String(values.pnbpBpkb || 0),
+                stckFee: Number(values.stckFee || 0),
+                bbnRegistrationFee: Number(values.bbnRegistrationFee || 0),
+                noticeFee: Number(values.noticeFee || 0),
+                pmiFee: Number(values.pmiFee || 0),
+                physicalCheckFee: Number(values.physicalCheckFee || 0),
+                nikValidationFee: Number(values.nikValidationFee || 0),
+                garwilFee: Number(values.garwilFee || 0),
+                builtUpFee: Number(values.builtUpFee || 0),
+                accelerationFee: Number(values.accelerationFee || 0),
+                plateRecommendationFee: Number(values.plateRecommendationFee || 0),
+                serviceFee: Number(values.serviceFee || 0),
+                skpdFee: Number(values.skpdFee || 0),
+                stampFee: Number(values.stampFee || 0),
+                pnbpBpkb: Number(values.pnbpBpkb || 0),
                 customerDeliveryDate: toPayloadDate(values.customerDeliveryDate),
               },
               vehicleDataPayload: {

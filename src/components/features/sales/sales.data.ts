@@ -20,6 +20,8 @@ export interface SalesLineItem {
   dpp: number;
   ppn: number;
   jumlah: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface SalesItem {
@@ -45,6 +47,8 @@ export interface SalesItem {
   totalBayar: number;
   lineItems: SalesLineItem[];
   units: UnitItem[];
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 /**

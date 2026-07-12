@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Printer, Download, Eye, ChevronsUpDown, Check } from 'lucide-react';
+import { Printer, Download, ChevronsUpDown, Check } from 'lucide-react';
 import { getCustomers, getUnitTypes } from '@/services/laporan-pengiriman.service';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -38,25 +38,30 @@ export default function LaporanPengirimanFilter({
   onPrint,
   onDownload,
 }: LaporanPengirimanFilterProps) {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    if (startDate && endDate) return { from: new Date(startDate), to: new Date(endDate) };
-    if (startDate) return { from: new Date(startDate), to: undefined };
+  const dateRange = useMemo(() => {
+    if (startDate && endDate) {
+      const from = new Date(startDate);
+      const to = new Date(endDate);
+      return {
+        from: Number.isNaN(from.getTime()) ? undefined : from,
+        to: Number.isNaN(to.getTime()) ? undefined : to,
+      };
+    }
+    if (startDate) {
+      const from = new Date(startDate);
+      return {
+        from: Number.isNaN(from.getTime()) ? undefined : from,
+        to: undefined,
+      };
+    }
     return undefined;
-  });
+  }, [startDate, endDate]);
   const [customers, setCustomers] = useState<OptionItem[]>([]);
   const [unitTypes, setUnitTypes] = useState<OptionItem[]>([]);
   const [openBox, setOpenBox] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTermInside, setSearchTermInside] = useState('');
-  const [perPage, setPerPage] = useState('50');
-
-  useEffect(() => {
-    if (!startDate && !endDate) {
-      setDateRange(undefined);
-    } else if (startDate && endDate && (!dateRange?.from || !dateRange?.to)) {
-      setDateRange({ from: new Date(startDate), to: new Date(endDate) });
-    }
-  }, [startDate, endDate, dateRange?.from, dateRange?.to]);
+  const [perPage, setPerPage] = useState('25');
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -100,9 +105,37 @@ export default function LaporanPengirimanFilter({
     option.name?.toLowerCase().includes(searchTermInside.toLowerCase())
   );
 
-  const handleApplyFilter = () => {
-    const appliedStartDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-    const appliedEndDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : appliedStartDate;
+  useEffect(() => {
+    let customerId: number | null = null;
+    let unitTypeId: number | null = null;
+
+    if (activeTab === 'per-customer') {
+      const matchedCustomer = customers.find(
+        (customer) => customer.name?.toLowerCase() === searchQuery.trim().toLowerCase()
+      );
+      customerId = matchedCustomer ? matchedCustomer.id : null;
+    }
+
+    if (activeTab === 'per-tipe') {
+      const matchedType = unitTypes.find(
+        (unitType) => unitType.name?.toLowerCase() === searchQuery.trim().toLowerCase()
+      );
+      unitTypeId = matchedType ? matchedType.id : null;
+    }
+
+    onApplyFilters({
+      startDate,
+      endDate,
+      customerId,
+      unitTypeId,
+      perPage: parseInt(perPage, 10),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, activeTab, perPage]);
+
+  const handleDateChange = (newRange: DateRange | undefined) => {
+    const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
+    const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
     let customerId: number | null = null;
     let unitTypeId: number | null = null;
@@ -134,15 +167,15 @@ export default function LaporanPengirimanFilter({
     <div className="flex items-end justify-between w-full no-print gap-4">
       <div className="flex items-end gap-6 flex-wrap">
         <div className="flex flex-col space-y-2">
-          <label className="text-[13px] font-bold text-gray-900">Periode Transaksi</label>
+          <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
           <div className="w-[280px]">
-            <DatePickerWithRange date={dateRange} onChange={setDateRange} />
+            <DatePickerWithRange date={dateRange} onChange={handleDateChange} />
           </div>
         </div>
 
         {activeTab !== 'per-nota' && (
           <div className="flex flex-col space-y-2">
-            <label className="text-[13px] font-bold text-gray-900">
+            <label className="text-[13px] font-medium text-slate-700">
               {activeTab === 'per-tipe' ? 'Masukkan Tipe ' : 'Masukkan Customer '}
               <span className="text-red-500">*</span>
             </label>
@@ -206,43 +239,26 @@ export default function LaporanPengirimanFilter({
         )}
 
         <div className="flex flex-col space-y-2">
-          <label className="text-[13px] font-bold text-gray-900">Per Halaman</label>
+          <label className="text-[13px] font-medium text-slate-700">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
-            <SelectTrigger className="w-[130px] bg-white">
+            <SelectTrigger className="w-[130px] bg-white cursor-pointer">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10 data</SelectItem>
-              <SelectItem value="25">25 data</SelectItem>
-              <SelectItem value="50">50 data</SelectItem>
-              <SelectItem value="100">100 data</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
         </div>
-
-        <Button
-          variant="outline"
-          onClick={handleApplyFilter}
-          className="bg-[#f8f9fa] shadow-sm text-gray-700 gap-2 px-4 whitespace-nowrap mb-[1px]"
-        >
-          <Eye className="h-4 w-4" />
-          Show
-        </Button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          onClick={onPrint}
-          className="gap-2 px-4 bg-white text-gray-700 shadow-sm border-gray-200"
-        >
-          <Printer className="h-4 w-4" /> Print
+      <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={onPrint} className="w-full sm:w-auto">
+          <Printer className="h-4 w-4 mr-2" /> Print
         </Button>
-        <Button
-          onClick={onDownload}
-          className="gap-2 px-4 shadow-sm bg-[#16a34a] hover:bg-[#15803d] text-white border-0"
-        >
-          <Download className="h-4 w-4" /> Download
+        <Button variant="outline" onClick={onDownload} className="w-full sm:w-auto">
+          <Download className="h-4 w-4 mr-2" /> Download
         </Button>
       </div>
     </div>

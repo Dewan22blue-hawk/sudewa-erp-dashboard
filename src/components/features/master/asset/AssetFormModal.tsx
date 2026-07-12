@@ -79,16 +79,38 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         <p className="text-xs text-gray-500">Opsional. Jika dikosongkan, kode aset akan dibuat otomatis oleh backend.</p>
                     </div>
 
-                    {/* Tanggal Beli */}
+                    {/* Tipe Aset */}
                     <div className="space-y-2">
-                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
-                        <Input
-                            id="purchase_date"
-                            type="date"
-                            {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
-                            className={errors.purchase_date ? 'border-red-500' : ''}
+                        <Label htmlFor="type" className="text-gray-900 font-medium">Tipe Aset</Label>
+                        <Controller
+                            control={control}
+                            name="type"
+                            rules={{ required: 'Tipe aset wajib dipilih' }}
+                            render={({ field }) => (
+                                <Select value={field.value} onValueChange={field.onChange}>
+                                    <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
+                                        <SelectValue placeholder="Select an item" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="inventory">Inventaris Kantor</SelectItem>
+                                        <SelectItem value="vehicles">Kendaraan</SelectItem>
+                                        <SelectItem value="buildings">Bangunan</SelectItem>
+                                        <SelectItem value="land">Tanah</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            )}
                         />
-                        {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
+                        {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
+                    </div>
+
+                    {/* Serial Number */}
+                    <div className="space-y-2">
+                        <Label htmlFor="serial_number" className="text-gray-900 font-medium">Serial Number</Label>
+                        <Input
+                            id="serial_number"
+                            placeholder="Contoh: AWS0001"
+                            {...register('serial_number')}
+                        />
                     </div>
 
                     {/* Nama Barang */}
@@ -103,28 +125,16 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
                     </div>
 
-                    {/* Tipe Aset */}
+                    {/* Tanggal Beli */}
                     <div className="space-y-2">
-                        <Label htmlFor="type" className="text-gray-900 font-medium">Tipe Aset</Label>
-                        <Controller
-                            control={control}
-                            name="type"
-                            rules={{ required: 'Tipe aset wajib dipilih' }}
-                            render={({ field }) => (
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
-                                        <SelectValue placeholder="Select an item" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="inventory">Inventory</SelectItem>
-                                        <SelectItem value="vehicles">Vehicles</SelectItem>
-                                        <SelectItem value="buildings">Buildings</SelectItem>
-                                        <SelectItem value="land">Land</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            )}
+                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
+                        <Input
+                            id="purchase_date"
+                            type="date"
+                            {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
+                            className={errors.purchase_date ? 'border-red-500' : ''}
                         />
-                        {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
+                        {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
                     </div>
 
                     {/* Harga Beli */}
@@ -145,16 +155,6 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                             )}
                         />
                         {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
-                    </div>
-
-                    {/* Serial Number */}
-                    <div className="space-y-2">
-                        <Label htmlFor="serial_number" className="text-gray-900 font-medium">Serial Number</Label>
-                        <Input
-                            id="serial_number"
-                            placeholder="Contoh: AWS0001"
-                            {...register('serial_number')}
-                        />
                     </div>
 
                     <div className="flex flex-col space-y-2 pt-2">

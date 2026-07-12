@@ -1,4 +1,5 @@
 import type { LaravelPagination, PaginationMeta } from '@/@types/pagination.types';
+import type { FinanceBilling } from '@/@types/finance-billing.types';
 
 export interface KasHarianCash {
   id: number;
@@ -22,60 +23,75 @@ export interface KasHarianCompany {
   name: string;
 }
 
+export interface KasHarianUnitTransactionBilling {
+  id: number;
+  uuid?: string;
+  unit_transaction_id: number;
+  grand_total: number;
+  last_payment_at?: string;
+  is_paid: boolean;
+  is_valid?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface KasHarianGoodsTransactionBilling {
+  id: number;
+  uuid?: string;
+  goods_transaction_id: number;
+  grand_total: number;
+  last_payment_at?: string;
+  is_paid: boolean;
+  is_valid?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface KasHarian {
   id: number;
   uuid?: string;
   company_id: number;
-  cash_id: number;
+  cash_id?: number | null;
   account_id?: number | null;
-  unit_transaction_billing_history_id?: number | null;
+  unit_transaction_billing_id?: number | null;
+  goods_transaction_billing_id?: number | null;
+  transaction_category?: string;
+  cash_flow_type?: 'debet' | 'credit' | string;
   code: string;
   date: string;
   note: string;
+  amount?: number;
   debet: number;
+  debet_original?: number;
   credit: number;
-  transaction_category?: string;
+  credit_original?: number;
   payment_proof?: string | null;
+  is_paid?: boolean | string | null;
+  is_valid?: boolean;
   created_at?: string;
   updated_at?: string;
-  cash: KasHarianCash;
+  grand_total?: number;
+  remaining_payment?: number;
+  remaining_payment_usd?: number;
+  cash?: KasHarianCash | null;
   account?: KasHarianAccount | null;
   company: KasHarianCompany;
-  finance_billing?: {
-    id: number;
-    uuid?: string;
-    cash_flow_id?: number;
-    unit_transaction_billing_id?: number;
-    last_payment_at?: string;
-    grand_total?: number;
-    is_valid?: boolean;
-    created_at?: string;
-    updated_at?: string;
-    finance_billing_items?: Array<{
-      id: number;
-      finance_billing_id: number;
-      bca_payment_amount: number;
-      bca_payment_usd_amount: number;
-      cash_payment_amount: number;
-      payment_proof: string | null;
-      payment_at: string;
-      note: string;
-      created_at?: string;
-      updated_at?: string;
-    }>;
-  } | null;
+  finance_billings?: FinanceBilling[];
+  unit_transaction_billing?: KasHarianUnitTransactionBilling | null;
+  goods_transaction_billing?: KasHarianGoodsTransactionBilling | null;
 }
 
 export interface CashFlowPayload {
   company_id: number;
-  cash_id: number;
-  account_id: number;
+  cash_id?: number;
+  account_id?: number;
   date: string;
   note: string;
   debet: number;
   credit: number;
   transaction_category: string;
   payment_proof?: File | null;
+  is_paid?: boolean;
 }
 
 export interface CashFlowFilterParams {
@@ -123,4 +139,7 @@ export interface KasHarianListItem {
   cashFlowId?: number;
   financeBillingId?: number;
   transaction_category?: string;
+  goodsTransactionBillingId?: number;
+  unitTransactionBillingId?: number;
+  is_paid?: boolean;
 }

@@ -105,85 +105,87 @@ export default function LaporanPengirimanPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6 bg-white min-h-screen laporan-pengiriman-page laporan-penerimaan-page">
+      <div className="space-y-6">
         <div className="no-print">
-          <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Laporan Pengiriman</h1>
-          <p className="text-[15px] text-gray-500">Pantau semua transaksi pengiriman unit</p>
+          <h1 className="text-2xl font-semibold">Laporan Pengiriman</h1>
+          <p className="text-sm text-muted-foreground">Pantau semua transaksi pengiriman unit</p>
         </div>
 
-        <LaporanPengirimanFilter
-          activeTab={activeTab}
-          startDate={startDate}
-          endDate={endDate}
-          onApplyFilters={handleApplyFilters}
-          onPrint={handlePrint}
-          onDownload={exportToCSV}
-        />
+        <div className="space-y-4">
+          <LaporanPengirimanFilter
+            activeTab={activeTab}
+            startDate={startDate}
+            endDate={endDate}
+            onApplyFilters={handleApplyFilters}
+            onPrint={handlePrint}
+            onDownload={exportToCSV}
+          />
 
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-8">
-          <div className="flex mb-12 no-print">
-            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
-              <TabsTrigger value="per-nota" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Pengiriman
-              </TabsTrigger>
-              <TabsTrigger value="per-tipe" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Pengiriman Per Tipe
-              </TabsTrigger>
-              <TabsTrigger value="per-customer" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
-                Laporan Pengiriman Per Customer
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <PrintLetterPage
-            id="laporan-pengiriman-print"
-            className="laporan-pengiriman-print-area laporan-penerimaan-print-area"
-            letterheadSrc={selectedPrintBackground}
-          >
-            <div className="laporan-pengiriman-print-content laporan-penerimaan-print-content">
-              <div className="flex flex-col items-center justify-center text-center space-y-1 mb-8">
-                <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
-                  REKAP PENGIRIMAN {activeTab.replace('-', ' ')}
-                </h2>
-                <p className="text-[13px] font-bold text-gray-900 tracking-wide">
-                  PT WAJIRA JAGRATARA MORINDO
-                </p>
-                <p className="text-[13px] font-semibold text-gray-800 opacity-90">
-                  {startDate && endDate
-                    ? `Periode: ${format(new Date(startDate), 'dd/MM/yyyy')} s.d. ${format(new Date(endDate), 'dd/MM/yyyy')}`
-                    : '2026'}
-                </p>
-              </div>
-
-              <TabsContent value="per-nota" className="mt-0">
-                <LaporanPengirimanTable
-                  data={data}
-                  pagination={pagination}
-                  isLoading={isLoading}
-                  onPageChange={setPage}
-                />
-              </TabsContent>
-
-              <TabsContent value="per-tipe" className="mt-0">
-                <LaporanPengirimanPerTipe
-                  data={data}
-                  pagination={pagination}
-                  isLoading={isLoading}
-                  onPageChange={setPage}
-                />
-              </TabsContent>
-
-              <TabsContent value="per-customer" className="mt-0">
-                <LaporanPengirimanPerCustomer
-                  data={data}
-                  pagination={pagination}
-                  isLoading={isLoading}
-                  onPageChange={setPage}
-                />
-              </TabsContent>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+            <div className="flex no-print">
+              <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+                <TabsTrigger value="per-nota" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                  Laporan Pengiriman
+                </TabsTrigger>
+                <TabsTrigger value="per-tipe" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                  Laporan Pengiriman Per Tipe
+                </TabsTrigger>
+                <TabsTrigger value="per-customer" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                  Laporan Pengiriman Per Customer
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </PrintLetterPage>
-        </Tabs>
+
+            <PrintLetterPage
+              id="laporan-pengiriman-print"
+              className="laporan-pengiriman-print-area laporan-penerimaan-print-area"
+              letterheadSrc={selectedPrintBackground}
+            >
+              <div className="laporan-pengiriman-print-content laporan-penerimaan-print-content">
+                <div className="flex flex-col items-center justify-center text-center space-y-1 mb-8">
+                  <h2 className="text-[13px] font-bold uppercase text-gray-900 tracking-wide">
+                    REKAP PENGIRIMAN {activeTab.replace('-', ' ')}
+                  </h2>
+                  <p className="text-[13px] font-bold text-gray-900 tracking-wide">
+                    PT WAJIRA JAGRATARA MORINDO
+                  </p>
+                  <p className="text-[13px] font-semibold text-gray-800 opacity-90">
+                    {startDate && endDate
+                      ? `Periode: ${format(new Date(startDate), 'dd/MM/yyyy')} s.d. ${format(new Date(endDate), 'dd/MM/yyyy')}`
+                      : '2026'}
+                  </p>
+                </div>
+
+                <TabsContent value="per-nota" className="mt-0">
+                  <LaporanPengirimanTable
+                    data={data}
+                    pagination={pagination}
+                    isLoading={isLoading}
+                    onPageChange={setPage}
+                  />
+                </TabsContent>
+
+                <TabsContent value="per-tipe" className="mt-0">
+                  <LaporanPengirimanPerTipe
+                    data={data}
+                    pagination={pagination}
+                    isLoading={isLoading}
+                    onPageChange={setPage}
+                  />
+                </TabsContent>
+
+                <TabsContent value="per-customer" className="mt-0">
+                  <LaporanPengirimanPerCustomer
+                    data={data}
+                    pagination={pagination}
+                    isLoading={isLoading}
+                    onPageChange={setPage}
+                  />
+                </TabsContent>
+              </div>
+            </PrintLetterPage>
+          </Tabs>
+        </div>
       </div>
     </DashboardLayout>
   );

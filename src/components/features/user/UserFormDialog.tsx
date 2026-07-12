@@ -33,7 +33,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
 
   // Using a union type for potential values
   const form = useForm<CreateUserFormValues | UpdateUserFormValues>({
-    resolver: zodResolver(isEdit ? updateUserSchema : createUserSchema),
+    resolver: zodResolver(isEdit ? updateUserSchema : createUserSchema) as any,
     defaultValues: {
       name: '',
       email: '',

@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreVertical } from "lucide-react"
 import { SalesItem } from "./sales.data"
-import { formatCurrency } from "@/lib/utils/currency"
+import { currenciesFormat } from "@/components/ui/currenciesFormat"
 import { Badge } from "@/components/ui/badge"
 
 interface Props {
@@ -45,15 +45,15 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || ""
 
     const handleEdit = () => {
-        router.push(slug ? `/dashboard/${slug}/sales/edit/${item.id}` : `/sales/edit/${item.id}`)
+        router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/edit/${item.id}` : `/transaksi/penjualan-unit/edit/${item.id}`)
     }
 
     const handleDetail = () => {
-        router.push(slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`)
+        router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}` : `/transaksi/penjualan-unit/${item.id}`)
     }
 
     const handleRefund = () => {
-        router.push(slug ? `/dashboard/${slug}/sales/${item.id}/refund` : `/sales/${item.id}/refund`)
+        router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}/refund` : `/transaksi/penjualan-unit/${item.id}/refund`)
     }
 
     const handleDelete = async () => {
@@ -69,19 +69,11 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     }
 
     return (
-        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 hover:bg-accent/50">
-            {/* Checkbox */}
-            <TableCell className="w-12 transition-all duration-200 group-hover:translate-x-0.5">
-                <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => onToggle(item.id)}
-                />
-            </TableCell>
-
+        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
             {/* Kode Jual - Link biru */}
-            <TableCell className="transition-all duration-200">
+            <TableCell className="px-4 py-4 text-left text-sm font-medium">
                 <Link
-                    href={slug ? `/dashboard/${slug}/sales/${item.id}` : `/sales/${item.id}`}
+                    href={slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}` : `/transaksi/penjualan-unit/${item.id}`}
                     className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
                 >
                     {item.kodeJual}
@@ -89,10 +81,10 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             </TableCell>
 
             {/* Tanggal */}
-            <TableCell className="transition-all duration-200">{item.tanggal}</TableCell>
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.tanggal}</TableCell>
 
             {/* Customer */}
-            <TableCell className="transition-all duration-200">
+            <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                 <div className="flex items-center gap-2">
                     <span>{item.customer}</span>
                     {item.isRefunded ? (
@@ -101,53 +93,58 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                 </div>
             </TableCell>
 
+            {/* Biaya Ekspedisi */}
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                {currenciesFormat('idr', item.biayaEkspedisi)}
+            </TableCell>
+
             {/* Total Biaya */}
-            <TableCell className="text-left transition-all duration-200">
-                {item.totalBiaya}
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                {currenciesFormat('idr', item.totalBiaya)}
             </TableCell>
 
             {/* Total DPP */}
-            <TableCell className="text-right py-4 transition-all duration-200">
-                {formatCurrency(item.totalDpp)}
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                {currenciesFormat('idr', item.totalDpp)}
             </TableCell>
 
             {/* Total PPN */}
-            <TableCell className="text-right py-4 transition-all duration-200">
-                {formatCurrency(item.totalPpn)}
+            <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
+                {currenciesFormat('idr', item.totalPpn)}
             </TableCell>
 
             {/* Total Jual */}
-            <TableCell className="text-right font-semibold py-4 transition-all duration-200">
-                {formatCurrency(item.totalJual)}
+            <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">
+                {currenciesFormat('idr', item.totalJual)}
             </TableCell>
 
             {/* Kurang Bayar - MERAH */}
-            <TableCell className="text-right text-red-600 font-semibold py-4 transition-all duration-200">
-                {formatCurrency(item.kurangBayar)}
+            <TableCell className="px-4 py-4 text-center text-sm text-red-600 font-semibold">
+                {currenciesFormat('idr', item.kurangBayar)}
             </TableCell>
 
             {/* Action Dropdown */}
-            <TableCell className="text-right transition-all duration-200">
+            <TableCell className="px-4 py-4 text-center">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="rounded-md p-1 hover:bg-muted transition-colors duration-200 hover:scale-110 active:scale-95 transform">
+                        <button className="rounded-md p-1 hover:bg-slate-100 transition-colors duration-200 hover:scale-110 active:scale-95 transform">
                             <MoreVertical className="h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={handleEdit}>
+                    <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleEdit}>
                             Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDetail}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleDetail}>
                             Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
                             {item.isRefunded ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => window.open(slug ? `/dashboard/${slug}/sales/${item.id}?print=true` : `/sales/${item.id}?print=true`, '_blank')}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')}>
                             Print
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-red-600">
+                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -8,7 +8,10 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { CashFlowItem } from '@/services/cashFlow.service';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 interface LaporanKasTableProps {
     data: CashFlowItem[];
@@ -25,7 +28,7 @@ export function LaporanKasTable({
     totalPengeluaran = 0,
     onSort,
     sortKey,
-    sortOrder 
+    sortOrder
 }: LaporanKasTableProps) {
     const formatCurrency = (val: number) => {
         return `Rp ${val.toLocaleString('id-ID')}`;
@@ -33,88 +36,92 @@ export function LaporanKasTable({
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        if (Number.isNaN(date.getTime())) return dateString;
+        return format(date, 'dd MMMM yyyy', { locale: id });
+    };
+
+    const renderSortHeader = (title: string, key: string, align: 'left' | 'right' | 'center' = 'left') => {
+        const isSorted = sortKey === key;
+        const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
+        return (
+            <button
+                type="button"
+                className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase transition-colors ${
+                    isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
+                } ${justifyClass}`}
+                onClick={() => onSort?.(key)}
+            >
+                <span>{title}</span>
+                {isSorted ? (
+                    sortOrder === 'asc' ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                    ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                    )
+                ) : (
+                    <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
+                )}
+            </button>
+        );
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
             <div className="overflow-x-auto">
                 <Table>
-                    <TableHeader className="bg-[#f3f4f6]">
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
-                            <TableHead className="font-semibold text-gray-700 py-3 px-4 w-[150px]">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer select-none"
-                                    onClick={() => onSort?.('date')}
-                                >
-                                    TANGGAL
-                                    <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <TableHead className="p-0 text-center w-[150px]">
+                                {renderSortHeader('Tanggal', 'date', 'center')}
                             </TableHead>
-                            <TableHead className="font-semibold text-gray-700 py-3 px-4 w-[150px]">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer select-none"
-                                    onClick={() => onSort?.('code')}
-                                >
-                                    NOTA REFF
-                                    <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <TableHead className="p-0 text-left w-[150px]">
+                                {renderSortHeader('Nota Reff', 'code', 'left')}
                             </TableHead>
-                            <TableHead className="font-semibold text-gray-700 py-3 px-4">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer select-none"
-                                    onClick={() => onSort?.('note')}
-                                >
-                                    KETERANGAN
-                                    <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                                </div>
+                            <TableHead className="p-0 text-left">
+                                {renderSortHeader('Keterangan', 'note', 'left')}
                             </TableHead>
-                            <TableHead className="font-semibold text-gray-700 py-3 px-4 w-[200px]">PEMASUKAN</TableHead>
-                            <TableHead className="font-semibold text-gray-700 py-3 px-4 w-[200px]">PENGELUARAN</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-center">PEMASUKAN</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-center">PENGELUARAN</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {data.map((item) => (
-                            <TableRow key={item.id} className="hover:bg-gray-50 bg-white">
-                                <TableCell className="py-3 px-4 text-sm text-gray-600 font-medium">
+                            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors bg-white border-b">
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-center">
                                     {formatDate(item.date)}
                                 </TableCell>
-                                <TableCell className="py-3 px-4 text-sm text-gray-600">
+                                <TableCell className="px-4 py-4 text-sm text-gray-600">
                                     {item.code}
                                 </TableCell>
-                                <TableCell className="py-3 px-4 text-sm text-gray-600">
+                                <TableCell className="px-4 py-4 text-sm text-gray-600">
                                     {item.note || '-'}
                                 </TableCell>
-                                <TableCell className="py-3 px-4 text-sm font-medium text-[#22c55e]">
+                                <TableCell className="px-4 py-4 text-sm font-semibold text-emerald-600 text-center">
                                     {item.debet > 0 ? formatCurrency(item.debet) : ''}
                                 </TableCell>
-                                <TableCell className="py-3 px-4 text-sm font-medium text-[#ef4444]">
+                                <TableCell className="px-4 py-4 text-sm font-semibold text-rose-600 text-center">
                                     {item.credit > 0 ? formatCurrency(item.credit) : ''}
                                 </TableCell>
                             </TableRow>
                         ))}
                         {data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center text-gray-500">
+                                <TableCell colSpan={5} className="px-4 py-10 text-center text-sm text-gray-500">
                                     Tidak ada data transaksi kas
                                 </TableCell>
                             </TableRow>
                         )}
                         {/* Footer Totals Row */}
-                        <TableRow className="bg-white hover:bg-white border-t-2 border-gray-100">
-                            <TableCell colSpan={3} className="py-4">
+                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200">
+                            <TableCell colSpan={3} className="px-4 py-4">
                                 <div className="text-right pr-12">
-                                    <span className="text-sm font-bold text-gray-900">Grand Total</span>
+                                    <span className="text-sm font-semibold text-slate-900">Grand Total</span>
                                 </div>
                             </TableCell>
-                            <TableCell className="py-4 text-sm font-bold text-gray-900">
+                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
                                 {formatCurrency(totalPemasukan)}
                             </TableCell>
-                            <TableCell className="py-4 text-sm font-bold text-gray-900">
+                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
                                 {formatCurrency(totalPengeluaran)}
                             </TableCell>
                         </TableRow>

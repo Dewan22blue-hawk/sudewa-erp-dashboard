@@ -169,14 +169,20 @@ export interface DashboardStats {
  */
 export interface BillingStatsRaw {
   opening_balance: {
-    debet: { cash: number; bca_idr: number; bca_usd: number };
-    kredit?: { cash: number; bca_idr: number; bca_usd: number };
+    debet: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
+    kredit?: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
   };
   mutation: {
-    debet: { cash: number; bca_idr: number; bca_usd: number };
-    kredit: { cash: number; bca_idr: number; bca_usd: number };
+    debet: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
+    kredit: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
   };
-  percentage?: any;
+  percentage?: Array<{
+    date: string;
+    debet: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
+    kredit: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
+    debet_percentage?: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
+    kredit_percentage?: { cash?: number; cash_idr?: number; bca_idr: number; bca_usd: number };
+  }>;
 }
 
 /**

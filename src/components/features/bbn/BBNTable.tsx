@@ -53,10 +53,14 @@ export function BBNTable({
             return Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
                     key={p}
-                    variant={p === page ? "outline" : "ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={() => onPageChange(p)}
-                    className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                    className={
+                        p === page
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                    }
                 >
                     {p}
                 </Button>
@@ -83,11 +87,17 @@ export function BBNTable({
         return pages.map((p, idx) => (
             <Button
                 key={idx}
-                variant={p === page ? "outline" : "ghost"}
+                variant="ghost"
                 size="sm"
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
-                className={p === page ? "border-gray-200 bg-white" : "text-gray-500"}
+                className={
+                    p === page
+                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                        : p === '...'
+                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                }
             >
                 {p}
             </Button>
@@ -117,36 +127,35 @@ export function BBNTable({
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                        <span>Show</span>
                         <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
                             <SelectTrigger className="w-[70px] bg-white">
-                                <SelectValue placeholder="10" />
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
                                 <SelectItem value="25">25</SelectItem>
                                 <SelectItem value="50">50</SelectItem>
                                 <SelectItem value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">Page</span>
+                        <span>Page</span>
                     </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    {onImport ? (
+                    {onImport && (
                         <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
                             <Upload className="h-4 w-4 mr-2" />
                             Import
                         </Button>
-                    ) : null}
-                    {onExport ? (
+                    )}
+                    {onExport && (
                         <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
-                            <Download className="h-4 w-4 mr-2" />
+                            <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
-                    ) : null}
+                    )}
                     <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                         <Plus className="h-4 w-4 mr-2" />
                         Tambah
@@ -240,19 +249,19 @@ export function BBNTable({
                 </div>
             </Card>
 
-            <div className="flex items-center justify-between px-2 pt-2">
-                <div className="text-sm text-gray-500">
+            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+                <div>
                     Showing {totalData === 0 ? 0 : startData}-{endData} of {totalData} data
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Previous
                         </Button>
@@ -264,7 +273,7 @@ export function BBNTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="text-gray-500"
+                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Next
                         </Button>

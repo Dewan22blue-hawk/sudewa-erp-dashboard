@@ -21,6 +21,7 @@ interface AccountApiModel {
   type?: 'credit' | 'debet' | 'debit';
   category?: string;
   is_active?: boolean | number;
+  is_lock?: boolean | number;
   created_at?: string;
   updated_at?: string;
 }
@@ -38,6 +39,7 @@ const mapAccount = (payload: AccountApiModel): Account => ({
   cashFlow: undefined,
   description: payload.description ?? null,
   isActive: payload.is_active === undefined ? true : payload.is_active === true || payload.is_active === 1,
+  is_lock: payload.is_lock === undefined ? false : payload.is_lock === true || payload.is_lock === 1 || String(payload.is_lock) === '1' || String(payload.is_lock) === 'true',
   createdAt: payload.created_at,
   updatedAt: payload.updated_at,
   companyId: payload.account_group?.company_id ? String(payload.account_group.company_id) : undefined,
@@ -70,14 +72,15 @@ export const getAccounts = async (params: PaginationParams & { search?: string; 
   const scopedData = params.company_id
     ? (data.data ?? []).filter((item) => String(item.account_group?.company_id) === String(params.company_id))
     : (data.data ?? []);
+  const isFrontendFallback = params.company_id ? (scopedData.length !== (data.data ?? []).length) : false;
 
   return toPaginatedResult(
     {
       data: scopedData,
       current_page: data.current_page,
       per_page: data.per_page ?? data.perPage ?? params.perPage ?? 10,
-      total: params.company_id ? scopedData.length : data.total,
-      last_page: data.last_page,
+      total: isFrontendFallback ? scopedData.length : data.total,
+      last_page: isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.per_page ?? data.perPage ?? params.perPage ?? 1, 1))) : data.last_page,
     },
     mapAccount,
   );
@@ -168,5 +171,34 @@ export const importAccount = async (file: File, companyId?: string | number): Pr
   const payload = response.data as LaravelApiResponse<null>;
   if (!payload.status) {
     throw new ApiResponseError(payload.message ?? 'Failed to import account');
+  }
+};
+
+export const bulkUpdateAccounts = async (payload: {
+  accountIds: (number | string)[];
+  accountGroupId: number;
+  category: string;
+}): Promise<void> => {
+  try {
+    const body = new URLSearchParams();
+    payload.accountIds.forEach((id) => {
+      body.append('account_id[]', String(id));
+    });
+    body.append('account_group_id', String(payload.accountGroupId));
+    body.append('category', payload.category);
+
+    const response = await apiClient.put<LaravelApiResponse<null>>(`${basePath}/bulk-update`, body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const data = response.data;
+    if (!data.status) {
+      throw new ApiResponseError(data.message ?? 'Gagal memperbarui akun terpilih secara massal');
+    }
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      throw error;
+    }
+    throw error;
   }
 };

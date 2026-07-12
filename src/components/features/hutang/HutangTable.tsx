@@ -1,5 +1,5 @@
 import { Hutang } from '@/@types/hutang.types';
-import { MoreVertical, Search, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -89,9 +89,9 @@ export default function HutangTable({ data }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10</SelectItem>
               <SelectItem value="25">25</SelectItem>
               <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
           <span>Page</span>

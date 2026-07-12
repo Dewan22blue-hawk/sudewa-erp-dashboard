@@ -3,19 +3,19 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
-import { useCompany } from '@/contexts/CompanyContext';
-import { useDealers } from '@/hooks/useDealer';
+import { useDitlantasProcessOptions } from '@/hooks/useVehicleDocument';
 import { useBBNBillDetail, useUpdateBBNBill } from '@/hooks/useBBNBill';
 import { toDateValue, toPayloadDate } from '@/components/features/tagihan-bbn/utils';
 
 type FormValues = {
-  dealerId: string;
+  ditlantasProcessId: string;
   billDate?: Date;
   paidDate?: Date;
 };
@@ -24,16 +24,14 @@ export default function EditBBNBillPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const id = typeof router.query.id === 'string' ? router.query.id : null;
-  const { companyId } = useCompany();
-  const safeCompanyId = companyId || '1';
 
-  const [dealerSearch, setDealerSearch] = React.useState('');
+  const [ditlantasSearch, setDitlantasSearch] = React.useState('');
   const detailQuery = useBBNBillDetail(id);
-  const dealersQuery = useDealers(safeCompanyId, { page: 1, perPage: 100, search: dealerSearch, sort_order: 'asc' });
+  const ditlantasQuery = useDitlantasProcessOptions(ditlantasSearch, false);
   const updateMutation = useUpdateBBNBill();
   const form = useForm<FormValues>({
     defaultValues: {
-      dealerId: '',
+      ditlantasProcessId: '',
       billDate: undefined,
       paidDate: undefined,
     },
@@ -42,21 +40,44 @@ export default function EditBBNBillPage() {
   React.useEffect(() => {
     if (!detailQuery.data) return;
     form.reset({
-      dealerId: String(detailQuery.data.dealerId),
+      ditlantasProcessId: detailQuery.data.ditlantasProcess?.id
+        ? String(detailQuery.data.ditlantasProcess.id)
+        : detailQuery.data.dealerId
+        ? String(detailQuery.data.dealerId)
+        : '',
       billDate: toDateValue(detailQuery.data.billDate),
       paidDate: toDateValue(detailQuery.data.paidDate),
     });
   }, [detailQuery.data, form]);
 
-  const dealerOptions = React.useMemo(
-    () =>
-      (dealersQuery.data?.data ?? []).map((dealer) => ({
-        value: String(dealer.id),
-        label: dealer.namaDealer || dealer.code || `Dealer ID ${dealer.id}`,
-        subtitle: dealer.code || undefined,
-      })),
-    [dealersQuery.data?.data],
-  );
+  const currentDitlantas = detailQuery.data?.ditlantasProcess;
+
+  const ditlantasOptions = React.useMemo(() => {
+    const list = (ditlantasQuery.data ?? [])
+      .filter((item) => {
+        if (item.isAlreadyProcessed === true) return false;
+        if (item.unprocessedCount === 0) return false;
+        return true;
+      })
+      .map((item) => ({
+        value: String(item.id),
+        label: `${item.code} - ${item.vendorName || ''}`,
+        subtitle: item.vendorName || undefined,
+      }));
+
+    if (currentDitlantas && currentDitlantas.id) {
+      const exists = list.some((opt) => opt.value === String(currentDitlantas.id));
+      if (!exists) {
+        list.unshift({
+          value: String(currentDitlantas.id),
+          label: `${currentDitlantas.code} - ${currentDitlantas.vendor?.name || ''}`,
+          subtitle: currentDitlantas.vendor?.name || undefined,
+        });
+      }
+    }
+
+    return list;
+  }, [ditlantasQuery.data, currentDitlantas]);
 
   return (
     <DashboardLayout>
@@ -75,7 +96,7 @@ export default function EditBBNBillPage() {
             </Button>
             <div>
               <h1 className="text-[30px] font-semibold tracking-[-0.02em] text-slate-950">Ubah Data Tagihan BBN</h1>
-              <p className="mt-1 text-sm text-slate-500">Perbarui dealer dan tanggal tagihan sesuai kebutuhan.</p>
+              <p className="mt-1 text-sm text-slate-500">Perbarui proses ditlantas dan tanggal tagihan sesuai kebutuhan.</p>
             </div>
           </div>
 
@@ -88,7 +109,7 @@ export default function EditBBNBillPage() {
                   await updateMutation.mutateAsync({
                     id,
                     payload: {
-                      dealerId: values.dealerId,
+                      ditlantasProcessId: values.ditlantasProcessId,
                       billDate: toPayloadDate(values.billDate),
                       paidDate: toPayloadDate(values.paidDate),
                     },
@@ -96,25 +117,25 @@ export default function EditBBNBillPage() {
                   toast.success('Tagihan BBN berhasil diperbarui');
                   router.push(`/dashboard/${slug}/tagihan-bbn/${id}`);
                 } catch (error: any) {
-                  toast.error(error.message || 'Gagal memperbarui tagihan BBN');
+                  toast.error(getApiErrorMessage(error));
                 }
               })}
               className="grid gap-6 md:grid-cols-2"
             >
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-900">Dealer</Label>
+                <Label className="text-sm font-semibold text-slate-900">Proses Ditlantas</Label>
                 <Controller
-                  name="dealerId"
+                  name="ditlantasProcessId"
                   control={form.control}
                   render={({ field }) => (
                     <SearchableSelect
                       value={field.value}
                       onChange={field.onChange}
-                      options={dealerOptions}
-                      onSearchChange={setDealerSearch}
-                      placeholder="Pilih dealer"
-                      searchPlaceholder="Cari dealer..."
-                      emptyText="Dealer tidak ditemukan."
+                      options={ditlantasOptions}
+                      onSearchChange={setDitlantasSearch}
+                      placeholder="Pilih kode proses Ditlantas"
+                      searchPlaceholder="Cari proses Ditlantas..."
+                      emptyText="Proses Ditlantas tidak ditemukan."
                       className="h-11 rounded-xl border-slate-200"
                     />
                   )}
@@ -126,7 +147,7 @@ export default function EditBBNBillPage() {
                 <Controller
                   name="billDate"
                   control={form.control}
-                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />}
+                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
                 />
               </div>
 
@@ -135,12 +156,12 @@ export default function EditBBNBillPage() {
                 <Controller
                   name="paidDate"
                   control={form.control}
-                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />}
+                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
                 />
               </div>
 
               <div className="flex items-end justify-end">
-                <Button type="submit" disabled={updateMutation.isPending} className="h-11 rounded-xl bg-[#1f4163] px-6 hover:bg-[#183552]">
+                <Button type="submit" disabled={updateMutation.isPending} className="rounded-xl bg-[#1e3a5f] px-6 hover:bg-[#152e4d]">
                   <Save className="mr-2 h-4 w-4" />
                   {updateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
                 </Button>

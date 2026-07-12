@@ -39,11 +39,14 @@ export interface Purchase {
   code: string;
   date: string;
   supplierName: string;
+  supplierAddress?: string | null;
+  supplierNpwp?: string | null;
   companyId: string;
   stockState?: string;
   maxCapacity?: number;
   warehouseName?: string;
   warehouseId?: string;
+  transaction_date?: string;
 
   totalDpp: number;
   totalPpn: number;
@@ -78,17 +81,27 @@ export interface CreatePurchaseRequest {
   bbn_price?: number;
   expedition_fee?: number;
   other_fee?: number;
+  transaction_date?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 }
 
 export interface UpdatePurchaseRequest {
-  date: string;
-  supplierName: string;
+  company_id: number;
+  person_id: number;
+  code: string;
+  type: 'purchase' | 'sales';
+  max_capacity: string;
+  stock_state: string;
+  transaction_date?: string;
 }
 
 export interface PurchaseFormValues {
   supplierName: string;
   date: string;
   code: string;
+  supplierAddress?: string | null;
+  supplierNpwp?: string | null;
 }
 
 export interface CreatePurchaseUnitRequest {

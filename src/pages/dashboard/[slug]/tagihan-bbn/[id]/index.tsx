@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Pencil, Plus, Printer } from 'lucide-react';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -37,7 +38,6 @@ export default function BBNBillDetailPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const id = typeof router.query.id === 'string' ? router.query.id : null;
-  const shouldPrint = router.query.print === '1';
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
 
@@ -89,10 +89,20 @@ export default function BBNBillDetailPage() {
   const paymentItems = React.useMemo(() => {
     return (billingItemsQuery.data?.data ?? [])
       .filter((item) => billingIds.has(item.bbnBillBillingId))
-      .map((item) => ({
-        ...item,
-        cashLabel: item.cashLabel || (item.cashId ? cashLabelMap.get(item.cashId) : undefined) || 'Cash',
-      }));
+      .map((item) => {
+        const cashIdNum = item.cashId ? Number(item.cashId) : 0;
+        const rawLabel = cashLabelMap.get(cashIdNum) || item.cashLabel || 'Cash';
+        const label = (() => {
+          const upper = rawLabel.toUpperCase();
+          if (upper.includes('USD')) return 'BCA USD';
+          if (upper.includes('BCA')) return 'BCA IDR';
+          return 'CASH IDR';
+        })();
+        return {
+          ...item,
+          cashLabel: label,
+        };
+      });
   }, [billingIds, billingItemsQuery.data?.data, cashLabelMap]);
 
   const vehicles = React.useMemo(() => detailQuery.data?.dealerDetail?.vehicleDatas ?? [], [detailQuery.data?.dealerDetail?.vehicleDatas]);
@@ -134,14 +144,6 @@ export default function BBNBillDetailPage() {
     );
   }, [vehicles]);
 
-  React.useEffect(() => {
-    if (!shouldPrint || !detailQuery.data) return;
-    const timeout = window.setTimeout(() => {
-      window.print();
-    }, 350);
-    return () => window.clearTimeout(timeout);
-  }, [detailQuery.data, shouldPrint]);
-
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
@@ -165,24 +167,30 @@ export default function BBNBillDetailPage() {
                   Edit
                 </Button>
               </Link>
-              <Button onClick={() => window.print()} className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
+              <Button onClick={() => router.push(`/dashboard/${slug}/tagihan-bbn/print/${detailQuery.data.id}`)} className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
                 <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>
             </div>
           </div>
 
-          <Card className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              <ReadonlyField label="Dealer" value={detailQuery.data.dealer?.name || '-'} />
-              <ReadonlyField label="Nomor Tagihan" value={formatBillCode(detailQuery.data.id)} />
+          <Card className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+            <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
+              <ReadonlyField label="Kode Ditlantas" value={detailQuery.data.ditlantasProcess?.code || '-'} />
+              <ReadonlyField label="Nomor Tagihan" value={detailQuery.data.code || formatBillCode(detailQuery.data.id)} />
+            </div>
+            <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
               <ReadonlyField label="Tanggal Penagihan" value={formatShortDate(detailQuery.data.billDate)} />
               <ReadonlyField label="Tanggal Bayar" value={formatShortDate(detailQuery.data.paidDate)} />
+            </div>
+            <div className="grid gap-5 grid-cols-1 md:grid-cols-3">
               <ReadonlyField label="Jumlah Tagihan" value={formatCurrency(detailQuery.data.bruttoAmount)} />
-              <ReadonlyField label="PPH 23=2%" value={formatCurrency(0)} />
-              <ReadonlyField label="Grand Total (Jumlah Tagihan & PPH)" value={formatCurrency(detailQuery.data.bruttoAmount)} />
+              <ReadonlyField label="PPH 23=2%" value={formatCurrency(detailQuery.data.pph23Amount ?? 0)} />
+              <ReadonlyField label="Grand Total (Jumlah Tagihan & PPH)" value={formatCurrency(detailQuery.data.bruttoAmount - (detailQuery.data.pph23Amount ?? 0))} />
+            </div>
+            <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
+              <ReadonlyField label="Kurang Bayar" value={formatCurrency(detailQuery.data.remainingAmount !== undefined ? detailQuery.data.remainingAmount : calculateOutstanding(detailQuery.data.bruttoAmount, detailQuery.data.paidAmount))} danger />
               <ReadonlyField label="Terbayar" value={formatCurrency(detailQuery.data.paidAmount)} />
-              <ReadonlyField label="Kurang Bayar" value={formatCurrency(calculateOutstanding(detailQuery.data.bruttoAmount, detailQuery.data.paidAmount))} danger />
             </div>
           </Card>
 
@@ -214,12 +222,12 @@ export default function BBNBillDetailPage() {
                 </div>
               </div>
 
-              <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
+              {/* <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
                 <Button className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
                   <Plus className="mr-2 h-4 w-4" />
                   Tambah Pembayaran
                 </Button>
-              </Link>
+              </Link> */}
             </div>
 
             <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -284,7 +292,7 @@ export default function BBNBillDetailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-[32px] font-semibold tracking-[-0.03em] text-slate-950">History Pembayaran</h2>
-                <p className="mt-1 text-sm text-slate-500">Rincian pembayaran tagihan yang telah dibuat</p>
+                <p className="mt-1 text-sm text-slate-500">Rincian lengkap unit yang dibeli</p>
               </div>
             </div>
 
@@ -307,7 +315,9 @@ export default function BBNBillDetailPage() {
                       return (
                         <TableRow key={item.id} className="border-slate-100">
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{formatShortDate(item.paidDate)}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-slate-700">-</TableCell>
+                          <TableCell className="px-4 py-3 text-sm text-blue-600 font-medium">
+                            <span className="cursor-pointer hover:underline">Link</span>
+                          </TableCell>
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA IDR' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA USD' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
                           <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'CASH IDR' || label === 'Cash' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
@@ -323,7 +333,7 @@ export default function BBNBillDetailPage() {
                                     await deleteBillingItemMutation.mutateAsync(item.id);
                                     toast.success('Item pembayaran berhasil dihapus');
                                   } catch (error: any) {
-                                    toast.error(error.message || 'Gagal menghapus item pembayaran');
+                                    toast.error(getApiErrorMessage(error));
                                   }
                                 }}
                                 className="text-sm font-medium text-red-600"

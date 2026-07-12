@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { GoodsIssue } from '@/@types/goods-issue.types';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
+import { cn } from '@/lib/utils';
 import { formatCurrency, formatDate, getIssueStatusLabel } from './goods-issue.utils';
 
 interface GoodsIssueTableProps {
@@ -52,107 +53,144 @@ export function GoodsIssueTable({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[24px] font-semibold text-slate-900">Data Pengeluaran Material</h1>
-        <p className="mt-1 text-sm text-slate-500">Kelola dan lacak semua data pengeluaran stock material</p>
+        <h1 className="text-2xl font-semibold">Data Pengeluaran Material</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock material</p>
       </div>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-[335px]">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm" />
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="pl-9 bg-white" />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-[16px] text-slate-700">
-            <span>Show</span>
-            <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white shadow-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
-          </div>
+
+          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah
+          </Button>
         </div>
 
-        <Button onClick={onAdd} className="h-11 rounded-xl bg-[#1f4163] px-6 text-[18px] font-medium hover:bg-[#183552]">
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah
-        </Button>
-      </div>
-
-      <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <Table>
-          <TableHeader className="bg-slate-100">
-            <TableRow className="border-slate-200">
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">KODE PENGELUARAN</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">TANGGAL</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">CUSTOMER</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">HARGA JUAL</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">STATUS</TableHead>
-              <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">ACTION</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-28 text-center text-slate-500">Memuat data pengeluaran material...</TableCell>
+        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+          <Table>
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+              <TableRow className="hover:bg-[#f8f9fa]">
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE PENGELUARAN</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TANGGAL</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">CUSTOMER</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">HARGA JUAL</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
               </TableRow>
-            ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-28 text-center text-slate-500">Tidak ada data pengeluaran material.</TableCell>
-              </TableRow>
-            ) : (
-              data.map((item) => (
-                <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70">
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.code}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatDate(item.transactionDate)}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.customer?.name ?? '-'}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatCurrency(item.totalBrutto)}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{getIssueStatusLabel(item)}</TableCell>
-                  <TableCell className="px-5 py-4 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-                          <MoreVertical className="h-4 w-4 text-slate-700" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40 rounded-2xl border-slate-200 p-2 shadow-lg">
-                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
-                          <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material/${item.id}/edit`}>Edit</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
-                          <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material/${item.id}`}>Detail</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">Bayar</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onUpload(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">Upload Nota</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Memuat data pengeluaran material...</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+              ) : data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Tidak ada data pengeluaran material.</TableCell>
+                </TableRow>
+              ) : (
+                data.map((item) => (
+                  <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.code}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.customer?.name ?? '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatCurrency(item.totalBrutto)}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{getIssueStatusLabel(item)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material/${item.id}/edit`}>Edit</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material/${item.id}`}>Detail</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onPay(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">Bayar</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onUpload(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">Upload Nota</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">Hapus</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-      <div className="flex flex-col gap-4 px-2 lg:flex-row lg:items-center lg:justify-between">
-        <p className="text-[14px] text-slate-500">Showing {startData}-{endData} of {totalData} data</p>
-        <div className="flex items-center gap-1 text-[16px]">
-          <Button variant="ghost" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="text-slate-700">Previous</Button>
-          {pageNumbers.map((pageNumber) => (
-            <Button key={pageNumber} variant={pageNumber === page ? 'outline' : 'ghost'} onClick={() => onPageChange(pageNumber)} className={pageNumber === page ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white' : 'h-10 min-w-10 rounded-xl text-slate-700'}>
-              {pageNumber}
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+          <p>Showing {startData}-{endData} of {totalData} data</p>
+          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={page <= 1}
+              onClick={() => onPageChange(page - 1)}
+            >
+              Previous
             </Button>
-          ))}
-          {totalPages > 5 && page < totalPages - 2 ? <span className="px-2 text-slate-500">...</span> : null}
-          {totalPages > 5 && !pageNumbers.includes(totalPages) ? <Button variant="ghost" onClick={() => onPageChange(totalPages)} className="h-10 min-w-10 rounded-xl text-slate-700">{totalPages}</Button> : null}
-          <Button variant="ghost" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="text-slate-700">Next</Button>
+            {pageNumbers.map((pageNumber) => (
+              <Button
+                key={pageNumber}
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  pageNumber === page
+                    ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                    : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                )}
+                onClick={() => onPageChange(pageNumber)}
+              >
+                {pageNumber}
+              </Button>
+            ))}
+            {totalPages > 5 && !pageNumbers.includes(totalPages) && <span className="px-1 text-slate-500">...</span>}
+            {totalPages > 5 && !pageNumbers.includes(totalPages) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                onClick={() => onPageChange(totalPages)}
+              >
+                {totalPages}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              disabled={page >= totalPages}
+              onClick={() => onPageChange(page + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>

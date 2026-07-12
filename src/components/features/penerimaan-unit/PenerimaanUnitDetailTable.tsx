@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, Search, Trash, ArrowDown } from 'lucide-react';
+import { Check, Search, Trash, ArrowDown, ArrowUpDown, ArrowUp } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button';
 import { PenerimaanUnitDetail } from '@/@types/penerimaan-unit.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useTableSort } from '@/hooks/useTableSort';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import { useCompany } from '@/contexts/CompanyContext';
 import { usePenerimaanReceiptTable } from '@/hooks/usePenerimaanReceiptTable';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Props {
   data?: PenerimaanUnitDetail[];
@@ -137,25 +137,48 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
     return pages;
   };
 
+  const renderSortHeader = (key: string, label: string) => {
+    const isSorted = sortKey === key;
+    return (
+      <TableHead
+        onClick={() => handleSort(key as any)}
+        className="px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap text-left"
+      >
+        <div className="flex items-center gap-1 justify-start">
+          {label}
+          {isSorted ? (
+            sortOrder === 'asc' ? (
+              <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
+            ) : (
+              <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
+            )
+          ) : (
+            <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
+          )}
+        </div>
+      </TableHead>
+    );
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
-        <div className="flex items-center gap-4">
-          <div className="relative w-60 sm:w-64">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[300px]">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input placeholder="Search here" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-10 border-gray-200 rounded-lg focus-visible:ring-1" />
+            <Input placeholder="Search here" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-white" />
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-700">
+          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
             <span>Show</span>
             <Select value={itemsPerPage} onValueChange={(val) => setItemsPerPage(val)}>
-              <SelectTrigger className="h-10 w-20 border-gray-200 rounded-lg">
-                <SelectValue />
+              <SelectTrigger className="w-[70px] bg-white">
+                <SelectValue placeholder="25" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10</SelectItem>
                 <SelectItem value="25">25</SelectItem>
                 <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
               </SelectContent>
             </Select>
             <span>Page</span>
@@ -204,76 +227,62 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-[#f5f7fa] text-xs font-medium text-gray-700">
-            <tr>
-              <th className="px-4 py-3 text-center w-[48px]">
+        <Table className="w-full text-sm">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow>
+              <TableHead className="px-4 py-4 text-center w-[48px]">
                 <Checkbox
                   checked={paginated.filter((d) => !receivedIds.includes(d.id)).length > 0 && paginated.filter((d) => !receivedIds.includes(d.id)).every((d) => selected.includes(d.id))}
                   onCheckedChange={() => toggleAll()}
                 />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="NO" sortKey="id" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="NO PEMBELIAN" sortKey="purchaseCode" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="TIPE UNIT" sortKey="unitTypeName" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="WARNA" sortKey="color" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="NO MESIN" sortKey="machineNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="NO RANGKA" sortKey="chassisNumber" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="STATUS" sortKey="status" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-700 justify-start w-full" />
-              </th>
-              <th className="px-4 py-3 text-center">Action</th>
-            </tr>
-          </thead>
+              </TableHead>
+              {renderSortHeader('id', 'NO')}
+              {renderSortHeader('purchaseCode', 'NO PEMBELIAN')}
+              {renderSortHeader('unitTypeName', 'TIPE UNIT')}
+              {renderSortHeader('color', 'WARNA')}
+              {renderSortHeader('machineNumber', 'NO MESIN')}
+              {renderSortHeader('chassisNumber', 'NO RANGKA')}
+              {renderSortHeader('status', 'STATUS')}
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">Action</TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody className="divide-y divide-gray-100">
+          <TableBody>
             {paginated.length > 0 ? (
               paginated.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-center">
+                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors">
+                  <TableCell className="px-4 py-4 text-center">
                     <Checkbox checked={selected.includes(item.id) || receivedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} disabled={receivedIds.includes(item.id)} />
-                  </td>
-                  <td className="px-4 py-3">{startIndex + index + 1}</td>
-                  <td className="px-4 py-3">{item.purchaseCode}</td>
-                  <td className="px-4 py-3">{item.unitTypeName}</td>
-                  <td className="px-4 py-3">{item.color}</td>
-                  <td className="px-4 py-3">{item.machineNumber}</td>
-                  <td className="px-4 py-3">{item.chassisNumber}</td>
-                  <td className="px-4 py-3">
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.purchaseCode}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.unitTypeName}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.color}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.machineNumber}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.chassisNumber}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                     {receivedIds.includes(item.id) ? (
                       <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Sudah Diterima</span>
                     ) : (
                       item.status
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-center">
                     <Button variant="ghost" size="icon" onClick={() => setConfirmDeleteIds([item.id])}>
                       <Trash size={16} className="text-red-600" />
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={9} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Tidak ada data.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <div className="flex justify-between items-center text-sm text-gray-500 mt-4">

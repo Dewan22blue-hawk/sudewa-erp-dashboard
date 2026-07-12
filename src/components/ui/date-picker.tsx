@@ -8,11 +8,12 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { formatDateUI } from '@/lib/utils/date';
 
 export function DatePicker({
   value,
   onChange,
-  placeholder = 'Select date',
+  placeholder = 'Pilih tanggal',
   disabled,
   className,
   id,
@@ -43,7 +44,7 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <Button type="button" id={id} variant={'outline'} className={cn('w-full justify-start text-left font-normal', !dateValue && 'text-muted-foreground', className)} disabled={disabled}>
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {dateValue ? format(dateValue, 'PPP') : <span>{placeholder}</span>}
+          {dateValue ? formatDateUI(dateValue) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 shadow-lg rounded-md" align="start" sideOffset={8}>
@@ -56,8 +57,8 @@ export function DatePicker({
           }}
           initialFocus
           captionLayout="dropdown-buttons"
-          fromYear={1950}
-          toYear={new Date().getFullYear() + 10}
+          fromYear={fromYear}
+          toYear={toYear}
         />
       </PopoverContent>
     </Popover>

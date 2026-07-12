@@ -13,6 +13,7 @@ interface AccountGroupApiModel {
   name?: string;
   description?: string | null;
   is_active?: boolean | number;
+  is_lock?: boolean | number;
   created_at?: string;
   updated_at?: string;
 }
@@ -29,6 +30,7 @@ const mapAccountGroup = (payload: AccountGroupApiModel): AccountGroup => {
     companyId: payload.company_id ?? null,
     description: payload.description ?? null,
     isActive: payload.is_active === undefined ? true : payload.is_active === true || payload.is_active === 1,
+    is_lock: payload.is_lock === undefined ? false : payload.is_lock === true || payload.is_lock === 1 || String(payload.is_lock) === '1' || String(payload.is_lock) === 'true',
     createdAt: payload.created_at,
     updatedAt: payload.updated_at,
   };
@@ -43,7 +45,7 @@ type PaginatedAccountGroupResponse = LaravelApiResponse<{
   perPage?: number;
   total: number;
   last_page: number;
-}>;
+} | AccountGroupApiModel[]>;
 
 type AccountGroupItemResponse = LaravelApiResponse<AccountGroupApiModel>;
 
@@ -58,20 +60,24 @@ export const getAccountGroups = async (params: PaginationParams & { company_id?:
   });
 
   const data = ensureSuccess(response.data);
+  const isDirectArray = Array.isArray(data);
+  const items = isDirectArray ? data : (data.data ?? []);
+
   const scopedData = params.company_id
-    ? (data.data ?? []).filter((item) => {
+    ? items.filter((item) => {
         if (item.company_id === undefined || item.company_id === null) return true;
         return String(item.company_id) === String(params.company_id);
       })
-    : (data.data ?? []);
+    : items;
+  const isFrontendFallback = params.company_id ? (scopedData.length !== items.length) : false;
 
   return toPaginatedResult(
     {
       data: scopedData,
-      current_page: data.current_page,
-      per_page: data.per_page ?? data.perPage ?? params.perPage ?? 10,
-      total: params.company_id ? scopedData.length : data.total,
-      last_page: data.last_page,
+      current_page: isDirectArray ? 1 : data.current_page,
+      per_page: isDirectArray ? items.length : (data.per_page ?? data.perPage ?? params.perPage ?? 10),
+      total: isDirectArray ? items.length : (isFrontendFallback ? scopedData.length : data.total),
+      last_page: isDirectArray ? 1 : (isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.per_page ?? data.perPage ?? params.perPage ?? 1, 1))) : data.last_page),
     },
     mapAccountGroup,
   );
@@ -143,5 +149,23 @@ export const deleteAccountGroup = async (id: number | string): Promise<void> => 
 
   if (!payload.status) {
     throw new ApiResponseError(payload.message ?? 'Failed to delete account group');
+  }
+};
+
+export const importAccountGroup = async (file: File, companyId?: string | number): Promise<void> => {
+  const body = new FormData();
+  body.append('file', file);
+
+  const url = companyId ? `${basePath}/${companyId}/import` : `${basePath}/import`;
+
+  const response = await apiClient.post(url, body, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const payload = response.data as LaravelApiResponse<null>;
+  if (!payload.status) {
+    throw new ApiResponseError(payload.message ?? 'Failed to import account group');
   }
 };

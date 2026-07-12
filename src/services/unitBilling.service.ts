@@ -15,6 +15,7 @@ type UnitBillingApiModel = {
   unitTransactionId?: string | number;
   grand_total?: string | number;
   remaining_payment?: string | number;
+  remaining_payment_usd?: string | number;
   last_payment_at?: string;
   bca_payment?: string | number;
   bca_payment_amount?: string | number;
@@ -56,6 +57,8 @@ type UnitBillingHistoryApiModel = {
   bca_payment_amount?: string | number;
   cash_payment_amount?: string | number;
   bca_payment_usd_amount?: string | number;
+  bca_usd_amount?: string | number;
+  bca_usd_amount_original?: string | number;
   payment_at?: string;
   note?: string;
   created_at?: string;
@@ -161,6 +164,7 @@ const mapBilling = (raw: UnitBillingApiModel): UnitBilling => {
     grand_total: grandTotal,
     total_paid: totalPaid,
     remaining_payment: remainingPayment,
+    remaining_payment_usd: toSafeNumber(item.remaining_payment_usd),
     last_payment_at: item.last_payment_at,
     bca_payment: bcaPayment,
     cash_payment: cashPayment,
@@ -197,7 +201,8 @@ const mapBillingHistory = (raw: UnitBillingHistoryApiModel): UnitBillingHistory 
   const item = unwrapBillingHistory(raw);
   const cashPayment = Math.max(toSafeNumber(item.cash_payment_amount), getHistoryAmountFromCashes(item, ['cash_idr', 'cash']));
   const bcaPayment = Math.max(toSafeNumber(item.bca_payment_amount), getHistoryAmountFromCashes(item, ['bca_idr', 'bca']));
-  const bcaPaymentUsd = Math.max(toSafeNumber(item.bca_payment_usd_amount), getHistoryAmountFromCashes(item, ['bca_usd', 'usd']));
+  const bcaPaymentUsd = Math.max(toSafeNumber(item.bca_usd_amount), toSafeNumber(item.bca_payment_usd_amount), getHistoryAmountFromCashes(item, ['bca_usd', 'usd']));
+  const bcaPaymentUsdOriginal = toSafeNumber(item.bca_usd_amount_original);
 
   return {
     id: String(item.id ?? ''),
@@ -207,9 +212,10 @@ const mapBillingHistory = (raw: UnitBillingHistoryApiModel): UnitBillingHistory 
     bca_payment_amount: bcaPayment,
     cash_payment_amount: cashPayment,
     bca_payment_usd_amount: bcaPaymentUsd,
+    bca_payment_usd_amount_original: bcaPaymentUsdOriginal,
     payment_methods: [
-      ...(bcaPayment > 0 ? ['BCA IDR'] : []),
       ...(bcaPaymentUsd > 0 ? ['BCA USD'] : []),
+      ...(bcaPayment > 0 ? ['BCA IDR'] : []),
       ...(cashPayment > 0 ? ['Cash'] : []),
     ],
     cashes: (item.cashes ?? []).map((cash) => ({
@@ -462,18 +468,32 @@ export const unitBillingService = {
     const bcaPaymentAmount = Number(payload.bca_payment_amount ?? 0);
     const cashPaymentAmount = Number(payload.cash_payment_amount ?? 0);
     const bcaPaymentUsdAmount = Number(payload.bca_payment_usd_amount ?? 0);
+    const totalPayment = bcaPaymentAmount + cashPaymentAmount + bcaPaymentUsdAmount;
 
     form.append('unit_transaction_billing_id', String(payload.unit_transaction_billing_id));
     if (bcaPaymentAmount > 0) form.append('bca_payment_amount', String(bcaPaymentAmount));
     if (cashPaymentAmount > 0) form.append('cash_payment_amount', String(cashPaymentAmount));
     if (bcaPaymentUsdAmount > 0) form.append('bca_payment_usd_amount', String(bcaPaymentUsdAmount));
 
+    // Append total payment amount to satisfy backend validation
+    form.append('payment', String(totalPayment));
+    form.append('payment_amount', String(totalPayment));
+    form.append('amount', String(totalPayment));
+
     if (payload.payment_at) form.append('payment_at', payload.payment_at);
     if (payload.note) form.append('note', payload.note);
+    if (payload.cash_id !== undefined && payload.cash_id !== null) {
+      form.append('cash_id', String(payload.cash_id));
+    }
 
     const response = await apiClient.post<LaravelApiResponse<UnitBillingHistoryApiModel>>(historyBasePath, form);
     const data = ensureSuccess(response.data);
     return mapBillingHistory(data as UnitBillingHistoryApiModel);
+  },
+
+  async deleteBillingHistory(id: string | number): Promise<void> {
+    const response = await apiClient.delete<LaravelApiResponse<any>>(`${historyBasePath}/${id}`);
+    ensureSuccess(response.data);
   },
 
   async getBillingById(id: string): Promise<UnitBilling> {

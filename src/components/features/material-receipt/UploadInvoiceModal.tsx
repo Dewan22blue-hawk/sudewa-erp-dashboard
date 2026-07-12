@@ -34,11 +34,11 @@ export function UploadInvoiceModal({
       return;
     }
 
-    const allowedExtensions = ['pdf', 'doc', 'docx'];
+    const allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
     const extension = nextFile.name.split('.').pop()?.toLowerCase() ?? '';
 
     if (!allowedExtensions.includes(extension)) {
-      toast.error('File invoice harus berformat PDF, DOC, atau DOCX');
+      toast.error('File invoice harus berformat PDF, DOC, DOCX, JPG, JPEG, atau PNG');
       setFile(null);
       return;
     }
@@ -64,7 +64,7 @@ export function UploadInvoiceModal({
           >
             <input
               type="file"
-              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
               onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
               className="block h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-2 file:py-1 file:text-sm"
             />

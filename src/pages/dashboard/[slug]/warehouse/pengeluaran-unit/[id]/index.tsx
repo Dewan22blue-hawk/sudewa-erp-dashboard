@@ -29,7 +29,7 @@ export default function DetailPengeluaranUnitPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(25);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   useEffect(() => {

@@ -30,7 +30,8 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
     sort_by: 'name',
     sort_order: 'asc' 
   });
-  const brands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const rawBrands: Brand[] = Array.isArray(brandsData) ? brandsData : ((brandsData as any)?.data ?? []);
+  const brands = Array.from(new Map(rawBrands.map((b) => [b.id, b])).values());
   const [openBrandDialog, setOpenBrandDialog] = useState(false);
   const [openBrandSelect, setOpenBrandSelect] = useState(false);
   const [brandSearch, setBrandSearch] = useState('');
@@ -45,250 +46,281 @@ export function TypeUnitForm({ form, onSubmit, onCancel, isSubmitting = false, s
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <div className="space-y-8">
-            {/* Section Merk */}
-            <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-              <FormLabel className="text-sm font-semibold text-gray-900">Merk<RequiredMark /></FormLabel>
-              <div className="flex items-center gap-2">
+            {/* Section 1: Informasi Unit */}
+            <div className="space-y-6">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-semibold text-slate-900">Informasi Unit</h3>
+                <p className="text-xs text-slate-500">Detail brand, kode, jenis, tipe, dan model unit</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Kode<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan Kode"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="brandId"
                   render={({ field }) => (
-                    <FormItem className="max-w-[300px] flex-1">
-                      <Popover
-                        open={openBrandSelect}
-                        onOpenChange={(open) => {
-                          setOpenBrandSelect(open);
-                          if (!open) setBrandSearch('');
-                        }}
-                      >
-                        <PopoverTrigger asChild>
-                          <Button type="button" variant="outline" role="combobox" aria-expanded={openBrandSelect} disabled={isBrandLoading} className="h-10 w-full justify-between rounded-lg border-gray-200 bg-white font-medium text-gray-500">
-                            <span className={cn('truncate', !field.value && 'text-gray-400')}>
-                              {field.value ? brands.find((brand: Brand) => brand.id === Number(field.value))?.name ?? 'Pilih Merk' : isBrandLoading ? 'Memuat...' : 'Pilih Merk'}
-                            </span>
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                          <Command shouldFilter={false}>
-                            <CommandInput placeholder="Cari merk..." value={brandSearch} onValueChange={setBrandSearch} />
-                            <CommandList>
-                              <CommandEmpty>Merk tidak ditemukan.</CommandEmpty>
-                              <CommandGroup>
-                                {filteredBrands.map((brand: Brand) => (
-                                  <CommandItem
-                                    key={brand.id}
-                                    value={`${brand.name} ${brand.id}`}
-                                    onSelect={() => {
-                                      field.onChange(brand.id);
-                                      setOpenBrandSelect(false);
-                                      setBrandSearch('');
-                                    }}
-                                  >
-                                    <Check className={cn('mr-2 h-4 w-4', Number(field.value) === brand.id ? 'opacity-100' : 'opacity-0')} />
-                                    <span className="truncate">{brand.name}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Merk<RequiredMark /></FormLabel>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <Popover
+                            open={openBrandSelect}
+                            onOpenChange={(open) => {
+                              setOpenBrandSelect(open);
+                              if (!open) setBrandSearch('');
+                            }}
+                          >
+                            <PopoverTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={openBrandSelect}
+                                disabled={isBrandLoading}
+                                className="h-10 w-full justify-between rounded-lg border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 shadow-none hover:bg-slate-50 focus-visible:ring-slate-300"
+                              >
+                                <span className={cn('truncate', !field.value && 'text-slate-400')}>
+                                  {field.value
+                                    ? brands.find((brand: Brand) => brand.id === Number(field.value))?.name ?? 'Pilih Merk'
+                                    : isBrandLoading
+                                    ? 'Memuat...'
+                                    : 'Pilih Merk'}
+                                </span>
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 text-slate-400" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                              <Command shouldFilter={false}>
+                                <CommandInput placeholder="Cari merk..." value={brandSearch} onValueChange={setBrandSearch} className="h-9" />
+                                <CommandList>
+                                  <CommandEmpty>Merk tidak ditemukan.</CommandEmpty>
+                                  <CommandGroup>
+                                    {filteredBrands.map((brand: Brand) => (
+                                      <CommandItem
+                                        key={brand.id}
+                                        value={`${brand.name} ${brand.id}`}
+                                        onSelect={() => {
+                                          field.onChange(brand.id);
+                                          setOpenBrandSelect(false);
+                                          setBrandSearch('');
+                                        }}
+                                      >
+                                        <Check className={cn('mr-2 h-4 w-4', Number(field.value) === brand.id ? 'opacity-100' : 'opacity-0')} />
+                                        <span className="truncate">{brand.name}</span>
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-10 w-10 flex-shrink-0 rounded-lg border-slate-200 text-slate-700 shadow-none hover:bg-slate-50"
+                          onClick={() => setOpenBrandDialog(true)}
+                        >
+                          +
+                        </Button>
+                      </div>
+                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
-                <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenBrandDialog(true)}>
-                  +
-                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Tipe Unit<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan Tipe"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="unitType"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Jenis<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan Jenis"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="unitModel"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Model</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan Model"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
-            {/* Section Unit */}
-            <div className="space-y-4">
-              <h3 className="text-[13px] font-medium text-gray-400">Unit</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Kode<RequiredMark /></FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="code"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Masukkan Kode" className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[100px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Jenis<RequiredMark /></FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="unitType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Masukkan Jenis" className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400" {...field} value={field.value || ''} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+            {/* Section 2: Informasi Tambahan */}
+            <div className="space-y-6">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-semibold text-slate-900">Informasi Tambahan</h3>
+                <p className="text-xs text-slate-500">Informasi berat bersih, berat kotor, harga beli, dan harga jual unit</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Tipe Unit<RequiredMark /></FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Masukkan Tipe" className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400" {...field} value={field.value || ''} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                <FormField
+                  control={form.control}
+                  name="nettoWeight"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Netto (Kg)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Masukkan Berat"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(parseNumber(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
 
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[100px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Model</FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="unitModel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Masukkan Model" className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400" {...field} value={field.value || ''} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
+                <FormField
+                  control={form.control}
+                  name="brutoWeight"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Bruto (Kg)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Masukkan Berat"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(parseNumber(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Section Berat */}
-            <div className="space-y-4 pt-2">
-              <h3 className="text-[13px] font-medium text-gray-400">Berat</h3>
-              <div className="space-y-4 max-w-[500px]">
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Netto</FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="nettoWeight"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Masukkan Berat"
-                            className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
-                            value={field.value ?? ''}
-                            onChange={(e) => field.onChange(parseNumber(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="buyPrice"
+                  render={({ field: { onChange, value, ...rest } }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Harga Beli<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <MoneyInput
+                          placeholder="Masukkan Harga"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...rest}
+                          value={value ?? 0}
+                          onChangeValue={onChange}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
 
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Bruto</FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="brutoWeight"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Masukkan Berat"
-                            className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
-                            value={field.value ?? ''}
-                            onChange={(e) => field.onChange(parseNumber(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Section Harga */}
-            <div className="space-y-4 pt-2">
-              <h3 className="text-[13px] font-medium text-gray-400">Harga</h3>
-              <div className="space-y-4 max-w-[500px]">
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Beli<RequiredMark /></FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="buyPrice"
-                    render={({ field: { onChange, value, ...rest } }) => (
-                      <FormItem>
-                        <FormControl>
-                          <MoneyInput
-                            placeholder="Masukkan Harga"
-                            className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
-                            {...rest}
-                            value={value ?? 0}
-                            onChangeValue={onChange}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[160px_1fr] items-center gap-4">
-                  <FormLabel className="text-sm font-semibold text-gray-900">Harga Jual<RequiredMark /></FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="sellPrice"
-                    render={({ field: { onChange, value, ...rest } }) => (
-                      <FormItem>
-                        <FormControl>
-                          <MoneyInput
-                            placeholder="Masukkan Harga"
-                            className="bg-white border-gray-200 h-10 rounded-lg font-medium placeholder:font-normal placeholder:text-gray-400"
-                            {...rest}
-                            value={value ?? 0}
-                            onChangeValue={onChange}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-
+                <FormField
+                  control={form.control}
+                  name="sellPrice"
+                  render={({ field: { onChange, value, ...rest } }) => (
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Harga Jual<RequiredMark /></FormLabel>
+                      <FormControl>
+                        <MoneyInput
+                          placeholder="Masukkan Harga"
+                          className="h-10 rounded-lg border-slate-200 px-3 text-sm shadow-none focus-visible:ring-slate-300 bg-white placeholder:text-slate-400"
+                          {...rest}
+                          value={value ?? 0}
+                          onChangeValue={onChange}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
           </div>
 
-          <div className="flex justify-center gap-8 pt-12 pb-4">
-            <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting} className="text-gray-900 hover:text-gray-900 hover:bg-gray-100 font-medium px-6">
+          <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 mt-8">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onCancel}
+              disabled={isSubmitting}
+              className="text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            >
               Batal
             </Button>
-            <Button type="submit" className="bg-[#2B3B52] hover:bg-[#1E2A3C] text-white min-w-[140px] rounded-lg shadow-sm" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="bg-[#1F3B5B] hover:bg-[#1B3450] text-white min-w-[120px] rounded-lg shadow-sm gap-2"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 'Menyimpan...'
               ) : (
                 <>
-                  <Save className="mr-2 h-4 w-4" />
+                  <Save className="h-4 w-4" />
                   {submitLabel}
                 </>
               )}

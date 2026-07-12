@@ -16,6 +16,7 @@ export interface TarifFormData {
     ujTowing: number | null;
     ujCdd: number | null;
     ujFuso: number | null;
+    invTowing: number | null;
     invCdd: number | null;
     invFuso: number | null;
     isActive: boolean;
@@ -40,6 +41,7 @@ export function TarifForm({ initialData, onSubmit, isSubmitting, title }: TarifF
             ujTowing: null,
             ujCdd: null,
             ujFuso: null,
+            invTowing: null,
             invCdd: null,
             invFuso: null,
             isActive: true,
@@ -55,6 +57,7 @@ export function TarifForm({ initialData, onSubmit, isSubmitting, title }: TarifF
                 ujTowing: initialData.ujTowing !== null && initialData.ujTowing !== undefined ? Number(initialData.ujTowing) : null,
                 ujCdd: initialData.ujCdd !== null && initialData.ujCdd !== undefined ? Number(initialData.ujCdd) : null,
                 ujFuso: initialData.ujFuso !== null && initialData.ujFuso !== undefined ? Number(initialData.ujFuso) : null,
+                invTowing: initialData.invTowing !== null && initialData.invTowing !== undefined ? Number(initialData.invTowing) : null,
                 invCdd: initialData.invCdd !== null && initialData.invCdd !== undefined ? Number(initialData.invCdd) : null,
                 invFuso: initialData.invFuso !== null && initialData.invFuso !== undefined ? Number(initialData.invFuso) : null,
                 isActive: initialData.isActive ?? true,
@@ -70,6 +73,7 @@ export function TarifForm({ initialData, onSubmit, isSubmitting, title }: TarifF
             uj_towing: data.ujTowing,
             uj_cdd: data.ujCdd,
             uj_fuso: data.ujFuso,
+            inv_towing: data.invTowing,
             inv_cdd: data.invCdd,
             inv_fuso: data.invFuso,
             is_active: data.isActive,
@@ -216,15 +220,21 @@ export function TarifForm({ initialData, onSubmit, isSubmitting, title }: TarifF
                         {/* Row 4: Invoice Towing (placeholder) | Invoice CDD | Invoice Fuso */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="space-y-1.5">
-                                <Label className="text-sm font-medium text-gray-700">
+                                <Label htmlFor="invTowing" className="text-sm font-medium text-gray-700">
                                     Invoice Towing
                                 </Label>
-                                {/* Reserved for future use — API doesn't have inv_towing yet */}
-                                <Input
-                                    type="text"
-                                    placeholder="Masukkan data"
-                                    disabled
-                                    className="bg-gray-50 cursor-not-allowed text-gray-400 border-gray-200"
+                                <Controller
+                                    control={control}
+                                    name="invTowing"
+                                    render={({ field }) => (
+                                        <MoneyInput
+                                            id="invTowing"
+                                            placeholder="Masukkan data"
+                                            value={field.value}
+                                            onChangeValue={field.onChange}
+                                            className="bg-white"
+                                        />
+                                    )}
                                 />
                             </div>
 

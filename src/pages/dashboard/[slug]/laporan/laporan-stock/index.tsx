@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
@@ -28,19 +28,35 @@ const reportMeta = {
 export default function LaporanStockPage() {
     const [activeTab, setActiveTab] = useState('stock');
     const [currentActions, setCurrentActions] = useState<{ print: () => void; download: () => void } | null>(null);
-    const [stockPerPage, setStockPerPage] = useState(50);
+    const [stockPerPage, setStockPerPage] = useState(25);
 
-    const [stockDetailPerPage, setStockDetailPerPage] = useState(50);
+    const [stockDetailPerPage, setStockDetailPerPage] = useState(25);
     const [machineNumber, setMachineNumber] = useState('');
     const [appliedMachineNumber, setAppliedMachineNumber] = useState('');
 
-    const [poPerPage, setPoPerPage] = useState(50);
+    const [poPerPage, setPoPerPage] = useState(25);
     const [poDateRange, setPoDateRange] = useState<DateRange | undefined>();
     const [appliedPoDateRange, setAppliedPoDateRange] = useState<DateRange | undefined>();
 
-    const [soPerPage, setSoPerPage] = useState(50);
+    const [soPerPage, setSoPerPage] = useState(25);
     const [soDateRange, setSoDateRange] = useState<DateRange | undefined>();
     const [appliedSoDateRange, setAppliedSoDateRange] = useState<DateRange | undefined>();
+
+    // Trigger filters automatically
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAppliedMachineNumber(machineNumber.trim());
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [machineNumber]);
+
+    useEffect(() => {
+        setAppliedPoDateRange(poDateRange);
+    }, [poDateRange]);
+
+    useEffect(() => {
+        setAppliedSoDateRange(soDateRange);
+    }, [soDateRange]);
 
     const router = useRouter();
     const { companyId } = useCompany();
@@ -55,9 +71,9 @@ export default function LaporanStockPage() {
         switch (activeTab) {
             case 'stock-detail':
                 return (
-                    <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex flex-wrap items-end gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">No Mesin</label>
+                            <label className="text-[13px] font-medium text-slate-700">No Mesin</label>
                             <Input
                                 value={machineNumber}
                                 onChange={(event) => setMachineNumber(event.target.value)}
@@ -65,105 +81,87 @@ export default function LaporanStockPage() {
                                 className="w-[240px] bg-white"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Per Halaman</label>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                            <span>Show</span>
                             <Select value={String(stockDetailPerPage)} onValueChange={(value) => setStockDetailPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] bg-white">
-                                    <SelectValue />
+                                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                    <SelectItem value="100">100</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="25">25</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="50">50</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <span>Page</span>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="mb-[1px] gap-2"
-                            onClick={() => setAppliedMachineNumber(machineNumber.trim())}
-                        >
-                            Show
-                        </Button>
                     </div>
                 );
             case 'purchase-order':
                 return (
-                    <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex flex-wrap items-end gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Periode Transaksi</label>
-                            <div className="w-[300px]">
+                            <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
+                            <div className="w-[280px]">
                                 <DatePickerWithRange date={poDateRange} onChange={setPoDateRange} />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Per Halaman</label>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                            <span>Show</span>
                             <Select value={String(poPerPage)} onValueChange={(value) => setPoPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] bg-white">
-                                    <SelectValue />
+                                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                    <SelectItem value="100">100</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="25">25</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="50">50</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <span>Page</span>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="mb-[1px] gap-2"
-                            onClick={() => setAppliedPoDateRange(poDateRange)}
-                        >
-                            Show
-                        </Button>
                     </div>
                 );
             case 'sales-order':
                 return (
-                    <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex flex-wrap items-end gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Periode Transaksi</label>
-                            <div className="w-[300px]">
+                            <label className="text-[13px] font-medium text-slate-700">Periode Transaksi</label>
+                            <div className="w-[280px]">
                                 <DatePickerWithRange date={soDateRange} onChange={setSoDateRange} />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Per Halaman</label>
+                        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                            <span>Show</span>
                             <Select value={String(soPerPage)} onValueChange={(value) => setSoPerPage(Number(value))}>
-                                <SelectTrigger className="w-[120px] bg-white">
-                                    <SelectValue />
+                                <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                    <SelectValue placeholder="25" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                    <SelectItem value="100">100</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="25">25</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="50">50</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <span>Page</span>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="mb-[1px] gap-2"
-                            onClick={() => setAppliedSoDateRange(soDateRange)}
-                        >
-                            Show
-                        </Button>
                     </div>
                 );
             default:
                 return (
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap mb-1">
+                        <span>Show</span>
                         <Select value={String(stockPerPage)} onValueChange={(value) => setStockPerPage(Number(value))}>
-                            <SelectTrigger className="w-[90px] bg-white">
-                                <SelectValue />
+                            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                                <SelectValue placeholder="25" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="25">25</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                                <SelectItem value="100">100</SelectItem>
+                                <SelectItem className="cursor-pointer" value="25">25</SelectItem>
+                                <SelectItem className="cursor-pointer" value="50">50</SelectItem>
+                                <SelectItem className="cursor-pointer" value="100">100</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-gray-500">entries</span>
+                        <span>Page</span>
                     </div>
                 );
         }
@@ -171,57 +169,61 @@ export default function LaporanStockPage() {
 
     return (
         <DashboardLayout>
-            <div className="p-6 space-y-6 bg-white min-h-screen">
+            <div className="space-y-6">
                 <div className="no-print">
-                    <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">{activeMeta.title}</h1>
-                    <p className="text-[15px] text-gray-500">{activeMeta.subtitle}</p>
+                    <h1 className="text-2xl font-semibold">{activeMeta.title}</h1>
+                    <p className="text-sm text-muted-foreground">{activeMeta.subtitle}</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                    {pageFilter}
-                </div>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="no-print flex w-full flex-col gap-4">
-                        <div className="flex w-full flex-wrap items-center justify-between gap-4">
-                            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
-                                <TabsTrigger
-                                    value="stock"
-                                    className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                                >
-                                    Jumlah Stock
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="stock-detail"
-                                    className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                                >
-                                    Stock Detail
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="purchase-order"
-                                    className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                                >
-                                    Purchase Order Outstanding
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="sales-order"
-                                    className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                                >
-                                    Sales Order Outstanding
-                                </TabsTrigger>
-                            </TabsList>
+                        <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl self-start">
+                            <TabsTrigger
+                                value="stock"
+                                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                            >
+                                Jumlah Stock
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="stock-detail"
+                                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                            >
+                                Stock Detail
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="purchase-order"
+                                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                            >
+                                Purchase Order Outstanding
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="sales-order"
+                                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                            >
+                                Sales Order Outstanding
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
-                                <Button variant="outline" onClick={() => currentActions?.print()} className="gap-2 whitespace-nowrap">
-                                    <Printer className="h-4 w-4" />
-                                    Print
-                                </Button>
-                                <Button className="gap-2 bg-[#00c566] hover:bg-[#00b35c] whitespace-nowrap" onClick={() => currentActions?.download()}>
-                                    <Download className="h-4 w-4" />
-                                    Download
-                                </Button>
-                            </div>
+                    {/* Unified Filter Toolbar */}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end justify-between w-full no-print">
+                        <div className="flex items-end gap-4 w-full sm:w-auto">
+                            {pageFilter}
                         </div>
-
-
+                        <div className="flex items-center gap-3 self-start sm:self-auto">
+                            <Button
+                                variant="outline"
+                                onClick={() => currentActions?.print()}
+                                className="gap-2 rounded-xl px-4"
+                            >
+                                <Printer className="h-4 w-4" /> Print
+                            </Button>
+                            <Button
+                                onClick={() => currentActions?.download()}
+                                className="gap-2 rounded-xl px-4 bg-green-600 hover:bg-green-700 text-white border-0"
+                            >
+                                <Download className="h-4 w-4" /> Download
+                            </Button>
+                        </div>
                     </div>
 
                     <PrintLetterPage

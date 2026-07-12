@@ -69,7 +69,7 @@ export default function GoodsIssueListPage() {
   const { companyId } = useCompany();
   const companyIdValue = Number(companyId ?? '3') || 3;
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 10 });
+  const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const listQuery = useGoodsIssues({ page, perPage, customer_name: search, companyId: companyIdValue });
   const customersQuery = useCustomers({ page: 1, perPage: 100, company_id: String(companyIdValue) });

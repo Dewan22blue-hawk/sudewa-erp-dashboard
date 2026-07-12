@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import type { FinanceRefundRecord, RefundTransactionType } from '@/@types/finance-refund.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import FinanceRefundApprovalModal from '@/components/features/finance-refund/FinanceRefundApprovalModal';
@@ -24,6 +24,13 @@ const formatDate = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('id-ID');
+};
+
+const getColumnAlignment = (columnId: string): 'left' | 'center' => {
+  if (['refundDate', 'totalTransaction', 'refundAmount', 'status', 'actions'].includes(columnId)) {
+    return 'center';
+  }
+  return 'left';
 };
 
 export default function FinanceRefundTable({ data, meta, page, isLoading = false, transactionType, onPageChange }: FinanceRefundTableProps) {
@@ -130,32 +137,38 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   return (
     <>
       <div className="space-y-4">
-        <div className="text-sm overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="text-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="bg-gray-50/50 border-b border-gray-200">
+                <TableRow key={headerGroup.id} className="bg-[#f8f9fa] border-b border-gray-200">
                   {headerGroup.headers.map((header) => {
+                    const align = getColumnAlignment(header.column.id);
                     const isSortable = header.column.getCanSort();
                     const isSorted = header.column.getIsSorted();
+                    const isSortedActive = !!isSorted;
+                    const justifyClass = align === 'center' ? 'justify-center w-full' : 'justify-start';
+                    const title = flexRender(header.column.columnDef.header, header.getContext());
 
                     return (
-                      <TableHead key={header.id} className="py-3 px-4 text-sm font-semibold uppercase tracking-wider text-gray-900 bg-gray-50/50">
+                      <TableHead key={header.id} className="p-0 text-left bg-[#f8f9fa] border-b border-gray-200">
                         {header.isPlaceholder ? null : (
                           <button
                             type="button"
-                            className="flex items-center gap-1.5 font-semibold text-gray-900 cursor-pointer disabled:cursor-default"
+                            className={`flex items-center gap-1 select-none w-full px-4 py-4 text-xs font-semibold uppercase ${
+                              isSortable ? 'cursor-pointer group' : 'cursor-default'
+                            } ${isSortedActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
                             onClick={header.column.getToggleSortingHandler()}
                             disabled={!isSortable}
                           >
-                            <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
+                            <span>{title}</span>
                             {isSortable ? (
                               isSorted === 'asc' ? (
-                                <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+                                <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
                               ) : isSorted === 'desc' ? (
-                                <ArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+                                <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
                               ) : (
-                                <ArrowUpDown className="h-3.5 w-3.5 opacity-50 text-slate-400" />
+                                <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
                               )
                             ) : null}
                           </button>
@@ -177,12 +190,18 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="hover:bg-slate-50/80 cursor-pointer transition-all duration-150 active:bg-slate-100"
+                    className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
                     onClick={() => setSelectedRefund(row.original)}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-4 px-4">{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const align = getColumnAlignment(cell.column.id);
+                      const alignClass = align === 'center' ? 'text-center' : 'text-left';
+                      return (
+                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass}`}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : (

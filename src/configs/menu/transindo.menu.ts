@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Settings, DollarSign, Warehouse } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, DollarSign, Warehouse, ScrollText } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getTransindoMenus = (slug: string): MenuItem[] => {
@@ -24,10 +24,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Akun',
           href: base('/master/account'),
         },
-        {
-          label: 'Grup Akun',
-          href: base('/master/account-group'),
-        },
+        // {
+        //   label: 'Grup Akun',
+        //   href: base('/master/account-group'),
+        // },
         {
           label: 'Dealer',
           href: base('/master/dealer'),
@@ -36,6 +36,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Customer',
           href: base('/master/customer'),
         },
+        // {
+        //   label: 'Supplier',
+        //   href: base('/master/supplier'),
+        // },
         {
           label: 'Tarif',
           href: base('/master/tarif'),
@@ -85,16 +89,20 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: Warehouse,
       children: [
         {
-          label: 'Perlengkapan Masuk',
+          label: 'Stok Perlengkapan',
+          href: base('/warehouse/stock-perlengkapan'),
+        },
+        {
+          label: 'Penerimaan Perlengkapan',
           href: base('/warehouse/perlengkapan-masuk'),
         },
         {
-          label: 'Perlengkapan Keluar',
-          href: base('/warehouse/perlengkapan-keluar'),
+          label: 'Pengeluaran Perlengkapan',
+          href: base('/warehouse/pengeluaran-perlengkapan'),
         },
         {
-          label: 'Stock Perlengkapan',
-          href: base('/warehouse/stock-perlengkapan'),
+          label: 'Maintenance Armada',
+          href: base('/warehouse/maintenance'),
         },
       ],
     },
@@ -103,8 +111,59 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       icon: DollarSign,
       children: [
         {
+          label: 'Kas Harian',
+          href: base('/finance/transaksi-kas-harian'),
+        },
+        {
+          label: 'Linimasa Driver',
+          href: base('/finance/uj-driver'),
+        },
+        {
+          label: 'Invoice',
+          href: base('/finance/invoice'),
+        },
+        {
+          label: 'Laporan Bukti Potong',
+          href: base('/finance/bukti-potong'),
+        },
+        {
           label: 'Aset',
           href: base('/finance/asset'),
+        },
+
+      ],
+    },
+    {
+      label: 'Laporan',
+      icon: ScrollText,
+      children: [
+        {
+          label: 'Laporan Transaksi Kas',
+          href: base('/laporan/laporan-transaksi-kas'),
+        },
+        {
+          label: 'Laporan Akuntansi',
+          href: base('/laporan/laporan-akuntansi'),
+        },
+        {
+          label: 'Laporan Surat Jalan',
+          href: base('/laporan/laporan-surat-jalan'),
+        },
+        {
+          label: 'Laporan Invoice',
+          href: base('/laporan/laporan-invoice'),
+        },
+        {
+          label: 'Laporan Ritase Armada/Maintenance',
+          href: base('/laporan/laporan-ritase-armada'),
+        },
+        {
+          label: 'Laporan Persediaan Barang',
+          href: base('/laporan/laporan-stock-perlengkapan'),
+        },
+        {
+          label: 'Laporan Aset',
+          href: base('/laporan/laporan-aset'),
         },
       ],
     },

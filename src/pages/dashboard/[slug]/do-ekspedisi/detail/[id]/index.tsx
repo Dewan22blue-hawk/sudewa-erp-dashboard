@@ -1,27 +1,28 @@
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Printer } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiDetailCard } from '@/components/features/do-ekspedisi/DOEkspedisiDetailCard';
-import DOEkspedisiPrintDocument from '@/components/features/do-ekspedisi/DOEkspedisiPrintDocument';
 // import { DOEkspedisiDetailTable } from '@/components/features/do-ekspedisi/DOEkspedisiDetailTable';
 import { DeleteDOEkspedisiModal } from '@/components/features/do-ekspedisi/DeleteDOEkspedisiModal';
 import type { DoEkspedisi, DoEkspedisiItem, DoEkspedisiOrderList, DoEkspedisiOrderTarifItem, DoEkspedisiOrderTarifLoadItem } from '@/@types/do-ekspedisi.types';
 import { useDeleteDoEkspedisiItem, useDoEkspedisiDetail } from '@/hooks/useDoEkspedisi';
 import { useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
+import { useProcessDoExpedition } from '@/hooks/useDoInvoice';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 // pagination helper removed (unused in print/detail view)
 
 export default function DetailDOEkspedisiPage() {
   const router = useRouter();
   const { slug, id } = router.query;
-  const printMode = typeof router.query.print !== 'undefined' && String(router.query.print) === '1';
 
   const [selectedItem, setSelectedItem] = React.useState<DoEkspedisiItem | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
   const detailQuery = useDoEkspedisiDetail(id ? String(id) : null);
+  const processExpeditionMutation = useProcessDoExpedition();
   const orderListId = detailQuery.data?.orderList?.id ?? null;
   const tarifQuery = useOrderListTarifs({
     page: 1,
@@ -79,21 +80,7 @@ export default function DetailDOEkspedisiPage() {
     };
   }, [detailQuery.data, tarifQuery.data?.data, tarifItemQuery.data?.data]);
 
-  React.useEffect(() => {
-    if (!printMode) return;
-    if (detailQuery.isLoading || tarifQuery.isLoading) return;
-    if (!detailQuery.data) return;
-
-    const timer = window.setTimeout(() => {
-      try {
-        window.print();
-      } catch {
-        // ignore
-      }
-    }, 300);
-
-    return () => window.clearTimeout(timer);
-  }, [printMode, detailQuery.isLoading, tarifQuery.isLoading, detailQuery.data]);
+  // Print effect removed (handled in dedicated print page)
 
   const handleDeleteItem = async () => {
     if (!selectedItem || !id) return;
@@ -123,10 +110,6 @@ export default function DetailDOEkspedisiPage() {
   }, [detailQuery.isError, detailQuery.error]);
 
   if (detailQuery.isLoading || tarifQuery.isLoading || tarifItemQuery.isLoading) {
-    if (printMode) {
-      return <div className="p-6">Memuat detail DO Ekspedisi...</div>;
-    }
-
     return (
       <DashboardLayout>
         <div className="flex h-64 items-center justify-center text-slate-500">Memuat detail DO Ekspedisi...</div>
@@ -136,10 +119,6 @@ export default function DetailDOEkspedisiPage() {
 
   // Check if router is ready and id is available
   if (!router.isReady || !id) {
-    if (printMode) {
-      return <div className="p-6 text-yellow-600">ID DO tidak ditemukan</div>;
-    }
-
     return (
       <DashboardLayout>
         <div className="flex h-64 items-center justify-center text-yellow-600">ID DO tidak ditemukan</div>
@@ -148,17 +127,6 @@ export default function DetailDOEkspedisiPage() {
   }
 
   if (detailQuery.isError) {
-    if (printMode) {
-      return (
-        <div className="p-6 text-red-500">
-          <p className="mb-2">Gagal memuat detail DO Ekspedisi</p>
-          <p className="text-sm text-slate-600">
-            {detailQuery.error instanceof Error ? detailQuery.error.message : 'Unknown error'}
-          </p>
-        </div>
-      );
-    }
-
     return (
       <DashboardLayout>
         <div className="space-y-4">
@@ -170,7 +138,7 @@ export default function DetailDOEkspedisiPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
             </div>
           </div>
 
@@ -194,10 +162,6 @@ export default function DetailDOEkspedisiPage() {
   }
 
   if (!detailQuery.data) {
-    if (printMode) {
-      return <div className="p-6 text-red-500">Data DO Ekspedisi tidak ditemukan</div>;
-    }
-
     return (
       <DashboardLayout>
         <div className="space-y-4">
@@ -209,7 +173,7 @@ export default function DetailDOEkspedisiPage() {
               <ChevronLeft className="h-5 w-5 text-slate-500" />
             </button>
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+              <h1 className="text-2xl font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
             </div>
           </div>
 
@@ -227,26 +191,33 @@ export default function DetailDOEkspedisiPage() {
     );
   }
 
-  if (printMode) {
-    return (
-      <div className="print-letter-page">
-        <div id="do-ekspedisi-print" className="print-letter-content">
-          <DOEkspedisiPrintDocument data={effectiveData ?? detailQuery.data} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-start gap-3">
-          <button onClick={() => slug && router.push(`/dashboard/${slug}/do-ekspedisi`)} className="rounded-md p-1 transition-colors hover:bg-slate-100">
-            <ChevronLeft className="h-5 w-5 text-slate-500" />
-          </button>
-          <div>
-            <h1 className="text-[24px] font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <button onClick={() => slug && router.push(`/dashboard/${slug}/do-ekspedisi`)} className="rounded-md p-1 transition-colors hover:bg-slate-100">
+              <ChevronLeft className="h-5 w-5 text-slate-500" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-950">Detail Delivery Order Ekspedisi</h1>
+            </div>
           </div>
+          <button
+            onClick={async () => {
+              if (!id || !slug) return;
+              try {
+                await processExpeditionMutation.mutateAsync({ id: Number(id) });
+                router.push(`/dashboard/${slug}/do-ekspedisi/print/${id}`);
+              } catch (error: any) {
+                toast.error(getApiErrorMessage(error));
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#152e4d]"
+          >
+            <Printer className="h-4 w-4" />
+            Print DO
+          </button>
         </div>
 
         <DOEkspedisiDetailCard data={effectiveData ?? detailQuery.data} />
@@ -270,10 +241,9 @@ export default function DetailDOEkspedisiPage() {
                 setPage(1);
               }}>
                 <SelectTrigger className="h-12 w-[88px] rounded-xl border-[#E5E7EB] bg-white">
-                  <SelectValue placeholder="10" />
+                  <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
                   <SelectItem value="100">100</SelectItem>

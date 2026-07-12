@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Plus, RotateCw, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import type { KasHarian, KasHarianListItem } from '@/@types/kas-harian.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AddKasHarianDialog from '@/components/features/kas-harian/AddKasHarianDialog';
 import DeleteKasHarianDialog from '@/components/features/kas-harian/DeleteKasHarianDialog';
 import EditKasHarianDialog from '@/components/features/kas-harian/EditKasHarianDialog';
+import TogglePaymentStatusDialog from '@/components/features/kas-harian/TogglePaymentStatusDialog';
 import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKasHarian } from '@/hooks/useKasHarian';
@@ -20,7 +21,7 @@ const LIVE_UPDATE_INTERVAL = 5000;
 
 const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   id: item.id,
-  source: item.finance_billing?.id ? 'billing' : 'manual',
+  source: (item.finance_billings ?? []).length > 0 ? 'billing' : 'manual',
   date: item.date,
   code: item.code,
   note: item.note || 'Transaksi kas harian',
@@ -29,8 +30,11 @@ const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   accountName: item.account ? `${item.account.code ?? '-'} - ${item.account.name ?? '-'}` : '-',
   cashName: item.cash?.description || item.cash?.code || '-',
   cashFlowId: item.id,
-  financeBillingId: item.finance_billing?.id,
+  financeBillingId: (item.finance_billings ?? [])[0]?.id,
   transaction_category: item.transaction_category,
+  goodsTransactionBillingId: item.goods_transaction_billing_id ?? undefined,
+  unitTransactionBillingId: item.unit_transaction_billing_id ?? undefined,
+  is_paid: item.is_paid === true || item.is_paid === '1' ? true : item.is_paid === false || item.is_paid === '0' ? false : undefined,
 });
 
 export default function KasHarianPage() {
@@ -46,6 +50,8 @@ export default function KasHarianPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isToggleOpen, setIsToggleOpen] = useState(false);
+  const [targetStatus, setTargetStatus] = useState(false);
   const [selectedItem, setSelectedItem] = useState<KasHarian | null>(null);
 
   useEffect(() => {
@@ -65,7 +71,7 @@ export default function KasHarianPage() {
     },
     {
       enabled: !isCompanyLoading && companyNumber > 0,
-      refetchInterval: !isAddOpen && !isEditOpen && !isDeleteOpen ? LIVE_UPDATE_INTERVAL : false,
+      refetchInterval: !isAddOpen && !isEditOpen && !isDeleteOpen && !isToggleOpen ? LIVE_UPDATE_INTERVAL : false,
     },
   );
 
@@ -138,12 +144,18 @@ export default function KasHarianPage() {
     setIsDeleteOpen(true);
   };
 
-  const pushTo = (item: KasHarianListItem, path?: 'bayar') => {
-    if (typeof slug !== 'string') return;
-    const targetId = item.cashFlowId;
+  const handleToggleStatus = (item: KasHarianListItem) => {
+    const manualItem = (kasHarianQuery.data?.data ?? []).find((cashFlow) => cashFlow.id === item.cashFlowId);
+    if (!manualItem) return;
+    setSelectedItem(manualItem);
+    setTargetStatus(!manualItem.is_paid);
+    setIsToggleOpen(true);
+  };
+
+  const pushTo = (item: KasHarianListItem) => {
+    const targetId = item.cashFlowId || item.id;
     if (!targetId) return;
-    const suffix = path === 'bayar' ? '/bayar' : '';
-    void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${targetId}${suffix}?source=${item.source}`);
+    void router.push(`/dashboard/${slug}/finance/transaksi-kas-harian/${targetId}?source=${item.source}`);
   };
 
   return (
@@ -152,91 +164,80 @@ export default function KasHarianPage() {
         <title>Transaksi Kas Harian - Wajira Dashboard</title>
       </Head>
 
-      <div className="space-y-8 p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[40px] font-semibold tracking-tight text-slate-950">Arus Transaksi Kas Harian</h1>
-            <p className="mt-1 text-lg text-slate-500">Kelola arus transaksi kas harian</p>
+            <h1 className="text-2xl font-semibold">Arus Transaksi Kas Harian</h1>
+            <p className="text-sm text-muted-foreground">Kelola arus transaksi kas harian</p>
           </div>
 
-          <Button type="button" onClick={() => setIsAddOpen(true)} className="h-12 rounded-2xl bg-[#18385b] px-6 text-base hover:bg-[#102843]">
+          <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
         </div>
 
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative w-full md:w-[332px]">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input
-                placeholder="Search here"
-                className="h-12 rounded-2xl border-slate-200 bg-white pl-11"
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-              />
-            </div>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center flex-wrap w-full sm:w-auto">
+              <div className="relative w-full sm:w-[332px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search here"
+                  className="pl-9 bg-white"
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                />
+              </div>
 
-            <div className="flex items-center gap-3 text-lg text-slate-700">
-              <span>Show</span>
-              <Select
-                value={String(perPage)}
-                onValueChange={(value) => {
-                  setPerPage(Number(value));
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="h-12 w-[92px] rounded-2xl border-slate-200 bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>Page</span>
+              <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+                <span>Show</span>
+                <Select
+                  value={String(perPage)}
+                  onValueChange={(value) => {
+                    setPerPage(Number(value));
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[70px] bg-white cursor-pointer">
+                    <SelectValue placeholder="25" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>Page</span>
+              </div>
             </div>
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="h-12 rounded-2xl border-slate-200"
-            onClick={() => {
+          <KasHarianTable
+            data={paginatedData}
+            meta={meta}
+            hasNextPage={page < meta.lastPage}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            isError={isError}
+            errorMessage={errorMessage}
+            onRetry={() => {
               void kasHarianQuery.refetch();
             }}
-            disabled={isFetching}
-          >
-            <span className="mr-3 inline-block h-2.5 w-2.5 rounded-full bg-emerald-400" />
-            <RotateCw className="mr-2 h-4 w-4" />
-            Live Update
-          </Button>
+            onView={pushTo}
+            onPay={pushTo}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
+            onPageChange={setPage}
+          />
         </div>
-
-        <KasHarianTable
-          data={paginatedData}
-          meta={meta}
-          hasNextPage={page < meta.lastPage}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          isError={isError}
-          errorMessage={errorMessage}
-          onRetry={() => {
-            void kasHarianQuery.refetch();
-          }}
-          onView={(item) => pushTo(item)}
-          onPay={(item) => pushTo(item, 'bayar')}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onPageChange={setPage}
-        />
       </div>
 
       <AddKasHarianDialog open={isAddOpen} onOpenChange={setIsAddOpen} />
       <EditKasHarianDialog open={isEditOpen} onOpenChange={setIsEditOpen} data={selectedItem} />
       <DeleteKasHarianDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen} data={selectedItem} />
+      <TogglePaymentStatusDialog open={isToggleOpen} onOpenChange={setIsToggleOpen} data={selectedItem} targetStatus={targetStatus} />
     </DashboardLayout>
   );
 }

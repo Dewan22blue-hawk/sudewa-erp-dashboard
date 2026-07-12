@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CalendarDays, Eye, MoreVertical, Plus, Printer, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { CalendarDays, Check, Eye, MoreVertical, Plus, Printer, RefreshCw, Search, Trash2 } from 'lucide-react';
 import type { DoInvoiceTableRow } from '@/@types/create-invoice.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -83,18 +83,18 @@ export function CreateInvoiceTable({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[38px] font-semibold tracking-[-0.03em] text-slate-950">Data Invoice</h1>
-          <p className="mt-1 text-base text-slate-500">Buat faktur dengan informasi penagihan yang diperlukan.</p>
+          <h1 className="text-2xl font-semibold">Data Invoice</h1>
+          <p className="text-sm text-muted-foreground">Buat faktur dengan informasi penagihan yang diperlukan.</p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <Button type="button" variant="outline" onClick={onResetFilters} className="h-11 rounded-xl border-slate-200">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" variant="outline" onClick={onResetFilters} className="w-full sm:w-auto">
             <RefreshCw className="mr-2 h-4 w-4" />
             Reset Filter
           </Button>
-          <Button type="button" onClick={onAdd} className="h-11 rounded-xl bg-[#1f4163] px-5 text-sm font-medium hover:bg-[#183552]">
+          <Button type="button" onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -103,19 +103,19 @@ export function CreateInvoiceTable({
 
       <div className="grid gap-3 xl:grid-cols-[1fr_auto_auto_auto_auto] xl:items-center">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-11 text-sm" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="pl-9 bg-white" />
         </div>
 
         <DatePicker
           value={dateFilter}
           onChange={(date) => onDateFilterChange(date ? date.toISOString().slice(0, 10) : '')}
           placeholder="Filter tanggal"
-          className="h-11 min-w-[180px] rounded-xl border-slate-200 bg-white"
+          className="min-w-[180px] bg-white"
         />
 
         <Select value={printFilter || 'all'} onValueChange={(value) => onPrintFilterChange(value === 'all' ? '' : (value as '0' | '1'))}>
-          <SelectTrigger className="h-11 min-w-[170px] rounded-xl border-slate-200 bg-white">
+          <SelectTrigger className="min-w-[170px] bg-white">
             <SelectValue placeholder="Status print" />
           </SelectTrigger>
           <SelectContent>
@@ -126,7 +126,7 @@ export function CreateInvoiceTable({
         </Select>
 
         <Select value={sortOrder} onValueChange={(value) => onSortOrderChange(value as 'asc' | 'desc')}>
-          <SelectTrigger className="h-11 min-w-[150px] rounded-xl border-slate-200 bg-white">
+          <SelectTrigger className="min-w-[150px] bg-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -135,58 +135,83 @@ export function CreateInvoiceTable({
           </SelectContent>
         </Select>
 
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-700">Show</span>
+        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+          <span>Show</span>
           <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-            <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white">
+            <SelectTrigger className="w-[70px] bg-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="10">10</SelectItem>
               <SelectItem value="25">25</SelectItem>
               <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-          <span className="text-sm text-slate-700">Page</span>
+          <span>Page</span>
         </div>
       </div>
 
       {selectedIds.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-          <Badge className="bg-emerald-600 text-white">{selectedIds.length} invoice terpilih</Badge>
-          <Button type="button" onClick={onProcessSelected} disabled={isProcessing} className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700">
-            {isProcessing ? 'Memproses...' : 'Proses Invoice'}
+        <div className="flex items-center justify-between rounded-2xl border border-emerald-100 bg-emerald-50/40 px-5 py-3 shadow-sm transition-all">
+          <div className="flex items-center gap-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-sm">
+              <Check className="h-4 w-4" strokeWidth={3} />
+            </div>
+            <span className="text-sm font-semibold text-slate-800">
+              {selectedIds.length} Invoice Terpilih
+            </span>
+          </div>
+          <Button
+            type="button"
+            onClick={onProcessSelected}
+            disabled={isProcessing}
+            className="h-10 rounded-xl bg-[#1f4163] hover:bg-[#183552] text-sm font-medium px-5 gap-2 text-white shadow-sm transition-all"
+          >
+            <Printer className="h-4 w-4" />
+            {isProcessing ? 'Memproses...' : 'Bulk Print Invoice'}
           </Button>
         </div>
       ) : null}
 
-      <Card className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+      <Card className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-[#eef3f8]">
+            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200">
                 <TableHead className="w-[56px] px-4 py-4 text-center">
                   <Checkbox checked={allSelected ? true : partialSelected ? 'indeterminate' : false} onCheckedChange={(checked) => onToggleAll(Boolean(checked))} />
                 </TableHead>
-                {['KODE INVOICE', 'KODE ORDER', 'NAMA CUSTOMER', 'TANGGAL', 'STATUS', 'ACTION'].map((header) => (
-                  <TableHead key={header} className="whitespace-nowrap px-4 py-4 text-center text-sm font-semibold text-slate-900">
-                    {header}
-                  </TableHead>
-                ))}
+                <TableHead className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
+                  KODE INVOICE
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  KODE ORDER
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  NAMA CUSTOMER
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  TANGGAL
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  STATUS
+                </TableHead>
+                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                  ACTION
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`} className="border-slate-100">
-                      {Array.from({ length: 7 }).map((__, cellIndex) => (
-                        <TableCell key={cellIndex} className="px-4 py-4">
-                          <div className="h-4 animate-pulse rounded bg-slate-100" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  <TableRow key={`skeleton-${index}`} className="border-slate-100">
+                    {Array.from({ length: 7 }).map((__, cellIndex) => (
+                      <TableCell key={cellIndex} className="px-4 py-4">
+                        <div className="h-4 animate-pulse rounded bg-slate-100" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
                 : null}
 
               {!isLoading && rows.length === 0 ? (
@@ -222,16 +247,16 @@ export function CreateInvoiceTable({
                             <MoreVertical className="h-4 w-4 text-slate-600" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[200px] rounded-xl">
-                          <DropdownMenuItem onSelect={() => onDetail(row)} className="cursor-pointer">
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                          <DropdownMenuItem onSelect={() => onDetail(row)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             <Eye className="mr-2 h-4 w-4" />
                             Detail
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => onPrint(row)} className="cursor-pointer">
+                          <DropdownMenuItem onSelect={() => onPrint(row)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             <Printer className="mr-2 h-4 w-4" />
                             Print Invoice
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => onDelete(row)} className="cursor-pointer text-red-600 focus:text-red-600">
+                          <DropdownMenuItem onSelect={() => onDelete(row)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Hapus
                           </DropdownMenuItem>
@@ -245,18 +270,47 @@ export function CreateInvoiceTable({
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-slate-500">Showing {startData}-{endData} of {totalData} data</p>
-        <div className="flex flex-wrap items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="text-slate-600">Previous</Button>
+      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
+        <p>Showing {startData}-{endData} of {totalData} data</p>
+        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          >
+            Previous
+          </Button>
           {visiblePages[0] > 1 ? <span className="px-2 text-sm text-slate-500">1 ...</span> : null}
           {visiblePages.map((value) => (
-            <Button key={value} variant={value === page ? 'outline' : 'ghost'} size="sm" onClick={() => onPageChange(value)} className={cn(value === page ? 'rounded-xl border-slate-200 bg-white' : 'text-slate-600')}>
+            <Button
+              key={value}
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(value)}
+              className={cn(
+                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                value === page
+                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+              )}
+            >
               {value}
             </Button>
           ))}
           {visiblePages[visiblePages.length - 1] < totalPages ? <span className="px-2 text-sm text-slate-500">... {totalPages}</span> : null}
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="text-slate-600">Next</Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= totalPages}
+            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>

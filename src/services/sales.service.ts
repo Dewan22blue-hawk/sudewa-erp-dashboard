@@ -14,6 +14,16 @@ export type SalesPayload = {
   max_capacity: number;
   stock_state: string;
   warehouse_id?: number;
+  unit_type_id?: number;
+  sparepart_id?: number;
+  qty_total?: number;
+  price?: number;
+  bbn_price?: number;
+  expedition_fee?: number;
+  other_fee?: number;
+  transaction_date?: string;
+  price_usd?: number;
+  price_per_unit_usd?: number;
 };
 
 const appendIfDefined = (form: FormData, key: string, value: string | number | undefined) => {
@@ -30,6 +40,16 @@ const appendPayload = (form: FormData, payload: SalesPayload) => {
   form.append('type', payload.type);
   form.append('max_capacity', String(payload.max_capacity));
   form.append('stock_state', payload.stock_state);
+  appendIfDefined(form, 'unit_type_id', payload.unit_type_id);
+  appendIfDefined(form, 'sparepart_id', payload.sparepart_id);
+  appendIfDefined(form, 'qty_total', payload.qty_total);
+  appendIfDefined(form, 'price', payload.price);
+  appendIfDefined(form, 'bbn_price', payload.bbn_price);
+  appendIfDefined(form, 'expedition_fee', payload.expedition_fee);
+  appendIfDefined(form, 'other_fee', payload.other_fee);
+  appendIfDefined(form, 'transaction_date', payload.transaction_date);
+  appendIfDefined(form, 'price_usd', payload.price_usd);
+  appendIfDefined(form, 'price_per_unit_usd', payload.price_per_unit_usd);
 };
 
 const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
@@ -43,6 +63,36 @@ const toUrlEncodedPayload = (payload: SalesPayload): URLSearchParams => {
   params.append('type', payload.type);
   params.append('max_capacity', String(payload.max_capacity));
   params.append('stock_state', payload.stock_state);
+  if (payload.unit_type_id !== undefined && payload.unit_type_id !== null) {
+    params.append('unit_type_id', String(payload.unit_type_id));
+  }
+  if (payload.sparepart_id !== undefined && payload.sparepart_id !== null) {
+    params.append('sparepart_id', String(payload.sparepart_id));
+  }
+  if (payload.qty_total !== undefined && payload.qty_total !== null) {
+    params.append('qty_total', String(payload.qty_total));
+  }
+  if (payload.price !== undefined && payload.price !== null) {
+    params.append('price', String(payload.price));
+  }
+  if (payload.bbn_price !== undefined && payload.bbn_price !== null) {
+    params.append('bbn_price', String(payload.bbn_price));
+  }
+  if (payload.expedition_fee !== undefined && payload.expedition_fee !== null) {
+    params.append('expedition_fee', String(payload.expedition_fee));
+  }
+  if (payload.other_fee !== undefined && payload.other_fee !== null) {
+    params.append('other_fee', String(payload.other_fee));
+  }
+  if (payload.transaction_date) {
+    params.append('transaction_date', payload.transaction_date);
+  }
+  if (payload.price_usd !== undefined && payload.price_usd !== null) {
+    params.append('price_usd', String(payload.price_usd));
+  }
+  if (payload.price_per_unit_usd !== undefined && payload.price_per_unit_usd !== null) {
+    params.append('price_per_unit_usd', String(payload.price_per_unit_usd));
+  }
   return params;
 };
 
@@ -147,9 +197,19 @@ export const salesService = {
     const form = new FormData();
     appendPayload(form, payload);
 
-    const response = await apiClient.post<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(basePath, form);
-    const data = ensureSuccess(response.data);
-    return unwrapDetail(data);
+    try {
+      const response = await apiClient.post<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(basePath, form);
+      const data = ensureSuccess(response.data);
+      return unwrapDetail(data);
+    } catch (error) {
+      try {
+        const response = await apiClient.post<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(fallbackBasePath, form);
+        const data = ensureSuccess(response.data);
+        return unwrapDetail(data);
+      } catch {
+        throw error;
+      }
+    }
   },
 
   async updateSales(id: string, payload: SalesPayload) {
