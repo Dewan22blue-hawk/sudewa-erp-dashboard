@@ -10,10 +10,7 @@ export const HIDDEN_MENU_LABELS = [
   'Kas',
   'User',
   
-  // Administrasi
-  'Arus Transaksi',
-  'Pembelian Unit',
-  'Penjualan Unit',
+
 
   // Warehouse
   'Stok Unit',
