@@ -13,7 +13,6 @@ export const HIDDEN_MENU_LABELS = [
 
 
   // Warehouse
-  'Stok Unit',
   'Penerimaan Unit',
   'Pengeluaran Unit',
   'Perlengkapan Masuk',

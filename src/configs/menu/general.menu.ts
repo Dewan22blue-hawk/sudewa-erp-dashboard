@@ -82,7 +82,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         },
         {
           label: 'Penjualan Unit',
-          href: base('/sales'),
+          href: base('/transaksi/penjualan-unit'),
         },
       ],
     },
