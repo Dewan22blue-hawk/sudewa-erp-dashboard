@@ -32,6 +32,8 @@ const mapManualCashFlow = (item: KasHarian): KasHarianListItem => ({
   cashFlowId: item.id,
   financeBillingId: (item.finance_billings ?? [])[0]?.id,
   transaction_category: item.transaction_category,
+  goodsTransactionBillingId: item.goods_transaction_billing_id ?? undefined,
+  unitTransactionBillingId: item.unit_transaction_billing_id ?? undefined,
   is_paid: item.is_paid === true || item.is_paid === '1' ? true : item.is_paid === false || item.is_paid === '0' ? false : undefined,
 });
 

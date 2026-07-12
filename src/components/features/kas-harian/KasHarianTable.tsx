@@ -6,10 +6,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from '@/components/ui/skeleton';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Info } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Props {
   data: KasHarianListItem[];
@@ -94,6 +95,8 @@ export default function KasHarianTable({
     });
   }, [data, sortBy, sortDirection]);
 
+  console.log(sortedData);
+
   const pageNumbers = (() => {
     if (meta.lastPage <= 5) return Array.from({ length: meta.lastPage }, (_, index) => index + 1);
     if (page <= 3) return [1, 2, 3, 4, '...', meta.lastPage];
@@ -136,9 +139,7 @@ export default function KasHarianTable({
               <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('STATUS', 'is_paid', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('AKUN', 'accountName', 'left')}</th>
-              <th className="p-0 text-left">{renderSortHeader('KAS', 'cashName', 'left')}</th>
+              <th className="p-0 text-left">{renderSortHeader('STATUS BAYAR', 'is_paid', 'center')}</th>
               <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
             </tr>
           </thead>
@@ -168,7 +169,25 @@ export default function KasHarianTable({
               sortedData.map((item) => (
                 <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
-                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900"><CopyBox text={`${item.code || '-'}`} /></td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">
+                    <div className="flex items-center gap-2">
+                      <CopyBox text={`${item.code || '-'}`} />
+                      {(item.unitTransactionBillingId || item.goodsTransactionBillingId) ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="cursor-help text-[#18385b] hover:text-[#102843] transition-colors flex items-center shrink-0">
+                                <Info className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                              Data Arus Transaksi Kas Harian ini terhubung dengan data Administrasi
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : null}
+                    </div>
+                  </td>
                   <td className="px-4 py-4 text-left text-sm text-slate-700"><TextTruncate text={item.note || '-'} maxLength={15} /></td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{currenciesFormat('idr', item.debet)}</td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.credit)}</td>
@@ -179,11 +198,9 @@ export default function KasHarianTable({
                         ? "bg-green-50 text-green-700 border border-green-200"
                         : "bg-amber-50 text-amber-700 border border-amber-200"
                     )}>
-                      {item.is_paid ? 'Lunas' : 'Belum'}
+                      {item.is_paid ? 'Lunas' : 'Belum Lunas'}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.accountName}</td>
-                  <td className="px-4 py-4 text-left text-sm text-slate-700">{item.cashName || '-'}</td>
                   <td className="px-4 py-4 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

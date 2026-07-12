@@ -35,22 +35,36 @@ export interface KasHarianUnitTransactionBilling {
   updated_at?: string;
 }
 
+export interface KasHarianGoodsTransactionBilling {
+  id: number;
+  uuid?: string;
+  goods_transaction_id: number;
+  grand_total: number;
+  last_payment_at?: string;
+  is_paid: boolean;
+  is_valid?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface KasHarian {
   id: number;
   uuid?: string;
   company_id: number;
-  cash_id: number;
+  cash_id?: number | null;
   account_id?: number | null;
   unit_transaction_billing_id?: number | null;
   goods_transaction_billing_id?: number | null;
+  transaction_category?: string;
+  cash_flow_type?: 'debet' | 'credit' | string;
   code: string;
   date: string;
   note: string;
+  amount?: number;
   debet: number;
   debet_original?: number;
   credit: number;
   credit_original?: number;
-  transaction_category?: string;
   payment_proof?: string | null;
   is_paid?: boolean | string | null;
   is_valid?: boolean;
@@ -59,12 +73,12 @@ export interface KasHarian {
   grand_total?: number;
   remaining_payment?: number;
   remaining_payment_usd?: number;
-  cash: KasHarianCash;
+  cash?: KasHarianCash | null;
   account?: KasHarianAccount | null;
   company: KasHarianCompany;
   finance_billings?: FinanceBilling[];
   unit_transaction_billing?: KasHarianUnitTransactionBilling | null;
-  goods_transaction_billing?: Record<string, unknown> | null;
+  goods_transaction_billing?: KasHarianGoodsTransactionBilling | null;
 }
 
 export interface CashFlowPayload {
@@ -125,5 +139,7 @@ export interface KasHarianListItem {
   cashFlowId?: number;
   financeBillingId?: number;
   transaction_category?: string;
+  goodsTransactionBillingId?: number;
+  unitTransactionBillingId?: number;
   is_paid?: boolean;
 }
