@@ -12,6 +12,7 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -21,15 +22,9 @@ export interface PurchaseTableProps {
   slug: string;
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
-  loading?: boolean;
-  subTabs?: { id: string; label: string }[];
-  activeSubTab?: string;
-  onSubTabChange?: (id: string) => void;
-  mainTabs?: { id: string; label: string }[];
-  activeMainTab?: string;
-  onMainTabChange?: (id: string) => void;
   search?: string;
   onSearchChange?: (value: string) => void;
+  loading?: boolean;
 }
 
 export default function PurchaseTable({
@@ -41,12 +36,6 @@ export default function PurchaseTable({
   onPageChange,
   onPerPageChange,
   loading,
-  subTabs,
-  activeSubTab,
-  onSubTabChange,
-  mainTabs,
-  activeMainTab,
-  onMainTabChange,
   search,
   onSearchChange,
 }: PurchaseTableProps) {
@@ -54,6 +43,7 @@ export default function PurchaseTable({
   const [localSearch, setLocalSearch] = useState(search || '');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
+  const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -231,37 +221,14 @@ export default function PurchaseTable({
             <Input type="text" placeholder="Search No. Rangka / No. Mesin..." className="pl-8 bg-white h-9 border-slate-300" value={localSearch} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
-          {/* 2. Main Status Dropdown */}
-          {mainTabs && mainTabs.length > 0 && (
-            <Select value={activeMainTab} onValueChange={onMainTabChange}>
-              <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {mainTabs.map((tab) => (
-                  <SelectItem key={tab.id} value={tab.id}>
-                    {tab.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          {/* 3. Sub Status Dropdown */}
-          {subTabs && subTabs.length > 0 && (
-            <Select value={activeSubTab} onValueChange={onSubTabChange}>
-              <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-                <SelectValue placeholder="Detail Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {subTabs.map((sub) => (
-                  <SelectItem key={sub.id} value={sub.id}>
-                    {sub.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-xl shadow-none px-4 whitespace-nowrap"
+            onClick={() => setIsVehicleSearchOpen(true)}
+          >
+            Cari Data Kendaraan
+          </Button>
 
           {/* 4. Show + Page limit */}
           <div className="flex items-center gap-2 whitespace-nowrap">
@@ -408,6 +375,12 @@ export default function PurchaseTable({
           </div>
         </div>
       )}
+      {/* Vehicle Search Modal */}
+      <SearchVehicleModal
+        open={isVehicleSearchOpen}
+        onOpenChange={setIsVehicleSearchOpen}
+        type="purchase"
+      />
     </div>
   );
 }

@@ -467,6 +467,7 @@ export const unitTransactionService = {
       status: params.status || undefined,
       sort_order: 'desc',
       type: 'purchase',
+      is_paid: 'true',
     };
 
     for (const path of listBasePaths) {
@@ -619,6 +620,20 @@ export const unitTransactionService = {
     } catch {
       return [];
     }
+  },
+
+  async searchUnitVehicleDetails(params: {
+    type?: 'purchase' | 'sales';
+    search_of: string;
+    search: string;
+    page?: number;
+    per_page?: number;
+  }) {
+    const response = await apiClient.get<LaravelApiResponse<any>>(
+      `/wapi/transaction/unit-transaction/search-unit-transaction-item-details`,
+      { params }
+    );
+    return ensureSuccess(response.data);
   },
 };
 

@@ -12,6 +12,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -26,41 +27,9 @@ export function SalesTable({ onAdd }: Props) {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
   const [localSearch, setLocalSearch] = useState('');
-  const [mainTab, setMainTab] = useState('common');
-  const [subTab, setSubTab] = useState('all');
+  const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
 
-  const TABS = [
-    { id: 'common', label: 'Common' },
-    { id: 'inbound', label: 'Inbound' },
-    { id: 'outbound', label: 'Outbound' },
-  ];
-
-  const SUBTABS = {
-    common: [
-      { id: 'all', label: 'All' },
-      { id: 'draft', label: 'Draft' },
-      { id: 'cancel', label: 'Cancel' },
-      { id: 'rejected', label: 'Rejected' },
-      { id: 'prepare', label: 'Prepare' },
-    ],
-    inbound: [
-      { id: 'all', label: 'All' },
-      { id: 'inbound_purcase_order', label: 'Purchase Order' },
-      { id: 'inbound_incoming_goods', label: 'Incoming Goods' },
-      { id: 'inbound_receipt', label: 'Receipt' },
-      { id: 'inbound_return', label: 'Return' },
-    ],
-    outbound: [
-      { id: 'all', label: 'All' },
-      { id: 'outbound_reserved', label: 'Reserved' },
-      { id: 'outbound_in_transit', label: 'In Transit' },
-      { id: 'outbound_delivered', label: 'Delivered' },
-      { id: 'outbound_return', label: 'Return' },
-    ]
-  };
-
-  const activeStatus = subTab === 'all' ? undefined : subTab;
-  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm, status: activeStatus });
+  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
   const deleteMutation = useDeleteSales();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const salesData = data?.data ?? [];
@@ -227,33 +196,14 @@ export function SalesTable({ onAdd }: Props) {
             />
           </div>
 
-          {/* 2. Main Status Dropdown */}
-          <Select value={mainTab} onValueChange={(val) => { setMainTab(val); setSubTab('all'); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {TABS.map((tab) => (
-                <SelectItem key={tab.id} value={tab.id}>
-                  {tab.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* 3. Sub Status Dropdown */}
-          <Select value={subTab} onValueChange={(val) => { setSubTab(val); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-              <SelectValue placeholder="Detail Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {SUBTABS[mainTab as keyof typeof SUBTABS].map((sub) => (
-                <SelectItem key={sub.id} value={sub.id}>
-                  {sub.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Button
+            type="button"
+            variant="outline"
+            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-xl shadow-none px-4 whitespace-nowrap"
+            onClick={() => setIsVehicleSearchOpen(true)}
+          >
+            Cari Data Kendaraan
+          </Button>
 
           {/* 4. Show + Page limit */}
           <div className="flex items-center gap-2 whitespace-nowrap">
@@ -355,6 +305,12 @@ export function SalesTable({ onAdd }: Props) {
           </div>
         </div>
       )}
+      {/* Vehicle Search Modal */}
+      <SearchVehicleModal
+        open={isVehicleSearchOpen}
+        onOpenChange={setIsVehicleSearchOpen}
+        type="sales"
+      />
     </div>
   );
 }
