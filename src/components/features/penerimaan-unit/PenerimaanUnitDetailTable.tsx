@@ -8,7 +8,9 @@ import { PenerimaanUnitDetail } from '@/@types/penerimaan-unit.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useRouter } from 'next/router';
 import { usePenerimaanReceiptTable } from '@/hooks/usePenerimaanReceiptTable';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Props {
@@ -20,6 +22,8 @@ interface Props {
 
 export default function PenerimaanUnitDetailTable({ data, personId, onTerima, onDelete }: Props) {
   const { companyId } = useCompany();
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState('25');
   const [receivedFilter, setReceivedFilter] = useState<'all' | 'received' | 'pending'>('all');
@@ -256,7 +260,11 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
                   </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.purchaseCode}</TableCell>
-                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.unitTypeName}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                    <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item.unitTypeName}`}>
+                      {item.unitTypeName}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.color}</TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.machineNumber}</TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.chassisNumber}</TableCell>

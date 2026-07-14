@@ -11,6 +11,8 @@ import { useRouter } from 'next/router';
 import { useTableSort } from '@/hooks/useTableSort';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { id } from 'date-fns/locale';
 
 interface Props {
@@ -72,9 +74,19 @@ export default function PenerimaanUnitTable({ data }: Props) {
         <TableBody>
           {sortedData.map((item) => (
             <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
-              <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">{item.noPenerimaan}</TableCell>
+              <TableCell className="sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                <CopyBox text={`${item?.noPenerimaan || '-'}`} />
+              </TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{formatDate(item.tanggal)}</TableCell>
-              <TableCell className="px-4 py-4 text-left text-sm">{item.supplier}</TableCell>
+              <TableCell className="px-4 py-4 text-left text-sm">
+                {item?.person ? (
+                  <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${item?.person?.name}`}>
+                    {item.supplier}
+                  </ReferenceLink>
+                ) : (
+                  item.supplier
+                )}
+              </TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{item.keterangan || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 <DropdownMenu>
@@ -85,7 +97,7 @@ export default function PenerimaanUnitTable({ data }: Props) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                     <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-                      {slug ? <Link href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Edit</Link> : <span className="text-gray-400">Edit</span>}
+                      {slug ? <Link href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Detail</Link> : <span className="text-gray-400">Detail</span>}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setDeleteId(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                       Hapus

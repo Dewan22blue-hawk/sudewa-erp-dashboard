@@ -4,6 +4,10 @@ export interface PenerimaanUnit {
   tanggal: string;
   supplier: string;
   keterangan?: string;
+  person?: {
+    id: string;
+    name: string;
+  }
 }
 
 export interface PenerimaanUnitDetail {

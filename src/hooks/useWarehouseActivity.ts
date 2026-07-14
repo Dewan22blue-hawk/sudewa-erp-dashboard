@@ -13,6 +13,7 @@ import {
   getWarehouseActivityById,
   receiptStock,
   updateWarehouseActivity,
+  deleteWarehouseActivity,
 } from '@/services/warehouse.service';
 
 const warehouseActivitiesKey = 'warehouse-activities';
@@ -75,6 +76,17 @@ export const useReceiptStock = () => {
       queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey] });
       queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey, 'detail', variables.activityId] });
       queryClient.invalidateQueries({ queryKey: ['penerimaan-receipt-table'] });
+    },
+  });
+};
+
+export const useDeleteWarehouseActivity = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteWarehouseActivity(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey] });
     },
   });
 };

@@ -5,6 +5,7 @@ import {
   useUpdateWarehouseActivity,
   useWarehouseActivities,
   useWarehouseActivityDetail,
+  useDeleteWarehouseActivity,
 } from '@/hooks/useWarehouseActivity';
 
 export const usePenerimaanUnits = () => {
@@ -20,12 +21,7 @@ export const useCreatePenerimaanUnit = () => {
 };
 
 export const useDeletePenerimaanUnit = () => {
-  // Endpoint delete warehouse activity is not available in current backend contract.
-  return useMutation({
-    mutationFn: async () => {
-      throw new Error('Delete endpoint tidak tersedia untuk warehouse activity');
-    },
-  });
+  return useDeleteWarehouseActivity();
 };
 
 export const usePenerimaanDetail = (penerimaanId?: string) => {
