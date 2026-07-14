@@ -104,7 +104,7 @@ export function TransactionTable({ data, isLoading }: TransactionTableProps) {
           </TableHeader>
           <TableBody>
             {sortedData.map((item, idx) => (
-              <TableRow key={`${item.note}-${idx}`} className="hover:bg-slate-50/50">
+              <TableRow key={`${item.note}-${idx}`} className="group hover:bg-slate-50/50">
                 <TableCell className="font-medium text-slate-800">{item.note}</TableCell>
                 <TableCell className="text-slate-700">{formatDate(item.date)}</TableCell>
                 <TableCell className="text-slate-700">{item.sale}</TableCell>

@@ -84,7 +84,7 @@ export default function LaporanPenerimaanTable({
             </TableHeader>
             <TableBody>
               {data.map((item, idx) => (
-                <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
+                <TableRow key={item.id} className="group border-b border-slate-200 hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                     {idx + 1 + (pagination.currentPage - 1) * pagination.perPage}
                   </TableCell>

@@ -57,8 +57,8 @@ export function GoodsReceiptEquipmentDetailTable({
       </TableHeader>
       <TableBody>
         {data.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={8} className="h-28 text-center text-sm text-slate-500">
+          <TableRow className="group">
+            <TableCell colSpan={8} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
               Belum ada detail perlengkapan yang dimasukkan.
             </TableCell>
           </TableRow>
@@ -66,7 +66,7 @@ export function GoodsReceiptEquipmentDetailTable({
           data.map((item, index) => {
             console.log('GoodsReceiptEquipmentDetailTable item:', item);
             return (
-              <TableRow key={item.id} className="border-slate-200 bg-white hover:bg-slate-50 transition-colors">
+              <TableRow key={item.id} className="group border-slate-200 bg-white hover:bg-slate-50 transition-colors">
                 <TableCell className="px-4 py-4 text-center">
                   <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => toggleOne(item.id, !!checked)} />
                 </TableCell>

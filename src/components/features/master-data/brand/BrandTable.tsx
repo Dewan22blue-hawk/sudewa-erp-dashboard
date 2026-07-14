@@ -196,7 +196,7 @@ export const BrandTable = ({
                     <TableBody>
                         {isLoading ? (
                             [...Array(perPage)].map((_, i) => (
-                                <TableRow key={i} className="bg-white hover:bg-slate-50 transition-colors">
+                                <TableRow key={i} className="group bg-white hover:bg-slate-50 transition-colors">
                                     <TableCell className="px-4 py-4">
                                         <div className="flex items-center gap-3">
                                             <Skeleton className="h-10 w-10 rounded-lg" />
@@ -212,14 +212,14 @@ export const BrandTable = ({
                                 </TableRow>
                             ))
                         ) : data.length === 0 ? (
-                            <TableRow>
+                            <TableRow className="group">
                                 <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
                                     Tidak ada data.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="bg-white hover:bg-slate-50 transition-colors">
+                                <TableRow key={row.id} className="group bg-white hover:bg-slate-50 transition-colors">
                                     {row.getVisibleCells().map((cell) => {
                                         const isAction = cell.column.id === 'actions';
                                         return (

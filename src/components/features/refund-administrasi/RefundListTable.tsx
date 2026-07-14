@@ -126,21 +126,21 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
                   Memuat data refund...
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-slate-50">
+                <TableRow key={row.id} className="group hover:bg-slate-50">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
                   Belum ada refund untuk transaksi ini.
                 </TableCell>

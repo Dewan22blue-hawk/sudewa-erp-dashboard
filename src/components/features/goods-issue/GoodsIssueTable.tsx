@@ -100,16 +100,16 @@ export function GoodsIssueTable({
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Memuat data pengeluaran material...</TableCell>
+                <TableRow className="group">
+                  <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Memuat data pengeluaran material...</TableCell>
                 </TableRow>
               ) : data.length === 0 ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Tidak ada data pengeluaran material.</TableCell>
                 </TableRow>
               ) : (
                 data.map((item) => (
-                  <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
+                  <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.code}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.customer?.name ?? '-'}</TableCell>

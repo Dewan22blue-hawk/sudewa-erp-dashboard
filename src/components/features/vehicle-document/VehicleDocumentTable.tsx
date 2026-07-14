@@ -115,9 +115,9 @@ export function VehicleDocumentTable({
             <TableBody>
               {isLoading ? (
                 Array.from({ length: Math.min(perPage, 6) }).map((_, rowIndex) => (
-                  <TableRow key={rowIndex} className="animate-pulse border-slate-100">
+                  <TableRow key={rowIndex} className="group animate-pulse border-slate-100">
                     {Array.from({ length: 9 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="px-4 py-4">
+                      <TableCell key={cellIndex} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                         <div className="h-4 rounded bg-slate-100" />
                       </TableCell>
                     ))}
@@ -125,7 +125,7 @@ export function VehicleDocumentTable({
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50/70 transition-colors">
+                  <TableRow key={item.id} className="group border-b border-slate-200 hover:bg-gray-50/70 transition-colors">
                     <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.ditlantasProcess?.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.ditlantasProcess?.vendor?.name || '-'}</TableCell>
@@ -150,7 +150,7 @@ export function VehicleDocumentTable({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={9} className="h-28 text-center text-sm text-slate-500 px-4 py-4">
                     Belum ada data penerimaan BPKB/STNK.
                   </TableCell>

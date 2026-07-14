@@ -171,8 +171,8 @@ export function RegionTable({
                     <TableBody>
                         {regions.length > 0 ? (
                             regions.map((region) => (
-                                <TableRow key={region.uuid} className="bg-white hover:bg-slate-50 transition-colors">
-                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left font-medium">
+                                <TableRow key={region.uuid} className="group bg-white hover:bg-slate-50 transition-colors">
+                                    <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                         {region.code || '-'}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-gray-900 text-left truncate uppercase">
@@ -200,7 +200,7 @@ export function RegionTable({
                                 </TableRow>
                             ))
                         ) : (
-                            <TableRow>
+                            <TableRow className="group">
                                 <TableCell colSpan={3} className="h-32 text-center text-gray-505 py-10 text-sm">
                                     Tidak ada data wilayah ditemukan
                                 </TableCell>

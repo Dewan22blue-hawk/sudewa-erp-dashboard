@@ -105,29 +105,29 @@ export function FinanceAssetTable({
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UMUR EKONOMIS</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PENYUSUTAN/BULAN</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NILAI AKHIR</TableHead>
-                                <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i} className="border-b border-slate-100 last:border-0">
+                                    <TableRow key={i} className="group border-b border-slate-100 last:border-0">
                                         {Array.from({ length: 11 }).map((_, j) => (
-                                            <TableCell key={j} className="px-4 py-4">
+                                            <TableCell key={j} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                                 <Skeleton className="h-4 w-full" />
                                             </TableCell>
                                         ))}
                                     </TableRow>
                                 ))
                             ) : assets.length === 0 ? (
-                                <TableRow>
+                                <TableRow className="group">
                                     <TableCell colSpan={11} className="h-24 text-center text-slate-500">
                                         No data found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 assets.map((asset, index) => (
-                                    <TableRow key={asset.id} className="border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
+                                    <TableRow key={asset.id} className="group border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(page - 1) * perPage + index + 1}</TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">{asset.code}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">

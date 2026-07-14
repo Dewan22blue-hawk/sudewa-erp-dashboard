@@ -127,8 +127,8 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
           <TableBody>
             {isLoading ? (
               Array.from({ length: perPage }).map((_, index) => (
-                <TableRow key={index} className="hover:bg-gray-50 transition-colors">
-                  <TableCell className="px-4 py-4 text-center">
+                <TableRow key={index} className="group hover:bg-gray-50 transition-colors">
+                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Skeleton className="mx-auto h-4 w-4 rounded" />
                   </TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
@@ -139,7 +139,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                 </TableRow>
               ))
             ) : data.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={6} className="px-4 py-10 text-center text-sm text-gray-500">
                   Tidak ada data akun.
                 </TableCell>
@@ -149,7 +149,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                 const checked = selectedIds.has(String(account.id));
 
                 return (
-                  <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="hover:bg-gray-50 transition-colors">
+                  <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="group hover:bg-gray-50 transition-colors">
                     {/* Checkbox */}
                     <TableCell className="px-4 py-4 text-center">
                       <Checkbox

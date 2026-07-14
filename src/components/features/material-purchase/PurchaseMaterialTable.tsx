@@ -165,13 +165,13 @@ export function PurchaseMaterialTable({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={5} className="h-28 text-center text-slate-500">
                   {loadingText}
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={5} className="h-28 text-center text-slate-500">
                   {emptyText}
                 </TableCell>

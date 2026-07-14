@@ -189,19 +189,19 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN</TableHead>
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">JUMLAH</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={12} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
+              <TableRow className="group">
+                <TableCell colSpan={12} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   {isError ? 'Gagal memuat data' : isLoading ? 'Loading data...' : 'Tidak ada data'}
                 </TableCell>
               </TableRow>
             ) : (
               pagedData.map((item, idx) => (
-                <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <TableRow key={item.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
                   <TableCell className="px-4 py-4 text-center">
                     <Checkbox checked={selectedIds.has(item.id)} onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))} aria-label="Pilih baris" />

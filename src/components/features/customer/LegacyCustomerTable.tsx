@@ -121,7 +121,7 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   Tidak ada data
                 </TableCell>

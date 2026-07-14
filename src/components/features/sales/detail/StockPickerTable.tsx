@@ -102,26 +102,26 @@ export function StockPickerTable({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={6} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Memuat stock unit...
                 </TableCell>
               </TableRow>
             ) : isError ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={6} className="h-20 text-center text-destructive px-4 py-4 text-sm">
                   Gagal memuat stock unit
                 </TableCell>
               </TableRow>
             ) : pagedRows.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={6} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Stock unit tidak tersedia
                 </TableCell>
               </TableRow>
             ) : (
               pagedRows.map((row, index) => (
-                <TableRow key={row.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <TableRow key={row.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   <TableCell className="text-center px-4 py-4 text-sm text-slate-500">{(currentPage - 1) * perPage + index + 1}</TableCell>
                   <TableCell className="text-center px-4 py-4">
                     <Checkbox checked={selectedIds.has(row.id)} onCheckedChange={(checked) => onToggleOne(row.id, Boolean(checked))} aria-label="Pilih baris" />

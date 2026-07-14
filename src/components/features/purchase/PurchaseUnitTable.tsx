@@ -214,24 +214,24 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">OTHER FEE</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP TOTAL</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN TOTAL</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[120px]">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isError ? (
-                <TableRow>
-                  <TableCell colSpan={11} className="h-20 text-center text-destructive px-4 py-4 text-sm">
+                <TableRow className="group">
+                  <TableCell colSpan={11} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     Gagal memuat unit item
                   </TableCell>
                 </TableRow>
               ) : isLoading ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={11} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                     Loading data...
                   </TableCell>
                 </TableRow>
               ) : pagedData.length === 0 ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={11} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                     Belum ada unit item.
                   </TableCell>
@@ -241,7 +241,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                   const itemDetails = allDetails.filter((d) => String(d.unit_transaction_item_id) === String(item.id));
                   const isComplete = itemDetails.length === Number(item.qty_total ?? 0);
                   return (
-                    <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <TableRow key={item.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
                       <TableCell className="px-4 py-4 text-center">
                         <Checkbox

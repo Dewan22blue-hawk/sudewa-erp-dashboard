@@ -250,19 +250,19 @@ export function SalesTable({ onAdd }: Props) {
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data tidak ditemukan. Coba ubah kata kunci pencarian.
                 </TableCell>

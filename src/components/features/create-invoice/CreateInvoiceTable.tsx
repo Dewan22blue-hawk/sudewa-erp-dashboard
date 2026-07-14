@@ -204,9 +204,9 @@ export function CreateInvoiceTable({
             <TableBody>
               {isLoading
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                  <TableRow key={`skeleton-${index}`} className="border-slate-100">
+                  <TableRow key={`skeleton-${index}`} className="group border-slate-100">
                     {Array.from({ length: 7 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="px-4 py-4">
+                      <TableCell key={cellIndex} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                         <div className="h-4 animate-pulse rounded bg-slate-100" />
                       </TableCell>
                     ))}
@@ -215,7 +215,7 @@ export function CreateInvoiceTable({
                 : null}
 
               {!isLoading && rows.length === 0 ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={7} className="h-32 text-center text-sm text-slate-500">
                     <div className="flex flex-col items-center gap-2">
                       <CalendarDays className="h-8 w-8 text-slate-300" />
@@ -227,7 +227,7 @@ export function CreateInvoiceTable({
 
               {!isLoading &&
                 rows.map((row) => (
-                  <TableRow key={row.id} className="border-slate-100 transition-colors hover:bg-slate-50/70">
+                  <TableRow key={row.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
                     <TableCell className="px-4 py-4 text-center">
                       <Checkbox checked={selectedIds.includes(row.id)} onCheckedChange={(checked) => onToggleRow(row.id, Boolean(checked))} />
                     </TableCell>

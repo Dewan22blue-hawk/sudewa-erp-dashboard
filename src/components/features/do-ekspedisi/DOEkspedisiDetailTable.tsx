@@ -58,15 +58,15 @@ export function DOEkspedisiDetailTable({
           <TableBody>
             {isLoading ? (
               Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell colSpan={13} className="px-4 py-4">
+                <TableRow key={index} className="group">
+                  <TableCell colSpan={13} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <div className="h-5 animate-pulse rounded bg-slate-200" />
                   </TableCell>
                 </TableRow>
               ))
             ) : data.length > 0 ? (
               data.map((item, index) => (
-                <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
+                <TableRow key={item.id} className="group border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{(page - 1) * perPage + index + 1}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.customerName || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.loadingIn || '-'}</TableCell>
@@ -104,7 +104,7 @@ export function DOEkspedisiDetailTable({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={13} className="h-32 text-center text-slate-500">
                   Tidak ada data detail DO ditemukan
                 </TableCell>

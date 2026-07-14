@@ -143,14 +143,14 @@ export function VehicleEquipmentTable({
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">NAMA BARANG</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-[120px]">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {equipments.length > 0 ? (
                                 equipments.map((item) => (
-                                    <TableRow key={item.uuid} className="hover:bg-gray-50/50 border-b border-gray-100">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-center">
+                                    <TableRow key={item.uuid} className="group hover:bg-gray-50/50 border-b border-gray-100">
+                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             {item.code || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-800 text-center font-medium">
@@ -182,7 +182,7 @@ export function VehicleEquipmentTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
+                                <TableRow className="group">
                                     <TableCell colSpan={3} className="h-40 text-center text-gray-400 text-sm font-medium">
                                         Tidak ada data perlengkapan ditemukan
                                     </TableCell>

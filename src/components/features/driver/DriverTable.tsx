@@ -228,9 +228,9 @@ export function DriverTable({
                         <TableBody>
                             {isLoading ? (
                                 Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                                    <TableRow key={i} className="group hover:bg-gray-50 transition-colors">
                                         {Array.from({ length: 7 }).map((_, j) => (
-                                            <TableCell key={j} className="px-4 py-4">
+                                            <TableCell key={j} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                                 <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
                                             </TableCell>
                                         ))}
@@ -238,7 +238,7 @@ export function DriverTable({
                                 ))
                             ) : drivers.length > 0 ? (
                                 drivers.map((driver) => (
-                                    <TableRow key={driver.id} className="hover:bg-gray-50 transition-colors">
+                                    <TableRow key={driver.id} className="group hover:bg-gray-50 transition-colors">
                                         <TableCell className="px-4 py-4 text-sm text-gray-900 text-left font-medium whitespace-nowrap">
                                             {driver.name || '-'}
                                         </TableCell>
@@ -287,7 +287,7 @@ export function DriverTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
+                                <TableRow className="group">
                                     <TableCell
                                         colSpan={7}
                                         className="h-32 text-center text-gray-505 py-10 text-sm"

@@ -199,7 +199,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
           <TableBody>
             {isLoading ? (
               [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="bg-white hover:bg-slate-50 transition-colors">
+                <TableRow key={i} className="group bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
@@ -210,7 +210,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
               ))
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="bg-white hover:bg-slate-50 transition-colors">
+                <TableRow key={row.id} className="group bg-white hover:bg-slate-50 transition-colors">
                   {row.getVisibleCells().map((cell) => {
                     const isAction = cell.column.id === 'actions';
                     const isStatus = cell.column.id === 'isActive';
@@ -223,7 +223,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>
