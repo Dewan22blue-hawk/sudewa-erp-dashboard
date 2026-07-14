@@ -218,15 +218,15 @@ export function SupplierTable({
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, index) => (
-                  <TableRow key={index} className="hover:bg-gray-50 transition-colors">
-                    <TableCell colSpan={7} className="px-4 py-4">
+                  <TableRow key={index} className="group hover:bg-gray-50 transition-colors">
+                    <TableCell colSpan={7} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="h-6 animate-pulse rounded bg-[#F4F4F5]" />
                     </TableCell>
                   </TableRow>
                 ))
               ) : sortedData.length > 0 ? (
                 sortedData.map((supplier) => (
-                  <TableRow key={supplier.id} className="hover:bg-gray-50 transition-colors">
+                  <TableRow key={supplier.id} className="group hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm font-medium text-gray-600 text-left">
                       {supplier.code || '-'}
                     </TableCell>
@@ -279,7 +279,7 @@ export function SupplierTable({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
                     Belum ada data supplier untuk company aktif
                   </TableCell>

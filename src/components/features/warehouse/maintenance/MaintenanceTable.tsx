@@ -39,20 +39,20 @@ export function MaintenanceTable({
       </TableHeader>
       <TableBody>
         {isLoading ? (
-          <TableRow>
+          <TableRow className="group">
             <TableCell colSpan={7} className="h-28 text-center text-slate-500 text-sm">
               Memuat data maintenance...
             </TableCell>
           </TableRow>
         ) : data.length === 0 ? (
-          <TableRow>
+          <TableRow className="group">
             <TableCell colSpan={7} className="h-28 text-center text-slate-500 text-sm">
               Belum ada data maintenance.
             </TableCell>
           </TableRow>
         ) : (
           data.map((item, index) => (
-            <TableRow key={item.id} className="border-slate-200 bg-white hover:bg-slate-50 transition-colors">
+            <TableRow key={item.id} className="group border-slate-200 bg-white hover:bg-slate-50 transition-colors">
               <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{startIndex + index}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 font-medium text-left">{item.driver?.name || '-'}</TableCell>

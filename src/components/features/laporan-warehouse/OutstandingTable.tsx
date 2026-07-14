@@ -193,14 +193,14 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} className="group">
                     {Array.from({ length: 8 }).map((_, j) => (
                       <TableCell key={j} className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : isError ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={8} className="py-16 px-4">
                     <div className="flex flex-col items-center justify-center text-red-500">
                       <AlertCircle className="h-8 w-8 mb-2" />
@@ -209,7 +209,7 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
                   </TableCell>
                 </TableRow>
               ) : pagedRows.length === 0 ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={8} className="px-4 py-10 text-center text-sm text-gray-500">
                     Data tidak tersedia
                   </TableCell>
@@ -217,7 +217,7 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
               ) : (
                 <>
                   {pagedRows.map((item, index) => (
-                    <TableRow key={`${item.code}-${item.unit_type}-${index}`} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
+                    <TableRow key={`${item.code}-${item.unit_type}-${index}`} className="group border-b border-slate-200 hover:bg-gray-50 transition-colors">
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                         {(safeTablePage - 1) * ROWS_PER_PAGE + index + 1}
                       </TableCell>
@@ -230,7 +230,7 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
                       <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatNumber(item.remaining_qty)}</TableCell>
                     </TableRow>
                   ))}
-                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold print-hide-pagination">
+                  <TableRow className="group bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold print-hide-pagination">
                     <TableCell colSpan={5} className="px-4 py-4 text-center text-slate-900">
                       GRAND TOTAL
                     </TableCell>

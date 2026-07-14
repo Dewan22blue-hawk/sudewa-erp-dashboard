@@ -238,10 +238,11 @@ export default function EditRolePage() {
               <Button
                 type="submit"
                 disabled={isPending || !name.trim()}
-                className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition-all"
+                className="h-11 px-6 rounded-xl bg-indigo-950 hover:bg-indigo-900 text-white font-semibold shadow-sm transition-all"
               >
                 {updateMutation.isPending ? 'Menyimpan...' : 'Perbarui Peran'}
               </Button>
+
             </div>
           </form>
         )}

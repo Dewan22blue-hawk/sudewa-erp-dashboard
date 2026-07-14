@@ -183,14 +183,14 @@ export function MaterialTable({
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[40%] uppercase px-4 py-4 text-left">DESKRIPSI</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-right">HARGA</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[10%] uppercase px-4 py-4 text-center">SATUAN</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {materials.length > 0 ? (
                                 materials.map((item) => (
-                                    <TableRow key={item.uuid} className="hover:bg-gray-50 transition-colors">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-left">
+                                    <TableRow key={item.uuid} className="group hover:bg-gray-50 transition-colors">
+                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             {item.code || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">
@@ -224,7 +224,7 @@ export function MaterialTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
+                                <TableRow className="group">
                                     <TableCell colSpan={5} className="h-32 text-center text-gray-550 py-10 text-sm">
                                         Tidak ada data material ditemukan
                                     </TableCell>

@@ -218,8 +218,8 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
           <TableBody>
             {isLoading ? (
               [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="bg-white hover:bg-slate-50 transition-colors">
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
+                <TableRow key={i} className="group bg-white hover:bg-slate-50 transition-colors">
+                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-4 w-12" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
@@ -232,14 +232,14 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 </TableRow>
               ))
             ) : typeUnits.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={10} className="text-center text-gray-550 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
               sortedData.map((item) => (
-                <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
+                <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.code}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.brand?.name ?? item.brandId}</TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.name}</TableCell>

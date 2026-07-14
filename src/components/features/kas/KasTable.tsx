@@ -180,14 +180,14 @@ export function KasTable({ data }: Props) {
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={4} className="text-center text-gray-505 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
               currentData.map((item) => (
-                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={item.id} className="group hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">{item.code}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">{item.name}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.description || '-'}</TableCell>

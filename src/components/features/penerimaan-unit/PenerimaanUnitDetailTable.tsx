@@ -250,8 +250,8 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
           <TableBody>
             {paginated.length > 0 ? (
               paginated.map((item, index) => (
-                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors">
-                  <TableCell className="px-4 py-4 text-center">
+                <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors">
+                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Checkbox checked={selected.includes(item.id) || receivedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} disabled={receivedIds.includes(item.id)} />
                   </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>
@@ -275,7 +275,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={9} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Tidak ada data.
                 </TableCell>

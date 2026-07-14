@@ -208,13 +208,13 @@ export default function PengeluaranUnitCreateTable({
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="px-4 py-8 text-center text-gray-500 text-sm">
+              <TableRow className="group">
+                <TableCell colSpan={8} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   Memuat data unit...
                 </TableCell>
               </TableRow>
             ) : isError ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={8} className="px-4 py-8 text-center text-red-600 text-sm">
                   <div className="space-y-2">
                     <p>{errorMessage ?? 'Gagal memuat data unit'}</p>
@@ -227,14 +227,14 @@ export default function PengeluaranUnitCreateTable({
                 </TableCell>
               </TableRow>
             ) : filteredData.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={8} className="px-4 py-8 text-center text-gray-500 text-sm">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
               filteredData.map((item, index) => (
-                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors border-slate-100">
+                <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors border-slate-100">
                   <TableCell className="px-4 py-4 text-center">
                     <Checkbox checked={item.isDispatched || selectedIds.includes(item.unitTransactionItemDetailId)} disabled={item.isDispatched} onCheckedChange={() => toggleSelect(item.unitTransactionItemDetailId)} />
                   </TableCell>

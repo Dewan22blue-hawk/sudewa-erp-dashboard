@@ -189,14 +189,14 @@ export function AssetTable({
                                 <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">NAMA BARANG</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap">TGL BELI</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
-                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {assets.length > 0 ? (
                                 assets.map((item, index) => (
-                                    <TableRow key={item.uuid} className="border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
-                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
+                                    <TableRow key={item.uuid} className="group border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
+                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             {(page - 1) * perPage + index + 1}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">
@@ -237,7 +237,7 @@ export function AssetTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
+                                <TableRow className="group">
                                     <TableCell colSpan={8} className="h-32 text-center text-slate-500">
                                         Tidak ada data aset ditemukan
                                     </TableCell>

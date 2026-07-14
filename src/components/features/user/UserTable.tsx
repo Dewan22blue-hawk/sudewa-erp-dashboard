@@ -167,7 +167,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={5} className="text-center text-slate-500 py-10 text-sm">
                   Tidak ada data.
                 </TableCell>

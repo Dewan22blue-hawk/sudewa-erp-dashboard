@@ -86,7 +86,7 @@ export function LaporanKasTable({
                     </TableHeader>
                     <TableBody>
                         {data.map((item) => (
-                            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors bg-white border-b">
+                            <TableRow key={item.id} className="group border-slate-200 hover:bg-gray-50 transition-colors bg-white border-b">
                                 <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-center">
                                     {formatDate(item.date)}
                                 </TableCell>
@@ -105,14 +105,14 @@ export function LaporanKasTable({
                             </TableRow>
                         ))}
                         {data.length === 0 && (
-                            <TableRow>
+                            <TableRow className="group">
                                 <TableCell colSpan={5} className="px-4 py-10 text-center text-sm text-gray-500">
                                     Tidak ada data transaksi kas
                                 </TableCell>
                             </TableRow>
                         )}
                         {/* Footer Totals Row */}
-                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200">
+                        <TableRow className="group bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200">
                             <TableCell colSpan={3} className="px-4 py-4">
                                 <div className="text-right pr-12">
                                     <span className="text-sm font-semibold text-slate-900">Grand Total</span>

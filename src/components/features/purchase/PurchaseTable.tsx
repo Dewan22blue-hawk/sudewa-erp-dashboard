@@ -276,14 +276,14 @@ export default function PurchaseTable({
           </TableHeader>
           <TableBody>
             {processedData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={12} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
+              <TableRow className="group">
+                <TableCell colSpan={12} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   Tidak ada data
                 </TableCell>
               </TableRow>
             ) : (
               processedData.map((item) => (
-                <TableRow key={item.id} className="border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
+                <TableRow key={item.id} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
                   {/* Kode Jual - Link biru */}
                   <TableCell className="px-4 py-4 text-left text-sm font-medium">
                     <button

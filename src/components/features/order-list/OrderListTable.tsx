@@ -147,9 +147,9 @@ export const OrderListTable = React.memo(function OrderListTable({
             <TableBody>
               {isLoading
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`} className="border-slate-100">
+                    <TableRow key={`skeleton-${index}`} className="group border-slate-100">
                       {headers.map((header) => (
-                        <TableCell key={header.key} className="px-4 py-5">
+                        <TableCell key={header.key} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                           <div className="h-4 min-w-[90px] animate-pulse rounded bg-slate-100" />
                         </TableCell>
                       ))}
@@ -158,7 +158,7 @@ export const OrderListTable = React.memo(function OrderListTable({
                 : null}
 
               {!isLoading && data.length === 0 ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={headers.length} className="h-28 text-center text-sm text-slate-500">
                     Belum ada data order list.
                   </TableCell>
@@ -170,7 +170,7 @@ export const OrderListTable = React.memo(function OrderListTable({
                     const primaryTarif = getPrimaryTarifItem(item);
 
                     return (
-                      <TableRow key={item.id} className="border-slate-100 transition-colors hover:bg-slate-50/70">
+                      <TableRow key={item.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
                         <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.code || '-'}</TableCell>
                         <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
                         
@@ -256,7 +256,7 @@ export const OrderListTable = React.memo(function OrderListTable({
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
-                        <TableCell className="px-4 py-4 text-center">
+                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="button" variant="ghost" size="icon" className="h-9 w-9 cursor-pointer rounded-full">

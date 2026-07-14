@@ -71,8 +71,8 @@ export default function PenerimaanUnitTable({ data }: Props) {
 
         <TableBody>
           {sortedData.map((item) => (
-            <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
-              <TableCell className="px-4 py-4 font-medium text-gray-900 text-left text-sm">{item.noPenerimaan}</TableCell>
+            <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
+              <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">{item.noPenerimaan}</TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{formatDate(item.tanggal)}</TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{item.supplier}</TableCell>
               <TableCell className="px-4 py-4 text-left text-sm">{item.keterangan || '-'}</TableCell>

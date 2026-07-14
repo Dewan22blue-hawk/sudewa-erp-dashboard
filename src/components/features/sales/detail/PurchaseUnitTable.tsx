@@ -161,7 +161,7 @@ export function PurchaseUnitTable({ units }: Props) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="p-0">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -170,7 +170,7 @@ export function PurchaseUnitTable({ units }: Props) {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>

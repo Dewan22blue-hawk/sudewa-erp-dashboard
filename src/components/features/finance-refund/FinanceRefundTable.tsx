@@ -181,7 +181,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
                     Memuat data refund finance...
                   </TableCell>
@@ -190,7 +190,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
+                    className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
                     onClick={() => setSelectedRefund(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -205,7 +205,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
                     Tidak ada data refund finance.
                   </TableCell>

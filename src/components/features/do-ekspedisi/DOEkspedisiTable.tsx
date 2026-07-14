@@ -124,15 +124,15 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
             <TableBody>
               {isLoading ? (
                 Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell colSpan={7} className="px-4 py-4">
+                  <TableRow key={index} className="group">
+                    <TableCell colSpan={7} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="h-5 animate-pulse rounded bg-slate-200" />
                     </TableCell>
                   </TableRow>
                 ))
               ) : data.length > 0 ? (
                 data.map((item) => (
-                  <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
+                  <TableRow key={item.id} className="group border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-800">{item.doCode || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.orderCode || item.orderList?.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">
@@ -173,7 +173,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={7} className="h-32 text-center text-slate-500">
                     Tidak ada data DO Ekspedisi ditemukan
                   </TableCell>

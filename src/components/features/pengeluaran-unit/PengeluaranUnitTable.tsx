@@ -136,13 +136,13 @@ export default function PengeluaranUnitTable({
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
+              <TableRow className="group">
+                <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : isError ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={6} className="px-4 py-8 text-center text-red-600 text-sm">
                   <div className="space-y-2">
                     <p>{errorMessage ?? 'Gagal memuat data pengeluaran unit'}</p>
@@ -153,14 +153,14 @@ export default function PengeluaranUnitTable({
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
+              <TableRow className="group">
+                <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
               data.map((item) => (
-                <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
+                <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4 text-gray-900 font-medium text-left text-sm">{item.activityNumber}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{formatDate(item.activityDate)}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.person?.name ?? '-'}</TableCell>

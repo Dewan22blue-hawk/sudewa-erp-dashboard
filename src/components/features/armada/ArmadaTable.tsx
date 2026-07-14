@@ -130,14 +130,14 @@ export function ArmadaTable({
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO RANGKA</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA STNK</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA KIR</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                  <TableRow key={index} className="animate-pulse">
-                    <TableCell colSpan={7} className="px-4 py-4">
+                  <TableRow key={index} className="group animate-pulse">
+                    <TableCell colSpan={7} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="h-5 rounded bg-gray-200" />
                     </TableCell>
                   </TableRow>
@@ -148,7 +148,7 @@ export function ArmadaTable({
                   const kirInfo = getRemainingLabel(armada.kirAge);
  
                   return (
-                    <TableRow key={armada.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <TableRow key={armada.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                       <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
                       <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.type}</TableCell>
                       <TableCell className="px-4 py-4 text-left text-sm text-slate-700 font-medium whitespace-nowrap">{armada.machineNumber}</TableCell>
@@ -217,7 +217,7 @@ export function ArmadaTable({
                   );
                 })
               ) : (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={7} className="h-32 text-center text-slate-500 px-4 py-4 text-sm">
                     Tidak ada data armada ditemukan
                   </TableCell>

@@ -171,7 +171,7 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                     <TableBody>
                         {paginated.length > 0 ? (
                             paginated.map((item, index) => (
-                                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors border-slate-100">
+                                <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors border-slate-100">
                                     <TableCell className="px-4 py-4 text-center">
                                         <Checkbox checked={selected.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
                                     </TableCell>
@@ -184,7 +184,7 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                                 </TableRow>
                             ))
                         ) : (
-                            <TableRow>
+                            <TableRow className="group">
                                 <TableCell colSpan={7} className="px-4 py-8 text-center text-gray-500 text-sm">
                                     Tidak ada data.
                                 </TableCell>

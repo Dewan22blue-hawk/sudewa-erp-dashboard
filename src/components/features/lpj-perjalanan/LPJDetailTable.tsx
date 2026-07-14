@@ -36,7 +36,7 @@ export function LPJDetailTable({ items }: LPJDetailTableProps) {
         </TableHeader>
         <TableBody>
           {items.map((item, index) => (
-            <TableRow key={item.id} className="text-xs">
+            <TableRow key={item.id} className="group text-xs">
               <TableCell className="text-center py-2">{index + 1}</TableCell>
               <TableCell className="text-center py-2">{format(new Date(item.tanggal), 'dd/MM/yyyy')}</TableCell>
               <TableCell className="text-center py-2">{item.noPolisi}</TableCell>
@@ -50,7 +50,7 @@ export function LPJDetailTable({ items }: LPJDetailTableProps) {
             </TableRow>
           ))}
 
-          <TableRow className="bg-[#d9e5f7] text-sm font-semibold">
+          <TableRow className="group bg-[#d9e5f7] text-sm font-semibold">
             <TableCell colSpan={5} className="text-center py-2">
               Keterangan
             </TableCell>

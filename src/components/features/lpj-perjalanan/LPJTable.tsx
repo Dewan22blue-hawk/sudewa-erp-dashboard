@@ -71,14 +71,14 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">RUTE</TableHead>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">MUATAN</TableHead>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TOTAL KM</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.length > 0 ? (
                 data.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-gray-50/50">
-                    <TableCell className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">{item.kodeLPJ}</TableCell>
+                  <TableRow key={item.id} className="group hover:bg-gray-50/50">
+                    <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">{item.kodeLPJ}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.driver}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.noPolisi}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{format(new Date(item.tglBerangkat), 'dd/MM/yyyy')}</TableCell>
@@ -114,7 +114,7 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={9} className="h-32 text-center text-gray-500">
                     Tidak ada data LPJ ditemukan
                   </TableCell>

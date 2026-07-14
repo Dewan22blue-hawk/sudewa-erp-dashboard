@@ -239,14 +239,14 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={10} className="text-center text-gray-505 py-10 text-sm">
+              <TableRow className="group">
+                <TableCell colSpan={10} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   Tidak ada data.
                 </TableCell>
               </TableRow>
             ) : (
               currentData.map((item) => (
-                <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
+                <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.code}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.brand?.name ?? item.brandId ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.name}</TableCell>

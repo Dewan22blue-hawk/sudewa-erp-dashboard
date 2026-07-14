@@ -187,9 +187,9 @@ export function TarifTable({
                         <TableBody>
                             {isLoading ? (
                                 Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                                    <TableRow key={i} className="group hover:bg-gray-50 transition-colors">
                                         {Array.from({ length: 9 }).map((_, j) => (
-                                            <TableCell key={j} className="px-4 py-4">
+                                            <TableCell key={j} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                                 <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
                                             </TableCell>
                                         ))}
@@ -197,7 +197,7 @@ export function TarifTable({
                                 ))
                             ) : tarifs.length > 0 ? (
                                 tarifs.map((tarif) => (
-                                    <TableRow key={tarif.id} className="hover:bg-gray-50 transition-colors">
+                                    <TableRow key={tarif.id} className="group hover:bg-gray-50 transition-colors">
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
                                             {tarif.loadingIn || '-'}
                                         </TableCell>
@@ -250,7 +250,7 @@ export function TarifTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
+                                <TableRow className="group">
                                     <TableCell colSpan={9} className="h-32 text-center text-gray-552 py-10 text-sm">
                                         Tidak ada data tarif ditemukan
                                     </TableCell>
