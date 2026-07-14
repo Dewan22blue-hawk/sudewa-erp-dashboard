@@ -37,7 +37,7 @@ export function DashboardLayout({ children, minimal = false }: DashboardLayoutPr
 
     if (minimal) {
         return (
-            <div className="flex h-screen w-full overflow-hidden bg-[#fafafa]">
+            <div className="fixed inset-0 flex w-full overflow-hidden bg-[#fafafa]">
                 <main className="flex-1 overflow-y-auto bg-[#fafafa]">
                     <div className="mx-auto w-full max-w-[950px] px-4 sm:px-6 py-10 space-y-6 box-border">
                         {children}
@@ -48,7 +48,7 @@ export function DashboardLayout({ children, minimal = false }: DashboardLayoutPr
     }
 
     return (
-        <div className="flex h-screen w-full overflow-hidden">
+        <div className="fixed inset-0 flex w-full overflow-hidden bg-background">
             {/* ── Desktop Sidebar (hidden on mobile) ── */}
             <div className="print:hidden hidden md:flex shrink-0 w-64 h-full overflow-hidden">
                 <Sidebar />
