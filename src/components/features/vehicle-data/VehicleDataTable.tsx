@@ -231,7 +231,7 @@ export function VehicleDataTable({
                 ))
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}>
+                  <TableRow key={item.id} className={`group ${assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}`}>
                     <TableCell className="px-4 py-4 text-center">
                       <Checkbox
                         checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
