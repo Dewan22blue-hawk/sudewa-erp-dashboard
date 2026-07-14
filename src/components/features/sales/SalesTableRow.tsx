@@ -69,7 +69,7 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
     }
 
     return (
-        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+        <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
             {/* Kode Jual - Link biru */}
             <TableCell className="px-4 py-4 text-left text-sm font-medium">
                 <Link
@@ -124,7 +124,7 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             </TableCell>
 
             {/* Action Dropdown */}
-            <TableCell className="px-4 py-4 text-center">
+            <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button className="rounded-md p-1 hover:bg-slate-100 transition-colors duration-200 hover:scale-110 active:scale-95 transform">

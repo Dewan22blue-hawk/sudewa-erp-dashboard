@@ -271,7 +271,7 @@ export default function PurchaseTable({
               {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
               {renderSortHeader('remainingPayment', 'KURANG BAYAR', 'center')}
               {renderSortHeader('billing', 'BILLING', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -283,7 +283,7 @@ export default function PurchaseTable({
               </TableRow>
             ) : (
               processedData.map((item) => (
-                <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <TableRow key={item.id} className="border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
                   {/* Kode Jual - Link biru */}
                   <TableCell className="px-4 py-4 text-left text-sm font-medium">
                     <button
@@ -319,7 +319,7 @@ export default function PurchaseTable({
                     )}
                   </TableCell>
 
-                  <TableCell className="text-center px-4 py-4">
+                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

@@ -52,7 +52,7 @@ export function GoodsReceiptEquipmentDetailTable({
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">HARGA SATUAN</TableHead>
           <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">QTY</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">TOTAL</TableHead>
-          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
+          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -66,7 +66,7 @@ export function GoodsReceiptEquipmentDetailTable({
           data.map((item, index) => {
             console.log('GoodsReceiptEquipmentDetailTable item:', item);
             return (
-              <TableRow key={item.id} className="border-slate-200 hover:bg-slate-50/70 transition-colors">
+              <TableRow key={item.id} className="border-slate-200 bg-white hover:bg-slate-50 transition-colors">
                 <TableCell className="px-4 py-4 text-center">
                   <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => toggleOne(item.id, !!checked)} />
                 </TableCell>
@@ -78,7 +78,7 @@ export function GoodsReceiptEquipmentDetailTable({
                 <TableCell className="px-4 py-4 text-[15px] font-semibold text-slate-900 text-left">
                   {formatCurrency((item.price || 0) * item.qty)}
                 </TableCell>
-                <TableCell className="px-4 py-4 text-center">
+                <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-9 w-9 rounded-full p-0">

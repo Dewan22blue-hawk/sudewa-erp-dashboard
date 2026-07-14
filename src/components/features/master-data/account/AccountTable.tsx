@@ -186,7 +186,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                       className={cn(
                         'px-4 py-4 text-xs font-semibold text-slate-500 uppercase select-none transition-colors',
                         (isAction || isStatus) ? 'text-center text-slate-500' : 'text-left',
-                        isAction && 'w-[80px]'
+                        isAction && 'w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]'
                       )}
                     >
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -199,23 +199,23 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
           <TableBody>
             {isLoading ? (
               [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={i} className="bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-40" /></TableCell>
                   <TableCell className="px-4 py-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
                 </TableRow>
               ))
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={row.id} className="bg-white hover:bg-slate-50 transition-colors">
                   {row.getVisibleCells().map((cell) => {
                     const isAction = cell.column.id === 'actions';
                     const isStatus = cell.column.id === 'isActive';
                     return (
-                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", (isAction || isStatus) ? "text-center" : "text-left")}>
+                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isStatus && "text-center", isAction ? "text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : !isStatus && "text-left")}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     );

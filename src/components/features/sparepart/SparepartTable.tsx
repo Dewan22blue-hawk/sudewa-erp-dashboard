@@ -234,7 +234,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">ACTION</TableHead>
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -246,7 +246,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
               </TableRow>
             ) : (
               currentData.map((item) => (
-                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.code}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.brand?.name ?? item.brandId ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.name}</TableCell>
@@ -256,7 +256,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport }: Prop
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.brutoWeight ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatCurrency(item.purchasePrice ?? item.price ?? 0)}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatCurrency(item.sellingPrice ?? item.price ?? 0)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <div className="flex justify-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

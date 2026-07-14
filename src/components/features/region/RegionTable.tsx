@@ -165,20 +165,20 @@ export function RegionTable({
                         <TableRow className="hover:bg-[#f8f9fa]">
                             <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">KODE WILAYAH</TableHead>
                             <TableHead className="text-xs font-semibold text-slate-500 w-[60%] uppercase px-4 py-4 text-left">NAMA WILAYAH</TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {regions.length > 0 ? (
                             regions.map((region) => (
-                                <TableRow key={region.uuid} className="hover:bg-gray-50 transition-colors">
+                                <TableRow key={region.uuid} className="bg-white hover:bg-slate-50 transition-colors">
                                     <TableCell className="px-4 py-4 text-sm text-gray-600 text-left font-medium">
                                         {region.code || '-'}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-gray-900 text-left truncate uppercase">
                                         {region.name}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-center">
+                                    <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                         <div className="flex justify-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

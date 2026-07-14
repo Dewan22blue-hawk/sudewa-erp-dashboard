@@ -366,12 +366,12 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
                 <TableHead>Kas</TableHead>
                 <TableHead className="text-right">Nominal</TableHead>
                 <TableHead>Catatan</TableHead>
-                <TableHead className="w-12 text-center">Aksi</TableHead>
+                <TableHead className="w-12 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {financeBillings.map((fb, index) => (
-                <TableRow key={fb.id}>
+                <TableRow key={fb.id} className="bg-white hover:bg-slate-50 transition-colors group">
                   <TableCell className="text-center text-slate-500">{index + 1}</TableCell>
                   <TableCell className="text-slate-800">{formatDate(fb.payment_at)}</TableCell>
                   <TableCell className="text-slate-800">{getKasLabel(fb.cash_id)}</TableCell>
@@ -379,7 +379,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
                     {currenciesFormat(fb?.cash?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr', fb.amount)}
                   </TableCell>
                   <TableCell className="text-slate-600 max-w-[200px] truncate">{fb.note || '-'}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     {!disabled && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

@@ -244,7 +244,7 @@ export function SalesTable({ onAdd }: Props) {
               {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
               {renderSortHeader('totalJual', 'TOTAL JUAL', 'center')}
               {renderSortHeader('kurangBayar', 'KURANG BAYAR', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
 

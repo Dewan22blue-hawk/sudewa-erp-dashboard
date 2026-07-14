@@ -34,7 +34,7 @@ export function MaintenanceTable({
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO POLISI</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">ARMADA</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KETERANGAN</TableHead>
-          <TableHead className="w-[100px] px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">ACTION</TableHead>
+          <TableHead className="w-[100px] px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -52,14 +52,14 @@ export function MaintenanceTable({
           </TableRow>
         ) : (
           data.map((item, index) => (
-            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
+            <TableRow key={item.id} className="border-slate-200 bg-white hover:bg-slate-50 transition-colors">
               <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{startIndex + index}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 font-medium text-left">{item.driver?.name || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.vehicleFleet?.registrationNumber || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 uppercase text-left">{item.vehicleFleet?.type || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.description || '-'}</TableCell>
-              <TableCell className="px-4 py-4 text-center">
+              <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 <Button
                   variant="outline"
                   size="sm"

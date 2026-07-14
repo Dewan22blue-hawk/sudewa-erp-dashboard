@@ -167,7 +167,7 @@ export const BrandTable = ({
             <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                 <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="hover:bg-[#f8f9fa]">
+                        <TableRow className="bg-white hover:bg-[#f8f9fa]">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 headerGroup.headers.map((header) => {
                                     const columnId = header.id;
@@ -180,7 +180,7 @@ export const BrandTable = ({
                                             key={header.id}
                                             className={cn(
                                                 'px-4 py-4 text-xs font-semibold uppercase select-none transition-colors',
-                                                isAction ? 'text-center text-gray-600 w-[100px]' : 'text-left',
+                                                isAction ? 'text-center text-gray-600 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : 'text-left',
                                                 isSortable ? 'group cursor-pointer' : '',
                                                 isSortable && isSorted ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
                                             )}
@@ -196,7 +196,7 @@ export const BrandTable = ({
                     <TableBody>
                         {isLoading ? (
                             [...Array(perPage)].map((_, i) => (
-                                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                                <TableRow key={i} className="bg-white hover:bg-slate-50 transition-colors">
                                     <TableCell className="px-4 py-4">
                                         <div className="flex items-center gap-3">
                                             <Skeleton className="h-10 w-10 rounded-lg" />
@@ -206,7 +206,7 @@ export const BrandTable = ({
                                     <TableCell className="px-4 py-4">
                                         <Skeleton className="h-4 w-32" />
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-center">
+                                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                         <Skeleton className="h-8 w-8 mx-auto rounded-full" />
                                     </TableCell>
                                 </TableRow>
@@ -219,11 +219,11 @@ export const BrandTable = ({
                             </TableRow>
                         ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="hover:bg-gray-50 transition-colors">
+                                <TableRow key={row.id} className="bg-white hover:bg-slate-50 transition-colors">
                                     {row.getVisibleCells().map((cell) => {
                                         const isAction = cell.column.id === 'actions';
                                         return (
-                                            <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isAction ? "text-center" : "text-left")}>
+                                            <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isAction ? "text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : "text-left")}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         );
