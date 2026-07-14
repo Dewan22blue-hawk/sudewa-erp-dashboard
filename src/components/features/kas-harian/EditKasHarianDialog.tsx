@@ -77,6 +77,7 @@ export default function EditKasHarianDialog({ open, onOpenChange, data }: Props)
     } catch (error) {
       const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Gagal memperbarui transaksi kas harian';
       toast.error(message);
+      onOpenChange(false);
     }
   };
 

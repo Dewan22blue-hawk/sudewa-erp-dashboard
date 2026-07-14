@@ -167,7 +167,7 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
             ],
         },
         {
-            label: 'Settings',
+            label: 'Manajemen Pengguna',
             icon: Settings,
             children: [
                 {

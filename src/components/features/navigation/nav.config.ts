@@ -202,7 +202,7 @@ export const getNavItems = (slug: string): NavItemConfig[] => {
       ], // Siap untuk di-expand dengan sub-items
     },
     {
-      label: 'Settings',
+      label: 'Manajemen Pengguna',
       icon: Shield,
       children: [
         {

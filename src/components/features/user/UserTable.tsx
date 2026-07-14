@@ -134,7 +134,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 onClick={() => handleSort('username')}
               >
                 <div className="flex items-center gap-1">
-                  User ID
+                  Username
                   <SortIcon sortKey="username" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
@@ -182,6 +182,8 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 const isDeactivating = deactivateMutation.isPending && deactivateMutation.variables === user.id;
                 const isUpdating = isActivating || isDeactivating;
 
+                const isAdmin = user.roles?.some((r) => r.name.toLowerCase() === 'admin');
+
                 return (
                   <tr key={user.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                     <td className="px-4 py-4 font-semibold text-slate-900 text-sm text-left">{userIdLabel}</td>
@@ -199,7 +201,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                             <Switch
                               checked={isActive}
                               onCheckedChange={(checked) => handleToggleStatus(user, checked)}
-                              disabled={activateMutation.isPending || deactivateMutation.isPending}
+                              disabled={activateMutation.isPending || deactivateMutation.isPending || isAdmin}
                             />
                             <span className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-slate-400'}`}>
                               {isActive ? 'Aktif' : 'Nonaktif'}
@@ -220,7 +222,11 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                             <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                            <DropdownMenuItem
+                              onClick={() => onDelete(user)}
+                              disabled={isAdmin}
+                              className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                            >
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>

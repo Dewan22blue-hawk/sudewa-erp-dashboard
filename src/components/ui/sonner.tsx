@@ -12,7 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       closeButton
       toastOptions={{
         classNames: {
-          toast: 'group toast rounded-2xl border shadow-2xl backdrop-blur-xl bg-white/70 dark:bg-primary/70 border-white/20 dark:border-white/10 z-[1000] p-4 flex items-center gap-4',
+          toast: 'group toast rounded-2xl border shadow-2xl backdrop-blur-xl bg-white/70 dark:bg-primary/70 border-white/20 dark:border-white/10 z-[1000] p-4 pr-8 flex items-center gap-4 relative',
           title: 'text-sm font-semibold',
           description: 'group-[.toast]:text-muted-foreground text-xs',
           actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground font-medium',
@@ -21,7 +21,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           error: '!bg-red-500/20 !text-red-700 dark:!text-red-400 !border-red-500/30 !backdrop-blur-xl',
           info: '!bg-blue-500/20 !text-blue-700 dark:!text-blue-400 !border-blue-500/30 !backdrop-blur-xl',
           warning: '!bg-amber-500/20 !text-amber-700 dark:!text-amber-400 !border-amber-500/30 !backdrop-blur-xl',
-          closeButton: 'bg-white/10 hover:bg-white/20 dark:hover:bg-white/10 border-none transition-all duration-200 !text-inherit opacity-100',
+          closeButton: 'left-auto right-2 top-2 !bg-transparent hover:!bg-black/5 dark:hover:!bg-white/10 !text-current border-none opacity-70 hover:opacity-100 transition-all duration-200 !transform-none',
         },
       }}
       icons={{

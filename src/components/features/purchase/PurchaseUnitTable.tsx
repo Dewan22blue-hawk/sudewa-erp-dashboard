@@ -133,7 +133,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
           <div>
             <p className="font-semibold text-slate-900">Detail Unit Belum Lengkap</p>
             <p className="text-xs mt-0.5 text-slate-600">
-              Beberapa tipe unit belum memiliki detail unit (Warna, No Rangka, No Mesin) yang lengkap. 
+              Beberapa tipe unit belum memiliki detail unit (Warna, No Rangka, No Mesin) yang lengkap.
               Silakan klik menu <span className="font-semibold">Action &gt; Detail / Kelola Unit</span> pada baris item untuk melengkapi detailnya sebelum melakukan Terima Barang.
             </p>
           </div>
@@ -240,6 +240,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                 pagedData.map((item, idx) => {
                   const itemDetails = allDetails.filter((d) => String(d.unit_transaction_item_id) === String(item.id));
                   const isComplete = itemDetails.length === Number(item.qty_total ?? 0);
+                  console.log(item);
                   return (
                     <TableRow key={item.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>

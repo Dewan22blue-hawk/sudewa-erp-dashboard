@@ -14,10 +14,12 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
   const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
   const totalHpp = totalDpp + totalPpn;
 
-  const biayaBbn = Number(data.transaction_bbn_total ?? 0);
-  const biayaEkspedisi = Number(data.expedition_fee_total ?? 0);
-  const biayaLainnya = Number(data.transaction_other_fee ?? 0);
-  const totalBiaya = biayaBbn + biayaEkspedisi + biayaLainnya;
+  const biayaBbn = Number(data?.transaction_bbn_total ?? 0);
+  const biayaEkspedisi = Number(data?.expedition_fee_total ?? 0);
+  const biayaLainnya = Number(data?.transaction_other_fee ?? 0);
+  const totalBiaya = Number(data?.total_operational_fee ?? 0);
+
+  console.log(data);
 
   const totalPembelian = totalHpp + totalBiaya;
 

@@ -301,6 +301,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
       closeForm();
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Gagal menyimpan pembayaran');
+      closeForm();
     }
   };
 
@@ -312,6 +313,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
       setDeleteTarget(null);
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Gagal menghapus pembayaran');
+      setDeleteTarget(null);
     }
   };
 

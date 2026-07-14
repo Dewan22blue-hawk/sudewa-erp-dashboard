@@ -24,6 +24,7 @@ export default function TogglePaymentStatusDialog({ open, onOpenChange, data, ta
     } catch (error) {
       const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Gagal mengubah status pembayaran';
       toast.error(message);
+      onOpenChange(false);
     }
   };
 

@@ -29,6 +29,7 @@ type UnitTransactionApiModel = {
   unit_transaction_item_total_dpp?: string | number;
   unit_transaction_item_total_ppn?: string | number;
   unit_transaction_item_bruto_total?: string | number;
+  total_operational_fee?: string | number;
   unit_transaction_items?: Array<{
     id?: number | string;
     qty_total?: number | string;
@@ -184,15 +185,15 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   stock_state: item.stock_state ?? '-',
   unit_transaction_billing: item.unit_transaction_billing
     ? {
-        id: String(item.unit_transaction_billing.id ?? ''),
-        unit_transaction_id: String(item.unit_transaction_billing.unit_transaction_id ?? item.id ?? ''),
-        grand_total: toNumber(item.unit_transaction_billing.grand_total),
-        total_paid: toNumber(item.unit_transaction_billing.total_paid),
-        remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
-        is_paid: Boolean(item.unit_transaction_billing?.is_paid),
-        payment_at: item.unit_transaction_billing.payment_at ?? null,
-        unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
-      }
+      id: String(item.unit_transaction_billing.id ?? ''),
+      unit_transaction_id: String(item.unit_transaction_billing.unit_transaction_id ?? item.id ?? ''),
+      grand_total: toNumber(item.unit_transaction_billing.grand_total),
+      total_paid: toNumber(item.unit_transaction_billing.total_paid),
+      remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
+      is_paid: Boolean(item.unit_transaction_billing?.is_paid),
+      payment_at: item.unit_transaction_billing.payment_at ?? null,
+      unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
+    }
     : null,
   isPaid: Boolean(item.unit_transaction_billing?.is_paid || item.billing_summary?.is_paid),
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
@@ -430,27 +431,28 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
     transaction_bbn_total: toNumber(item.transaction_bbn_total),
     transaction_other_fee: toNumber(item.transaction_other_fee),
     expedition_fee_total: toNumber(item.expedition_fee_total),
+    total_operational_fee: toNumber(item.total_operational_fee),
     billing_summary: item.billing_summary
       ? {
-          grand_total: toNumber(item.billing_summary.grand_total),
-          total_cash_payment: toNumber(item.billing_summary.total_cash_payment),
-          total_bca_payment: toNumber(item.billing_summary.total_bca_payment),
-          total_paid: toNumber(item.billing_summary.total_paid),
-          remaining_payment: toNumber(item.billing_summary.remaining_payment),
-          is_paid: Boolean(item.billing_summary?.is_paid),
-        }
+        grand_total: toNumber(item.billing_summary.grand_total),
+        total_cash_payment: toNumber(item.billing_summary.total_cash_payment),
+        total_bca_payment: toNumber(item.billing_summary.total_bca_payment),
+        total_paid: toNumber(item.billing_summary.total_paid),
+        remaining_payment: toNumber(item.billing_summary.remaining_payment),
+        is_paid: Boolean(item.billing_summary?.is_paid),
+      }
       : null,
     unit_transaction_billing: item.unit_transaction_billing
       ? {
-          id: String(item.unit_transaction_billing.id ?? ''),
-          unit_transaction_id: String(item.unit_transaction_billing.unit_transaction_id ?? item.id ?? ''),
-          grand_total: toNumber(item.unit_transaction_billing.grand_total),
-          total_paid: toNumber(item.unit_transaction_billing.total_paid),
-          remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
-          is_paid: Boolean(item.unit_transaction_billing?.is_paid),
-          payment_at: item.unit_transaction_billing.payment_at ?? null,
-          unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
-        }
+        id: String(item.unit_transaction_billing.id ?? ''),
+        unit_transaction_id: String(item.unit_transaction_billing.unit_transaction_id ?? item.id ?? ''),
+        grand_total: toNumber(item.unit_transaction_billing.grand_total),
+        total_paid: toNumber(item.unit_transaction_billing.total_paid),
+        remaining_payment: toNumber(item.unit_transaction_billing.remaining_payment),
+        is_paid: Boolean(item.unit_transaction_billing?.is_paid),
+        payment_at: item.unit_transaction_billing.payment_at ?? null,
+        unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
+      }
       : null,
     unit_transaction_adjustments: item.unit_transaction_adjustments ?? [],
     unit_transaction_items: item.unit_transaction_items ?? [],
@@ -496,8 +498,8 @@ export const unitTransactionService = {
 
         let paginatedResult = toPaginatedResult(payload, mapUnitTransaction);
         if (params.status && params.status !== 'All') {
-           const filteredData = paginatedResult.data.filter(item => item.stock_state === params.status);
-           paginatedResult = { ...paginatedResult, data: filteredData };
+          const filteredData = paginatedResult.data.filter(item => item.stock_state === params.status);
+          paginatedResult = { ...paginatedResult, data: filteredData };
         }
         return paginatedResult;
       } catch (error) {
@@ -531,11 +533,11 @@ export const unitTransactionService = {
     statePayload:
       | string
       | {
-          stockState?: string;
-          unitTransactionDetails?: Array<string | number>;
-          cashId?: string | number;
-          description?: string;
-        },
+        stockState?: string;
+        unitTransactionDetails?: Array<string | number>;
+        cashId?: string | number;
+        description?: string;
+      },
   ): Promise<UnitTransactionDetail> {
     const normalizedStockState = typeof statePayload === 'string' ? statePayload : statePayload.stockState ?? '';
     const normalizedDetails =

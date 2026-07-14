@@ -258,7 +258,7 @@ export default function KasHarianTable({
                         ) : null}
                         {item.cashFlowId && onToggleStatus ? (
                           <>
-                            {item.isValid && !item.is_paid ? (
+                            {item.isValid || !item.is_paid ? (
                               <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
                                 Tandai Lunas
                               </DropdownMenuItem>
