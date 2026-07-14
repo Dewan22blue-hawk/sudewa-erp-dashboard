@@ -108,7 +108,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 ACTION
               </TableHead>
             </TableRow>
@@ -117,12 +117,12 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
           <TableBody>
             {isLoading ? (
               [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={i} className="bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell className="px-4 py-4"><Skeleton className="h-4 w-48" /></TableCell>
                   <TableCell className="px-4 py-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
                 </TableRow>
               ))
             ) : sortedData.length === 0 ? (
@@ -133,7 +133,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
               </TableRow>
             ) : (
               sortedData.map((group) => (
-                <TableRow key={group.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={group.id} className="bg-white hover:bg-slate-50 transition-colors">
                   {/* KODE */}
                   <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">
                     <div className="flex items-center gap-1.5">
@@ -167,7 +167,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                     </Badge>
                   </TableCell>
                   {/* ACTION */}
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">

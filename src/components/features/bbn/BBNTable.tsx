@@ -176,7 +176,7 @@ export function BBNTable({
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">GARWIL</TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIRO/LOKET</TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIAYA LAIN</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">ACTION</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -193,7 +193,7 @@ export function BBNTable({
                                 ))
                             ) : bbns.length > 0 ? (
                                 bbns.map((item) => (
-                                    <TableRow key={item.uuid} className="hover:bg-gray-50/50">
+                                    <TableRow key={item.uuid} className="bg-white hover:bg-slate-50 transition-colors">
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium">
                                             {item.dealer?.namaDealer || item.dealer?.code || '-'}
                                         </TableCell>
@@ -218,7 +218,7 @@ export function BBNTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600">
                                             {item.otherFee === 0 ? '0' : formatCurrency(item.otherFee)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">

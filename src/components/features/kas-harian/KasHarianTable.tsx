@@ -137,8 +137,7 @@ export default function KasHarianTable({
               <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('STATUS BAYAR', 'is_paid', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -165,7 +164,7 @@ export default function KasHarianTable({
               </tr>
             ) : (
               sortedData.map((item) => (
-                <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <tr key={`${item.source}-${item.id}`} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
                   <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
                   <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">
                     <div className="flex items-center gap-2">
@@ -235,7 +234,7 @@ export default function KasHarianTable({
                       {item.is_paid ? 'Lunas' : 'Belum Lunas'}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">

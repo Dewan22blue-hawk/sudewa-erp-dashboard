@@ -95,7 +95,7 @@ export function GoodsIssueTable({
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">CUSTOMER</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">HARGA JUAL</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -109,13 +109,13 @@ export function GoodsIssueTable({
                 </TableRow>
               ) : (
                 data.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <TableRow key={item.id} className="bg-white hover:bg-slate-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.code}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.customer?.name ?? '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatCurrency(item.totalBrutto)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{getIssueStatusLabel(item)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">

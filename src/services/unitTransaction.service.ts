@@ -110,7 +110,7 @@ const strictBasePath = '/wapi/transaction/unit-transaction/unit-transaction';
 const itemBasePath = '/wapi/transaction/unit-transaction-item';
 const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
 
-const listBasePaths = [fallbackBasePath, itemBasePath, basePath, itemLegacyBasePath];
+const listBasePaths = [basePath, fallbackBasePath, itemBasePath, itemLegacyBasePath];
 
 const withBaseFallback = async <T>(
   primary: (activeBasePath: string) => Promise<T>,
@@ -467,7 +467,6 @@ export const unitTransactionService = {
       status: params.status || undefined,
       sort_order: 'desc',
       type: 'purchase',
-      is_paid: 'true',
     };
 
     for (const path of listBasePaths) {
