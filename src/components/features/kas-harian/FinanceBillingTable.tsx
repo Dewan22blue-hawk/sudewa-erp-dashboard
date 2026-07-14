@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { useCreateFinanceBilling, useUpdateFinanceBilling, useDeleteFinanceBilling } from '@/hooks/useFinanceBilling';
 import { useKas } from '@/hooks/useKas';
 import { useAccounts } from '@/hooks/useAccount';
@@ -176,6 +178,10 @@ interface Props {
 }
 
 export default function FinanceBillingTable({ financeBillings, cashFlowDetail, companyId, disabled = false }: Props) {
+  const router = useRouter();
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
+
   const createMutation = useCreateFinanceBilling();
   const updateMutation = useUpdateFinanceBilling();
   const deleteMutation = useDeleteFinanceBilling();
@@ -314,6 +320,11 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     return kas ? (kas.cash_name || `${kas.code} - ${kas.description}`) : '-';
   };
 
+  const getAccountLabel = (cashId: number) => {
+    const akun = akunOptions.find((a) => Number(a.id) === cashId);
+    return akun ? (akun.name || `${akun.code} - ${akun.description}`) : '-';
+  };
+
   return (
     <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -363,6 +374,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
               <TableRow className="hover:bg-transparent">
                 <TableHead className="w-12 text-center">No</TableHead>
                 <TableHead>Tanggal Bayar</TableHead>
+                <TableHead>Akun</TableHead>
                 <TableHead>Kas</TableHead>
                 <TableHead className="text-right">Nominal</TableHead>
                 <TableHead>Catatan</TableHead>
@@ -374,7 +386,16 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
                 <TableRow key={fb.id}>
                   <TableCell className="text-center text-slate-500">{index + 1}</TableCell>
                   <TableCell className="text-slate-800">{formatDate(fb.payment_at)}</TableCell>
-                  <TableCell className="text-slate-800">{getKasLabel(fb.cash_id)}</TableCell>
+                  <TableCell className="text-slate-800">
+                    <ReferenceLink href={`/dashboard/${slugStr}/master/account?search=${encodeURIComponent(getKasLabel(fb.account_id))}`}>
+                      {getAccountLabel(fb.account_id)}
+                    </ReferenceLink>
+                  </TableCell>
+                  <TableCell className="text-slate-800">
+                    <ReferenceLink href={`/dashboard/${slugStr}/master/kas?search=${encodeURIComponent(getKasLabel(fb.cash_id))}`}>
+                      {getKasLabel(fb.cash_id)}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="text-right font-semibold text-slate-900">
                     {currenciesFormat(fb?.cash?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr', fb.amount)}
                   </TableCell>
@@ -383,9 +404,15 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
                     {!disabled && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          {cashFlowDetail?.is_paid ? (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" disabled>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          )}
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => openEditForm(fb)} className="cursor-pointer">
