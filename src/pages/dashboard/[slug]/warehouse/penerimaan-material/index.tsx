@@ -204,7 +204,7 @@ export default function GoodsReceiptListPage() {
         onAdd={canCreate ? () => setOpenForm(true) : undefined}
         onPay={setSelectedPay}
         onUpload={setSelectedUpload}
-        onDelete={setDeleteTarget}
+        onDelete={canDelete ? setDeleteTarget : undefined}
       />
 
       <GoodsReceiptFormModal

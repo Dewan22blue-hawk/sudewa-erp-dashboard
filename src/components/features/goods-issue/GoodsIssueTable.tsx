@@ -23,7 +23,7 @@ interface GoodsIssueTableProps {
   onPageChange: (value: number) => void;
   onPerPageChange: (value: number) => void;
   onSearchChange: (value: string) => void;
-  onAdd: () => void;
+  onAdd?: () => void;
   onPay: (item: GoodsIssue) => void;
   onUpload: (item: GoodsIssue) => void;
   onDelete: (item: GoodsIssue) => void;
@@ -80,7 +80,7 @@ export function GoodsIssueTable({
             </div>
           </div>
 
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Button onClick={() => onAdd?.()} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>

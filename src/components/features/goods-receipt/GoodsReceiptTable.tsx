@@ -20,13 +20,14 @@ interface GoodsReceiptTableProps {
   perPage: number;
   search: string;
   isLoading?: boolean;
+  canAdd?: boolean;
   onPageChange: (value: number) => void;
   onPerPageChange: (value: number) => void;
   onSearchChange: (value: string) => void;
-  onAdd: () => void;
+  onAdd?: () => void;
   onPay: (item: GoodsReceipt) => void;
   onUpload: (item: GoodsReceipt) => void;
-  onDelete: (item: GoodsReceipt) => void;
+  onDelete?: (item: GoodsReceipt) => void;
 }
 
 export function GoodsReceiptTable({
@@ -37,6 +38,7 @@ export function GoodsReceiptTable({
   perPage,
   search,
   isLoading = false,
+  canAdd = false,
   onPageChange,
   onPerPageChange,
   onSearchChange,
@@ -80,7 +82,7 @@ export function GoodsReceiptTable({
             </div>
           </div>
 
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Button onClick={() => onAdd?.()} disabled={!canAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -135,7 +137,7 @@ export function GoodsReceiptTable({
                           <DropdownMenuItem onClick={() => onUpload(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Upload Nota
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                          <DropdownMenuItem onClick={() => onDelete?.(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>

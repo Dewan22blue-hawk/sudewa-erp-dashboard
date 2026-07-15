@@ -112,61 +112,38 @@ export default function ProfilePage() {
                     <p className="text-sm text-slate-500">Kelola dan perbarui detail informasi profil Anda.</p>
                 </div>
 
-                <Card className="border-slate-200 shadow-md">
-                    <CardHeader className="border-b border-slate-100 pb-4">
-                        <CardTitle className="text-lg font-bold text-slate-900">Detail Pengguna</CardTitle>
-                        <CardDescription>Informasi profil pribadi Anda di dalam sistem.</CardDescription>
-                    </CardHeader>
-                    
-                    <CardContent className="pt-6">
-                        <form onSubmit={handleSave} className="space-y-6">
-                            
-                            {/* Avatar Upload Section */}
-                            <div className="flex flex-col items-center space-y-4 pb-4">
-                                <div className="relative group">
-                                    {avatarPreview ? (
+                <form onSubmit={handleSave} className="space-y-6">
+                    {/* Card 1: Foto Profil */}
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardHeader className="border-b border-slate-100 pb-4">
+                            <CardTitle className="text-lg font-bold text-slate-900">Foto Profil</CardTitle>
+                            <CardDescription>Unggah foto profil terbaru Anda.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <div className="flex flex-col items-center">
+                                {(avatarPreview || user?.avatar) ? (
+                                    <div className="mb-5 flex justify-center">
                                         <img 
-                                            src={avatarPreview} 
-                                            alt="Avatar Preview" 
+                                            src={avatarPreview || user?.avatar || undefined} 
+                                            alt="Avatar" 
                                             className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm" 
                                         />
-                                    ) : user?.avatar ? (
-                                        <img 
-                                            src={user.avatar} 
-                                            alt="User Avatar" 
-                                            className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm" 
-                                        />
-                                    ) : (
+                                    </div>
+                                ) : (
+                                    <div className="mb-5 flex justify-center">
                                         <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-200 bg-slate-100 text-3xl font-bold text-slate-800 shadow-sm">
                                             {initials}
                                         </div>
-                                    )}
-                                    <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                        <Upload className="h-6 w-6 text-white animate-pulse" />
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(event) => {
-                                                const file = event.target.files?.[0] ?? null;
-                                                setAvatarFile(file);
-                                                if (file) {
-                                                    setAvatarPreview(URL.createObjectURL(file));
-                                                } else {
-                                                    setAvatarPreview(null);
-                                                }
-                                            }}
-                                        />
-                                    </label>
-                                </div>
+                                    </div>
+                                )}
 
                                 {/* Drag/Click File Uploader Box inspired by KasHarianForm */}
-                                <label className="flex w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-4 text-center hover:bg-slate-100/70 transition">
-                                    <Upload className="mb-2 h-5 w-5 text-slate-500" />
-                                    <span className="text-xs font-semibold text-slate-700">
-                                        {avatarFile ? avatarFile.name : 'Klik untuk ganti foto profil'}
+                                <label className="flex w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-5 text-center hover:bg-slate-100/70 transition">
+                                    <Upload className="mb-2 h-6 w-6 text-slate-500" />
+                                    <span className="text-sm font-medium text-slate-700">
+                                        {avatarFile ? avatarFile.name : 'Klik untuk upload gambar'}
                                     </span>
-                                    <span className="mt-1 text-[10px] text-slate-400">Format PNG, JPG maksimal 5MB</span>
+                                    <span className="mt-1 text-xs text-slate-400">Format PNG, JPG maksimal 5MB</span>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -183,118 +160,103 @@ export default function ProfilePage() {
                                     />
                                 </label>
                             </div>
+                        </CardContent>
+                    </Card>
 
-                            {/* Divider */}
-                            <div className="border-t border-slate-100 pt-4" />
+                    {/* Card 2: Detail Pribadi */}
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardHeader className="border-b border-slate-100 pb-4">
+                            <CardTitle className="text-lg font-bold text-slate-900">Detail Pribadi</CardTitle>
+                            <CardDescription>Informasi nama dan identitas Anda.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-6 space-y-5">
+                            <div className="space-y-2">
+                                <Label htmlFor="name" className="text-sm font-semibold text-slate-700">
+                                    Nama Lengkap <span className="text-rose-500">*</span>
+                                </Label>
+                                <Input
+                                    id="name"
+                                    placeholder="Masukkan nama lengkap"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    disabled={isSubmitting}
+                                    className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
+                                />
+                            </div>
 
-                            {/* Vertical Form Fields */}
-                            <div className="space-y-5">
-                                {/* Editable Fields */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="name" className="text-sm font-semibold text-slate-700">
-                                        Nama Lengkap <span className="text-rose-500">*</span>
-                                    </Label>
+                            <div className="space-y-2">
+                                <Label htmlFor="username" className="text-sm font-semibold text-slate-700">
+                                    Username <span className="text-rose-500">*</span>
+                                </Label>
+                                <Input
+                                    id="username"
+                                    placeholder="Masukkan username"
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                    disabled={isSubmitting}
+                                    className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 3: Informasi Akun */}
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardHeader className="border-b border-slate-100 pb-4">
+                            <CardTitle className="text-lg font-bold text-slate-900">Informasi Akun</CardTitle>
+                            <CardDescription>Detail sistem dan hak akses akun Anda.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-6 space-y-5">
+                            <div className="space-y-2">
+                                <Label htmlFor="email" className="text-sm font-semibold text-slate-700">
+                                    Alamat Email
+                                </Label>
+                                <div className="relative">
                                     <Input
-                                        id="name"
-                                        placeholder="Masukkan nama lengkap"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        disabled={isSubmitting}
-                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
+                                        id="email"
+                                        value={user?.email || '-'}
+                                        disabled
+                                        className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-xl"
                                     />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="username" className="text-sm font-semibold text-slate-700">
-                                        Username <span className="text-rose-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="username"
-                                        placeholder="Masukkan username"
-                                        value={formData.username}
-                                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                        disabled={isSubmitting}
-                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
-                                    />
-                                </div>
-
-                                {/* Read-Only User-Understandable Fields */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="email" className="text-sm font-semibold text-slate-700">
-                                        Alamat Email
-                                    </Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="email"
-                                            value={user?.email || '-'}
-                                            disabled
-                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-xl"
-                                        />
-                                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                    </div>
-                                </div>
-
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="firstname" className="text-sm font-semibold text-slate-700">
-                                            Nama Depan
-                                        </Label>
-                                        <Input
-                                            id="firstname"
-                                            value={user?.firstname || '-'}
-                                            disabled
-                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed rounded-xl"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="lastname" className="text-sm font-semibold text-slate-700">
-                                            Nama Belakang
-                                        </Label>
-                                        <Input
-                                            id="lastname"
-                                            value={user?.lastname || '-'}
-                                            disabled
-                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed rounded-xl"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="role" className="text-sm font-semibold text-slate-700">
-                                        Hak Akses / Role
-                                    </Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="role"
-                                            value={roleName}
-                                            disabled
-                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-xl"
-                                        />
-                                        <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                    </div>
+                                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
-                            <div className="flex justify-end pt-4 border-t border-slate-100">
-                                <Button 
-                                    type="submit" 
-                                    disabled={isSubmitting} 
-                                    className="bg-slate-900 hover:bg-slate-800 text-white min-w-[140px] h-11 shadow-sm px-6 rounded-xl cursor-pointer font-medium"
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Menyimpan...
-                                        </>
-                                    ) : (
-                                        'Simpan Perubahan'
-                                    )}
-                                </Button>
+                            <div className="space-y-2">
+                                <Label htmlFor="role" className="text-sm font-semibold text-slate-700">
+                                    Hak Akses / Role
+                                </Label>
+                                <div className="relative">
+                                    <Input
+                                        id="role"
+                                        value={roleName}
+                                        disabled
+                                        className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-xl"
+                                    />
+                                    <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                </div>
                             </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+
+                    {/* Submit Button */}
+                    <div className="flex justify-end pt-2">
+                        <Button 
+                            type="submit" 
+                            disabled={isSubmitting} 
+                            className="bg-slate-900 hover:bg-slate-800 text-white min-w-[140px] h-11 shadow-sm px-6 rounded-xl cursor-pointer font-medium"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Menyimpan...
+                                </>
+                            ) : (
+                                'Simpan Perubahan'
+                            )}
+                        </Button>
+                    </div>
+                </form>
             </div>
         </DashboardLayout>
     );
