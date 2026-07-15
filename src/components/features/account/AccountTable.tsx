@@ -18,6 +18,8 @@ interface AccountTableProps {
   page: number;
   perPage: number;
   selectedIds: Set<string>;
+  canEdit: boolean;
+  canDelete: boolean;
   onToggleAll: (checked: boolean) => void;
   onToggleRow: (id: string, checked: boolean) => void;
   onEdit: (account: Account) => void;
@@ -34,7 +36,7 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
   return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
-export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange }: AccountTableProps) {
+export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange, canEdit, canDelete }: AccountTableProps) {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
   });
@@ -194,6 +196,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                         <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                            disabled={account.is_lock || !canEdit}
                             onSelect={(e) => {
                               e.preventDefault();
                               onEdit(account);
@@ -203,7 +206,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                            disabled={account.is_lock}
+                            disabled={account.is_lock || !canDelete}
                             onSelect={(e) => {
                               e.preventDefault();
                               onDelete(account);
