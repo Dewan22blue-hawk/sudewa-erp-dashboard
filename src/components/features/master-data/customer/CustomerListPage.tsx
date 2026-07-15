@@ -7,14 +7,20 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { DataImportModal } from '../../master-data/DataImportModal';
 import { Plus, Upload } from 'lucide-react';
 import { useImportCustomer } from '@/hooks/useCustomer';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export const CustomerListPage = () => {
     const { companyId } = useCompany();
     const [openImport, setOpenImport] = useState(false);
     const importMutation = useImportCustomer();
 
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+
     const handleImport = async (file: File) => {
-        await importMutation.mutateAsync({ companyId: companyId ?? '', file });
+        if (canCreate) {
+            await importMutation.mutateAsync({ companyId: companyId ?? '', file });
+        }
     };
 
     return (
@@ -26,14 +32,18 @@ export const CustomerListPage = () => {
                         <p className="text-sm text-muted-foreground">Kelola data customer</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button onClick={() => setOpenImport(true)} variant="outline" className="gap-2">
-                            <Upload className="h-4 w-4" />
-                            Import
-                        </Button>
-                        <Button className="gap-2">
-                            <Plus className="h-4 w-4" />
-                            Tambah
-                        </Button>
+                        {canCreate && (
+                            <>
+                                <Button onClick={() => setOpenImport(true)} variant="outline" className="gap-2">
+                                    <Upload className="h-4 w-4" />
+                                    Import
+                                </Button>
+                                <Button className="gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    Tambah
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -42,15 +52,17 @@ export const CustomerListPage = () => {
                 </div>
             </div>
 
-            <DataImportModal
-                open={openImport}
-                onOpenChange={setOpenImport}
-                title="Import Data Customer"
-                description="Unggah file .xlsx untuk mengimport data customer."
-                onImport={handleImport}
-                isPending={importMutation.isPending}
-                templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
-            />
+            {canCreate && (
+                <DataImportModal
+                    open={openImport}
+                    onOpenChange={setOpenImport}
+                    title="Import Data Customer"
+                    description="Unggah file .xlsx untuk mengimport data customer."
+                    onImport={handleImport}
+                    isPending={importMutation.isPending}
+                    templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
+                />
+            )}
         </DashboardLayout>
     );
 };

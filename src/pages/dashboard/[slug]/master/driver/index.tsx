@@ -16,10 +16,15 @@ import {
 import { useCompany } from '@/contexts/CompanyContext';
 import type { Driver, DriverPayload } from '@/@types/driver.types';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function DriverPage() {
     const { companyId: localCompanyId } = useCompany();
     const { data: profile } = useAuthMe();
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+    const canEdit = hasPermission('master-data:edit');
+    const canDelete = hasPermission('master-data:delete');
 
     // Table state
     const [searchInput, setSearchInput] = useState('');   // immediate display value
@@ -52,21 +57,26 @@ export default function DriverPage() {
 
     // ── Handlers ──────────────────────────────────────────────────────────────
     const handleAddClick = () => {
+        if (!canCreate) return;
         setSelectedDriver(null);
         setIsFormOpen(true);
     };
 
     const handleEditClick = (driver: Driver) => {
+        if (!canEdit) return;
         setSelectedDriver(driver);
         setIsFormOpen(true);
     };
 
     const handleDeleteClick = (driver: Driver) => {
+        if (!canDelete) return;
         setSelectedDriver(driver);
         setIsDeleteOpen(true);
     };
 
     const handleSaveForm = async (data: DriverPayload) => {
+        if (selectedDriver && !canEdit) return;
+        if (!selectedDriver && !canCreate) return;
         if (!localCompanyId) {
             toast.error('Company belum dipilih');
             return;
@@ -93,6 +103,7 @@ export default function DriverPage() {
     };
 
     const handleConfirmDelete = async () => {
+        if (!canDelete) return;
         if (!selectedDriver) return;
         try {
             await deleteMutation.mutateAsync(selectedDriver.id);
@@ -105,6 +116,7 @@ export default function DriverPage() {
     };
 
     const handleImport = async (file: File) => {
+        if (!canCreate) return;
         if (!localCompanyId) {
             toast.error('Company belum dipilih');
             return;
@@ -165,11 +177,14 @@ export default function DriverPage() {
                         setPage(1);
                     }}
                     onAdd={handleAddClick}
-                    onImport={() => setIsImportOpen(true)}
+                    onImport={canCreate ? () => setIsImportOpen(true) : undefined}
                     onExport={handleExport}
                     isExporting={exportMutation.isPending}
                     onEdit={handleEditClick}
                     onDelete={handleDeleteClick}
+                    canCreate={canCreate}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                 />
             </div>
 

@@ -22,6 +22,8 @@ interface BrandTableProps {
     page: number;
     perPage: number;
     isLoading?: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
     onEdit: (brand: Brand) => void;
     onDelete: (brand: Brand) => void;
     onPageChange: (page: number) => void;
@@ -49,6 +51,8 @@ export const BrandTable = ({
     onDelete,
     onPageChange,
     onPerPageChange,
+    canEdit,
+    canDelete,
 }: BrandTableProps) => {
     const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
         data,
@@ -104,11 +108,11 @@ export const BrandTable = ({
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => onEdit(row.original)}>
+                                <DropdownMenuItem onClick={() => onEdit(row.original)} disabled={!canEdit}>
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50" disabled={!canDelete}>
                                     <Trash className="mr-2 h-4 w-4" />
                                     Hapus
                                 </DropdownMenuItem>
@@ -118,7 +122,7 @@ export const BrandTable = ({
                 ),
             },
         ],
-        [onDelete, onEdit, sortKey, sortOrder],
+        [onDelete, onEdit, sortKey, sortOrder, canEdit, canDelete],
     );
 
     const table = useReactTable({

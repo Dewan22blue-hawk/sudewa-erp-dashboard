@@ -24,6 +24,9 @@ interface BBNTableProps {
     onEdit: (bbn: BBN) => void;
     onDelete: (bbn: BBN) => void;
     isExporting?: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function BBNTable({
@@ -42,6 +45,9 @@ export function BBNTable({
     onEdit,
     onDelete,
     isExporting = false,
+    canCreate,
+    canEdit,
+    canDelete,
 }: BBNTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -144,22 +150,26 @@ export function BBNTable({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    {onImport && (
-                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                        </Button>
+                    {canCreate && (
+                        <>
+                            {onImport && (
+                                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import
+                                </Button>
+                            )}
+                            {onExport && (
+                                <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    {isExporting ? 'Exporting...' : 'Export'}
+                                </Button>
+                            )}
+                            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah
+                            </Button>
+                        </>
                     )}
-                    {onExport && (
-                        <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
-                            <Upload className="h-4 w-4 mr-2" />
-                            {isExporting ? 'Exporting...' : 'Export'}
-                        </Button>
-                    )}
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
                 </div>
             </div>
 
@@ -226,10 +236,10 @@ export function BBNTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer text-gray-700">
+                                                    <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer text-gray-700">
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600 cursor-pointer focus:text-red-600">
+                                                    <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="text-red-600 cursor-pointer focus:text-red-600">
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>

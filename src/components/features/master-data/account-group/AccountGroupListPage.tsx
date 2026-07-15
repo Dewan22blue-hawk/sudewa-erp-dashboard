@@ -14,6 +14,7 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, Plus, Search, Upload } from 'lucide-react';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
@@ -33,6 +34,11 @@ export const AccountGroupListPage = () => {
   const updateMutation = useUpdateAccountGroup();
   const deleteMutation = useDeleteAccountGroup(companyId ?? undefined);
   const importMutation = useImportAccountGroup();
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   const [selectedToDelete, setSelectedToDelete] = useState<AccountGroup | null>(null);
   const [editing, setEditing] = useState<AccountGroup | null>(null);
@@ -159,14 +165,18 @@ export const AccountGroupListPage = () => {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Button onClick={() => setOpenImport(true)} variant="outline" className="w-full sm:w-auto">
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-              <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                <Plus className="h-4 w-4 mr-2" />
-                Tambah
-              </Button>
+              {canCreate && (
+                <>
+                  <Button onClick={() => setOpenImport(true)} variant="outline" className="w-full sm:w-auto">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import
+                  </Button>
+                  <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -177,6 +187,8 @@ export const AccountGroupListPage = () => {
               data={data?.data ?? []}
               meta={data?.meta}
               page={page}
+              canEdit={canEdit}
+              canDelete={canDelete}
               perPage={perPage}
               isLoading={isLoading || isFetching}
               onEdit={handleEdit}

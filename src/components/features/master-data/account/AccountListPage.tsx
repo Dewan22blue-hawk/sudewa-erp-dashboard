@@ -335,15 +335,17 @@ export const AccountListPage = () => {
                 <Upload className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpenImport(true)}>
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
               {canCreate && (
-                <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={handleAdd}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Tambah
-                </Button>
+                <>
+                  <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpenImport(true)}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import
+                  </Button>
+                  <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={handleAdd}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah
+                  </Button>
+                </>
               )}
             </div>
           </div>

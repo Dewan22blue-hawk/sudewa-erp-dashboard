@@ -6,14 +6,20 @@ import { Button } from '@/components/ui/button';
 import { useCompany } from '@/contexts/CompanyContext';
 import { DataImportModal } from '../../master-data/DataImportModal';
 import { useImportDealer } from '@/hooks/useDealer';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export const DealerListPage = () => {
     const { companyId } = useCompany();
     const [openImport, setOpenImport] = useState(false);
     const importMutation = useImportDealer();
 
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+
     const handleImport = async (file: File) => {
-        await importMutation.mutateAsync({ companyId: companyId ?? '', file });
+        if (canCreate) {
+            await importMutation.mutateAsync({ companyId: companyId ?? '', file });
+        }
     };
 
     return (
@@ -25,12 +31,16 @@ export const DealerListPage = () => {
                         <p className="text-sm text-muted-foreground">Kelola data dealer</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button onClick={() => setOpenImport(true)} variant="outline" className="gap-2">
-                            Import
-                        </Button>
-                        <Button className="gap-2">
-                            + Tambah
-                        </Button>
+                        {canCreate && (
+                            <>
+                                <Button onClick={() => setOpenImport(true)} variant="outline" className="gap-2">
+                                    Import
+                                </Button>
+                                <Button className="gap-2">
+                                    + Tambah
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -39,15 +49,17 @@ export const DealerListPage = () => {
                 </div>
             </div>
 
-            <DataImportModal
-                open={openImport}
-                onOpenChange={setOpenImport}
-                title="Import Data Dealer"
-                description="Unggah file .xlsx untuk mengimport data dealer."
-                onImport={handleImport}
-                isPending={importMutation.isPending}
-                templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
-            />
+            {canCreate && (
+                <DataImportModal
+                    open={openImport}
+                    onOpenChange={setOpenImport}
+                    title="Import Data Dealer"
+                    description="Unggah file .xlsx untuk mengimport data dealer."
+                    onImport={handleImport}
+                    isPending={importMutation.isPending}
+                    templateUrl="https://docs.google.com/spreadsheets/d/1wQmTkJSGyt7vb6DA21TdHyYiDD3tLqlXxUwQA88Qb1M/edit?usp=sharing"
+                />
+            )}
         </DashboardLayout>
     );
 };

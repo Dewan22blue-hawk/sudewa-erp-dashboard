@@ -20,6 +20,9 @@ interface VehicleEquipmentTableProps {
     onAdd: () => void;
     onEdit: (equipment: VehicleEquipment) => void;
     onDelete: (equipment: VehicleEquipment) => void;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function VehicleEquipmentTable({
@@ -34,6 +37,9 @@ export function VehicleEquipmentTable({
     onAdd,
     onEdit,
     onDelete,
+    canCreate,
+    canEdit,
+    canDelete,
 }: VehicleEquipmentTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -128,10 +134,12 @@ export function VehicleEquipmentTable({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Tambah
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -166,12 +174,14 @@ export function VehicleEquipmentTable({
                                                 <DropdownMenuContent align="end" className="w-[140px] rounded-xl border border-gray-100 bg-white shadow-lg p-1.5">
                                                     <DropdownMenuItem 
                                                         onClick={() => onEdit(item)} 
+                                                        disabled={!canEdit}
                                                         className="cursor-pointer text-gray-700 font-medium rounded-lg hover:bg-gray-50 px-3 py-2 text-sm"
                                                     >
                                                         Edit
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem 
                                                         onClick={() => onDelete(item)} 
+                                                        disabled={!canDelete}
                                                         className="text-red-600 cursor-pointer font-medium rounded-lg hover:bg-red-50 focus:bg-red-50 focus:text-red-600 px-3 py-2 text-sm"
                                                     >
                                                         Hapus

@@ -20,6 +20,8 @@ interface AccountGroupTableProps {
   onDelete: (accountGroup: AccountGroup) => void;
   page: number;
   perPage: number;
+  canEdit: boolean;
+  canDelete: boolean;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
 }
@@ -33,7 +35,7 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
   return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
-export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange }: AccountGroupTableProps) => {
+export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange, canEdit, canDelete }: AccountGroupTableProps) => {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
   });
@@ -180,7 +182,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                             e.preventDefault();
                             onEdit(group);
                           }}
-                          disabled={group.is_lock}
+                          disabled={group.is_lock || !canEdit}
                           className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                         >
                           <Pencil className="mr-2 h-4 w-4" />
@@ -192,7 +194,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                             onDelete(group);
                           }}
                           className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                          disabled={group.is_lock}
+                          disabled={group.is_lock || !canDelete}
                         >
                           <Trash className="mr-2 h-4 w-4" />
                           Hapus

@@ -14,6 +14,7 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { createSupplierSchema, type CreateSupplierFormValues } from '@/scheme/supplier.schema';
 import { getSupplierById } from '@/services/supplier.service';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { toast } from 'sonner';
 
 const defaultSupplierValues: CreateSupplierFormValues = {
@@ -52,6 +53,11 @@ const applyValidationErrors = (
 export function SupplierManagementPage() {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
   const { data: profile } = useAuthMe();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
+
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
   const deferredSearch = useDeferredValue(search);
 
@@ -92,12 +98,14 @@ export function SupplierManagementPage() {
   };
 
   const handleAdd = () => {
+    if (!canCreate) return;
     setEditingSupplier(null);
     form.reset(defaultSupplierValues);
     setIsFormOpen(true);
   };
 
   const handleEdit = async (supplier: ApiSupplier) => {
+    if (!canEdit) return;
     setLoadingDetailId(supplier.id);
 
     try {
@@ -120,6 +128,9 @@ export function SupplierManagementPage() {
   };
 
   const handleSubmit = async (values: CreateSupplierFormValues) => {
+    if (editingSupplier && !canEdit) return;
+    if (!editingSupplier && !canCreate) return;
+
     if (!companyId) {
       toast.error('Company ID tidak ditemukan');
       return;
@@ -164,6 +175,7 @@ export function SupplierManagementPage() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (!deleteTarget || !companyId) return;
 
     try {
@@ -180,6 +192,7 @@ export function SupplierManagementPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     if (!companyId) {
       throw new Error('Company ID tidak ditemukan');
     }
@@ -236,6 +249,9 @@ export function SupplierManagementPage() {
           onImport={() => setIsImportOpen(true)}
           onExport={handleExport}
           isExporting={exportSupplier.isPending}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
       </div>
 

@@ -8,16 +8,21 @@ import { toast } from 'sonner';
 import { useDealers, useCreateDealer, useUpdateDealer, useDeleteDealer, useImportDealer, useExportDealer } from '@/hooks/useDealer';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { useCompany } from '@/contexts/CompanyContext';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { Dealer } from '@/@types/dealer.types';
 
 export default function DealerPage() {
+  const { companyId } = useCompany();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   // Table state
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
-  const { companyId } = useCompany();
   const { data: dealersData } = useDealers(companyId, { page, perPage, search });
   
   const createMutation = useCreateDealer();
@@ -34,16 +39,19 @@ export default function DealerPage() {
 
   // Handlers
   const handleAddClick = () => {
+    if (!canCreate) return;
     setSelectedDealer(null);
     setIsFormOpen(true);
   };
 
   const handleEditClick = (dealer: Dealer) => {
+    if (!canEdit) return;
     setSelectedDealer(dealer);
     setIsFormOpen(true);
   };
 
   const handleDeleteClick = (dealer: Dealer) => {
+    if (!canDelete) return;
     setSelectedDealer(dealer);
     setIsDeleteOpen(true);
   };
@@ -79,6 +87,7 @@ export default function DealerPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     if (!companyId) return;
     try {
       await importMutation.mutateAsync({ companyId, file });
@@ -129,11 +138,14 @@ export default function DealerPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setOpenImport(true)}
+          onImport={canCreate ? () => setOpenImport(true) : undefined}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
 
       </div>

@@ -8,8 +8,13 @@ import { ImportRegionModal } from '@/components/features/region/ImportRegionModa
 import { toast } from 'sonner';
 import { useRegions, useCreateRegion, useUpdateRegion, useDeleteRegion, useImportRegion, useExportRegion } from '@/hooks/useRegion';
 import type { Region } from '@/@types/region.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function RegionPage() {
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   // Table state
   const [search, setSearch] = useState('');
@@ -32,21 +37,26 @@ export default function RegionPage() {
 
   // Handlers
   const handleAddClick = () => {
+    if (!canCreate) return;
     setSelectedRegion(null);
     setIsFormOpen(true);
   };
 
   const handleEditClick = (region: Region) => {
+    if (!canEdit) return;
     setSelectedRegion(region);
     setIsFormOpen(true);
   };
 
   const handleDeleteClick = (region: Region) => {
+    if (!canDelete) return;
     setSelectedRegion(region);
     setIsDeleteOpen(true);
   };
 
   const handleSaveForm = async (data: RegionFormData) => {
+    if (selectedRegion && !canEdit) return;
+    if (!selectedRegion && !canCreate) return;
     try {
       if (selectedRegion) {
         // Edit
@@ -64,6 +74,7 @@ export default function RegionPage() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (selectedRegion) {
       try {
         await deleteMutation.mutateAsync(selectedRegion.id);
@@ -77,6 +88,7 @@ export default function RegionPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     try {
       await importMutation.mutateAsync({ file });
       toast.success('Import data wilayah berhasil');
@@ -126,11 +138,14 @@ export default function RegionPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setIsImportOpen(true)}
+          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
 
       </div>

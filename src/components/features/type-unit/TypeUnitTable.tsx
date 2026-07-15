@@ -25,6 +25,8 @@ interface TypeUnitTableProps {
   onAdd?: () => void;
   onImport?: () => void;
   isLoading?: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
@@ -36,7 +38,7 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
   return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
-export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, onImport, isLoading }: TypeUnitTableProps) {
+export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, onImport, isLoading, canEdit, canDelete }: TypeUnitTableProps) {
   const totalPages = meta?.lastPage ?? Math.max(1, Math.ceil((meta?.total ?? typeUnits.length) / perPage));
   const hasData = (meta?.total ?? typeUnits.length) > 0;
   const startIndex = meta ? (page - 1) * perPage + 1 : 1;
@@ -258,10 +260,10 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                          <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                          <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>

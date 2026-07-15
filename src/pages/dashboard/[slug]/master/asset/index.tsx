@@ -8,10 +8,15 @@ import { ImportAssetModal } from '@/components/features/master/asset/ImportAsset
 import { toast } from 'sonner';
 import { useAssets, useCreateAsset, useUpdateAsset, useDeleteAsset, useImportAsset, useExportAsset } from '@/hooks/useAsset';
 import { useCompany } from '@/contexts/CompanyContext';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { Asset } from '@/@types/asset.types';
 
 export default function AssetPage() {
   const { companyId } = useCompany();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   // Table state
   const [search, setSearch] = useState('');
@@ -34,16 +39,19 @@ export default function AssetPage() {
 
   // Handlers
   const handleAddClick = () => {
+    if (!canCreate) return;
     setSelectedAsset(null);
     setIsFormOpen(true);
   };
 
   const handleEditClick = (asset: Asset) => {
+    if (!canEdit) return;
     setSelectedAsset(asset);
     setIsFormOpen(true);
   };
 
   const handleDeleteClick = (asset: Asset) => {
+    if (!canDelete) return;
     setSelectedAsset(asset);
     setIsDeleteOpen(true);
   };
@@ -79,6 +87,7 @@ export default function AssetPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     try {
       await importMutation.mutateAsync({ file, companyId: companyId ? Number(companyId) : undefined });
       toast.success('Import data aset berhasil');
@@ -128,11 +137,14 @@ export default function AssetPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setIsImportOpen(true)}
+          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
 
       </div>

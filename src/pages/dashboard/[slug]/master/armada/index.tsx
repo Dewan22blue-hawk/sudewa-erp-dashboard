@@ -6,10 +6,16 @@ import { DataImportModal } from '@/components/features/master-data/DataImportMod
 import { toast } from 'sonner';
 import { useRouter } from 'next/router';
 import { useArmadas, useDeleteArmada, useImportArmada } from '@/hooks/useArmada';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function ArmadaPage() {
   const router = useRouter();
   const { slug } = router.query;
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
@@ -32,23 +38,27 @@ export default function ArmadaPage() {
   const importMutation = useImportArmada();
 
   const handleAddClick = () => {
+    if (!canCreate) return;
     if (slug) {
       router.push(`/dashboard/${slug}/master/armada/create`);
     }
   };
 
   const handleEditClick = (armada: { id: string | number }) => {
+    if (!canEdit) return;
     if (slug) {
       router.push(`/dashboard/${slug}/master/armada/edit/${armada.id}`);
     }
   };
 
   const handleDeleteClick = (armada: { id: string | number }) => {
+    if (!canDelete) return;
     setSelectedArmadaId(armada.id);
     setIsDeleteOpen(true);
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (!selectedArmadaId) return;
 
     try {
@@ -62,6 +72,7 @@ export default function ArmadaPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     await importMutation.mutateAsync(file);
   };
 
@@ -94,9 +105,12 @@ export default function ArmadaPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setIsImportOpen(true)}
+          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
       </div>
 

@@ -24,6 +24,9 @@ interface AssetTableProps {
     onEdit: (asset: Asset) => void;
     onDelete: (asset: Asset) => void;
     isExporting?: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function AssetTable({
@@ -41,6 +44,9 @@ export function AssetTable({
     onEdit,
     onDelete,
     isExporting = false,
+    canCreate,
+    canEdit,
+    canDelete,
 }: AssetTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -164,16 +170,20 @@ export function AssetTable({
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
-                    {onImport && (
-                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                        </Button>
+                    {canCreate && (
+                        <>
+                            {onImport && (
+                                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import
+                                </Button>
+                            )}
+                            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah
+                            </Button>
+                        </>
                     )}
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
                 </div>
             </div>
 
@@ -225,10 +235,10 @@ export function AssetTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                                                    <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-slate-700">
+                                                    <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer rounded-xl px-3 py-2.5 text-slate-700">
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600">
+                                                    <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600">
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>

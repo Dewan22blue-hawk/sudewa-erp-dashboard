@@ -22,6 +22,9 @@ interface TarifTableProps {
     onAdd: () => void;
     onEdit: (tarif: Tarif) => void;
     onDelete: (tarif: Tarif) => void;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 const formatCurrency = (amount: number | null | undefined) => {
@@ -47,6 +50,9 @@ export function TarifTable({
     onAdd,
     onEdit,
     onDelete,
+    canCreate,
+    canEdit,
+    canDelete,
 }: TarifTableProps) {
     const totalPages = Math.ceil(totalData / perPage);
     const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
@@ -142,10 +148,12 @@ export function TarifTable({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Tambah
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -233,12 +241,14 @@ export function TarifTable({
                                                     <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                                                         <DropdownMenuItem
                                                             onClick={() => onEdit(tarif)}
+                                                            disabled={!canEdit}
                                                             className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                                                         >
                                                             Edit
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => onDelete(tarif)}
+                                                            disabled={!canDelete}
                                                             className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                                                         >
                                                             Hapus

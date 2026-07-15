@@ -23,6 +23,9 @@ interface MaterialTableProps {
     onEdit: (material: Material) => void;
     onDelete: (material: Material) => void;
     isExporting?: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function MaterialTable({
@@ -40,6 +43,9 @@ export function MaterialTable({
     onEdit,
     onDelete,
     isExporting = false,
+    canCreate,
+    canEdit,
+    canDelete,
 }: MaterialTableProps) {
     const totalPages = Math.ceil(totalData / perPage);
     const startData = (page - 1) * perPage + 1;
@@ -154,23 +160,27 @@ export function MaterialTable({
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
-                    {onImport && (
-                        <Button 
-                            onClick={onImport} 
-                            variant="outline" 
-                            className="w-full sm:w-auto"
-                        >
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                        </Button>
+                    {canCreate && (
+                        <>
+                            {onImport && (
+                                <Button 
+                                    onClick={onImport} 
+                                    variant="outline" 
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import
+                                </Button>
+                            )}
+                            <Button 
+                                onClick={onAdd} 
+                                className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah
+                            </Button>
+                        </>
                     )}
-                    <Button 
-                        onClick={onAdd} 
-                        className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
                 </div>
             </div>
 
@@ -211,10 +221,10 @@ export function MaterialTable({
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                                                        <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                                                        <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                                                             Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                                        <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                                                             Hapus
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>

@@ -24,6 +24,9 @@ interface ArmadaTableProps {
   onEdit: (armada: Armada) => void;
   onDelete: (armada: Armada) => void;
   onDetail?: (armada: Armada) => void;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 const formatDate = (value?: string | null) => {
@@ -76,6 +79,9 @@ export function ArmadaTable({
   onEdit,
   onDelete,
   onDetail,
+  canCreate,
+  canEdit,
+  canDelete,
 }: ArmadaTableProps) {
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
@@ -106,16 +112,20 @@ export function ArmadaTable({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {onImport && (
-            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
+          {canCreate && (
+            <>
+              {onImport && (
+                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+              )}
+              <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah
+              </Button>
+            </>
           )}
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah
-          </Button>
         </div>
       </div>
 
@@ -198,16 +208,16 @@ export function ArmadaTable({
                               <MoreVertical className="h-4 w-4 text-gray-500" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[160px]">
+                           <DropdownMenuContent align="end" className="w-[160px]">
                             {onDetail && (
                               <DropdownMenuItem onClick={() => onDetail(armada)} className="cursor-pointer">
                                 Detail
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => onEdit(armada)} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => onEdit(armada)} disabled={!canEdit} className="cursor-pointer">
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(armada)} className="cursor-pointer text-red-600 focus:text-red-600">
+                            <DropdownMenuItem onClick={() => onDelete(armada)} disabled={!canDelete} className="cursor-pointer text-red-600 focus:text-red-600">
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>

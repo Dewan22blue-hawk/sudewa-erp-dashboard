@@ -26,6 +26,9 @@ interface SupplierTableProps {
   onImport: () => void;
   onExport: () => void;
   isExporting?: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 const buildPagination = (page: number, totalPages: number): Array<number | 'ellipsis'> => {
@@ -70,6 +73,9 @@ export function SupplierTable({
   onImport,
   onExport,
   isExporting = false,
+  canCreate,
+  canEdit,
+  canDelete,
 }: SupplierTableProps) {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data: suppliers,
@@ -110,18 +116,22 @@ export function SupplierTable({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
-            <Upload className="h-4 w-4 mr-2" />
-            Import
-          </Button>
+          {canCreate && (
+            <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+          )}
           <Button variant="outline" className="w-full sm:w-auto" onClick={onExport} disabled={isExporting}>
             <Upload className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={onAdd}>
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah
-          </Button>
+          {canCreate && (
+            <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={onAdd}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah
+            </Button>
+          )}
         </div>
       </div>
 
@@ -256,6 +266,7 @@ export function SupplierTable({
                           <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                             <DropdownMenuItem
                               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                              disabled={!canEdit}
                               onSelect={(e) => {
                                   e.preventDefault();
                                   onEdit(supplier);
@@ -265,6 +276,7 @@ export function SupplierTable({
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                              disabled={!canDelete}
                               onSelect={(e) => {
                                   e.preventDefault();
                                   onDelete(supplier);
