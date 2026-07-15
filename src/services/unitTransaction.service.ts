@@ -93,6 +93,7 @@ type UnitTransactionItemListApiModel = {
     code?: string;
     stock_state?: string;
     expedition_fee_total?: string | number;
+    total_operational_fee?: string | number;
     created_at?: string;
     person?: {
       id?: number | string;
@@ -182,6 +183,7 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   transaction_bbn_total: toNumber(item.transaction_bbn_total),
   transaction_other_fee: toNumber(item.transaction_other_fee),
   expedition_fee_total: toNumber(item.expedition_fee_total),
+  total_operational_fee: toNumber(item.total_operational_fee),
   stock_state: item.stock_state ?? '-',
   unit_transaction_billing: item.unit_transaction_billing
     ? {
@@ -240,6 +242,7 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
         transaction_bbn_total: transactionBbn,
         transaction_other_fee: otherFee,
         expedition_fee_total: toNumber(row.unit_transaction?.expedition_fee_total) || transactionExpedition,
+        total_operational_fee: toNumber(row.unit_transaction?.total_operational_fee),
         stock_state: row.unit_transaction?.stock_state ?? '-',
         unit_transaction_billing: null,
         isPaid: false,

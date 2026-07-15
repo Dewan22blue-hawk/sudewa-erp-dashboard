@@ -105,7 +105,7 @@ export default function ArmadaPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
+          onImport={() => setIsImportOpen(true)}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
           canCreate={canCreate}

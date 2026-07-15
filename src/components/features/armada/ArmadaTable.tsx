@@ -156,7 +156,7 @@ export function ArmadaTable({
                 armadas.map((armada) => {
                   const stnkInfo = getRemainingLabel(armada.stnkAge);
                   const kirInfo = getRemainingLabel(armada.kirAge);
- 
+
                   return (
                     <TableRow key={armada.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                       <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
@@ -168,13 +168,12 @@ export function ArmadaTable({
                         {stnkInfo && (
                           <div className="mt-1 flex justify-center">
                             <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                                stnkInfo.className.includes('#DC2626')
-                                  ? 'bg-red-50 text-[#DC2626]'
-                                  : stnkInfo.className.includes('#F59E0B')
-                                    ? 'bg-amber-50 text-[#F59E0B]'
-                                    : 'bg-green-50 text-[#16A34A]'
-                              }`}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${stnkInfo.className.includes('#DC2626')
+                                ? 'bg-red-50 text-[#DC2626]'
+                                : stnkInfo.className.includes('#F59E0B')
+                                  ? 'bg-amber-50 text-[#F59E0B]'
+                                  : 'bg-green-50 text-[#16A34A]'
+                                }`}
                             >
                               <span>{stnkInfo.text}</span>
                               {(stnkInfo.className.includes('#DC2626') || stnkInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
@@ -187,13 +186,12 @@ export function ArmadaTable({
                         {kirInfo && (
                           <div className="mt-1 flex justify-center">
                             <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                                kirInfo.className.includes('#DC2626')
-                                  ? 'bg-red-50 text-[#DC2626]'
-                                  : kirInfo.className.includes('#F59E0B')
-                                    ? 'bg-amber-50 text-[#F59E0B]'
-                                    : 'bg-green-50 text-[#16A34A]'
-                              }`}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${kirInfo.className.includes('#DC2626')
+                                ? 'bg-red-50 text-[#DC2626]'
+                                : kirInfo.className.includes('#F59E0B')
+                                  ? 'bg-amber-50 text-[#F59E0B]'
+                                  : 'bg-green-50 text-[#16A34A]'
+                                }`}
                             >
                               <span>{kirInfo.text}</span>
                               {(kirInfo.className.includes('#DC2626') || kirInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
@@ -208,7 +206,7 @@ export function ArmadaTable({
                               <MoreVertical className="h-4 w-4 text-gray-500" />
                             </Button>
                           </DropdownMenuTrigger>
-                           <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuContent align="end" className="w-[160px]">
                             {onDetail && (
                               <DropdownMenuItem onClick={() => onDetail(armada)} className="cursor-pointer">
                                 Detail
@@ -266,8 +264,8 @@ export function ArmadaTable({
                   item === page
                     ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                     : item === '...'
-                    ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                    : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                      ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                      : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
               >
                 {item}

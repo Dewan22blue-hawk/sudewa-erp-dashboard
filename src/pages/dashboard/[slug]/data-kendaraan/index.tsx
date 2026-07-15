@@ -286,6 +286,9 @@ export default function VehicleFleetPage() {
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
             onDetail={handleDetailClick}
+            canCreate={false}
+            canEdit={false}
+            canDelete={false}
           />
         )}
       </div>

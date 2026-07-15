@@ -7,7 +7,7 @@ export interface PenerimaanUnit {
   person?: {
     id: string;
     name: string;
-  }
+  } | null;
 }
 
 export interface PenerimaanUnitDetail {

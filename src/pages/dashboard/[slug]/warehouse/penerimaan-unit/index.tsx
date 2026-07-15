@@ -10,6 +10,7 @@ import PenerimaanUnitTable from '@/components/features/penerimaan-unit/Penerimaa
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
 import { cn } from '@/lib/utils';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
@@ -22,6 +23,11 @@ export default function PenerimaanUnitPage() {
     activityType: 'receipt',
     perPage: 10000,
   });
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   const allData = useMemo(() => activities?.data ?? [], [activities?.data]);
 
