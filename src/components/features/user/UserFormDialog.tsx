@@ -85,6 +85,9 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
     if (!payload.password) delete payload.password;
     if (!payload.password_confirmation) delete payload.password_confirmation;
 
+    // Gabungkan firstname dan lastname untuk kolom name yang wajib di backend
+    payload.name = [payload.firstname, payload.lastname].filter(Boolean).join(' ');
+
     try {
       if (isEdit && user) {
         await updateMutation.mutateAsync({
@@ -123,20 +126,6 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nama Lengkap<RequiredMark /></FormLabel>
-                  <FormControl>
-                    <Input placeholder="Tambahkan nama" {...field} disabled={isBusy} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}

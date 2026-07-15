@@ -3,17 +3,20 @@ import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyMenuMap } from '@/configs/menu/company-menu.map';
 import { MenuItem } from '@/types/menu.types';
-import { Company, fetchCompanyDetail } from '@/services/company.service';
+import { Company } from '@/services/company.service';
+import { AuthService } from '@/features/auth/services/auth.service';
+import { setStoredPermissions } from '@/lib/session/storage';
 
-const MODULE_MAP: Record<string, string[]> = {
-    'master-data': ['Master Data'],
-    'transaction': ['Administrasi'],
-    'warehouse': ['Warehouse'],
-    'finance': ['Finance'],
-    'report': ['Laporan'],
+const ALWAYS_ALLOWED = ['Dashboard', 'Settings'];
+
+const MENU_PERMISSION_MAP: Record<string, string[]> = {
+    'Master Data': ['master-data:list'],
+    'Administrasi': ['transaction:list'],
+    'Warehouse': ['warehouse:list'],
+    'Finance': ['finance:list'],
+    'Laporan': ['report:list'],
+    'Manajemen Pengguna': ['user:list', 'role:list', 'permission:list'],
 };
-
-const ALWAYS_ALLOWED = ['Dashboard', 'Settings', 'Manajemen Pengguna'];
 
 export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoading: boolean } {
     const router = useRouter();
@@ -21,40 +24,26 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
     const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
 
     const { companyId } = useCompany();
-    const [allowedLabels, setAllowedLabels] = useState<string[]>(ALWAYS_ALLOWED);
+    const [permissions, setPermissions] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     // Find the exact company based on ID from Context, to get its safe slug or name
     const currentCompany = companies.find((c) => String(c.id) === String(companyId));
 
     useEffect(() => {
-        if (!currentCompany?.slug) return;
         setIsLoading(true);
-        fetchCompanyDetail(currentCompany.slug)
-            .then((data) => {
-                const companySlug = (data.slug || data.name || '').toLowerCase();
-                const labels = [...ALWAYS_ALLOWED];
-                if (data.modules) {
-                    data.modules.forEach(m => {
-                        const mapped = MODULE_MAP[m.slug || ''];
-                        if (mapped) {
-                            labels.push(...mapped);
-                        }
-                    });
-                }
-                if (companySlug.includes('yanotama')) {
-                    labels.push('Warehouse');
-                    labels.push('Laporan');
-                }
-                setAllowedLabels(labels);
+        AuthService.getPermissions()
+            .then((perms) => {
+                setPermissions(perms || []);
+                setStoredPermissions(perms || []);
             })
             .catch((err) => {
-                console.error('Failed to fetch company modules:', err);
+                console.error('Failed to fetch permissions:', err);
             })
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [currentCompany?.slug]);
+    }, [companyId]);
 
     const mappedMenus = useMemo(() => {
         if (!currentCompany) return [];
@@ -93,9 +82,35 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
             });
         }
 
-        // Fallback if no specific menu
-        return baseMenus.filter(m => allowedLabels.includes(m.label));
-    }, [currentCompany, slug, allowedLabels]);
+        // Filter menus and submenus based on user permissions
+        return baseMenus
+            .map((menu) => {
+                if (menu.children) {
+                    let filteredChildren = menu.children;
+                    if (menu.label === 'Manajemen Pengguna') {
+                        filteredChildren = menu.children.filter((child) => {
+                            if (child.label === 'Pengguna') return permissions.includes('user:list');
+                            if (child.label === 'Hak Akses') return permissions.includes('role:list');
+                            if (child.label === 'Izin Akses') return permissions.includes('permission:list');
+                            return true;
+                        });
+                    }
+                    return {
+                        ...menu,
+                        children: filteredChildren,
+                    };
+                }
+                return menu;
+            })
+            .filter((menu) => {
+                if (ALWAYS_ALLOWED.includes(menu.label)) return true;
+                const required = MENU_PERMISSION_MAP[menu.label];
+                if (required) {
+                    return required.some((perm) => permissions.includes(perm));
+                }
+                return false;
+            });
+    }, [currentCompany, slug, permissions]);
 
     return { menus: mappedMenus, isLoading };
 }

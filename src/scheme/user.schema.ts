@@ -4,16 +4,20 @@ const toOptionalString = (schema: z.ZodString) => z.preprocess((val) => (val ===
 
 const passwordSchema = z.string()
   .min(8, 'Password minimal 8 karakter')
+  .max(253, 'Password maksimal 253 karakter')
   .regex(/[a-z]/, 'Password harus mengandung huruf kecil')
   .regex(/[A-Z]/, 'Password harus mengandung huruf besar')
   .regex(/[0-9]/, 'Password harus mengandung angka')
   .regex(/[^a-zA-Z0-9]/, 'Password harus mengandung karakter unik/spesial');
 
 const baseUserShape = {
-  name: z.string().min(3, 'Nama minimal 3 karakter'),
+  name: z.string().optional(),
   email: z.string().email('Email tidak valid'),
-  username: z.string().min(3, 'Username minimal 3 karakter'),
-  firstname: z.string().optional(),
+  username: z.string()
+    .min(3, 'Username minimal 3 karakter')
+    .regex(/^\S+$/, 'Username tidak boleh mengandung spasi')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username hanya boleh berisi huruf, angka, dan underscore'),
+  firstname: z.string().min(1, 'Nama depan wajib diisi'),
   lastname: z.string().optional(),
   roles: z.string().optional(),
 };

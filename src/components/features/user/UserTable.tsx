@@ -4,9 +4,10 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, MoreVertical, Plus, ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
+import { Loader2, MoreVertical, Plus, ArrowUp, ArrowDown, ArrowUpDown, Search, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTableSort } from '@/hooks/useTableSort';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
 import { useActivateUser, useDeactivateUser } from '@/hooks/useUser';
 import { toast } from 'sonner';
@@ -198,6 +199,20 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
+                            {!isActive ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button type="button" className="cursor-help text-orange-500 hover:text-orange-700 transition-colors flex items-center">
+                                      <Info className="h-3.5 w-3.5 mr-0.5" />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                                    Akun ini non-aktif, pengguna tidak bisa menggunakan akun ini untuk login ke Dashboard
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : null}
                             <Switch
                               checked={isActive}
                               onCheckedChange={(checked) => handleToggleStatus(user, checked)}

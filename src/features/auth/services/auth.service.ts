@@ -36,6 +36,23 @@ export class AuthService {
     return response.data;
   }
 
+  static async getPermissions(): Promise<string[]> {
+    const response = await apiClient.get<{
+      status: boolean;
+      message: string;
+      errors: any;
+      data: {
+        permissions: string[];
+      };
+    }>('/wapi/auth/has-permissions');
+
+    if (!response.data.status) {
+      throw new Error(response.data.message || 'Failed to fetch permissions');
+    }
+
+    return response.data.data.permissions;
+  }
+
   static async updateProfile(id: number, data: { name?: string; username?: string; firstname?: string; lastname?: string; email?: string }): Promise<ProfileResponse> {
     const body = new URLSearchParams();
     if (data.name) body.append('name', data.name);
