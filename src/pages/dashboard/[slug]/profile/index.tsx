@@ -13,6 +13,13 @@ import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 import { AuthService } from '@/features/auth/services/auth.service';
 import { toast } from 'sonner';
 
+const getAvatarUrl = (path?: string | null) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const base = process.env.NEXT_PUBLIC_API_URL ?? 'https://api-finance.wajiracorps.co.id';
+    return `${base.replace(/\/$/, '')}/storage/${path.replace(/^\/+/, '')}`;
+};
+
 export default function ProfilePage() {
     const { data: profileData, isLoading, refetch } = useAuthMe();
     const user = profileData?.data;
@@ -128,7 +135,7 @@ export default function ProfilePage() {
                                 {(avatarPreview || user?.avatar) ? (
                                     <div className="mb-5 flex justify-center">
                                         <img 
-                                            src={avatarPreview || user?.avatar || undefined} 
+                                            src={avatarPreview || getAvatarUrl(user?.avatar) || undefined} 
                                             alt="Avatar" 
                                             className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm" 
                                         />
