@@ -20,6 +20,7 @@ import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { formatDate, formatMoney } from '@/lib/utils/format';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function LaporanInvoicePage() {
   const router = useRouter();

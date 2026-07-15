@@ -12,12 +12,17 @@ import WithholdingTaxDetailModal from '@/components/features/finance/withholding
 import WithholdingTaxDeleteDialog from '@/components/features/finance/withholding-tax/WithholdingTaxDeleteDialog';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxes } from '@/hooks/useWithholdingTax';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { fetchUserCompanies } from '@/services/company.service';
 
 export default function BuktiPotongPage() {
   const { companyId } = useCompany();
   // Ensure we use the active companyId.
   const companyNumber = Number(companyId || 4);
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('finance:create');
+  const canEdit = hasPermission('finance:edit');
+  const canDelete = hasPermission('finance:delete');
   const [companyName, setCompanyName] = useState('');
 
   useEffect(() => {
@@ -175,10 +180,12 @@ export default function BuktiPotongPage() {
                 <Download className="h-4 w-4" />
                 Export
               </Button>
+              {canCreate && (
               <Button onClick={handleCreate} className="flex items-center gap-2 rounded-xl bg-[#1e3a5f] hover:bg-[#152e4d] text-white">
                 <Plus className="h-4 w-4" />
                 Tambah Data
               </Button>
+              )}
             </div>
           </div>
 

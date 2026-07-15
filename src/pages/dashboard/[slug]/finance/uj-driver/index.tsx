@@ -9,10 +9,15 @@ import UJDriverTable from '@/components/features/finance/uj-driver/UJDriverTable
 import UJDriverPaymentModal from '@/components/features/finance/uj-driver/UJDriverPaymentModal';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useUJDriverList } from '@/hooks/finance/useUJDriver';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function UJDriverPage() {
   const { companyId } = useCompany();
   const companyNumber = Number(companyId || 0);
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('finance:create');
+  const canEdit = hasPermission('finance:edit');
+  const canDelete = hasPermission('finance:delete');
 
   const [searchInput, setSearchInput] = useState('');
   const [searchValue, setSearchValue] = useState('');

@@ -13,12 +13,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function PurchasePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { companyId } = useCompany();
   const { slug } = router.query;
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
@@ -61,7 +65,7 @@ export default function PurchasePage() {
               data={data?.data ?? []}
               meta={data?.meta}
               onDelete={(id) => setSelectedId(id)}
-              onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
+              onAdd={canCreate ? () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`) : undefined}
               slug={slug as string}
               onPageChange={setPage}
               onPerPageChange={(value) => {

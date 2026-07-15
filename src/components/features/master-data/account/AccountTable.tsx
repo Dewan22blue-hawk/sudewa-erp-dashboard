@@ -26,9 +26,11 @@ interface AccountTableProps {
   onDelete: (account: Account) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
-export const AccountTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onPageChange, onPerPageChange }: AccountTableProps) => {
+export const AccountTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onPageChange, onPerPageChange, canEdit, canDelete }: AccountTableProps) => {
   const columns = useMemo<ColumnDef<Account>[]>(
     () => [
       {
@@ -92,7 +94,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
               <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                 <DropdownMenuItem
                   onClick={() => onEdit(row.original)}
-                  disabled={row.original.is_lock}
+                  disabled={row.original.is_lock || !canEdit}
                   className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                 >
                   <Pencil className="mr-2 h-4 w-4" />
@@ -101,7 +103,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 <DropdownMenuItem
                   onClick={() => onDelete(row.original)}
                   className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                  disabled={row.original.is_lock}
+                  disabled={row.original.is_lock || !canDelete}
                 >
                   <Trash className="mr-2 h-4 w-4" />
                   Hapus

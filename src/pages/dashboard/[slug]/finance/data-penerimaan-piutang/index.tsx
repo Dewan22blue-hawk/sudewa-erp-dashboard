@@ -4,10 +4,15 @@ import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PenerimaanPiutangTable from '@/components/features/penerimaan-piutang/PenerimaanPiutangTable';
 import { useDeletePenerimaanPiutang, usePenerimaanPiutang } from '@/hooks/usePenerimaanPiutang';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { PenerimaanPiutang } from '@/@types/penerimaan-piutang.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 export default function DataPenerimaanPiutangPage() {
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('finance:create');
+    const canEdit = hasPermission('finance:edit');
+    const canDelete = hasPermission('finance:delete');
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);

@@ -16,6 +16,7 @@ import TogglePaymentStatusDialog from '@/components/features/kas-harian/TogglePa
 import KasHarianTable from '@/components/features/kas-harian/KasHarianTable';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKasHarian } from '@/hooks/useKasHarian';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const LIVE_UPDATE_INTERVAL = 5000;
 
@@ -43,6 +44,10 @@ export default function KasHarianPage() {
   const { slug } = router.query;
   const { companyId, isLoading: isCompanyLoading } = useCompany();
   const companyNumber = Number(companyId || 0);
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('finance:create');
+  const canEdit = hasPermission('finance:edit');
+  const canDelete = hasPermission('finance:delete');
 
   const [searchInput, setSearchInput] = useState('');
   const [searchValue, setSearchValue] = useState('');
@@ -172,10 +177,12 @@ export default function KasHarianPage() {
             <p className="text-sm text-muted-foreground">Kelola arus transaksi kas harian</p>
           </div>
 
+          {canCreate && (
           <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
+          )}
         </div>
 
         <div className="space-y-4">

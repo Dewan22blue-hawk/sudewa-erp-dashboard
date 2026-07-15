@@ -24,6 +24,7 @@ import { useSuppliers } from '@/hooks/useSupplier';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import type { GoodsReceiptFormValues, GoodsReceiptPaymentFormValues } from '@/scheme/goods-receipt.schema';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const translateBackendMessageToIndonesian = (message: string) => {
   const normalized = message.trim();
@@ -93,6 +94,11 @@ export default function GoodsReceiptListPage() {
   const createBillingMutation = useCreateGoodsReceiptBilling();
   const createPaymentMutation = useCreateGoodsReceiptPayment();
   const uploadMutation = useUploadGoodsReceiptInvoice();
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
 
   const [openForm, setOpenForm] = useState(false);
   const [selectedPay, setSelectedPay] = useState<GoodsReceipt | null>(null);
@@ -195,7 +201,7 @@ export default function GoodsReceiptListPage() {
         onPageChange={setPage}
         onPerPageChange={setPerPage}
         onSearchChange={setSearch}
-        onAdd={() => setOpenForm(true)}
+        onAdd={canCreate ? () => setOpenForm(true) : undefined}
         onPay={setSelectedPay}
         onUpload={setSelectedUpload}
         onDelete={setDeleteTarget}

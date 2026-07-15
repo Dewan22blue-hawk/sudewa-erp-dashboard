@@ -31,6 +31,7 @@ import type { MaterialTransactionFormValues } from '@/scheme/material-transactio
 import { getMaterialTransactionById } from '@/services/material-transaction.service';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { id } from 'date-fns/locale';
 
 const formatDate = (value?: string) => {
@@ -59,6 +60,11 @@ export default function MaterialReleaseListPage() {
   const updateMutation = useUpdateMaterialTransaction();
   const deleteMutation = useDeleteMaterialTransaction();
   const uploadInvoiceMutation = useUploadMaterialTransactionInvoice();
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
 
   const [openForm, setOpenForm] = useState(false);
   const [openInvoiceModal, setOpenInvoiceModal] = useState(false);
@@ -161,16 +167,18 @@ export default function MaterialReleaseListPage() {
             <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock perlengkapan</p>
           </div>
 
-          <Button
-            onClick={() => {
-              setEditingTransaction(null);
-              setOpenForm(true);
-            }}
-            className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah
-          </Button>
+          {canCreate && (
+            <Button
+              onClick={() => {
+                setEditingTransaction(null);
+                setOpenForm(true);
+              }}
+              className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah
+            </Button>
+          )}
         </div>
 
         <div className="space-y-4">

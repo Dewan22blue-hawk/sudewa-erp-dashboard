@@ -12,6 +12,7 @@ import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { useGoodsTransactionStockMaterial } from '@/hooks/warehouse/useGoodsTransactionStockMaterial';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 type StockTab = 'diterima' | 'keluar';
 
@@ -32,6 +33,11 @@ const formatUnitLabel = (value?: string) => {
 };
 
 export default function StockPerlengkapanPage() {
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
+
   const { companyId, isLoading: isCompanyLoading } = useCompany();
   const { page, perPage, search, setPage, setPerPage, getParam, updateQuery } = useQueryParamsTable({ defaultPerPage: 25 });
 
