@@ -147,13 +147,18 @@ export default function ProfilePage() {
                                     <span className="text-sm font-medium text-slate-700">
                                         {avatarFile ? avatarFile.name : 'Klik untuk upload gambar'}
                                     </span>
-                                    <span className="mt-1 text-xs text-slate-400">Format PNG, JPG maksimal 5MB</span>
+                                    <span className="mt-1 text-xs text-slate-400">Format PNG, JPG maksimal 2MB</span>
                                     <input
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
                                         onChange={(event) => {
                                             const file = event.target.files?.[0] ?? null;
+                                            if (file && file.size > 2 * 1024 * 1024) {
+                                                toast.error('Ukuran file gambar maksimal 2MB');
+                                                event.target.value = ''; // Reset input element value
+                                                return;
+                                            }
                                             setAvatarFile(file);
                                             if (file) {
                                                 setAvatarPreview(URL.createObjectURL(file));
