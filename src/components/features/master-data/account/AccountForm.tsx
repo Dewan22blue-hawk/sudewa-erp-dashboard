@@ -11,7 +11,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { CreateAccountGroupDialog } from '@/components/features/account/CreateAccountGroupDialog';
 import { ACCOUNT_CATEGORY_OPTIONS } from '@/lib/account';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import RequiredMark from '@/components/ui/required-mark';
 import { cn } from '@/lib/utils';
 

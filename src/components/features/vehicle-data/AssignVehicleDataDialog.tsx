@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CalendarDays, Check, ChevronsUpDown, FileCheck2 } from 'lucide-react';
+import { CalendarDays, Check, ChevronsUpDown, FileCheck2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';

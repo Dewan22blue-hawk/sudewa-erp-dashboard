@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical } from 'lucide-react';
+import { Search, Plus, MoreVertical, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -194,16 +194,15 @@ export function TarifTable({
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-                                Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="group hover:bg-gray-50 transition-colors">
-                                        {Array.from({ length: 9 }).map((_, j) => (
-                                            <TableCell key={j} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : tarifs.length > 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : tarifs.length > 0 ? (
                                 tarifs.map((tarif) => (
                                     <TableRow key={tarif.id} className="group hover:bg-gray-50 transition-colors">
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
@@ -261,9 +260,15 @@ export function TarifTable({
                                 ))
                             ) : (
                                 <TableRow className="group">
-                                    <TableCell colSpan={9} className="h-32 text-center text-gray-552 py-10 text-sm">
-                                        Tidak ada data tarif ditemukan
-                                    </TableCell>
+                                    <TableCell colSpan={100} className="h-32 text-center text-gray-552 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

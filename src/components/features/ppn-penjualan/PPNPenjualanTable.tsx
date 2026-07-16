@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Loader2, Search } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -119,7 +119,14 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
           </thead>
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : isError ? (
               <tr>
                 <td colSpan={15} className="px-4 py-10 text-center">
@@ -135,8 +142,14 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={15} className="px-4 py-10 text-center text-slate-500">
-                  Tidak ada data PPN penjualan
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : (

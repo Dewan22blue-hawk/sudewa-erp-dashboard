@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SortableHeader } from '@/components/ui/sortable-header';
 import type { SortOrder } from '@/hooks/useTableSort';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Loader2, Search } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
@@ -90,8 +90,15 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
 
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
-            ) : error ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : error ? (
               <tr>
                 <td colSpan={7} className="px-4 py-10 text-center">
                   <div className="space-y-3">
@@ -106,8 +113,14 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
               </tr>
             ) : !hasData ? (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                  Tidak ada data
+                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </td>
               </tr>
             ) : (

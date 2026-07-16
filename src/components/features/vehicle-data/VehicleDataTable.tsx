@@ -1,4 +1,4 @@
-import { CheckCircle2, Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
+import { CheckCircle2, Download, MoreVertical, Plus, Search, Upload, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -220,16 +220,15 @@ export function VehicleDataTable({
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                Array.from({ length: Math.min(perPage, 6) }).map((_, index) => (
-                  <TableRow key={`loading-${index}`} className="group animate-pulse border-slate-100">
-                    {Array.from({ length: 11 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                        <div className="h-4 rounded bg-slate-100" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : items.length ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : items.length ? (
                 items.map((item) => (
                   <TableRow key={item.id} className={assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}>
                     <TableCell className="px-4 py-4 text-center">
@@ -282,9 +281,15 @@ export function VehicleDataTable({
                 ))
               ) : (
                 <TableRow className="group">
-                  <TableCell colSpan={11} className="h-28 text-center text-sm text-slate-500">
-                    Belum ada data kendaraan.
-                  </TableCell>
+                  <TableCell colSpan={100} className="py-16 h-28 text-center text-sm text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               )}
             </TableBody>

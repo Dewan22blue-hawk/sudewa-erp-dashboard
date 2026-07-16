@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
+import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown, Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -199,27 +199,25 @@ export const BrandTable = ({
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
-                            [...Array(perPage)].map((_, i) => (
-                                <TableRow key={i} className="group bg-white hover:bg-slate-50 transition-colors">
-                                    <TableCell className="px-4 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className="h-10 w-10 rounded-lg" />
-                                            <Skeleton className="h-4 w-32" />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4">
-                                        <Skeleton className="h-4 w-32" />
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                        <Skeleton className="h-8 w-8 mx-auto rounded-full" />
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        ) : data.length === 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : data.length === 0 ? (
                             <TableRow className="group">
-                                <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
-                                    Tidak ada data.
-                                </TableCell>
+                                <TableCell colSpan={100} className="text-center text-gray-500 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                             </TableRow>
                         ) : (
                             table.getRowModel().rows.map((row) => (
