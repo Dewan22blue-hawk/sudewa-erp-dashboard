@@ -128,11 +128,11 @@ export default function LaporanBuktiPotongTable({
               {loading && data.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="px-4 py-12 text-center text-slate-500">
-                    <span className="inline-flex items-center justify-center gap-2 w-full">
-                      <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                      Memuat data...
-                    </span>
-                  </td>
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</td>
                 </tr>
               ) : data.length > 0 ? (
                 data.map((item, index) => (
@@ -176,15 +176,15 @@ export default function LaporanBuktiPotongTable({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={10} className="px-4 py-16 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="bg-slate-50 p-4 rounded-full mb-3">
-                        <Search className="h-8 w-8 text-slate-300" />
-                      </div>
-                      <p className="text-base font-medium text-slate-900">Data Tidak Ditemukan</p>
-                      <p className="text-sm mt-1">Belum ada data laporan bukti potong untuk ditampilkan.</p>
+                  <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                  </td>
+                </td>
                 </tr>
               )}
             </tbody>

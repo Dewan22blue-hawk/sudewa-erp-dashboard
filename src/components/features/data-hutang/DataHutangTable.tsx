@@ -165,11 +165,11 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
             {loading && data.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-                  <span className="inline-flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Memuat data...
-                  </span>
-                </td>
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</td>
               </tr>
             ) : sortedData.length > 0 ? (
               sortedData.map((item, index) => (
@@ -199,8 +199,14 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-                  Tidak ada data yang ditemukan.
+                <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </td>
               </tr>
             )}

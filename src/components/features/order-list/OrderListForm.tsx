@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { ChevronLeft, Plus, Save, Trash2 } from 'lucide-react';
+import { ChevronLeft, Plus, Save, Trash2, Search } from 'lucide-react';
 import type { OrderList, OrderListVehicleType } from '@/@types/order-list.types';
 import type { Tarif } from '@/@types/tarif.types';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/features/vehicle-data/SearchableSelect';

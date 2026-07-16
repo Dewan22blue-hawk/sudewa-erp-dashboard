@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MoreVertical, Download } from 'lucide-react';
+import { Search, MoreVertical, Download, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -110,16 +110,15 @@ export function FinanceAssetTable({
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i} className="group border-b border-slate-100 last:border-0">
-                                        {Array.from({ length: 11 }).map((_, j) => (
-                                            <TableCell key={j} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                                <Skeleton className="h-4 w-full" />
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : assets.length === 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : assets.length === 0 ? (
                                 <TableRow className="group">
                                     <TableCell colSpan={11} className="h-24 text-center text-slate-500">
                                         No data found.

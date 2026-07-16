@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, Eye } from 'lucide-react';
+import { ArrowUpDown, Eye, Loader2, Search } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
@@ -127,9 +127,12 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
           <TableBody>
             {isLoading ? (
               <TableRow className="group">
-                <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
-                  Memuat data refund...
-                </TableCell>
+                <TableCell colSpan={columns.length} className="py-16 h-40 text-center text-slate-500">
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</TableCell>
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
@@ -141,8 +144,14 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
               ))
             ) : (
               <TableRow className="group">
-                <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
-                  Belum ada refund untuk transaksi ini.
+                <TableCell colSpan={100} className="py-16 h-40 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </TableCell>
               </TableRow>
             )}

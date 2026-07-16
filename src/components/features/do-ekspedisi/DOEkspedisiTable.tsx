@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MoreVertical, Printer, Edit, FileText, Trash2 } from 'lucide-react';
+import { Search, MoreVertical, Printer, Edit, FileText, Trash2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -123,14 +123,15 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                  <TableRow key={index} className="group">
-                    <TableCell colSpan={7} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <div className="h-5 animate-pulse rounded bg-slate-200" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : data.length > 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : data.length > 0 ? (
                 data.map((item) => (
                   <TableRow key={item.id} className="group border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-800">{item.doCode || '-'}</TableCell>
@@ -174,9 +175,15 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                 ))
               ) : (
                 <TableRow className="group">
-                  <TableCell colSpan={7} className="h-32 text-center text-slate-500">
-                    Tidak ada data DO Ekspedisi ditemukan
-                  </TableCell>
+                  <TableCell colSpan={100} className="py-16 h-32 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               )}
             </TableBody>

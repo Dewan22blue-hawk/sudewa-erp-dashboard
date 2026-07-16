@@ -8,7 +8,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { CashFlowItem } from '@/services/cashFlow.service';
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
 
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -106,9 +106,15 @@ export function LaporanKasTable({
                         ))}
                         {data.length === 0 && (
                             <TableRow className="group">
-                                <TableCell colSpan={5} className="px-4 py-10 text-center text-sm text-gray-500">
-                                    Tidak ada data transaksi kas
-                                </TableCell>
+                                <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                             </TableRow>
                         )}
                         {/* Footer Totals Row */}

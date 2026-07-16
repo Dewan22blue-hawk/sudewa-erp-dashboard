@@ -193,9 +193,15 @@ export function VehicleEquipmentTable({
                                 ))
                             ) : (
                                 <TableRow className="group">
-                                    <TableCell colSpan={3} className="h-40 text-center text-gray-400 text-sm font-medium">
-                                        Tidak ada data perlengkapan ditemukan
-                                    </TableCell>
+                                    <TableCell colSpan={100} className="py-16 h-40 text-center text-gray-400 text-sm font-medium">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

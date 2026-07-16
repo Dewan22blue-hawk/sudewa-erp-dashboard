@@ -13,7 +13,7 @@ import { ACCOUNT_CATEGORY_OPTIONS } from '@/lib/account';
 import { cn } from '@/lib/utils';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { CreateAccountGroupDialog } from './CreateAccountGroupDialog';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 
 interface AccountFormModalProps {
   open: boolean;

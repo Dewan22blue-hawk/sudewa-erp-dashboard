@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { MoreVertical, Plus, Search } from 'lucide-react';
+import { MoreVertical, Plus, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -103,11 +103,24 @@ export function GoodsReceiptTable({
             <TableBody>
               {isLoading ? (
                 <TableRow className="group">
-                  <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Memuat data penerimaan material...</TableCell>
+                  <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</TableCell>
                 </TableRow>
               ) : data.length === 0 ? (
                 <TableRow className="group">
-                  <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Tidak ada data penerimaan material.</TableCell>
+                  <TableCell colSpan={100} className="py-16 h-28 text-center text-slate-500 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               ) : (
                 data.map((item) => (
