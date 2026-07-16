@@ -344,7 +344,7 @@ export default function UnitPurchaseDetailPage() {
                     <TableHead className="text-xs font-semibold text-slate-500">Warna</TableHead>
                     <TableHead className="text-xs font-semibold text-slate-500">Nomor Mesin</TableHead>
                     <TableHead className="text-xs font-semibold text-slate-500">Nomor Rangka</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500 text-right">Aksi</TableHead>
+                    <TableHead className="text-xs font-semibold text-slate-500 sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -377,7 +377,7 @@ export default function UnitPurchaseDetailPage() {
                         <TableCell>
                           <CopyBox text={item.chassis_number || '-'} />
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8">

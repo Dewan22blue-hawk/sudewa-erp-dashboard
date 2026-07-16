@@ -6,12 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Eye, MoreVertical, Pencil, Plus, Trash2, Search } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { SalesLineItem } from '../sales.data';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useBulkDeleteUnitItem, useDeleteUnitItem, useSalesUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { toast } from 'sonner';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface Props {
   lineItems: SalesLineItem[];
@@ -127,7 +128,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
     <div className="rounded-xl border bg-white">
       <div className="border-b px-6 py-5">
         <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
-        <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dibeli</p>
+        <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>
       </div>
 
       <div className="flex items-center justify-between gap-2 px-6 py-4">
@@ -179,17 +180,17 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
               <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[50px]">
                 <Checkbox checked={allPageSelected} onCheckedChange={(checked) => toggleAllPage(Boolean(checked))} aria-label="Pilih semua" />
               </TableHead>
-              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE UNIT</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">QTY</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HARGA JUAL</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA BBN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA EKSPEDISI</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BIAYA LAIN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">HPP</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">JUMLAH</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold text-slate-500">Tipe Unit</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500 w-[80px]">QTY</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Harga Jual</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Biaya BBN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Biaya Ekspedisi</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Biaya Lainnya</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">HPP</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">DPP</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">PPN</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Jumlah</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -212,23 +213,27 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
                   <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Checkbox checked={selectedIds.has(item.id)} onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))} aria-label="Pilih baris" />
                   </TableCell>
-                  <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">
+                    <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${getUnitTypeName(item.unit_type_id)}`}>
+                      {getUnitTypeName(item.unit_type_id)}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.qty_total}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                    <div>{formatCurrency(item.price)}</div>
+                    <div>{currenciesFormat('idr', item.price)}</div>
                     {item.price_usd ? (
                       <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga Jual USD">
-                        {formatCurrency(item.price_usd, 'USD')}
+                        {currenciesFormat('usd', item.price_usd)}
                       </div>
                     ) : null}
                   </TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.hpp_total_price ?? 0)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.dpp_total_price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppn_total_price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{formatCurrency((item.hpp_total_price ?? 0) + item.ppn_total_price + item.bbn_price + item.expedition_fee + item.other_fee)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.bbn_price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.expedition_fee)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.other_fee)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.hpp_total_price ?? 0)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.dpp_total_price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.ppn_total_price)}</TableCell>
+                  <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{currenciesFormat('idr', (item.hpp_total_price ?? 0) + item.ppn_total_price + item.bbn_price + item.expedition_fee + item.other_fee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -237,8 +242,8 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)}> <Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}> <Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id} / edit`)}> <Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id}`)}> <Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
                         <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)}> <Trash2 className="mr-2 h-4 w-4" />
                           Hapus
                         </DropdownMenuItem>
@@ -249,8 +254,8 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
               ))
             )}
           </TableBody>
-        </Table>
-      </div>
+        </Table >
+      </div >
 
       <div className="flex items-center justify-between px-6 py-4 text-sm text-muted-foreground">
         <span>
@@ -298,6 +303,6 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </div >
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
@@ -28,6 +28,11 @@ export function SalesTable({ onAdd }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [localSearch, setLocalSearch] = useState('');
   const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
 
   const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
   const deleteMutation = useDeleteSales();
@@ -223,7 +228,7 @@ export function SalesTable({ onAdd }: Props) {
         </div>
 
         {/* RIGHT CONTROLS */}
-        {onAdd && (
+        {canCreate && onAdd && (
           <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
@@ -275,7 +280,7 @@ export function SalesTable({ onAdd }: Props) {
               </TableRow>
             ) : (
               currentData.map((item) => (
-                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} />
+                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} canEdit={canEdit} canDelete={canDelete} />
               ))
             )}
           </TableBody>

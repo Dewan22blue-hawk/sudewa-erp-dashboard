@@ -118,7 +118,6 @@ export const salesService = {
       per_page: options.perPage ?? 10,
       search: options.search || undefined,
       status: options.status || undefined,
-      is_paid: 'true',
     };
 
     try {
