@@ -18,9 +18,11 @@ interface Props {
   lineItems: SalesLineItem[];
   salesId: string;
   onAddUnit?: () => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
-export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
+export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDelete }: Props) {
   const router = useRouter();
   const { data: unitItemsData, isLoading, isError } = useSalesUnitItems(salesId);
   const { data: typeUnits } = useTypeUnits();
@@ -154,16 +156,18 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="destructive"
-            disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
-            onClick={() => setIsBulkDeleteOpen(true)}
-          >
-            Bulk Delete ({selectedIds.size})
-          </Button>
+          {canDelete && (
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
+              onClick={() => setIsBulkDeleteOpen(true)}
+            >
+              Bulk Delete ({selectedIds.size})
+            </Button>
+          )}
 
-          {onAddUnit && (
+          {onAddUnit && canEdit && (
             <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={onAddUnit}>
               <Plus className="mr-2 h-4 w-4" />
               Add Unit
@@ -242,9 +246,9 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit }: Props) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id} / edit`)}> <Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id} / edit`)} disabled={!canEdit}> <Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id}`)}> <Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)}> <Trash2 className="mr-2 h-4 w-4" />
+                        <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)} disabled={!canDelete}> <Trash2 className="mr-2 h-4 w-4" />
                           Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
