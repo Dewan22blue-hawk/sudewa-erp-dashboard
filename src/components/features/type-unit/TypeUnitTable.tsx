@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown, Loader2 } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -219,24 +219,24 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="group bg-white hover:bg-slate-50 transition-colors">
-                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-4 w-12" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-12" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-20 mx-auto" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-4 w-20 mx-auto" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
-                </TableRow>
-              ))
-            ) : typeUnits.length === 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : typeUnits.length === 0 ? (
               <TableRow className="group">
-                <TableCell colSpan={10} className="text-center text-gray-550 py-10 text-sm">
-                  Tidak ada data.
+                <TableCell colSpan={100} className="text-center text-gray-550 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </TableCell>
               </TableRow>
             ) : (

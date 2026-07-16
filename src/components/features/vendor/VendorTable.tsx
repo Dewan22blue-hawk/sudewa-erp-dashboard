@@ -224,9 +224,15 @@ export function VendorTable({
                                 ))
                             ) : (
                                 <TableRow className="group">
-                                    <TableCell colSpan={6} className="h-32 text-center text-gray-505 py-10 text-sm">
-                                        Tidak ada data vendor ditemukan
-                                    </TableCell>
+                                    <TableCell colSpan={100} className="h-32 text-center text-gray-505 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

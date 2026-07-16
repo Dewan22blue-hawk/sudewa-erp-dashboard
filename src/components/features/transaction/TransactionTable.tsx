@@ -1,6 +1,6 @@
 import { Transaction } from '@/@types/transaction.types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreVertical, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { MoreVertical, ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTableSort } from '@/hooks/useTableSort';
 import { formatDate } from '@/lib/utils/format';
@@ -122,8 +122,14 @@ export function TransactionTable({ data, onEdit, onDelete, canEdit, canDelete }:
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="h-64 text-center text-slate-500 text-sm">
-                  Tidak ada data transaksi
+                <td colSpan={100} className="py-16 h-64 text-center text-slate-500 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </td>
               </tr>
             )}

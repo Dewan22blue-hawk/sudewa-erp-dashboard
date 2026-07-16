@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { Download, MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Download, MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown, Loader2 } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 
 interface CustomerTableProps {
@@ -238,14 +238,15 @@ export function CustomerTable({
 
             <TableBody>
               {isLoading ? (
-                Array.from({ length: 3 }).map((_, index) => (
-                  <TableRow key={index} className="group hover:bg-gray-50 transition-colors">
-                    <TableCell colSpan={8} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <div className="h-6 animate-pulse rounded bg-[#F4F4F5]" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : sortedData.length > 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : sortedData.length > 0 ? (
                 sortedData.map((customer) => (
                   <TableRow key={customer.id} className="group hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm font-medium text-gray-600 text-left">
@@ -317,9 +318,15 @@ export function CustomerTable({
                 ))
               ) : (
                 <TableRow className="group">
-                  <TableCell colSpan={8} className="px-4 py-10 text-center text-sm text-gray-500">
-                    Belum ada data customer untuk company aktif
-                  </TableCell>
+                  <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               )}
             </TableBody>

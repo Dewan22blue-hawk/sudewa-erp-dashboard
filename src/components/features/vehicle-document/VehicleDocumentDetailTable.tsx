@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Pencil, Search } from 'lucide-react';
+import { Pencil, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -82,16 +82,15 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
             </thead>
             <tbody>
               {isLoading ? (
-                Array.from({ length: Math.min(perPage, 6) }).map((_, rowIndex) => (
-                  <tr key={rowIndex} className="animate-pulse border-b border-slate-100 text-slate-700">
-                    {Array.from({ length: 16 }).map((__, cellIndex) => (
-                      <td key={cellIndex} className="px-4 py-4">
-                        <div className="h-4 rounded bg-slate-100" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : items.length ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : items.length ? (
                 items.map((item) => (
                   <tr key={`${item.id}-${item.registrationId}`} className="border-b border-slate-200 text-slate-700 hover:bg-gray-50/70 transition-colors">
                     <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.dealerName || '-'}</td>
@@ -118,7 +117,15 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
                 ))
               ) : (
                 <tr>
-                  <td colSpan={16} className="h-24 text-center text-sm text-slate-500 px-4 py-4">Belum ada detail registrasi.</td>
+                  <td colSpan={100} className="h-24 text-center text-sm text-slate-500 px-4 py-16">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </td>
                 </tr>
               )}
             </tbody>

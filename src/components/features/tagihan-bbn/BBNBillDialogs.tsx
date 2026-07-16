@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Search } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';

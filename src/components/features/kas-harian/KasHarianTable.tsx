@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from '@/components/ui/skeleton';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Info, CheckCircle } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Info, CheckCircle, Loader2, Search } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import { cn } from '@/lib/utils';
@@ -142,7 +142,14 @@ export default function KasHarianTable({
           </thead>
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : isError ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
@@ -158,8 +165,14 @@ export default function KasHarianTable({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
-                  Belum ada data transaksi kas harian.
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : (

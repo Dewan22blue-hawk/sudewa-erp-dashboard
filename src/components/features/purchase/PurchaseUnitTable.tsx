@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, MoreVertical, Pencil, Plus, Trash2, Info } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Trash2, Info, Search } from 'lucide-react';
 import { UnitTransactionItem } from '@/@types/unit-transaction.types';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
@@ -232,9 +232,15 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                 </TableRow>
               ) : pagedData.length === 0 ? (
                 <TableRow className="group">
-                  <TableCell colSpan={11} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
-                    Belum ada unit item.
-                  </TableCell>
+                  <TableCell colSpan={100} className="h-20 text-center text-muted-foreground px-4 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               ) : (
                 pagedData.map((item, idx) => {
