@@ -93,7 +93,7 @@ export default function Home() {
           <img
             src="/wajira-footer-design.png"
             alt="Wajira Illustration"
-            className="w-full h-auto object-cover max-h-[90vh] mb-1 sm:max-h-[50vh] pointer-events-auto select-none"
+            className="w-full h-auto object-cover max-h-[90vh] mb-1 sm:max-h-[60vh] pointer-events-auto select-none"
             draggable="false"
           />
         </div>
