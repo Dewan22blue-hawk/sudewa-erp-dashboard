@@ -127,7 +127,7 @@ export default function RolesPage() {
                 <th className="px-4 py-3 text-left">Nama</th>
                 <th className="px-4 py-3 text-left">Guard</th>
                 <th className="px-4 py-3 text-left">Users</th>
-                <th className="px-4 py-3 text-center">Action</th>
+                <th className="px-4 py-3 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>

@@ -1,15 +1,17 @@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/router';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown, Loader2 } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useTableSort } from '@/hooks/useTableSort';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { CopyBox } from '@/components/ui/copy-box';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface TypeUnitTableProps {
   typeUnits: TypeUnit[];
@@ -38,11 +40,15 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
   return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
-export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, onImport, isLoading, canEdit, canDelete }: TypeUnitTableProps) {
+export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearchChange, onPageChange, onPerPageChange, onEdit, onDelete, onAdd, onImport, isLoading, canEdit, canDelete }:
+  TypeUnitTableProps) {
+  const router = useRouter();
   const totalPages = meta?.lastPage ?? Math.max(1, Math.ceil((meta?.total ?? typeUnits.length) / perPage));
   const hasData = (meta?.total ?? typeUnits.length) > 0;
   const startIndex = meta ? (page - 1) * perPage + 1 : 1;
   const endIndex = meta ? Math.min(page * perPage, meta.total) : typeUnits.length;
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
 
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data: typeUnits,
@@ -214,43 +220,49 @@ export function TypeUnitTable({ typeUnits, meta, search, page, perPage, onSearch
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : typeUnits.length === 0 ? (
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : typeUnits.length === 0 ? (
               <TableRow className="group">
                 <TableCell colSpan={100} className="text-center text-gray-550 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               sortedData.map((item) => (
                 <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
-                  <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.code}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.brand?.name ?? item.brandId}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">
+                    <CopyBox text={item.code} />
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">
+                    <ReferenceLink href={`/dashboard/${slugStr}/master/brand?search=${encodeURIComponent(item.brand?.name ?? item.brandId ?? '')}`}>
+                      {item.brand?.name ?? item.brandId}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left uppercase">{item.name}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.unitType || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left uppercase">{item.unitModel || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.nettoWeight ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.brutoWeight ?? '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.buyPrice !== null && item.buyPrice !== undefined ? formatCurrency(item.buyPrice) : '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.sellPrice !== null && item.sellPrice !== undefined ? formatCurrency(item.sellPrice) : '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.buyPrice !== null && item.buyPrice !== undefined ? currenciesFormat('idr', item.buyPrice) : '-'}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{item.sellPrice !== null && item.sellPrice !== undefined ? currenciesFormat('idr', item.sellPrice) : '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <div className="flex justify-center">
                       <DropdownMenu>

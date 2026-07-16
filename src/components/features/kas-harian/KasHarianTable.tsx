@@ -137,7 +137,7 @@ export default function KasHarianTable({
               <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</th>
             </tr>
           </thead>
           <tbody>

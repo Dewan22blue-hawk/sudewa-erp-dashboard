@@ -101,8 +101,8 @@ export function RegionTable({
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
-                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                 )}
             >
                 {p}
@@ -142,9 +142,9 @@ export function RegionTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -175,7 +175,7 @@ export function RegionTable({
                         <TableRow className="hover:bg-[#f8f9fa]">
                             <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">KODE WILAYAH</TableHead>
                             <TableHead className="text-xs font-semibold text-slate-500 w-[60%] uppercase px-4 py-4 text-left">NAMA WILAYAH</TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -212,14 +212,14 @@ export function RegionTable({
                         ) : (
                             <TableRow className="group">
                                 <TableCell colSpan={100} className="h-32 text-center text-gray-505 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                            <Search className="h-8 w-8 text-slate-400" />
+                                        </div>
+                                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                    </div>
+                                </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
@@ -242,7 +242,7 @@ export function RegionTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

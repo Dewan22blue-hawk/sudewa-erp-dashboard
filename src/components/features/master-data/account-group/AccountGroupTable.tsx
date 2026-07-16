@@ -118,24 +118,24 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
           <TableBody>
             {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : sortedData.length === 0 ? (
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : sortedData.length === 0 ? (
               <TableRow className="group">
                 <TableCell colSpan={100} className="text-center text-gray-500 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -168,7 +168,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                     {group.description ? (group.description.length > 50 ? `${group.description.substring(0, 50)}...` : group.description) : '-'}
                   </TableCell>
                   {/* STATUS */}
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Badge variant={group.isActive ? 'default' : 'secondary'} className={group.isActive ? '' : 'bg-gray-200 text-gray-700'}>
                       {group.isActive ? 'Aktif' : 'Nonaktif'}
                     </Badge>

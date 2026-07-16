@@ -71,7 +71,7 @@ export default function UJDriverTable({
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = currentSortBy === sortKey;
     const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    
+
     return (
       <button
         type="button"
@@ -123,7 +123,7 @@ export default function UJDriverTable({
               <th className="p-0 text-left">{renderSortHeader('UJ DRIVER', 'uj_driver', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('UJ LAINNYA', 'other_amount', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('KAS MASUK', 'amount', 'right')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Aksi</th>
             </tr>
           </thead>
           <tbody>

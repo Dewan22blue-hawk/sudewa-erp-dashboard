@@ -234,7 +234,7 @@ export default function UnitPurchaseDetailPage() {
                 <span>Harga Unit</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(price)}</span>
               </div>
-                            <div className="flex items-center justify-between text-sm text-slate-600">
+              <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>BBN</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(bbnPrice)}</span>
               </div>
@@ -293,7 +293,7 @@ export default function UnitPurchaseDetailPage() {
                 <span className="font-medium text-slate-700">Total</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(totalBiayaLainnya)}</span>
               </div> */}
-                            <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total Pembelian</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(totalPembelian)}</span>
               </div>
@@ -328,7 +328,7 @@ export default function UnitPurchaseDetailPage() {
                     <TableHead className="text-xs font-semibold text-slate-500">WARNA</TableHead>
                     <TableHead className="text-xs font-semibold text-slate-500">NOMOR MESIN</TableHead>
                     <TableHead className="text-xs font-semibold text-slate-500">NOMOR RANGKA</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500 text-right">ACTION</TableHead>
+                    <TableHead className="text-xs font-semibold text-slate-500 text-right">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

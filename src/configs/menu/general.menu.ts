@@ -38,10 +38,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Customer',
           href: master('/customer'),
         },
-        // {
-        //   label: 'Merk Unit Tipe',
-        //   href: master('/brand'),
-        // },
+        {
+          label: 'Merk Unit Tipe',
+          href: master('/brand'),
+        },
         {
           label: 'Tipe Unit',
           href: master('/type-unit'),

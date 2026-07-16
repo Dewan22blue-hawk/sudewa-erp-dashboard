@@ -79,7 +79,7 @@ export function PurchaseUnitTable({ units }: Props) {
     },
     {
       id: 'actions',
-      header: () => <div className="text-center font-semibold text-slate-500 uppercase px-4 py-4 text-xs w-[80px]">ACTION</div>,
+      header: () => <div className="text-center font-semibold text-slate-500 uppercase px-4 py-4 text-xs w-[80px]">Aksi</div>,
       cell: ({ row }) => {
         const unit = row.original;
         return (

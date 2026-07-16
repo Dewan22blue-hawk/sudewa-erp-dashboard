@@ -172,7 +172,7 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                         {paginated.length > 0 ? (
                             paginated.map((item, index) => (
                                 <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors border-slate-100">
-                                    <TableCell className="px-4 py-4 text-center">
+                                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                         <Checkbox checked={selected.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>
@@ -186,14 +186,14 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                         ) : (
                             <TableRow className="group">
                                 <TableCell colSpan={100} className="px-4 py-16 text-center text-gray-500 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                            <Search className="h-8 w-8 text-slate-400" />
+                                        </div>
+                                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                    </div>
+                                </TableCell>
                             </TableRow>
                         )}
                     </TableBody>

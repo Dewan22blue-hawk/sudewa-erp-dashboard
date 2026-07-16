@@ -48,10 +48,10 @@ interface TableRowProps {
 
 const FinanceInvoiceTableRow = ({ item, noUrut, kasMasuk, onPay }: TableRowProps) => {
   const { data: orderListDetail, isLoading: isLoadingDetail } = useOrderListDetail(item.orderList?.id ?? null);
-  
+
   const firstExp = item.expeditions?.[0];
   const orderList = item.orderList ?? firstExp?.orderList;
-  
+
   // Fallbacks from nested structures and order_list detail
   const vehicleReg = firstExp?.vehicle?.registrationNumber ?? item.vehicle?.registrationNumber ?? orderListDetail?.vehicles?.[0]?.registrationNumber ?? '-';
   const vehicleType = firstExp?.vehicle?.type ?? item.vehicle?.type ?? orderList?.vehicleType ?? orderListDetail?.vehicleType ?? '-';
@@ -59,7 +59,7 @@ const FinanceInvoiceTableRow = ({ item, noUrut, kasMasuk, onPay }: TableRowProps
   const loadingIn = firstExp?.tarif?.loadingIn ?? orderList?.loadingIn ?? orderListDetail?.loadingIn ?? '-';
   const destination = orderList?.doDeliveryDestination ?? firstExp?.destination ?? orderListDetail?.tarifs?.[0]?.deliveryDestination ?? '-';
   const loadingOut = firstExp?.tarif?.loadingOut ?? orderList?.loadingOut ?? orderListDetail?.loadingOut ?? '-';
-  
+
   // Calculations
   const invoiceEkspedisi = firstExp?.invoiceExpedition ?? orderList?.billInvoice ?? orderListDetail?.billInvoice ?? 0;
   const additionalFee = (item.additional_fee ?? 0) + (item.other_fee ?? 0);
@@ -143,7 +143,7 @@ export default function FinanceInvoiceTable({
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = currentSortBy === sortKey;
     const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    
+
     return (
       <button
         type="button"
@@ -188,7 +188,7 @@ export default function FinanceInvoiceTable({
               <th className="p-0 text-left">{renderSortHeader('INVOICE EKSPEDISI', 'invoice_amount', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('BIAYA TAMBAHAN', 'additional_fee', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('KAS MASUK', 'amount', 'right')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -230,14 +230,14 @@ export default function FinanceInvoiceTable({
               data.map((item, index) => {
                 const noUrut = startIndex + index;
                 const kasMasuk = getKasMasukAmount(item);
-                
+
                 return (
-                  <FinanceInvoiceTableRow 
-                    key={item.id} 
-                    item={item} 
-                    noUrut={noUrut} 
-                    kasMasuk={kasMasuk} 
-                    onPay={onPay} 
+                  <FinanceInvoiceTableRow
+                    key={item.id}
+                    item={item}
+                    noUrut={noUrut}
+                    kasMasuk={kasMasuk}
+                    onPay={onPay}
                   />
                 );
               })

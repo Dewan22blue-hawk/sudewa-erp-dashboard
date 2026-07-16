@@ -77,20 +77,20 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
                 <th className="px-4 py-4 text-left">Nomor TNKB</th>
                 <th className="px-4 py-4 text-center">Notice SKPD</th>
                 <th className="px-4 py-4 text-left">Vendor Karyawan</th>
-                <th className="px-4 py-4 text-center">Action</th>
+                <th className="px-4 py-4 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : items.length ? (
+                <tr>
+                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : items.length ? (
                 items.map((item) => (
                   <tr key={`${item.id}-${item.registrationId}`} className="border-b border-slate-200 text-slate-700 hover:bg-gray-50/70 transition-colors">
                     <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.dealerName || '-'}</td>
@@ -119,13 +119,13 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
                 <tr>
                   <td colSpan={100} className="h-24 text-center text-sm text-slate-500 px-4 py-16">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </td>
+                  </td>
                 </tr>
               )}
             </tbody>

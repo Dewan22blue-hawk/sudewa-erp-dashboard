@@ -23,6 +23,9 @@ export default function PurchasePage() {
 
   const { hasPermission } = usePermissionGuard();
   const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
@@ -72,6 +75,8 @@ export default function PurchasePage() {
                 setPerPage(value);
                 setPage(1);
               }}
+              canEdit={canEdit}
+              canDelete={canDelete}
               loading={isLoading || isFetching}
               search={search}
               onSearchChange={(val) => { setSearch(val); setPage(1); }}

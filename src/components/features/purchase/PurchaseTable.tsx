@@ -13,6 +13,8 @@ import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -23,6 +25,8 @@ export interface PurchaseTableProps {
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
   search?: string;
+  canEdit?: boolean;
+  canDelete?: boolean;
   onSearchChange?: (value: string) => void;
   loading?: boolean;
 }
@@ -37,6 +41,8 @@ export default function PurchaseTable({
   onPerPageChange,
   loading,
   search,
+  canEdit,
+  canDelete,
   onSearchChange,
 }: PurchaseTableProps) {
   const router = useRouter();
@@ -271,20 +277,20 @@ export default function PurchaseTable({
               {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
               {renderSortHeader('remainingPayment', 'KURANG BAYAR', 'center')}
               {renderSortHeader('billing', 'BILLING', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {processedData.length === 0 ? (
               <TableRow className="group">
                 <TableCell colSpan={100} className="text-center px-4 py-16 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -292,16 +298,14 @@ export default function PurchaseTable({
                 <TableRow key={item.id} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
                   {/* Kode Jual - Link biru */}
                   <TableCell className="px-4 py-4 text-left text-sm font-medium">
-                    <button
-                      type="button"
-                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
-                      onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}
-                    >
-                      {item.code || '-'}
-                    </button>
+                    <CopyBox text={item.code || '-'} />
                   </TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd MMM yyyy') : '-'}</TableCell>
-                  <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
+                  <TableCell className="text-left text-sm text-slate-700 px-4 py-4">
+                    <ReferenceLink href={`/dashboard/${slug}/supplier?search=${item.supplier}`}>
+                      {item.supplier || '-'}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bruto_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bbn_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.expedition_fee_total)}</TableCell>
@@ -333,15 +337,17 @@ export default function PurchaseTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
+                        {canEdit && <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>}
                         <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
+
+                        {canEdit && (<DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
                           {isRefunded(item) ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                        {canDelete && <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                           Hapus
-                        </DropdownMenuItem>
+                        </DropdownMenuItem>}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

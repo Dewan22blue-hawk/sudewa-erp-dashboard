@@ -216,7 +216,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
               <th className="w-16 px-4 py-3 text-left">No</th>
               <th className="px-4 py-3 text-left">Keterangan</th>
               <th className="w-[320px] px-4 py-3 text-left">Nominal Bayar</th>
-              <th className="w-20 px-4 py-3 text-center sticky right-0 bg-[#f3f6fb] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</th>
+              <th className="w-20 px-4 py-3 text-center sticky right-0 bg-[#f3f6fb] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -330,13 +330,13 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
             {!hasRows && editingId !== 'new' ? (
               <tr>
                 <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : null}

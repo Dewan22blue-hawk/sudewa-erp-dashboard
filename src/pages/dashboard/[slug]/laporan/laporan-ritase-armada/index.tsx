@@ -253,7 +253,7 @@ export default function LaporanRitaseArmadaPage() {
 
                             <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">RITASE</TableHead>
 
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap no-print w-16">ACTION</TableHead>
+                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap no-print w-16">Aksi</TableHead>
                           </TableRow>
                         </>
                       )}

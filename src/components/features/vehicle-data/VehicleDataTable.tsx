@@ -215,23 +215,23 @@ export function VehicleDataTable({
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Rangka</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Faktur</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Terima Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Action</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : items.length ? (
+                <tr>
+                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : items.length ? (
                 items.map((item) => (
                   <TableRow key={item.id} className={`group ${assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}`}>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <Checkbox
                         checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
                         disabled={assignedIds.includes(item.id)}
@@ -263,7 +263,7 @@ export function VehicleDataTable({
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.chassisNumber || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceDate)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceReceiveDate)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -283,13 +283,13 @@ export function VehicleDataTable({
                 <TableRow className="group">
                   <TableCell colSpan={100} className="py-16 h-28 text-center text-sm text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>

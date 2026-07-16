@@ -114,7 +114,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               <th className="p-0 text-left">{renderSortHeader('DPP', 'dpp_amount', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('PPN 11%', 'ppn_11', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('Total Bayar', 'payment_amount', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Action</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Aksi</th>
             </tr>
           </thead>
           <tbody>

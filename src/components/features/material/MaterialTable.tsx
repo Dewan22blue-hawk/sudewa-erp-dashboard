@@ -100,8 +100,8 @@ export function MaterialTable({
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
-                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                 )}
             >
                 {p}
@@ -150,9 +150,9 @@ export function MaterialTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -163,17 +163,17 @@ export function MaterialTable({
                     {canCreate && (
                         <>
                             {onImport && (
-                                <Button 
-                                    onClick={onImport} 
-                                    variant="outline" 
+                                <Button
+                                    onClick={onImport}
+                                    variant="outline"
                                     className="w-full sm:w-auto"
                                 >
                                     <Upload className="h-4 w-4 mr-2" />
                                     Import
                                 </Button>
                             )}
-                            <Button 
-                                onClick={onAdd} 
+                            <Button
+                                onClick={onAdd}
                                 className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
@@ -193,7 +193,7 @@ export function MaterialTable({
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[40%] uppercase px-4 py-4 text-left">DESKRIPSI</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-right">HARGA</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[10%] uppercase px-4 py-4 text-center">SATUAN</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -236,14 +236,14 @@ export function MaterialTable({
                             ) : (
                                 <TableRow className="group">
                                     <TableCell colSpan={100} className="h-32 text-center text-gray-550 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -267,7 +267,7 @@ export function MaterialTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

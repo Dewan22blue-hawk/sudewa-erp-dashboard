@@ -147,165 +147,165 @@ export const OrderListTable = React.memo(function OrderListTable({
             <TableBody>
               {isLoading
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                    <TableRow key={`skeleton-${index}`} className="group border-slate-100">
-                      {headers.map((header) => (
-                        <TableCell key={header.key} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                          <div className="h-4 min-w-[90px] animate-pulse rounded bg-slate-100" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  <TableRow key={`skeleton-${index}`} className="group border-slate-100">
+                    {headers.map((header) => (
+                      <TableCell key={header.key} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                        <div className="h-4 min-w-[90px] animate-pulse rounded bg-slate-100" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
                 : null}
 
               {!isLoading && data.length === 0 ? (
                 <TableRow className="group">
                   <TableCell colSpan={100} className="py-16 h-28 text-center text-sm text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               ) : null}
 
               {!isLoading
                 ? data.map((item) => {
-                    const primaryTarif = getPrimaryTarifItem(item);
+                  const primaryTarif = getPrimaryTarifItem(item);
 
-                    return (
-                      <TableRow key={item.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
-                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.code || '-'}</TableCell>
-                        <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
-                        
-                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                          {item.tarifs.length > 1 ? (
-                            <div className="flex flex-col items-start text-left gap-1">
-                              {item.tarifs.map((t, idx) => (
-                                <div key={t.id || idx} className="whitespace-nowrap">
-                                  <span>{idx + 1}. {t.loadingIn || '-'}</span>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            primaryTarif?.loadingIn || item.loadingIn || '-'
-                          )}
-                        </TableCell>
+                  return (
+                    <TableRow key={item.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.code || '-'}</TableCell>
+                      <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
 
-                        <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">
-                          {item.tarifs.length > 1 ? (
-                            <div className="flex flex-col items-start text-left gap-1">
-                              {item.tarifs.map((t, idx) => (
-                                <div key={t.id || idx}>
-                                  <span>{idx + 1}. {t.deliveryDestination || '-'}</span>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            primaryTarif?.deliveryDestination || '-'
-                          )}
-                        </TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                        {item.tarifs.length > 1 ? (
+                          <div className="flex flex-col items-start text-left gap-1">
+                            {item.tarifs.map((t, idx) => (
+                              <div key={t.id || idx} className="whitespace-nowrap">
+                                <span>{idx + 1}. {t.loadingIn || '-'}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          primaryTarif?.loadingIn || item.loadingIn || '-'
+                        )}
+                      </TableCell>
 
-                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                          {item.tarifs.length > 1 ? (
-                            <div className="flex flex-col items-start text-left gap-1">
-                              {item.tarifs.map((t, idx) => (
-                                <div key={t.id || idx} className="whitespace-nowrap">
-                                  <span>{idx + 1}. {t.loadingOut || '-'}</span>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            primaryTarif?.loadingOut || item.loadingOut || '-'
-                          )}
-                        </TableCell>
+                      <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">
+                        {item.tarifs.length > 1 ? (
+                          <div className="flex flex-col items-start text-left gap-1">
+                            {item.tarifs.map((t, idx) => (
+                              <div key={t.id || idx}>
+                                <span>{idx + 1}. {t.deliveryDestination || '-'}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          primaryTarif?.deliveryDestination || '-'
+                        )}
+                      </TableCell>
 
-                        <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{getOrderVehicleTypeLabel(item, primaryTarif)}</TableCell>
-                        <TableCell className="px-4 py-4 text-right text-sm text-slate-700">{formatOrderCurrency(item.ujDriver)}</TableCell>
-                        <TableCell className="px-4 py-4 text-right text-sm text-slate-700">
-                          {formatOrderCurrency(item.billInvoice)}
-                        </TableCell>
-                        <TableCell className="px-4 py-4 text-right text-sm text-slate-700">{formatOrderCurrency(item.ppn)}</TableCell>
-                        <TableCell className="px-4 py-4 text-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                type="button"
-                                className={cn(
-                                  'inline-flex items-center justify-center rounded-full border px-3 py-1 text-xs font-medium cursor-pointer transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2',
-                                  getOrderStatusBadgeClassName(item.status)
-                                )}
-                              >
-                                {getOrderStatusLabel(item.status)}
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="center" className="w-[140px] rounded-xl">
-                              <div className="px-2 py-1.5 text-xs font-semibold text-slate-500">Ubah Status</div>
-                              <DropdownMenuSeparator />
-                              {ORDER_LIST_STATUS_OPTIONS.map((option) => (
-                                <DropdownMenuItem
-                                  key={option.value}
-                                  disabled={item.status === option.value}
-                                  onSelect={(e) => {
-                                    e.preventDefault();
-                                    if (item.status !== option.value && onUpdateStatus) {
-                                      onUpdateStatus(item, option.value);
-                                    }
-                                  }}
-                                  className={cn('cursor-pointer rounded-lg', item.status === option.value && 'bg-slate-100 opacity-50')}
-                                >
-                                  {option.label}
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="button" variant="ghost" size="icon" className="h-9 w-9 cursor-pointer rounded-full">
-                                <MoreVertical className="h-4 w-4 text-slate-600" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-[190px] rounded-xl">
+                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                        {item.tarifs.length > 1 ? (
+                          <div className="flex flex-col items-start text-left gap-1">
+                            {item.tarifs.map((t, idx) => (
+                              <div key={t.id || idx} className="whitespace-nowrap">
+                                <span>{idx + 1}. {t.loadingOut || '-'}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          primaryTarif?.loadingOut || item.loadingOut || '-'
+                        )}
+                      </TableCell>
+
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{getOrderVehicleTypeLabel(item, primaryTarif)}</TableCell>
+                      <TableCell className="px-4 py-4 text-right text-sm text-slate-700">{formatOrderCurrency(item.ujDriver)}</TableCell>
+                      <TableCell className="px-4 py-4 text-right text-sm text-slate-700">
+                        {formatOrderCurrency(item.billInvoice)}
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-right text-sm text-slate-700">{formatOrderCurrency(item.ppn)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className={cn(
+                                'inline-flex items-center justify-center rounded-full border px-3 py-1 text-xs font-medium cursor-pointer transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2',
+                                getOrderStatusBadgeClassName(item.status)
+                              )}
+                            >
+                              {getOrderStatusLabel(item.status)}
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="center" className="w-[140px] rounded-xl">
+                            <div className="px-2 py-1.5 text-xs font-semibold text-slate-500">Ubah Status</div>
+                            <DropdownMenuSeparator />
+                            {ORDER_LIST_STATUS_OPTIONS.map((option) => (
                               <DropdownMenuItem
-                                onSelect={(event) => {
-                                  event.preventDefault();
-                                  onDetail(item);
+                                key={option.value}
+                                disabled={item.status === option.value}
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  if (item.status !== option.value && onUpdateStatus) {
+                                    onUpdateStatus(item, option.value);
+                                  }
                                 }}
-                                className="cursor-pointer"
+                                className={cn('cursor-pointer rounded-lg', item.status === option.value && 'bg-slate-100 opacity-50')}
                               >
-                                <Eye className="mr-2 h-4 w-4" />
-                                Detail
+                                {option.label}
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onSelect={(event) => {
-                                  event.preventDefault();
-                                  onEdit(item);
-                                }}
-                                className="cursor-pointer"
-                              >
-                                <FilePenLine className="mr-2 h-4 w-4" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onSelect={(event) => {
-                                  event.preventDefault();
-                                  onDelete(item);
-                                }}
-                                className="cursor-pointer text-red-600 focus:text-red-600"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Hapus
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                      <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" className="h-9 w-9 cursor-pointer rounded-full">
+                              <MoreVertical className="h-4 w-4 text-slate-600" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[190px] rounded-xl">
+                            <DropdownMenuItem
+                              onSelect={(event) => {
+                                event.preventDefault();
+                                onDetail(item);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              Detail
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={(event) => {
+                                event.preventDefault();
+                                onEdit(item);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <FilePenLine className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={(event) => {
+                                event.preventDefault();
+                                onDelete(item);
+                              }}
+                              className="cursor-pointer text-red-600 focus:text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
                 : null}
             </TableBody>
           </Table>

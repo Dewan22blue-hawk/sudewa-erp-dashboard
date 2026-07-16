@@ -19,7 +19,7 @@ export default function KasPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold">Kas</h1>
-              <p className="text-sm text-muted-foreground">Kelola keuangan</p>
+              <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
             </div>
           </div>
           <Card className="rounded-xl p-8 flex justify-center items-center h-[300px]">
@@ -37,7 +37,7 @@ export default function KasPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold">Kas</h1>
-              <p className="text-sm text-muted-foreground">Kelola keuangan</p>
+              <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
             </div>
           </div>
           <Card className="rounded-xl p-8 flex justify-center items-center h-[300px]">
@@ -55,7 +55,7 @@ export default function KasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Kas</h1>
-            <p className="text-sm text-muted-foreground">Kelola keuangan</p>
+            <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
           </div>
         </div>
 
