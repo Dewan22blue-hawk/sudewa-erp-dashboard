@@ -7,7 +7,6 @@ import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useCreateUnitItemDetail, useDeleteUnitItemDetail, useImportUnitItemDetails, useUnitItemDetails, useUnitTransactionItemById, useUpdateUnitItemDetail } from '@/hooks/useUnitItemDetail';
 import { UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
-import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,6 +15,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
+import { CopyBox } from '@/components/ui/copy-box';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 const parseApiError = (err: any): string => {
   const details = err?.details ?? err?.response?.data?.errors;
@@ -30,6 +33,11 @@ const parseApiError = (err: any): string => {
 
 export default function UnitPurchaseDetailPage() {
   const router = useRouter();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
+
   const { slug, id, unitId } = router.query;
 
   const purchaseId = String(id ?? '');
@@ -213,11 +221,15 @@ export default function UnitPurchaseDetailPage() {
               </div>
               <div className="text-sm text-slate-600">
                 <p>Nomor Pembelian</p>
-                <p className="font-semibold text-slate-900">{purchase.code}</p>
+                <p className="font-semibold text-slate-900">
+                  <CopyBox text={purchase.code} />
+                </p>
               </div>
               <div className="text-sm text-slate-600">
                 <p>Tipe Unit</p>
-                <p className="font-semibold text-slate-900">{unitTypeName}</p>
+                <p className="font-semibold text-slate-900">
+                  <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitTypeName}`}>{unitTypeName}</ReferenceLink>
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -232,11 +244,11 @@ export default function UnitPurchaseDetailPage() {
               </div>
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>Harga Unit</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(price)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', price)}</span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>BBN</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(bbnPrice)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>Quantity</span>
@@ -244,22 +256,22 @@ export default function UnitPurchaseDetailPage() {
               </div>
               {/* <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total Pembelian</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(totalPembelian)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
               </div> */}
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>Total HPP</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(totalHpp)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalHpp)}</span>
               </div>
               {unitItem?.price_usd ? (
                 <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100 mt-2">
                   <span className="font-medium">Total Harga (USD)</span>
-                  <span className="font-bold">{formatCurrency(Number(unitItem.price_usd), 'USD')}</span>
+                  <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_usd))}</span>
                 </div>
               ) : null}
               {unitItem?.price_per_unit_usd ? (
                 <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100">
                   <span className="font-medium">Harga Satuan (USD)</span>
-                  <span className="font-bold">{formatCurrency(Number(unitItem.price_per_unit_usd), 'USD')}</span>
+                  <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_per_unit_usd))}</span>
                 </div>
               ) : null}
             </CardContent>
@@ -275,27 +287,27 @@ export default function UnitPurchaseDetailPage() {
               </div>
               {/* <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>BBN</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(bbnPrice)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
               </div> */}
               {/* <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>HPP</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(hppPerUnit)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', hppPerUnit)}</span>
               </div> */}
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>DPP</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(dppPerUnit)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', dppPerUnit)}</span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>PPN</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(ppnPerUnit)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', ppnPerUnit)}</span>
               </div>
               {/* <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(totalBiayaLainnya)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalBiayaLainnya)}</span>
               </div> */}
               <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total Pembelian</span>
-                <span className="font-semibold text-slate-900">{formatCurrency(totalPembelian)}</span>
+                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
               </div>
             </CardContent>
           </Card>
@@ -309,14 +321,18 @@ export default function UnitPurchaseDetailPage() {
                 <p className="text-xs text-slate-500">Rincian lengkap unit yang dibeli</p>
               </div>
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline" onClick={() => setOpenImport(true)}>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Import
-                </Button>
-                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreateForm}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Unit
-                </Button>
+                {canCreate && (
+                  <>
+                    <Button size="sm" variant="outline" onClick={() => setOpenImport(true)} disabled={qty === details.length}>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Import
+                    </Button>
+                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreateForm} disabled={qty === details.length || !qty}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Tambah Detail Unit
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -324,10 +340,10 @@ export default function UnitPurchaseDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[#F9FAFB] hover:bg-[#F9FAFB]">
-                    <TableHead className="text-xs font-semibold text-slate-500 w-[80px]">NO</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500">WARNA</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500">NOMOR MESIN</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500">NOMOR RANGKA</TableHead>
+                    <TableHead className="text-xs font-semibold text-slate-500 w-[80px]">No</TableHead>
+                    <TableHead className="text-xs font-semibold text-slate-500">Warna</TableHead>
+                    <TableHead className="text-xs font-semibold text-slate-500">Nomor Mesin</TableHead>
+                    <TableHead className="text-xs font-semibold text-slate-500">Nomor Rangka</TableHead>
                     <TableHead className="text-xs font-semibold text-slate-500 text-right">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -355,8 +371,12 @@ export default function UnitPurchaseDetailPage() {
                       <TableRow key={item.id}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{item.color}</TableCell>
-                        <TableCell>{item.machine_number}</TableCell>
-                        <TableCell>{item.chassis_number}</TableCell>
+                        <TableCell>
+                          <CopyBox text={item.machine_number || '-'} />
+                        </TableCell>
+                        <TableCell>
+                          <CopyBox text={item.chassis_number || '-'} />
+                        </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -365,11 +385,11 @@ export default function UnitPurchaseDetailPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEditForm(item)}>
+                              <DropdownMenuItem onClick={() => openEditForm(item)} disabled={!canEdit}>
                                 <Pencil className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteTarget(item)}>
+                              <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteTarget(item)} disabled={!canDelete}>
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Hapus
                               </DropdownMenuItem>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseTable from '@/components/features/purchase/PurchaseTable';
 import DeletePurchaseDialog from '@/components/features/purchase/DeletePurchaseDialog';
