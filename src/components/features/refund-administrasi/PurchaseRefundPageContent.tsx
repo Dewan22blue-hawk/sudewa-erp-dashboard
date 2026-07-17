@@ -4,7 +4,6 @@ import {
   MoreVertical,
   Plus,
   Loader2,
-  Search,
   ArrowLeft,
   ChevronRight,
   AlertTriangle,
@@ -13,24 +12,20 @@ import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useDeleteRefund, useRefundList, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
-import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 import PurchaseRefundFormModal from './PurchaseRefundFormModal';
 import { refundPrimaryButtonClassName } from './purchase-refund.styles';
 import { RefundPaymentProgressBadge } from '@/components/features/refund/RefundPaymentProgressBadge';
 import { getRefundPaymentProgressStatus } from '@/components/features/refund/refund.utils';
-import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
 import { useUnitBillings, useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
 import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
 import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
@@ -38,6 +33,7 @@ const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
 const PURCHASE_RECEIVED_STATE_SET = new Set(['receipt', 'inbound_receipt']);
 
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -136,7 +132,9 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
         accessorKey: 'code',
         sortable: true,
         alignment: 'left' as const,
-        cell: (payment: any) => payment.code,
+        cell: (payment: any) => (
+          <CopyBox text={payment.code} />
+        )
       },
       {
         header: 'Nominal Refund',
@@ -440,13 +438,15 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
         <BaseTable
           data={refunds ?? []}
           columns={columns}
-          headerRowClassName="bg-[#E9EEF5] hover:bg-[#E9EEF5]"
+          headerRowClassName="border-slate-200 bg-white"
           defaultSort={{ key: 'payment_date', direction: 'desc' }}
           headerActions={
-            <Button className={refundPrimaryButtonClassName} onClick={() => setIsCreateOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Tambah Data Refund
-            </Button>
+            <div className='w-full flex items-end justify-end'>
+              <Button className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto" onClick={() => setIsCreateOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah Data
+              </Button>
+            </div>
           }
         />
 
