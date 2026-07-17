@@ -405,7 +405,7 @@ export function DOEkspedisiForm({
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                      <input type="hidden" {...register(`destinationStops.${index}.id` as const)} />
+                      <input autoComplete="off" type="hidden" {...register(`destinationStops.${index}.id` as const)} />
 
                       <div className="space-y-2">
                         <Label htmlFor={`destinationStops.${index}.destination`}>Tujuan</Label>

@@ -276,7 +276,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
 
           {/* USD Transaction Toggle */}
           <div className="flex items-center space-x-2 py-1">
-            <input
+            <input autoComplete="off"
               type="checkbox"
               id="is_usd"
               checked={isUsd}

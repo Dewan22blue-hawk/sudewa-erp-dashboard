@@ -62,7 +62,7 @@ export function UploadInvoiceModal({
             }}
             className="mt-6 space-y-5"
           >
-            <input
+            <input autoComplete="off"
               type="file"
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
               onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}

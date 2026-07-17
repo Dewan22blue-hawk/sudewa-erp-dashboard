@@ -1,11 +1,10 @@
-import { Search, ArrowUp, ArrowDown, ArrowUpDown, Loader2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { StockStatus, StockUnit } from '@/@types/stock-unit.types';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useTableSort } from '@/hooks/useTableSort';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { cn } from '@/lib/utils';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: StockUnit[];
@@ -50,15 +49,6 @@ const statusTextClasses: Record<StockStatus, string> = {
   outbound_return: 'text-rose-600 font-medium',
 };
 
-function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
-  const isActive = currentSortKey === sortKey;
-  if (isActive && sortOrder === 'asc')
-    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
-  if (isActive && sortOrder === 'desc')
-    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
-  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
-}
-
 export default function StockUnitTable({
   data,
   isLoading,
@@ -71,237 +61,82 @@ export default function StockUnitTable({
   search,
   onSearchChange,
 }: Props) {
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data: data,
-  });
+  const renderStatus = (status: StockStatus) => (
+    <span className={cn('text-sm', statusTextClasses[status] ?? 'text-gray-600')}>
+      {statusLabel[status] ?? status}
+    </span>
+  );
 
-  const totalPages = Math.max(1, Math.ceil(totalData / perPage));
-  const startIndex = totalData === 0 ? 0 : (page - 1) * perPage;
-  const endIndex = totalData === 0 ? 0 : Math.min(startIndex + perPage, totalData);
+  const router = useRouter();
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
 
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxPagesToShow = 5;
+  const columns: ColumnDef<StockUnit>[] = [
+    {
+      header: 'No',
+      alignment: 'left',
+      cell: (_item, index) => (page - 1) * perPage + index + 1,
+    },
+    {
+      header: 'Nama Unit',
+      accessorKey: 'namaUnit',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) =>
+        <ReferenceLink href={`/dashboard/${slugStr}/master/type-unit?search=${item?.namaUnit}`}>
+          {item.namaUnit}
+        </ReferenceLink>,
+    },
+    {
+      header: 'Warna',
+      accessorKey: 'warna',
+      sortable: true,
+      alignment: 'left',
+    },
+    {
+      header: 'Nomor Mesin',
+      accessorKey: 'noMesin',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => <CopyBox text={item.noMesin} />,
+    },
+    {
+      header: 'Nomor Rangka',
+      accessorKey: 'noRangka',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => <CopyBox text={item.noRangka} />,
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      sortable: true,
+      alignment: 'center',
+      cell: (item) => renderStatus(item.status),
+    },
+  ];
 
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      if (page <= Math.ceil(maxPagesToShow / 2)) {
-        for (let i = 1; i <= maxPagesToShow - 1; i++) pages.push(i);
-        pages.push('...', totalPages);
-      } else if (page >= totalPages - Math.floor(maxPagesToShow / 2)) {
-        pages.push(1, '...');
-        for (let i = totalPages - (maxPagesToShow - 2); i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1, '...', page - 1, page, page + 1, '...', totalPages);
-      }
-    }
-    return pages;
-  };
-
-  const renderStatus = (status: StockStatus) => {
-    return (
-      <span className={cn('text-sm', statusTextClasses[status] ?? 'text-gray-600')}>
-        {statusLabel[status] ?? status}
-      </span>
-    );
+  const meta = {
+    currentPage: page,
+    perPage,
+    lastPage: Math.max(1, Math.ceil(totalData / perPage)),
+    total: totalData,
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-[300px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input placeholder="Search here" value={search} onChange={(e) => onSearchChange(e.target.value)} className="pl-9 bg-white" />
-          </div>
-
-          <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-            <span>Show</span>
-            <Select
-              value={String(perPage)}
-              onValueChange={(val) => {
-                onPerPageChange(Number(val));
-              }}
-            >
-              <SelectTrigger className="w-[70px] bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Page</span>
-          </div>
-        </div>
-
-        {statusTabs && <div className="flex-shrink-0 w-full sm:w-auto flex justify-end">{statusTabs}</div>}
-      </div>
-
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-        <table className="w-full text-sm">
-          <thead className="bg-[#f8f9fa] border-b border-gray-200">
-            <tr className="hover:bg-[#f8f9fa]">
-              {/* No */}
-              <th className="text-xs font-semibold text-gray-500 uppercase px-4 py-4 text-left w-[60px]">No</th>
-
-              {/* Nama Unit */}
-              <th
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'namaUnit' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('namaUnit')}
-              >
-                <div className="flex items-center gap-1">
-                  Nama Unit
-                  <SortIcon sortKey="namaUnit" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </th>
-
-              {/* Warna */}
-              <th
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'warna' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('warna')}
-              >
-                <div className="flex items-center gap-1">
-                  Warna
-                  <SortIcon sortKey="warna" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </th>
-
-              {/* Nomor Mesin */}
-              <th
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'noMesin' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('noMesin')}
-              >
-                <div className="flex items-center gap-1">
-                  Nomor Mesin
-                  <SortIcon sortKey="noMesin" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </th>
-
-              {/* Nomor Rangka */}
-              <th
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'noRangka' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('noRangka')}
-              >
-                <div className="flex items-center gap-1">
-                  Nomor Rangka
-                  <SortIcon sortKey="noRangka" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </th>
-
-              {/* Status */}
-              <th
-                className={cn(
-                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'status' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('status')}
-              >
-                <div className="inline-flex items-center">
-                  <span className="w-3 shrink-0" />
-                  <span>Status</span>
-                  <SortIcon sortKey="status" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {isLoading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</td>
-              </tr>
-            ) : data.length > 0 ? (
-              sortedData.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm text-left text-gray-600">{(page - 1) * perPage + index + 1}</td>
-                  <td className="px-4 py-4 text-sm font-medium text-gray-900 text-left">{item.namaUnit}</td>
-                  <td className="px-4 py-4 text-sm text-gray-600 text-left">{item.warna}</td>
-                  <td className="px-4 py-4 text-sm text-gray-600 text-left">{item.noMesin}</td>
-                  <td className="px-4 py-4 text-sm text-gray-600 text-left">{item.noRangka}</td>
-                  <td className="px-4 py-4 text-sm text-center">{renderStatus(item.status)}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          Showing {totalData === 0 ? 0 : startIndex + 1}-{endIndex} of {totalData} data
-        </div>
-
-        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-            disabled={page === 1 || isLoading}
-            onClick={() => onPageChange(page - 1)}
-          >
-            Previous
-          </Button>
-
-          {getPageNumbers().map((pageNum, idx) => (
-            <Button
-              key={idx}
-              variant="ghost"
-              size="sm"
-              className={cn(
-                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-                pageNum === page
-                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-              )}
-              onClick={() => typeof pageNum === 'number' && onPageChange(pageNum)}
-              disabled={typeof pageNum !== 'number' || isLoading}
-            >
-              {pageNum}
-            </Button>
-          ))}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-            disabled={page === totalPages || totalData === 0 || isLoading}
-            onClick={() => onPageChange(page + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-    </div>
+    <BaseTable
+      data={data}
+      columns={columns}
+      loading={isLoading}
+      searchPlaceholder="Search here"
+      search={search}
+      onSearchChange={onSearchChange}
+      showLimitChange
+      perPage={perPage}
+      onPerPageChange={onPerPageChange}
+      meta={meta}
+      onPageChange={onPageChange}
+      headerActions={statusTabs}
+    />
   );
 }

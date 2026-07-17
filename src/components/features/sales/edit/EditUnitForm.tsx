@@ -41,7 +41,7 @@ interface EditUnitFormProps {
  */
 export function EditUnitForm({
   defaultValues,
-  onSubmit = () => {},
+  onSubmit = () => { },
   onCancel,
   readOnly = false,
   showAddUnitButton = false,
@@ -239,7 +239,7 @@ export function EditUnitForm({
 
             {/* USD Transaction Toggle */}
             <div className="flex items-center space-x-2 py-1">
-              <input
+              <input autoComplete="off"
                 type="checkbox"
                 id="sales_is_usd"
                 checked={isUsd}

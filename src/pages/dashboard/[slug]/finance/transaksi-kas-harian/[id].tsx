@@ -349,7 +349,7 @@ export default function KasHarianDetailPage() {
                   {selectedFile ? selectedFile.name : (proofUrl ? 'Klik untuk ganti bukti pembayaran' : 'Klik untuk upload bukti pembayaran')}
                 </span>
                 <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>
-                <input
+                <input autoComplete="off"
                   type="file"
                   accept="image/*,application/pdf"
                   className="hidden"
