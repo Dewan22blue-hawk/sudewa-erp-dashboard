@@ -233,7 +233,7 @@ export function CustomerTable({
                   </div>
                 </TableHead>
                 {/* Action */}
-                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">Aksi</TableHead>
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
               </TableRow>
             </TableHeader>
 

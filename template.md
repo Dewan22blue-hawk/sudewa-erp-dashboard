@@ -179,10 +179,10 @@ import { Button } from '@/components/ui/button';
 
 ## 7. Data Table Wrapper
 
-**Aturan**: Tabel dibungkus dalam `<div>` dengan `rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none`.
+**Aturan**: Tabel dibungkus dalam `<div>` dengan `rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none`.
 
 ```tsx
-<div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+<div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
   <Table>
     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
       <TableRow className="hover:bg-[#f8f9fa]">
@@ -226,6 +226,16 @@ import { Button } from '@/components/ui/button';
   - **Kode Transaksi**: Kolom kode unik (No Penjualan, No Pembelian, No Penerimaan, No Pengiriman, dll.).
   - **Nama Entitas**: Nama Customer, Nama Supplier, PIC, dll.
   - **Deskripsi / Keterangan**: Tipe Unit, Nama Barang, Alamat, Keterangan Kas, dll.
+
+### Standarisasi Kolom Aksi (Sticky Fixed)
+
+Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama responsif), **wajib** menerapkan pola *sticky* pada kolom "Action" (selalu di kanan) dengan ketentuan:
+
+1. **Table Container**: Kontainer pembungkus tabel wajib menggunakan `overflow-x-auto` (bukan `overflow-hidden`) agar dapat digeser horizontal tanpa memotong efek *sticky*.
+2. **Table Head (Th)**: Kolom header action wajib menggunakan class: 
+   `sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]`
+3. **Table Cell (Td)**: Kolom cell action wajib menggunakan class:
+   `sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]`
 
 ---
 
@@ -406,9 +416,11 @@ import { Button } from '@/components/ui/button';
 | TabsTrigger (Pills) | `rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm` |
 | Search Input | `pl-9 bg-white` |
 | Select pagination | `w-[70px] bg-white` |
-| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none` |
+| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none` |
 | TableHeader | `bg-[#f8f9fa] border-b border-gray-200` |
 | TableHead / Cell | `px-4 py-4` |
+| Sticky Action Head | `sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
+| Sticky Action Cell | `sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
 | TableRow hover | `hover:bg-gray-50 transition-colors` |
 | Pagination btn | `h-9 rounded-xl` |
 | Pagination active | `border-slate-200 bg-white text-slate-950 shadow-sm` |
@@ -575,9 +587,11 @@ Ketentuan:
 | TabsTrigger (Pills) | `rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm` |
 | Search Input | `pl-9 bg-white` |
 | Select pagination | `w-[70px] bg-white` |
-| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none` |
+| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none` |
 | TableHeader | `bg-[#f8f9fa] border-b border-gray-200` |
 | TableHead / Cell | `px-4 py-4` |
+| Sticky Action Head | `sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
+| Sticky Action Cell | `sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
 | TableRow hover | `hover:bg-gray-50 transition-colors` |
 | Pagination btn | `h-9 rounded-xl` |
 | Pagination active | `border-slate-200 bg-white text-slate-950 shadow-sm` |

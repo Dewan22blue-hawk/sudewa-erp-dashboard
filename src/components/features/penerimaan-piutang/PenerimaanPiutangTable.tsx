@@ -152,7 +152,7 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                 </div>
             ) : null}
 
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
                 <table className="w-full text-sm">
                     <thead className="bg-[#f8f9fa] border-b border-gray-200">
                         <tr>
@@ -164,7 +164,7 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                             <th className="p-0 text-left">{renderSortHeader('Total Diterima', 'total_paid', 'center')}</th>
                             <th className="p-0 text-left">{renderSortHeader('Sisa Piutang', 'remaining_payment', 'center')}</th>
                             <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Status</th>
-                            {showActions ? <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Aksi</th> : null}
+                            {showActions ? <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</th> : null}
                         </tr>
                     </thead>
                     <tbody>
@@ -202,7 +202,7 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                                             </div>
                                         </td>
                                         {showActions ? (
-                                            <td className="px-4 py-4 text-center">
+                                            <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">

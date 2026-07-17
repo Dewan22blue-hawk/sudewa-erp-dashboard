@@ -215,7 +215,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                     const isAction = cell.column.id === 'actions';
                     const isStatus = cell.column.id === 'isActive';
                     return (
-                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isStatus && "text-center", isAction ? "text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : !isStatus && "text-left")}>
+                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isStatus && "text-center", isAction ? "text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : !isStatus && "text-left")}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     );

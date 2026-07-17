@@ -186,7 +186,7 @@ export function VendorTable({
                             {vendors.length > 0 ? (
                                 vendors.map((item) => (
                                     <TableRow key={item.uuid} className="group hover:bg-gray-50 transition-colors">
-                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="text-center px-4 py-4">
                                             {item.code || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">
@@ -201,7 +201,7 @@ export function VendorTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                                             {item.phone || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <div className="flex justify-center">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>

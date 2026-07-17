@@ -84,7 +84,7 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
               <th className="py-2 text-left">
                 <SortableHeader title="Keterangan" sortKey="keterangan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
               </th>
-              <th className="py-2 text-right px-4">Aksi</th>
+              <th className="py-2 text-center px-4 sticky right-0 bg-gray-100 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
 
@@ -133,7 +133,7 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
                   <td className="px-4 py-3 text-right font-medium text-red-600">{currenciesFormat('idr', item.totalRefund)}</td>
                   <td className="px-4 py-3">{item.kasMasuk}</td>
                   <td className="px-4 py-3 text-gray-500">{item.keterangan}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

@@ -206,7 +206,7 @@ export function CreateInvoiceTable({
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
                   <TableRow key={`skeleton-${index}`} className="group border-slate-100">
                     {Array.from({ length: 7 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                      <TableCell key={cellIndex} className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                         <div className="h-4 animate-pulse rounded bg-slate-100" />
                       </TableCell>
                     ))}
