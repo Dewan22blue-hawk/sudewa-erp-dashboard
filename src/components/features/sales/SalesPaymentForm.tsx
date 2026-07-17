@@ -129,6 +129,13 @@ export function SalesPaymentForm({
             toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
             return;
         }
+        if (remainingPayment > 0 && total > remainingPayment) {
+            form.setError('cashPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
+            form.setError('bcaPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
+            form.setError('bcaPayment2', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
+            toast.error('Total pembayaran tidak boleh melebihi sisa tagihan.');
+            return;
+        }
         await onSubmitPayment(values);
         resetForm();
     };

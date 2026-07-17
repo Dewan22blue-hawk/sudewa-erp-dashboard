@@ -305,27 +305,36 @@ export default function PurchaseDetailPage() {
         <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} />
 
         {/* PAYMENT HISTORY TABLE */}
-        {resolvedBillingHistories.length > 0 && (
-          <div className="space-y-3">
-            <div>
-              <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>
-              <p className="text-xs text-muted-foreground">Rincian lengkap unit yang dibeli</p>
-            </div>
+        <div className="space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>
+            <p className="text-xs text-muted-foreground">Rincian lengkap unit yang dibeli</p>
+          </div>
 
-            <div className="rounded-lg border border-slate-200 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-green-100 border-b border-slate-200">
+          <div className="rounded-lg border border-slate-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-green-100 border-b border-slate-200">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700 w-12">No</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
+                  <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA USD</th>
+                  <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA IDR</th>
+                  <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran CASH IDR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {resolvedBillingHistories.length === 0 ? (
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700 w-12">No</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA USD</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA IDR</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran CASH IDR</th>
+                    <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center gap-1">
+                        <p className="font-medium text-slate-700">Belum ada riwayat pembayaran</p>
+                        <p className="text-xs">Data pembayaran akan muncul di sini setelah proses bayar dilakukan.</p>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {resolvedBillingHistories.map((history, index) => {
+                ) : (
+                  resolvedBillingHistories.map((history, index) => {
                     const paymentDate = history.payment_at
                       ? new Date(history.payment_at).toLocaleDateString('id-ID', {
                         day: '2-digit',
@@ -356,12 +365,12 @@ export default function PurchaseDetailPage() {
                         <td className="px-4 py-3 text-right text-slate-900 font-medium">{cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}</td>
                       </tr>
                     );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
       </div>
     </DashboardLayout>
   );
