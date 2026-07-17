@@ -184,7 +184,7 @@ export default function BBNBillPaymentPage() {
       ) : (
         <div className="space-y-7">
           <div className="flex items-center gap-3">
-            <Button type="button" variant="ghost" size="icon" onClick={() => router.back()} className="h-9 w-9 rounded-full">
+            <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>

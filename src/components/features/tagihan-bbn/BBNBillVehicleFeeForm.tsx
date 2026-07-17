@@ -82,7 +82,7 @@ export function BBNBillVehicleFeeForm({ vehicle, onSubmit, onCancel, isSubmittin
   return (
     <div className="space-y-7">
       <div className="flex items-center gap-2">
-        <Button type="button" variant="ghost" size="icon" onClick={onCancel} className="h-9 w-9 rounded-full text-slate-700 hover:bg-slate-100">
+        <Button type="button" onClick={onCancel} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-[24px] font-semibold tracking-[-0.03em] text-slate-950">Ubah Data Detail STNK/BPKB</h1>

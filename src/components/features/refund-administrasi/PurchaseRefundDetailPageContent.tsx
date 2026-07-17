@@ -194,12 +194,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
-              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-            >
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
@@ -314,7 +309,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
                   <p className="text-xs text-slate-500">Daftar transaksi pembayaran refund yang telah dicatat</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setIsAddDetailOpen(true)} disabled={lessPayment === 0}>
+                  <Button onClick={() => setIsAddDetailOpen(true)} disabled={lessPayment === 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
                     Tambah Pembayaran Refund
                   </Button>

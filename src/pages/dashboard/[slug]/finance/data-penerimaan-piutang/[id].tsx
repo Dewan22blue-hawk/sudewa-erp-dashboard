@@ -124,7 +124,7 @@ export default function DetailPenerimaanPiutangPage() {
           <div className="space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-2">
-                <Button variant="ghost" size="sm" asChild className="px-0 text-gray-500 hover:bg-transparent hover:text-gray-900">
+                <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                   <Link href={slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard'}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Kembali
@@ -138,11 +138,7 @@ export default function DetailPenerimaanPiutangPage() {
                 </div>
               </div>
 
-              <Button
-                onClick={() => setPaymentDialogOpen(true)}
-                disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0}
-                className="bg-emerald-600 text-white hover:bg-emerald-700"
-              >
+              <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                 Tambah Penerimaan
               </Button>
             </div>

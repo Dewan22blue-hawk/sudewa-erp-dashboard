@@ -235,10 +235,10 @@ export default function LaporanPembelianFilter({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-2">
-        <Button variant="outline" onClick={onPrint} className="w-full sm:w-auto">
+        <Button onClick={onPrint} variant="outline" className="w-full sm:w-auto">
           <Printer className="h-4 w-4 mr-2" /> Print
         </Button>
-        <Button variant="outline" onClick={onDownload} className="w-full sm:w-auto">
+        <Button onClick={onDownload} variant="outline" className="w-full sm:w-auto">
           <Download className="h-4 w-4 mr-2" /> Download
         </Button>
       </div>

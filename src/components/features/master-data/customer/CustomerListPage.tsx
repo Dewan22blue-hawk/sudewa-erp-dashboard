@@ -34,11 +34,11 @@ export const CustomerListPage = () => {
                     <div className="flex gap-2">
                         {canCreate && (
                             <>
-                                <Button onClick={() => setOpenImport(true)} variant="outline" className="gap-2">
+                                <Button onClick={() => setOpenImport(true)} variant="outline" className="w-full sm:w-auto">
                                     <Upload className="h-4 w-4" />
                                     Import
                                 </Button>
-                                <Button className="gap-2">
+                                <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                                     <Plus className="h-4 w-4" />
                                     Tambah
                                 </Button>

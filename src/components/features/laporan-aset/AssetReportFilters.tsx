@@ -74,17 +74,10 @@ export default function AssetReportFilters({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
-        <Button 
-          variant="outline" 
-          onClick={onPrint} 
-          className="gap-2 px-4 h-10 rounded-xl bg-white text-gray-700 border-gray-200 hover:bg-gray-50 flex-1 md:flex-none shadow-sm"
-        >
+        <Button onClick={onPrint} variant="outline" className="w-full sm:w-auto">
           <Printer className="h-4 w-4" /> Print
         </Button>
-        <Button 
-          onClick={onDownload} 
-          className="gap-2 px-4 h-10 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-white border-0 flex-1 md:flex-none shadow-sm transition-colors"
-        >
+        <Button onClick={onDownload} variant="outline" className="w-full sm:w-auto">
           <Download className="h-4 w-4" /> Download
         </Button>
       </div>

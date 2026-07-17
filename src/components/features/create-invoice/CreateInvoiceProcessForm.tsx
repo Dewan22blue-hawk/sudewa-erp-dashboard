@@ -56,12 +56,7 @@ export function CreateInvoiceProcessForm({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onBack}
-          className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-        >
+        <Button onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <ArrowLeft className="h-5 w-5 text-slate-700" />
         </Button>
         <div>
@@ -231,7 +226,7 @@ export function CreateInvoiceProcessForm({
         <Button type="button" variant="ghost" onClick={onCancel} className="text-base text-slate-700 hover:bg-transparent hover:text-slate-900">
           Batal
         </Button>
-        <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="h-10 rounded-xl bg-[#1e3a5f] px-6 text-sm font-semibold text-white hover:bg-[#152e4d]">
+        <Button type="button" onClick={onSubmit} disabled={isSubmitting} variant="outline" className="w-full sm:w-auto">
           <Printer className="mr-2 h-4 w-4" />
           {isSubmitting ? 'Memproses...' : 'Print Invoice'}
         </Button>

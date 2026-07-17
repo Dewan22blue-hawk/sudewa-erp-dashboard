@@ -27,7 +27,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-            <Button variant="ghost" size="sm" asChild className="px-0 text-gray-500 hover:bg-transparent hover:text-gray-900">
+            <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <Link href={resolvedBackHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Kembali
@@ -45,7 +45,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
           </div>
         </div>
 
-        <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           Tambah Pembayaran
         </Button>
       </div>

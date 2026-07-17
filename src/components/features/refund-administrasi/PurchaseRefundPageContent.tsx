@@ -382,12 +382,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
-              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-            >
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
@@ -442,7 +437,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
           defaultSort={{ key: 'payment_date', direction: 'desc' }}
           headerActions={
             <div className='w-full flex items-end justify-end'>
-              <Button className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto" onClick={() => setIsCreateOpen(true)}>
+              <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                 <Plus className="mr-2 h-4 w-4" />
                 Tambah Data
               </Button>

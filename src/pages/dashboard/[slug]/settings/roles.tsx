@@ -110,11 +110,7 @@ export default function RolesPage() {
             </div>
           </div>
 
-          <Button
-            className="bg-[#1e293b] hover:bg-[#0f172a]"
-            onClick={handleAdd}
-            disabled={isLoading}
-          >
+          <Button onClick={handleAdd} disabled={isLoading} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus size={16} className="mr-2" />
             Tambah Role
           </Button>

@@ -80,7 +80,7 @@ export function BBNBillTable({
           </div>
         </div>
 
-        <Button onClick={onAdd} className="rounded-xl bg-[#1e3a5f] hover:bg-[#152e4d] px-5 text-sm font-medium">
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah
         </Button>
