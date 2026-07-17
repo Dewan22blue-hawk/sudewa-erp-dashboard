@@ -88,8 +88,8 @@ export function GoodsReceiptTable({
           </Button>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-          <Table>
+        <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+        <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE BELI</TableHead>

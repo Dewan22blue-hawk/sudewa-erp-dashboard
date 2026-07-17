@@ -169,8 +169,8 @@ export function RegionTable({
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
-                <Table>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none">
+        <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-[#f8f9fa]">
                             <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">KODE WILAYAH</TableHead>
@@ -224,7 +224,7 @@ export function RegionTable({
                         )}
                     </TableBody>
                 </Table>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div className="text-sm text-gray-500">

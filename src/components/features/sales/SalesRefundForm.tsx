@@ -266,8 +266,8 @@ export function SalesRefundForm({
             </div>
 
             {/* ── Tabel Unit Item Detail ── */}
-            <div className="overflow-hidden rounded-xl border border-gray-200">
-              <Table>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <Table>
                 <TableHeader>
                   <TableRow className="bg-[#f8fafc] hover:bg-[#f8fafc]">
                     <TableHead className="w-10 py-3 pl-4">

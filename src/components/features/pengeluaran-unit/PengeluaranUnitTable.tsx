@@ -121,7 +121,7 @@ export default function PengeluaranUnitTable({
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">

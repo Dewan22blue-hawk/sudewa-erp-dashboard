@@ -107,8 +107,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
         </div>
       </div>
 
-      <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-        <div className="overflow-x-auto">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
           <Table className="min-w-[980px]">
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
@@ -118,7 +117,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Nama Driver</TableHead>
                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No Polisi</TableHead>
                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Tipe</TableHead>
-                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -188,8 +187,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+      </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <div>

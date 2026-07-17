@@ -117,8 +117,8 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
             </Button>
           </div>
 
-          <div className="overflow-hidden rounded-[10px] border border-[#D9DEE8] bg-white">
-            <Table>
+          <div className="overflow-x-auto rounded-[10px] border border-[#D9DEE8] bg-white">
+        <Table>
               <TableHeader>
                 <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                   {['NO', 'TANGGAL REFUND', 'NOMINAL BAYAR', 'KETERANGAN', 'ACTION'].map((header) => (
@@ -185,8 +185,8 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
             </Button>
           </div>
 
-          <div className="overflow-hidden bg-white">
-            <Table>
+          <div className="overflow-x-auto bg-white">
+        <Table>
               <TableHeader>
                 <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
                   <TableHead className="w-[56px] px-4 text-center">

@@ -112,7 +112,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport, canEdi
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">

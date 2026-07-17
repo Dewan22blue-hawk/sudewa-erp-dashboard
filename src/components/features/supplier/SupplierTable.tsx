@@ -136,9 +136,7 @@ export function SupplierTable({
         </div>
       </div>
 
-      <Card className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-none">s*<Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 {/* Kode */}
@@ -307,8 +305,7 @@ export function SupplierTable({
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+            </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <p>

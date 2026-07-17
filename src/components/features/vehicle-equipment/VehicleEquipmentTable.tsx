@@ -144,9 +144,7 @@ export function VehicleEquipmentTable({
             </div>
 
             {/* Table Card */}
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
@@ -206,8 +204,7 @@ export function VehicleEquipmentTable({
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             {/* Bottom Pagination */}
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">

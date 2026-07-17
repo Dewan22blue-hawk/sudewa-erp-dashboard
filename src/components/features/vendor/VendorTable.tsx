@@ -169,9 +169,7 @@ export function VendorTable({
                 </div>
             </div>
 
-            <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-[#f8f9fa]">
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">KODE VENDOR</TableHead>
@@ -237,8 +235,7 @@ export function VendorTable({
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>

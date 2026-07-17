@@ -207,11 +207,10 @@ export function DriverTable({
             </div>
 
             {/* Table */}
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table className="min-w-[900px]">
-                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow className="hover:bg-[#f8f9fa]">
+            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+                <Table className="min-w-[900px]">
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        <TableRow className="hover:bg-[#f8f9fa]">
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     NAMA DRIVER
                                 </TableHead>
@@ -230,7 +229,7 @@ export function DriverTable({
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
                                     TGL GABUNG
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">
+                                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                     ACTION
                                 </TableHead>
                             </TableRow>
@@ -268,7 +267,7 @@ export function DriverTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
                                             {formatDate(driver.joinedAt)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <div className="flex justify-center">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -315,8 +314,7 @@ export function DriverTable({
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             {/* Pagination */}
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">

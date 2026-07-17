@@ -58,7 +58,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">

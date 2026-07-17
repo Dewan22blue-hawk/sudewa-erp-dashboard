@@ -168,8 +168,8 @@ export const BrandTable = ({
                 </div>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                <Table>
+            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto">
+        <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="bg-white hover:bg-[#f8f9fa]">
                             {table.getHeaderGroups().map((headerGroup) => (

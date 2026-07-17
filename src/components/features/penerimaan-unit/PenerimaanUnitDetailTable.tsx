@@ -230,7 +230,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>

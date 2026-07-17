@@ -70,7 +70,7 @@ export function CustomerOverviewCard({ data, isLoading }: CustomerOverviewCardPr
         <StatItem label="Rata-rata pendapatan dari customer" value={data.averageRevenue.toString()} />
       </div>
 
-      <div className="overflow-hidden rounded-xl border-none">
+      <div className="overflow-x-auto rounded-xl border-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa]">
             <TableRow className="border-none hover:bg-transparent">
@@ -126,7 +126,7 @@ export function ProductOverviewCard({ data, isLoading }: ProductOverviewCardProp
         <StatItem label="Jumlah Produk Terjual" value={data.totalSold.toLocaleString('id-ID')} />
       </div>
 
-      <div className="overflow-hidden rounded-xl border-none">
+      <div className="overflow-x-auto rounded-xl border-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa]">
             <TableRow className="border-none hover:bg-transparent">
