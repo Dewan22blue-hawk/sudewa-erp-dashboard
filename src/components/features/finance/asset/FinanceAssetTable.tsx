@@ -105,20 +105,20 @@ export function FinanceAssetTable({
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UMUR EKONOMIS</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PENYUSUTAN/BULAN</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NILAI AKHIR</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : assets.length === 0 ? (
+                                <tr>
+                                    <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                                        <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                                            <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                                            <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : assets.length === 0 ? (
                                 <TableRow className="group">
                                     <TableCell colSpan={11} className="h-24 text-center text-slate-500">
                                         No data found.
@@ -139,7 +139,7 @@ export function FinanceAssetTable({
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
-                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400">

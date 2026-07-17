@@ -71,7 +71,7 @@ export default function UJDriverTable({
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = currentSortBy === sortKey;
     const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    
+
     return (
       <button
         type="button"

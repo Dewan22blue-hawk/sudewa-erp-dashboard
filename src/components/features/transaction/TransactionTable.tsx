@@ -5,14 +5,17 @@ import { Button } from '@/components/ui/button';
 import { useTableSort } from '@/hooks/useTableSort';
 import { formatDate } from '@/lib/utils/format';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface Props {
   data: Transaction[];
   onEdit: (trx: Transaction) => void;
   onDelete: (trx: Transaction) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
-export function TransactionTable({ data, onEdit, onDelete }: Props) {
+export function TransactionTable({ data, onEdit, onDelete, canEdit, canDelete }: Props) {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
   });
@@ -82,7 +85,9 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
               sortedData.map((trx) => (
                 <tr key={trx.id} className="border-b hover:bg-gray-50 transition-colors border-slate-100 last:border-0">
                   <td className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">{formatDate(trx.date)}</td>
-                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{trx.name}</td>
+                  <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">
+                    <CopyBox text={trx.name} />
+                  </td>
 
                   {/* BANK */}
                   <td className={`px-4 py-4 text-center text-sm ${trx.debitUSD ? 'text-green-600 font-medium' : 'text-slate-400'}`}>{trx.debitUSD ? currenciesFormat('usd', trx.debitUSD) : '0'}</td>
@@ -106,10 +111,10 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                          <DropdownMenuItem onClick={() => onEdit(trx)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                          <DropdownMenuItem onClick={() => onEdit(trx)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(trx)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                          <DropdownMenuItem onClick={() => onDelete(trx)} disabled={!canDelete} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -121,13 +126,13 @@ export function TransactionTable({ data, onEdit, onDelete }: Props) {
             ) : (
               <tr>
                 <td colSpan={100} className="py-16 h-64 text-center text-slate-500 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             )}

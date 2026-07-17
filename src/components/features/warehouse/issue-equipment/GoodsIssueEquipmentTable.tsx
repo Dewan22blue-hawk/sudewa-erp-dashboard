@@ -44,30 +44,30 @@ export function GoodsIssueEquipmentTable({
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">DRIVER</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NOMOR POLISI</TableHead>
           <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KATEGORI</TableHead>
-          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {isLoading ? (
           <TableRow className="group">
             <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</TableCell>
+              <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+              </div>
+            </TableCell>
           </TableRow>
         ) : data.length === 0 ? (
           <TableRow className="group">
             <TableCell colSpan={100} className="py-16 h-28 text-center text-slate-500 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+              <div className="flex flex-col items-center justify-center gap-2">
+                <div className="rounded-full bg-slate-50 p-4 mb-2">
+                  <Search className="h-8 w-8 text-slate-400" />
+                </div>
+                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+              </div>
+            </TableCell>
           </TableRow>
         ) : (
           data.map((item) => (

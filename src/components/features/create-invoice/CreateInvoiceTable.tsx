@@ -218,32 +218,32 @@ export function CreateInvoiceTable({
                 <TableRow className="group">
                   <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               ) : null}
 
               {!isLoading &&
                 rows.map((row) => (
                   <TableRow key={row.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <Checkbox checked={selectedIds.includes(row.id)} onCheckedChange={(checked) => onToggleRow(row.id, Boolean(checked))} />
                     </TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700">{row.code}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{row.orderCode}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{row.customerName}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatDisplayDate(row.date)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <Badge className={cn('rounded-full border px-3 py-1 text-xs font-medium', row.isPrinted ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-red-400 bg-red-50 text-red-500')}>
                         {row.statusLabel}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">

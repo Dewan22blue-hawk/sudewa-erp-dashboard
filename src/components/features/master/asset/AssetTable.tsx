@@ -8,6 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Asset } from '@/@types/asset.types';
 import { formatDateUI } from '@/lib/utils/date';
+import { CopyBox } from '@/components/ui/copy-box';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface AssetTableProps {
     assets: Asset[];
@@ -100,22 +102,13 @@ export function AssetTable({
                     p === page
                         ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                         : p === '...'
-                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
             >
                 {p}
             </Button>
         ));
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
     };
 
     const formatAssetType = (type: string) => {
@@ -160,9 +153,9 @@ export function AssetTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -199,7 +192,7 @@ export function AssetTable({
                                 <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">NAMA BARANG</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap">TGL BELI</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -210,7 +203,7 @@ export function AssetTable({
                                             {(page - 1) * perPage + index + 1}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">
-                                            {item.code || '-'}
+                                            <CopyBox text={item.code || '-'} />
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                                             {formatAssetType(item.type)}
@@ -225,9 +218,9 @@ export function AssetTable({
                                             {formatDateUI(item.purchase_date)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">
-                                            {formatCurrency(item.price)}
+                                            {currenciesFormat('idr', item.price)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500">
@@ -249,14 +242,14 @@ export function AssetTable({
                             ) : (
                                 <TableRow className="group">
                                     <TableCell colSpan={100} className="py-16 h-32 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -280,7 +273,7 @@ export function AssetTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

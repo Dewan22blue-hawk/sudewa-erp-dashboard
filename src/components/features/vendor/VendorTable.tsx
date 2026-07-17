@@ -179,7 +179,7 @@ export function VendorTable({
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[30%] uppercase px-4 py-4 text-left">ALAMAT</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PIC</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[15%] uppercase px-4 py-4 text-left">PHONE</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -225,14 +225,14 @@ export function VendorTable({
                             ) : (
                                 <TableRow className="group">
                                     <TableCell colSpan={100} className="h-32 text-center text-gray-505 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

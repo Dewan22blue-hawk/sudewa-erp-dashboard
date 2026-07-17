@@ -10,10 +10,15 @@ import FinanceInvoiceTable from '@/components/features/finance/invoice/FinanceIn
 import FinanceInvoicePaymentModal from '@/components/features/finance/invoice/FinanceInvoicePaymentModal';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useDoInvoices } from '@/hooks/useDoInvoice';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function FinanceInvoicePage() {
   const { companyId } = useCompany();
   const companyNumber = Number(companyId || 0);
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('finance:create');
+  const canEdit = hasPermission('finance:edit');
+  const canDelete = hasPermission('finance:delete');
 
   const [searchInput, setSearchInput] = useState('');
   const [searchValue, setSearchValue] = useState('');

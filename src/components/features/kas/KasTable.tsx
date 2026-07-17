@@ -7,6 +7,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 const KAS_NAME_MAP: Record<string, string> = {
@@ -182,19 +183,21 @@ export function KasTable({ data }: Props) {
             {currentData.length === 0 ? (
               <TableRow className="group">
                 <TableCell colSpan={100} className="text-center text-gray-505 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               currentData.map((item) => (
                 <TableRow key={item.id} className="group hover:bg-gray-50 transition-colors">
-                  <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">{item.code}</TableCell>
+                  <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">
+                    <CopyBox text={item.code} />
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">{item.name}</TableCell>
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.description || '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-sm font-semibold text-gray-600 text-left">

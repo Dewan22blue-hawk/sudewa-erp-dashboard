@@ -33,6 +33,7 @@ import type { GoodsReceiptEquipmentPaymentFormValues } from '@/scheme/goods-rece
 import { getReceiptBilling } from '@/components/features/warehouse/receipt-equipment/goodsReceiptEquipment.utils';
 
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const getErrorMessage = (error: any): string => {
   return getApiErrorMessage(error);
@@ -75,6 +76,11 @@ export default function PerlengkapanMasukListPage() {
   const createPaymentMutation = useCreateGoodsReceiptPayment();
 
   // UI States
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
+
   const [openForm, setOpenForm] = useState(false);
   const [openInvoice, setOpenInvoice] = useState(false);
   const [openPayment, setOpenPayment] = useState(false);
@@ -173,13 +179,15 @@ export default function PerlengkapanMasukListPage() {
             <p className="text-sm text-muted-foreground">Kelola dan lacak semua transaksi perlengkapan masuk</p>
           </div>
 
-          <Button
-            onClick={() => setOpenForm(true)}
-            className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah
-          </Button>
+          {canCreate && (
+            <Button
+              onClick={() => setOpenForm(true)}
+              className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah
+            </Button>
+          )}
         </div>
 
         <div className="space-y-4">

@@ -20,13 +20,14 @@ interface GoodsReceiptTableProps {
   perPage: number;
   search: string;
   isLoading?: boolean;
+  canAdd?: boolean;
   onPageChange: (value: number) => void;
   onPerPageChange: (value: number) => void;
   onSearchChange: (value: string) => void;
-  onAdd: () => void;
+  onAdd?: () => void;
   onPay: (item: GoodsReceipt) => void;
   onUpload: (item: GoodsReceipt) => void;
-  onDelete: (item: GoodsReceipt) => void;
+  onDelete?: (item: GoodsReceipt) => void;
 }
 
 export function GoodsReceiptTable({
@@ -37,6 +38,7 @@ export function GoodsReceiptTable({
   perPage,
   search,
   isLoading = false,
+  canAdd = false,
   onPageChange,
   onPerPageChange,
   onSearchChange,
@@ -80,7 +82,7 @@ export function GoodsReceiptTable({
             </div>
           </div>
 
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Button onClick={() => onAdd?.()} disabled={!canAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
@@ -95,30 +97,30 @@ export function GoodsReceiptTable({
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">SUPPLIER</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">HARGA BELI</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow className="group">
                   <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</TableCell>
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ) : data.length === 0 ? (
                 <TableRow className="group">
                   <TableCell colSpan={100} className="py-16 h-28 text-center text-slate-500 text-sm">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               ) : (
                 data.map((item) => (
@@ -148,7 +150,7 @@ export function GoodsReceiptTable({
                           <DropdownMenuItem onClick={() => onUpload(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Upload Nota
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                          <DropdownMenuItem onClick={() => onDelete?.(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>

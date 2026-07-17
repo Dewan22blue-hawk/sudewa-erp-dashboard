@@ -3,6 +3,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { FinanceAssetTable } from '@/components/features/finance/asset/FinanceAssetTable';
 import { useFinanceAssets, useDeleteFinanceAsset, useExportFinanceAsset } from '@/hooks/useFinanceAsset';
 import { useCompany } from '@/contexts/CompanyContext';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DeleteAssetModal } from '@/components/features/master/asset/DeleteAssetModal';
@@ -12,6 +13,10 @@ export default function FinanceAssetPage() {
     const { companyId } = useCompany();
     const router = useRouter();
     const { slug } = router.query;
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('finance:create');
+    const canEdit = hasPermission('finance:edit');
+    const canDelete = hasPermission('finance:delete');
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);

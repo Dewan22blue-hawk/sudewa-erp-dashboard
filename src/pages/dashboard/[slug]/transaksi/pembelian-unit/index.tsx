@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseTable from '@/components/features/purchase/PurchaseTable';
 import DeletePurchaseDialog from '@/components/features/purchase/DeletePurchaseDialog';
@@ -13,12 +12,19 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function PurchasePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { companyId } = useCompany();
   const { slug } = router.query;
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
@@ -61,13 +67,15 @@ export default function PurchasePage() {
               data={data?.data ?? []}
               meta={data?.meta}
               onDelete={(id) => setSelectedId(id)}
-              onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
+              onAdd={canCreate ? () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`) : undefined}
               slug={slug as string}
               onPageChange={setPage}
               onPerPageChange={(value) => {
                 setPerPage(value);
                 setPage(1);
               }}
+              canEdit={canEdit}
+              canDelete={canDelete}
               loading={isLoading || isFetching}
               search={search}
               onSearchChange={(val) => { setSearch(val); setPage(1); }}

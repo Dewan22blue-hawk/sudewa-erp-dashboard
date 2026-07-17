@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
@@ -28,6 +28,11 @@ export function SalesTable({ onAdd }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [localSearch, setLocalSearch] = useState('');
   const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
 
   const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
   const deleteMutation = useDeleteSales();
@@ -223,7 +228,7 @@ export function SalesTable({ onAdd }: Props) {
         </div>
 
         {/* RIGHT CONTROLS */}
-        {onAdd && (
+        {canCreate && onAdd && (
           <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
@@ -244,7 +249,7 @@ export function SalesTable({ onAdd }: Props) {
               {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
               {renderSortHeader('totalJual', 'TOTAL JUAL', 'center')}
               {renderSortHeader('kurangBayar', 'KURANG BAYAR', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -264,18 +269,18 @@ export function SalesTable({ onAdd }: Props) {
             ) : isSearchEmpty ? (
               <TableRow className="group">
                 <TableCell colSpan={100} className="h-20 text-center text-muted-foreground px-4 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               currentData.map((item) => (
-                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} />
+                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} canEdit={canEdit} canDelete={canDelete} />
               ))
             )}
           </TableBody>

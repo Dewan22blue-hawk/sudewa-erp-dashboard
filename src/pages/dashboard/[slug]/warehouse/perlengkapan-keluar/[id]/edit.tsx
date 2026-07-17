@@ -376,7 +376,7 @@ export default function MaterialReleaseEditPage() {
                 <TableHead className="px-4 py-4 text-[14px] font-semibold uppercase text-slate-950">KODE BARANG</TableHead>
                 <TableHead className="px-4 py-4 text-[14px] font-semibold uppercase text-slate-950">NAMA BARANG</TableHead>
                 <TableHead className="px-4 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">QTY</TableHead>
-                <TableHead className="px-4 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">Action</TableHead>
+                <TableHead className="px-4 py-4 text-center text-[14px] font-semibold uppercase text-slate-950">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

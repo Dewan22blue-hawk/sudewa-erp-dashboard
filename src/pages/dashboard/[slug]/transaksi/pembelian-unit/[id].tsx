@@ -15,7 +15,7 @@ import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
 import { ArrowLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -38,6 +38,11 @@ const readApiError = (error: any): string => {
 
 export default function PurchaseDetailPage() {
   const router = useRouter();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
+
   const { slug, id } = router.query;
   const { data: purchase, isLoading, isError } = usePurchaseById(id as string);
   const { data: billings = [] } = useUnitBillings(purchase?.id);
@@ -242,28 +247,28 @@ export default function PurchaseDetailPage() {
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span>Kode Beli:</span>
                 <span className="text-blue-600 font-semibold">{purchase.code}</span>
-              {isPaid ? (
-                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
-                  Lunas
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
-                  Belum Lunas
-                </Badge>
-              )}
-              {isAlreadyReceived ? (
-                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                  Stok Diterima
-                </Badge>
-              ) : null}
-              {isRefunded ? (
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
-                  Sudah Refund
-                </Badge>
-              ) : null}
+                {isPaid ? (
+                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                    Lunas
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                    Belum Lunas
+                  </Badge>
+                )}
+                {isAlreadyReceived ? (
+                  <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
+                    Stok Diterima
+                  </Badge>
+                ) : null}
+                {isRefunded ? (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                    Sudah Refund
+                  </Badge>
+                ) : null}
+              </div>
             </div>
           </div>
-        </div>
 
           <div className="flex gap-2">
             <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
@@ -297,7 +302,7 @@ export default function PurchaseDetailPage() {
         <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
         {/* UNIT TABLE */}
-        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} />
+        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} />
 
         {/* PAYMENT HISTORY TABLE */}
         {resolvedBillingHistories.length > 0 && (

@@ -202,7 +202,7 @@ import { Button } from '@/components/ui/button';
           {/* data */}
         </TableCell>
         {/* ... */}
-        <TableCell className="px-4 py-4 text-center">
+        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
           {/* Action dropdown */}
         </TableCell>
       </TableRow>

@@ -5,7 +5,7 @@ import {
     TableRow,
     TableCell,
 } from "@/components/ui/table"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ReferenceLink } from '@/components/ui/reference-link';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -26,18 +26,21 @@ import { MoreVertical } from "lucide-react"
 import { SalesItem } from "./sales.data"
 import { currenciesFormat } from "@/components/ui/currenciesFormat"
 import { Badge } from "@/components/ui/badge"
+import { CopyBox } from "@/components/ui/copy-box"
 
 interface Props {
     item: SalesItem
     isSelected: boolean
     onToggle: (id: string) => void
     onDelete?: (id: string) => Promise<void> | void
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 /**
  * Sales Table Row - EXACT sesuai Figma dengan checkbox state dan navigasi
  */
-export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
+export function SalesTableRow({ item, isSelected, onToggle, onDelete, canEdit, canDelete }: Props) {
     const router = useRouter()
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
@@ -72,12 +75,7 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
         <TableRow className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
             {/* Kode Jual - Link biru */}
             <TableCell className="px-4 py-4 text-left text-sm font-medium">
-                <Link
-                    href={slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}` : `/transaksi/penjualan-unit/${item.id}`}
-                    className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
-                >
-                    {item.kodeJual}
-                </Link>
+                <CopyBox text={item.kodeJual} />
             </TableCell>
 
             {/* Tanggal */}
@@ -86,7 +84,9 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
             {/* Customer */}
             <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                 <div className="flex items-center gap-2">
-                    <span>{item.customer}</span>
+                    <ReferenceLink href={`/dashboard/${slug}/customer?search=${item.customer}`}>
+                        {item.customer || '-'}
+                    </ReferenceLink>
                     {item.isRefunded ? (
                         <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">Sudah Refund</Badge>
                     ) : null}
@@ -132,19 +132,19 @@ export function SalesTableRow({ item, isSelected, onToggle, onDelete }: Props) {
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleEdit}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleEdit} disabled={!canEdit}>
                             Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleDetail}>
                             Detail
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleRefund} disabled={Boolean(item.isRefunded)}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={handleRefund} disabled={Boolean(item.isRefunded) || !canEdit}>
                             {item.isRefunded ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')}>
+                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')} disabled={!canEdit}>
                             Print
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                        <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer" disabled={!canDelete}>
                             Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -93,8 +93,8 @@ export function VehicleEquipmentTable({
                     p === page
                         ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                         : p === '...'
-                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
             >
                 {p}
@@ -151,7 +151,7 @@ export function VehicleEquipmentTable({
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">NAMA BARANG</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -172,15 +172,15 @@ export function VehicleEquipmentTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-[140px] rounded-xl border border-gray-100 bg-white shadow-lg p-1.5">
-                                                    <DropdownMenuItem 
-                                                        onClick={() => onEdit(item)} 
+                                                    <DropdownMenuItem
+                                                        onClick={() => onEdit(item)}
                                                         disabled={!canEdit}
                                                         className="cursor-pointer text-gray-700 font-medium rounded-lg hover:bg-gray-50 px-3 py-2 text-sm"
                                                     >
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem 
-                                                        onClick={() => onDelete(item)} 
+                                                    <DropdownMenuItem
+                                                        onClick={() => onDelete(item)}
                                                         disabled={!canDelete}
                                                         className="text-red-600 cursor-pointer font-medium rounded-lg hover:bg-red-50 focus:bg-red-50 focus:text-red-600 px-3 py-2 text-sm"
                                                     >
@@ -194,14 +194,14 @@ export function VehicleEquipmentTable({
                             ) : (
                                 <TableRow className="group">
                                     <TableCell colSpan={100} className="py-16 h-40 text-center text-gray-400 text-sm font-medium">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -226,7 +226,7 @@ export function VehicleEquipmentTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

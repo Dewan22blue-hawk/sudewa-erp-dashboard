@@ -2,6 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SalesTable } from '@/components/features/sales/SalesTable';
 import { useRouter } from 'next/router';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 /**
  * Sales Page - Penjualan Unit
@@ -11,6 +12,9 @@ export default function SalesPage() {
   const router = useRouter();
   const slugQuery = router.query.slug;
   const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
 
   return (
     <DashboardLayout>
@@ -23,7 +27,7 @@ export default function SalesPage() {
 
         {/* Sales Table */}
         <SalesTable
-          onAdd={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/create` : '/transaksi/penjualan-unit/create')}
+          onAdd={canCreate ? () => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/create` : '/transaksi/penjualan-unit/create') : undefined}
         />
       </div>
     </DashboardLayout>

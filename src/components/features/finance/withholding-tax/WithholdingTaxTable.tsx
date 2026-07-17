@@ -74,7 +74,7 @@ export default function WithholdingTaxTable({
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = currentSortBy === sortKey;
     const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    
+
     return (
       <button
         type="button"
@@ -155,7 +155,7 @@ export default function WithholdingTaxTable({
                 const noUrut = startIndex + index;
                 const customerName = item.do_invoice?.customer?.name ?? '-';
                 const nominalInvoice = item.do_invoice?.total_amount ?? item.do_invoice?.invoice_amount ?? item.do_invoice?.bill_invoice ?? 0;
-                
+
                 return (
                   <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                     <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{noUrut}</td>

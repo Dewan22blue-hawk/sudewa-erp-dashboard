@@ -25,9 +25,9 @@ export default function PenerimaanUnitPage() {
   });
 
   const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('master-data:create');
-  const canEdit = hasPermission('master-data:edit');
-  const canDelete = hasPermission('master-data:delete');
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
 
   const allData = useMemo(() => activities?.data ?? [], [activities?.data]);
 
@@ -121,10 +121,12 @@ export default function PenerimaanUnitPage() {
               </div>
             </div>
 
-            <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => setOpenForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah
-            </Button>
+            {canCreate && (
+              <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => setOpenForm(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah
+              </Button>
+            )}
           </div>
 
           {isLoading ? (

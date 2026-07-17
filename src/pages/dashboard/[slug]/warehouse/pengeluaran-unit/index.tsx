@@ -7,9 +7,15 @@ import PengeluaranUnitTable from '@/components/features/pengeluaran-unit/Pengelu
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { usePengeluaranUnits } from '@/hooks/usePengeluaranUnit';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function PengeluaranUnitPage() {
   const router = useRouter();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [searchInput, setSearchInput] = useState('');
@@ -62,10 +68,12 @@ export default function PengeluaranUnitPage() {
             <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock unit</p>
           </div>
 
-          <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah
-          </Button>
+          {canCreate && (
+            <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah
+            </Button>
+          )}
         </div>
 
         <PengeluaranUnitTable

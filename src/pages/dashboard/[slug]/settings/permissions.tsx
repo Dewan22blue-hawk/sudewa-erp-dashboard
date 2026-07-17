@@ -127,7 +127,7 @@ export default function PermissionsPage() {
                     <TableCell className="px-4 py-4"><Skeleton className="h-4 w-48" /></TableCell>
                     <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                     <TableCell className="px-4 py-4"><Skeleton className="h-4 w-28" /></TableCell>
-                    <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
                   </TableRow>
                 ))
               ) : currentData.length === 0 ? (

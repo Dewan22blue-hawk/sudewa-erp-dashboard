@@ -3,8 +3,13 @@ import { Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import DataHutangTable from '@/components/features/data-hutang/DataHutangTable';
 import { useDataHutang } from '@/hooks/useDataHutang';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function DataHutangPage() {
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('finance:create');
+    const canEdit = hasPermission('finance:edit');
+    const canDelete = hasPermission('finance:delete');
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);

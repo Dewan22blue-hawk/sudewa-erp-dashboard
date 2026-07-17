@@ -176,11 +176,11 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
             {loading && data.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</td>
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
               </tr>
             ) : sortedData.length > 0 ? (
               sortedData.map((item, i) => (
@@ -211,13 +211,13 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
             ) : (
               <tr>
                 <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             )}

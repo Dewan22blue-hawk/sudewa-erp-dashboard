@@ -25,6 +25,7 @@ import { GoodsIssueEquipmentUploadInvoiceModal } from '@/components/features/war
 import type { GoodsIssueEquipment } from '@/@types/goods-issue-equipment.types';
 import type { GoodsIssueEquipmentFormValues } from '@/scheme/goods-issue-equipment.schema';
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const getErrorMessage = (error: any): string => {
   return getApiErrorMessage(error);
@@ -41,6 +42,11 @@ export default function PengeluaranPerlengkapanIndex() {
   const { page, perPage, search, setPage, setPerPage, updateQuery } = useQueryParamsTable({ defaultPerPage: 25 });
   const [searchInput, setSearchInput] = useState(search);
   const debouncedSearch = useDebouncedValue(searchInput, 400);
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
 
   const [formOpen, setFormOpen] = useState(false);
   const [invoiceOpen, setInvoiceOpen] = useState(false);
@@ -189,12 +195,14 @@ export default function PengeluaranPerlengkapanIndex() {
               Kelola dan lacak semua transaksi pengeluaran perlengkapan kendaraan
             </p>
           </div>
-          <Button
-            onClick={() => setFormOpen(true)}
-            className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Tambah
-          </Button>
+          {canCreate && (
+            <Button
+              onClick={() => setFormOpen(true)}
+              className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Tambah
+            </Button>
+          )}
         </div>
 
         <div className="space-y-4">
