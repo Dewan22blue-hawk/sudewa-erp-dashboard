@@ -43,7 +43,7 @@ export default function KasHarianForm({
           <FormField
             control={form.control}
             name="company_id"
-            render={({ field }) => <input type="hidden" value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <input autoComplete="off" type="hidden" value={field.value} onChange={field.onChange} />}
           />
         </div>
 
@@ -193,7 +193,7 @@ export default function KasHarianForm({
                   <Upload className="mb-3 h-7 w-7 text-slate-500" />
                   <span className="text-sm font-medium text-slate-700">{paymentProof ? paymentProof.name : 'Klik untuk upload dokumen'}</span>
                   <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>
-                  <input
+                  <input autoComplete="off"
                     type="file"
                     accept="image/*,application/pdf"
                     className="hidden"

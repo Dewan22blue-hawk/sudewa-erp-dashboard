@@ -250,7 +250,7 @@ export function Topbar() {
           <div className="hidden md:block relative w-96">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <form onSubmit={handleSearchSubmit}>
-              <input
+              <input autoComplete="off"
                 ref={searchInputRef}
                 value={query}
                 onChange={(e) => {
@@ -262,7 +262,7 @@ export function Topbar() {
                 className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 pl-10 pr-12 text-sm text-gray-900 placeholder:text-gray-400 transition focus:bg-white focus:outline-none focus:border-slate-300"
               />
             </form>
-            
+
             {/* Keyboard shortcut hint badge */}
             <div className={cn("absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-0.5 bg-gray-200/50 border border-gray-300/40 rounded px-1.5 py-0.5 text-[10px] font-mono text-gray-500 transition-opacity", (open || query) && "opacity-0")}>
               <span className="text-[9px]">⌘</span>K
@@ -335,7 +335,7 @@ export function Topbar() {
           <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
             <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
               <Search className="h-4 w-4 shrink-0 text-gray-400" />
-              <input
+              <input autoComplete="off"
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

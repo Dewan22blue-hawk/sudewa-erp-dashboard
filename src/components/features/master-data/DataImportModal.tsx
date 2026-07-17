@@ -56,7 +56,7 @@ export function DataImportModal({ open, onOpenChange, title, description, onImpo
                         <Upload className="mx-auto mb-2 h-8 w-8 text-slate-400" />
                         <span className="block font-medium">{file ? file.name : 'Pilih file import'}</span>
                         <span className="mt-1 block text-xs text-slate-500">Klik atau seret file ke sini</span>
-                        <input
+                        <input autoComplete="off"
                             type="file"
                             accept={accept}
                             onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}

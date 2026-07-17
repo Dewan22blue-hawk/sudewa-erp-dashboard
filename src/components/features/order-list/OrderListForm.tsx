@@ -324,8 +324,8 @@ export function OrderListForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
-      <input type="hidden" {...register('status')} />
-      <input type="hidden" {...register('note')} />
+      <input autoComplete="off" type="hidden" {...register('status')} />
+      <input autoComplete="off" type="hidden" {...register('note')} />
 
       <div className="flex items-center gap-3">
         <button
