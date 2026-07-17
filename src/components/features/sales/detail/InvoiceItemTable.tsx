@@ -163,7 +163,7 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
                         {currentData.map((item, i) => (
                             <TableRow key={item.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                                 {/* Checkbox */}
-                                <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                     <Checkbox
                                         checked={selectedIds.has(item.id)}
                                         onCheckedChange={() => handleToggle(item.id)}

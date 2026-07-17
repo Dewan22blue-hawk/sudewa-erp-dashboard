@@ -109,7 +109,7 @@ export function VehicleDocumentTable({
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Unprocessed</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Deskripsi</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tanggal Dibuat</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Action</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -133,7 +133,7 @@ export function VehicleDocumentTable({
                     <TableCell className="px-4 py-4 text-center text-sm font-semibold text-amber-600">{item.unprocessedCount}</TableCell>
                     <TableCell className="max-w-[220px] truncate px-4 py-4 text-sm text-slate-700 text-left">{item.description || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.createdAt)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

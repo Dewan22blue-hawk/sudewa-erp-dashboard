@@ -112,7 +112,7 @@ export default function WithholdingTaxTable({
               <th className="p-0 text-left">{renderSortHeader('UANG MUKA PPH', 'pph_description', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('JUMLAH PEMBAYARAN', 'payment_amount', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('TGL DIBAYAR', 'payment_date', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -177,7 +177,7 @@ export default function WithholdingTaxTable({
                       {formatCurrency(item.payment_amount || 0)}
                     </td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.payment_date)}</td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

@@ -52,7 +52,7 @@ export function DOEkspedisiDetailTable({
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Invoice Tambahan</TableHead>
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PPN</TableHead>
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Fee</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px]">Action</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -80,7 +80,7 @@ export function DOEkspedisiDetailTable({
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.additionalCostFee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppnFee)}</TableCell>
                   <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.serviceFee)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <div className="flex justify-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

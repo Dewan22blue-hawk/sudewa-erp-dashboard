@@ -114,7 +114,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               <th className="p-0 text-left">{renderSortHeader('DPP', 'dpp_amount', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('PPN 11%', 'ppn_11', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('Total Bayar', 'payment_amount', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Action</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -192,7 +192,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
                     <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.dpp_amount)}</td>
                     <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.ppn_11)}</td>
                     <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.payment_amount)}</td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">

@@ -220,7 +220,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
             <TableBody>
               {isError ? (
                 <TableRow className="group">
-                  <TableCell colSpan={11} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <TableCell colSpan={11} className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     Gagal memuat unit item
                   </TableCell>
                 </TableRow>

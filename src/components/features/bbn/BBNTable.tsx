@@ -226,7 +226,7 @@ export function BBNTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600">
                                             {item.otherFee === 0 ? '0' : formatCurrency(item.otherFee)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">

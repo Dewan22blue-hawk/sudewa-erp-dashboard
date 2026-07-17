@@ -98,7 +98,7 @@ export default function HutangTable({ data }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
             <tr className="border-b border-gray-200">
@@ -121,7 +121,7 @@ export default function HutangTable({ data }: Props) {
               <th className="py-2 text-right">
                 <SortableHeader title="AMOUNT HUTANG" sortKey="amountHutang" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
               </th>
-              <th className="px-4 py-3 text-center">ACTION</th>
+              <th className="px-4 py-3 text-center sticky right-0 bg-gray-50 z-10 border-l border-gray-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -135,7 +135,7 @@ export default function HutangTable({ data }: Props) {
                   <td className="px-4 py-3 text-right">{formatCurrency(item.totalBeli)}</td>
                   <td className="px-4 py-3 text-right">{formatCurrency(item.totalBayar)}</td>
                   <td className="px-4 py-3 text-right text-red-600 font-medium">{formatCurrency(item.amountHutang)}</td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-gray-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 p-0">

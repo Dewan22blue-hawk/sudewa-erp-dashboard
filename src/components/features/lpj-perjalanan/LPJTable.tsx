@@ -78,7 +78,7 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
               {data.length > 0 ? (
                 data.map((item) => (
                   <TableRow key={item.id} className="group hover:bg-gray-50/50">
-                    <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">{item.kodeLPJ}</TableCell>
+                    <TableCell className="text-center px-4 py-4">{item.kodeLPJ}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.driver}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.noPolisi}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{format(new Date(item.tglBerangkat), 'dd/MM/yyyy')}</TableCell>
@@ -91,7 +91,7 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.muatan}</TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.totalKM} km</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-center">
+                    <TableCell className="px-4 py-3 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

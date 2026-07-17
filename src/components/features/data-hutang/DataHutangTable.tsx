@@ -147,7 +147,7 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
         </div>
       ) : null}
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto shadow-none">
         <table className="w-full text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
@@ -158,7 +158,7 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
               <th className="p-0 text-left">{renderSortHeader('TOTAL BELI', 'grand_total', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('TOTAL BAYAR', 'total_paid', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('AMOUNT HUTANG', 'remaining_payment', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -181,7 +181,7 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
                   <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.grand_total)}</td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.total_paid)}</td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.remaining_payment)}</td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">

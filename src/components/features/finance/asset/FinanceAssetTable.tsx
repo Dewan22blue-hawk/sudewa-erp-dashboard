@@ -139,7 +139,7 @@ export function FinanceAssetTable({
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
-                                        <TableCell className="px-4 py-4 text-center">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400">

@@ -149,7 +149,7 @@ export const OrderListTable = React.memo(function OrderListTable({
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`} className="group border-slate-100">
                       {headers.map((header) => (
-                        <TableCell key={header.key} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                        <TableCell key={header.key} className={cn("px-4 py-4", header.key === 'action' ? "text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : "text-left")}>
                           <div className="h-4 min-w-[90px] animate-pulse rounded bg-slate-100" />
                         </TableCell>
                       ))}
@@ -262,7 +262,7 @@ export const OrderListTable = React.memo(function OrderListTable({
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
-                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="button" variant="ghost" size="icon" className="h-9 w-9 cursor-pointer rounded-full">

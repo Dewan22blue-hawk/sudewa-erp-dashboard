@@ -121,7 +121,7 @@ export default function LaporanBuktiPotongTable({
                 <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NOMINAL INVOICE</th>
                 <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPH</th>
                 <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">UANG MUKA PPH</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
               </tr>
             </thead>
             <tbody>
@@ -146,7 +146,7 @@ export default function LaporanBuktiPotongTable({
                     <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.nominal_invoice)}</td>
                     <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.pph)}</td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500">{item.uang_muka_pph || '-'}</td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500 hover:text-slate-900">

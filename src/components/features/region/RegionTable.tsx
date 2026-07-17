@@ -182,13 +182,13 @@ export function RegionTable({
                         {regions.length > 0 ? (
                             regions.map((region) => (
                                 <TableRow key={region.uuid} className="group bg-white hover:bg-slate-50 transition-colors">
-                                    <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                    <TableCell className="text-center px-4 py-4">
                                         {region.code || '-'}
                                     </TableCell>
                                     <TableCell className="px-4 py-4 text-sm text-gray-900 text-left truncate uppercase">
                                         {region.name}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                    <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                         <div className="flex justify-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

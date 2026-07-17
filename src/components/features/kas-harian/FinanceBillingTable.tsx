@@ -386,7 +386,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             <TableBody>
               {financeBillings.map((fb, index) => (
                 <TableRow key={fb.id} className="bg-white hover:bg-slate-50 transition-colors group">
-                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">{index + 1}</TableCell>
+                  <TableCell className="text-center px-4 py-4">{index + 1}</TableCell>
                   <TableCell className="text-slate-800">{formatDate(fb.payment_at)}</TableCell>
                   <TableCell className="text-slate-800">
                     <ReferenceLink href={`/dashboard/${slugStr}/master/account?search=${encodeURIComponent(getKasLabel(fb.account_id))}`}>
@@ -402,7 +402,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
                     {currenciesFormat(fb?.cash?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr', fb.amount)}
                   </TableCell>
                   <TableCell className="text-slate-600 max-w-[200px] truncate">{fb.note || '-'}</TableCell>
-                  <TableCell className="text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <TableCell className="text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     {!disabled && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

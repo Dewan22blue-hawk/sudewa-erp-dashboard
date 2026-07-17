@@ -128,7 +128,7 @@ export default function KasHarianTable({
 
   return (
     <div className="space-y-5">
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
         <table className="w-full min-w-[1120px] text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
@@ -247,7 +247,7 @@ export default function KasHarianTable({
                       {item.is_paid ? 'Lunas' : 'Belum Lunas'}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">

@@ -206,7 +206,7 @@ export function AssetTable({
                             {assets.length > 0 ? (
                                 assets.map((item, index) => (
                                     <TableRow key={item.uuid} className="group border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
-                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="text-center px-4 py-4">
                                             {(page - 1) * perPage + index + 1}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">
@@ -227,7 +227,7 @@ export function AssetTable({
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">
                                             {formatCurrency(item.price)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-center">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500">

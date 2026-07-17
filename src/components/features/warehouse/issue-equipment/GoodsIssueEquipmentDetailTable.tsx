@@ -77,7 +77,7 @@ export function GoodsIssueEquipmentDetailTable({
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.vehicleEquipment?.name || '-'}</TableCell>
               <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{item.qty}</TableCell>
               <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.description || '-'}</TableCell>
-              <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+              <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-9 w-9 rounded-full p-0">

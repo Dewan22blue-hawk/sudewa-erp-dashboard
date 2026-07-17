@@ -120,7 +120,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                 </div>
               </TableHead>
               {/* Action - center */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-gray-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 ACTION
               </TableHead>
             </TableRow>
@@ -188,7 +188,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                     {/* Kategori Akun */}
                     <TableCell className="px-4 py-4 text-sm text-gray-600">{getAccountCategoryLabel(account.category)}</TableCell>
                     {/* Action */}
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-gray-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
