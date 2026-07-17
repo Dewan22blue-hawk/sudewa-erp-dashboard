@@ -19,6 +19,7 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 const parseApiError = (err: any): string => {
   const details = err?.details ?? err?.response?.data?.errors;
@@ -42,6 +43,60 @@ export default function UnitPurchaseDetailPage() {
 
   const purchaseId = String(id ?? '');
   const unitItemId = String(unitId ?? '');
+
+  const columns = useMemo(
+    () => [
+      {
+        header: 'NO',
+        alignment: 'left' as const,
+        cell: (_: any, index: number) => index + 1,
+      },
+      {
+        header: 'Nomor Mesin',
+        accessorKey: 'machine_number',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (payment: any) => payment.machine_number,
+      },
+      {
+        header: 'Nomor Rangka',
+        accessorKey: 'chassis_number',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (payment: any) => payment.chassis_number,
+      },
+      {
+        header: 'Warna',
+        accessorKey: 'color',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (payment: any) => payment.color,
+      },
+      {
+        header: 'ACTION',
+        alignment: 'left' as const,
+        sticky: 'right' as const,
+        cell: (payment: any) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#111827]">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
+              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(payment)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(payment)}>
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [router, slug, purchaseId],
+  );
 
   const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
   const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
@@ -315,93 +370,35 @@ export default function UnitPurchaseDetailPage() {
 
         <Card className="border border-slate-200 shadow-sm">
           <CardContent className="p-4 space-y-4">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Unit</h2>
-                <p className="text-xs text-slate-500">Rincian lengkap unit yang dibeli</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {canCreate && (
-                  <>
-                    <Button size="sm" variant="outline" onClick={() => setOpenImport(true)} disabled={qty === details.length}>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Import
-                    </Button>
-                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreateForm} disabled={qty === details.length || !qty}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Tambah Detail Unit
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-[#F9FAFB] hover:bg-[#F9FAFB]">
-                    <TableHead className="text-xs font-semibold text-slate-500 w-[80px]">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500">Warna</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500">Nomor Mesin</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500">Nomor Rangka</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-500 sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {detailsLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                        Memuat detail unit...
-                      </TableCell>
-                    </TableRow>
-                  ) : detailsError ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center text-destructive">
-                        Gagal memuat detail unit
-                      </TableCell>
-                    </TableRow>
-                  ) : details.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                        Belum ada detail unit
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    details.map((item, index) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{item.color}</TableCell>
-                        <TableCell>
-                          <CopyBox text={item.machine_number || '-'} />
-                        </TableCell>
-                        <TableCell>
-                          <CopyBox text={item.chassis_number || '-'} />
-                        </TableCell>
-                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEditForm(item)} disabled={!canEdit}>
-                                <Pencil className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteTarget(item)} disabled={!canDelete}>
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Hapus
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <BaseTable
+              data={details ?? []}
+              columns={columns}
+              headerRowClassName="bg-[#E9EEF5] hover:bg-[#E9EEF5]"
+              defaultSort={{ key: 'payment_date', direction: 'desc' }}
+              headerActions=
+              {(
+                <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
+                  <div>
+                    <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Detail Unit</h2>
+                    <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {canCreate && (
+                      <>
+                        <Button size="sm" variant="outline" onClick={() => setOpenImport(true)} disabled={qty === details.length}>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Import
+                        </Button>
+                        <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreateForm} disabled={qty === details.length || !qty}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Tambah Detail Unit
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            />
           </CardContent>
         </Card>
       </div>

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 export interface ColumnDef<T> {
   header: React.ReactNode;
   id?: string;
-  accessorKey?: keyof T | string; // Optional key for sorting (or path)
+  accessorKey?: string; // Optional key for sorting (or path)
   sortable?: boolean; // If true, this column can be sorted
   alignment?: 'left' | 'center' | 'right';
   className?: string;
@@ -22,18 +22,18 @@ export interface BaseTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   loading?: boolean;
-  
+
   // Header / Control bar props
   searchPlaceholder?: string;
   search?: string;
   onSearchChange?: (value: string) => void;
   headerActions?: React.ReactNode;
-  
+
   // Show / Limit page props
   showLimitChange?: boolean;
   perPage?: number;
   onPerPageChange?: (value: number) => void;
-  
+
   // Sorting props
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
@@ -101,7 +101,7 @@ export default function BaseTable<T>({
   const handleSort = (key: string) => {
     const nextDirection =
       activeSort?.key === key && activeSort.direction === 'asc' ? 'desc' : 'asc';
-    
+
     if (onSortChange) {
       onSortChange(key, nextDirection);
     } else {
@@ -189,50 +189,55 @@ export default function BaseTable<T>({
     ));
   };
 
-  const hasControls = onSearchChange || headerActions || showLimitChange;
+  const hasControls = Boolean(onSearchChange || headerActions || showLimitChange);
+  const showDefaultControls = Boolean(onSearchChange || showLimitChange);
 
   return (
     <div className="space-y-4">
       {hasControls && (
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            {onSearchChange && (
-              <div className="relative w-full sm:w-[240px]">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                <Input
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  className="pl-8 bg-white h-9 border-slate-300"
-                  value={localSearch}
-                  onChange={(e) => setLocalSearch(e.target.value)}
-                />
-              </div>
-            )}
+        showDefaultControls ? (
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+              {onSearchChange && (
+                <div className="relative w-full sm:w-[240px]">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="text"
+                    placeholder={searchPlaceholder}
+                    className="pl-8 bg-white h-9 border-slate-300"
+                    value={localSearch}
+                    onChange={(e) => setLocalSearch(e.target.value)}
+                  />
+                </div>
+              )}
 
-            {showLimitChange && onPerPageChange && (
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <span className="text-sm font-medium text-slate-700">Show</span>
-                <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                  <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
-                    <SelectValue placeholder="25" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span className="text-sm font-medium text-slate-700">Page</span>
+              {showLimitChange && onPerPageChange && (
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <span className="text-sm font-medium text-slate-700">Show</span>
+                  <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                    <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
+                      <SelectValue placeholder="25" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm font-medium text-slate-700">Page</span>
+                </div>
+              )}
+            </div>
+
+            {headerActions && (
+              <div className="w-full sm:w-auto">
+                {headerActions}
               </div>
             )}
           </div>
-
-          {headerActions && (
-            <div className="w-full sm:w-auto">
-              {headerActions}
-            </div>
-          )}
-        </div>
+        ) : (
+          headerActions
+        )
       )}
 
       <div className={cn('relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none', containerClassName)}>
@@ -255,8 +260,8 @@ export default function BaseTable<T>({
                     className={cn(
                       'px-4 py-4 text-xs font-semibold uppercase text-slate-500 whitespace-nowrap',
                       isSortable && 'cursor-pointer select-none group',
-                      col.sticky === 'right' && cn('sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]', headerRowClassName),
-                      col.sticky === 'left' && cn('sticky left-0 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)]', headerRowClassName),
+                      col.sticky === 'right' && cn('sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]', headerRowClassName),
+                      col.sticky === 'left' && cn('sticky left-0 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]', headerRowClassName),
                       textAlignment,
                       col.headerClassName
                     )}
@@ -305,8 +310,8 @@ export default function BaseTable<T>({
                         key={col.id || colIdx}
                         className={cn(
                           'px-4 py-4 text-sm text-slate-700 transition-colors',
-                          col.sticky === 'right' && 'sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]',
-                          col.sticky === 'left' && 'sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)]',
+                          col.sticky === 'right' && 'sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]',
+                          col.sticky === 'left' && 'sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]',
                           textAlignment,
                           col.className
                         )}
