@@ -3,6 +3,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +15,7 @@ export interface ColumnDef<T> {
   alignment?: 'left' | 'center' | 'right';
   className?: string;
   headerClassName?: string;
-  cell: (item: T, index: number) => React.ReactNode;
+  cell?: (item: T, index: number) => React.ReactNode;
   sticky?: 'left' | 'right'; // If provided, column will float/sticky
 }
 
@@ -52,6 +53,12 @@ export interface BaseTableProps<T> {
   // Custom styling
   headerRowClassName?: string; // e.g. bg-[#f8f9fa] or bg-[#E9EEF5]
   containerClassName?: string;
+
+  // Selection / Checkbox props
+  showCheckbox?: boolean;
+  selectedIds?: Set<string>;
+  onSelectedIdsChange?: (ids: Set<string>) => void;
+  getRowId?: (item: T) => string;
 }
 
 export default function BaseTable<T>({
@@ -73,11 +80,46 @@ export default function BaseTable<T>({
   onPageChange,
   headerRowClassName = 'bg-[#f8f9fa]',
   containerClassName,
+  showCheckbox = false,
+  selectedIds,
+  onSelectedIdsChange,
+  getRowId,
 }: BaseTableProps<T>) {
   const [localSearch, setLocalSearch] = useState(search || '');
   const [internalSort, setInternalSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(
     defaultSort || null
   );
+
+  const getRowIdInternal = (item: T) => {
+    if (getRowId) return getRowId(item);
+    const anyItem = item as any;
+    return String(anyItem.id || anyItem.uuid || '');
+  };
+
+  const handleToggleAll = (checked: boolean) => {
+    if (!onSelectedIdsChange) return;
+    const next = new Set(selectedIds || new Set());
+    sortedData.forEach((item) => {
+      const id = getRowIdInternal(item);
+      if (checked) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+    });
+    onSelectedIdsChange(next);
+  };
+
+  const handleToggleOne = (id: string, checked: boolean) => {
+    if (!onSelectedIdsChange) return;
+    const next = new Set(selectedIds || new Set());
+    if (checked) {
+      next.add(id);
+    } else {
+      next.delete(id);
+    }
+    onSelectedIdsChange(next);
+  };
 
   // Sync search prop
   useEffect(() => {
@@ -244,6 +286,15 @@ export default function BaseTable<T>({
         <Table className="w-max min-w-full">
           <TableHeader className={cn('border-b border-gray-200', headerRowClassName)}>
             <TableRow className="hover:bg-transparent border-none">
+              {showCheckbox && (
+                <TableHead className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
+                  <Checkbox
+                    checked={sortedData.length > 0 && sortedData.every((item) => selectedIds?.has(getRowIdInternal(item)))}
+                    onCheckedChange={handleToggleAll}
+                    aria-label="Pilih semua"
+                  />
+                </TableHead>
+              )}
               {columns.map((col, idx) => {
                 const alignment = col.alignment ?? 'left';
                 const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
@@ -288,7 +339,7 @@ export default function BaseTable<T>({
           <TableBody>
             {sortedData.length === 0 ? (
               <TableRow className="hover:bg-transparent border-none">
-                <TableCell colSpan={columns.length} className="text-center px-4 py-16 bg-white border-none">
+                <TableCell colSpan={columns.length + (showCheckbox ? 1 : 0)} className="text-center px-4 py-16 bg-white border-none">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <div className="rounded-full bg-slate-50 p-4 mb-2">
                       <Search className="h-8 w-8 text-slate-400" />
@@ -301,6 +352,15 @@ export default function BaseTable<T>({
             ) : (
               sortedData.map((item, rowIdx) => (
                 <TableRow key={rowIdx} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
+                  {showCheckbox && (
+                    <TableCell className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
+                      <Checkbox
+                        checked={selectedIds?.has(getRowIdInternal(item)) ?? false}
+                        onCheckedChange={(checked) => handleToggleOne(getRowIdInternal(item), Boolean(checked))}
+                        aria-label="Pilih baris"
+                      />
+                    </TableCell>
+                  )}
                   {columns.map((col, colIdx) => {
                     const alignment = col.alignment ?? 'left';
                     const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
@@ -316,7 +376,11 @@ export default function BaseTable<T>({
                           col.className
                         )}
                       >
-                        {col.cell(item, rowIdx)}
+                        {col.cell
+                          ? col.cell(item, rowIdx)
+                          : col.accessorKey
+                            ? String((item as any)[col.accessorKey] ?? '')
+                            : null}
                       </TableCell>
                     );
                   })}

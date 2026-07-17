@@ -1,20 +1,21 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { ChevronRight, MoreVertical, Plus, Search, ArrowLeft } from 'lucide-react';
+import { ChevronRight, MoreVertical, Plus, ArrowLeft, FileText, DollarSign, Package } from 'lucide-react';
 import type { UnitTransactionRefundPayment } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useDeleteRefundPayment, useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
+import { useDeleteRefundPayment, useRefundDetail } from '@/hooks/useRefundAdministrasi';
 import { toast } from 'sonner';
 import PurchaseRefundPaymentDetailModal from './PurchaseRefundPaymentDetailModal';
-import { refundInputClassName, refundPrimaryButtonClassName } from './purchase-refund.styles';
 import { RefundPaymentProgressBadge } from '@/components/features/refund/RefundPaymentProgressBadge';
 import { getRefundPaymentProgressStatus } from '@/components/features/refund/refund.utils';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { Badge } from '@/components/ui/badge';
+import { CopyBox } from '@/components/ui/copy-box';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -31,7 +32,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
   const [deletingPayment, setDeletingPayment] = useState<UnitTransactionRefundPayment | null>(null);
   const deletePaymentMutation = useDeleteRefundPayment();
 
-  const transactionQuery = useRefundTransactionDetail(transactionId);
   const refundQuery = useRefundDetail(refundId);
   const refund = refundQuery.data;
 
@@ -39,12 +39,70 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
   const lessPayment = Math.max(0, Number(refund?.refund_amount || 0) - totalPaid);
   const qty = refund?.items?.length ?? 0;
 
+  const unitColumns = useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'NO',
+        alignment: 'left',
+        cell: (_, index) => index + 1,
+      },
+      {
+        header: 'TIPE UNIT',
+        alignment: 'left',
+        cell: (item) => item.unit_type_name || '-',
+      },
+      {
+        header: 'WARNA',
+        alignment: 'left',
+        cell: (item) => item.color || '-',
+      },
+      {
+        header: 'NO. MESIN',
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.machine_number || '-'} />,
+      },
+      {
+        header: 'NO. RANGKA',
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.chassis_number || '-'} />,
+      },
+      {
+        header: 'STATUS UNIT',
+        alignment: 'left',
+        cell: (item) => (
+          <Badge variant="outline" className={`${item.status === 'refunded' || item.status === 'returned' ? 'border-orange-200 bg-orange-50 text-orange-700' : item.status === 'receive' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-700'} font-semibold`}>
+            {item.status}
+          </Badge>
+        ),
+      },
+      {
+        header: 'TANGGAL DIBUAT',
+        alignment: 'left',
+        cell: (item) => formatDate(item.created_at),
+      },
+      {
+        header: 'NILAI',
+        alignment: 'right',
+        cell: (item) => currenciesFormat('idr', Number(item.price ?? 0)),
+      },
+    ],
+    [],
+  );
+
+
   const columns = useMemo<ColumnDef<UnitTransactionRefundPayment>[]>(
     () => [
       {
         header: 'NO',
         alignment: 'left',
         cell: (_, index) => index + 1,
+      },
+      {
+        header: 'KODE REFUND',
+        accessorKey: 'code',
+        sortable: true,
+        alignment: 'left',
+        cell: (payment) => <CopyBox text={payment.code || '-'} />,
       },
       {
         header: 'TANGGAL REFUND',
@@ -105,7 +163,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
     }
   };
 
-  if (refundQuery.isLoading || transactionQuery.isLoading) {
+  if (refundQuery.isLoading) {
     return (
       <DashboardLayout>
         <div className="p-10 text-center text-[#6B7280]">Memuat detail refund pembelian...</div>
@@ -159,45 +217,112 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
           <p className="text-sm text-slate-600">Pembayaran refund hanya bisa ditambahkan setelah refund ini tersimpan.</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Kode Refund</label>
-            <Input readOnly value={refund.code || ''} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Nominal Refund</label>
-            <Input readOnly value={currenciesFormat('idr', refund.refund_amount)} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Tanggal Refund</label>
-            <Input readOnly value={formatDate(refund.refund_date)} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Kurang Bayar</label>
-            <Input readOnly value={currenciesFormat('idr', lessPayment)} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Tipe</label>
-            <Input readOnly value={refund.items?.[0]?.unit_type_name || refund.note || ''} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">QTY</label>
-            <Input readOnly value={String(qty)} className={refundInputClassName} />
-          </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Card 1: Informasi Refund */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="p-5 space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-md bg-blue-50">
+                  <FileText className="h-5 w-5 text-blue-500" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-700">Informasi Refund</h3>
+              </div>
+              <div className="text-sm text-slate-600 mt-3 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-slate-400">Kode Refund</p>
+                    <p className="font-semibold text-slate-900">
+                      <CopyBox text={refund.code || '-'} />
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">Tanggal Refund</p>
+                    <p className="font-semibold text-slate-900">{formatDate(refund.refund_date)}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+                  <span className="text-xs text-slate-400">Nominal Refund</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', refund.refund_amount)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Total Terbayar</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPaid)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">Kurang Bayar</span>
+                  <span className="font-bold text-emerald-600">{currenciesFormat('idr', lessPayment)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: Informasi Unit */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="p-5 space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-md bg-yellow-50">
+                  <Package className="h-5 w-5 text-yellow-500" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-700">Informasi Unit</h3>
+              </div>
+              <div className="text-sm text-slate-600 mt-3 space-y-2">
+                <div>
+                  <p className="text-xs text-slate-400">Tipe Unit</p>
+                  <p className="font-semibold text-slate-900 truncate" title={refund.items?.[0]?.unit_type_name || refund.note || '-'}>
+                    {refund.items?.[0]?.unit_type_name || refund.note || '-'}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Quantity</span>
+                  <span className="font-semibold text-slate-900">{qty}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs text-slate-400">Alasan Refund</span>
+                  <p className="text-slate-900 p-2 rounded-md bg-slate-50 w-full">
+                    {refund?.note || '-'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <BaseTable
-          data={refund.payments ?? []}
-          columns={columns}
-          headerRowClassName="bg-[#E9EEF5] hover:bg-[#E9EEF5]"
-          defaultSort={{ key: 'payment_date', direction: 'desc' }}
-          headerActions={
-            <Button className={refundPrimaryButtonClassName} onClick={() => setIsAddDetailOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Tambah Pembayaran Refund
-            </Button>
-          }
-        />
+        {/* Tabel Detail Unit yang Direfund */}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-base font-semibold text-slate-800">Detail Unit yang Direfund</h2>
+            <p className="text-xs text-slate-500">Rincian item detail unit yang termasuk dalam refund ini</p>
+          </div>
+          <BaseTable
+            data={refund.items ?? []}
+            columns={unitColumns}
+            headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
+          />
+        </div>
+
+        {/* Tabel Pembayaran Refund */}
+        <div className="space-y-4">
+          <BaseTable
+            data={refund.payments ?? []}
+            columns={columns}
+            headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
+            defaultSort={{ key: 'payment_date', direction: 'desc' }}
+            headerActions={
+              <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-slate-800">Riwayat Pembayaran Refund</h2>
+                  <p className="text-xs text-slate-500">Daftar transaksi pembayaran refund yang telah dicatat</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setIsAddDetailOpen(true)} disabled={lessPayment === 0}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Pembayaran Refund
+                  </Button>
+                </div>
+              </div>
+            }
+          />
+        </div>
 
         <PurchaseRefundPaymentDetailModal open={isAddDetailOpen} onClose={() => setIsAddDetailOpen(false)} refund={refund} />
         <PurchaseRefundPaymentDetailModal open={Boolean(editingPayment)} onClose={() => setEditingPayment(null)} refund={refund} payment={editingPayment} />

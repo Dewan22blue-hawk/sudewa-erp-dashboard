@@ -178,7 +178,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                 className="rounded-[10px] px-4 py-3 text-sm text-[#111827]"
                 onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${transactionId}/refund/${payment.id}`)}
               >
-                Detail
+                Bayar Refund
               </DropdownMenuItem>
               <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => handleDeletePrompt(payment)}>
                 Hapus
@@ -438,7 +438,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
         <BaseTable
           data={refunds ?? []}
           columns={columns}
-          headerRowClassName="border-slate-200 bg-white"
+          headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
           defaultSort={{ key: 'payment_date', direction: 'desc' }}
           headerActions={
             <div className='w-full flex items-end justify-end'>

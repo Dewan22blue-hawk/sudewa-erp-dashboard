@@ -95,7 +95,6 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
             unit_transaction_refund_id: values.unit_transaction_refund_id,
             payment_date: values.payment_date,
             amount: values.amount,
-            note: values.note,
             cash_id: resolvedCashId,
           },
         });
@@ -115,15 +114,15 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[430px] rounded-[14px] border-none p-0 shadow-[0_20px_50px_rgba(15,23,42,0.25)] sm:max-w-[430px]">
+      <DialogContent className="max-w-[430px] max-h-[800px] rounded-[14px] border-none p-0 shadow-[0_20px_50px_rgba(15,23,42,0.25)] sm:max-w-[430px]">
         <DialogHeader className="px-6 pb-0 pt-7 text-left">
           <DialogTitle className="text-[18px] font-semibold text-[#111827]">
             {isEdit ? `Edit Detail Refund ${entityLabel}` : `Tambah Detail Refund ${entityLabel}`}
           </DialogTitle>
-          <p className="mt-2 text-sm text-[#6B7280]">{isEdit ? 'Edit detail refund' : 'Tambah detail refund'}</p>
+          <p className="text-sm text-[#6B7280]">{isEdit ? 'Edit detail pembayaran refund' : 'Tambah detail pembayaran refund'}</p>
         </DialogHeader>
 
-        <form onSubmit={onSubmit} className="space-y-5 px-6 pb-7 pt-6">
+        <form onSubmit={onSubmit} className="space-y-5 px-6 mb-5">
           <div className="grid gap-3 rounded-[12px] border border-[#D9DEE8] bg-[#F8FAFC] p-4 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-[#6B7280]">Nominal Refund</span>
@@ -138,8 +137,7 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
           <div>
             <Label className={refundLabelClassName}>Tanggal Refund</Label>
             <div className="relative">
-              <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#6B7280]" />
-              <Input type="date" className={`${refundInputClassName} pl-12`} {...form.register('payment_date')} />
+              <Input type="date" {...form.register('payment_date')} />
             </div>
             {form.formState.errors.payment_date ? <p className="mt-2 text-sm text-red-600">{form.formState.errors.payment_date.message}</p> : null}
           </div>
@@ -153,11 +151,12 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
                 <Input
                   type="text"
                   inputMode="numeric"
-                  className={refundInputClassName}
                   placeholder="Rp 0"
                   value={field.value === undefined || field.value === null || Number(field.value) === 0 ? '' : formatCurrency(Number(field.value))}
-                  onChange={(event) => {
-                    field.onChange(parseCurrencyInput(event.target.value));
+                  onChange={(e) => {
+                    const nextAmount = parseCurrencyInput(e.target.value);
+                    const clampedAmount = remainingAmount ? Math.min(nextAmount, remainingAmount) : nextAmount;
+                    field.onChange(clampedAmount);
                   }}
                   onBlur={field.onBlur}
                   name={field.name}
@@ -165,13 +164,11 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
                 />
               )}
             />
-            {!form.formState.errors.amount ? <p className="mt-2 text-xs text-[#6B7280]">Nominal refund diisi manual dan akan diformat ke IDR.</p> : null}
-            {form.formState.errors.amount ? <p className="mt-2 text-sm text-red-600">{form.formState.errors.amount.message}</p> : null}
-          </div>
-
-          <div>
-            <Label className={refundLabelClassName}>Keterangan</Label>
-            <Textarea className="min-h-[112px] rounded-[12px] border border-[#D9DEE8] px-4 py-3 text-sm shadow-none focus-visible:ring-0" placeholder="Type your message here." {...form.register('note')} />
+            {form.formState.errors.amount ? (
+              <p className="mt-2 text-sm text-red-600">{form.formState.errors.amount.message}</p>
+            ) : (
+              <p className="mt-2 text-xs text-[#6B7280]">Nominal refund diisi manual dan akan diformat ke IDR.</p>
+            )}
           </div>
 
           <div className="space-y-3 pt-1">
