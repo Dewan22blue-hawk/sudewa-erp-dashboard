@@ -373,7 +373,7 @@ export default function UnitPurchaseDetailPage() {
             <BaseTable
               data={details ?? []}
               columns={columns}
-              headerRowClassName="bg-[#E9EEF5] hover:bg-[#E9EEF5]"
+              headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
               defaultSort={{ key: 'payment_date', direction: 'desc' }}
               headerActions=
               {(
