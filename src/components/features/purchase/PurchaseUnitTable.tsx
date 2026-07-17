@@ -5,23 +5,26 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, MoreVertical, Pencil, Plus, Trash2, Info } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Trash2, Info, Search } from 'lucide-react';
 import { UnitTransactionItem } from '@/@types/unit-transaction.types';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { useBulkDeleteUnitItem, useDeleteUnitItem, usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useUnitItemDetailsByTransactionId } from '@/hooks/useUnitItemDetail';
-import { formatCurrency } from '@/lib/utils/currency';
 import { Checkbox } from '@/components/ui/checkbox';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface Props {
   purchaseId: string;
   slug: string;
   isPaid?: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
-export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: Props) {
+export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, canEdit, canDelete }: Props) {
   const router = useRouter();
   const { data, isLoading, isError } = usePurchaseUnitItems(purchaseId);
   const { data: typeUnits } = useTypeUnits();
@@ -133,8 +136,8 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
           <div>
             <p className="font-semibold text-slate-900">Detail Unit Belum Lengkap</p>
             <p className="text-xs mt-0.5 text-slate-600">
-              Beberapa tipe unit belum memiliki detail unit (Warna, No Rangka, No Mesin) yang lengkap. 
-              Silakan klik menu <span className="font-semibold">Action &gt; Detail / Kelola Unit</span> pada baris item untuk melengkapi detailnya sebelum melakukan Terima Barang.
+              Beberapa tipe unit belum memiliki detail unit (Warna, No Rangka, No Mesin) yang lengkap.
+              Silakan klik menu <span className="font-semibold">Aksi &gt; Detail / Kelola Unit</span> pada baris item untuk melengkapi detailnya sebelum melakukan Terima Barang.
             </p>
           </div>
         </div>
@@ -206,66 +209,77 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                     aria-label="Pilih semua"
                   />
                 </TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE UNIT</TableHead>
+                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Tipe Unit</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">QTY</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PRICE</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Harga</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">BBN</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">EXPEDITION FEE</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">OTHER FEE</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP TOTAL</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN TOTAL</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[120px]">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Biaya Ekspedisi</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Biaya Lainnya</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">DPP Total</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPN Total</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isError ? (
-                <TableRow>
-                  <TableCell colSpan={11} className="h-20 text-center text-destructive px-4 py-4 text-sm">
+                <TableRow className="group">
+                  <TableCell colSpan={11} className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     Gagal memuat unit item
                   </TableCell>
                 </TableRow>
               ) : isLoading ? (
-                <TableRow>
+                <TableRow className="group">
                   <TableCell colSpan={11} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                     Loading data...
                   </TableCell>
                 </TableRow>
               ) : pagedData.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={11} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
-                    Belum ada unit item.
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="h-20 text-center text-muted-foreground px-4 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
                 pagedData.map((item, idx) => {
                   const itemDetails = allDetails.filter((d) => String(d.unit_transaction_item_id) === String(item.id));
                   const isComplete = itemDetails.length === Number(item.qty_total ?? 0);
+                  console.log(item);
                   return (
-                    <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <TableRow key={item.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
-                      <TableCell className="px-4 py-4 text-center">
+                      <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                         <Checkbox
                           checked={selectedIds.has(item.id)}
                           onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))}
                           aria-label="Pilih baris"
                         />
                       </TableCell>
-                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">{getUnitTypeName(item.unit_type_id)}</TableCell>
+                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">
+                        <ReferenceLink href={`/dashboard/${slug}/master-data/tipe-unit?search=${getUnitTypeName(item.unit_type_id)}`}>
+                          {getUnitTypeName(item.unit_type_id)}
+                        </ReferenceLink>
+                      </TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{item.qty_total}</TableCell>
                       <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                        <div>{formatCurrency(item.price)}</div>
+                        <div>{currenciesFormat('idr', item.price)}</div>
                         {item.price_usd ? (
                           <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga USD">
-                            {formatCurrency(item.price_usd, 'USD')}
+                            {currenciesFormat('usd', item.price_usd)}
                           </div>
                         ) : null}
                       </TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.bbn_price)}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.expedition_fee)}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.other_fee)}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{formatCurrency(item.dpp_total_price)}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatCurrency(item.ppn_total_price)}</TableCell>
-                      <TableCell className="px-4 py-4 text-center">
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.bbn_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.expedition_fee)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.other_fee)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 font-semibold">{currenciesFormat('idr', item.dpp_total_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.ppn_total_price)}</TableCell>
+                      <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -273,7 +287,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(item.id)}>
+                            <DropdownMenuItem onClick={() => handleEdit(item.id)} disabled={!canEdit}>
                               <Pencil className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDetail(item.id)}>
@@ -282,6 +296,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false }: 
                             <DropdownMenuItem
                               className="text-red-600 focus:text-red-600 focus:bg-red-50"
                               onClick={() => setUnitToDelete(item.id)}
+                              disabled={!canDelete}
                             >
                               <Trash2 className="mr-2 h-4 w-4" /> Hapus
                             </DropdownMenuItem>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { MoreVertical, Plus, Search } from 'lucide-react';
+import { MoreVertical, Plus, Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -23,7 +23,7 @@ interface GoodsIssueTableProps {
   onPageChange: (value: number) => void;
   onPerPageChange: (value: number) => void;
   onSearchChange: (value: string) => void;
-  onAdd: () => void;
+  onAdd?: () => void;
   onPay: (item: GoodsIssue) => void;
   onUpload: (item: GoodsIssue) => void;
   onDelete: (item: GoodsIssue) => void;
@@ -80,14 +80,14 @@ export function GoodsIssueTable({
             </div>
           </div>
 
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Button onClick={() => onAdd?.()} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-          <Table>
+        <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+        <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE PENGELUARAN</TableHead>
@@ -95,27 +95,40 @@ export function GoodsIssueTable({
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">CUSTOMER</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">HARGA JUAL</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap">ACTION</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Memuat data pengeluaran material...</TableCell>
+                <TableRow className="group">
+                  <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ) : data.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-28 text-center text-slate-500 text-sm">Tidak ada data pengeluaran material.</TableCell>
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="py-16 h-28 text-center text-slate-500 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ) : (
                 data.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.code}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatDate(item.transactionDate)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.customer?.name ?? '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{formatCurrency(item.totalBrutto)}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{getIssueStatusLabel(item)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">

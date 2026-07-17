@@ -12,6 +12,7 @@ import { useAccounts, useDeleteAccount, useUpdateAccount, useBulkUpdateAccounts 
 import { useAccountGroups } from '@/hooks/useAccountGroup';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { useCompany } from '@/contexts/CompanyContext';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { Account } from '@/@types/account.types';
 import type { AccountGroup } from '@/@types/account-group.types';
 import { ACCOUNT_CATEGORY_OPTIONS, getAccountTypeFromCategory } from '@/lib/account';
@@ -32,6 +33,10 @@ const initialBulkFormValues: BulkFormValues = {
 
 export const AccountListPage = () => {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
 
   const { data, isLoading, isError, isFetching } = useAccounts({
@@ -129,34 +134,40 @@ export const AccountListPage = () => {
   };
 
   const handleAdd = () => {
-    const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
-    router.push(`${basePath}/create`);
+    if (canCreate) {
+      const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
+      router.push(`${basePath}/create`);
+    }
   };
 
   const handleEdit = (account: Account) => {
-    const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
-    router.push(`${basePath}/${account.id}/edit`);
+    if (canEdit) {
+      const basePath = router.query.slug ? `/dashboard/${router.query.slug}/master/account` : '/master-data/account';
+      router.push(`${basePath}/${account.id}/edit`);
+    }
   };
 
   const handleDelete = async () => {
-    if (!selectedAccount) return;
+    if (canDelete) {
+      if (!selectedAccount) return;
 
-    try {
-      await deleteMutation.mutateAsync(selectedAccount.id);
-      toast.success('Data akun berhasil dihapus');
-      setSelectedIds((previous) => {
-        const next = new Set(previous);
-        next.delete(String(selectedAccount.id));
-        return next;
-      });
-      setTimeout(() => {
-        document.body.style.pointerEvents = 'auto';
-      }, 100);
-    } catch (error) {
-      const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus akun';
-      toast.error(message);
-    } finally {
-      setSelectedAccount(null);
+      try {
+        await deleteMutation.mutateAsync(selectedAccount.id);
+        toast.success('Data akun berhasil dihapus');
+        setSelectedIds((previous) => {
+          const next = new Set(previous);
+          next.delete(String(selectedAccount.id));
+          return next;
+        });
+        setTimeout(() => {
+          document.body.style.pointerEvents = 'auto';
+        }, 100);
+      } catch (error) {
+        const message = error instanceof ApiResponseError ? error.message : 'Gagal menghapus akun';
+        toast.error(message);
+      } finally {
+        setSelectedAccount(null);
+      }
     }
   };
 
@@ -324,14 +335,18 @@ export const AccountListPage = () => {
                 <Upload className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpenImport(true)}>
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-              <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={handleAdd}>
-                <Plus className="h-4 w-4 mr-2" />
-                Tambah
-              </Button>
+              {canCreate && (
+                <>
+                  <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpenImport(true)}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import
+                  </Button>
+                  <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={handleAdd}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -358,6 +373,8 @@ export const AccountListPage = () => {
               total={totalAccounts}
               isLoading={isLoading || isFetching}
               page={page}
+              canEdit={canEdit}
+              canDelete={canDelete}
               perPage={perPage}
               selectedIds={selectedIds}
               onToggleAll={toggleAll}

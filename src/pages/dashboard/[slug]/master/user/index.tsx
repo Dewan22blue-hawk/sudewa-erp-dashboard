@@ -49,8 +49,8 @@ export default function UserPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold">User</h1>
-              <p className="text-sm text-muted-foreground">Kelola user role</p>
+              <h1 className="text-2xl font-semibold">Pengguna</h1>
+              <p className="text-sm text-muted-foreground">Kelola data Pengguna</p>
             </div>
           </div>
           <Card className="rounded-xl p-8 flex justify-center items-center h-[300px]">
@@ -67,8 +67,8 @@ export default function UserPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold">User</h1>
-              <p className="text-sm text-muted-foreground">Kelola user role</p>
+              <h1 className="text-2xl font-semibold">Pengguna</h1>
+              <p className="text-sm text-muted-foreground">Kelola data Pengguna</p>
             </div>
           </div>
           <Card className="rounded-xl p-8 flex justify-center items-center h-[300px]">
@@ -85,8 +85,8 @@ export default function UserPage() {
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">User</h1>
-            <p className="text-sm text-muted-foreground">Kelola user role</p>
+            <h1 className="text-2xl font-semibold">Pengguna</h1>
+            <p className="text-sm text-muted-foreground">Kelola data Penngguna</p>
           </div>
         </div>
 

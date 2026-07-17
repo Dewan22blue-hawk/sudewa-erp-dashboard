@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MoreVertical, Printer, Edit, FileText, Trash2 } from 'lucide-react';
+import { Search, MoreVertical, Printer, Edit, FileText, Trash2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -107,8 +107,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
         </div>
       </div>
 
-      <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-        <div className="overflow-x-auto">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
           <Table className="min-w-[980px]">
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
@@ -118,21 +117,22 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Nama Driver</TableHead>
                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No Polisi</TableHead>
                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Tipe</TableHead>
-                <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px]">Action</TableHead>
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell colSpan={7} className="px-4 py-4">
-                      <div className="h-5 animate-pulse rounded bg-slate-200" />
-                    </TableCell>
-                  </TableRow>
-                ))
+                <tr>
+                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
               ) : data.length > 0 ? (
                 data.map((item) => (
-                  <TableRow key={item.id} className="border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
+                  <TableRow key={item.id} className="group border-b border-[#EEF2F6] last:border-0 hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-800">{item.doCode || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.orderCode || item.orderList?.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">
@@ -141,7 +141,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.driver?.name || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.vehicle?.registrationNumber || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-600">{item.vehicle?.type || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -173,16 +173,21 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center text-slate-500">
-                    Tidak ada data DO Ekspedisi ditemukan
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="py-16 h-32 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+      </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <div>
@@ -200,7 +205,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
             >
               Previous
             </Button>
-            
+
             {renderPaginationNumbers()}
 
             <Button

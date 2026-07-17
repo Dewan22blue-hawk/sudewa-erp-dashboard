@@ -153,48 +153,49 @@ export function PurchaseMaterialTable({
 
       <Card className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className={!isLoading && data.length > 0 ? 'pr-24' : undefined}>
-        <Table className="min-w-[820px]">
-          <TableHeader className="bg-slate-100">
-            <TableRow className="border-slate-200">
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{codeHeader}</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{dateHeader}</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{counterpartyHeader}</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">NOMINAL</TableHead>
-              <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">STATUS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-28 text-center text-slate-500">
-                  {loadingText}
-                </TableCell>
+          <Table className="min-w-[820px]">
+            <TableHeader className="bg-slate-100">
+              <TableRow className="border-slate-200">
+                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{codeHeader}</TableHead>
+                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{dateHeader}</TableHead>
+                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">{counterpartyHeader}</TableHead>
+                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">NOMINAL</TableHead>
+                <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">STATUS</TableHead>
               </TableRow>
-            ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-28 text-center text-slate-500">
-                  {emptyText}
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.map((item) => {
-                const statusMeta = getPaymentStatusMeta(item);
-                return (
-                <TableRow key={item.id} className="group border-slate-200 hover:bg-slate-50/70">
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.code}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatDate(item.transactionDate)}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.supplierName}</TableCell>
-                  <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatCurrency(item.totalAmount)}</TableCell>
-                  <TableCell className="px-5 py-4">
-                    <Badge variant="outline" className={`rounded-full px-3 py-1 text-[12px] font-semibold ${statusMeta.className}`}>
-                      {statusMeta.label}
-                    </Badge>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow className="group">
+                  <TableCell colSpan={5} className="h-28 text-center text-slate-500">
+                    {loadingText}
                   </TableCell>
                 </TableRow>
-              )})
-            )}
-          </TableBody>
-        </Table>
+              ) : data.length === 0 ? (
+                <TableRow className="group">
+                  <TableCell colSpan={5} className="h-28 text-center text-slate-500">
+                    {emptyText}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.map((item) => {
+                  const statusMeta = getPaymentStatusMeta(item);
+                  return (
+                    <TableRow key={item.id} className="group border-slate-200 hover:bg-slate-50/70">
+                      <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.code}</TableCell>
+                      <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatDate(item.transactionDate)}</TableCell>
+                      <TableCell className="px-5 py-4 text-[16px] text-slate-800">{item.supplierName}</TableCell>
+                      <TableCell className="px-5 py-4 text-[16px] text-slate-800">{formatCurrency(item.totalAmount)}</TableCell>
+                      <TableCell className="px-5 py-4">
+                        <Badge variant="outline" className={`rounded-full px-3 py-1 text-[12px] font-semibold ${statusMeta.className}`}>
+                          {statusMeta.label}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
         </div>
 
         {!isLoading && data.length > 0 ? (
@@ -202,7 +203,7 @@ export function PurchaseMaterialTable({
             <table className="w-full caption-bottom text-sm">
               <thead className="bg-slate-100">
                 <tr className="border-b border-slate-200">
-                  <th className="h-10 px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">ACTION</th>
+                  <th className="h-10 px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">Aksi</th>
                 </tr>
               </thead>
               <tbody>

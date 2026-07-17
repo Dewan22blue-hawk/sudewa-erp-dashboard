@@ -4,9 +4,10 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, MoreVertical, Plus, ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
+import { Loader2, MoreVertical, Plus, ArrowUp, ArrowDown, ArrowUpDown, Search, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTableSort } from '@/hooks/useTableSort';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
 import { useActivateUser, useDeactivateUser } from '@/hooks/useUser';
 import { toast } from 'sonner';
@@ -121,7 +122,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-transparent border-gray-100">
@@ -134,7 +135,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 onClick={() => handleSort('username')}
               >
                 <div className="flex items-center gap-1">
-                  User ID
+                  Username
                   <SortIcon sortKey="username" currentSortKey={sortKey as string} sortOrder={sortOrder} />
                 </div>
               </TableHead>
@@ -160,16 +161,22 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 Status
               </TableHead>
               {/* Action */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 Action
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-slate-500 py-10 text-sm">
-                  Tidak ada data.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="text-center text-slate-500 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -181,6 +188,8 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 const isActivating = activateMutation.isPending && activateMutation.variables === user.id;
                 const isDeactivating = deactivateMutation.isPending && deactivateMutation.variables === user.id;
                 const isUpdating = isActivating || isDeactivating;
+
+                const isAdmin = user.roles?.some((r) => r.name.toLowerCase() === 'admin');
 
                 return (
                   <tr key={user.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
@@ -196,10 +205,24 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
+                            {!isActive ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button type="button" className="cursor-help text-orange-500 hover:text-orange-700 transition-colors flex items-center">
+                                      <Info className="h-3.5 w-3.5 mr-0.5" />
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                                    Akun ini non-aktif, pengguna tidak bisa menggunakan akun ini untuk login ke Dashboard
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : null}
                             <Switch
                               checked={isActive}
                               onCheckedChange={(checked) => handleToggleStatus(user, checked)}
-                              disabled={activateMutation.isPending || deactivateMutation.isPending}
+                              disabled={activateMutation.isPending || deactivateMutation.isPending || isAdmin}
                             />
                             <span className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-slate-400'}`}>
                               {isActive ? 'Aktif' : 'Nonaktif'}
@@ -208,7 +231,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -220,7 +243,11 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                             <DropdownMenuItem onClick={() => onEdit(user)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(user)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                            <DropdownMenuItem
+                              onClick={() => onDelete(user)}
+                              disabled={isAdmin}
+                              className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                            >
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>

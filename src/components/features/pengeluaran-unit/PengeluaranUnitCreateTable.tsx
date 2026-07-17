@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, Search, SendHorizontal } from 'lucide-react';
+import { Check, Search, SendHorizontal, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -183,7 +183,7 @@ export default function PengeluaranUnitCreateTable({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
@@ -208,34 +208,39 @@ export default function PengeluaranUnitCreateTable({
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="px-4 py-8 text-center text-gray-500 text-sm">
-                  Memuat data unit...
+              <TableRow className="group">
+                <TableCell colSpan={8} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : isError ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={8} className="px-4 py-8 text-center text-red-600 text-sm">
-                  <div className="space-y-2">
-                    <p>{errorMessage ?? 'Gagal memuat data unit'}</p>
-                    {onRetry ? (
-                      <Button variant="outline" size="sm" onClick={onRetry}>
-                        Coba Lagi
-                      </Button>
-                    ) : null}
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
                   </div>
                 </TableCell>
               </TableRow>
             ) : filteredData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="px-4 py-8 text-center text-gray-500 text-sm">
-                  Tidak ada data.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="px-4 py-16 text-center text-gray-500 text-sm">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               filteredData.map((item, index) => (
-                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors border-slate-100">
-                  <TableCell className="px-4 py-4 text-center">
+                <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors border-slate-100">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Checkbox checked={item.isDispatched || selectedIds.includes(item.unitTransactionItemDetailId)} disabled={item.isDispatched} onCheckedChange={() => toggleSelect(item.unitTransactionItemDetailId)} />
                   </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index}</TableCell>

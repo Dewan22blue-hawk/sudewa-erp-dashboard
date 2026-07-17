@@ -68,8 +68,8 @@ export default function PermissionsPage() {
       <div className="space-y-6">
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Permissions</h1>
-          <p className="text-sm text-muted-foreground">Daftar permission yang tersedia di sistem</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Izin Akses</h1>
+          <p className="text-sm text-muted-foreground">Daftar Izin Akses yang tersedia pada sistem</p>
         </div>
 
         {/* TOOLBAR */}
@@ -107,10 +107,10 @@ export default function PermissionsPage() {
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
-                  Nama Permission
+                  Nama Izin Akses
                 </TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
-                  Guard
+                  Deksripsi
                 </TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
                   Dibuat
@@ -127,7 +127,7 @@ export default function PermissionsPage() {
                     <TableCell className="px-4 py-4"><Skeleton className="h-4 w-48" /></TableCell>
                     <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
                     <TableCell className="px-4 py-4"><Skeleton className="h-4 w-28" /></TableCell>
-                    <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
                   </TableRow>
                 ))
               ) : currentData.length === 0 ? (
@@ -151,7 +151,7 @@ export default function PermissionsPage() {
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal">
-                        {perm.guard_name || '-'}
+                        {perm.description || '-'}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-4">

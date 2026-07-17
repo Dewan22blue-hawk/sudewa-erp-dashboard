@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseTable from '@/components/features/purchase/PurchaseTable';
 import DeletePurchaseDialog from '@/components/features/purchase/DeletePurchaseDialog';
@@ -13,58 +12,26 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function PurchasePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { companyId } = useCompany();
   const { slug } = router.query;
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
-  const [mainTab, setMainTab] = useState('common');
-  const [subTab, setSubTab] = useState('all');
   const [search, setSearch] = useState('');
 
-  // Reset subtab when maintab changes
-  useEffect(() => {
-    setSubTab('all');
-    setPage(1);
-  }, [mainTab]);
-
-  const activeStatus = subTab === 'all' ? undefined : subTab;
-  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, status: activeStatus, search });
+  const { data, isLoading, isFetching } = useUnitTransactions({ page, perPage, search });
   const deleteMutation = useDeletePurchase();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const TABS = [
-    { id: 'common', label: 'Common' },
-    { id: 'inbound', label: 'Inbound' },
-    { id: 'outbound', label: 'Outbound' },
-  ];
-
-  const SUBTABS = {
-    common: [
-      { id: 'all', label: 'All' },
-      { id: 'draft', label: 'Draft' },
-      { id: 'cancel', label: 'Cancel' },
-      { id: 'rejected', label: 'Rejected' },
-      { id: 'prepare', label: 'Prepare' },
-    ],
-    inbound: [
-      { id: 'all', label: 'All' },
-      { id: 'inbound_purcase_order', label: 'Purchase Order' },
-      { id: 'inbound_incoming_goods', label: 'Incoming Goods' },
-      { id: 'inbound_receipt', label: 'Receipt' },
-      { id: 'inbound_return', label: 'Return' },
-    ],
-    outbound: [
-      { id: 'all', label: 'All' },
-      { id: 'outbound_reserved', label: 'Reserved' },
-      { id: 'outbound_in_transit', label: 'In Transit' },
-      { id: 'outbound_delivered', label: 'Delivered' },
-      { id: 'outbound_return', label: 'Return' },
-    ]
-  };
 
   const handleDelete = async () => {
     if (!selectedId) return;
@@ -100,20 +67,16 @@ export default function PurchasePage() {
               data={data?.data ?? []}
               meta={data?.meta}
               onDelete={(id) => setSelectedId(id)}
-              onAdd={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`)}
+              onAdd={canCreate ? () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`) : undefined}
               slug={slug as string}
               onPageChange={setPage}
               onPerPageChange={(value) => {
                 setPerPage(value);
                 setPage(1);
               }}
+              canEdit={canEdit}
+              canDelete={canDelete}
               loading={isLoading || isFetching}
-              mainTabs={TABS}
-              activeMainTab={mainTab}
-              onMainTabChange={setMainTab}
-              subTabs={(SUBTABS as any)[mainTab]}
-              activeSubTab={subTab}
-              onSubTabChange={(id) => { setSubTab(id); setPage(1); }}
               search={search}
               onSearchChange={(val) => { setSearch(val); setPage(1); }}
             />

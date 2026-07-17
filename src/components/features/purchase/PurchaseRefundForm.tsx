@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Save, Loader2 } from 'lucide-react';
+import { Plus, Save, Loader2, Search } from 'lucide-react';
 import { UnitTransactionDetail, UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 import { Kas } from '@/@types/kas.types';
 import { Button } from '@/components/ui/button';
@@ -273,8 +273,8 @@ export function PurchaseRefundForm({
             </div>
 
             {/* ── Tabel Unit Item Detail ── */}
-            <div className="overflow-hidden rounded-xl border border-gray-200">
-              <Table>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <Table>
                 <TableHeader>
                   <TableRow className="bg-[#f8fafc] hover:bg-[#f8fafc]">
                     <TableHead className="w-10 py-3 pl-4">
@@ -316,9 +316,15 @@ export function PurchaseRefundForm({
                     </TableRow>
                   ) : unitItemDetails.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="py-10 text-center text-sm text-slate-400">
-                        Tidak ada data unit untuk transaksi ini
-                      </TableCell>
+                      <TableCell colSpan={100} className="py-16 text-center text-sm text-slate-400">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                     </TableRow>
                   ) : (
                     sortedUnitItemDetails.map((detail) => {

@@ -8,6 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { Asset } from '@/@types/asset.types';
 import { formatDateUI } from '@/lib/utils/date';
+import { CopyBox } from '@/components/ui/copy-box';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface AssetTableProps {
     assets: Asset[];
@@ -24,6 +26,9 @@ interface AssetTableProps {
     onEdit: (asset: Asset) => void;
     onDelete: (asset: Asset) => void;
     isExporting?: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function AssetTable({
@@ -41,6 +46,9 @@ export function AssetTable({
     onEdit,
     onDelete,
     isExporting = false,
+    canCreate,
+    canEdit,
+    canDelete,
 }: AssetTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -94,22 +102,13 @@ export function AssetTable({
                     p === page
                         ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                         : p === '...'
-                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
             >
                 {p}
             </Button>
         ));
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
     };
 
     const formatAssetType = (type: string) => {
@@ -154,9 +153,9 @@ export function AssetTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -164,22 +163,24 @@ export function AssetTable({
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
-                    {onImport && (
-                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                        </Button>
+                    {canCreate && (
+                        <>
+                            {onImport && (
+                                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import
+                                </Button>
+                            )}
+                            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah
+                            </Button>
+                        </>
                     )}
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-slate-200 bg-white shadow-none">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">NO</TableHead>
@@ -189,18 +190,18 @@ export function AssetTable({
                                 <TableHead className="text-left text-xs font-semibold text-slate-500 uppercase px-4 py-4">NAMA BARANG</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 whitespace-nowrap">TGL BELI</TableHead>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
-                                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {assets.length > 0 ? (
                                 assets.map((item, index) => (
-                                    <TableRow key={item.uuid} className="border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
-                                        <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
+                                    <TableRow key={item.uuid} className="group border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
+                                        <TableCell className="text-center px-4 py-4">
                                             {(page - 1) * perPage + index + 1}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">
-                                            {item.code || '-'}
+                                            <CopyBox text={item.code || '-'} />
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
                                             {formatAssetType(item.type)}
@@ -215,9 +216,9 @@ export function AssetTable({
                                             {formatDateUI(item.purchase_date)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">
-                                            {formatCurrency(item.price)}
+                                            {currenciesFormat('idr', item.price)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-center">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500">
@@ -225,10 +226,10 @@ export function AssetTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                                                    <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-slate-700">
+                                                    <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer rounded-xl px-3 py-2.5 text-slate-700">
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600">
+                                                    <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600">
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -237,16 +238,21 @@ export function AssetTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
-                                    <TableCell colSpan={8} className="h-32 text-center text-slate-500">
-                                        Tidak ada data aset ditemukan
+                                <TableRow className="group">
+                                    <TableCell colSpan={100} className="py-16 h-32 text-center text-slate-500">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>
@@ -264,7 +270,7 @@ export function AssetTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

@@ -137,8 +137,8 @@ export function MaintenanceDetailModal({
           {/* List of Equipments */}
           <div className="space-y-3">
             <h3 className="text-base font-semibold text-slate-900">Perlengkapan Maintenance</h3>
-            <div className="overflow-hidden rounded-xl border border-slate-200">
-              <Table>
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+        <Table>
                 <TableHeader className="bg-slate-50">
                   <TableRow>
                     <TableHead className="w-12 text-center">NO</TableHead>

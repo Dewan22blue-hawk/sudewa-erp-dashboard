@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
 import { mapSalesDetailCard } from '@/services/sales.mapper';
-import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 /**
  * Detail Data Penjualan Unit - Image 4
@@ -20,6 +20,11 @@ export default function SalesDetailPage() {
   const { id } = router.query;
   const salesId = Array.isArray(id) ? id[0] : id;
   const { data, isLoading } = useSalesDetail(salesId);
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
 
   const { slug } = router.query;
   const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
@@ -177,7 +182,7 @@ export default function SalesDetailPage() {
         <SalesDetailCards data={salesData} billingHistories={resolvedBillingHistories} />
 
         {/* Detail Unit Table */}
-        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} />
+        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} canEdit={canEdit} canDelete={canDelete} />
 
         {/* PAYMENT HISTORY TABLE */}
         {resolvedBillingHistories.length > 0 && (

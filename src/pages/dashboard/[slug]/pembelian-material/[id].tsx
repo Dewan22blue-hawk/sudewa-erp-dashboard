@@ -293,7 +293,7 @@ export default function PurchaseMaterialDetailPage() {
                 <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-900">QTY</TableHead>
                 <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-900">HARGA SATUAN</TableHead>
                 <TableHead className="px-5 py-4 text-center text-[14px] font-semibold uppercase text-slate-900">SUB TOTAL</TableHead>
-                <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">ACTION</TableHead>
+                <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale/id';
-import { Wallet, Trash } from 'lucide-react';
+import { Wallet, Trash, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -392,9 +392,15 @@ export function PurchasePaymentForm({
                             <TableBody>
                                 {histories.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="h-20 text-center text-muted-foreground">
-                                            Belum ada histori pembayaran
-                                        </TableCell>
+                                        <TableCell colSpan={100} className="py-16 h-20 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                                     </TableRow>
                                 ) : (
                                     histories.map((item) => {

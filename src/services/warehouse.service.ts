@@ -377,3 +377,7 @@ export const createWarehouseData = async (payload: CreateWarehouseDataPayload): 
 
   ensureSuccess(response.data);
 };
+
+export const deleteWarehouseActivity = async (id: string): Promise<void> => {
+  await apiClient.delete<LaravelApiResponse<unknown>>(`${basePath}/${id}`);
+};

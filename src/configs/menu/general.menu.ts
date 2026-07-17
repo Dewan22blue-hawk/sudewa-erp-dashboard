@@ -38,10 +38,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Customer',
           href: master('/customer'),
         },
-        // {
-        //   label: 'Merk Unit Tipe',
-        //   href: master('/brand'),
-        // },
+        {
+          label: 'Merk Unit Tipe',
+          href: master('/brand'),
+        },
         {
           label: 'Tipe Unit',
           href: master('/type-unit'),
@@ -53,10 +53,6 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         {
           label: 'Kas',
           href: master('/kas'),
-        },
-        {
-          label: 'User',
-          href: master('/user'),
         },
         {
           label: 'Aset',
@@ -209,15 +205,19 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
       ],
     },
     {
-      label: 'Settings',
+      label: 'Manajemen Pengguna',
       icon: Shield,
       children: [
         {
-          label: 'Roles',
+          label: 'Pengguna',
+          href: master('/user'),
+        },
+        {
+          label: 'Hak Akses',
           href: settings('/roles'),
         },
         {
-          label: 'Permissions',
+          label: 'Izin Akses',
           href: settings('/permissions'),
         },
       ],

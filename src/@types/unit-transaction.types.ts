@@ -71,6 +71,7 @@ export interface UnitTransaction {
   transaction_bbn_total: number;
   transaction_other_fee: number;
   expedition_fee_total: number;
+  total_operational_fee: number;
   stock_state: string;
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;
@@ -109,6 +110,7 @@ export interface UnitTransactionDetail {
   transaction_bbn_total: number;
   transaction_other_fee: number;
   expedition_fee_total: number;
+  total_operational_fee?: number;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];

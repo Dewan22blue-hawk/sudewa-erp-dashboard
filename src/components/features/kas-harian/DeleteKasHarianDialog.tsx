@@ -23,6 +23,7 @@ export default function DeleteKasHarianDialog({ open, onOpenChange, data }: Prop
     } catch (error) {
       const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Gagal menghapus transaksi kas harian';
       toast.error(message);
+      onOpenChange(false);
     }
   };
 

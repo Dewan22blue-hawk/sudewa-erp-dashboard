@@ -7,10 +7,16 @@ import { DataImportModal } from '@/components/features/master-data/DataImportMod
 import { toast } from 'sonner';
 import { useBBNs, useDeleteBBN, useImportBBN, useExportBBN } from '@/hooks/useBBN';
 import type { BBN } from '@/@types/bbn.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function BBNPage() {
   const router = useRouter();
   const slug = router.query.slug as string;
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   // Table state
   const [searchInput, setSearchInput] = useState('');  // immediate input value (for display)
@@ -40,19 +46,23 @@ export default function BBNPage() {
 
   // Handlers
   const handleAddClick = () => {
+    if (!canCreate) return;
     router.push(`/dashboard/${slug}/master/bbn/create`);
   };
 
   const handleEditClick = (bbn: BBN) => {
+    if (!canEdit) return;
     router.push(`/dashboard/${slug}/master/bbn/${bbn.id}/edit`);
   };
 
   const handleDeleteClick = (bbn: BBN) => {
+    if (!canDelete) return;
     setSelectedBBN(bbn);
     setIsDeleteOpen(true);
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (selectedBBN) {
       try {
         await deleteMutation.mutateAsync(selectedBBN.id);
@@ -66,6 +76,7 @@ export default function BBNPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     try {
       await importMutation.mutateAsync(file);
       toast.success('Data biaya berhasil diimport');
@@ -113,11 +124,14 @@ export default function BBNPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setIsImportOpen(true)}
+          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
           onExport={handleExport}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
           isExporting={exportMutation.isPending}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
 
       </div>

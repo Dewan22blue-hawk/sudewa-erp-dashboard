@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft, LogOut, MoreVertical, Plus } from 'lucide-react';
+import { ChevronLeft, LogOut, MoreVertical, Plus, Search } from 'lucide-react';
 import type { UnitTransactionRefundPayment } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -129,8 +129,8 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
             </Button>
           </div>
 
-          <div className="overflow-hidden rounded-[10px] border border-[#D9DEE8] bg-white">
-            <Table>
+          <div className="overflow-x-auto rounded-[10px] border border-[#D9DEE8] bg-white">
+        <Table>
               <TableHeader>
                 <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                   {['NO', 'TANGGAL REFUND', 'NOMINAL BAYAR', 'KETERANGAN', 'ACTION'].map((header) => (
@@ -169,9 +169,15 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-[#6B7280]">
-                      Belum ada detail refund penjualan.
-                    </TableCell>
+                    <TableCell colSpan={100} className="py-16 h-24 text-center text-[#6B7280]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -191,8 +197,8 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
             </Button>
           </div>
 
-          <div className="overflow-hidden bg-white">
-            <Table>
+          <div className="overflow-x-auto bg-white">
+        <Table>
               <TableHeader>
                 <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
                   <TableHead className="w-[56px] px-4 text-center">

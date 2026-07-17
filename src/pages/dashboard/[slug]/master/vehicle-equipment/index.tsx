@@ -7,8 +7,14 @@ import { useVehicleEquipments, useCreateVehicleEquipment, useUpdateVehicleEquipm
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import type { VehicleEquipment } from '@/@types/vehicle-equipment.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function VehicleEquipmentPage() {
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+    const canEdit = hasPermission('master-data:edit');
+    const canDelete = hasPermission('master-data:delete');
+
     // Table state
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -27,21 +33,26 @@ export default function VehicleEquipmentPage() {
 
     // Handlers
     const handleAddClick = () => {
+        if (!canCreate) return;
         setSelectedItem(null);
         setIsFormOpen(true);
     };
 
     const handleEditClick = (item: VehicleEquipment) => {
+        if (!canEdit) return;
         setSelectedItem(item);
         setIsFormOpen(true);
     };
 
     const handleDeleteClick = (item: VehicleEquipment) => {
+        if (!canDelete) return;
         setSelectedItem(item);
         setIsDeleteOpen(true);
     };
 
     const handleSaveForm = async (formData: { code: string; name: string }) => {
+        if (selectedItem && !canEdit) return;
+        if (!selectedItem && !canCreate) return;
         try {
             if (selectedItem) {
                 // Edit / Update
@@ -60,6 +71,7 @@ export default function VehicleEquipmentPage() {
     };
 
     const handleConfirmDelete = async () => {
+        if (!canDelete) return;
         if (selectedItem) {
             try {
                 await deleteMutation.mutateAsync(selectedItem.id);
@@ -118,6 +130,9 @@ export default function VehicleEquipmentPage() {
                         onAdd={handleAddClick}
                         onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
+                        canCreate={canCreate}
+                        canEdit={canEdit}
+                        canDelete={canDelete}
                     />
                 )}
             </div>

@@ -76,7 +76,7 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                             {...register('code')}
                             className={errors.code ? 'border-red-500' : ''}
                         />
-                        <p className="text-xs text-gray-500">Opsional. Jika dikosongkan, kode aset akan dibuat otomatis oleh backend.</p>
+                        <p className="text-xs text-gray-500">Opsional. Jika dikosongkan, kode aset akan dibuat otomatis oleh sistem.</p>
                     </div>
 
                     {/* Tipe Aset */}

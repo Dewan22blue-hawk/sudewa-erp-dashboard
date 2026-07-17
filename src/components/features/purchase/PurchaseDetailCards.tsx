@@ -1,8 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
 import { Calendar, User, FileText, DollarSign, CreditCard } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils/currency';
 import { getHistoryTotalIdrEquivalent, getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface Props {
   data: UnitTransactionDetail;
@@ -14,10 +14,12 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
   const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
   const totalHpp = totalDpp + totalPpn;
 
-  const biayaBbn = Number(data.transaction_bbn_total ?? 0);
-  const biayaEkspedisi = Number(data.expedition_fee_total ?? 0);
-  const biayaLainnya = Number(data.transaction_other_fee ?? 0);
-  const totalBiaya = biayaBbn + biayaEkspedisi + biayaLainnya;
+  const biayaBbn = Number(data?.transaction_bbn_total ?? 0);
+  const biayaEkspedisi = Number(data?.expedition_fee_total ?? 0);
+  const biayaLainnya = Number(data?.transaction_other_fee ?? 0);
+  const totalBiaya = Number(data?.total_operational_fee ?? 0);
+
+  console.log(data);
 
   const totalPembelian = totalHpp + totalBiaya;
 
@@ -76,25 +78,25 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
               <span>Total DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', (totalDpp))}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total PPN</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalPpn)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', (totalPpn))}</span>
             </div>
             <div className="border-t border-slate-100 my-1"></div>
             <div className="flex items-center justify-between text-slate-900">
               <span className="font-bold text-sm">Total HPP</span>
-              <span className="text-sm font-bold">{formatCurrency(totalHpp)}</span>
+              <span className="text-sm font-bold">{currenciesFormat('idr', (totalHpp))}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total Biaya</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalBiaya)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', (totalBiaya))}</span>
             </div>
             <div className="border-t border-slate-100 my-1"></div>
             <div className="flex items-center justify-between text-slate-900">
               <span className="font-bold uppercase text-sm">TOTAL PEMBELIAN</span>
-              <span className="text-sm font-bold">{formatCurrency(totalPembelian)}</span>
+              <span className="text-sm font-bold">{currenciesFormat('idr', (totalPembelian))}</span>
             </div>
           </div>
         </CardContent>
@@ -113,15 +115,15 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
               <span>Debet Bank USD</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankUsd, 'USD')}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('usd', (debetBankUsd))}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Debet Bank IDR</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankIdr)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', (debetBankIdr))}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Debet Cash IDR</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetCashIdr)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', (debetCashIdr))}</span>
             </div>
           </div>
         </CardContent>

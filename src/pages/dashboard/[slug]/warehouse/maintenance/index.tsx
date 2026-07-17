@@ -15,8 +15,14 @@ import { useMaintenance } from '@/hooks/warehouse/useMaintenance';
 import { MaintenanceTable } from '@/components/features/warehouse/maintenance/MaintenanceTable';
 import { MaintenanceDetailModal } from '@/components/features/warehouse/maintenance/MaintenanceDetailModal';
 import type { MaintenanceItem } from '@/@types/maintenance.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function MaintenanceListPage() {
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
+
   const { isLoading: isCompanyLoading } = useCompany();
 
   // PT Wajira Transindo company ID is 4

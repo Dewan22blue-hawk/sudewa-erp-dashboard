@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -12,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { useCreateFinanceBilling, useUpdateFinanceBilling, useDeleteFinanceBilling } from '@/hooks/useFinanceBilling';
 import { useKas } from '@/hooks/useKas';
 import { useAccounts } from '@/hooks/useAccount';
@@ -176,6 +178,10 @@ interface Props {
 }
 
 export default function FinanceBillingTable({ financeBillings, cashFlowDetail, companyId, disabled = false }: Props) {
+  const router = useRouter();
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
+
   const createMutation = useCreateFinanceBilling();
   const updateMutation = useUpdateFinanceBilling();
   const deleteMutation = useDeleteFinanceBilling();
@@ -295,6 +301,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
       closeForm();
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Gagal menyimpan pembayaran');
+      closeForm();
     }
   };
 
@@ -306,12 +313,18 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
       setDeleteTarget(null);
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Gagal menghapus pembayaran');
+      setDeleteTarget(null);
     }
   };
 
   const getKasLabel = (cashId: number) => {
     const kas = kasOptions.find((k) => Number(k.id) === cashId);
     return kas ? (kas.cash_name || `${kas.code} - ${kas.description}`) : '-';
+  };
+
+  const getAccountLabel = (cashId: number) => {
+    const akun = akunOptions.find((a) => Number(a.id) === cashId);
+    return akun ? (akun.name || `${akun.code} - ${akun.description}`) : '-';
   };
 
   return (
@@ -363,29 +376,45 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
               <TableRow className="hover:bg-transparent">
                 <TableHead className="w-12 text-center">No</TableHead>
                 <TableHead>Tanggal Bayar</TableHead>
+                <TableHead>Akun</TableHead>
                 <TableHead>Kas</TableHead>
                 <TableHead className="text-right">Nominal</TableHead>
                 <TableHead>Catatan</TableHead>
-                <TableHead className="w-12 text-center">Aksi</TableHead>
+                <TableHead className="w-12 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {financeBillings.map((fb, index) => (
-                <TableRow key={fb.id}>
-                  <TableCell className="text-center text-slate-500">{index + 1}</TableCell>
+                <TableRow key={fb.id} className="bg-white hover:bg-slate-50 transition-colors group">
+                  <TableCell className="text-center px-4 py-4">{index + 1}</TableCell>
                   <TableCell className="text-slate-800">{formatDate(fb.payment_at)}</TableCell>
-                  <TableCell className="text-slate-800">{getKasLabel(fb.cash_id)}</TableCell>
+                  <TableCell className="text-slate-800">
+                    <ReferenceLink href={`/dashboard/${slugStr}/master/account?search=${encodeURIComponent(getKasLabel(fb.account_id))}`}>
+                      {getAccountLabel(fb.account_id)}
+                    </ReferenceLink>
+                  </TableCell>
+                  <TableCell className="text-slate-800">
+                    <ReferenceLink href={`/dashboard/${slugStr}/master/kas?search=${encodeURIComponent(getKasLabel(fb.cash_id))}`}>
+                      {getKasLabel(fb.cash_id)}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="text-right font-semibold text-slate-900">
                     {currenciesFormat(fb?.cash?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr', fb.amount)}
                   </TableCell>
                   <TableCell className="text-slate-600 max-w-[200px] truncate">{fb.note || '-'}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     {!disabled && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          {cashFlowDetail?.is_paid ? (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" disabled>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          )}
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => openEditForm(fb)} className="cursor-pointer">

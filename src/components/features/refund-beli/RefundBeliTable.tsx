@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SortableHeader } from '@/components/ui/sortable-header';
 import type { SortOrder } from '@/hooks/useTableSort';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Loader2, Search } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
@@ -84,13 +84,20 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
               <th className="py-2 text-left">
                 <SortableHeader title="Keterangan" sortKey="keterangan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
               </th>
-              <th className="py-2 text-right px-4">ACTION</th>
+              <th className="py-2 text-center px-4 sticky right-0 bg-gray-100 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
 
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : error ? (
               <tr>
                 <td colSpan={7} className="px-4 py-10 text-center">
@@ -106,8 +113,14 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
               </tr>
             ) : !hasData ? (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                  Tidak ada data
+                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -120,7 +133,7 @@ export default function RefundBeliTable({ data, pagination, sortKey, sortOrder, 
                   <td className="px-4 py-3 text-right font-medium text-red-600">{currenciesFormat('idr', item.totalRefund)}</td>
                   <td className="px-4 py-3">{item.kasMasuk}</td>
                   <td className="px-4 py-3 text-gray-500">{item.keterangan}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

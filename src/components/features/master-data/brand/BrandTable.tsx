@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
+import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown, Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -22,6 +22,8 @@ interface BrandTableProps {
     page: number;
     perPage: number;
     isLoading?: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
     onEdit: (brand: Brand) => void;
     onDelete: (brand: Brand) => void;
     onPageChange: (page: number) => void;
@@ -49,6 +51,8 @@ export const BrandTable = ({
     onDelete,
     onPageChange,
     onPerPageChange,
+    canEdit,
+    canDelete,
 }: BrandTableProps) => {
     const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
         data,
@@ -104,11 +108,11 @@ export const BrandTable = ({
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => onEdit(row.original)}>
+                                <DropdownMenuItem onClick={() => onEdit(row.original)} disabled={!canEdit}>
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50" disabled={!canDelete}>
                                     <Trash className="mr-2 h-4 w-4" />
                                     Hapus
                                 </DropdownMenuItem>
@@ -118,7 +122,7 @@ export const BrandTable = ({
                 ),
             },
         ],
-        [onDelete, onEdit, sortKey, sortOrder],
+        [onDelete, onEdit, sortKey, sortOrder, canEdit, canDelete],
     );
 
     const table = useReactTable({
@@ -164,10 +168,10 @@ export const BrandTable = ({
                 </div>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                <Table>
+            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto">
+        <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="hover:bg-[#f8f9fa]">
+                        <TableRow className="bg-white hover:bg-[#f8f9fa]">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 headerGroup.headers.map((header) => {
                                     const columnId = header.id;
@@ -180,7 +184,7 @@ export const BrandTable = ({
                                             key={header.id}
                                             className={cn(
                                                 'px-4 py-4 text-xs font-semibold uppercase select-none transition-colors',
-                                                isAction ? 'text-center text-gray-600 w-[100px]' : 'text-left',
+                                                isAction ? 'text-center text-gray-600 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : 'text-left',
                                                 isSortable ? 'group cursor-pointer' : '',
                                                 isSortable && isSorted ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
                                             )}
@@ -195,35 +199,33 @@ export const BrandTable = ({
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
-                            [...Array(perPage)].map((_, i) => (
-                                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
-                                    <TableCell className="px-4 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className="h-10 w-10 rounded-lg" />
-                                            <Skeleton className="h-4 w-32" />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4">
-                                        <Skeleton className="h-4 w-32" />
-                                    </TableCell>
-                                    <TableCell className="px-4 py-4 text-center">
-                                        <Skeleton className="h-8 w-8 mx-auto rounded-full" />
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        ) : data.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
-                                    Tidak ada data.
-                                </TableCell>
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : data.length === 0 ? (
+                            <TableRow className="group">
+                                <TableCell colSpan={100} className="text-center text-gray-500 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                             </TableRow>
                         ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="hover:bg-gray-50 transition-colors">
+                                <TableRow key={row.id} className="group bg-white hover:bg-slate-50 transition-colors">
                                     {row.getVisibleCells().map((cell) => {
                                         const isAction = cell.column.id === 'actions';
                                         return (
-                                            <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isAction ? "text-center" : "text-left")}>
+                                            <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isAction ? "text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : "text-left")}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         );

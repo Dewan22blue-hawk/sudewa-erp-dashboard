@@ -107,50 +107,56 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
 
       <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className={currentData.length > 0 ? 'pr-24' : undefined}>
-        <Table className="min-w-[1040px]">
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableHead className="font-semibold uppercase text-slate-700">Kode Customer</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Nama Customer</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Alamat</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">NPWP</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">PIC</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Phone</TableHead>
-              <TableHead className="font-semibold uppercase text-slate-700">Maps</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentData.length === 0 ? (
+          <Table className="min-w-[1040px]">
+            <TableHeader className="bg-slate-50">
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                  Tidak ada data
-                </TableCell>
+                <TableHead className="font-semibold uppercase text-slate-700">Kode Customer</TableHead>
+                <TableHead className="font-semibold uppercase text-slate-700">Nama Customer</TableHead>
+                <TableHead className="font-semibold uppercase text-slate-700">Alamat</TableHead>
+                <TableHead className="font-semibold uppercase text-slate-700">NPWP</TableHead>
+                <TableHead className="font-semibold uppercase text-slate-700">PIC</TableHead>
+                <TableHead className="font-semibold uppercase text-slate-700">Phone</TableHead>
+                <TableHead className="font-semibold uppercase text-slate-700">Maps</TableHead>
               </TableRow>
-            ) : (
-              currentData.map((customer) => (
-                <TableRow key={customer.id} className="group hover:bg-slate-50/50">
-                  <TableCell className="font-medium text-slate-800">{customer.code ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{customer.name}</TableCell>
-                  <TableCell className="max-w-75 truncate text-slate-700" title={customer.address ?? undefined}>
-                    {customer.address ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-slate-700">{customer.npwp ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{customer.pic ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">{customer.phone ?? '-'}</TableCell>
-                  <TableCell className="text-slate-700">
-                    {customer.map_link ? (
-                      <a href={customer.map_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        [link]
-                      </a>
-                    ) : (
-                      '-'
-                    )}
+            </TableHeader>
+            <TableBody>
+              {currentData.length === 0 ? (
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="py-16 h-24 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                currentData.map((customer) => (
+                  <TableRow key={customer.id} className="group hover:bg-slate-50/50">
+                    <TableCell className="font-medium text-slate-800">{customer.code ?? '-'}</TableCell>
+                    <TableCell className="text-slate-700">{customer.name}</TableCell>
+                    <TableCell className="max-w-75 truncate text-slate-700" title={customer.address ?? undefined}>
+                      {customer.address ?? '-'}
+                    </TableCell>
+                    <TableCell className="text-slate-700">{customer.npwp ?? '-'}</TableCell>
+                    <TableCell className="text-slate-700">{customer.pic ?? '-'}</TableCell>
+                    <TableCell className="text-slate-700">{customer.phone ?? '-'}</TableCell>
+                    <TableCell className="text-slate-700">
+                      {customer.map_link ? (
+                        <a href={customer.map_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                          [link]
+                        </a>
+                      ) : (
+                        '-'
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
 
         {currentData.length > 0 ? (
@@ -158,7 +164,7 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
             <table className="w-full caption-bottom text-sm">
               <thead className="bg-slate-50">
                 <tr className="border-b">
-                  <th className="h-10 px-2 text-right align-middle font-semibold uppercase text-slate-700 whitespace-nowrap">Action</th>
+                  <th className="h-10 px-2 text-right align-middle font-semibold uppercase text-slate-700 whitespace-nowrap">Aksi</th>
                 </tr>
               </thead>
               <tbody>

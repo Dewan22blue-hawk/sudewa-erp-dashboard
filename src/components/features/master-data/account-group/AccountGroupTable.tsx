@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { MoreVertical, Pencil, Trash, Lock, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, Pencil, Trash, Lock, ArrowUp, ArrowDown, ArrowUpDown, Loader2, Search } from 'lucide-react';
 import type { AccountGroup } from '@/@types/account-group.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { useTableSort } from '@/hooks/useTableSort';
@@ -20,6 +20,8 @@ interface AccountGroupTableProps {
   onDelete: (accountGroup: AccountGroup) => void;
   page: number;
   perPage: number;
+  canEdit: boolean;
+  canDelete: boolean;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
 }
@@ -33,7 +35,7 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
   return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
-export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange }: AccountGroupTableProps) => {
+export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDelete, page, perPage, onPageChange, onPerPageChange, canEdit, canDelete }: AccountGroupTableProps) => {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
   });
@@ -50,7 +52,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
@@ -108,7 +110,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                 </div>
               </TableHead>
               {/* ACTION */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 ACTION
               </TableHead>
             </TableRow>
@@ -116,24 +118,29 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
 
           <TableBody>
             {isLoading ? (
-              [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-48" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
-                </TableRow>
-              ))
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : sortedData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-gray-500 py-10 text-sm">
-                  Tidak ada data.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="text-center text-gray-500 py-16 text-sm">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               sortedData.map((group) => (
-                <TableRow key={group.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={group.id} className="bg-white hover:bg-slate-50 transition-colors">
                   {/* KODE */}
                   <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 text-left">
                     <div className="flex items-center gap-1.5">
@@ -161,13 +168,13 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                     {group.description ? (group.description.length > 50 ? `${group.description.substring(0, 50)}...` : group.description) : '-'}
                   </TableCell>
                   {/* STATUS */}
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Badge variant={group.isActive ? 'default' : 'secondary'} className={group.isActive ? '' : 'bg-gray-200 text-gray-700'}>
                       {group.isActive ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                   </TableCell>
                   {/* ACTION */}
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
@@ -180,7 +187,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                             e.preventDefault();
                             onEdit(group);
                           }}
-                          disabled={group.is_lock}
+                          disabled={group.is_lock || !canEdit}
                           className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                         >
                           <Pencil className="mr-2 h-4 w-4" />
@@ -192,7 +199,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
                             onDelete(group);
                           }}
                           className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                          disabled={group.is_lock}
+                          disabled={group.is_lock || !canDelete}
                         >
                           <Trash className="mr-2 h-4 w-4" />
                           Hapus

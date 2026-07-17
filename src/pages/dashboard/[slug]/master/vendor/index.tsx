@@ -8,10 +8,15 @@ import { ImportVendorModal } from '@/components/features/vendor/ImportVendorModa
 import { toast } from 'sonner';
 import { useVendors, useCreateVendor, useUpdateVendor, useDeleteVendor, useImportVendor, useExportVendor } from '@/hooks/useVendor';
 import { useCompany } from '@/contexts/CompanyContext';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { Vendor } from '@/@types/vendor.types';
 
 export default function VendorPage() {
   const { companyId: localCompanyId } = useCompany();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   // Table state
   const [search, setSearch] = useState('');
@@ -34,21 +39,26 @@ export default function VendorPage() {
 
   // Handlers
   const handleAddClick = () => {
+    if (!canCreate) return;
     setSelectedVendor(null);
     setIsFormOpen(true);
   };
 
   const handleEditClick = (vendor: Vendor) => {
+    if (!canEdit) return;
     setSelectedVendor(vendor);
     setIsFormOpen(true);
   };
 
   const handleDeleteClick = (vendor: Vendor) => {
+    if (!canDelete) return;
     setSelectedVendor(vendor);
     setIsDeleteOpen(true);
   };
 
   const handleSaveForm = async (data: VendorFormData) => {
+    if (selectedVendor && !canEdit) return;
+    if (!selectedVendor && !canCreate) return;
     try {
       if (!localCompanyId) {
         toast.error('Company belum dipilih');
@@ -71,6 +81,7 @@ export default function VendorPage() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (selectedVendor) {
       try {
         await deleteMutation.mutateAsync(selectedVendor.id);
@@ -84,6 +95,7 @@ export default function VendorPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     try {
       if (!localCompanyId) {
         toast.error('Company belum dipilih');
@@ -142,11 +154,14 @@ export default function VendorPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setIsImportOpen(true)}
+          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
 
       </div>

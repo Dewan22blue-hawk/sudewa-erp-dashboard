@@ -12,6 +12,7 @@ import { TransactionTable } from '@/components/features/transaction/TransactionT
 import { DeleteTransactionDialog } from '@/components/features/transaction/DeleteTransactionDialog';
 import { Plus, Search } from 'lucide-react';
 import { Transaction } from '@/@types/transaction.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 // This page implements the List view
 export default function TransactionListPage() {
@@ -25,6 +26,11 @@ export default function TransactionListPage() {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(25);
     const [localSearch, setLocalSearch] = useState('');
+
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('transaction:create');
+    const canEdit = hasPermission('transaction:edit');
+    const canDelete = hasPermission('transaction:delete');
 
     // Query Hooks
     const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);
@@ -80,10 +86,12 @@ export default function TransactionListPage() {
                         </div>
                     </div>
 
-                    <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => router.push(`${basePath}/create`)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Tambah
-                    </Button>
+                    {canCreate && (
+                        <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => router.push(`${basePath}/create`)}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Tambah
+                        </Button>
+                    )}
                 </div>
 
                 {/* TABLE */}
@@ -92,7 +100,7 @@ export default function TransactionListPage() {
                         <span className="animate-pulse text-muted-foreground">Loading transactions...</span>
                     </div>
                 ) : (
-                    <TransactionTable data={data?.data || []} onEdit={handleEdit} onDelete={handleDelete} />
+                    <TransactionTable data={data?.data || []} onEdit={handleEdit} onDelete={handleDelete} canEdit={canEdit} canDelete={canDelete} />
                 )}
 
                 {!isListLoading && data && (

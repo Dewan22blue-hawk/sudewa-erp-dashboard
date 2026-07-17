@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal, Eye, Edit, Trash2, Loader2, Search } from 'lucide-react';
 
 interface Props {
   data: WithholdingTaxItem[];
@@ -74,7 +74,7 @@ export default function WithholdingTaxTable({
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = currentSortBy === sortKey;
     const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    
+
     return (
       <button
         type="button"
@@ -112,12 +112,19 @@ export default function WithholdingTaxTable({
               <th className="p-0 text-left">{renderSortHeader('UANG MUKA PPH', 'pph_description', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('JUMLAH PEMBAYARAN', 'payment_amount', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('TGL DIBAYAR', 'payment_date', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-24 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : isError ? (
               <tr>
                 <td colSpan={12} className="px-4 py-10 text-center">
@@ -133,8 +140,14 @@ export default function WithholdingTaxTable({
               </tr>
             ) : !hasData ? (
               <tr>
-                <td colSpan={12} className="px-4 py-10 text-center text-slate-500">
-                  Belum ada data bukti potong.
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -142,7 +155,7 @@ export default function WithholdingTaxTable({
                 const noUrut = startIndex + index;
                 const customerName = item.do_invoice?.customer?.name ?? '-';
                 const nominalInvoice = item.do_invoice?.total_amount ?? item.do_invoice?.invoice_amount ?? item.do_invoice?.bill_invoice ?? 0;
-                
+
                 return (
                   <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                     <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{noUrut}</td>
@@ -164,7 +177,7 @@ export default function WithholdingTaxTable({
                       {formatCurrency(item.payment_amount || 0)}
                     </td>
                     <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.payment_date)}</td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

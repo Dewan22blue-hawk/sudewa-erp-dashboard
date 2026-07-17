@@ -5,8 +5,13 @@ import { Loader2 } from "lucide-react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import DataPiutangTable from "@/components/features/data-piutang/DataPiutangTable"
 import { useDataPiutang } from "@/hooks/useDataPiutang"
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function DataPiutangPage() {
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('finance:create');
+    const canEdit = hasPermission('finance:edit');
+    const canDelete = hasPermission('finance:delete');
     const [search, setSearch] = useState("")
     const [debouncedSearch, setDebouncedSearch] = useState("")
     const [currentPage, setCurrentPage] = useState(1)

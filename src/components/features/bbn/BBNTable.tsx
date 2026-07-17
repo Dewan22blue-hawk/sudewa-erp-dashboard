@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Upload, Download } from 'lucide-react';
+import { Search, Plus, MoreVertical, Upload, Download, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,9 @@ interface BBNTableProps {
     onEdit: (bbn: BBN) => void;
     onDelete: (bbn: BBN) => void;
     isExporting?: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function BBNTable({
@@ -42,6 +45,9 @@ export function BBNTable({
     onEdit,
     onDelete,
     isExporting = false,
+    canCreate,
+    canEdit,
+    canDelete,
 }: BBNTableProps) {
 
     const totalPages = Math.ceil(totalData / perPage);
@@ -95,8 +101,8 @@ export function BBNTable({
                     p === page
                         ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                         : p === '...'
-                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
             >
                 {p}
@@ -144,28 +150,30 @@ export function BBNTable({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    {onImport && (
-                        <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                        </Button>
+                    {canCreate && (
+                        <>
+                            {onImport && (
+                                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import
+                                </Button>
+                            )}
+                            {onExport && (
+                                <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    {isExporting ? 'Exporting...' : 'Export'}
+                                </Button>
+                            )}
+                            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah
+                            </Button>
+                        </>
                     )}
-                    {onExport && (
-                        <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
-                            <Upload className="h-4 w-4 mr-2" />
-                            {isExporting ? 'Exporting...' : 'Export'}
-                        </Button>
-                    )}
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 w-[20%]">DEALER</TableHead>
@@ -176,24 +184,22 @@ export function BBNTable({
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">GARWIL</TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIRO/LOKET</TableHead>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIAYA LAIN</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">ACTION</TableHead>
+                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-                                // Loading skeleton rows
-                                Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="animate-pulse">
-                                        {Array.from({ length: 9 }).map((_, j) => (
-                                            <TableCell key={j} className="px-4 py-4">
-                                                <div className="h-4 bg-gray-200 rounded w-full" />
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
+                                <tr>
+                                    <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                                        <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                                            <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                                            <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             ) : bbns.length > 0 ? (
                                 bbns.map((item) => (
-                                    <TableRow key={item.uuid} className="hover:bg-gray-50/50">
+                                    <TableRow key={item.uuid} className="group bg-white hover:bg-slate-50 transition-colors">
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium">
                                             {item.dealer?.namaDealer || item.dealer?.code || '-'}
                                         </TableCell>
@@ -218,7 +224,7 @@ export function BBNTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600">
                                             {item.otherFee === 0 ? '0' : formatCurrency(item.otherFee)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -226,10 +232,10 @@ export function BBNTable({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer text-gray-700">
+                                                    <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer text-gray-700">
                                                         Edit
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600 cursor-pointer focus:text-red-600">
+                                                    <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="text-red-600 cursor-pointer focus:text-red-600">
                                                         Hapus
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -238,16 +244,21 @@ export function BBNTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="h-32 text-center text-gray-500">
-                                        Tidak ada data biaya ditemukan
+                                <TableRow className="group">
+                                    <TableCell colSpan={100} className="py-16 h-32 text-center text-gray-500">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>
@@ -265,7 +276,7 @@ export function BBNTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

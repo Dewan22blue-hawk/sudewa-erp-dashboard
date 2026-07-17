@@ -23,6 +23,9 @@ interface MaterialTableProps {
     onEdit: (material: Material) => void;
     onDelete: (material: Material) => void;
     isExporting?: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 export function MaterialTable({
@@ -40,6 +43,9 @@ export function MaterialTable({
     onEdit,
     onDelete,
     isExporting = false,
+    canCreate,
+    canEdit,
+    canDelete,
 }: MaterialTableProps) {
     const totalPages = Math.ceil(totalData / perPage);
     const startData = (page - 1) * perPage + 1;
@@ -94,8 +100,8 @@ export function MaterialTable({
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
-                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                 )}
             >
                 {p}
@@ -144,9 +150,9 @@ export function MaterialTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button 
-                            onClick={onExport} 
-                            variant="outline" 
+                        <Button
+                            onClick={onExport}
+                            variant="outline"
                             className="w-full sm:w-auto"
                             disabled={isExporting}
                         >
@@ -154,43 +160,45 @@ export function MaterialTable({
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
                     )}
-                    {onImport && (
-                        <Button 
-                            onClick={onImport} 
-                            variant="outline" 
-                            className="w-full sm:w-auto"
-                        >
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                        </Button>
+                    {canCreate && (
+                        <>
+                            {onImport && (
+                                <Button
+                                    onClick={onImport}
+                                    variant="outline"
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    Import
+                                </Button>
+                            )}
+                            <Button
+                                onClick={onAdd}
+                                className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah
+                            </Button>
+                        </>
                     )}
-                    <Button 
-                        onClick={onAdd} 
-                        className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-[#f8f9fa]">
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-left">KODE MATERIAL</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[40%] uppercase px-4 py-4 text-left">DESKRIPSI</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-right">HARGA</TableHead>
                                 <TableHead className="text-xs font-semibold text-slate-500 w-[10%] uppercase px-4 py-4 text-center">SATUAN</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">ACTION</TableHead>
+                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {materials.length > 0 ? (
                                 materials.map((item) => (
-                                    <TableRow key={item.uuid} className="hover:bg-gray-50 transition-colors">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-left">
+                                    <TableRow key={item.uuid} className="group hover:bg-gray-50 transition-colors">
+                                        <TableCell className="text-center px-4 py-4">
                                             {item.code || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">
@@ -202,7 +210,7 @@ export function MaterialTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase text-center">
                                             {item.type || '-'}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <div className="flex justify-center">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -211,10 +219,10 @@ export function MaterialTable({
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                                                        <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                                                        <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                                                             Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                                        <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                                                             Hapus
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -224,16 +232,21 @@ export function MaterialTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="h-32 text-center text-gray-550 py-10 text-sm">
-                                        Tidak ada data material ditemukan
+                                <TableRow className="group">
+                                    <TableCell colSpan={100} className="h-32 text-center text-gray-550 py-16 text-sm">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div className="text-sm text-gray-500">
@@ -251,7 +264,7 @@ export function MaterialTable({
                         >
                             Previous
                         </Button>
-                        
+
                         {renderPaginationNumbers()}
 
                         <Button

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { MoreVertical, Plus, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import type { FinanceBillingItem } from '@/@types/finance-billing.types';
 import { useCreateFinanceBillingItem, useDeleteFinanceBillingItem, useUpdateFinanceBillingItem } from '@/hooks/useFinanceBilling';
@@ -216,14 +216,14 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
               <th className="w-16 px-4 py-3 text-left">No</th>
               <th className="px-4 py-3 text-left">Keterangan</th>
               <th className="w-[320px] px-4 py-3 text-left">Nominal Bayar</th>
-              <th className="w-20 px-4 py-3 text-center">Action</th>
+              <th className="w-20 px-4 py-3 text-center sticky right-0 bg-[#f3f6fb] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.map((item, index) => {
               const isEditing = editingId === item.id;
               return (
-                <tr key={item.id}>
+                <tr key={item.id} className="bg-white hover:bg-slate-50 transition-colors group">
                   <td className="px-4 py-3 text-center">
                     <Checkbox
                       checked={selectedIds.includes(item.id)}
@@ -258,7 +258,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                       <span className="font-medium text-slate-900">{formatCurrency(item.totalAmount)}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     {isEditing ? (
                       <div className="flex items-center justify-center gap-2">
                         <Button type="button" size="sm" className="h-9 rounded-lg bg-[#18385b] px-3 hover:bg-[#102843]" disabled={isBusy} onClick={() => void handleSave(item.id)}>
@@ -329,8 +329,14 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
 
             {!hasRows && editingId !== 'new' ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                  Belum ada rincian transaksi.
+                <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : null}

@@ -354,7 +354,7 @@ export default function GoodsReceiptEditPage() {
                 <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">SATUAN</TableHead>
                 <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">HARGA SATUAN</TableHead>
                 <TableHead className="px-5 py-4 text-[14px] font-semibold uppercase text-slate-900">TOTAL</TableHead>
-                <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">ACTION</TableHead>
+                <TableHead className="px-5 py-4 text-right text-[14px] font-semibold uppercase text-slate-900">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

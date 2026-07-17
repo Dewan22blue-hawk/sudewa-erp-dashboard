@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { Button } from '@/components/ui/button';
 import { SalesTableRow } from './SalesTableRow';
 import { Plus, ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
@@ -12,6 +12,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { useDeleteSales, useSalesList } from '@/hooks/useSales';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 
 interface Props {
   // Add props if needed, simpler for SalesTable as it uses static data
@@ -26,41 +27,14 @@ export function SalesTable({ onAdd }: Props) {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
   const [localSearch, setLocalSearch] = useState('');
-  const [mainTab, setMainTab] = useState('common');
-  const [subTab, setSubTab] = useState('all');
+  const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
 
-  const TABS = [
-    { id: 'common', label: 'Common' },
-    { id: 'inbound', label: 'Inbound' },
-    { id: 'outbound', label: 'Outbound' },
-  ];
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
 
-  const SUBTABS = {
-    common: [
-      { id: 'all', label: 'All' },
-      { id: 'draft', label: 'Draft' },
-      { id: 'cancel', label: 'Cancel' },
-      { id: 'rejected', label: 'Rejected' },
-      { id: 'prepare', label: 'Prepare' },
-    ],
-    inbound: [
-      { id: 'all', label: 'All' },
-      { id: 'inbound_purcase_order', label: 'Purchase Order' },
-      { id: 'inbound_incoming_goods', label: 'Incoming Goods' },
-      { id: 'inbound_receipt', label: 'Receipt' },
-      { id: 'inbound_return', label: 'Return' },
-    ],
-    outbound: [
-      { id: 'all', label: 'All' },
-      { id: 'outbound_reserved', label: 'Reserved' },
-      { id: 'outbound_in_transit', label: 'In Transit' },
-      { id: 'outbound_delivered', label: 'Delivered' },
-      { id: 'outbound_return', label: 'Return' },
-    ]
-  };
-
-  const activeStatus = subTab === 'all' ? undefined : subTab;
-  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm, status: activeStatus });
+  const { data, isLoading } = useSalesList({ page: currentPage, perPage: itemsPerPage, search: searchTerm });
   const deleteMutation = useDeleteSales();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const salesData = data?.data ?? [];
@@ -227,33 +201,14 @@ export function SalesTable({ onAdd }: Props) {
             />
           </div>
 
-          {/* 2. Main Status Dropdown */}
-          <Select value={mainTab} onValueChange={(val) => { setMainTab(val); setSubTab('all'); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {TABS.map((tab) => (
-                <SelectItem key={tab.id} value={tab.id}>
-                  {tab.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* 3. Sub Status Dropdown */}
-          <Select value={subTab} onValueChange={(val) => { setSubTab(val); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-              <SelectValue placeholder="Detail Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {SUBTABS[mainTab as keyof typeof SUBTABS].map((sub) => (
-                <SelectItem key={sub.id} value={sub.id}>
-                  {sub.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Button
+            type="button"
+            variant="outline"
+            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-xl shadow-none px-4 whitespace-nowrap"
+            onClick={() => setIsVehicleSearchOpen(true)}
+          >
+            Cari Data Kendaraan
+          </Button>
 
           {/* 4. Show + Page limit */}
           <div className="flex items-center gap-2 whitespace-nowrap">
@@ -273,7 +228,7 @@ export function SalesTable({ onAdd }: Props) {
         </div>
 
         {/* RIGHT CONTROLS */}
-        {onAdd && (
+        {canCreate && onAdd && (
           <Button onClick={onAdd} className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white whitespace-nowrap h-9 w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
@@ -281,7 +236,7 @@ export function SalesTable({ onAdd }: Props) {
         )}
       </div>
 
-      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="relative overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
@@ -294,32 +249,38 @@ export function SalesTable({ onAdd }: Props) {
               {renderSortHeader('totalPPN', 'TOTAL PPN', 'center')}
               {renderSortHeader('totalJual', 'TOTAL JUAL', 'center')}
               {renderSortHeader('kurangBayar', 'KURANG BAYAR', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Loading data...
                 </TableCell>
               </TableRow>
             ) : isDataEmpty ? (
-              <TableRow>
+              <TableRow className="group">
                 <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
                   Data penjualan masih kosong.
                 </TableCell>
               </TableRow>
             ) : isSearchEmpty ? (
-              <TableRow>
-                <TableCell colSpan={10} className="h-20 text-center text-muted-foreground px-4 py-4 text-sm">
-                  Data tidak ditemukan. Coba ubah kata kunci pencarian.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="h-20 text-center text-muted-foreground px-4 py-16 text-sm">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               currentData.map((item) => (
-                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} />
+                <SalesTableRow key={item.id} item={item} isSelected={selectedIds.has(item.id)} onToggle={handleToggle} onDelete={handleDelete} canEdit={canEdit} canDelete={canDelete} />
               ))
             )}
           </TableBody>
@@ -355,6 +316,12 @@ export function SalesTable({ onAdd }: Props) {
           </div>
         </div>
       )}
+      {/* Vehicle Search Modal */}
+      <SearchVehicleModal
+        open={isVehicleSearchOpen}
+        onOpenChange={setIsVehicleSearchOpen}
+        type="sales"
+      />
     </div>
   );
 }

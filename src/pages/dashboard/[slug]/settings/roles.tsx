@@ -69,8 +69,8 @@ export default function RolesPage() {
     <DashboardLayout>
       <div className="space-y-6 p-6 grid grid-cols-1">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Roles</h1>
-          <p className="text-sm text-gray-500">Kelola role dan permission.</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Hak Akses</h1>
+          <p className="text-sm text-gray-500">Kelola Hak dan Izin Akses.</p>
         </div>
 
         <div className="flex justify-between items-center">
@@ -127,7 +127,7 @@ export default function RolesPage() {
                 <th className="px-4 py-3 text-left">Nama</th>
                 <th className="px-4 py-3 text-left">Guard</th>
                 <th className="px-4 py-3 text-left">Users</th>
-                <th className="px-4 py-3 text-center">Action</th>
+                <th className="px-4 py-3 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>

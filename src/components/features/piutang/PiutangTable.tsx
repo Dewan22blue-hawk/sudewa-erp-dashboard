@@ -100,7 +100,7 @@ export default function PiutangTable({ data }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
             <tr className="border-b border-gray-200">
@@ -123,7 +123,7 @@ export default function PiutangTable({ data }: Props) {
               <th className="py-2 text-right">
                 <SortableHeader title="AMOUNT PIUTANG" sortKey="amountPiutang" currentSortKey={sortKey as string} sortOrder={sortOrder} onSort={handleSort} className="text-gray-900 justify-end w-full" />
               </th>
-              <th className="px-4 py-3 text-center">ACTION</th>
+              <th className="px-4 py-3 text-center sticky right-0 bg-gray-50 z-10 border-l border-gray-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -137,7 +137,7 @@ export default function PiutangTable({ data }: Props) {
                   <td className="px-4 py-3 text-right">{formatCurrency(item.totalJual)}</td>
                   <td className="px-4 py-3 text-right">{formatCurrency(item.totalBayar)}</td>
                   <td className="px-4 py-3 text-right text-red-600 font-medium">{formatCurrency(item.amountPiutang)}</td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-gray-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
@@ -155,8 +155,14 @@ export default function PiutangTable({ data }: Props) {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                  Tidak ada data yang ditemukan.
+                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             )}

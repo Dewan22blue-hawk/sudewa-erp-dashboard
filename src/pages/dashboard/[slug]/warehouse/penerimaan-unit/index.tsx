@@ -10,6 +10,7 @@ import PenerimaanUnitTable from '@/components/features/penerimaan-unit/Penerimaa
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
 import { cn } from '@/lib/utils';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
@@ -22,6 +23,11 @@ export default function PenerimaanUnitPage() {
     activityType: 'receipt',
     perPage: 10000,
   });
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
 
   const allData = useMemo(() => activities?.data ?? [], [activities?.data]);
 
@@ -115,10 +121,12 @@ export default function PenerimaanUnitPage() {
               </div>
             </div>
 
-            <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => setOpenForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah
-            </Button>
+            {canCreate && (
+              <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={() => setOpenForm(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah
+              </Button>
+            )}
           </div>
 
           {isLoading ? (

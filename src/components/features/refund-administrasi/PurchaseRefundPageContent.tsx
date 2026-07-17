@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft, MoreVertical, Plus } from 'lucide-react';
+import { ChevronLeft, MoreVertical, Plus, Loader2, Search } from 'lucide-react';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -115,8 +115,8 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
           </Button>
         </div>
 
-        <div className="overflow-hidden rounded-[10px] border border-[#D9DEE8] bg-white">
-          <Table>
+        <div className="overflow-x-auto rounded-[10px] border border-[#D9DEE8] bg-white">
+        <Table>
             <TableHeader>
               <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                 {['NO', 'TANGGAL REFUND', 'KODE REFUND', 'NOMINAL REFUND', 'KURANG BAYAR', 'QTY', 'STATUS', 'ACTION'].map((header) => (
@@ -129,9 +129,12 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
             <TableBody>
               {refundQuery.isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center text-[#6B7280]">
-                    Memuat data refund...
-                  </TableCell>
+                  <TableCell colSpan={8} className="py-16 h-32 text-center text-[#6B7280]">
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</TableCell>
                 </TableRow>
               ) : refunds.length > 0 ? (
                 refunds.map((refund, index) => {
@@ -176,9 +179,15 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-28 text-center text-[#6B7280]">
-                    Belum ada data refund pembelian.
-                  </TableCell>
+                  <TableCell colSpan={100} className="py-16 h-28 text-center text-[#6B7280]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -191,8 +200,8 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
             <p className="mt-1 text-sm text-[#6B7280]">Rincian lengkap unit yang direfund</p>
           </div>
 
-          <div className="overflow-hidden bg-white">
-            <Table>
+          <div className="overflow-x-auto bg-white">
+        <Table>
               <TableHeader>
                 <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
                   {['Tanggal', 'TIPE UNIT', 'QTY', 'NOMINAL REFUND', 'KETERANGAN'].map((header) => (
@@ -215,9 +224,15 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-[#6B7280]">
-                      Belum ada history pembayaran refund.
-                    </TableCell>
+                    <TableCell colSpan={100} className="py-16 h-24 text-center text-[#6B7280]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                   </TableRow>
                 )}
               </TableBody>

@@ -14,6 +14,7 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { customerSchema, type CustomerFormValues } from '@/scheme/customer.schema';
 import { getCustomerById } from '@/services/customer.service';
 import { toast } from 'sonner';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const defaultCustomerValues: CustomerFormValues = {
   name: '',
@@ -51,6 +52,11 @@ const applyValidationErrors = (
 
 export function CustomerManagementPage() {
   const { companyId, isLoading: isLoadingCompany } = useCompany();
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
+
   const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
   const deferredSearch = useDeferredValue(search);
 
@@ -91,12 +97,14 @@ export function CustomerManagementPage() {
   };
 
   const handleAdd = () => {
+    if (!canCreate) return;
     setEditingCustomer(null);
     form.reset(defaultCustomerValues);
     setIsFormOpen(true);
   };
 
   const handleEdit = async (customer: ApiCustomer) => {
+    if (!canEdit) return;
     setLoadingDetailId(customer.id);
 
     try {
@@ -120,6 +128,9 @@ export function CustomerManagementPage() {
   };
 
   const handleSubmit = async (values: CustomerFormValues) => {
+    if (editingCustomer && !canEdit) return;
+    if (!editingCustomer && !canCreate) return;
+
     if (!companyId) {
       toast.error('Company ID tidak ditemukan');
       return;
@@ -156,6 +167,7 @@ export function CustomerManagementPage() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (!deleteTarget || !companyId) return;
 
     try {
@@ -172,6 +184,7 @@ export function CustomerManagementPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     if (!companyId) {
       throw new Error('Company ID tidak ditemukan');
     }
@@ -228,6 +241,9 @@ export function CustomerManagementPage() {
           onImport={() => setIsImportOpen(true)}
           onExport={handleExport}
           isExporting={exportCustomer.isPending}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
       </div>
 

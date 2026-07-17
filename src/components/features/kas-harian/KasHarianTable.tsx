@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from '@/components/ui/skeleton';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Info } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Info, CheckCircle, Loader2, Search } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import { cn } from '@/lib/utils';
@@ -95,8 +95,6 @@ export default function KasHarianTable({
     });
   }, [data, sortBy, sortDirection]);
 
-  console.log(sortedData);
-
   const pageNumbers = (() => {
     if (meta.lastPage <= 5) return Array.from({ length: meta.lastPage }, (_, index) => index + 1);
     if (page <= 3) return [1, 2, 3, 4, '...', meta.lastPage];
@@ -130,7 +128,7 @@ export default function KasHarianTable({
 
   return (
     <div className="space-y-5">
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
         <table className="w-full min-w-[1120px] text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
@@ -139,13 +137,19 @@ export default function KasHarianTable({
               <th className="p-0 text-left">{renderSortHeader('KETERANGAN', 'note', 'left')}</th>
               <th className="p-0 text-left">{renderSortHeader('DEBET', 'debet', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('KREDIT', 'credit', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('STATUS BAYAR', 'is_paid', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : isError ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
@@ -161,17 +165,22 @@ export default function KasHarianTable({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
-                  Belum ada data transaksi kas harian.
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
               sortedData.map((item) => (
-                <tr key={`${item.source}-${item.id}`} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <tr key={`${item.source}-${item.id}`} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
                   <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.date)}</td>
                   <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">
                     <div className="flex items-center gap-2">
-                      <CopyBox text={`${item.code || '-'}`} />
                       {(item.unitTransactionBillingId || item.goodsTransactionBillingId) ? (
                         <TooltipProvider>
                           <Tooltip>
@@ -186,11 +195,48 @@ export default function KasHarianTable({
                           </Tooltip>
                         </TooltipProvider>
                       ) : null}
+                      <CopyBox text={`${item.code || '-'}`} />
                     </div>
                   </td>
                   <td className="px-4 py-4 text-left text-sm text-slate-700"><TextTruncate text={item.note || '-'} maxLength={15} /></td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600">{currenciesFormat('idr', item.debet)}</td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600">{currenciesFormat('idr', item.credit)}</td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-green-600 align-middle">
+                    <div className="flex items-center justify-center gap-1">
+                      {item.isValid === true && item.debet > 0 ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="cursor-help text-green-400 hover:text-green-600 transition-colors">
+                                <CheckCircle className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                              Nominal telah disesuaikan
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : null}
+                      <span>{currenciesFormat('idr', item.debet)}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-center text-sm font-medium text-red-600 align-middle">
+                    <div className="flex items-center justify-center gap-1">
+                      {item.isValid === true && item.credit > 0 ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="cursor-help text-green-400 hover:text-green-600 transition-colors">
+                                <CheckCircle className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                              Nominal telah disesuaikan
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : null}
+                      <span>{currenciesFormat('idr', item.credit)}</span>
+                    </div>
+                  </td>
                   <td className="px-4 py-4 text-center">
                     <span className={cn(
                       "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
@@ -201,7 +247,7 @@ export default function KasHarianTable({
                       {item.is_paid ? 'Lunas' : 'Belum Lunas'}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -224,9 +270,17 @@ export default function KasHarianTable({
                           </DropdownMenuItem>
                         ) : null}
                         {item.cashFlowId && onToggleStatus ? (
-                          <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
-                            {item.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
-                          </DropdownMenuItem>
+                          <>
+                            {item.isValid || !item.is_paid ? (
+                              <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
+                                Tandai Lunas
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
+                                Tandai Belum Lunas
+                              </DropdownMenuItem>
+                            )}
+                          </>
                         ) : null}
                         {item.source === 'manual' ? (
                           <DropdownMenuItem onClick={() => onDelete(item)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">

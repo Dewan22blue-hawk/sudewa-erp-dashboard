@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Loader2, Search } from 'lucide-react';
 
 interface Props {
   data: UJDriverItem[];
@@ -71,7 +71,7 @@ export default function UJDriverTable({
   const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
     const isSorted = currentSortBy === sortKey;
     const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    
+
     return (
       <button
         type="button"
@@ -123,12 +123,19 @@ export default function UJDriverTable({
               <th className="p-0 text-left">{renderSortHeader('UJ DRIVER', 'uj_driver', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('UJ LAINNYA', 'other_amount', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('KAS MASUK', 'amount', 'right')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />)
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : isError ? (
               <tr>
                 <td colSpan={14} className="px-4 py-10 text-center">
@@ -144,8 +151,14 @@ export default function UJDriverTable({
               </tr>
             ) : !hasData ? (
               <tr>
-                <td colSpan={14} className="px-4 py-10 text-center text-slate-500">
-                  Belum ada data.
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -176,7 +189,7 @@ export default function UJDriverTable({
                     <td className="px-4 py-4 text-right text-sm font-medium text-emerald-600">
                       {kasMasuk != null ? formatCurrency(kasMasuk) : <span className="text-slate-500 font-normal">Belum Bayar</span>}
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       {kasMasuk != null ? (
                         <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 font-medium">
                           Lunas

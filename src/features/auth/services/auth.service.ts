@@ -36,17 +36,35 @@ export class AuthService {
     return response.data;
   }
 
-  static async updateProfile(id: number, data: { name?: string; username?: string; firstname?: string; lastname?: string; email?: string }): Promise<ProfileResponse> {
-    const body = new URLSearchParams();
+  static async getPermissions(): Promise<string[]> {
+    const response = await apiClient.get<{
+      status: boolean;
+      message: string;
+      errors: any;
+      data: {
+        permissions: string[];
+      };
+    }>('/wapi/auth/has-permissions');
+
+    if (!response.data.status) {
+      throw new Error(response.data.message || 'Failed to fetch permissions');
+    }
+
+    return response.data.data.permissions;
+  }
+
+  static async updateProfile(id: number, data: { name?: string; username?: string; firstname?: string; lastname?: string; email?: string; avatar?: File | null }): Promise<ProfileResponse> {
+    const body = new FormData();
     if (data.name) body.append('name', data.name);
     if (data.username) body.append('username', data.username);
     if (data.firstname) body.append('firstname', data.firstname);
     if (data.lastname) body.append('lastname', data.lastname);
     if (data.email) body.append('email', data.email);
-    body.append('_method', 'PUT'); // usually Laravel/PHP requires this for x-www-form-urlencoded PUTs if we use post, but we can just use apiClient.put. However, standard apiClient might support put perfectly. The prompt says Method: PUT, Content-Type: application/x-www-form-urlencoded. So let's use put.
+    if (data.avatar) body.append('avatar', data.avatar);
+    body.append('_method', 'PUT');
 
-    const response = await apiClient.put<ProfileResponse>(`/wapi/users/${id}`, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    const response = await apiClient.post<ProfileResponse>(`/wapi/users/${id}`, body, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     if (!response.data.status) {

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Loader2, Search } from 'lucide-react';
 import type { FinanceRefundRecord, RefundTransactionType } from '@/@types/finance-refund.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import FinanceRefundApprovalModal from '@/components/features/finance-refund/FinanceRefundApprovalModal';
@@ -86,32 +86,30 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         },
       ];
 
-      if (transactionType === 'purchase') {
-        baseColumns.push(
-          {
-            accessorKey: 'status',
-            header: 'STATUS',
-            cell: ({ row }) => <RefundStatusBadge status={row.original.status} />,
-          },
-          {
-            id: 'actions',
-            header: 'ACTION',
-            cell: ({ row }) => (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedRefund(row.original);
-                }}
-              >
-                Approval
-              </Button>
-            ),
-          }
-        );
-      }
+      baseColumns.push(
+        {
+          accessorKey: 'status',
+          header: 'STATUS',
+          cell: ({ row }) => <RefundStatusBadge status={row.original.status} />,
+        },
+        {
+          id: 'actions',
+          header: 'ACTION',
+          cell: ({ row }) => (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedRefund(row.original);
+              }}
+            >
+              Approval
+            </Button>
+          ),
+        }
+      );
 
       return baseColumns;
     },
@@ -137,7 +135,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   return (
     <>
       <div className="space-y-4">
-        <div className="text-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+        <div className="text-sm overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-none">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -151,7 +149,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                     const title = flexRender(header.column.columnDef.header, header.getContext());
 
                     return (
-                      <TableHead key={header.id} className="p-0 text-left bg-[#f8f9fa] border-b border-gray-200">
+                      <TableHead key={header.id} className={`p-0 text-left bg-[#f8f9fa] border-b border-gray-200 ${header.column.id === 'actions' ? 'sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] text-center' : ''}`}>
                         {header.isPlaceholder ? null : (
                           <button
                             type="button"
@@ -181,23 +179,26 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
-                    Memuat data refund finance...
-                  </TableCell>
+                <TableRow className="group">
+                  <TableCell colSpan={columns.length} className="py-16 h-40 text-center text-slate-500">
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</TableCell>
                 </TableRow>
               ) : table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
+                    className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
                     onClick={() => setSelectedRefund(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const align = getColumnAlignment(cell.column.id);
                       const alignClass = align === 'center' ? 'text-center' : 'text-left';
                       return (
-                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass}`}>
+                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass} ${cell.column.id === 'actions' ? 'sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : ''}`}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       );
@@ -205,10 +206,16 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
-                    Tidak ada data refund finance.
-                  </TableCell>
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="py-16 h-40 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                 </TableRow>
               )}
             </TableBody>

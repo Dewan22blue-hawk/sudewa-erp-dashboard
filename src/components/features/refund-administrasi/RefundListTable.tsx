@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, Eye } from 'lucide-react';
+import { ArrowUpDown, Eye, Loader2, Search } from 'lucide-react';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
@@ -108,7 +108,7 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -126,23 +126,32 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
-                  Memuat data refund...
-                </TableCell>
+              <TableRow className="group">
+                <TableCell colSpan={columns.length} className="py-16 h-40 text-center text-slate-500">
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</TableCell>
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-slate-50">
+                <TableRow key={row.id} className="group hover:bg-slate-50">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-40 text-center text-slate-500">
-                  Belum ada refund untuk transaksi ini.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="py-16 h-40 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </TableCell>
               </TableRow>
             )}

@@ -1,4 +1,4 @@
-import { Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
+import { Download, MoreVertical, Plus, Search, Upload, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -96,9 +96,7 @@ export function VehicleDocumentTable({
         </div>
       </div>
 
-      <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="overflow-x-auto rounded-[16px] border border-slate-200 bg-white shadow-sm">s*<Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200 hover:bg-transparent">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Dokumen</TableHead>
@@ -109,23 +107,22 @@ export function VehicleDocumentTable({
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Unprocessed</TableHead>
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Deskripsi</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tanggal Dibuat</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px]">Action</TableHead>
+                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                Array.from({ length: Math.min(perPage, 6) }).map((_, rowIndex) => (
-                  <TableRow key={rowIndex} className="animate-pulse border-slate-100">
-                    {Array.from({ length: 9 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="px-4 py-4">
-                        <div className="h-4 rounded bg-slate-100" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                <tr>
+                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
               ) : items.length ? (
                 items.map((item) => (
-                  <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50/70 transition-colors">
+                  <TableRow key={item.id} className="group border-b border-slate-200 hover:bg-gray-50/70 transition-colors">
                     <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.ditlantasProcess?.code || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.ditlantasProcess?.vendor?.name || '-'}</TableCell>
@@ -134,7 +131,7 @@ export function VehicleDocumentTable({
                     <TableCell className="px-4 py-4 text-center text-sm font-semibold text-amber-600">{item.unprocessedCount}</TableCell>
                     <TableCell className="max-w-[220px] truncate px-4 py-4 text-sm text-slate-700 text-left">{item.description || '-'}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatDate(item.createdAt)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -150,16 +147,21 @@ export function VehicleDocumentTable({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={9} className="h-28 text-center text-sm text-slate-500 px-4 py-4">
-                    Belum ada data penerimaan BPKB/STNK.
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="h-28 text-center text-sm text-slate-500 px-4 py-16">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+            </div>
 
       <div className="flex flex-col gap-4 px-1 pb-2 md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-slate-500">Showing {startData}-{endData} of {totalData} data</div>

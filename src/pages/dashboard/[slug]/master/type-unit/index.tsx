@@ -9,12 +9,18 @@ import { DeleteTypeUnitDialog } from '@/components/features/type-unit/DeleteType
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useCompany } from '@/contexts/CompanyContext';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function TypeUnitPage() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   const { data, isLoading, isError, refetch } = useTypeUnits();
   const filteredData = useMemo(() => {
@@ -54,16 +60,19 @@ export default function TypeUnitPage() {
   const [typeUnitToDelete, setTypeUnitToDelete] = useState<TypeUnit | null>(null);
 
   const handleCreateClick = () => {
+    if (!canCreate) return;
     const slug = router.query.slug as string;
     router.push(`/dashboard/${slug}/master/type-unit/create`);
   };
 
   const handleEditClick = (typeUnit: TypeUnit) => {
+    if (!canEdit) return;
     const slug = router.query.slug as string;
     router.push(`/dashboard/${slug}/master/type-unit/${typeUnit.id}/edit`);
   };
 
   const handleDeleteClick = (typeUnit: TypeUnit) => {
+    if (!canDelete) return;
     setTypeUnitToDelete(typeUnit);
     setDeleteDialogOpen(true);
   };
@@ -84,6 +93,7 @@ export default function TypeUnitPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     await importMutation.mutateAsync({ file });
     refetch();
   };
@@ -156,8 +166,10 @@ export default function TypeUnitPage() {
             isLoading={isLoading}
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
-            onAdd={handleCreateClick}
-            onImport={() => setOpenImport(true)}
+            onAdd={canCreate ? handleCreateClick : undefined}
+            onImport={canCreate ? () => setOpenImport(true) : undefined}
+            canEdit={canEdit}
+            canDelete={canDelete}
           />
         </div>
       </div>

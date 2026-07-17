@@ -18,8 +18,8 @@ export function LPJDetailTable({ items }: LPJDetailTableProps) {
   const totalPPH = items.reduce((acc, item) => acc + item.pph2, 0);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#d5dce7]">
-      <Table className="min-w-250">
+    <div className="overflow-x-auto rounded-xl border border-[#d5dce7]">
+        <Table className="min-w-250">
         <TableHeader className="bg-[#d9e5f7]">
           <TableRow>
             <TableHead className="text-[11px] font-semibold text-center">NO</TableHead>
@@ -36,7 +36,7 @@ export function LPJDetailTable({ items }: LPJDetailTableProps) {
         </TableHeader>
         <TableBody>
           {items.map((item, index) => (
-            <TableRow key={item.id} className="text-xs">
+            <TableRow key={item.id} className="group text-xs">
               <TableCell className="text-center py-2">{index + 1}</TableCell>
               <TableCell className="text-center py-2">{format(new Date(item.tanggal), 'dd/MM/yyyy')}</TableCell>
               <TableCell className="text-center py-2">{item.noPolisi}</TableCell>
@@ -50,7 +50,7 @@ export function LPJDetailTable({ items }: LPJDetailTableProps) {
             </TableRow>
           ))}
 
-          <TableRow className="bg-[#d9e5f7] text-sm font-semibold">
+          <TableRow className="group bg-[#d9e5f7] text-sm font-semibold">
             <TableCell colSpan={5} className="text-center py-2">
               Keterangan
             </TableCell>

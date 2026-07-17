@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Upload, CircleAlert } from 'lucide-react';
+import { Search, Plus, MoreVertical, Upload, CircleAlert, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,9 @@ interface ArmadaTableProps {
   onEdit: (armada: Armada) => void;
   onDelete: (armada: Armada) => void;
   onDetail?: (armada: Armada) => void;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 const formatDate = (value?: string | null) => {
@@ -76,6 +79,9 @@ export function ArmadaTable({
   onEdit,
   onDelete,
   onDetail,
+  canCreate,
+  canEdit,
+  canDelete,
 }: ArmadaTableProps) {
   const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
   const endData = totalData === 0 ? 0 : Math.min(page * perPage, totalData);
@@ -106,21 +112,24 @@ export function ArmadaTable({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {onImport && (
-            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
+          {canCreate && (
+            <>
+              {onImport && (
+                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+              )}
+              <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah
+              </Button>
+            </>
           )}
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah
-          </Button>
         </div>
       </div>
 
-      <Card className="overflow-hidden rounded-xl border border-gray-200">
-        <div className="overflow-x-auto">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
           <Table className="min-w-[1100px]">
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
@@ -130,25 +139,26 @@ export function ArmadaTable({
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO RANGKA</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA STNK</TableHead>
                 <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA KIR</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[100px]">ACTION</TableHead>
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
-                  <TableRow key={index} className="animate-pulse">
-                    <TableCell colSpan={7} className="px-4 py-4">
-                      <div className="h-5 rounded bg-gray-200" />
-                    </TableCell>
-                  </TableRow>
-                ))
+                <tr>
+                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
               ) : armadas.length > 0 ? (
                 armadas.map((armada) => {
                   const stnkInfo = getRemainingLabel(armada.stnkAge);
                   const kirInfo = getRemainingLabel(armada.kirAge);
- 
+
                   return (
-                    <TableRow key={armada.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <TableRow key={armada.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
                       <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
                       <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.type}</TableCell>
                       <TableCell className="px-4 py-4 text-left text-sm text-slate-700 font-medium whitespace-nowrap">{armada.machineNumber}</TableCell>
@@ -158,13 +168,12 @@ export function ArmadaTable({
                         {stnkInfo && (
                           <div className="mt-1 flex justify-center">
                             <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                                stnkInfo.className.includes('#DC2626')
-                                  ? 'bg-red-50 text-[#DC2626]'
-                                  : stnkInfo.className.includes('#F59E0B')
-                                    ? 'bg-amber-50 text-[#F59E0B]'
-                                    : 'bg-green-50 text-[#16A34A]'
-                              }`}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${stnkInfo.className.includes('#DC2626')
+                                ? 'bg-red-50 text-[#DC2626]'
+                                : stnkInfo.className.includes('#F59E0B')
+                                  ? 'bg-amber-50 text-[#F59E0B]'
+                                  : 'bg-green-50 text-[#16A34A]'
+                                }`}
                             >
                               <span>{stnkInfo.text}</span>
                               {(stnkInfo.className.includes('#DC2626') || stnkInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
@@ -177,13 +186,12 @@ export function ArmadaTable({
                         {kirInfo && (
                           <div className="mt-1 flex justify-center">
                             <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                                kirInfo.className.includes('#DC2626')
-                                  ? 'bg-red-50 text-[#DC2626]'
-                                  : kirInfo.className.includes('#F59E0B')
-                                    ? 'bg-amber-50 text-[#F59E0B]'
-                                    : 'bg-green-50 text-[#16A34A]'
-                              }`}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${kirInfo.className.includes('#DC2626')
+                                ? 'bg-red-50 text-[#DC2626]'
+                                : kirInfo.className.includes('#F59E0B')
+                                  ? 'bg-amber-50 text-[#F59E0B]'
+                                  : 'bg-green-50 text-[#16A34A]'
+                                }`}
                             >
                               <span>{kirInfo.text}</span>
                               {(kirInfo.className.includes('#DC2626') || kirInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
@@ -191,7 +199,8 @@ export function ArmadaTable({
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm">
+                      <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                        <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -204,29 +213,35 @@ export function ArmadaTable({
                                 Detail
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => onEdit(armada)} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => onEdit(armada)} disabled={!canEdit} className="cursor-pointer">
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(armada)} className="cursor-pointer text-red-600 focus:text-red-600">
+                            <DropdownMenuItem onClick={() => onDelete(armada)} disabled={!canDelete} className="cursor-pointer text-red-600 focus:text-red-600">
                               Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
                 })
               ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center text-slate-500 px-4 py-4 text-sm">
-                    Tidak ada data armada ditemukan
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="h-32 text-center text-slate-500 px-4 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+      </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <div>
@@ -256,8 +271,8 @@ export function ArmadaTable({
                   item === page
                     ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                     : item === '...'
-                    ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                    : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                      ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                      : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
               >
                 {item}

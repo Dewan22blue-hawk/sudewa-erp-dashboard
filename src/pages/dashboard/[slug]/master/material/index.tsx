@@ -8,8 +8,13 @@ import { ImportMaterialModal } from '@/components/features/material/ImportMateri
 import { toast } from 'sonner';
 import { useMaterials, useCreateMaterial, useUpdateMaterial, useDeleteMaterial, useImportMaterial, useExportMaterial } from '@/hooks/useMaterial';
 import type { Material } from '@/@types/material.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function MaterialPage() {
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   // Table state
   const [search, setSearch] = useState('');
@@ -32,21 +37,26 @@ export default function MaterialPage() {
 
   // Handlers
   const handleAddClick = () => {
+    if (!canCreate) return;
     setSelectedMaterial(null);
     setIsFormOpen(true);
   };
 
   const handleEditClick = (material: Material) => {
+    if (!canEdit) return;
     setSelectedMaterial(material);
     setIsFormOpen(true);
   };
 
   const handleDeleteClick = (material: Material) => {
+    if (!canDelete) return;
     setSelectedMaterial(material);
     setIsDeleteOpen(true);
   };
 
   const handleSaveForm = async (data: MaterialFormData) => {
+    if (selectedMaterial && !canEdit) return;
+    if (!selectedMaterial && !canCreate) return;
     try {
       if (selectedMaterial) {
         // Edit
@@ -64,6 +74,7 @@ export default function MaterialPage() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!canDelete) return;
     if (selectedMaterial) {
       try {
         await deleteMutation.mutateAsync(selectedMaterial.id);
@@ -77,6 +88,7 @@ export default function MaterialPage() {
   };
 
   const handleImport = async (file: File) => {
+    if (!canCreate) return;
     try {
       await importMutation.mutateAsync({ file });
       toast.success('Import data material berhasil');
@@ -126,11 +138,14 @@ export default function MaterialPage() {
             setPage(1);
           }}
           onAdd={handleAddClick}
-          onImport={() => setIsImportOpen(true)}
+          onImport={canCreate ? () => setIsImportOpen(true) : undefined}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          canCreate={canCreate}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
 
       </div>

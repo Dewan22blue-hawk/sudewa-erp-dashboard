@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MoreVertical, Download } from 'lucide-react';
+import { Search, MoreVertical, Download, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -90,9 +90,8 @@ export function FinanceAssetTable({
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto shadow-none">
+                    <Table className="min-w-[1200px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-transparent border-gray-100">
                                 <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NO</TableHead>
@@ -105,29 +104,34 @@ export function FinanceAssetTable({
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UMUR EKONOMIS</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PENYUSUTAN/BULAN</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NILAI AKHIR</TableHead>
-                                <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">ACTION</TableHead>
+                                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i} className="border-b border-slate-100 last:border-0">
-                                        {Array.from({ length: 11 }).map((_, j) => (
-                                            <TableCell key={j} className="px-4 py-4">
-                                                <Skeleton className="h-4 w-full" />
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
+                                <tr>
+                                    <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                                        <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                                            <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                                            <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             ) : assets.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={11} className="h-24 text-center text-slate-500">
-                                        No data found.
+                                <TableRow className="group">
+                                    <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 assets.map((asset, index) => (
-                                    <TableRow key={asset.id} className="border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
+                                    <TableRow key={asset.id} className="group border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(page - 1) * perPage + index + 1}</TableCell>
                                         <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">{asset.code}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
@@ -140,7 +144,8 @@ export function FinanceAssetTable({
                                         <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
-                                        <TableCell className="px-4 py-4 text-center">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                            <div className="flex justify-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400">
@@ -159,13 +164,13 @@ export function FinanceAssetTable({
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             )}
                         </TableBody>
                     </Table>
-                </div>
             </div>
 
             {/* Pagination Info & Controls */}

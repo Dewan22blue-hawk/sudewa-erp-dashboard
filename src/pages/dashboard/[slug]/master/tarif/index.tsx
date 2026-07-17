@@ -6,10 +6,16 @@ import { DeleteTarifModal } from '@/components/features/tarif/DeleteTarifModal';
 import { toast } from 'sonner';
 import { useTarifs, useDeleteTarif } from '@/hooks/useTarif';
 import type { Tarif } from '@/@types/tarif.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function TarifPage() {
     const router = useRouter();
     const slug = router.query.slug as string;
+
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+    const canEdit = hasPermission('master-data:edit');
+    const canDelete = hasPermission('master-data:delete');
 
     // Table state
     const [searchInput, setSearchInput] = useState('');   // immediate input
@@ -35,19 +41,23 @@ export default function TarifPage() {
 
     // Handlers
     const handleAddClick = () => {
+        if (!canCreate) return;
         router.push(`/dashboard/${slug}/master/tarif/create`);
     };
 
     const handleEditClick = (tarif: Tarif) => {
+        if (!canEdit) return;
         router.push(`/dashboard/${slug}/master/tarif/${tarif.id}/edit`);
     };
 
     const handleDeleteClick = (tarif: Tarif) => {
+        if (!canDelete) return;
         setSelectedTarif(tarif);
         setIsDeleteOpen(true);
     };
 
     const handleConfirmDelete = async () => {
+        if (!canDelete) return;
         if (!selectedTarif) return;
         try {
             await deleteMutation.mutateAsync(selectedTarif.id);
@@ -90,6 +100,9 @@ export default function TarifPage() {
                     onAdd={handleAddClick}
                     onEdit={handleEditClick}
                     onDelete={handleDeleteClick}
+                    canCreate={canCreate}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                 />
             </div>
 

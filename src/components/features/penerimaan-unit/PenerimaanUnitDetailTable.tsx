@@ -8,7 +8,9 @@ import { PenerimaanUnitDetail } from '@/@types/penerimaan-unit.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useRouter } from 'next/router';
 import { usePenerimaanReceiptTable } from '@/hooks/usePenerimaanReceiptTable';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Props {
@@ -20,6 +22,8 @@ interface Props {
 
 export default function PenerimaanUnitDetailTable({ data, personId, onTerima, onDelete }: Props) {
   const { companyId } = useCompany();
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState('25');
   const [receivedFilter, setReceivedFilter] = useState<'all' | 'received' | 'pending'>('all');
@@ -226,7 +230,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
@@ -243,20 +247,24 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
               {renderSortHeader('machineNumber', 'NO MESIN')}
               {renderSortHeader('chassisNumber', 'NO RANGKA')}
               {renderSortHeader('status', 'STATUS')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">Action</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {paginated.length > 0 ? (
               paginated.map((item, index) => (
-                <TableRow key={item.id} className="hover:bg-gray-50/70 border-b transition-colors">
-                  <TableCell className="px-4 py-4 text-center">
+                <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors">
+                  <TableCell className="text-center px-4 py-4">
                     <Checkbox checked={selected.includes(item.id) || receivedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} disabled={receivedIds.includes(item.id)} />
                   </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.purchaseCode}</TableCell>
-                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.unitTypeName}</TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                    <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item.unitTypeName}`}>
+                      {item.unitTypeName}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.color}</TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.machineNumber}</TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.chassisNumber}</TableCell>
@@ -267,7 +275,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
                       item.status
                     )}
                   </TableCell>
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <Button variant="ghost" size="icon" onClick={() => setConfirmDeleteIds([item.id])}>
                       <Trash size={16} className="text-red-600" />
                     </Button>
@@ -275,9 +283,15 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={9} className="px-4 py-8 text-center text-gray-500 text-sm">
-                  Tidak ada data.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="px-4 py-16 text-center text-gray-500 text-sm">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

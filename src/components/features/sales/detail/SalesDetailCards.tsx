@@ -1,9 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, DollarSign, CreditCard, Calendar, User } from 'lucide-react';
 import { SalesItem } from '../sales.data';
-import { Progress } from '@/components/ui/progress';
-import { formatCurrency } from '@/lib/utils/currency';
+import { useRouter } from 'next/router';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { getHistoryTotalIdrEquivalent, getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface Props {
   data: SalesItem;
@@ -11,6 +13,7 @@ interface Props {
 }
 
 export function SalesDetailCards({ data, billingHistories = [] }: Props) {
+  const router = useRouter();
   const totalDppFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.dpp ?? 0), 0);
   const totalPpnFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.ppn ?? 0), 0);
   const totalDpp = totalDppFromItems > 0 ? totalDppFromItems : Number(data.totalDpp ?? 0);
@@ -18,6 +21,9 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
   const totalHpp = Number(data.totalHpp ?? 0) || (totalDpp + totalPpn);
   const totalBiaya = Number(data.totalBiaya ?? 0);
   const totalJual = Number(data.totalJual ?? 0);
+
+  const slugQuery = router.query.slug;
+  const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
 
   const historyPaid = billingHistories.reduce((sum, item) => sum + getHistoryTotalIdrEquivalent(item), 0);
   const kurangBayar = Math.max(0, totalJual - historyPaid);
@@ -41,7 +47,9 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="space-y-1">
               <p>Nomor Invoice</p>
-              <p className="text-sm font-semibold text-slate-900">{data.kodeJual}</p>
+              <p className="text-sm font-semibold text-slate-900">
+                <CopyBox text={data.kodeJual} />
+              </p>
             </div>
 
             <div className="space-y-1">
@@ -56,7 +64,9 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
               <p>Customer</p>
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <User className="h-4 w-4 text-slate-500" />
-                <span className="uppercase truncate">{data.customer}</span>
+                <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${data.customer}`}>
+                  {data.customer}
+                </ReferenceLink>
               </div>
             </div>
           </div>
@@ -76,36 +86,36 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="flex items-center justify-between">
               <span>Total DPP</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalDpp)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', totalDpp)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total PPN</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalPpn)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', totalPpn)}</span>
             </div>
             <div className="border-t border-slate-100 my-1"></div>
             <div className="flex items-center justify-between text-slate-900">
               <span className="font-bold text-sm">Total HPP</span>
-              <span className="text-sm font-bold">{formatCurrency(totalHpp)}</span>
+              <span className="text-sm font-bold">{currenciesFormat('idr', totalHpp)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total Biaya</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(totalBiaya)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', totalBiaya)}</span>
             </div>
             <div className="border-t border-slate-100 my-1"></div>
             <div className="flex items-center justify-between text-slate-900">
               <span className="font-bold uppercase text-sm">TOTAL PENJUALAN</span>
-              <span className="text-sm font-bold">{formatCurrency(totalJual)}</span>
+              <span className="text-sm font-bold">{currenciesFormat('idr', totalJual)}</span>
             </div>
             {data.price_usd ? (
               <div className="flex items-center justify-between text-xs text-amber-800 bg-amber-50/50 px-2 py-1 rounded border border-amber-100 mt-2">
                 <span className="font-medium">Total Harga (USD)</span>
-                <span className="font-bold">{formatCurrency(data.price_usd, 'USD')}</span>
+                <span className="font-bold">{currenciesFormat('usd', data.price_usd)}</span>
               </div>
             ) : null}
             {data.price_per_unit_usd ? (
               <div className="flex items-center justify-between text-xs text-amber-800 bg-amber-50/50 px-2 py-1 rounded border border-amber-100">
                 <span className="font-medium">Harga Satuan (USD)</span>
-                <span className="font-bold">{formatCurrency(data.price_per_unit_usd, 'USD')}</span>
+                <span className="font-bold">{currenciesFormat('usd', data.price_per_unit_usd)}</span>
               </div>
             ) : null}
           </div>
@@ -125,15 +135,15 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
           <div className="space-y-3 text-xs text-slate-500 flex-1 flex flex-col">
             <div className="flex items-center justify-between">
               <span>Debet Bank USD</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankUsd, 'USD')}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('usd', debetBankUsd)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Debet Bank IDR</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetBankIdr)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', debetBankIdr)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Debet Cash IDR</span>
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(debetCashIdr)}</span>
+              <span className="text-sm font-semibold text-slate-900">{currenciesFormat('idr', debetCashIdr)}</span>
             </div>
           </div>
         </CardContent>

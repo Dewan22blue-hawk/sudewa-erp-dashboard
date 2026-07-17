@@ -3,12 +3,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Skeleton } from '@/components/ui/skeleton';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { cn } from '@/lib/utils';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { getAccountCategoryLabel } from '@/lib/account';
 import type { Account } from '@/@types/account.types';
-import { MoreVertical, Lock, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { MoreVertical, Lock, ArrowUp, ArrowDown, ArrowUpDown, Loader2, Search } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 
 interface AccountTableProps {
@@ -18,6 +20,8 @@ interface AccountTableProps {
   page: number;
   perPage: number;
   selectedIds: Set<string>;
+  canEdit: boolean;
+  canDelete: boolean;
   onToggleAll: (checked: boolean) => void;
   onToggleRow: (id: string, checked: boolean) => void;
   onEdit: (account: Account) => void;
@@ -34,10 +38,11 @@ function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; cur
   return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
 }
 
-export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange }: AccountTableProps) {
+export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange, canEdit, canDelete }: AccountTableProps) {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data,
   });
+  const router = useRouter();
 
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const pageIds = sortedData.map((item) => String(item.id));
@@ -48,9 +53,12 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
   const visiblePages = getVisiblePageNumbers(totalPages, page);
   const showLastPageShortcut = visiblePages[visiblePages.length - 1] !== totalPages;
 
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
+
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
@@ -118,7 +126,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                 </div>
               </TableHead>
               {/* Action - center */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 ACTION
               </TableHead>
             </TableRow>
@@ -126,22 +134,24 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
 
           <TableBody>
             {isLoading ? (
-              Array.from({ length: perPage }).map((_, index) => (
-                <TableRow key={index} className="hover:bg-gray-50 transition-colors">
-                  <TableCell className="px-4 py-4 text-center">
-                    <Skeleton className="mx-auto h-4 w-4 rounded" />
-                  </TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-44" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="mx-auto h-4 w-8" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-36" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="mx-auto h-7 w-7 rounded-full" /></TableCell>
-                </TableRow>
-              ))
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
             ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="px-4 py-10 text-center text-sm text-gray-500">
-                  Tidak ada data akun.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -149,9 +159,9 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                 const checked = selectedIds.has(String(account.id));
 
                 return (
-                  <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="hover:bg-gray-50 transition-colors">
+                  <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="group hover:bg-gray-50 transition-colors">
                     {/* Checkbox */}
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <Checkbox
                         checked={checked}
                         onCheckedChange={(value) => onToggleRow(String(account.id), Boolean(value))}
@@ -162,7 +172,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                     {/* Kode Akun */}
                     <TableCell className="px-4 py-4 text-sm font-medium text-gray-900">
                       <div className="flex items-center gap-1.5">
-                        <span>{account.code}</span>
+                        <CopyBox text={account.code} />
                         {account.is_lock && (
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -180,11 +190,15 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                     {/* Nama Akun */}
                     <TableCell className="px-4 py-4 text-sm text-gray-900">{account.name}</TableCell>
                     {/* Grup Akun - center */}
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{account.accountGroupCode ?? '-'}</TableCell>
+                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                      <ReferenceLink href={`/dashboard/${slugStr}/master/account-group?search=${encodeURIComponent(account.accountGroupCode ?? account.accountGroupId ?? '')}`}>
+                        {account.accountGroupCode ?? '-'}
+                      </ReferenceLink>
+                    </TableCell>
                     {/* Kategori Akun */}
                     <TableCell className="px-4 py-4 text-sm text-gray-600">{getAccountCategoryLabel(account.category)}</TableCell>
                     {/* Action */}
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
@@ -194,6 +208,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                         <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                            disabled={account.is_lock || !canEdit}
                             onSelect={(e) => {
                               e.preventDefault();
                               onEdit(account);
@@ -203,7 +218,7 @@ export function AccountTable({ data, total, isLoading, page, perPage, selectedId
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                            disabled={account.is_lock}
+                            disabled={account.is_lock || !canDelete}
                             onSelect={(e) => {
                               e.preventDefault();
                               onDelete(account);

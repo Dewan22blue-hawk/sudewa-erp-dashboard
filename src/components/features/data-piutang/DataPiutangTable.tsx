@@ -158,7 +158,7 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
         </div>
       ) : null}
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto shadow-none">
         <table className="w-full text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
@@ -169,17 +169,17 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
               <th className="p-0 text-left">{renderSortHeader('TOTAL JUAL', 'grand_total', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('TOTAL BAYAR', 'total_paid', 'center')}</th>
               <th className="p-0 text-left">{renderSortHeader('AMOUNT PIUTANG', 'remaining_payment', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">ACTION</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
             {loading && data.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-                  <span className="inline-flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Memuat data...
-                  </span>
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
                 </td>
               </tr>
             ) : sortedData.length > 0 ? (
@@ -192,7 +192,7 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
                   <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.grand_total)}</td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-emerald-600">{currenciesFormat('idr', item.total_paid)}</td>
                   <td className="px-4 py-4 text-center text-sm font-medium text-orange-600">{currenciesFormat('idr', item.remaining_payment)}</td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -210,8 +210,14 @@ export default function DataPiutangTable({ data, meta, loading, error, search, p
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-                  Tidak ada data yang ditemukan.
+                <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             )}

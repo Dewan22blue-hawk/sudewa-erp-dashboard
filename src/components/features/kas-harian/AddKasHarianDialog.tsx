@@ -72,6 +72,7 @@ export default function AddKasHarianDialog({ open, onOpenChange }: Props) {
     } catch (error) {
       const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Gagal menambahkan transaksi kas harian';
       toast.error(message);
+      onOpenChange(false);
     }
   };
 

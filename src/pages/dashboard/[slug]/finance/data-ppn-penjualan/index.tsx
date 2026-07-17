@@ -10,11 +10,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePPNPenjualan } from '@/hooks/usePPNPenjualan';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 
 export default function DataPPNPenjualanPage() {
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('finance:create');
+  const canEdit = hasPermission('finance:edit');
+  const canDelete = hasPermission('finance:delete');
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState(25);

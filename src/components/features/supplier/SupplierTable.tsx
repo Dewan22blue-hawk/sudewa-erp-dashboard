@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { Download, MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Download, MoreVertical, Plus, Search, Upload, ArrowUp, ArrowDown, ArrowUpDown, Loader2 } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface SupplierTableProps {
   suppliers: Supplier[];
@@ -26,6 +27,9 @@ interface SupplierTableProps {
   onImport: () => void;
   onExport: () => void;
   isExporting?: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 const buildPagination = (page: number, totalPages: number): Array<number | 'ellipsis'> => {
@@ -70,6 +74,9 @@ export function SupplierTable({
   onImport,
   onExport,
   isExporting = false,
+  canCreate,
+  canEdit,
+  canDelete,
 }: SupplierTableProps) {
   const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
     data: suppliers,
@@ -110,24 +117,26 @@ export function SupplierTable({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
-            <Upload className="h-4 w-4 mr-2" />
-            Import
-          </Button>
+          {canCreate && (
+            <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+          )}
           <Button variant="outline" className="w-full sm:w-auto" onClick={onExport} disabled={isExporting}>
             <Upload className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={onAdd}>
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah
-          </Button>
+          {canCreate && (
+            <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" onClick={onAdd}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah
+            </Button>
+          )}
         </div>
       </div>
 
-      <Card className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-none">s*<Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 {/* Kode */}
@@ -209,7 +218,7 @@ export function SupplierTable({
                   </div>
                 </TableHead>
                 {/* Action */}
-                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   Action
                 </TableHead>
               </TableRow>
@@ -217,18 +226,19 @@ export function SupplierTable({
 
             <TableBody>
               {isLoading ? (
-                Array.from({ length: 3 }).map((_, index) => (
-                  <TableRow key={index} className="hover:bg-gray-50 transition-colors">
-                    <TableCell colSpan={7} className="px-4 py-4">
-                      <div className="h-6 animate-pulse rounded bg-[#F4F4F5]" />
-                    </TableCell>
-                  </TableRow>
-                ))
+                <tr>
+                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
+                </tr>
               ) : sortedData.length > 0 ? (
                 sortedData.map((supplier) => (
-                  <TableRow key={supplier.id} className="hover:bg-gray-50 transition-colors">
+                  <TableRow key={supplier.id} className="group hover:bg-gray-50 transition-colors">
                     <TableCell className="px-4 py-4 text-sm font-medium text-gray-600 text-left">
-                      {supplier.code || '-'}
+                      <CopyBox text={supplier.code || '-'} />
                     </TableCell>
                     <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 text-left truncate max-w-[220px]">
                       {supplier.name}
@@ -245,7 +255,7 @@ export function SupplierTable({
                     <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
                       <span className="line-clamp-2">{supplier.address || '-'}</span>
                     </TableCell>
-                    <TableCell className="px-4 py-4 text-center">
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -256,18 +266,20 @@ export function SupplierTable({
                           <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                             <DropdownMenuItem
                               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                              disabled={!canEdit}
                               onSelect={(e) => {
-                                  e.preventDefault();
-                                  onEdit(supplier);
+                                e.preventDefault();
+                                onEdit(supplier);
                               }}
                             >
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                              disabled={!canDelete}
                               onSelect={(e) => {
-                                  e.preventDefault();
-                                  onDelete(supplier);
+                                e.preventDefault();
+                                onDelete(supplier);
                               }}
                             >
                               Hapus
@@ -279,16 +291,21 @@ export function SupplierTable({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
-                    Belum ada data supplier untuk company aktif
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+            </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <p>

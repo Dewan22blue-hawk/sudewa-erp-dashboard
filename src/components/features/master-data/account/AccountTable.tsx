@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { MoreVertical, Pencil, Plus, Trash, Lock, Search } from 'lucide-react';
+import { MoreVertical, Pencil, Plus, Trash, Lock, Search, Loader2 } from 'lucide-react';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,9 +26,11 @@ interface AccountTableProps {
   onDelete: (account: Account) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
-export const AccountTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onPageChange, onPerPageChange }: AccountTableProps) => {
+export const AccountTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onPageChange, onPerPageChange, canEdit, canDelete }: AccountTableProps) => {
   const columns = useMemo<ColumnDef<Account>[]>(
     () => [
       {
@@ -92,7 +94,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
               <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                 <DropdownMenuItem
                   onClick={() => onEdit(row.original)}
-                  disabled={row.original.is_lock}
+                  disabled={row.original.is_lock || !canEdit}
                   className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                 >
                   <Pencil className="mr-2 h-4 w-4" />
@@ -101,7 +103,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 <DropdownMenuItem
                   onClick={() => onDelete(row.original)}
                   className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                  disabled={row.original.is_lock}
+                  disabled={row.original.is_lock || !canDelete}
                 >
                   <Trash className="mr-2 h-4 w-4" />
                   Hapus
@@ -170,7 +172,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -186,7 +188,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                       className={cn(
                         'px-4 py-4 text-xs font-semibold text-slate-500 uppercase select-none transition-colors',
                         (isAction || isStatus) ? 'text-center text-slate-500' : 'text-left',
-                        isAction && 'w-[80px]'
+                        isAction && 'w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]'
                       )}
                     >
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -198,24 +200,22 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              [...Array(perPage)].map((_, i) => (
-                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-16" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-32" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell className="px-4 py-4"><Skeleton className="h-4 w-40" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></TableCell>
-                  <TableCell className="px-4 py-4 text-center"><Skeleton className="h-8 w-8 mx-auto rounded-full" /></TableCell>
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows.length ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={row.id} className="group bg-white hover:bg-slate-50 transition-colors">
                   {row.getVisibleCells().map((cell) => {
                     const isAction = cell.column.id === 'actions';
                     const isStatus = cell.column.id === 'isActive';
                     return (
-                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", (isAction || isStatus) ? "text-center" : "text-left")}>
+                      <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isStatus && "text-center", isAction ? "text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : !isStatus && "text-left")}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     );
@@ -223,9 +223,15 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="text-center text-gray-500 py-10 text-sm">
-                  Tidak ada data.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="text-center text-gray-500 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </TableCell>
               </TableRow>
             )}

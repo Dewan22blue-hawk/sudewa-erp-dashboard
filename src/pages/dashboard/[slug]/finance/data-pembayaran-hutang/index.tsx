@@ -2,12 +2,17 @@ import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PembayaranHutangTable from '@/components/features/pembayaran-hutang/PembayaranHutangTable';
 import { useDeletePembayaranHutang, usePembayaranHutang } from '@/hooks/usePembayaranHutang';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { LiabilityListItem } from '@/types/pembayaran-hutang.types';
 
 export default function DataPembayaranHutangPage() {
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('finance:create');
+  const canEdit = hasPermission('finance:edit');
+  const canDelete = hasPermission('finance:delete');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);

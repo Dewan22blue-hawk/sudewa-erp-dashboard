@@ -54,6 +54,7 @@ export default function TransactionCategoryModal({ open, onOpenChange, cashFlowD
       onOpenChange(false);
     } catch (error) {
       toast.error(getApiErrorMessage(error) || 'Gagal memperbarui kategori transaksi');
+      onOpenChange(false);
     }
   };
 

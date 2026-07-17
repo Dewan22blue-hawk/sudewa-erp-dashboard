@@ -1,4 +1,4 @@
-import { Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Search, ArrowUp, ArrowDown, ArrowUpDown, Loader2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { StockStatus, StockUnit } from '@/@types/stock-unit.types';
 import { Input } from '@/components/ui/input';
@@ -223,8 +223,11 @@ export default function StockUnitTable({
             {isLoading ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  Memuat data...
-                </td>
+    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+    </div>
+</td>
               </tr>
             ) : data.length > 0 ? (
               sortedData.map((item, index) => (
@@ -239,8 +242,14 @@ export default function StockUnitTable({
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  Tidak ada data yang ditemukan.
+                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                 </td>
               </tr>
             )}

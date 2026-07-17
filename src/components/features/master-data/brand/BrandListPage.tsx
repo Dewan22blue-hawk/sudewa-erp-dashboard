@@ -11,6 +11,7 @@ import { BrandTable } from './BrandTable';
 import { BrandFormModal } from './BrandFormModal';
 import { useBrands, useCreateBrand, useUpdateBrand, useDeleteBrand } from '@/hooks/useBrand';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { brandSchema, type BrandFormValues } from '@/scheme/brand.schema';
 import type { Brand } from '@/@types/brand.types';
 import { toast } from 'sonner';
@@ -18,6 +19,10 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 
 export const BrandListPage = () => {
     const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+    const canEdit = hasPermission('master-data:edit');
+    const canDelete = hasPermission('master-data:delete');
 
     const { data, isLoading, isError, isFetching } = useBrands({ page, perPage, search });
     const createMutation = useCreateBrand();
@@ -37,6 +42,7 @@ export const BrandListPage = () => {
     });
 
     const handleDelete = async () => {
+        if (!canDelete) return;
         if (!selectedToDelete) return;
         try {
             await deleteMutation.mutateAsync(selectedToDelete.id);
@@ -50,6 +56,7 @@ export const BrandListPage = () => {
     };
 
     const handleAdd = () => {
+        if (!canCreate) return;
         setEditing(null);
         form.reset({
             name: '',
@@ -59,6 +66,7 @@ export const BrandListPage = () => {
     };
 
     const handleEdit = (item: Brand) => {
+        if (!canEdit) return;
         setEditing(item);
         form.reset({
             name: item.name,
@@ -98,10 +106,12 @@ export const BrandListPage = () => {
                         <h1 className="text-2xl font-semibold">Merk Unit Tipe</h1>
                         <p className="text-sm text-muted-foreground">Kelola semua merk unit tipe</p>
                     </div>
-                    <Button onClick={handleAdd} className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        Tambah Merk
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={handleAdd} className="gap-2">
+                            <Plus className="h-4 w-4" />
+                            Tambah Merk
+                        </Button>
+                    )}
                 </div>
 
                 <Card className="p-6">
@@ -117,6 +127,8 @@ export const BrandListPage = () => {
                                 setPage(1);
                             }}
                             page={page}
+                            canEdit={canEdit}
+                            canDelete={canDelete}
                             perPage={perPage}
                             isLoading={isLoading || isFetching}
                             onEdit={handleEdit}

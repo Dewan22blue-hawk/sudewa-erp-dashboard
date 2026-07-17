@@ -24,6 +24,7 @@ import { useKas } from '@/hooks/useKas';
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import type { GoodsIssueFormValues, GoodsIssuePaymentFormValues } from '@/scheme/goods-issue.schema';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const translateBackendMessageToIndonesian = (message: string) => {
   const normalized = message.trim();
@@ -79,6 +80,11 @@ export default function GoodsIssueListPage() {
   const createBillingMutation = useCreateGoodsIssueBilling();
   const createPaymentMutation = useCreateGoodsIssuePayment();
   const uploadMutation = useUploadGoodsIssueInvoice();
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('warehouse:create');
+  const canEdit = hasPermission('warehouse:edit');
+  const canDelete = hasPermission('warehouse:delete');
 
   const [openForm, setOpenForm] = useState(false);
   const [selectedPay, setSelectedPay] = useState<GoodsIssue | null>(null);
@@ -172,7 +178,7 @@ export default function GoodsIssueListPage() {
         onPageChange={setPage}
         onPerPageChange={setPerPage}
         onSearchChange={setSearch}
-        onAdd={() => setOpenForm(true)}
+        onAdd={canCreate ? () => setOpenForm(true) : undefined}
         onPay={setSelectedPay}
         onUpload={setSelectedUpload}
         onDelete={setDeleteTarget}

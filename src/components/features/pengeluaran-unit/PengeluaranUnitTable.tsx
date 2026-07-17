@@ -1,6 +1,6 @@
 'use client';
 
-import { MoreVertical, Search } from 'lucide-react';
+import { MoreVertical, Search, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { PengeluaranUnit } from '@/@types/pengeluaran-unit.types';
 import { Input } from '@/components/ui/input';
@@ -121,7 +121,7 @@ export default function PengeluaranUnitTable({
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
@@ -130,43 +130,41 @@ export default function PengeluaranUnitTable({
               <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">CUSTOMER</TableHead>
               <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">WAREHOUSE</TableHead>
               <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KETERANGAN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-15 whitespace-nowrap">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-15 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
-                  Loading...
-                </TableCell>
-              </TableRow>
-            ) : isError ? (
-              <TableRow>
-                <TableCell colSpan={6} className="px-4 py-8 text-center text-red-600 text-sm">
-                  <div className="space-y-2">
-                    <p>{errorMessage ?? 'Gagal memuat data pengeluaran unit'}</p>
-                    <Button variant="outline" size="sm" onClick={onRetry}>
-                      Coba Lagi
-                    </Button>
+              <TableRow className="group">
+                <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
                   </div>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 text-sm">
-                  Tidak ada data.
+              <TableRow className="group">
+                <TableCell colSpan={100} className="text-center px-4 py-16 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               data.map((item) => (
-                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
                   <TableCell className="px-4 py-4 text-gray-900 font-medium text-left text-sm">{item.activityNumber}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{formatDate(item.activityDate)}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.person?.name ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.warehouse?.name ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.description || '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-center">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">

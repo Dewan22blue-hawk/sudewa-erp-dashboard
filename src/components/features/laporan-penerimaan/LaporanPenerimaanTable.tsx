@@ -67,9 +67,7 @@ export default function LaporanPenerimaanTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none w-full">s*<Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center w-12">NO</TableHead>
@@ -84,7 +82,7 @@ export default function LaporanPenerimaanTable({
             </TableHeader>
             <TableBody>
               {data.map((item, idx) => (
-                <TableRow key={item.id} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
+                <TableRow key={item.id} className="group border-b border-slate-200 hover:bg-gray-50 transition-colors">
                   <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
                     {idx + 1 + (pagination.currentPage - 1) * pagination.perPage}
                   </TableCell>
@@ -99,8 +97,7 @@ export default function LaporanPenerimaanTable({
               ))}
             </TableBody>
           </Table>
-        </div>
-      </div>
+            </div>
 
       {/* Pagination */}
       {pagination.total > 0 && (

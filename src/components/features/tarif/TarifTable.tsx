@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical } from 'lucide-react';
+import { Search, Plus, MoreVertical, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,9 @@ interface TarifTableProps {
     onAdd: () => void;
     onEdit: (tarif: Tarif) => void;
     onDelete: (tarif: Tarif) => void;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
 }
 
 const formatCurrency = (amount: number | null | undefined) => {
@@ -47,6 +50,9 @@ export function TarifTable({
     onAdd,
     onEdit,
     onDelete,
+    canCreate,
+    canEdit,
+    canDelete,
 }: TarifTableProps) {
     const totalPages = Math.ceil(totalData / perPage);
     const startData = totalData === 0 ? 0 : (page - 1) * perPage + 1;
@@ -142,19 +148,20 @@ export function TarifTable({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Tambah
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Tambah
+                        </Button>
+                    )}
                 </div>
             </div>
 
             {/* Table */}
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table className="min-w-[1100px]">
-                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow className="hover:bg-[#f8f9fa]">
+            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+                <Table className="min-w-[1100px]">
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                        <TableRow className="hover:bg-[#f8f9fa]">
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
                                     LOADING IN
                                 </TableHead>
@@ -179,25 +186,24 @@ export function TarifTable({
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-right">
                                     INV FUSO
                                 </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[80px] uppercase px-4 py-4 text-center">
+                                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                     ACTION
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-                                Array.from({ length: perPage > 5 ? 5 : perPage }).map((_, i) => (
-                                    <TableRow key={i} className="hover:bg-gray-50 transition-colors">
-                                        {Array.from({ length: 9 }).map((_, j) => (
-                                            <TableCell key={j} className="px-4 py-4">
-                                                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : tarifs.length > 0 ? (
+    <tr>
+        <td colSpan={100} className="px-4 py-16 text-center bg-white">
+            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+            </div>
+        </td>
+    </tr>
+) : tarifs.length > 0 ? (
                                 tarifs.map((tarif) => (
-                                    <TableRow key={tarif.id} className="hover:bg-gray-50 transition-colors">
+                                    <TableRow key={tarif.id} className="group hover:bg-gray-50 transition-colors">
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
                                             {tarif.loadingIn || '-'}
                                         </TableCell>
@@ -222,7 +228,7 @@ export function TarifTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600 text-right whitespace-nowrap">
                                             {formatCurrency(tarif.invFuso)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
+                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <div className="flex justify-center">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -233,12 +239,14 @@ export function TarifTable({
                                                     <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
                                                         <DropdownMenuItem
                                                             onClick={() => onEdit(tarif)}
+                                                            disabled={!canEdit}
                                                             className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                                                         >
                                                             Edit
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => onDelete(tarif)}
+                                                            disabled={!canDelete}
                                                             className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                                                         >
                                                             Hapus
@@ -250,16 +258,21 @@ export function TarifTable({
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="h-32 text-center text-gray-552 py-10 text-sm">
-                                        Tidak ada data tarif ditemukan
-                                    </TableCell>
+                                <TableRow className="group">
+                                    <TableCell colSpan={100} className="h-32 text-center text-gray-552 py-16 text-sm">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                            <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             {/* Pagination */}
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">

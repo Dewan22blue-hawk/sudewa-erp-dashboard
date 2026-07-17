@@ -8,11 +8,17 @@ import { DeleteSparepartDialog } from "@/components/features/sparepart/DeleteSpa
 import { DataImportModal } from "@/components/features/master-data/DataImportModal"
 import { useCompany } from "@/contexts/CompanyContext"
 import { Sparepart } from "@/@types/sparepart.types"
+import { usePermissionGuard } from "@/hooks/usePermissionGuard"
 
 export default function SparepartPage() {
     const { companyId } = useCompany()
     // Defaulting to "1" if context is missing, but DashboardLayout guards this.
     const safeCompanyId = companyId || "1"
+
+    const { hasPermission } = usePermissionGuard();
+    const canCreate = hasPermission('master-data:create');
+    const canEdit = hasPermission('master-data:edit');
+    const canDelete = hasPermission('master-data:delete');
 
     const { data, isLoading, isError, refetch } = useSpareparts(safeCompanyId)
     const importMutation = useImportSparepart(safeCompanyId)
@@ -23,6 +29,7 @@ export default function SparepartPage() {
     const [openImport, setOpenImport] = useState(false)
 
     const handleImport = async (file: File) => {
+        if (!canCreate) return;
         await importMutation.mutateAsync({ file });
         refetch();
     };
@@ -85,18 +92,24 @@ export default function SparepartPage() {
                     <SparepartTable
                         data={data?.data ?? []}
                         onEdit={(item) => {
-                            setSelected(item)
-                            setOpenForm(true)
+                            if (canEdit) {
+                                setSelected(item)
+                                setOpenForm(true)
+                            }
                         }}
                         onDelete={(item) => {
-                            setSelected(item)
-                            setOpenDelete(true)
+                            if (canDelete) {
+                                setSelected(item)
+                                setOpenDelete(true)
+                            }
                         }}
-                        onAdd={() => {
+                        onAdd={canCreate ? () => {
                             setSelected(null)
                             setOpenForm(true)
-                        }}
-                        onImport={() => setOpenImport(true)}
+                        } : undefined}
+                        onImport={canCreate ? () => setOpenImport(true) : undefined}
+                        canEdit={canEdit}
+                        canDelete={canDelete}
                     />
                 </div>
 

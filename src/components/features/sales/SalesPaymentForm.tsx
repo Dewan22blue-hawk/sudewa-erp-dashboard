@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Wallet, Trash } from 'lucide-react';
+import { Wallet, Trash, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -12,24 +12,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatCurrency } from '@/lib/utils/currency';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { 
-    getHistoryBcaIdrAmount, 
-    getHistoryCashIdrAmount, 
-    getHistoryUsdAmount, 
-    getHistoryTotalIdrEquivalent 
+import {
+    getHistoryBcaIdrAmount,
+    getHistoryCashIdrAmount,
+    getHistoryUsdAmount,
+    getHistoryTotalIdrEquivalent
 } from '@/utils/payment-helpers';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
 const paymentSchema = z.object({
@@ -147,7 +147,6 @@ export function SalesPaymentForm({
 
     return (
         <div className="space-y-6">
-            {/* Header */}
             <div>
                 <h2 className="text-2xl font-semibold">Informasi Penjualan</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Kode Jual: {salesCode || '-'}</p>
@@ -155,7 +154,6 @@ export function SalesPaymentForm({
             </div>
 
             <div className="space-y-6">
-                {/* ── Section: Biaya ── */}
                 <div className="rounded-lg border">
                     <div className="border-b px-4 py-3">
                         <h3 className="text-sm font-semibold text-muted-foreground">Biaya</h3>
@@ -176,14 +174,12 @@ export function SalesPaymentForm({
                     </div>
                 </div>
 
-                {/* Validation warning */}
                 {validationMessage && (
                     <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
                         {validationMessage}
                     </div>
                 )}
 
-                {/* ── Section: Pembayaran ── */}
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 
@@ -392,8 +388,14 @@ export function SalesPaymentForm({
                             <TableBody>
                                 {histories.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="h-20 text-center text-muted-foreground">
-                                            Belum ada histori pembayaran
+                                        <TableCell colSpan={100} className="py-16 h-20 text-center text-muted-foreground">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                    <Search className="h-8 w-8 text-slate-400" />
+                                                </div>
+                                                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ) : (
@@ -402,7 +404,7 @@ export function SalesPaymentForm({
                                         const usdAmount = getHistoryUsdAmount(item);
                                         const idrAmount = getHistoryBcaIdrAmount(item) + getHistoryCashIdrAmount(item);
                                         const isPureUsd = usdAmount > 0 && idrAmount === 0 && total === usdAmount;
-                                        
+
                                         const methods = getPaymentMethods(item);
                                         return (
                                             <TableRow key={item.id}>
@@ -455,13 +457,13 @@ export function SalesPaymentForm({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                             onClick={() => {
                                 if (deleteId && onDeleteHistory) {
                                     onDeleteHistory(deleteId);
                                     setDeleteId(null);
                                 }
-                            }} 
+                            }}
                             className="rounded-xl bg-red-600 hover:bg-red-700"
                         >
                             Hapus

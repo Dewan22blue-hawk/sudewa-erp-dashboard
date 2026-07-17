@@ -74,7 +74,7 @@ function EditAssetInnerForm({ initialData, onClose, onSave }: InnerProps) {
                     {...register('code')}
                     className={errors.code ? 'border-red-500' : ''}
                 />
-                <p className="text-xs text-gray-500">Opsional. Tidak perlu diisi jika kode aset dikelola oleh backend.</p>
+                <p className="text-xs text-gray-500">Opsional. Tidak perlu diisi jika kode aset dikelola oleh sistem.</p>
             </div>
 
             {/* Tanggal Beli */}

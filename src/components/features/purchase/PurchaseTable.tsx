@@ -12,6 +12,9 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -21,15 +24,11 @@ export interface PurchaseTableProps {
   slug: string;
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
-  loading?: boolean;
-  subTabs?: { id: string; label: string }[];
-  activeSubTab?: string;
-  onSubTabChange?: (id: string) => void;
-  mainTabs?: { id: string; label: string }[];
-  activeMainTab?: string;
-  onMainTabChange?: (id: string) => void;
   search?: string;
+  canEdit?: boolean;
+  canDelete?: boolean;
   onSearchChange?: (value: string) => void;
+  loading?: boolean;
 }
 
 export default function PurchaseTable({
@@ -41,19 +40,16 @@ export default function PurchaseTable({
   onPageChange,
   onPerPageChange,
   loading,
-  subTabs,
-  activeSubTab,
-  onSubTabChange,
-  mainTabs,
-  activeMainTab,
-  onMainTabChange,
   search,
+  canEdit,
+  canDelete,
   onSearchChange,
 }: PurchaseTableProps) {
   const router = useRouter();
   const [localSearch, setLocalSearch] = useState(search || '');
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
+  const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -231,37 +227,14 @@ export default function PurchaseTable({
             <Input type="text" placeholder="Search No. Rangka / No. Mesin..." className="pl-8 bg-white h-9 border-slate-300" value={localSearch} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
-          {/* 2. Main Status Dropdown */}
-          {mainTabs && mainTabs.length > 0 && (
-            <Select value={activeMainTab} onValueChange={onMainTabChange}>
-              <SelectTrigger className="w-[130px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {mainTabs.map((tab) => (
-                  <SelectItem key={tab.id} value={tab.id}>
-                    {tab.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          {/* 3. Sub Status Dropdown */}
-          {subTabs && subTabs.length > 0 && (
-            <Select value={activeSubTab} onValueChange={onSubTabChange}>
-              <SelectTrigger className="w-[150px] bg-white h-9 border-slate-300 text-slate-700 font-medium">
-                <SelectValue placeholder="Detail Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {subTabs.map((sub) => (
-                  <SelectItem key={sub.id} value={sub.id}>
-                    {sub.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-xl shadow-none px-4 whitespace-nowrap"
+            onClick={() => setIsVehicleSearchOpen(true)}
+          >
+            Cari Data Kendaraan
+          </Button>
 
           {/* 4. Show + Page limit */}
           <div className="flex items-center gap-2 whitespace-nowrap">
@@ -289,7 +262,7 @@ export default function PurchaseTable({
         )}
       </div>
 
-      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="relative overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
@@ -304,31 +277,35 @@ export default function PurchaseTable({
               {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
               {renderSortHeader('remainingPayment', 'KURANG BAYAR', 'center')}
               {renderSortHeader('billing', 'BILLING', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">ACTION</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {processedData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={12} className="h-24 text-center text-muted-foreground px-4 py-4 text-sm">
-                  Tidak ada data
+              <TableRow className="group">
+                <TableCell colSpan={100} className="text-center px-4 py-16 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               processedData.map((item) => (
-                <TableRow key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                <TableRow key={item.id} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
                   {/* Kode Jual - Link biru */}
                   <TableCell className="px-4 py-4 text-left text-sm font-medium">
-                    <button
-                      type="button"
-                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
-                      onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}
-                    >
-                      {item.code || '-'}
-                    </button>
+                    <CopyBox text={item.code || '-'} />
                   </TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd MMM yyyy') : '-'}</TableCell>
-                  <TableCell className="text-left text-sm text-slate-700 px-4 py-4">{item.supplier || '-'}</TableCell>
+                  <TableCell className="text-left text-sm text-slate-700 px-4 py-4">
+                    <ReferenceLink href={`/dashboard/${slug}/supplier?search=${item.supplier}`}>
+                      {item.supplier || '-'}
+                    </ReferenceLink>
+                  </TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bruto_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bbn_total)}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.expedition_fee_total)}</TableCell>
@@ -352,7 +329,7 @@ export default function PurchaseTable({
                     )}
                   </TableCell>
 
-                  <TableCell className="text-center px-4 py-4">
+                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -360,15 +337,17 @@ export default function PurchaseTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>
+                        {canEdit && <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>}
                         <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
+
+                        {canEdit && (<DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
                           {isRefunded(item) ? 'Sudah Refund' : 'Refund'}
                         </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                        {canDelete && <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
                           Hapus
-                        </DropdownMenuItem>
+                        </DropdownMenuItem>}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -408,6 +387,12 @@ export default function PurchaseTable({
           </div>
         </div>
       )}
+      {/* Vehicle Search Modal */}
+      <SearchVehicleModal
+        open={isVehicleSearchOpen}
+        onOpenChange={setIsVehicleSearchOpen}
+        type="purchase"
+      />
     </div>
   );
 }

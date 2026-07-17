@@ -92,6 +92,7 @@ export interface CashFlowPayload {
   transaction_category: string;
   payment_proof?: File | null;
   is_paid?: boolean;
+  is_valid?: boolean;
 }
 
 export interface CashFlowFilterParams {
@@ -141,5 +142,6 @@ export interface KasHarianListItem {
   transaction_category?: string;
   goodsTransactionBillingId?: number;
   unitTransactionBillingId?: number;
+  isValid?: boolean;
   is_paid?: boolean;
 }

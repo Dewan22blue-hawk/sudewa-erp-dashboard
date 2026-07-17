@@ -244,7 +244,7 @@ export default function BBNBillDetailPage() {
                       <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">ACC GARWIL</TableHead>
                       <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">ACC NIK</TableHead>
                       <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">PERCEPATAN</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">ACTION</TableHead>
+                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -306,7 +306,7 @@ export default function BBNBillDetailPage() {
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash BCA</TableHead>
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran USD BCA</TableHead>
                       <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Action</TableHead>
+                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
