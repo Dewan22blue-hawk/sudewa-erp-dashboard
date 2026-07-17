@@ -121,7 +121,7 @@ export default function PengeluaranUnitTable({
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
@@ -164,7 +164,7 @@ export default function PengeluaranUnitTable({
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.person?.name ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.warehouse?.name ?? '-'}</TableCell>
                   <TableCell className="px-4 py-4 text-slate-700 text-left text-sm">{item.description || '-'}</TableCell>
-                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">

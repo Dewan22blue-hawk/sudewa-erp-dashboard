@@ -86,9 +86,7 @@ export function BBNBillTable({
         </Button>
       </div>
 
-      <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">s*<Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NOMOR TAGIHAN</TableHead>
@@ -160,8 +158,7 @@ export function BBNBillTable({
                 : null}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+            </div>
 
       <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-500">Showing {startData}-{endData} of {totalData} data</p>

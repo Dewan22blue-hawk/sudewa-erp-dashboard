@@ -108,7 +108,7 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

@@ -144,9 +144,7 @@ export function VehicleEquipmentTable({
             </div>
 
             {/* Table Card */}
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
@@ -158,7 +156,7 @@ export function VehicleEquipmentTable({
                             {equipments.length > 0 ? (
                                 equipments.map((item) => (
                                     <TableRow key={item.uuid} className="group hover:bg-gray-50/50 border-b border-gray-100">
-                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             {item.code || '-'}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 text-sm text-gray-800 text-center font-medium">
@@ -206,8 +204,7 @@ export function VehicleEquipmentTable({
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             {/* Bottom Pagination */}
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">

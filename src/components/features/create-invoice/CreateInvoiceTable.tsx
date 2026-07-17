@@ -173,8 +173,7 @@ export function CreateInvoiceTable({
         </div>
       ) : null}
 
-      <Card className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
-        <div className="overflow-x-auto">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200">
@@ -196,7 +195,7 @@ export function CreateInvoiceTable({
                 <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
                   STATUS
                 </TableHead>
-                <TableHead className="whitespace-nowrap px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">
+                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   ACTION
                 </TableHead>
               </TableRow>
@@ -206,7 +205,7 @@ export function CreateInvoiceTable({
                 ? Array.from({ length: Math.min(perPage, 5) }).map((_, index) => (
                   <TableRow key={`skeleton-${index}`} className="group border-slate-100">
                     {Array.from({ length: 7 }).map((__, cellIndex) => (
-                      <TableCell key={cellIndex} className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                      <TableCell key={cellIndex} className={cn("text-center px-4 py-4", cellIndex === 6 && "sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]")}>
                         <div className="h-4 animate-pulse rounded bg-slate-100" />
                       </TableCell>
                     ))}
@@ -231,19 +230,20 @@ export function CreateInvoiceTable({
               {!isLoading &&
                 rows.map((row) => (
                   <TableRow key={row.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
-                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                    <TableCell className="px-4 py-4 text-center">
                       <Checkbox checked={selectedIds.includes(row.id)} onCheckedChange={(checked) => onToggleRow(row.id, Boolean(checked))} />
                     </TableCell>
                     <TableCell className="px-4 py-4 text-sm text-slate-700">{row.code}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{row.orderCode}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{row.customerName}</TableCell>
                     <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{formatDisplayDate(row.date)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                    <TableCell className="px-4 py-4 text-center">
                       <Badge className={cn('rounded-full border px-3 py-1 text-xs font-medium', row.isPrinted ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-red-400 bg-red-50 text-red-500')}>
                         {row.statusLabel}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                      <div className="flex justify-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
@@ -265,13 +265,13 @@ export function CreateInvoiceTable({
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+      </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
         <p>Showing {startData}-{endData} of {totalData} data</p>

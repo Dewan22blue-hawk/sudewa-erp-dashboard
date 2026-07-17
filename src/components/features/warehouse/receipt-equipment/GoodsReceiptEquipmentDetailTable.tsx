@@ -84,7 +84,7 @@ export function GoodsReceiptEquipmentDetailTable({
                 <TableCell className="px-4 py-4 text-[15px] font-semibold text-slate-900 text-left">
                   {formatCurrency((item.price || 0) * item.qty)}
                 </TableCell>
-                <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-9 w-9 rounded-full p-0">

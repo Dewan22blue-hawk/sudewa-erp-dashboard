@@ -230,7 +230,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <Table className="w-full text-sm">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>
@@ -247,7 +247,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
               {renderSortHeader('machineNumber', 'NO MESIN')}
               {renderSortHeader('chassisNumber', 'NO RANGKA')}
               {renderSortHeader('status', 'STATUS')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">Aksi</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -255,7 +255,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
             {paginated.length > 0 ? (
               paginated.map((item, index) => (
                 <TableRow key={item.id} className="group hover:bg-gray-50/70 border-b transition-colors">
-                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <TableCell className="text-center px-4 py-4">
                     <Checkbox checked={selected.includes(item.id) || receivedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} disabled={receivedIds.includes(item.id)} />
                   </TableCell>
                   <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{startIndex + index + 1}</TableCell>

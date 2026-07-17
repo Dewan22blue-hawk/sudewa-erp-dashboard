@@ -86,32 +86,30 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         },
       ];
 
-      if (transactionType === 'purchase') {
-        baseColumns.push(
-          {
-            accessorKey: 'status',
-            header: 'STATUS',
-            cell: ({ row }) => <RefundStatusBadge status={row.original.status} />,
-          },
-          {
-            id: 'actions',
-            header: 'ACTION',
-            cell: ({ row }) => (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedRefund(row.original);
-                }}
-              >
-                Approval
-              </Button>
-            ),
-          }
-        );
-      }
+      baseColumns.push(
+        {
+          accessorKey: 'status',
+          header: 'STATUS',
+          cell: ({ row }) => <RefundStatusBadge status={row.original.status} />,
+        },
+        {
+          id: 'actions',
+          header: 'ACTION',
+          cell: ({ row }) => (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedRefund(row.original);
+              }}
+            >
+              Approval
+            </Button>
+          ),
+        }
+      );
 
       return baseColumns;
     },
@@ -137,7 +135,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   return (
     <>
       <div className="space-y-4">
-        <div className="text-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+        <div className="text-sm overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-none">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -151,7 +149,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                     const title = flexRender(header.column.columnDef.header, header.getContext());
 
                     return (
-                      <TableHead key={header.id} className="p-0 text-left bg-[#f8f9fa] border-b border-gray-200">
+                      <TableHead key={header.id} className={`p-0 text-left bg-[#f8f9fa] border-b border-gray-200 ${header.column.id === 'actions' ? 'sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] text-center' : ''}`}>
                         {header.isPlaceholder ? null : (
                           <button
                             type="button"
@@ -200,7 +198,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                       const align = getColumnAlignment(cell.column.id);
                       const alignClass = align === 'center' ? 'text-center' : 'text-left';
                       return (
-                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass}`}>
+                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass} ${cell.column.id === 'actions' ? 'sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : ''}`}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       );
