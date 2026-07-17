@@ -66,9 +66,7 @@ export function LaporanKasTable({
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-none">
-            <div className="overflow-x-auto">
-                <Table>
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto shadow-none">s*<Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
                             <TableHead className="p-0 text-center w-[150px]">
@@ -134,6 +132,5 @@ export function LaporanKasTable({
                     </TableBody>
                 </Table>
             </div>
-        </div>
     );
 }

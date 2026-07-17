@@ -162,8 +162,8 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
           </div>
 
           {/* Results Table */}
-          <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white">
-            <Table>
+          <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white">
+        <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead className="text-xs font-bold uppercase text-slate-500 py-3.5">Kode Transaksi</TableHead>

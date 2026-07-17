@@ -258,7 +258,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                       <span className="font-medium text-slate-900">{formatCurrency(item.totalAmount)}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     {isEditing ? (
                       <div className="flex items-center justify-center gap-2">
                         <Button type="button" size="sm" className="h-9 rounded-lg bg-[#18385b] px-3 hover:bg-[#102843]" disabled={isBusy} onClick={() => void handleSave(item.id)}>

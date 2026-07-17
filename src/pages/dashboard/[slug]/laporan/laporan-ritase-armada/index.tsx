@@ -208,8 +208,7 @@ export default function LaporanRitaseArmadaPage() {
                 </p>
               </div>
 
-              <Card className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none w-full">
-                <div className="overflow-x-auto">
+              <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto shadow-none w-full">
                   <Table>
                     <TableHeader className="bg-slate-50 border-b border-slate-200">
                       {activeTab === 'ritase' && (
@@ -253,7 +252,7 @@ export default function LaporanRitaseArmadaPage() {
 
                             <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">RITASE</TableHead>
 
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap no-print w-16">Aksi</TableHead>
+                            <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-bold text-slate-700 uppercase sticky right-0 bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">Aksi</TableHead>
                           </TableRow>
                         </>
                       )}
@@ -293,16 +292,24 @@ export default function LaporanRitaseArmadaPage() {
 
                             <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{item.ritase}</TableCell>
 
-                            <TableCell className="text-center no-print">
+                            <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-100 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">
+                              <div className="flex justify-center">
                               <Button variant="ghost" size="icon" onClick={handleOpenEdit} className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )) : (
-                          <TableRow>
-                            <TableCell colSpan={14} className="h-28 text-center text-slate-500 font-medium">
-                              Tidak ada data ditemukan.
+                          <TableRow className="group">
+                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
                             </TableCell>
                           </TableRow>
                         )
@@ -321,17 +328,22 @@ export default function LaporanRitaseArmadaPage() {
                             <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.tglPerbaikan)}</TableCell>
                           </TableRow>
                         )) : (
-                          <TableRow>
-                            <TableCell colSpan={8} className="h-28 text-center text-slate-500 font-medium">
-                              Tidak ada data ditemukan.
+                          <TableRow className="group">
+                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
                             </TableCell>
                           </TableRow>
                         )
                       )}
                     </TableBody>
                   </Table>
-                </div>
-              </Card>
+              </div>
             </div>
           </PrintLetterPage>
 

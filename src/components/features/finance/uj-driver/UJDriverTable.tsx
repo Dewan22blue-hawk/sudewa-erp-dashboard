@@ -123,7 +123,7 @@ export default function UJDriverTable({
               <th className="p-0 text-left">{renderSortHeader('UJ DRIVER', 'uj_driver', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('UJ LAINNYA', 'other_amount', 'right')}</th>
               <th className="p-0 text-left">{renderSortHeader('KAS MASUK', 'amount', 'right')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Aksi</th>
+              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -189,7 +189,7 @@ export default function UJDriverTable({
                     <td className="px-4 py-4 text-right text-sm font-medium text-emerald-600">
                       {kasMasuk != null ? formatCurrency(kasMasuk) : <span className="text-slate-500 font-normal">Belum Bayar</span>}
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       {kasMasuk != null ? (
                         <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 font-medium">
                           Lunas

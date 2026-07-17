@@ -388,64 +388,6 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
             </div>
           )}
 
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground">Harga</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormItem>
-              <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-
-            <FormItem>
-              <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-
-            <FormItem>
-              <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-          </div>
-
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground">Total Harga</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormItem>
-              <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-
-            <FormItem>
-              <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-
-            <FormItem>
-              <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
-          </div>
-
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground">Biaya</h2>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField
               control={form.control}
@@ -492,68 +434,50 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
             />
           </div>
 
-          <div className="pt-2">
-            <h2 className="text-sm font-semibold text-foreground flex flex-row">
-              Biaya USD
-              <Tooltip>
-                <TooltipTrigger>
-                  <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Grub Form dibawah hanya diperlukan untuk proses Print non-domestik</p>
-                </TooltipContent>
-              </Tooltip>
-            </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormItem>
+              <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormField
-              control={form.control}
-              name="pricePerUnitUsd"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
-                    HPP Satuan (USD)
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Harga unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormItem>
+              <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
 
-            <FormField
-              control={form.control}
-              name="priceUsd"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium flex flex-row justify-between">
-                    HPP Total (USD)
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <AlertCircle className='ml-1 w-5 h-5 text-orange-600' />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Total biaya unit kendaraan dalam mata uang Dolar Amerika Serikat (USD)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <MoneyInput placeholder="Value" name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormItem>
+              <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
+              <FormControl>
+                <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
+              </FormControl>
+            </FormItem>
           </div>
 
           <div className="flex justify-center gap-3 pt-8">

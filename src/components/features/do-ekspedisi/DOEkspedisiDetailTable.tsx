@@ -35,9 +35,7 @@ export function DOEkspedisiDetailTable({
   };
 
   return (
-    <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-      <div className="overflow-x-auto">
-        <Table className="min-w-[1500px]">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">s*<Table className="min-w-[1500px]">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No</TableHead>
@@ -52,7 +50,7 @@ export function DOEkspedisiDetailTable({
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Invoice Tambahan</TableHead>
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PPN</TableHead>
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">Fee</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px]">Aksi</TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,7 +117,6 @@ export function DOEkspedisiDetailTable({
             )}
           </TableBody>
         </Table>
-      </div>
-    </Card>
+            </div>
   );
 }

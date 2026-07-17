@@ -173,9 +173,7 @@ export function BBNTable({
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-gray-200 bg-white">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 w-[20%]">DEALER</TableHead>
@@ -226,7 +224,7 @@ export function BBNTable({
                                         <TableCell className="px-4 py-4 text-sm text-gray-600">
                                             {item.otherFee === 0 ? '0' : formatCurrency(item.otherFee)}
                                         </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -260,8 +258,7 @@ export function BBNTable({
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>

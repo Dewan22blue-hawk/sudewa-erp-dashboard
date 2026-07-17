@@ -52,8 +52,8 @@ export function ImportAssetModal({ isOpen, onClose, onImport, isUploading = fals
                         <p className="text-xs text-blue-700 mb-3">
                             File excel/CSV anda wajib memiliki header (baris pertama) seperti di bawah ini:
                         </p>
-                        <div className="rounded-md border bg-white overflow-hidden">
-                            <Table className="text-xs">
+                        <div className="rounded-md border bg-white overflow-x-auto">
+        <Table className="text-xs">
                                 <TableHeader className="bg-gray-50">
                                     <TableRow>
                                         <TableHead className="h-8 py-1">name</TableHead>
