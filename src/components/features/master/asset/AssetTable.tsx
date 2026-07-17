@@ -180,9 +180,7 @@ export function AssetTable({
                 </div>
             </div>
 
-            <Card className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl overflow-x-auto border border-slate-200 bg-white shadow-none">s*<Table>
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow>
                                 <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-12">NO</TableHead>
@@ -254,8 +252,7 @@ export function AssetTable({
                             )}
                         </TableBody>
                     </Table>
-                </div>
-            </Card>
+            </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
                 <div>

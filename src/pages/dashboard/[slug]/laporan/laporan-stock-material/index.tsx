@@ -307,9 +307,15 @@ export default function LaporanStockMaterialPage() {
                             );
                           })
                         ) : (
-                          <TableRow>
-                            <TableCell colSpan={activeTab === 'stock' ? 5 : 6} className="h-28 text-center text-slate-500 font-medium px-4 py-4 text-sm">
-                              Tidak ada data laporan ditemukan.
+                          <TableRow className="group">
+                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
                             </TableCell>
                           </TableRow>
                         )}

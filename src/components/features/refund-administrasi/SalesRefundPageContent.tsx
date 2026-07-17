@@ -115,8 +115,8 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
           </Button>
         </div>
 
-        <div className="overflow-hidden rounded-[10px] border border-[#D9DEE8] bg-white">
-          <Table>
+        <div className="overflow-x-auto rounded-[10px] border border-[#D9DEE8] bg-white">
+        <Table>
             <TableHeader>
               <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                 {['NO', 'TANGGAL REFUND', 'KODE REFUND', 'NOMINAL REFUND', 'KURANG BAYAR', 'QTY', 'STATUS', 'ACTION'].map((header) => (
@@ -200,8 +200,8 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
             <p className="mt-1 text-sm text-[#6B7280]">Rincian lengkap unit yang direfund</p>
           </div>
 
-          <div className="overflow-hidden bg-white">
-            <Table>
+          <div className="overflow-x-auto bg-white">
+        <Table>
               <TableHeader>
                 <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
                   {['Tanggal', 'TIPE UNIT', 'QTY', 'NOMINAL REFUND', 'KETERANGAN'].map((header) => (

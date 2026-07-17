@@ -90,9 +90,8 @@ export function FinanceAssetTable({
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-none">
-                <div className="overflow-x-auto">
-                    <Table>
+            <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto shadow-none">
+                    <Table className="min-w-[1200px]">
                         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                             <TableRow className="hover:bg-transparent border-gray-100">
                                 <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NO</TableHead>
@@ -105,7 +104,7 @@ export function FinanceAssetTable({
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UMUR EKONOMIS</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PENYUSUTAN/BULAN</TableHead>
                                 <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NILAI AKHIR</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+                                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -120,8 +119,14 @@ export function FinanceAssetTable({
                                 </tr>
                             ) : assets.length === 0 ? (
                                 <TableRow className="group">
-                                    <TableCell colSpan={11} className="h-24 text-center text-slate-500">
-                                        No data found.
+                                    <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                                <Search className="h-8 w-8 text-slate-400" />
+                                            </div>
+                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -140,6 +145,7 @@ export function FinanceAssetTable({
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
                                         <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
                                         <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                            <div className="flex justify-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400">
@@ -158,13 +164,13 @@ export function FinanceAssetTable({
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             )}
                         </TableBody>
                     </Table>
-                </div>
             </div>
 
             {/* Pagination Info & Controls */}

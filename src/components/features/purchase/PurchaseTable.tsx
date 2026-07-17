@@ -262,7 +262,7 @@ export default function PurchaseTable({
         )}
       </div>
 
-      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none">
+      <div className="relative overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow>

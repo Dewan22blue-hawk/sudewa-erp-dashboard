@@ -35,9 +35,7 @@ export function DOEkspedisiDetailTable({
   };
 
   return (
-    <Card className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-      <div className="overflow-x-auto">
-        <Table className="min-w-[1500px]">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">s*<Table className="min-w-[1500px]">
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-[#f8f9fa]">
               <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">No</TableHead>
@@ -119,7 +117,6 @@ export function DOEkspedisiDetailTable({
             )}
           </TableBody>
         </Table>
-      </div>
-    </Card>
+            </div>
   );
 }

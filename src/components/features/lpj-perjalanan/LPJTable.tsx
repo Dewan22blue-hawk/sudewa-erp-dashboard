@@ -58,9 +58,7 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
         </Button>
       </div>
 
-      <Card className="rounded-xl overflow-hidden border border-gray-200">
-        <div className="overflow-x-auto">
-          <Table className="min-w-275">
+      <div className="rounded-xl overflow-x-auto border border-gray-200">s*<Table className="min-w-275">
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">KODE LPJ</TableHead>
@@ -128,8 +126,7 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+            </div>
 
       {totalPages > 0 && (
         <div className="flex items-center justify-between px-2 pt-2">

@@ -73,8 +73,8 @@ export function ImportDriverModal({
                             File excel/CSV anda wajib memiliki header (baris pertama) persis seperti
                             di bawah ini, atau proses import akan gagal:
                         </p>
-                        <div className="rounded-md border bg-white overflow-hidden">
-                            <Table className="text-xs">
+                        <div className="rounded-md border bg-white overflow-x-auto">
+        <Table className="text-xs">
                                 <TableHeader className="bg-gray-50">
                                     <TableRow>
                                         <TableHead className="h-8 py-1 whitespace-nowrap">name</TableHead>

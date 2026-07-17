@@ -159,8 +159,7 @@ export default function LaporanInvoicePage() {
                   <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
                 </div>
               ) : (
-                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-                  <div className="overflow-x-auto">
+                <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none w-full">
                     <Table>
                       <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-transparent">
@@ -177,7 +176,7 @@ export default function LaporanInvoicePage() {
                           <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">LOADING OUT</TableHead>
                           <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">INV EKSPEDISI</TableHead>
                           <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">BIAYA</TableHead>
-                          <TableHead className="text-xs font-semibold uppercase text-slate-500 whitespace-nowrap text-center no-print">Aksi</TableHead>
+                          <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">Aksi</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -211,7 +210,8 @@ export default function LaporanInvoicePage() {
                                 <TableCell className="text-slate-600 whitespace-nowrap text-sm">{loadingOut}</TableCell>
                                 <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatMoney(invoiceExpedition, 'IDR')}</TableCell>
                                 <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatMoney(biaya, 'IDR')}</TableCell>
-                                <TableCell className="text-center no-print">
+                                <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">
+                                  <div className="flex justify-center">
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
@@ -231,20 +231,26 @@ export default function LaporanInvoicePage() {
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
+                                  </div>
                                 </TableCell>
                               </TableRow>
                             );
                           })
                         ) : (
-                          <TableRow>
-                            <TableCell colSpan={12} className="h-28 text-center text-slate-500 font-medium text-sm">
-                              Tidak ada data laporan ditemukan.
+                          <TableRow className="group">
+                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
                             </TableCell>
                           </TableRow>
                         )}
                       </TableBody>
                     </Table>
-                  </div>
                 </div>
               )}
             </div>

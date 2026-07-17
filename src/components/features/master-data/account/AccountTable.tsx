@@ -172,7 +172,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (

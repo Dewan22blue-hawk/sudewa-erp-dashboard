@@ -175,9 +175,8 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none w-full">
+        <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow>
                 <TableHead className="w-12 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
@@ -242,7 +241,6 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
               )}
             </TableBody>
           </Table>
-        </div>
 
         {/* Local Pagination */}
         {!isLoading && !isError && rows.length > 0 && (

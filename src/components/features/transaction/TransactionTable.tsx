@@ -44,8 +44,7 @@ export function TransactionTable({ data, onEdit, onDelete, canEdit, canDelete }:
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
-      <div className="overflow-x-auto">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
         <table className="w-full text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
@@ -64,7 +63,7 @@ export function TransactionTable({ data, onEdit, onDelete, canEdit, canDelete }:
               <th className="p-0 text-left min-w-[150px] align-middle" rowSpan={2}>
                 {renderSortHeader('description', 'KETERANGAN', 'left')}
               </th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 align-middle" rowSpan={2}>
+              <th className="w-[80px] px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 align-middle sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" rowSpan={2}>
                 ACTION
               </th>
             </tr>
@@ -102,7 +101,7 @@ export function TransactionTable({ data, onEdit, onDelete, canEdit, canDelete }:
                   <td className="px-4 py-4 text-left text-sm text-slate-500 max-w-[150px] truncate" title={trx.description}>
                     {trx.description || '-'}
                   </td>
-                  <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                     <div className="flex justify-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -138,7 +137,6 @@ export function TransactionTable({ data, onEdit, onDelete, canEdit, canDelete }:
             )}
           </tbody>
         </table>
-      </div>
     </div>
   );
 }

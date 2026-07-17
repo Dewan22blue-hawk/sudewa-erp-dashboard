@@ -198,9 +198,7 @@ export function VehicleDataTable({
         </div>
       </div>
 
-      <Card className="overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <Table>
+      <div className="overflow-x-auto rounded-[16px] border border-slate-200 bg-white shadow-sm">s*<Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="border-slate-200 hover:bg-transparent">
                 <TableHead className="w-14 px-4 py-4 text-center">
@@ -294,8 +292,7 @@ export function VehicleDataTable({
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+            </div>
 
       <div className="flex flex-col gap-4 px-1 pb-2 md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-slate-500">

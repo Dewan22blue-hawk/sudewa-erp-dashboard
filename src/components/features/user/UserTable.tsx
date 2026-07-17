@@ -122,7 +122,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-none">
         <Table>
           <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
             <TableRow className="hover:bg-transparent border-gray-100">
@@ -161,7 +161,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 Status
               </TableHead>
               {/* Action */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                 Action
               </TableHead>
             </TableRow>
@@ -231,7 +231,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
