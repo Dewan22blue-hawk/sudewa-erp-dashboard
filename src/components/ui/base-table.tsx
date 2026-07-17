@@ -98,7 +98,7 @@ export default function BaseTable<T>({
 
   const handleToggleAll = (checked: boolean) => {
     if (!onSelectedIdsChange) return;
-    const next = new Set(selectedIds || new Set());
+    const next = new Set<string>(selectedIds || new Set<string>());
     sortedData.forEach((item) => {
       const id = getRowIdInternal(item);
       if (checked) {
@@ -112,7 +112,7 @@ export default function BaseTable<T>({
 
   const handleToggleOne = (id: string, checked: boolean) => {
     if (!onSelectedIdsChange) return;
-    const next = new Set(selectedIds || new Set());
+    const next = new Set<string>(selectedIds || new Set<string>());
     if (checked) {
       next.add(id);
     } else {
