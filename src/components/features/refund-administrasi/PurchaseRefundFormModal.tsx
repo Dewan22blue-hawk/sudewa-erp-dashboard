@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { z } from 'zod';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,6 +7,7 @@ import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { useCreateRefund, useRefundDetail, useRefundSelectableItems, useUpdateRefund } from '@/hooks/useRefundAdministrasi';
 import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CopyBox } from '@/components/ui/copy-box';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ApiValidationError } from '@/lib/api/response';
 import { toast } from 'sonner';
 import { refundInputClassName, refundLabelClassName, refundPrimaryButtonClassName, refundSecondaryButtonClassName } from './purchase-refund.styles';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { Badge } from '@/components/ui/badge';
 
 interface PurchaseRefundFormModalProps {
   open: boolean;
@@ -144,7 +146,30 @@ export default function PurchaseRefundFormModal({
     () => selectedItems.reduce((total, item) => total + Number(item.price ?? 0), 0),
     [selectedItems],
   );
-  const allSelected = displayedItems.length > 0 && selectedIds.length === displayedItems.length;
+
+  const isItemDisabled = useCallback(
+    (item: any) => {
+      if (isDetail) return true;
+      const status = item.status?.toLowerCase();
+      const isRefundedOrReturned = status === 'returned' || status === 'refunded';
+      if (isRefundedOrReturned) {
+        // If we are editing, allow deselecting items that were already part of this refund
+        if (isEdit && selectedIdsFromRefund.includes(Number(item.id))) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    },
+    [isDetail, isEdit, selectedIdsFromRefund]
+  );
+
+  const selectableItemsForRefund = useMemo(
+    () => displayedItems.filter((item) => !isItemDisabled(item)),
+    [displayedItems, isItemDisabled]
+  );
+
+  const allSelected = selectableItemsForRefund.length > 0 && selectableItemsForRefund.every((item) => selectedIds.includes(Number(item.id)));
 
   useEffect(() => {
     if (!open) return;
@@ -174,9 +199,13 @@ export default function PurchaseRefundFormModal({
   };
 
   const toggleAllItems = (checked: boolean) => {
+    const selectableIds = selectableItemsForRefund.map((item) => Number(item.id));
+    const next = checked
+      ? Array.from(new Set([...selectedIds, ...selectableIds]))
+      : selectedIds.filter((id) => !selectableIds.includes(id));
     form.setValue(
       'unit_transaction_item_detail_ids',
-      checked ? displayedItems.map((item) => Number(item.id)) : [],
+      next,
       {
         shouldDirty: true,
         shouldValidate: true,
@@ -237,16 +266,13 @@ export default function PurchaseRefundFormModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         className={
-          'flex h-[calc(100vh-2rem)] max-h-[880px] w-[calc(100vw-2rem)] max-w-[920px] flex-col overflow-hidden rounded-[14px] border-none p-0 shadow-[0_20px_50px_rgba(15,23,42,0.25)] sm:h-[min(90vh,880px)] sm:w-[calc(100vw-4rem)] sm:max-w-[920px]'
+          'flex h-[calc(100vh-2rem)] max-h-[980px] w-[calc(100vw-2rem)] max-w-[1420px] flex-col overflow-hidden rounded-[14px] border-none p-0 shadow-[0_20px_50px_rgba(15,23,42,0.25)] sm:h-[min(90vh,980px)] sm:w-[calc(100vw-4rem)] sm:max-w-[1220px]'
         }
       >
         <DialogHeader className="shrink-0 px-6 pb-0 pt-7 text-left">
           <DialogTitle className="text-[18px] font-semibold text-[#111827]">
             {isDetail ? `Detail Refund ${titleLabel}` : isEdit ? `Ubah Data Refund ${titleLabel}` : `Tambah Data Refund ${titleLabel}`}
           </DialogTitle>
-          <p className="mt-2 text-sm text-[#6B7280]">
-            {isDetail ? 'Lihat detail refund yang sudah dibuat' : isEdit ? 'Ubah detail refund dengan cepat dan mudah' : 'Tambah detail refund dengan cepat dan mudah'}
-          </p>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -272,7 +298,7 @@ export default function PurchaseRefundFormModal({
                     className={refundInputClassName}
                     placeholder="Rp 0"
                     readOnly={isDetail}
-                    value={field.value === undefined || field.value === null || Number(field.value) === 0 ? '' : formatCurrency(Number(field.value))}
+                    value={field.value === undefined || field.value === null || Number(field.value) === 0 ? '' : currenciesFormat('idr', Number(field.value))}
                     onChange={(event) => {
                       field.onChange(parseCurrencyInput(event.target.value));
                     }}
@@ -301,7 +327,7 @@ export default function PurchaseRefundFormModal({
                   <h3 className="text-[14px] font-semibold text-[#111827]">{isDetail ? 'Detail Unit yang Direfund' : 'Pilih Unit yang Direfund'}</h3>
                   <p className="mt-1 text-xs text-[#6B7280]">{isDetail ? 'Daftar item detail unit yang termasuk ke refund ini.' : 'Checklist manual item detail yang ingin direfund.'}</p>
                 </div>
-                <div className="shrink-0 text-sm font-medium text-emerald-700">{formatCurrency(selectedTotal)}</div>
+                <div className="shrink-0 text-sm font-medium text-emerald-700">{currenciesFormat('idr', selectedTotal)}</div>
               </div>
 
               <div className="max-w-full overflow-hidden rounded-[12px] border border-[#D9DEE8] bg-white">
@@ -311,7 +337,7 @@ export default function PurchaseRefundFormModal({
                       <TableHeader>
                         <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                           <TableHead className="w-14 px-4 text-center">
-                            <Checkbox checked={allSelected} disabled={isDetail || displayedItems.length === 0} onCheckedChange={(checked) => toggleAllItems(Boolean(checked))} />
+                            <Checkbox checked={allSelected} disabled={isDetail || selectableItemsForRefund.length === 0} onCheckedChange={(checked) => toggleAllItems(Boolean(checked))} />
                           </TableHead>
                           <TableHead className="whitespace-nowrap px-4 text-[#111827]">Warna</TableHead>
                           <TableHead className="whitespace-nowrap px-4 text-[#111827]">No. Mesin</TableHead>
@@ -339,18 +365,26 @@ export default function PurchaseRefundFormModal({
                               <TableCell className="px-4 py-3 text-center">
                                 <Checkbox
                                   checked={selectedIds.includes(Number(item.id))}
-                                  disabled={isDetail}
+                                  disabled={isItemDisabled(item)}
                                   onCheckedChange={(checked) => toggleItem(Number(item.id), Boolean(checked))}
                                 />
                               </TableCell>
                               <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{item.color || '-'}</TableCell>
-                              <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{item.machine_number || '-'}</TableCell>
-                              <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{item.chassis_number || '-'}</TableCell>
+                              <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">
+                                <CopyBox text={item.machine_number || '-'} />
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">
+                                <CopyBox text={item.chassis_number || '-'} />
+                              </TableCell>
                               <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{item.in_stock ? 'Tersedia' : 'Tidak tersedia'}</TableCell>
                               <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{item.is_forecast ? 'Forecast' : 'Normal'}</TableCell>
-                              <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{item.status || '-'}</TableCell>
+                              <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">
+                                <Badge variant="outline" className={`${item.status === 'refunded' || item.status === 'returned' ? 'border-orange-200 bg-orange-50 text-orange-700' : item.status === 'receive' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-700'} font-semibold`}>
+                                  {item.status}
+                                </Badge>
+                              </TableCell>
                               <TableCell className="whitespace-nowrap px-4 py-3 text-sm text-[#111827]">{formatDate(item.created_at)}</TableCell>
-                              <TableCell className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-[#111827]">{formatCurrency(Number(item.price ?? 0))}</TableCell>
+                              <TableCell className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-[#111827]">{currenciesFormat('idr', Number(item.price ?? 0))}</TableCell>
                             </TableRow>
                           ))
                         ) : (
@@ -380,7 +414,7 @@ export default function PurchaseRefundFormModal({
               <>
                 <div>
                   <Label className={refundLabelClassName}>Kurang Bayar</Label>
-                  <Input readOnly className={refundInputClassName} value={formatCurrency(lessPayment)} />
+                  <Input readOnly className={refundInputClassName} value={currenciesFormat('idr', lessPayment)} />
                 </div>
 
                 <div>
@@ -390,10 +424,10 @@ export default function PurchaseRefundFormModal({
 
                 <div>
                   <Label className={refundLabelClassName}>Status</Label>
-                <Select value={form.watch('status') || 'belum-dibayar'} onValueChange={(value) => form.setValue('status', value)} disabled={isDetail}>
-                  <SelectTrigger className={refundInputClassName}>
-                    <SelectValue placeholder="Select an item" />
-                  </SelectTrigger>
+                  <Select value={form.watch('status') || 'belum-dibayar'} onValueChange={(value) => form.setValue('status', value)} disabled={isDetail}>
+                    <SelectTrigger className={refundInputClassName}>
+                      <SelectValue placeholder="Select an item" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="lunas">Lunas</SelectItem>
                       <SelectItem value="proses">Proses</SelectItem>

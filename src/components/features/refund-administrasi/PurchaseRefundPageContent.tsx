@@ -1,10 +1,18 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft, MoreVertical, Plus, Loader2, Search } from 'lucide-react';
+import {
+  MoreVertical,
+  Plus,
+  Loader2,
+  Search,
+  ArrowLeft,
+  ChevronRight,
+  AlertTriangle,
+} from 'lucide-react';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -12,9 +20,22 @@ import { useDeleteRefund, useRefundList, useRefundTransactionDetail } from '@/ho
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 import PurchaseRefundFormModal from './PurchaseRefundFormModal';
-import { refundInputClassName, refundPrimaryButtonClassName } from './purchase-refund.styles';
+import { refundPrimaryButtonClassName } from './purchase-refund.styles';
 import { RefundPaymentProgressBadge } from '@/components/features/refund/RefundPaymentProgressBadge';
 import { getRefundPaymentProgressStatus } from '@/components/features/refund/refund.utils';
+import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
+import { useUnitBillings, useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
+import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
+import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
+import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { unitItemDetailService } from '@/services/unitItemDetail.service';
+import { warehouseActivityService } from '@/services/warehouseActivity.service';
+import { CopyBox } from '@/components/ui/copy-box';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+
+const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
+const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
+const PURCHASE_RECEIVED_STATE_SET = new Set(['receipt', 'inbound_receipt']);
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -32,7 +53,17 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
   const deleteMutation = useDeleteRefund();
 
   const transactionQuery = useRefundTransactionDetail(transactionId);
-  const refundQuery = useRefundList({ page: 1, perPage: 100, search: transactionQuery.data?.code });
+  const purchase = transactionQuery.data;
+
+  const { data: billings = [] } = useUnitBillings(purchase?.id);
+  const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(purchase?.id ?? ''));
+  const billingId = String(currentBilling?.id ?? '');
+  const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(purchase?.id ?? ''));
+  const { data: unitItemsResponse, isLoading: unitItemsLoading } = usePurchaseUnitItems(purchase?.id);
+  const updateState = useUpdateUnitTransactionState();
+  const { data: typeUnits } = useTypeUnits();
+
+  const refundQuery = useRefundList({ page: 1, perPage: 100, search: purchase?.code });
 
   const refunds = useMemo(
     () => (refundQuery.data?.data ?? []).filter((item) => item.unit_transaction_id === transactionId || item.transaction?.id === transactionId),
@@ -52,6 +83,158 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
       })),
     [refunds],
   );
+
+  const billingSummary = purchase?.billing_summary;
+  const totalTagihan = Number(billingSummary?.grand_total ?? purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
+  const totalPaid = Number(billingSummary?.total_paid ?? billings.reduce(
+    (acc: number, item: any) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
+    0,
+  ));
+  const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
+  const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
+  const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
+  const isRefunded = currentStockState === 'inbound_return';
+  const isAlreadyReceived = PURCHASE_RECEIVED_STATE_SET.has(currentStockState);
+  const canReceive = isPaid && !isAlreadyReceived && !isRefunded;
+  const unitItems = unitItemsResponse?.data ?? [];
+  const resolvedBillingHistories =
+    billingHistories.length > 0
+      ? billingHistories
+      : (purchase?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history: any) => ({
+        id: String(history.id ?? ''),
+        unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? purchase?.unit_transaction_billing?.id ?? ''),
+        unit_transaction_id: purchase?.id,
+        payment_proof: history.payment_proof ?? null,
+        bca_payment_amount: Number((history as any).bca_payment_amount ?? (history as any).bca_payment ?? 0),
+        cash_payment_amount: Number((history as any).cash_payment_amount ?? (history as any).cash_payment ?? 0),
+        bca_payment_usd_amount: Number((history as any).bca_payment_usd_amount ?? (history as any).bca_payment_2 ?? 0),
+        payment_at: String(history.payment_at ?? ''),
+        note: history.note,
+        created_at: history.created_at,
+        updated_at: history.updated_at,
+        cashes: (history as any).cashes,
+      }));
+
+  const handleReceipt = async () => {
+    if (!purchase?.id) return;
+
+    try {
+      const warehouseId = String(purchase.warehouse?.id ?? '').trim();
+      const personId = String(purchase.person?.id ?? '').trim();
+
+      if (!warehouseId) {
+        toast.error('warehouse_id belum tersedia pada transaksi ini.');
+        return;
+      }
+      if (!personId) {
+        toast.error('person_id belum tersedia pada transaksi ini.');
+        return;
+      }
+      if (unitItems.length === 0) {
+        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        return;
+      }
+
+      const getUnitTypeName = (typeId?: string | number) => {
+        if (!typeId) return '-';
+        return typeUnits?.data?.find((type) => String(type.id) === String(typeId))?.name ?? String(typeId);
+      };
+
+      const incompleteItems: string[] = [];
+      const detailRows = await Promise.all(
+        unitItems.map(async (item) => {
+          const res = await unitItemDetailService.getDetails(String(item.id), { page: 1, perPage: 200 });
+          const qty = Number(item.qty_total ?? 0);
+          const detailsCount = res.data?.length ?? 0;
+          if (qty !== detailsCount) {
+            incompleteItems.push(`${getUnitTypeName(item.unit_type_id)} (Qty: ${qty}, Detail Terisi: ${detailsCount})`);
+          }
+          return res;
+        }),
+      );
+
+      if (incompleteItems.length > 0) {
+        toast.error(
+          `Detail unit belum lengkap:\n- ${incompleteItems.join('\n- ')}\n\nSilakan klik tombol Action > Detail / Kelola Unit pada tabel di bawah untuk melengkapi nomor rangka, nomor mesin, dan warna setiap unit.`,
+          { duration: 8000 }
+        );
+        return;
+      }
+
+      const detailIds = detailRows
+        .flatMap((row) => row.data)
+        .map((detail) => Number(detail.id ?? 0))
+        .filter((value) => Number.isFinite(value) && value > 0);
+
+      if (detailIds.length === 0) {
+        toast.error('Detail unit transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        return;
+      }
+
+      let stockStateForWarehouse = currentStockState;
+      if (stockStateForWarehouse !== PURCHASE_PREPARE_STOCK_STATE) {
+        await updateState.mutateAsync({
+          id: purchase.id,
+          stockState: PURCHASE_PREPARE_STOCK_STATE,
+          unitTransactionDetails: detailIds,
+        });
+        stockStateForWarehouse = PURCHASE_PREPARE_STOCK_STATE;
+      }
+
+      if (stockStateForWarehouse !== PURCHASE_PREPARE_STOCK_STATE) {
+        toast.error('State transaksi harus inbound_incoming_goods sebelum membuat warehouse activity.');
+        return;
+      }
+
+      const activityId = await warehouseActivityService.createReceiptActivity({
+        unitTransactionId: String(purchase.id),
+        warehouseId,
+        personId,
+        unitTransactionItemId: String(unitItems[0]?.id ?? ''),
+      });
+
+      await warehouseActivityService.receiptStock(activityId, detailIds);
+
+      await updateState.mutateAsync({
+        id: purchase.id,
+        stockState: PURCHASE_RECEIVED_STOCK_STATE,
+      });
+
+      toast.success('Status pembelian diperbarui ke receipt dan stok warehouse berhasil diproses.');
+    } catch (error: any) {
+      const readApiError = (err: any): string => {
+        const details = err?.details ?? err?.response?.data?.errors;
+        if (typeof details === 'string' && details.trim()) return details;
+
+        if (details && typeof details === 'object') {
+          const text = Object.entries(details)
+            .map(([field, value]) => `${field}: ${Array.isArray(value) ? value[0] : String(value)}`)
+            .join(', ')
+            .trim();
+          if (text) return text;
+        }
+
+        return err?.response?.data?.message || err?.message || 'Unexpected server error';
+      };
+
+      const message = readApiError(error);
+      console.error('[purchase.handleReceipt] failed', {
+        purchaseId: purchase.id,
+        stockState: currentStockState,
+        error: message,
+        raw: error,
+      });
+
+      toast.error(message || 'Gagal update state ke receipt', {
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            void handleReceipt();
+          },
+        },
+      });
+    }
+  };
 
   const handleDelete = async () => {
     if (!deletingRefund) return;
@@ -85,33 +268,102 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
     setDeletingRefund(refund);
   };
 
+  if (transactionQuery.isLoading || refundQuery.isLoading || billingLoading || historyLoading || unitItemsLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (transactionQuery.isError || !purchase) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
+          <p className="text-muted-foreground">Pembelian tidak ditemukan</p>
+          <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>Kembali ke List</Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
-      <div className="space-y-12 p-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${transactionId}`)}>
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-[22px] font-semibold text-[#111827]">Refund Pembelian</h1>
+      <div className="space-y-6 p-6">
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
+            Pembelian Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Refund Pembelian</span>
         </div>
 
-        <div className="rounded-[14px] border border-[#D9DEE8] bg-white p-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-[14px] font-medium text-[#111827]">Kode Pembelian</label>
-              <Input readOnly value={transactionQuery.data?.code || ''} className={refundInputClassName} />
-            </div>
-            <div>
-              <label className="mb-2 block text-[14px] font-medium text-[#111827]">Total Refund</label>
-              <Input readOnly value={formatCurrency(totalRefund)} className={refundInputClassName} />
+        {/* HEADLINE & ACTIONS */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+            >
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Data Pembelian</h1>
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{purchase.code}</span>
+                {isPaid ? (
+                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                    Lunas
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                    Belum Lunas
+                  </Badge>
+                )}
+                {isAlreadyReceived ? (
+                  <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
+                    Stok Diterima
+                  </Badge>
+                ) : null}
+                {isRefunded ? (
+                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                    Sudah Refund
+                  </Badge>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
 
+        <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Pembayaran refund hanya bisa dibuat setelah refund berhasil disimpan. Jika refund sudah memiliki pembayaran, ubah atau hapus refund sebaiknya dilakukan setelah pembayaran refund disesuaikan terlebih dahulu.
+        </div>
+
+        {isRefunded ? (
+          <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">
+            <AlertTriangle className="h-5 w-5 text-amber-655 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-amber-900">Transaksi Sudah Direfund</p>
+              <p className="text-xs mt-0.5 text-amber-700/95">
+                Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">inbound_return</span>. Proses terima barang dinonaktifkan.
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        {/* 3-COLUMN CARDS */}
+        <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
+
         <div className="flex justify-end">
           <Button className={refundPrimaryButtonClassName} onClick={() => setIsCreateOpen(true)}>
             <Plus className="h-4 w-4" />
-            Tambah
+            Tambah Data Refund
           </Button>
         </div>
 
@@ -120,7 +372,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
             <TableHeader>
               <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                 {['NO', 'TANGGAL REFUND', 'KODE REFUND', 'NOMINAL REFUND', 'KURANG BAYAR', 'QTY', 'STATUS', 'ACTION'].map((header) => (
-                  <TableHead key={header} className="h-12 px-4 text-center text-[14px] font-medium text-[#111827]">
+                  <TableHead key={header} className="h-12 px-4 text-[14px] font-medium text-[#111827]">
                     {header}
                   </TableHead>
                 ))}
@@ -130,11 +382,11 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
               {refundQuery.isLoading ? (
                 <TableRow>
                   <TableCell colSpan={8} className="py-16 h-32 text-center text-[#6B7280]">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</TableCell>
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ) : refunds.length > 0 ? (
                 refunds.map((refund, index) => {
@@ -142,16 +394,18 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                   const lessPayment = refund.remaining_payment ?? Math.max(0, Number(refund.refund_amount || 0) - totalPaid);
                   return (
                     <TableRow key={refund.id} className="border-[#E5E7EB] hover:bg-white">
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{index + 1}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatDate(refund.refund_date)}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm leading-5 text-[#111827]">{refund.code}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(refund.refund_amount)}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(lessPayment)}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{refund.total_qty ?? refund.items?.length ?? 0}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">
+                      <TableCell className="py-3 px-4 text-sm text-[#111827]">{index + 1}</TableCell>
+                      <TableCell className="py-3 px-4 text-sm text-[#111827]">{formatDate(refund.refund_date)}</TableCell>
+                      <TableCell className="py-3 px-4 text-sm leading-5 text-[#111827]">
+                        <CopyBox text={refund.code} />
+                      </TableCell>
+                      <TableCell className="py-3 px-4 text-sm text-[#111827]">{currenciesFormat('idr', refund.refund_amount)}</TableCell>
+                      <TableCell className="py-3 px-4 text-sm text-[#111827]">{currenciesFormat('idr', lessPayment)}</TableCell>
+                      <TableCell className="py-3 px-4 text-sm text-[#111827]">{refund.total_qty ?? refund.items?.length ?? 0}</TableCell>
+                      <TableCell className="py-3 px-4 text-sm text-[#111827]">
                         <RefundPaymentProgressBadge status={getRefundPaymentProgressStatus(refund)} />
                       </TableCell>
-                      <TableCell className="px-4 py-3 text-center">
+                      <TableCell className="py-3 px-4">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#111827]">
@@ -181,20 +435,20 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                 <TableRow>
                   <TableCell colSpan={100} className="py-16 h-28 text-center text-[#6B7280]">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </div>
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="px-8">
             <h2 className="text-[18px] font-semibold text-[#111827]">History Pembayaran Refund</h2>
             <p className="mt-1 text-sm text-[#6B7280]">Rincian lengkap unit yang direfund</p>
@@ -205,7 +459,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
               <TableHeader>
                 <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
                   {['Tanggal', 'TIPE UNIT', 'QTY', 'NOMINAL REFUND', 'KETERANGAN'].map((header) => (
-                    <TableHead key={header} className="h-11 px-4 text-[14px] font-medium text-[#111827]">
+                    <TableHead key={header} className="h-11 text-[14px] font-medium text-[#111827]">
                       {header}
                     </TableHead>
                   ))}
@@ -215,34 +469,30 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
                 {historyRows.length > 0 ? (
                   historyRows.map((row) => (
                     <TableRow key={row.id} className="border-[#E5E7EB] hover:bg-white">
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{row.tanggal}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{row.tipeUnit}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{row.qty}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{formatCurrency(row.nominalRefund)}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{row.keterangan}</TableCell>
+                      <TableCell className="py-3 text-sm text-[#111827]">{row.tanggal}</TableCell>
+                      <TableCell className="py-3 text-sm text-[#111827]">{row.tipeUnit}</TableCell>
+                      <TableCell className="py-3 text-sm text-[#111827]">{row.qty}</TableCell>
+                      <TableCell className="py-3 text-sm text-[#111827]">{currenciesFormat('idr', row.nominalRefund)}</TableCell>
+                      <TableCell className="py-3 text-sm text-[#111827]">{row.keterangan}</TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={100} className="py-16 h-24 text-center text-[#6B7280]">
-                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="flex flex-col items-center justify-center gap-2">
                         <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
+                          <Search className="h-8 w-8 text-slate-400" />
                         </div>
                         <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
                         <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </div>
-        </div>
-
-        <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Pembayaran refund hanya bisa dibuat setelah refund berhasil disimpan. Jika refund sudah memiliki pembayaran, ubah atau hapus refund sebaiknya dilakukan setelah pembayaran refund disesuaikan terlebih dahulu.
-        </div>
+        </div> */}
 
         <PurchaseRefundFormModal open={isCreateOpen} onClose={() => setIsCreateOpen(false)} transactionId={transactionId} />
         <PurchaseRefundFormModal open={Boolean(editingRefund)} onClose={() => setEditingRefund(null)} transactionId={transactionId} refund={editingRefund} />
