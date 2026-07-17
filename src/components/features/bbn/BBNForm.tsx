@@ -88,7 +88,7 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
         <div className="space-y-6">
             {/* Header Form */}
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-8 w-8">
+                <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
@@ -201,7 +201,7 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
                                                 )}
                                             />
                                         </div>
-                                        <Button type="button" variant="outline" size="icon" className="shrink-0" title="Tambah Jenis (Not implemented)">
+                                        <Button type="button" title="Tambah Jenis (Not implemented)" className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                                             <Plus className="h-4 w-4" />
                                         </Button>
                                     </div>

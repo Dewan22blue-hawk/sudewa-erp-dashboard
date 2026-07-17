@@ -136,7 +136,7 @@ export default function LaporanRitaseArmadaPage() {
             <h1 className="text-2xl font-semibold text-slate-950">Laporan Ritase Armada</h1>
             <p className="text-sm text-slate-500">Laporan ritase armada yang sudah dilakukan</p>
           </div>
-          <Button onClick={handlePrint} variant="outline" className="gap-2 rounded-xl px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer shadow-sm">
+          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
             <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
           </Button>
         </div>

@@ -107,7 +107,7 @@ export const BrandListPage = () => {
                         <p className="text-sm text-muted-foreground">Kelola semua merk unit tipe</p>
                     </div>
                     {canCreate && (
-                        <Button onClick={handleAdd} className="gap-2">
+                        <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                             <Plus className="h-4 w-4" />
                             Tambah Merk
                         </Button>

@@ -74,7 +74,7 @@ export function DataImportModal({ open, onOpenChange, title, description, onImpo
                         <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
                             Batal
                         </Button>
-                        <Button className="flex-1" onClick={handleImport} disabled={!file || isPending}>
+                        <Button onClick={handleImport} disabled={!file || isPending} variant="outline" className="w-full sm:w-auto">
                             {isPending ? 'Mengimpor...' : 'Import'}
                         </Button>
                     </div>

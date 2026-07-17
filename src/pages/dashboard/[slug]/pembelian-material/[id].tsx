@@ -196,7 +196,7 @@ export default function PurchaseMaterialDetailPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="space-y-3">
-          <Button variant="ghost" asChild className="px-0 text-slate-500 hover:bg-transparent hover:text-slate-900">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/pembelian-material`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
@@ -272,13 +272,7 @@ export default function PurchaseMaterialDetailPage() {
             </div>
           </div>
 
-          <Button
-            onClick={() => {
-              setEditingItem(null);
-              setOpenItemModal(true);
-            }}
-            className="h-11 rounded-xl bg-[#1f4163] px-6 text-[18px] font-medium hover:bg-[#183552]"
-          >
+          <Button onClick={() => { setEditingItem(null); setOpenItemModal(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>

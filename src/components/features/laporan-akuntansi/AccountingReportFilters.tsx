@@ -39,22 +39,11 @@ export default function AccountingReportFilters({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onPrint}
-          className="w-full sm:w-auto"
-        >
+        <Button type="button" onClick={onPrint} variant="outline" className="w-full sm:w-auto">
           <Printer className="h-4 w-4 mr-2" />
           Print
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onDownload}
-          disabled={isDownloading}
-          className="w-full sm:w-auto"
-        >
+        <Button type="button" onClick={onDownload} disabled={isDownloading} variant="outline" className="w-full sm:w-auto">
           <Download className="h-4 w-4 mr-2" />
           {isDownloading ? 'Preparing...' : 'Download'}
         </Button>

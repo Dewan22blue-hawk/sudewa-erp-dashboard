@@ -154,10 +154,7 @@ export function PurchaseRefundForm({
             {/* ── Header ── */}
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900">Informasi Pembelian</h2>
-              <Button
-                type="button"
-                className="h-9 rounded-xl bg-[#284d74] px-4 text-sm font-medium text-white hover:bg-[#1f3f5f]"
-              >
+              <Button type="button" className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                 <Plus className="mr-1.5 h-4 w-4" />
                 Tambah
               </Button>

@@ -161,12 +161,7 @@ export function CreateInvoiceTable({
               {selectedIds.length} Invoice Terpilih
             </span>
           </div>
-          <Button
-            type="button"
-            onClick={onProcessSelected}
-            disabled={isProcessing}
-            className="h-10 rounded-xl bg-[#1f4163] hover:bg-[#183552] text-sm font-medium px-5 gap-2 text-white shadow-sm transition-all"
-          >
+          <Button type="button" onClick={onProcessSelected} disabled={isProcessing} variant="outline" className="w-full sm:w-auto">
             <Printer className="h-4 w-4" />
             {isProcessing ? 'Memproses...' : 'Bulk Print Invoice'}
           </Button>

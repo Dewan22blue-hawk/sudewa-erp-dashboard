@@ -249,11 +249,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
                   <Trash2 className="h-4 w-4 mr-2" />
                   Bulk Delete ({selectedIds.size})
                 </Button>
-                <Button
-                  size="sm"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)}
-                >
+                <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Unit
                 </Button>

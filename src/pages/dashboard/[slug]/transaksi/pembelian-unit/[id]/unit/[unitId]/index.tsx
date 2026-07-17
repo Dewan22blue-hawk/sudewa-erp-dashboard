@@ -385,11 +385,11 @@ export default function UnitPurchaseDetailPage() {
                   <div className="flex items-center gap-2">
                     {canCreate && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => setOpenImport(true)} disabled={qty === details.length}>
+                        <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
                           <Upload className="h-4 w-4 mr-2" />
                           Import
                         </Button>
-                        <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreateForm} disabled={qty === details.length || !qty}>
+                        <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                           <Plus className="h-4 w-4 mr-2" />
                           Tambah Detail Unit
                         </Button>

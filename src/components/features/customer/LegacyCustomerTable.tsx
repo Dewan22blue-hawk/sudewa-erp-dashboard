@@ -91,13 +91,13 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
 
         <div className="flex w-full sm:w-auto justify-end gap-2">
           {onImport && (
-            <Button onClick={onImport} variant="outline" className="gap-2">
+            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
               <Upload className="h-4 w-4" />
               Import
             </Button>
           )}
           {onAdd && (
-            <Button onClick={onAdd} className="bg-[#1f304f] hover:bg-[#1a2842] text-white whitespace-nowrap">
+            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
               <Plus className="h-4 w-4" />
               Tambah
             </Button>

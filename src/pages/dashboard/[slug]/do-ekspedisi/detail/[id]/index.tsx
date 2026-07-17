@@ -253,7 +253,7 @@ export default function DetailDOEkspedisiPage() {
             </div>
           </div>
 
-          <Button onClick={() => slug && id && router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}/create`)} className="h-12 rounded-xl bg-[#1E3A5F] px-5 hover:bg-[#18314F]">
+          <Button onClick={() => slug && id && router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>

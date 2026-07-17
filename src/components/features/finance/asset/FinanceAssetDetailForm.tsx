@@ -111,11 +111,7 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
             </Card>
 
             <div className="flex items-center justify-center pt-4">
-                <Button
-                    type="button"
-                    onClick={onBack}
-                    className="px-8 bg-[#1e3a5f] hover:bg-[#152e4d] flex items-center gap-2"
-                >
+                <Button type="button" onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                     <ArrowLeft className="h-4 w-4" />
                     Kembali
                 </Button>

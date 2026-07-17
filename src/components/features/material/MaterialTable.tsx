@@ -150,12 +150,7 @@ export function MaterialTable({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {onExport && (
-                        <Button
-                            onClick={onExport}
-                            variant="outline"
-                            className="w-full sm:w-auto"
-                            disabled={isExporting}
-                        >
+                        <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
                             <Upload className="h-4 w-4 mr-2" />
                             {isExporting ? 'Exporting...' : 'Export'}
                         </Button>
@@ -163,19 +158,12 @@ export function MaterialTable({
                     {canCreate && (
                         <>
                             {onImport && (
-                                <Button
-                                    onClick={onImport}
-                                    variant="outline"
-                                    className="w-full sm:w-auto"
-                                >
+                                <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
                                     <Upload className="h-4 w-4 mr-2" />
                                     Import
                                 </Button>
                             )}
-                            <Button
-                                onClick={onAdd}
-                                className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-                            >
+                            <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                                 <Plus className="h-4 w-4 mr-2" />
                                 Tambah
                             </Button>
@@ -184,68 +172,68 @@ export function MaterialTable({
                 </div>
             </div>
 
-            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none">s*<Table>
-                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow className="hover:bg-[#f8f9fa]">
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-left">KODE MATERIAL</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[40%] uppercase px-4 py-4 text-left">DESKRIPSI</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-right">HARGA</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 w-[10%] uppercase px-4 py-4 text-center">SATUAN</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none"><Table>
+                <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                    <TableRow className="hover:bg-[#f8f9fa]">
+                        <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-left">KODE MATERIAL</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 w-[40%] uppercase px-4 py-4 text-left">DESKRIPSI</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-right">HARGA</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 w-[10%] uppercase px-4 py-4 text-center">SATUAN</TableHead>
+                        <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {materials.length > 0 ? (
+                        materials.map((item) => (
+                            <TableRow key={item.uuid} className="group hover:bg-gray-50 transition-colors">
+                                <TableCell className="text-center px-4 py-4">
+                                    {item.code || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">
+                                    {item.name || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">
+                                    {formatCurrency(item.price)}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase text-center">
+                                    {item.type || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                    <div className="flex justify-center">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                                <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                                                    Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                                                    Hapus
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {materials.length > 0 ? (
-                                materials.map((item) => (
-                                    <TableRow key={item.uuid} className="group hover:bg-gray-50 transition-colors">
-                                        <TableCell className="text-center px-4 py-4">
-                                            {item.code || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-900 text-left">
-                                            {item.name || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-right">
-                                            {formatCurrency(item.price)}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase text-center">
-                                            {item.type || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                            <div className="flex justify-center">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                                                        <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-                                                            Hapus
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow className="group">
-                                    <TableCell colSpan={100} className="h-32 text-center text-gray-550 py-16 text-sm">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                                <Search className="h-8 w-8 text-slate-400" />
-                                            </div>
-                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                        ))
+                    ) : (
+                        <TableRow className="group">
+                            <TableCell colSpan={100} className="h-32 text-center text-gray-550 py-16 text-sm">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
             </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">

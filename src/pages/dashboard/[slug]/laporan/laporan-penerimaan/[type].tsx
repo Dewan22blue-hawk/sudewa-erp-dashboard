@@ -46,12 +46,7 @@ export default function DetailLaporanPenerimaanPage() {
 
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => router.push(`/dashboard/${slug}/laporan/laporan-penerimaan`)}
-                            className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                        >
+                        <Button onClick={() => router.push(`/dashboard/${slug}/laporan/laporan-penerimaan`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                             <ArrowLeft className="h-5 w-5 text-slate-700" />
                         </Button>
                         <div>

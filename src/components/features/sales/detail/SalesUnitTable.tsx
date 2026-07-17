@@ -237,11 +237,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
                   </Button>
                 )}
                 {onAddUnit && canEdit && (
-                  <Button
-                    size="sm"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={onAddUnit}
-                  >
+                  <Button onClick={onAddUnit} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Unit
                   </Button>

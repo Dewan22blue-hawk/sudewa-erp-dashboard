@@ -43,7 +43,7 @@ export function VehicleDataDetail({ data, slug }: VehicleDataDetailProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-8 w-8 rounded-full">
+          <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>

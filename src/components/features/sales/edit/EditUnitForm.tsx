@@ -181,7 +181,7 @@ export function EditUnitForm({
                       )}
 
                       {showAddUnitButton && !readOnly && (
-                        <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 bg-transparent" onClick={onAddUnitClick}>
+                        <Button type="button" onClick={onAddUnitClick} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                           <Plus className="h-4 w-4" />
                         </Button>
                       )}

@@ -227,7 +227,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                         </Command>
                       </PopoverContent>
                     </Popover>
-                    <Button type="button" variant="outline" size="icon" className="h-10 w-10" onClick={() => setOpenTypeModal(true)}>
+                    <Button type="button" onClick={() => setOpenTypeModal(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
