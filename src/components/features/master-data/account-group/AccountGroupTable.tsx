@@ -6,6 +6,7 @@ import { MoreVertical, Pencil, Trash, Lock } from 'lucide-react';
 import type { AccountGroup } from '@/@types/account-group.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface AccountGroupTableProps {
   data: AccountGroup[];
@@ -31,7 +32,7 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
         className: 'font-semibold text-gray-900',
         cell: (item) => (
           <div className="flex items-center gap-1.5">
-            <span>{item.code}</span>
+            <CopyBox text={item.code} />
             {item.is_lock && (
               <Tooltip>
                 <TooltipTrigger asChild>

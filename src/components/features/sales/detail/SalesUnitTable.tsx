@@ -1,18 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Eye, MoreVertical, Pencil, Plus, Trash2, Search } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { SalesLineItem } from '../sales.data';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useBulkDeleteUnitItem, useDeleteUnitItem, useSalesUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { toast } from 'sonner';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 interface Props {
   lineItems: SalesLineItem[];
@@ -66,56 +64,24 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
     return typeUnits?.data?.find((unitType) => String(unitType.id) === String(id))?.name ?? '-';
   };
 
-  const allPageSelected = pagedData.length > 0 && pagedData.every((item) => selectedIds.has(item.id));
-
-  const toggleAllPage = (checked: boolean) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (checked) {
-        pagedData.forEach((item) => next.add(item.id));
-      } else {
-        pagedData.forEach((item) => next.delete(item.id));
-      }
-      return next;
-    });
-  };
-
-  const toggleOne = (id: string, checked: boolean) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (checked) {
-        next.add(id);
-      } else {
-        next.delete(id);
-      }
-      return next;
-    });
-  };
-
-  const handleDelete = async () => {
+  const handleDeleteConfirm = async () => {
     if (!deleteId) return;
-
     try {
       await deleteMutation.mutateAsync({ id: deleteId, purchaseId: salesId });
       toast.success('Unit item berhasil dihapus');
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(deleteId);
-        return next;
-      });
+      setSelectedIds((prev) => { const next = new Set(prev); next.delete(deleteId); return next; });
       setDeleteId(null);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menghapus unit item');
     }
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDeleteConfirm = async () => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) {
       toast.error('Pilih minimal satu item');
       return;
     }
-
     try {
       await bulkDeleteMutation.mutateAsync({ ids, purchaseId: salesId });
       toast.success(`${ids.length} unit item berhasil dihapus`);
@@ -126,158 +92,167 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
     }
   };
 
-  return (
-    <div className="rounded-xl border bg-white">
-      <div className="border-b px-6 py-5">
-        <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
-        <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>
-      </div>
+  const columns: ColumnDef<any>[] = useMemo(() => [
+    {
+      header: 'No',
+      alignment: 'center',
+      className: 'w-[60px]',
+      cell: (_, idx) => (currentPage - 1) * perPage + idx + 1,
+    },
+    {
+      header: 'Tipe Unit',
+      cell: (item) => (
+        <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${getUnitTypeName(item.unit_type_id)}`}>
+          {getUnitTypeName(item.unit_type_id)}
+        </ReferenceLink>
+      ),
+    },
+    {
+      header: 'QTY',
+      alignment: 'center',
+      className: 'w-[80px]',
+      cell: (item) => item.qty_total,
+    },
+    {
+      header: 'Harga Jual',
+      alignment: 'center',
+      cell: (item) => (
+        <div>
+          <div>{currenciesFormat('idr', item.price)}</div>
+          {item.price_usd ? (
+            <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga Jual USD">
+              {currenciesFormat('usd', item.price_usd)}
+            </div>
+          ) : null}
+        </div>
+      ),
+    },
+    {
+      header: 'Biaya BBN',
+      alignment: 'center',
+      cell: (item) => currenciesFormat('idr', item.bbn_price),
+    },
+    {
+      header: 'Biaya Ekspedisi',
+      alignment: 'center',
+      cell: (item) => currenciesFormat('idr', item.expedition_fee),
+    },
+    {
+      header: 'Biaya Lainnya',
+      alignment: 'center',
+      cell: (item) => currenciesFormat('idr', item.other_fee),
+    },
+    {
+      header: 'HPP',
+      alignment: 'center',
+      cell: (item) => currenciesFormat('idr', item.hpp_total_price ?? 0),
+    },
+    {
+      header: 'DPP',
+      alignment: 'center',
+      cell: (item) => currenciesFormat('idr', item.dpp_total_price),
+    },
+    {
+      header: 'PPN',
+      alignment: 'center',
+      cell: (item) => currenciesFormat('idr', item.ppn_total_price),
+    },
+    {
+      header: 'Jumlah',
+      alignment: 'center',
+      className: 'font-semibold text-slate-900',
+      cell: (item) => currenciesFormat('idr', (item.hpp_total_price ?? 0) + item.ppn_total_price + item.bbn_price + item.expedition_fee + item.other_fee),
+    },
+    {
+      header: 'Aksi',
+      alignment: 'center',
+      sticky: 'right',
+      cell: (item) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)} disabled={!canEdit}>
+              <Pencil className="mr-2 h-4 w-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}>
+              <Eye className="mr-2 h-4 w-4" /> Detail
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-600 focus:bg-red-50 focus:text-red-600"
+              onClick={() => setDeleteId(item.id)}
+              disabled={!canDelete}
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Hapus
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [currentPage, perPage, slug, typeUnits, canEdit, canDelete, basePath, salesId, router]);
 
-      <div className="flex items-center justify-between gap-2 px-6 py-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Show</span>
-          <Select
-            value={String(perPage)}
-            onValueChange={(value) => {
-              setPerPage(Number(value));
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border bg-white overflow-hidden">
+        <div className="border-b px-6 py-5">
+          <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
+          <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>
+        </div>
+
+        <div className="p-6">
+          <BaseTable
+            data={pagedData}
+            columns={columns}
+            loading={isLoading || isError}
+            showCheckbox
+            selectedIds={selectedIds}
+            onSelectedIdsChange={setSelectedIds}
+            showLimitChange
+            perPage={perPage}
+            onPerPageChange={(val) => {
+              setPerPage(val);
               setCurrentPage(1);
             }}
-          >
-            <SelectTrigger className="h-9 w-18 bg-white">
-              <SelectValue placeholder="25" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-sm">Page</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {canDelete && (
-            <Button
-              size="sm"
-              variant="destructive"
-              disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
-              onClick={() => setIsBulkDeleteOpen(true)}
-            >
-              Bulk Delete ({selectedIds.size})
-            </Button>
-          )}
-
-          {onAddUnit && canEdit && (
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={onAddUnit}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Unit
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-            <TableRow>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[60px]">No</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[50px]">
-                <Checkbox checked={allPageSelected} onCheckedChange={(checked) => toggleAllPage(Boolean(checked))} aria-label="Pilih semua" />
-              </TableHead>
-              <TableHead className="px-4 py-4 text-left text-xs font-semibold text-slate-500">Tipe Unit</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500 w-[80px]">QTY</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Harga Jual</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Biaya BBN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Biaya Ekspedisi</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Biaya Lainnya</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">HPP</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">DPP</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">PPN</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500">Jumlah</TableHead>
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pagedData.length === 0 ? (
-              <TableRow className="group">
-                <TableCell colSpan={100} className="text-center px-4 py-16 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              pagedData.map((item, idx) => (
-                <TableRow key={item.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(currentPage - 1) * perPage + idx + 1}</TableCell>
-                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    <Checkbox checked={selectedIds.has(item.id)} onCheckedChange={(checked) => toggleOne(item.id, Boolean(checked))} aria-label="Pilih baris" />
-                  </TableCell>
-                  <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900">
-                    <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${getUnitTypeName(item.unit_type_id)}`}>
-                      {getUnitTypeName(item.unit_type_id)}
-                    </ReferenceLink>
-                  </TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{item.qty_total}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">
-                    <div>{currenciesFormat('idr', item.price)}</div>
-                    {item.price_usd ? (
-                      <div className="text-[11px] text-amber-600 font-semibold mt-0.5" title="Harga Jual USD">
-                        {currenciesFormat('usd', item.price_usd)}
-                      </div>
-                    ) : null}
-                  </TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.bbn_price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.expedition_fee)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.other_fee)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.hpp_total_price ?? 0)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.dpp_total_price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{currenciesFormat('idr', item.ppn_total_price)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900">{currenciesFormat('idr', (item.hpp_total_price ?? 0) + item.ppn_total_price + item.bbn_price + item.expedition_fee + item.other_fee)}</TableCell>
-                  <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id} / edit`)} disabled={!canEdit}> <Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`${basePath} / ${salesId} / unit / ${item.id}`)}> <Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => setDeleteId(item.id)} disabled={!canDelete}> <Trash2 className="mr-2 h-4 w-4" />
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table >
-      </div >
-
-      <div className="flex items-center justify-between px-6 py-4 text-sm text-muted-foreground">
-        <span>
-          Showing {items.length === 0 ? 0 : (currentPage - 1) * perPage + 1}-{Math.min(currentPage * perPage, items.length)} of {items.length} data
-        </span>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-            {currentPage}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
-            Next
-          </Button>
+            meta={{
+              currentPage,
+              perPage,
+              lastPage: totalPages,
+              total: items.length,
+            }}
+            onPageChange={setCurrentPage}
+            headerActions={
+              <div className="flex items-center gap-2">
+                {canDelete && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
+                    onClick={() => setIsBulkDeleteOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Bulk Delete ({selectedIds.size})
+                  </Button>
+                )}
+                {onAddUnit && canEdit && (
+                  <Button
+                    size="sm"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={onAddUnit}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Unit
+                  </Button>
+                )}
+              </div>
+            }
+          />
         </div>
       </div>
 
+      {/* Delete single */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -286,13 +261,14 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDelete}>
-              Hapus
+            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDeleteConfirm}>
+              {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Bulk delete */}
       <AlertDialog open={isBulkDeleteOpen} onOpenChange={setIsBulkDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -301,12 +277,12 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDelete}>
+            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDeleteConfirm}>
               {bulkDeleteMutation.isPending ? 'Menghapus...' : 'Hapus Semua'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div >
+    </div>
   );
 }

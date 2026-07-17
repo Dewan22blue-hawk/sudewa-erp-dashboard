@@ -64,7 +64,7 @@ export const getStockUnits = async (
         machine_number: params.machine_number,
         chassis_number: params.chassis_number,
         color: params.color,
-        in_stock: params.in_stock,
+        in_stock: params.in_stock ?? true,
       },
     },
   );
