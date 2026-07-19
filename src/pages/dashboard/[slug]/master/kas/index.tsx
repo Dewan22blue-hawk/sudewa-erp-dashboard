@@ -1,14 +1,23 @@
+import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { useKas } from '@/hooks/useKas';
 import { KasTable } from '@/components/features/kas/KasTable';
 import { useCompany } from '@/contexts/CompanyContext';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { KasFormDialog } from '@/components/features/kas/KasFormDialog';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function KasPage() {
   const { companyId } = useCompany();
   const safeCompanyId = companyId || '1';
 
   const { data, isLoading, isError } = useKas(safeCompanyId);
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   // --- RENDER STATES ---
 
@@ -57,6 +66,12 @@ export default function KasPage() {
             <h1 className="text-2xl font-semibold">Kas</h1>
             <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
           </div>
+          {canCreate && (
+            <Button onClick={() => setIsFormOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah
+            </Button>
+          )}
         </div>
 
         {/* TABLE CARD */}
@@ -64,6 +79,14 @@ export default function KasPage() {
           <KasTable data={data?.data ?? []} />
         </div>
       </div>
+      <KasFormDialog
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        kas={null}
+        companyId={safeCompanyId}
+        title="Tambah Kas"
+        description="Tambahkan data kas baru"
+      />
     </DashboardLayout>
   );
 }
