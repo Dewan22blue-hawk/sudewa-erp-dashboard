@@ -48,7 +48,6 @@ export default function StockUnitPage() {
   useEffect(() => {
     if (data) {
       setTablePage(data.meta?.currentPage || 1);
-      setTablePerPage(data.meta?.perPage || 25);
       setTableTotalData(data.meta?.total || 0);
     }
   }, [data]);
@@ -103,8 +102,8 @@ export default function StockUnitPage() {
           totalData={tableTotalData} // Pass tableTotalData state
           statusTabs={(
             <div className="flex items-center gap-2">
-              <Select 
-                value={inStock === undefined ? 'all' : inStock ? 'true' : 'false'} 
+              <Select
+                value={inStock === undefined ? 'all' : inStock ? 'true' : 'false'}
                 onValueChange={(val) => {
                   const nextInStock = val === 'all' ? undefined : val === 'true';
                   setInStock(nextInStock);

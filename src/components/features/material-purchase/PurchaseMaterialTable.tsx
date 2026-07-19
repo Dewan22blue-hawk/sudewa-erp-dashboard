@@ -145,7 +145,7 @@ export function PurchaseMaterialTable({
           </div>
         </div>
 
-        <Button onClick={onAdd} className="h-11 rounded-xl bg-[#1f4163] px-6 text-[18px] font-medium hover:bg-[#183552]">
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah
         </Button>

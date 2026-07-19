@@ -276,12 +276,7 @@ export function DOEkspedisiDetailForm({
                 <p className="text-xs text-slate-500">Tambahkan tujuan lanjutan untuk item DO ini bila ada lebih dari satu tujuan.</p>
               </div>
               {!readOnly ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="rounded-xl"
-                  onClick={() => append({ destination: '', driverNote: '', mapsUrl: '' })}
-                >
+                <Button type="button" onClick={() => append({ destination: '', driverNote: '', mapsUrl: '' })} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                   <Plus className="mr-2 h-4 w-4" />
                   Tambah Tujuan
                 </Button>
@@ -303,7 +298,7 @@ export function DOEkspedisiDetailForm({
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                      <input type="hidden" {...register(`destinationStops.${index}.id` as const)} />
+                      <input autoComplete="off" type="hidden" {...register(`destinationStops.${index}.id` as const)} />
 
                       <div className="space-y-2">
                         <Label htmlFor={`destinationStops.${index}.destination`}>Tujuan</Label>

@@ -107,7 +107,7 @@ export default function EditVehicleDocumentPage() {
               <p className="mt-1 text-sm text-slate-500">Kelola dan update data registrasi kendaraan</p>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => window.print()} className="bg-[#1f3b5b] hover:bg-[#18304a]">
+              <Button onClick={() => window.print()} variant="outline" className="w-full sm:w-auto">
                 <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>

@@ -240,20 +240,11 @@ export default function SalesPrintDocument({
     <div className="space-y-4">
       {!hideControls && (
         <div className="no-print flex items-center justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleDownload}
-            className="gap-2 rounded-xl border-slate-200"
-          >
+          <Button type="button" onClick={handleDownload} variant="outline" className="w-full sm:w-auto">
             <Download className="h-4 w-4" />
             Download PDF
           </Button>
-          <Button
-            type="button"
-            onClick={() => window.print()}
-            className="gap-2 rounded-xl bg-[#1f4163] hover:bg-[#183552]"
-          >
+          <Button type="button" onClick={() => window.print()} variant="outline" className="w-full sm:w-auto">
             <Printer className="h-4 w-4" />
             Print
           </Button>

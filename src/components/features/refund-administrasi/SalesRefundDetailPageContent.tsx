@@ -123,7 +123,7 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
 
         <div className="space-y-5">
           <div className="flex justify-end">
-            <Button className={refundPrimaryButtonClassName} onClick={() => setIsAddDetailOpen(true)}>
+            <Button onClick={() => setIsAddDetailOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
               <Plus className="h-4 w-4" />
               Tambah Pembayaran Refund
             </Button>

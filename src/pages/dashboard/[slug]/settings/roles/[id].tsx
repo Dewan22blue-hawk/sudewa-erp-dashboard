@@ -131,11 +131,7 @@ export default function RoleDetailPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button 
-                      onClick={handleDispatchRole} 
-                      disabled={assignRoleMutation.isPending || !selectedUserId}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium h-10 px-4 rounded-lg flex items-center gap-2 shadow-xs transition-all w-full sm:w-auto"
-                    >
+                    <Button onClick={handleDispatchRole} disabled={assignRoleMutation.isPending || !selectedUserId} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                       <UserPlus size={16} />
                       Tambah
                     </Button>

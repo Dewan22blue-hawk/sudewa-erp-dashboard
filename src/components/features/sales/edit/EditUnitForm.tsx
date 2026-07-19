@@ -41,7 +41,7 @@ interface EditUnitFormProps {
  */
 export function EditUnitForm({
   defaultValues,
-  onSubmit = () => {},
+  onSubmit = () => { },
   onCancel,
   readOnly = false,
   showAddUnitButton = false,
@@ -181,7 +181,7 @@ export function EditUnitForm({
                       )}
 
                       {showAddUnitButton && !readOnly && (
-                        <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0 bg-transparent" onClick={onAddUnitClick}>
+                        <Button type="button" onClick={onAddUnitClick} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                           <Plus className="h-4 w-4" />
                         </Button>
                       )}
@@ -239,7 +239,7 @@ export function EditUnitForm({
 
             {/* USD Transaction Toggle */}
             <div className="flex items-center space-x-2 py-1">
-              <input
+              <input autoComplete="off"
                 type="checkbox"
                 id="sales_is_usd"
                 checked={isUsd}

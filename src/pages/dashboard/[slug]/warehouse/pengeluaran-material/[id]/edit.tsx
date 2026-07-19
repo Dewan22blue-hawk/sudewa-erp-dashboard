@@ -182,7 +182,7 @@ export default function GoodsIssueEditPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" asChild className="h-auto p-0 text-slate-600 hover:bg-transparent hover:text-slate-900">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
@@ -293,7 +293,7 @@ export default function GoodsIssueEditPage() {
               <span>Page</span>
             </div>
           </div>
-          <Button onClick={() => { setEditingItem(null); setItemOpen(true); }} className="h-11 rounded-xl bg-[#0ec447] px-6 text-[18px] font-medium hover:bg-[#0ba63b]">
+          <Button onClick={() => { setEditingItem(null); setItemOpen(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>

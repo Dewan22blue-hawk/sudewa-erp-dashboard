@@ -81,15 +81,15 @@ export function VehicleDocumentTable({
         </div>
 
         <div className="flex flex-wrap gap-2 xl:justify-end">
-          <Button variant="outline" onClick={onImport} className="h-11 rounded-xl px-4">
+          <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
             <Upload className="mr-2 h-4 w-4" />
             Import
           </Button>
-          <Button variant="outline" onClick={onExport} disabled={isExporting} className="h-11 rounded-xl px-4">
+          <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
-          <Button onClick={onAdd} className="h-11 rounded-xl bg-[#1f3b5b] px-5 hover:bg-[#18304a]">
+          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
             Tambah
           </Button>

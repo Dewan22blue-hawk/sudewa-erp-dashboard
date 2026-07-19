@@ -77,12 +77,7 @@ export function FinanceAssetTable({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        className="flex items-center gap-2 rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer"
-                        onClick={onExport}
-                        disabled={isExporting}
-                    >
+                    <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
                         <Download className="h-4 w-4" />
                         {isExporting ? 'Exporting...' : 'Export'}
                     </Button>

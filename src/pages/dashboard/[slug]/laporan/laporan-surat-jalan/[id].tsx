@@ -149,12 +149,7 @@ export default function LaporanSuratJalanDetailPage() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBack}
-            className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-          >
+          <Button onClick={handleBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-5 w-5 text-slate-700" />
           </Button>
           <div>
@@ -193,11 +188,7 @@ export default function LaporanSuratJalanDetailPage() {
               </div>
             </div>
 
-            <Button
-              onClick={handleExport}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
+            <Button onClick={handleExport} variant="outline" className="w-full sm:w-auto">
               <Download className="h-4 w-4 mr-2" /> Export
             </Button>
           </div>
