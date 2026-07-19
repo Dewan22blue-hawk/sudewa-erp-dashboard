@@ -227,7 +227,7 @@ export default function MaterialReleaseEditPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="space-y-1">
-          <Button variant="ghost" asChild className="h-auto px-0 text-slate-500 hover:bg-transparent hover:text-slate-900">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
@@ -332,14 +332,7 @@ export default function MaterialReleaseEditPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              onClick={() => {
-                setEditingItem(null);
-                setEditingItemId(undefined);
-                setOpenItemModal(true);
-              }}
-              className="h-11 rounded-xl bg-[#00c443] px-6 text-[18px] hover:bg-[#00b13d]"
-            >
+            <Button onClick={() => { setEditingItem(null); setEditingItemId(undefined); setOpenItemModal(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
               <Plus className="mr-2 h-4 w-4" />
               Tambah
             </Button>

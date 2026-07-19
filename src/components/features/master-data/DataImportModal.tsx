@@ -56,7 +56,7 @@ export function DataImportModal({ open, onOpenChange, title, description, onImpo
                         <Upload className="mx-auto mb-2 h-8 w-8 text-slate-400" />
                         <span className="block font-medium">{file ? file.name : 'Pilih file import'}</span>
                         <span className="mt-1 block text-xs text-slate-500">Klik atau seret file ke sini</span>
-                        <input
+                        <input autoComplete="off"
                             type="file"
                             accept={accept}
                             onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
@@ -74,7 +74,7 @@ export function DataImportModal({ open, onOpenChange, title, description, onImpo
                         <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
                             Batal
                         </Button>
-                        <Button className="flex-1" onClick={handleImport} disabled={!file || isPending}>
+                        <Button onClick={handleImport} disabled={!file || isPending} variant="outline" className="w-full sm:w-auto">
                             {isPending ? 'Mengimpor...' : 'Import'}
                         </Button>
                     </div>

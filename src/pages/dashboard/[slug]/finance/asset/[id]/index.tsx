@@ -35,12 +35,7 @@ export default function FinanceAssetDetailPage() {
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleBack}
-                        className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    >
+                    <Button onClick={handleBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                         <ArrowLeft className="h-5 w-5 text-slate-700" />
                     </Button>
                     <div>

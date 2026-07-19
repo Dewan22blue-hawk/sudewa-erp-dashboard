@@ -1,18 +1,11 @@
 import { useMemo } from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { ImageIcon, MoreVertical, Pencil, Trash } from 'lucide-react';
 import type { Brand } from '@/@types/brand.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreVertical, ImageIcon, Pencil, Trash, ArrowUp, ArrowDown, ArrowUpDown, Search, Loader2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useTableSort } from '@/hooks/useTableSort';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
 
 interface BrandTableProps {
     data: Brand[];
@@ -30,15 +23,6 @@ interface BrandTableProps {
     onPerPageChange: (perPage: number) => void;
 }
 
-function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
-  const isActive = currentSortKey === sortKey;
-  if (isActive && sortOrder === 'asc')
-    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
-  if (isActive && sortOrder === 'desc')
-    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
-  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
-}
-
 export const BrandTable = ({
     data,
     meta,
@@ -54,244 +38,84 @@ export const BrandTable = ({
     canEdit,
     canDelete,
 }: BrandTableProps) => {
-    const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-        data,
-    });
-
     const columns = useMemo<ColumnDef<Brand>[]>(
         () => [
             {
+                header: 'NAMA MERK',
                 accessorKey: 'name',
-                header: () => (
-                    <div className="flex items-center gap-1">
-                        NAMA MERK
-                        <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                    </div>
-                ),
-                cell: ({ row }) => (
+                sortable: true,
+                cell: (item) => (
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-slate-50 overflow-hidden">
-                            {row.original.image ? (
+                            {item.image ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={row.original.image} alt={row.original.name} className="h-full w-full object-contain" />
+                                <img src={item.image} alt={item.name} className="h-full w-full object-contain" />
                             ) : (
                                 <ImageIcon className="h-5 w-5 text-slate-400" />
                             )}
                         </div>
-                        <span className="text-sm font-semibold text-slate-900">{row.original.name}</span>
+                        <span className="text-sm font-semibold text-slate-900">{item.name}</span>
                     </div>
                 ),
             },
             {
+                header: 'TANGGAL DIBUAT',
                 accessorKey: 'createdAt',
-                header: () => (
-                    <div className="flex items-center gap-1">
-                        TANGGAL DIBUAT
-                        <SortIcon sortKey="createdAt" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                    </div>
-                ),
-                cell: ({ row }) => (
+                sortable: true,
+                alignment: 'center',
+                cell: (item) => (
                     <span className="text-sm text-slate-600">
-                        {row.original.createdAt ? format(new Date(row.original.createdAt), 'dd MMMM yyyy', { locale: localeId }) : '-'}
+                        {item.createdAt ? format(new Date(item.createdAt), 'dd MMMM yyyy', { locale: localeId }) : '-'}
                     </span>
                 ),
             },
             {
-                id: 'actions',
-                header: () => 'ACTION',
-                cell: ({ row }) => (
-                    <div className="flex justify-center">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 p-0 rounded-full">
-                                    <MoreVertical className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => onEdit(row.original)} disabled={!canEdit}>
-                                    <Pencil className="mr-2 h-4 w-4" />
-                                    Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-red-600 focus:text-red-600 focus:bg-red-50" disabled={!canDelete}>
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    Hapus
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                header: 'ACTION',
+                alignment: 'center',
+                sticky: 'right',
+                cell: (item) => (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="inline-flex items-center justify-center h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                <MoreVertical className="h-4 w-4" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600 focus:text-red-600 focus:bg-red-50" disabled={!canDelete}>
+                                <Trash className="mr-2 h-4 w-4" />
+                                Hapus
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 ),
             },
         ],
-        [onDelete, onEdit, sortKey, sortOrder, canEdit, canDelete],
+        [onEdit, onDelete, canEdit, canDelete],
     );
 
-    const table = useReactTable({
-        data: sortedData,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-        manualPagination: true,
-    });
-
-    const total = meta?.total ?? 0;
-    const totalPages = meta?.lastPage ?? 1;
-    const startIndex = (page - 1) * perPage;
-    const endIndex = startIndex + perPage;
-
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <div className="relative w-full sm:w-[300px]">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                            placeholder="Search here"
-                            className="pl-9 bg-white"
-                            value={search}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                        <span>Show</span>
-                        <Select value={perPage.toString()} onValueChange={(v) => onPerPageChange(Number(v))}>
-                            <SelectTrigger className="w-[70px] bg-white">
-                                <SelectValue placeholder="25" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="25">25</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                                <SelectItem value="100">100</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <span>Page</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto">
-        <Table>
-                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="bg-white hover:bg-[#f8f9fa]">
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                headerGroup.headers.map((header) => {
-                                    const columnId = header.id;
-                                    const isSortable = columnId === 'name' || columnId === 'createdAt';
-                                    const isAction = columnId === 'actions';
-                                    const isSorted = sortKey === columnId;
-
-                                    return (
-                                        <TableHead
-                                            key={header.id}
-                                            className={cn(
-                                                'px-4 py-4 text-xs font-semibold uppercase select-none transition-colors',
-                                                isAction ? 'text-center text-gray-600 w-[100px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : 'text-left',
-                                                isSortable ? 'group cursor-pointer' : '',
-                                                isSortable && isSorted ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                                            )}
-                                            onClick={isSortable ? () => handleSort(columnId) : undefined}
-                                        >
-                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
-                                    );
-                                })
-                            ))}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : data.length === 0 ? (
-                            <TableRow className="group">
-                                <TableCell colSpan={100} className="text-center text-gray-500 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
-                            </TableRow>
-                        ) : (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="group bg-white hover:bg-slate-50 transition-colors">
-                                    {row.getVisibleCells().map((cell) => {
-                                        const isAction = cell.column.id === 'actions';
-                                        return (
-                                            <TableCell key={cell.id} className={cn("px-4 py-4 text-sm", isAction ? "text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]" : "text-left")}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        );
-                                    })}
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-
-            {/* PAGINATION */}
-            <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
-                <span>
-                    Showing {data.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, total)} of {total} entries
-                </span>
-
-                <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-                    <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-                        Previous
-                    </Button>
-
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum: number;
-                        if (totalPages <= 5) {
-                            pageNum = i + 1;
-                        } else if (page <= 3) {
-                            pageNum = i + 1;
-                        } else if (page >= totalPages - 2) {
-                            pageNum = totalPages - 4 + i;
-                        } else {
-                            pageNum = page - 2 + i;
-                        }
-
-                        return (
-                            <Button
-                                key={pageNum}
-                                variant="ghost"
-                                size="sm"
-                                className={cn(
-                                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-                                    page === pageNum
-                                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-                                )}
-                                onClick={() => onPageChange(pageNum)}
-                            >
-                                {pageNum}
-                            </Button>
-                        );
-                    })}
-
-                    {totalPages > 5 && page < totalPages - 2 && (
-                        <>
-                            <span className="px-1 text-sm text-slate-500">...</span>
-                            <Button variant="ghost" size="sm" className="h-9 min-w-9 rounded-xl border border-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
-                                {totalPages}
-                            </Button>
-                        </>
-                    )}
-
-                    <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
-                        Next
-                    </Button>
-                </div>
-            </div>
-        </div>
+        <BaseTable
+            data={data}
+            columns={columns}
+            loading={isLoading}
+            searchPlaceholder="Search here"
+            search={search}
+            onSearchChange={onSearchChange}
+            showLimitChange
+            perPage={perPage}
+            onPerPageChange={onPerPageChange}
+            defaultSort={{ key: 'createdAt', direction: 'desc' }}
+            meta={{
+                currentPage: page,
+                perPage,
+                lastPage: meta?.lastPage ?? 1,
+                total: meta?.total ?? data.length,
+            }}
+            onPageChange={onPageChange}
+        />
     );
 };

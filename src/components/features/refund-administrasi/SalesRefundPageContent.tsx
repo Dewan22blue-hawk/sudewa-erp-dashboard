@@ -109,7 +109,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
         </div>
 
         <div className="flex justify-end">
-          <Button className={refundPrimaryButtonClassName} onClick={() => setIsCreateOpen(true)}>
+          <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="h-4 w-4" />
             Tambah
           </Button>

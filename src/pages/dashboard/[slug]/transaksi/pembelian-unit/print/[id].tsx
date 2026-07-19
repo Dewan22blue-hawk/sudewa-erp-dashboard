@@ -85,11 +85,7 @@ export default function PurchasePrintPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button
-              type="button"
-              onClick={() => handlePrint()}
-              className="gap-2 rounded-xl bg-[#1f4163] hover:bg-[#183552]"
-            >
+            <Button type="button" onClick={() => handlePrint()} variant="outline" className="w-full sm:w-auto">
               <Printer className="h-4 w-4" />
               Print
             </Button>

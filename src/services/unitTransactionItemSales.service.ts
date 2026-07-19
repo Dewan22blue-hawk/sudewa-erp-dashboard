@@ -202,6 +202,7 @@ export const unitTransactionItemSalesService = {
         per_page: 200,
         page: 1,
         unit_type_id: unitTypeId,
+        in_stock: true,
       },
     });
 

@@ -92,7 +92,7 @@ export function SearchableSelect({
         <Command shouldFilter={false}>
           <div className="flex h-9 items-center gap-2 border-b px-3" data-slot="command-input-wrapper">
             <Search className="size-4 shrink-0 opacity-50" />
-            <input
+            <input autoComplete="off"
               placeholder={searchPlaceholder}
               value={query}
               onChange={(e) => {

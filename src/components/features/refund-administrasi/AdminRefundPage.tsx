@@ -53,7 +53,7 @@ export function AdminRefundPage({ title, description, basePath, backHref, transa
     <DashboardLayout>
       <div className="space-y-6 p-4 md:p-6">
         <div className="flex items-start gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push(backHref)} className="mt-1 h-9 w-9 rounded-full">
+          <Button onClick={() => router.push(backHref)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <PageHeader title={title} description={description} />
@@ -104,7 +104,7 @@ export function AdminRefundPage({ title, description, basePath, backHref, transa
             </div>
           </div>
 
-          <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
+          <Button onClick={() => setIsCreateModalOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="h-4 w-4" />
             Tambah Refund
           </Button>

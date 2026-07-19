@@ -54,7 +54,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
     <DashboardLayout>
       <div className="space-y-6 p-4 md:p-6">
         <div className="flex items-start gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push(backHref)} className="mt-1 h-9 w-9 rounded-full">
+          <Button onClick={() => router.push(backHref)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <PageHeader title={title} description="Detail refund, histori pembayaran, dan item yang direfund." />
@@ -99,7 +99,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
                 <span className="font-semibold text-amber-700">{formatCurrency(remainingAmount)}</span>
               </div>
             </div>
-            <Button className="mt-5 w-full gap-2" onClick={() => setIsPaymentModalOpen(true)} disabled={remainingAmount <= 0}>
+            <Button onClick={() => setIsPaymentModalOpen(true)} disabled={remainingAmount <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
               <Plus className="h-4 w-4" />
               Tambah Pembayaran
             </Button>

@@ -187,12 +187,7 @@ export function DriverTable({
                                 </Button>
                             )}
                             {onExport && (
-                                <Button
-                                    variant="outline"
-                                    onClick={onExport}
-                                    disabled={isExporting}
-                                    className="w-full sm:w-auto"
-                                >
+                                <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
                                     <Upload className="h-4 w-4 mr-2" />
                                     {isExporting ? 'Exporting...' : 'Export'}
                                 </Button>

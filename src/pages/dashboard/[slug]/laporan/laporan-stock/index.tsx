@@ -210,17 +210,10 @@ export default function LaporanStockPage() {
                             {pageFilter}
                         </div>
                         <div className="flex items-center gap-3 self-start sm:self-auto">
-                            <Button
-                                variant="outline"
-                                onClick={() => currentActions?.print()}
-                                className="gap-2 rounded-xl px-4"
-                            >
+                            <Button onClick={() => currentActions?.print()} variant="outline" className="w-full sm:w-auto">
                                 <Printer className="h-4 w-4" /> Print
                             </Button>
-                            <Button
-                                onClick={() => currentActions?.download()}
-                                className="gap-2 rounded-xl px-4 bg-green-600 hover:bg-green-700 text-white border-0"
-                            >
+                            <Button onClick={() => currentActions?.download()} variant="outline" className="w-full sm:w-auto">
                                 <Download className="h-4 w-4" /> Download
                             </Button>
                         </div>

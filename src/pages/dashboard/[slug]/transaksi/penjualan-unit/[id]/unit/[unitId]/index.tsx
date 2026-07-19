@@ -367,60 +367,9 @@ export default function SalesUnitDetailPage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h3 className="text-lg font-semibold">Detail Penjualan Unit</h3>
-                <p className="text-sm text-muted-foreground">Pilih stock unit dari warehouse, bukan input manual detail unit</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                {/* <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!canMoveToOutbound || updateStateMutation.isPending || dispatchMutation.isPending}
-                  onClick={handleMoveToOutbound}
-                >
-                  {updateStateMutation.isPending && stockState === 'draft' ? 'Updating...' : 'Set Outbound'}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!canDispatch || dispatchMutation.isPending || updateStateMutation.isPending}
-                  onClick={handleDispatch}
-                >
-                  {dispatchMutation.isPending ? 'Dispatching...' : 'Dispatch Stock'}
-                </Button> */}
+                <p className="text-sm text-muted-foreground">Pilih stock unit yang tersedia untuk dijual</p>
               </div>
             </div>
-
-            {/* <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-              <span className="text-muted-foreground">
-                State: <span className="font-medium text-foreground">{stockState}</span>
-              </span>
-              <span className="text-muted-foreground">
-                Assigned Tersimpan:{' '}
-                <span className="font-medium text-foreground">
-                  {assignedIds.length}/{requiredQty}
-                </span>
-              </span>
-              <span className="text-muted-foreground">
-                Pilihan Saat Ini:{' '}
-                <span className="font-medium text-foreground">
-                  {selectedCount}/{requiredQty}
-                </span>
-              </span>
-              <span className="text-muted-foreground">
-                Sumber Sales Mapping:{' '}
-                <span className="font-medium text-foreground">{selectedFromSalesCount}</span>
-              </span>
-              <span className="text-muted-foreground">
-                Sumber Detail Legacy:{' '}
-                <span className="font-medium text-foreground">{selectedFromDetailCount}</span>
-              </span>
-              <span className="text-muted-foreground">
-                Semua Item Assigned: <span className="font-medium text-foreground">{allItemsAssigned ? 'Ya' : 'Belum'}</span>
-              </span>
-              {hasPendingSelectionChanges && (
-                <span className="text-amber-600">Ada perubahan pilihan yang belum di-assign. Klik tombol Assign Stock untuk menyimpan.</span>
-              )}
-            </div> */}
-            
 
             <StockPickerTable
               units={pickerRows}

@@ -115,7 +115,7 @@ export function BrandFormModal({
                                                         <p className="text-xs text-slate-500">Klik atau seret gambar ke sini</p>
                                                         <p className="text-[10px] text-slate-400 mt-1">PNG, JPG atau WebP (Maks. 2MB)</p>
                                                     </div>
-                                                    <input
+                                                    <input autoComplete="off"
                                                         type="file"
                                                         accept="image/*"
                                                         className="hidden"

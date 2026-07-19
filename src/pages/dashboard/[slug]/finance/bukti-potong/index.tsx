@@ -176,12 +176,12 @@ export default function BuktiPotongPage() {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="flex items-center gap-2 rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Download className="h-4 w-4" />
                 Export
               </Button>
               {canCreate && (
-              <Button onClick={handleCreate} className="flex items-center gap-2 rounded-xl bg-[#1e3a5f] hover:bg-[#152e4d] text-white">
+              <Button onClick={handleCreate} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                 <Plus className="h-4 w-4" />
                 Tambah Data
               </Button>

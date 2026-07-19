@@ -1,55 +1,51 @@
 'use client';
 
-import { MoreVertical, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { PenerimaanUnit } from '@/@types/penerimaan-unit.types';
 import DeletePenerimaanUnitDialog from './DeletePenerimaanUnitDialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useTableSort } from '@/hooks/useTableSort';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreVertical } from 'lucide-react';
 import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
-import { id } from 'date-fns/locale';
 
 interface Props {
   data: PenerimaanUnit[];
+  meta?: {
+    currentPage: number;
+    perPage: number;
+    lastPage: number;
+    total: number;
+  };
+  isLoading?: boolean;
+  search?: string;
+  onSearchChange?: (value: string) => void;
+  perPage?: number;
+  onPerPageChange?: (value: number) => void;
+  onPageChange?: (page: number) => void;
 }
 
-export default function PenerimaanUnitTable({ data }: Props) {
+export default function PenerimaanUnitTable({
+  data,
+  meta,
+  isLoading,
+  search,
+  onSearchChange,
+  perPage = 25,
+  onPerPageChange,
+  onPageChange,
+}: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data,
-  });
-
-  const renderSortHeader = (key: keyof PenerimaanUnit, label: string) => {
-    const isSorted = sortKey === key;
-    return (
-      <TableHead
-        onClick={() => handleSort(key as any)}
-        className="px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap text-left"
-      >
-        <div className="flex items-center gap-1 justify-start">
-          {label}
-          {isSorted ? (
-            sortOrder === 'asc' ? (
-              <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
-            ) : (
-              <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
-            )
-          ) : (
-            <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
-          )}
-        </div>
-      </TableHead>
-    );
-  };
 
   const formatDate = (val: string) => {
     if (!val) return '-';
@@ -58,59 +54,99 @@ export default function PenerimaanUnitTable({ data }: Props) {
     return format(date, 'dd MMMM yyyy', { locale: id });
   };
 
+  const columns: ColumnDef<PenerimaanUnit>[] = [
+    {
+      header: 'NO PENERIMAAN',
+      accessorKey: 'noPenerimaan',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => <CopyBox text={item?.noPenerimaan || '-'} />,
+    },
+    {
+      header: 'TANGGAL',
+      accessorKey: 'tanggal',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => formatDate(item.tanggal),
+    },
+    {
+      header: 'SUPPLIER',
+      accessorKey: 'supplier',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) =>
+        item?.person ? (
+          <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${item?.person?.name}`}>
+            {item.supplier}
+          </ReferenceLink>
+        ) : (
+          item.supplier
+        ),
+    },
+    {
+      header: 'KETERANGAN',
+      accessorKey: 'keterangan',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => item.keterangan || '-',
+    },
+    {
+      header: 'Aksi',
+      alignment: 'center',
+      sticky: 'right',
+      cell: (item) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="rounded-md p-1 hover:bg-slate-100 transition-colors duration-200 hover:scale-110 active:scale-95 transform">
+              <MoreVertical className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+            <DropdownMenuItem
+              asChild
+              className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+            >
+              {slug ? (
+                <a href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Detail</a>
+              ) : (
+                <span className="text-gray-400">Detail</span>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setDeleteId(item.id)}
+              className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+            >
+              Hapus
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
-        <Table className="w-full text-sm">
-        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-          <TableRow className="hover:bg-[#f8f9fa]">
-            {renderSortHeader('noPenerimaan', 'NO PENERIMAAN')}
-            {renderSortHeader('tanggal', 'TANGGAL')}
-            {renderSortHeader('supplier', 'SUPPLIER')}
-            {renderSortHeader('keterangan', 'KETERANGAN')}
-            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[60px] whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
-          </TableRow>
-        </TableHeader>
+    <>
+      <BaseTable
+        data={data}
+        columns={columns}
+        loading={isLoading}
+        searchPlaceholder="Search here"
+        search={search}
+        onSearchChange={onSearchChange}
+        showLimitChange
+        perPage={perPage}
+        onPerPageChange={onPerPageChange}
+        meta={meta}
+        onPageChange={onPageChange}
+      />
 
-        <TableBody>
-          {sortedData.map((item) => (
-            <TableRow key={item.id} className="group bg-white hover:bg-slate-50 transition-colors">
-              <TableCell className="sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                <CopyBox text={`${item?.noPenerimaan || '-'}`} />
-              </TableCell>
-              <TableCell className="px-4 py-4 text-left text-sm">{formatDate(item.tanggal)}</TableCell>
-              <TableCell className="px-4 py-4 text-left text-sm">
-                {item?.person ? (
-                  <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${item?.person?.name}`}>
-                    {item.supplier}
-                  </ReferenceLink>
-                ) : (
-                  item.supplier
-                )}
-              </TableCell>
-              <TableCell className="px-4 py-4 text-left text-sm">{item.keterangan || '-'}</TableCell>
-              <TableCell className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-                      {slug ? <Link href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Detail</Link> : <span className="text-gray-400">Detail</span>}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteId(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-                      Hapus
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      {deleteId && <DeletePenerimaanUnitDialog id={deleteId} open={!!deleteId} onClose={() => setDeleteId(null)} />}
-    </div>
+      {deleteId && (
+        <DeletePenerimaanUnitDialog
+          id={deleteId}
+          open={!!deleteId}
+          onClose={() => setDeleteId(null)}
+        />
+      )}
+    </>
   );
 }

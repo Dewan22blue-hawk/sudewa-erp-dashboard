@@ -354,11 +354,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           <p className="text-sm text-slate-500 mt-1">Daftar finance billing yang terkait dengan transaksi ini</p>
         </div>
         {!disabled && (
-          <Button
-            type="button"
-            className="h-10 rounded-xl bg-[#18385b] px-4 text-white text-xs font-semibold hover:bg-[#102843] transition-colors"
-            onClick={openAddForm}
-          >
+          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-1.5 h-4 w-4" />
             Tambah Pembayaran
           </Button>

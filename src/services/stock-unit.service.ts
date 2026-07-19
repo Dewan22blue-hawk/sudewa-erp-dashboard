@@ -52,21 +52,24 @@ export const getStockUnits = async (
     in_stock?: boolean;
   },
 ) => {
+  const queryParams: Record<string, unknown> = {
+    ...buildLaravelPaginationQuery(params),
+    page: params.page,
+    per_page: params.perPage,
+    search: params.search,
+    stock_state: params.stock_state,
+    machine_number: params.machine_number,
+    chassis_number: params.chassis_number,
+    color: params.color,
+  };
+
+  if (params.in_stock !== undefined) {
+    queryParams.in_stock = params.in_stock;
+  }
+
   const response = await apiClient.get<PaginatedStockUnitResponse>(
     `/wapi/warehouse/warehouse-get-unit-transaction-item-details/${companyId}`,
-    {
-      params: {
-        ...buildLaravelPaginationQuery(params),
-        page: params.page,
-        per_page: params.perPage,
-        search: params.search,
-        stock_state: params.stock_state,
-        machine_number: params.machine_number,
-        chassis_number: params.chassis_number,
-        color: params.color,
-        in_stock: params.in_stock,
-      },
-    },
+    { params: queryParams },
   );
 
   const data = ensureSuccess(response.data);

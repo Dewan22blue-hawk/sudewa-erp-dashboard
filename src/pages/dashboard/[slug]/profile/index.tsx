@@ -3,11 +3,11 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { 
-    Loader2, 
-    Upload, 
-    Mail, 
-    Shield 
+import {
+    Loader2,
+    Upload,
+    Mail,
+    Shield
 } from 'lucide-react';
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 import { AuthService } from '@/features/auth/services/auth.service';
@@ -67,7 +67,7 @@ export default function ProfilePage() {
         .slice(0, 2)
         .toUpperCase() || 'US';
 
-    const roleName = user?.roles?.[0]?.name 
+    const roleName = user?.roles?.[0]?.name
         ? user.roles[0].name.charAt(0).toUpperCase() + user.roles[0].name.slice(1)
         : 'User';
 
@@ -130,14 +130,14 @@ export default function ProfilePage() {
                                 <h2 className="text-base font-semibold text-slate-900">Foto Profil</h2>
                                 <p className="text-xs text-muted-foreground mt-0.5">Unggah foto profil terbaru Anda.</p>
                             </div>
-                            
+
                             <div className="flex flex-col items-center">
                                 {(avatarPreview || user?.avatar) ? (
                                     <div className="mb-5 flex justify-center">
-                                        <img 
-                                            src={avatarPreview || getAvatarUrl(user?.avatar) || undefined} 
-                                            alt="Avatar" 
-                                            className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm" 
+                                        <img
+                                            src={avatarPreview || getAvatarUrl(user?.avatar) || undefined}
+                                            alt="Avatar"
+                                            className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm"
                                         />
                                     </div>
                                 ) : (
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                                         {avatarFile ? avatarFile.name : 'Klik untuk upload gambar'}
                                     </span>
                                     <span className="mt-1 text-xs text-slate-400">Format PNG, JPG maksimal 2MB</span>
-                                    <input
+                                    <input autoComplete="off"
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
@@ -187,7 +187,7 @@ export default function ProfilePage() {
                                 <h2 className="text-base font-semibold text-slate-900">Detail Pribadi</h2>
                                 <p className="text-xs text-muted-foreground mt-0.5">Informasi nama dan identitas Anda.</p>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="firstname" className="text-sm font-medium text-slate-700">
@@ -239,7 +239,7 @@ export default function ProfilePage() {
                                 <h2 className="text-base font-semibold text-slate-900">Informasi Akun</h2>
                                 <p className="text-xs text-muted-foreground mt-0.5">Detail sistem dan hak akses akun Anda.</p>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="email" className="text-sm font-medium text-slate-700">
@@ -275,9 +275,9 @@ export default function ProfilePage() {
 
                         {/* Submit Button */}
                         <div className="flex justify-end pt-2">
-                            <Button 
-                                type="submit" 
-                                disabled={isSubmitting} 
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
                                 className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white min-w-[140px] h-11 shadow-sm px-6 rounded-xl cursor-pointer font-medium"
                             >
                                 {isSubmitting ? (

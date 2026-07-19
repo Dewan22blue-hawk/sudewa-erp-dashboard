@@ -33,7 +33,7 @@ export function GoodsIssueEquipmentUploadInvoiceModal({
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
       const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-      
+
       if (!validTypes.includes(selectedFile.type)) {
         toast.error('Format file tidak didukung. Harap upload file PDF atau Gambar (PNG/JPG).');
         return;
@@ -58,7 +58,7 @@ export function GoodsIssueEquipmentUploadInvoiceModal({
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const selectedFile = e.dataTransfer.files[0];
       const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-      
+
       if (!validTypes.includes(selectedFile.type)) {
         toast.error('Format file tidak didukung. Harap upload file PDF atau Gambar (PNG/JPG).');
         return;
@@ -107,7 +107,7 @@ export function GoodsIssueEquipmentUploadInvoiceModal({
               onClick={() => fileInputRef.current?.click()}
               className="flex flex-col items-center justify-center rounded-[16px] border border-dashed border-slate-300 bg-slate-50/50 p-6 text-center cursor-pointer hover:bg-slate-50 transition-colors"
             >
-              <input
+              <input autoComplete="off"
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}

@@ -162,12 +162,7 @@ export default function KasHarianDetailPage() {
           {/* HEADER */}
           <div className="flex items-center justify-between gap-4 w-full">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')}
-                className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-              >
+              <Button onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
                 <ArrowLeft className="h-5 w-5 text-slate-700" />
               </Button>
               <div>
@@ -349,7 +344,7 @@ export default function KasHarianDetailPage() {
                   {selectedFile ? selectedFile.name : (proofUrl ? 'Klik untuk ganti bukti pembayaran' : 'Klik untuk upload bukti pembayaran')}
                 </span>
                 <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>
-                <input
+                <input autoComplete="off"
                   type="file"
                   accept="image/*,application/pdf"
                   className="hidden"

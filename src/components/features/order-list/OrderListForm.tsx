@@ -324,8 +324,8 @@ export function OrderListForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
-      <input type="hidden" {...register('status')} />
-      <input type="hidden" {...register('note')} />
+      <input autoComplete="off" type="hidden" {...register('status')} />
+      <input autoComplete="off" type="hidden" {...register('note')} />
 
       <div className="flex items-center gap-3">
         <button
@@ -568,12 +568,7 @@ export function OrderListForm({
                   })}
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => appendCargoItem(index)}
-                  className="h-9 rounded-xl border-slate-200 px-4 text-[14px] flex items-center gap-2 text-slate-600 hover:bg-slate-50"
-                >
+                <Button type="button" onClick={() => appendCargoItem(index)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                   <Plus className="h-4 w-4" />
                   Tambah Muatan
                 </Button>
@@ -583,25 +578,7 @@ export function OrderListForm({
         })}
 
         {/* Button Tambah Rute Baru di Bawah Rute Terakhir */}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            const currentVehicleType = watchedItems?.[0]?.vehicleType ?? 'fuso';
-            append({
-              localId: createItemId(),
-              tarifId: '',
-              vehicleType: currentVehicleType,
-              loadingIn: '',
-              loadingOut: '',
-              deliveryDestination: '',
-              cargoItems: [createCargoItem()],
-              driverFee: 0,
-              expeditionInvoice: 0,
-            });
-          }}
-          className="w-full h-11 rounded-2xl border-dashed border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50 flex items-center justify-center gap-2 font-medium"
-        >
+        <Button type="button" onClick={() => { const currentVehicleType = watchedItems?.[0]?.vehicleType ?? 'fuso'; append({ localId: createItemId(), tarifId: '', vehicleType: currentVehicleType, loadingIn: '', loadingOut: '', deliveryDestination: '', cargoItems: [createCargoItem()], driverFee: 0, expeditionInvoice: 0, }); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="h-4 w-4" />
           Tambah Rute Pengiriman
         </Button>

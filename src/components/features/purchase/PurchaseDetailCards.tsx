@@ -3,6 +3,9 @@ import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
 import { Calendar, User, FileText, DollarSign, CreditCard } from 'lucide-react';
 import { getHistoryTotalIdrEquivalent, getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { CopyBox } from '@/components/ui/copy-box';
+import { useRouter } from 'next/router';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface Props {
   data: UnitTransactionDetail;
@@ -13,6 +16,8 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
   const totalDpp = Number(data.unit_transaction_item_total_dpp ?? 0);
   const totalPpn = Number(data.unit_transaction_item_total_ppn ?? 0);
   const totalHpp = totalDpp + totalPpn;
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
   const biayaBbn = Number(data?.transaction_bbn_total ?? 0);
   const biayaEkspedisi = Number(data?.expedition_fee_total ?? 0);
@@ -45,7 +50,9 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
           <div className="space-y-3 text-xs text-slate-500">
             <div className="space-y-1">
               <p>Nomor Invoice</p>
-              <p className="text-sm font-semibold text-slate-900">{data.code}</p>
+              <p className="text-sm font-semibold text-slate-900">
+                <CopyBox text={data.code} />
+              </p>
             </div>
             <div className="space-y-1">
               <p>Tanggal</p>
@@ -58,7 +65,11 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
               <p>Supplier</p>
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <User className="h-4 w-4 text-slate-500" />
-                <span className="uppercase">{data.person?.name ?? '-'}</span>
+                <span className="uppercase">
+                  <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${data?.person?.name}`}>
+                    {data?.person?.name ?? '-'}
+                  </ReferenceLink>
+                </span>
               </div>
             </div>
           </div>
@@ -128,7 +139,7 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 }
 

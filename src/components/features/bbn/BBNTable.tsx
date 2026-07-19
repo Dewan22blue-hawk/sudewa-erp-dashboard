@@ -159,7 +159,7 @@ export function BBNTable({
                                 </Button>
                             )}
                             {onExport && (
-                                <Button onClick={onExport} variant="outline" className="w-full sm:w-auto" disabled={isExporting}>
+                                <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
                                     <Upload className="h-4 w-4 mr-2" />
                                     {isExporting ? 'Exporting...' : 'Export'}
                                 </Button>

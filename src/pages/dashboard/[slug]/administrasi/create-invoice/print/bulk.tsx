@@ -108,12 +108,7 @@ export default function BulkCreateInvoicePrintPage() {
       <div className="space-y-6">
         <div className="no-print flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice`)}
-              className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-            >
+            <Button onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div>
@@ -121,11 +116,7 @@ export default function BulkCreateInvoicePrintPage() {
               <p className="text-sm text-slate-500">Total terpilih: {invoices.length} dokumen</p>
             </div>
           </div>
-          <Button
-            type="button"
-            onClick={() => handlePrint()}
-            className="gap-2 rounded-xl bg-[#1e3a5f] hover:bg-[#152e4d]"
-          >
+          <Button type="button" onClick={() => handlePrint()} variant="outline" className="w-full sm:w-auto">
             <Printer className="h-4 w-4" />
             Print All ({invoices.length})
           </Button>

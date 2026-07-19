@@ -167,7 +167,7 @@ export default function BBNBillDetailPage() {
                   Edit
                 </Button>
               </Link>
-              <Button onClick={() => router.push(`/dashboard/${slug}/tagihan-bbn/print/${detailQuery.data.id}`)} className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
+              <Button onClick={() => router.push(`/dashboard/${slug}/tagihan-bbn/print/${detailQuery.data.id}`)} variant="outline" className="w-full sm:w-auto">
                 <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>
@@ -223,7 +223,7 @@ export default function BBNBillDetailPage() {
               </div>
 
               {/* <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
-                <Button className="h-11 rounded-xl bg-[#1f4163] hover:bg-[#183552]">
+                <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                   <Plus className="mr-2 h-4 w-4" />
                   Tambah Pembayaran
                 </Button>
