@@ -10,7 +10,6 @@ import { UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -100,7 +99,7 @@ export default function UnitPurchaseDetailPage() {
 
   const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
   const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
-  const { data: detailResponse, isLoading: detailsLoading, isError: detailsError } = useUnitItemDetails(unitItemId);
+  const { data: detailResponse } = useUnitItemDetails(unitItemId);
   const { data: typeUnits } = useTypeUnits();
 
   const createMutation = useCreateUnitItemDetail();
@@ -127,6 +126,7 @@ export default function UnitPurchaseDetailPage() {
 
   const qty = Number(unitItem?.qty_total ?? 0);
   const price = Number(unitItem?.price ?? 0);
+
   const bbnPrice = Number(unitItem?.bbn_price ?? 0);
   const otherFee = Number(unitItem?.other_fee ?? 0);
   const expeditionFee = Number(unitItem?.expedition_fee ?? 0);
@@ -350,16 +350,22 @@ export default function UnitPurchaseDetailPage() {
               </div> */}
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>DPP</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', dppPerUnit)}</span>
+                <span className="font-semibold text-slate-900">
+                  {currenciesFormat('idr', dppPerUnit)}
+                  <span className="ml-2 font-light opacity-70">
+                    ({(Number(unitItem?.dpp_tax_rate) / 100).toFixed(2)}%)
+                  </span>
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>PPN</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', ppnPerUnit)}</span>
+                <span className="font-semibold text-slate-900">
+                  {currenciesFormat('idr', ppnPerUnit)}
+                  <span className="ml-2 font-light opacity-70">
+                    ({(Number(unitItem?.ppn_tax_rate) / 100).toFixed(2)}%)
+                  </span>
+                </span>
               </div>
-              {/* <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
-                <span className="font-medium text-slate-700">Total</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalBiayaLainnya)}</span>
-              </div> */}
               <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-700">Total Pembelian</span>
                 <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>

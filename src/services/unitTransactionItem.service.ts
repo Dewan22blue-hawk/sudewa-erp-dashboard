@@ -27,6 +27,8 @@ type UnitTransactionItemApiModel = {
   ppn_per_unit_price?: number | string;
   hpp_total_price?: number | string;
   dpp_total_price?: number | string;
+  dpp_tax_rate?: number | string;
+  ppn_tax_rate?: number | string;
   ppn_total_price?: number | string;
   price_usd?: number | string;
   price_per_unit_usd?: number | string;
@@ -313,69 +315,69 @@ export const unitTransactionItemService = {
   // ======================
   // UPDATE ITEM (FIXED)
   // ======================
-async updateItem(
-  id: string,
-  payload: UpdateUnitTransactionItemPayload
-): Promise<UnitTransactionItem> {
-  const params = new URLSearchParams();
+  async updateItem(
+    id: string,
+    payload: UpdateUnitTransactionItemPayload
+  ): Promise<UnitTransactionItem> {
+    const params = new URLSearchParams();
 
-  if (payload.unit_transaction_id !== undefined && String(payload.unit_transaction_id) !== 'null') {
-    params.append('unit_transaction_id', String(payload.unit_transaction_id));
-  }
-
-  if (payload.unit_type_id !== undefined && String(payload.unit_type_id) !== 'null') {
-    params.append('unit_type_id', String(payload.unit_type_id));
-  }
-
-  if (
-    payload.sparepart_id !== undefined &&
-    payload.sparepart_id !== null &&
-    String(payload.sparepart_id) !== 'null' &&
-    String(payload.sparepart_id).trim().length > 0
-  ) {
-    params.append('sparepart_id', String(payload.sparepart_id));
-  }
-
-  if (payload.qty_total !== undefined) {
-    params.append('qty_total', String(payload.qty_total));
-  }
-
-  if (payload.price !== undefined) {
-    params.append('price', Number(payload.price).toFixed(2));
-  }
-
-  if (payload.bbn_price !== undefined) {
-    params.append('bbn_price', Number(payload.bbn_price).toFixed(2));
-  }
-
-  if (payload.expedition_fee !== undefined) {
-    params.append('expedition_fee', Number(payload.expedition_fee).toFixed(2));
-  }
-
-  if (payload.other_fee !== undefined) {
-    params.append('other_fee', Number(payload.other_fee).toFixed(2));
-  }
-
-  if (payload.price_usd !== undefined) {
-    params.append('price_usd', Number(payload.price_usd).toFixed(2));
-  }
-
-  if (payload.price_per_unit_usd !== undefined) {
-    params.append('price_per_unit_usd', Number(payload.price_per_unit_usd).toFixed(2));
-  }
-
-  const response = await apiClient.put(
-    `${basePath}/${id}`,
-    params,
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    if (payload.unit_transaction_id !== undefined && String(payload.unit_transaction_id) !== 'null') {
+      params.append('unit_transaction_id', String(payload.unit_transaction_id));
     }
-  );
 
-  return mapItem(ensureSuccess(response.data));
-},
+    if (payload.unit_type_id !== undefined && String(payload.unit_type_id) !== 'null') {
+      params.append('unit_type_id', String(payload.unit_type_id));
+    }
+
+    if (
+      payload.sparepart_id !== undefined &&
+      payload.sparepart_id !== null &&
+      String(payload.sparepart_id) !== 'null' &&
+      String(payload.sparepart_id).trim().length > 0
+    ) {
+      params.append('sparepart_id', String(payload.sparepart_id));
+    }
+
+    if (payload.qty_total !== undefined) {
+      params.append('qty_total', String(payload.qty_total));
+    }
+
+    if (payload.price !== undefined) {
+      params.append('price', Number(payload.price).toFixed(2));
+    }
+
+    if (payload.bbn_price !== undefined) {
+      params.append('bbn_price', Number(payload.bbn_price).toFixed(2));
+    }
+
+    if (payload.expedition_fee !== undefined) {
+      params.append('expedition_fee', Number(payload.expedition_fee).toFixed(2));
+    }
+
+    if (payload.other_fee !== undefined) {
+      params.append('other_fee', Number(payload.other_fee).toFixed(2));
+    }
+
+    if (payload.price_usd !== undefined) {
+      params.append('price_usd', Number(payload.price_usd).toFixed(2));
+    }
+
+    if (payload.price_per_unit_usd !== undefined) {
+      params.append('price_per_unit_usd', Number(payload.price_per_unit_usd).toFixed(2));
+    }
+
+    const response = await apiClient.put(
+      `${basePath}/${id}`,
+      params,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+
+    return mapItem(ensureSuccess(response.data));
+  },
 
   // ======================
   // DELETE

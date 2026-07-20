@@ -132,6 +132,8 @@ export interface UnitTransactionItem {
   ppn_total_price: number;
   price_usd?: number;
   price_per_unit_usd?: number;
+  ppn_tax_rate?: number;
+  dpp_tax_rate?: number;
 }
 
 export interface UnitTransactionItemListResponse {
@@ -180,6 +182,8 @@ export interface UnitTransactionItemSummary {
   hpp_per_unit_price?: number;
   dpp_per_unit_price?: number;
   ppn_per_unit_price?: number;
+  dpp_tax_rate?: number;
+  ppn_tax_rate?: number;
   hpp_total_price?: number;
   dpp_total_price?: number;
   ppn_total_price?: number;
