@@ -29,7 +29,9 @@ export async function fetchUserCompanies(): Promise<Company[]> {
   const response = await apiClient.get<CompanyListApiResponse>('/wapi/global/company');
   const data = ensureSuccess(response.data);
   const list = Array.isArray(data) ? data : data ? [data] : [];
-  return list;
+  
+  // Exclude company_id = 5 (PT Adhiyas Agradasta) temporarily for separate dashboard
+  return list.filter(company => company.id !== 5);
 }
 
 export async function fetchCompanyDetail(slug: string): Promise<Company> {
