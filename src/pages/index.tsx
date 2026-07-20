@@ -3,8 +3,11 @@ import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
 import TrustedByMarquee from "@/components/landing/TrustedByMarquee";
 import BentoFeatures from "@/components/landing/BentoFeatures";
-// import FinalCTA from "@/components/landing/FinalCTA"; 
-// import Footer from "@/components/landing/Footer";
+import HowItWorks from "@/components/landing/HowItWorks";
+import Testimonials from "@/components/landing/Testimonials";
+import FAQ from "@/components/landing/FAQ"; 
+import FinalCTA from "@/components/landing/FinalCTA"; 
+import Footer from "@/components/landing/Footer";
 
 export default function Home() {
   return (
@@ -26,13 +29,13 @@ export default function Home() {
           <HeroSection />
           <TrustedByMarquee />
           <BentoFeatures />
-          
-          {/* Saran: Tambahkan komponen penutup agar user tahu harus klik apa selanjutnya */}
-          {/* <FinalCTA /> */}
+          <HowItWorks />
+          <Testimonials />
+          <FAQ />
+          <FinalCTA />
         </main>
         
-        {/* Saran: Tambahkan Footer untuk links, copyright, dan social */}
-        {/* <Footer /> */}
+        <Footer />
       </div>
     </>
   );
