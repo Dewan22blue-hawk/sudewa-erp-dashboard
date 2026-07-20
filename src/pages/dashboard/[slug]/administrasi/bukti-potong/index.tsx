@@ -62,7 +62,7 @@ export default function BuktiPotongPage() {
     return () => window.clearTimeout(timeout);
   }, [searchInput]);
 
-  const { data, isLoading, isError, error, refetch } = useWithholdingTaxes({
+  const { data, isLoading: isInitialLoading, isFetching, isError, error, refetch } = useWithholdingTaxes({
     source: sourceFilter,
     company_id: companyNumber,
     page,
@@ -71,6 +71,8 @@ export default function BuktiPotongPage() {
     order_by: orderBy,
     order_dir: orderSort,
   });
+
+  const isLoading = isInitialLoading || isFetching;
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -86,9 +88,40 @@ export default function BuktiPotongPage() {
       setOrderSort(orderSort === 'asc' ? 'desc' : 'asc');
     } else {
       setOrderBy(key);
-      setOrderSort('desc');
+      setOrderSort('desc'); // Default to descending mode when newly sorted
     }
     setPage(1);
+  };
+
+  const handleExport = () => {
+    const tableData = data?.data;
+    if (!tableData || tableData.length === 0) {
+      import('sonner').then(m => m.toast.error('Tidak ada data untuk diexport'));
+      return;
+    }
+
+    const headers = ['No Invoice', 'No Bukti Potong', 'Keterangan PPh', 'Masa Bukpot', 'Nominal PPh', 'Tanggal Dibuat', 'Tanggal Bayar'];
+    const rows = tableData.map((item) => [
+      item.no_invoice || item.do_invoice?.code || '-',
+      item.withholding_number || '-',
+      item.pph_description || '-',
+      item.withholding_age?.toString() || '-',
+      item.pph_amount?.toString() || '0',
+      item.created_at || '-',
+      item.payment_date || '-'
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bukti-potong-page-${page}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleCreate = () => {
@@ -177,8 +210,8 @@ export default function BuktiPotongPage() {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="w-full sm:w-auto">
-                <Download className="h-4 w-4" />
+              <Button onClick={handleExport} variant="outline" className="w-full sm:w-auto hover:bg-slate-50 transition-colors">
+                <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
               {canCreate && (

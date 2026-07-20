@@ -650,3 +650,91 @@ Ketentuan:
 
 - Font, ukuran teks, ketebalan teks, warna, spacing, padding, border radius, input, label, divider, dan layout wajib mengikuti Pattern UI Style pada `template.md`.
 - Struktur Form Pembelian Unit ini dapat dijadikan acuan untuk implementasi Form Penjualan Unit agar tampilan antar fitur transaksi tetap konsisten.
+
+---
+
+## 17. Standar Copy to Clipboard pada Tabel (Kode / Nomor Transaksi)
+
+Semua nomor unik (contoh: KODE BELI, NO INVOICE, NO BUKTI POTONG, dsb) yang panjang dan sering disalin oleh *user* **wajib** menggunakan komponen `<CopyBox>` agar menyediakan fitur penyalinan otomatis ketika di-klik.
+
+Ketentuan:
+- Gunakan komponen `@/components/ui/copy-box`.
+- Komponen ini tidak perlu dibungkus warna atau background yang mencolok; ia sudah memiliki *styling* transparan yang memukau (tersedia ikon copy & animasinya pada hover).
+- Apabila data tidak ada (`null` atau empty string), berikan *fallback* misal `'-'`.
+
+```tsx
+import { CopyBox } from '@/components/ui/copy-box';
+
+// Contoh Implementasi pada TableCell
+<td className="px-4 py-4 text-left text-sm font-medium text-slate-900">
+  <CopyBox text={item.invoice_number || '-'} />
+</td>
+```
+
+---
+
+## 18. Standar Frontend Logic & React Query (Data Fetching, Search, Sort, Export)
+
+Selain standar UI visual, wajib mematuhi panduan implementasi fungsional berikut agar performa dan pengalaman pengguna *(User Experience)* seragam.
+
+### A. Live Search (Debouncing)
+Pencarian list data tidak boleh me-request API di setiap ketikan keyboard *(keystroke)* agar tidak *spamming* server. Gunakan `setTimeout` debounce standard **400ms**.
+
+```tsx
+const [searchInput, setSearchInput] = useState(''); // Untuk binding Input UI
+const [searchValue, setSearchValue] = useState(''); // Untuk parameter API (trigger fetch)
+
+useEffect(() => {
+  const timeout = window.setTimeout(() => {
+    setSearchValue(searchInput.trim());
+    setPage(1); // Reset paginasi ke awal saat mengubah keyword
+  }, 400);
+  return () => window.clearTimeout(timeout);
+}, [searchInput]);
+```
+
+### B. Indikator Loading pada Sorting & Paginasi (isFetching)
+*React Query* memertahankan data lama *(placeholder)* ketika parameter (page/sort) berubah sehingga variabel `isLoading` bernilai `false`. Agar Loader UI tabel tetap berkedip/muncul merespon klik pengguna, selalu gunakan atau gabungkan dengan flag `isFetching`.
+
+```tsx
+const { data, isLoading: isInitialLoading, isFetching } = useResource({ page, order_by });
+
+// Gabungkan untuk memunculkan tabel Loading UI secara konsisten:
+const isLoading = isInitialLoading || isFetching;
+
+<TableComponent isLoading={isLoading} />
+```
+
+### C. Client-Side Export Data Transaksi (CSV)
+Setiap halaman CRUD/Laporan yang menampilkan tabel berfitur *Export* standar ke bentuk `.csv` (Jika *backend* tidak menyediakan endpoint export khusus), dapat menggunakan fitur eksport *Blob* di browser.
+
+```tsx
+const handleExport = () => {
+  const tableData = data?.data;
+  if (!tableData || tableData.length === 0) {
+    toast.error('Tidak ada data untuk diexport');
+    return;
+  }
+
+  // Definisikan header dan urutan map datanya
+  const headers = ['No Invoice', 'Nominal', 'Tanggal Dibuat'];
+  const rows = tableData.map((item) => [
+    item.no_invoice || '-',
+    item.amount || '0',
+    item.created_at || '-'
+  ]);
+
+  const csv = [headers, ...rows]
+    .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `data-laporan-page-${page}.csv`;
+  link.click();
+  window.URL.revokeObjectURL(url); // Hapus memori buffer
+};
+```
+
