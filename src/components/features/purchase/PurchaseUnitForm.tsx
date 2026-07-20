@@ -26,7 +26,7 @@ import type { Tax } from '@/@types/tax.types';
 
 interface Props {
   onSubmit: (data: CreatePurchaseUnitFormValues) => void;
-  defaultValues?: Partial<CreatePurchaseUnitFormValues>;
+  defaultValues?: Partial<CreatePurchaseUnitFormValues> & { dppTaxVersionId?: string | number | null; ppnTaxVersionId?: string | number | null };
   readOnly?: boolean;
   loading?: boolean;
   onCancel?: () => void;
