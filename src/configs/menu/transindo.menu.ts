@@ -82,6 +82,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           label: 'Create Invoice',
           href: base('/administrasi/create-invoice'),
         },
+        {
+          label: 'Bukti Potong',
+          href: base('/administrasi/bukti-potong'),
+        },
       ],
     },
     {
@@ -123,10 +127,6 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
           href: base('/finance/invoice'),
         },
         {
-          label: 'Laporan Bukti Potong',
-          href: base('/finance/bukti-potong'),
-        },
-        {
           label: 'Aset',
           href: base('/finance/asset'),
         },
@@ -164,6 +164,10 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
         {
           label: 'Laporan Aset',
           href: base('/laporan/laporan-aset'),
+        },
+        {
+          label: 'Laporan Bukti Potong',
+          href: base('/laporan/laporan-bukti-potong'),
         },
       ],
     },

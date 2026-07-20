@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Search, Plus, Download } from 'lucide-react';
+import { useRouter } from 'next/router';
 import type { WithholdingTaxItem } from '@/@types/withholding-tax.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import WithholdingTaxTable from '@/components/features/finance/withholding-tax/WithholdingTaxTable';
-import WithholdingTaxFormModal from '@/components/features/finance/withholding-tax/WithholdingTaxFormModal';
+import BuktiPotongTable from '@/components/features/bukti-potong/BuktiPotongTable';
+import BuktiPotongDeleteDialog from '@/components/features/bukti-potong/BuktiPotongDeleteDialog';
 import WithholdingTaxDetailModal from '@/components/features/finance/withholding-tax/WithholdingTaxDetailModal';
-import WithholdingTaxDeleteDialog from '@/components/features/finance/withholding-tax/WithholdingTaxDeleteDialog';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxes } from '@/hooks/useWithholdingTax';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
@@ -24,6 +24,10 @@ export default function BuktiPotongPage() {
   const canEdit = hasPermission('finance:edit');
   const canDelete = hasPermission('finance:delete');
   const [companyName, setCompanyName] = useState('');
+
+  const router = useRouter();
+  const slug = router.query.slug as string;
+  const base = (path: string) => (slug ? `/dashboard/${slug}${path}` : path);
 
   useEffect(() => {
     fetchUserCompanies()
@@ -45,7 +49,6 @@ export default function BuktiPotongPage() {
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
   const [sourceFilter, setSourceFilter] = useState<'internal' | 'client_supplier'>('internal');
   
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<WithholdingTaxItem | null>(null);
@@ -59,7 +62,7 @@ export default function BuktiPotongPage() {
     return () => window.clearTimeout(timeout);
   }, [searchInput]);
 
-  const { data, isLoading, isError, error, refetch } = useWithholdingTaxes({
+  const { data, isLoading: isInitialLoading, isFetching, isError, error, refetch } = useWithholdingTaxes({
     source: sourceFilter,
     company_id: companyNumber,
     page,
@@ -68,6 +71,8 @@ export default function BuktiPotongPage() {
     order_by: orderBy,
     order_dir: orderSort,
   });
+
+  const isLoading = isInitialLoading || isFetching;
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -83,19 +88,48 @@ export default function BuktiPotongPage() {
       setOrderSort(orderSort === 'asc' ? 'desc' : 'asc');
     } else {
       setOrderBy(key);
-      setOrderSort('desc');
+      setOrderSort('desc'); // Default to descending mode when newly sorted
     }
     setPage(1);
   };
 
+  const handleExport = () => {
+    const tableData = data?.data;
+    if (!tableData || tableData.length === 0) {
+      import('sonner').then(m => m.toast.error('Tidak ada data untuk diexport'));
+      return;
+    }
+
+    const headers = ['No Invoice', 'No Bukti Potong', 'Keterangan PPh', 'Masa Bukpot', 'Nominal PPh', 'Tanggal Dibuat', 'Tanggal Bayar'];
+    const rows = tableData.map((item) => [
+      item.no_invoice || item.do_invoice?.code || '-',
+      item.withholding_number || '-',
+      item.pph_description || '-',
+      item.withholding_age?.toString() || '-',
+      item.pph_amount?.toString() || '0',
+      item.created_at || '-',
+      item.payment_date || '-'
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bukti-potong-page-${page}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const handleCreate = () => {
-    setSelectedItem(null);
-    setIsFormModalOpen(true);
+    router.push(base('/administrasi/bukti-potong/create'));
   };
 
   const handleEdit = (item: WithholdingTaxItem) => {
-    setSelectedItem(item);
-    setIsFormModalOpen(true);
+    router.push(base(`/administrasi/bukti-potong/${item.id}/edit`));
   };
 
   const handleView = (item: WithholdingTaxItem) => {
@@ -116,7 +150,7 @@ export default function BuktiPotongPage() {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Laporan Bukti Potong</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">Bukti Potong</h1>
           <p className="text-sm text-slate-500">Kelola bukti potong dengan mudah</p>
         </div>
 
@@ -176,8 +210,8 @@ export default function BuktiPotongPage() {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="w-full sm:w-auto">
-                <Download className="h-4 w-4" />
+              <Button onClick={handleExport} variant="outline" className="w-full sm:w-auto hover:bg-slate-50 transition-colors">
+                <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
               {canCreate && (
@@ -189,7 +223,7 @@ export default function BuktiPotongPage() {
             </div>
           </div>
 
-          <WithholdingTaxTable
+          <BuktiPotongTable
             data={data?.data ?? []}
             meta={data?.meta ?? null}
             isLoading={isLoading}
@@ -206,15 +240,7 @@ export default function BuktiPotongPage() {
           />
         </div>
 
-        <WithholdingTaxFormModal
-          isOpen={isFormModalOpen}
-          onClose={() => {
-            setIsFormModalOpen(false);
-            setSelectedItem(null);
-          }}
-          item={selectedItem}
-          companyId={companyNumber}
-        />
+
 
         <WithholdingTaxDetailModal
           isOpen={isDetailModalOpen}
@@ -225,7 +251,7 @@ export default function BuktiPotongPage() {
           itemId={selectedItem?.id ?? null}
         />
 
-        <WithholdingTaxDeleteDialog
+        <BuktiPotongDeleteDialog
           isOpen={isDeleteModalOpen}
           onClose={() => {
             setIsDeleteModalOpen(false);

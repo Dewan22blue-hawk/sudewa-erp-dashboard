@@ -94,6 +94,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 //     label: 'Stok Material',
                 //     href: base('/stok-material'),
                 // },
+                {
+                    label: 'Bukti Potong',
+                    href: base('/administrasi/bukti-potong'),
+                },
             ],
         },
         {
@@ -107,10 +111,6 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 {
                     label: 'Aset',
                     href: base('/finance/asset'),
-                },
-                {
-                    label: 'Laporan Bukti Potong',
-                    href: base('/finance/bukti-potong'),
                 },
             ],
         },
@@ -163,6 +163,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                 {
                     label: 'Laporan Akuntansi',
                     href: base('/laporan/laporan-akuntansi'),
+                },
+                {
+                    label: 'Laporan Bukti Potong',
+                    href: base('/laporan/laporan-bukti-potong'),
                 },
             ],
         },

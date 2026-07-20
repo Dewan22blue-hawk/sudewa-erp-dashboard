@@ -1,236 +1,151 @@
-import React, { useMemo } from 'react';
-import { Loader2, MoreVertical, Search, Edit2, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
-import type { WithholdingTaxReport } from '@/@types/laporan-bukti-potong.types';
+import React from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { formatCurrency } from '@/lib/utils/currency';
+import { formatDateUI } from '@/lib/utils/date';
+import type { WithholdingTaxItem } from '@/@types/withholding-tax.types';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return '-';
-  const parts = dateStr.split('-');
-  if (parts.length === 3) {
-    const [y, m, d] = parts;
-    return `${parseInt(d, 10)}/${parseInt(m, 10)}/${y}`;
-  }
-  return dateStr;
-};
+interface LaporanBuktiPotongTableProps {
+  data: WithholdingTaxItem[];
+  onSort?: (key: string) => void;
+  sortKey?: string;
+  sortOrder?: 'asc' | 'desc';
+}
 
-type Props = {
-  data: WithholdingTaxReport[];
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    per_page: number;
-    to: number;
-    total: number;
-  } | null;
-  loading?: boolean;
-  search: string;
-  perPage: number;
-  currentPage: number;
-  onSearchChange: (value: string) => void;
-  onPerPageChange: (value: number) => void;
-  onPageChange: (value: number) => void;
-  onEdit: (item: WithholdingTaxReport) => void;
-  onDelete: (item: WithholdingTaxReport) => void;
-};
-
-export default function LaporanBuktiPotongTable({
+export function LaporanBuktiPotongTable({
   data,
-  meta,
-  loading,
-  search,
-  perPage,
-  currentPage,
-  onSearchChange,
-  onPerPageChange,
-  onPageChange,
-  onEdit,
-  onDelete,
-}: Props) {
-  const totalPages = meta?.last_page ?? 1;
-  const pages = useMemo(() => {
-    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, index) => index + 1);
-
-    if (currentPage <= 3) {
-      return [1, 2, 3, 4, '...', totalPages];
+  onSort,
+  sortKey,
+  sortOrder,
+}: LaporanBuktiPotongTableProps) {
+  const renderSortIndicator = (key: string) => {
+    if (sortKey === key) {
+      return sortOrder === 'asc' 
+        ? <ArrowUp className="inline-block h-3.5 w-3.5 ml-1 text-indigo-600 shrink-0 transition-colors" />
+        : <ArrowDown className="inline-block h-3.5 w-3.5 ml-1 text-indigo-600 shrink-0 transition-colors" />;
     }
-
-    if (currentPage >= totalPages - 2) {
-      return [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-    }
-
-    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
-  }, [currentPage, totalPages]);
-
-  const startIndex = meta?.from ?? 0;
-  const endIndex = meta?.to ?? 0;
-  const totalItems = meta?.total ?? 0;
+    return <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
+  };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-950">Laporan Bukti Potong</h1>
-        <p className="text-sm text-slate-500">Kelola bukti potong dengan mudah</p>
-      </div>
-
-      <div className="flex justify-start items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-          <span>Show</span>
-          <Select
-            value={String(perPage)}
-            onValueChange={(value) => onPerPageChange(Number(value))}
-          >
-            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Page</span>
-        </div>
-
-        <div className="relative w-[300px]">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <Input
-            placeholder="Search here"
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="pl-9 bg-white"
-          />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm whitespace-nowrap">
-            <thead className="bg-[#f8f9fa] border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NO</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TGL INVOICE</th>
-                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO INVOICE</th>
-                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NAMA CUSTOMER</th>
-                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO BUKPOT</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA BUKPOT</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NOMINAL INVOICE</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPH</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">UANG MUKA PPH</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && data.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : data.length > 0 ? (
-                data.map((item, index) => (
-                  <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{startIndex + index}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{formatDate(item.tgl_invoice)}</td>
-                    <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.no_invoice}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.nama_customer}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.no_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{item.masa_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.nominal_invoice)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.pph)}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{item.uang_muka_pph || '-'}</td>
-                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500 hover:text-slate-900">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                          <DropdownMenuItem
-                            onSelect={() => onEdit(item)}
-                            className="cursor-pointer rounded-xl px-3 py-2.5"
-                          >
-                            <Edit2 className="mr-2 h-4 w-4 text-slate-500" />
-                            <span className="text-sm font-medium">Edit Bukpot</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onSelect={() => onDelete(item)}
-                            className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600 focus:bg-red-50"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span className="text-sm font-medium">Hapus Data</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-50 p-4 mb-2">
-                        <Search className="h-8 w-8 text-slate-400" />
-                      </div>
-                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center text-sm text-slate-500 font-medium">
-        <div>
-          Showing {totalItems > 0 ? startIndex : 0}-{endIndex} of {totalItems} data
-        </div>
-        <div className="flex gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
-            className="text-slate-600 disabled:opacity-50"
-          >
-            Previous
-          </Button>
-
-          {pages.map((page, index) => (
-            <Button
-              key={index}
-              variant={page === currentPage ? 'outline' : 'ghost'}
-              size="sm"
-              className={`min-w-[32px] ${page === currentPage ? 'bg-white border-slate-200 text-slate-900' : 'text-slate-600'}`}
-              onClick={() => typeof page === 'number' && onPageChange(page)}
-              disabled={typeof page !== 'number'}
+    <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+      <Table>
+        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+          <TableRow className="hover:bg-[#f8f9fa]">
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[60px]">
+              No
+            </TableHead>
+            <TableHead 
+              className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 cursor-pointer hover:text-slate-700 whitespace-nowrap min-w-[180px] group"
+              onClick={() => onSort?.('withholding_number')}
             >
-              {page}
-            </Button>
-          ))}
+              No Bukti Potong
+              {renderSortIndicator('withholding_number')}
+            </TableHead>
+            <TableHead 
+              className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 cursor-pointer hover:text-slate-700 whitespace-nowrap min-w-[180px] group"
+              onClick={() => onSort?.('no_invoice')}
+            >
+              No Invoice
+              {renderSortIndicator('no_invoice')}
+            </TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">
+              Source
+            </TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 min-w-[150px]">
+              Cash
+            </TableHead>
+            <TableHead 
+              className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 cursor-pointer hover:text-slate-700 whitespace-nowrap min-w-[150px] group"
+              onClick={() => onSort?.('pph_amount')}
+            >
+              Nilai PPh
+              {renderSortIndicator('pph_amount')}
+            </TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap min-w-[150px]">
+              Nominal Bayar
+            </TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap min-w-[140px]">
+              Tgl Bayar
+            </TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 min-w-[200px]">
+              Keterangan
+            </TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
+              Umur BP (Masa)
+            </TableHead>
+            <TableHead 
+              className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 cursor-pointer hover:text-slate-700 whitespace-nowrap min-w-[140px] group"
+              onClick={() => onSort?.('created_at')}
+            >
+              Tanggal Dibuat
+              {renderSortIndicator('created_at')}
+            </TableHead>
+          </TableRow>
+        </TableHeader>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={currentPage === totalPages || totalPages === 0}
-            onClick={() => onPageChange(currentPage + 1)}
-            className="text-slate-600 disabled:opacity-50"
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+        <TableBody>
+          {data.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={11} className="h-24 text-center">
+                Belum ada data laporan bukti potong.
+              </TableCell>
+            </TableRow>
+          ) : (
+            data.map((item, index) => (
+              <TableRow key={item.id} className="hover:bg-gray-50 transition-colors">
+                <TableCell className="px-4 py-4 text-center text-sm text-gray-900 border-b border-gray-100">
+                  {index + 1}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-left text-sm font-medium text-gray-900 border-b border-gray-100">
+                  {item.withholding_number || '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-left text-sm text-gray-700 border-b border-gray-100">
+                  {item.no_invoice || '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-left text-sm text-gray-700 border-b border-gray-100 uppercase">
+                  {item.source === 'internal' ? 'Internal' : 'Client / Supplier'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-left text-sm text-gray-700 border-b border-gray-100">
+                  {item.cash ? (
+                    <div className="flex flex-col">
+                      <span className="font-medium text-slate-900">{item.cash.code}</span>
+                      <span className="text-xs text-slate-500">{item.cash.cash_name || item.cash.description || '-'}</span>
+                    </div>
+                  ) : (
+                    '-'
+                  )}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-center text-sm font-semibold text-slate-900 border-b border-gray-100">
+                  {item.pph_amount != null ? formatCurrency(item.pph_amount) : '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-center text-sm text-gray-900 border-b border-gray-100">
+                  {item.payment_amount != null ? formatCurrency(item.payment_amount) : '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-center text-sm text-gray-700 border-b border-gray-100">
+                  {item.payment_date ? formatDateUI(item.payment_date) : '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-left text-sm text-gray-700 border-b border-gray-100">
+                  {item.pph_description || '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-center text-sm text-gray-900 border-b border-gray-100">
+                  {item.withholding_age != null ? item.withholding_age : '-'}
+                </TableCell>
+                <TableCell className="px-4 py-4 text-center text-sm text-gray-700 border-b border-gray-100">
+                  {item.created_at ? formatDateUI(item.created_at) : '-'}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

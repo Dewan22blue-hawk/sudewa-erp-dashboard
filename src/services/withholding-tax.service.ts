@@ -8,7 +8,9 @@ import type {
   WithholdingTaxPayload,
 } from '@/@types/withholding-tax.types';
 
-const basePath = '/wapi/finance/withholding-tax';
+// Separate base paths for finance and transaction
+// const financeBasePath = '/wapi/finance/withholding-tax';
+const transactionBasePath = '/wapi/transaction/withholding-tax';
 
 const mapWithholdingTax = (item: any): WithholdingTaxItem => {
   return {
@@ -25,6 +27,7 @@ const mapWithholdingTax = (item: any): WithholdingTaxItem => {
     pph_description: item.pph_description ?? null,
     payment_amount: item.payment_amount ? Number(item.payment_amount) : null,
     payment_date: item.payment_date ?? null,
+    no_invoice: item.no_invoice ?? null,
     created_at: item.created_at ?? null,
     updated_at: item.updated_at ?? null,
     company: item.company,
@@ -44,6 +47,10 @@ const buildPayloadBody = (payload: WithholdingTaxPayload): FormData => {
   body.append('payment_amount', String(payload.payment_amount));
   body.append('payment_date', payload.payment_date);
 
+  if (payload.no_invoice) {
+    body.append('no_invoice', payload.no_invoice);
+  }
+
   if (payload.pph_description) {
     body.append('pph_description', payload.pph_description);
   }
@@ -56,16 +63,8 @@ const buildPayloadBody = (payload: WithholdingTaxPayload): FormData => {
     body.append('cash_id', String(payload.cash_id));
   }
 
-  if (payload.do_invoice_id != null) {
-    body.append('do_invoice_id', String(payload.do_invoice_id));
-  }
-
   if (payload.unit_transaction_id != null) {
     body.append('unit_transaction_id', String(payload.unit_transaction_id));
-  }
-
-  if (payload.bbn_bill_id != null) {
-    body.append('bbn_bill_id', String(payload.bbn_bill_id));
   }
 
   // The PUT request might use _method=PUT to simulate it through POST, or just use FormData with POST
@@ -75,19 +74,19 @@ const buildPayloadBody = (payload: WithholdingTaxPayload): FormData => {
 };
 
 export const getWithholdingTaxList = async (params: WithholdingTaxListParams): Promise<WithholdingTaxListResponse> => {
-  const response = await apiClient.get<LaravelApiResponse<any>>(basePath, {
+  const response = await apiClient.get<LaravelApiResponse<any>>(transactionBasePath, {
     params: {
       ...buildLaravelPaginationQuery(params),
       source: params.source,
       company_id: params.company_id,
       cash_id: params.cash_id,
-      do_invoice_id: params.do_invoice_id,
       withholding_number: params.withholding_number,
       withholding_age: params.withholding_age,
       pph_amount: params.pph_amount,
       pph_description: params.pph_description,
       payment_amount: params.payment_amount,
       payment_date: params.payment_date,
+      no_invoice: params.no_invoice,
       order_by: params.order_by ?? 'created_at',
       order_dir: params.order_dir ?? 'desc',
     },
@@ -98,13 +97,13 @@ export const getWithholdingTaxList = async (params: WithholdingTaxListParams): P
 };
 
 export const getWithholdingTaxDetail = async (id: string | number): Promise<WithholdingTaxItem> => {
-  const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/${id}`);
+  const response = await apiClient.get<LaravelApiResponse<any>>(`${transactionBasePath}/${id}`);
   return mapWithholdingTax(ensureSuccess(response.data));
 };
 
 export const createWithholdingTax = async (payload: WithholdingTaxPayload): Promise<WithholdingTaxItem> => {
   try {
-    const response = await apiClient.post<LaravelApiResponse<any>>(basePath, buildPayloadBody(payload), {
+    const response = await apiClient.post<LaravelApiResponse<any>>(transactionBasePath, buildPayloadBody(payload), {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return mapWithholdingTax(ensureSuccess(response.data));
@@ -116,12 +115,22 @@ export const createWithholdingTax = async (payload: WithholdingTaxPayload): Prom
 
 export const updateWithholdingTax = async (id: string | number, payload: WithholdingTaxPayload): Promise<WithholdingTaxItem> => {
   try {
-    // In Laravel, if updating with FormData, we usually POST with _method=PUT
-    const body = buildPayloadBody(payload);
-    body.append('_method', 'PUT');
+    const data = new URLSearchParams();
+    
+    if (payload.source) data.append('source', payload.source);
+    if (payload.cash_id != null) data.append('cash_id', String(payload.cash_id));
+    if (payload.unit_transaction_id != null) data.append('unit_transaction_id', String(payload.unit_transaction_id));
+    if (payload.withholding_number) data.append('withholding_number', payload.withholding_number);
+    if (payload.withholding_age != null && !Number.isNaN(payload.withholding_age)) data.append('withholding_age', String(payload.withholding_age));
+    if (payload.pph_amount != null && !Number.isNaN(payload.pph_amount)) data.append('pph_amount', String(payload.pph_amount));
+    if (payload.pph_description) data.append('pph_description', payload.pph_description);
+    if (payload.payment_amount != null && !Number.isNaN(payload.payment_amount)) data.append('payment_amount', String(payload.payment_amount));
+    if (payload.payment_date) data.append('payment_date', payload.payment_date);
+    if (payload.no_invoice) data.append('no_invoice', payload.no_invoice);
+    if (payload.company_id != null) data.append('company_id', String(payload.company_id));
 
-    const response = await apiClient.post<LaravelApiResponse<any>>(`${basePath}/${id}`, body, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await apiClient.put<LaravelApiResponse<any>>(`${transactionBasePath}/${id}`, data, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     return mapWithholdingTax(ensureSuccess(response.data));
   } catch (error) {
@@ -131,7 +140,7 @@ export const updateWithholdingTax = async (id: string | number, payload: Withhol
 };
 
 export const deleteWithholdingTax = async (id: string | number): Promise<void> => {
-  const response = await apiClient.delete<LaravelApiResponse<null>>(`${basePath}/${id}`);
+  const response = await apiClient.delete<LaravelApiResponse<null>>(`${transactionBasePath}/${id}`);
   if (!response.data.status) {
     throw new ApiResponseError(response.data.message ?? 'Failed to delete withholding tax data');
   }
