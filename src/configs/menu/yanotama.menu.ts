@@ -164,6 +164,10 @@ export const getYanotamaMenus = (slug: string): MenuItem[] => {
                     label: 'Laporan Akuntansi',
                     href: base('/laporan/laporan-akuntansi'),
                 },
+                {
+                    label: 'Laporan Bukti Potong',
+                    href: base('/laporan/laporan-bukti-potong'),
+                },
             ],
         },
         {
