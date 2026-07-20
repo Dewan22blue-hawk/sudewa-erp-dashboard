@@ -124,6 +124,8 @@ export default function UnitPurchaseDetailPage() {
     return typeUnits?.data?.find((item) => String(item.id) === String(unitItem.unit_type_id))?.name ?? unitItem.unit_type_id;
   }, [typeUnits, unitItem]);
 
+  console.log(unitItem);
+
   const qty = Number(unitItem?.qty_total ?? 0);
   const price = Number(unitItem?.price ?? 0);
 

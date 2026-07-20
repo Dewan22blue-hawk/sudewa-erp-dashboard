@@ -1,4 +1,4 @@
-import type { Tax, TaxListParams, TaxListResponse, TaxPayload } from '@/@types/tax.types';
+import type { Tax, TaxListParams, TaxListResponse, TaxPayload, TaxVersion } from '@/@types/tax.types';
 import type { PaginationParams } from '@/@types/pagination.types';
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
@@ -76,5 +76,22 @@ export const deleteTax = async (id: string | number): Promise<void> => {
   const response = await apiClient.delete<LaravelApiResponse<null>>(`${basePath}/${id}`);
   if (!response.data.status) {
     throw new ApiResponseError(response.data.message ?? 'Failed to delete tax');
+  }
+};
+
+const mapTaxVersion = (item: any): TaxVersion => ({
+  id: Number(item.id ?? 0),
+  tax_id: Number(item.tax_id ?? 0),
+  name: item.name ?? '',
+  is_default: item.is_default ?? 0,
+});
+
+export const getTaxDefault = async (code: string): Promise<TaxVersion | null> => {
+  try {
+    const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/${code}/default`);
+    const data = ensureSuccess(response.data);
+    return data ? mapTaxVersion(data) : null;
+  } catch {
+    return null;
   }
 };

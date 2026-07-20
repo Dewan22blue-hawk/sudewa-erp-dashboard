@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { TaxListParams, TaxPayload } from '@/@types/tax.types';
-import { createTax, deleteTax, getTaxById, getTaxList, updateTax } from '@/services/tax.service';
+import { createTax, deleteTax, getTaxById, getTaxDefault, getTaxList, updateTax } from '@/services/tax.service';
 
 export function useTaxes(params?: TaxListParams & { enabled?: boolean }) {
   const { enabled = true, ...rest } = params ?? {};
@@ -52,5 +52,14 @@ export function useDeleteTax() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tax'] });
     },
+  });
+}
+
+export function useTaxDefault(code: string | null) {
+  return useQuery({
+    queryKey: ['tax', 'default', code],
+    queryFn: () => getTaxDefault(code as string),
+    enabled: !!code,
+    staleTime: 1000 * 60 * 5,
   });
 }

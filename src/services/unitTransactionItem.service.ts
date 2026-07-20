@@ -40,6 +40,8 @@ export type UnitFormulaInput = {
   bbn_price?: number | string;
   expedition_fee?: number | string;
   other_fee?: number | string;
+  dpp_tax_id?: number | string | null;
+  ppn_tax_id?: number | string | null;
 };
 
 export type UnitFormulaResult = {
@@ -135,13 +137,20 @@ const mapFormula = (payload: any): UnitFormulaResult => ({
 
 export const unitTransactionItemService = {
   async getFormula(payload: UnitFormulaInput): Promise<UnitFormulaResult> {
-    const requestParams = {
+    const requestParams: Record<string, string | number | undefined> = {
       qty_total: toIntegerString(payload.qty_total),
       price: toDecimalString(payload.price),
       bbn_price: toDecimalString(payload.bbn_price),
       expedition_fee: toDecimalString(payload.expedition_fee),
       other_fee: toDecimalString(payload.other_fee),
     };
+
+    if (payload.dpp_tax_id != null && payload.dpp_tax_id !== '') {
+      requestParams.dpp_tax_id = Number(payload.dpp_tax_id);
+    }
+    if (payload.ppn_tax_id != null && payload.ppn_tax_id !== '') {
+      requestParams.ppn_tax_id = Number(payload.ppn_tax_id);
+    }
 
     const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/get-formula`, {
       params: requestParams,
