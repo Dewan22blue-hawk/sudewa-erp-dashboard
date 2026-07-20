@@ -48,7 +48,7 @@ export default function BuktiPotongPage() {
   const [orderBy, setOrderBy] = useState('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
   const [sourceFilter, setSourceFilter] = useState<'internal' | 'client_supplier'>('internal');
-  
+
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<WithholdingTaxItem | null>(null);
@@ -158,22 +158,20 @@ export default function BuktiPotongPage() {
         <div className="flex space-x-1 border-b border-slate-200">
           <button
             type="button"
-            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${
-              sourceFilter === 'internal'
+            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${sourceFilter === 'internal'
                 ? 'border-slate-900 text-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-            }`}
+              }`}
             onClick={() => { setSourceFilter('internal'); setPage(1); }}
           >
             Internal
           </button>
           <button
             type="button"
-            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${
-              sourceFilter === 'client_supplier'
+            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${sourceFilter === 'client_supplier'
                 ? 'border-slate-900 text-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-            }`}
+              }`}
             onClick={() => { setSourceFilter('client_supplier'); setPage(1); }}
           >
             Client / Supplier
@@ -197,7 +195,7 @@ export default function BuktiPotongPage() {
                 </Select>
                 <span>Page</span>
               </div>
-              
+
               <div className="relative w-full sm:w-[320px]">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <Input
@@ -208,17 +206,17 @@ export default function BuktiPotongPage() {
                 />
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Button onClick={handleExport} variant="outline" className="w-full sm:w-auto hover:bg-slate-50 transition-colors">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
               {canCreate && (
-              <Button onClick={handleCreate} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                <Plus className="h-4 w-4" />
-                Tambah Data
-              </Button>
+                <Button onClick={handleCreate} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                  <Plus className="h-4 w-4" />
+                  Tambah Data
+                </Button>
               )}
             </div>
           </div>
@@ -239,8 +237,6 @@ export default function BuktiPotongPage() {
             currentSortDirection={orderSort}
           />
         </div>
-
-
 
         <WithholdingTaxDetailModal
           isOpen={isDetailModalOpen}
