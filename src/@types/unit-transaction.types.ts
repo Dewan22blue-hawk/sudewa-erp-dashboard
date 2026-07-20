@@ -189,6 +189,15 @@ export interface UnitTransactionItemSummary {
   ppn_total_price?: number;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax?: {
+    id?: number,
+    tax_id?: number
+    tax?: {
+      id?: number,
+      name?: string,
+      code?: string,
+    }
+  }
 }
 
 export interface UnitTransactionItemDetail {
