@@ -16,7 +16,7 @@ export default function FinalCTA() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          className="text-5xl sm:text-7xl font-black tracking-[-0.04em] leading-[1.05] max-w-4xl"
+          className="text-4xl min-[400px]:text-5xl sm:text-6xl md:text-7xl font-black tracking-[-0.04em] leading-[1.05] max-w-4xl"
         >
           Siap Meninggalkan Sistem Lama Anda?
         </motion.h2>

@@ -10,7 +10,7 @@ const AnimatedHeading = ({ text, delay = 0, colorClass = "text-slate-900" }: { t
     initial={{ opacity: 0, scale: 0.8, y: 60, filter: "blur(12px)" }}
     animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
     transition={{ type: "spring", stiffness: 110, damping: 25, delay }}
-    className={`text-6xl sm:text-8xl md:text-[9rem] font-black tracking-[-0.04em] leading-[0.95] ${colorClass}`}
+    className={`text-[4rem] min-[400px]:text-7xl sm:text-8xl md:text-[9rem] font-black tracking-[-0.04em] leading-[0.95] ${colorClass}`}
   >
     {text}
   </motion.h1>
