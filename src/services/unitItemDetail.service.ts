@@ -21,6 +21,8 @@ type UnitTransactionItemApiModel = {
   hpp_per_unit_price?: string | number;
   dpp_per_unit_price?: string | number;
   ppn_per_unit_price?: string | number;
+  dpp_tax_id?: string | number;
+  ppn_tax_id?: string | number;
   dpp_tax_rate?: string | number;
   ppn_tax_rate?: string | number;
   hpp_total_price?: string | number;
@@ -29,6 +31,24 @@ type UnitTransactionItemApiModel = {
   unit_transaction?: {
     id?: string | number;
     code?: string;
+  };
+  dpp_tax?: {
+    id?: string | number,
+    tax_id?: string | number
+    tax?: {
+      id?: string | number,
+      name?: string,
+      code?: string,
+    }
+  };
+  ppn_tax?: {
+    id?: string | number,
+    tax_id?: string | number
+    tax?: {
+      id?: string | number,
+      name?: string,
+      code?: string,
+    }
   };
 };
 
@@ -106,8 +126,28 @@ const mapUnitTransactionItem = (item: UnitTransactionItemApiModel): UnitTransact
   hpp_total_price: toNumber(item.hpp_total_price),
   dpp_total_price: toNumber(item.dpp_total_price),
   ppn_total_price: toNumber(item.ppn_total_price),
+  dpp_tax_id: item.dpp_tax_id !== undefined ? String(item.dpp_tax_id) : undefined,
+  ppn_tax_id: item.ppn_tax_id !== undefined ? String(item.ppn_tax_id) : undefined,
   dpp_tax_rate: toNumber(item.dpp_tax_rate),
   ppn_tax_rate: toNumber(item.ppn_tax_rate),
+  dpp_tax: item.dpp_tax ? {
+    id: item?.dpp_tax?.id,
+    tax_id: item?.dpp_tax?.tax_id,
+    tax: item?.dpp_tax?.tax ? {
+      id: item?.dpp_tax?.tax?.id,
+      name: item?.dpp_tax?.tax?.name,
+      code: item?.dpp_tax?.tax?.code,
+    } : null,
+  } : null,
+  ppn_tax: item.ppn_tax ? {
+    id: item?.ppn_tax?.id,
+    tax_id: item?.ppn_tax?.tax_id,
+    tax: item?.ppn_tax?.tax ? {
+      id: item?.ppn_tax?.tax?.id,
+      name: item?.ppn_tax?.tax?.name,
+      code: item?.ppn_tax?.tax?.code,
+    } : null,
+  } : null,
 });
 
 const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransactionItemDetail => ({

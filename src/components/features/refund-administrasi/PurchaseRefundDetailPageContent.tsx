@@ -148,7 +148,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         ),
       },
     ],
-    [router, slug, transactionId],
+    [],
   );
 
   const handleDeletePayment = async () => {

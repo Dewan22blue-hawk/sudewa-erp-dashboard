@@ -12,6 +12,7 @@ import {
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 import { AuthService } from '@/features/auth/services/auth.service';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const getAvatarUrl = (path?: string | null) => {
     if (!path) return null;
@@ -134,9 +135,11 @@ export default function ProfilePage() {
                             <div className="flex flex-col items-center">
                                 {(avatarPreview || user?.avatar) ? (
                                     <div className="mb-5 flex justify-center">
-                                        <img
-                                            src={avatarPreview || getAvatarUrl(user?.avatar) || undefined}
+                                        <Image
+                                            src={avatarPreview || getAvatarUrl(user?.avatar)!}
                                             alt="Avatar"
+                                            width={100}
+                                            height={100}
                                             className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm"
                                         />
                                     </div>

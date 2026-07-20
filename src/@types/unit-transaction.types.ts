@@ -1,4 +1,5 @@
 import { PaginationMeta } from '@/@types/pagination.types';
+import { UnitTransactionItemDetail } from './ppn-pembelian.types';
 
 export interface UnitTransactionBillingHistoryCashPivot {
   unit_transaction_billing_history_id: string | number;
@@ -132,8 +133,28 @@ export interface UnitTransactionItem {
   ppn_total_price: number;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax_id?: string | number;
+  ppn_tax_id?: string | number;
   ppn_tax_rate?: number;
   dpp_tax_rate?: number;
+  dpp_tax?: {
+    id?: number,
+    tax_id?: number
+    tax?: {
+      id?: number,
+      name?: string,
+      code?: string,
+    }
+  };
+  ppn_tax?: {
+    id?: number,
+    tax_id?: number
+    tax?: {
+      id?: number,
+      name?: string,
+      code?: string,
+    }
+  };
 }
 
 export interface UnitTransactionItemListResponse {
@@ -154,6 +175,8 @@ export interface CreateUnitTransactionItemPayload {
   type?: string;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax_id?: number | string;
+  ppn_tax_id?: number | string;
 }
 
 export interface UpdateUnitTransactionItemPayload {
@@ -167,6 +190,18 @@ export interface UpdateUnitTransactionItemPayload {
   other_fee?: number;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax_id?: number | string;
+  ppn_tax_id?: number | string;
+}
+
+export interface TaxInfo {
+  id?: string | number;
+  tax_id?: string | number;
+  tax?: {
+    id?: string | number;
+    name?: string;
+    code?: string;
+  } | null;
 }
 
 export interface UnitTransactionItemSummary {
@@ -178,44 +213,21 @@ export interface UnitTransactionItemSummary {
   price: number;
   bbn_price: number;
   expedition_fee: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
   other_fee: number;
   hpp_per_unit_price?: number;
   dpp_per_unit_price?: number;
   ppn_per_unit_price?: number;
+  dpp_tax_id?: string | number;
+  ppn_tax_id?: string | number;
   dpp_tax_rate?: number;
   ppn_tax_rate?: number;
   hpp_total_price?: number;
   dpp_total_price?: number;
   ppn_total_price?: number;
-  price_usd?: number;
-  price_per_unit_usd?: number;
-  dpp_tax?: {
-    id?: number,
-    tax_id?: number
-    tax?: {
-      id?: number,
-      name?: string,
-      code?: string,
-    }
-  }
-}
-
-export interface UnitTransactionItemDetail {
-  id: string;
-  unit_transaction_item_id: string;
-  unit_type_name?: string;
-  price?: number;
-  color: string;
-  machine_number: string;
-  chassis_number: string;
-  in_stock?: boolean;
-  is_forecast?: boolean;
-  status?: string;
-  created_at?: string;
-  pivot?: {
-    unit_transaction_refund_id?: string | number;
-    unit_transaction_item_detail_id?: string | number;
-  };
+  dpp_tax?: TaxInfo | null;
+  ppn_tax?: TaxInfo | null;
 }
 
 export interface TransactionAdjustment {

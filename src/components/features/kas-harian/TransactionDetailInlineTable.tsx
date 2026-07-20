@@ -189,7 +189,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
           </Button>
           <Button type="button" disabled={disabled || isBusy || editingId === 'new'} onClick={handleAddRow} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Transaksi
+            Tambah Data Transaksi
           </Button>
         </div>
       </div>

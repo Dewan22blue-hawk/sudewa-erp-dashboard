@@ -66,6 +66,8 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
             bbn_price: Number(data.biayaBbn ?? 0),
             expedition_fee: Number(data.biayaEkspedisi ?? 0),
             other_fee: Number(data.biayaLain ?? 0),
+            dpp_tax_id: data.dppTaxVersionId ? Number(data.dppTaxVersionId) : undefined,
+            ppn_tax_id: data.ppnTaxVersionId ? Number(data.ppnTaxVersionId) : undefined,
         };
 
         if (!payload.max_capacity || payload.max_capacity <= 0) {

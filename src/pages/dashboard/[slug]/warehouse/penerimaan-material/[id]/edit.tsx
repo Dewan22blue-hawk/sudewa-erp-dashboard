@@ -320,7 +320,7 @@ export default function GoodsReceiptEditPage() {
 
           <Button onClick={() => { setEditingItem(null); setItemOpen(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
 

@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
-import { ArrowLeft, DollarSignIcon, FileText, ListTodoIcon, Loader2, MoreVertical, Pencil, Plus, Trash2, Upload } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ArrowLeft, DollarSignIcon, FileText, Info, ListTodoIcon, Loader2, MoreVertical, Plus, Upload } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useCreateUnitItemDetail, useDeleteUnitItemDetail, useImportUnitItemDetails, useUnitItemDetails, useUnitTransactionItemById, useUpdateUnitItemDetail } from '@/hooks/useUnitItemDetail';
-import { UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -55,27 +55,29 @@ export default function UnitPurchaseDetailPage() {
         accessorKey: 'machine_number',
         sortable: true,
         alignment: 'left' as const,
-        cell: (payment: any) => payment.machine_number,
+        cell: (details: any) => (
+          <CopyBox text={`${details.machine_number}`} />
+        ),
       },
       {
         header: 'Nomor Rangka',
         accessorKey: 'chassis_number',
         sortable: true,
         alignment: 'left' as const,
-        cell: (payment: any) => payment.chassis_number,
+        cell: (details: any) => <CopyBox text={`${details.chassis_number}`} />,
       },
       {
         header: 'Warna',
         accessorKey: 'color',
         sortable: true,
         alignment: 'left' as const,
-        cell: (payment: any) => payment.color,
+        cell: (details: any) => details.color,
       },
       {
         header: 'ACTION',
         alignment: 'left' as const,
         sticky: 'right' as const,
-        cell: (payment: any) => (
+        cell: (details: any) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-[#111827]">
@@ -83,10 +85,10 @@ export default function UnitPurchaseDetailPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
-              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(payment)}>
+              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(details)}>
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(payment)}>
+              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(details)}>
                 Hapus
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -94,7 +96,7 @@ export default function UnitPurchaseDetailPage() {
         ),
       },
     ],
-    [router, slug, purchaseId],
+    [],
   );
 
   const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
@@ -109,8 +111,8 @@ export default function UnitPurchaseDetailPage() {
 
   const [openForm, setOpenForm] = useState(false);
   const [openImport, setOpenImport] = useState(false);
-  const [editingItem, setEditingItem] = useState<UnitTransactionItemDetail | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<UnitTransactionItemDetail | null>(null);
+  const [editingItem, setEditingItem] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [formValues, setFormValues] = useState({
     color: '',
     machine_number: '',
@@ -154,7 +156,7 @@ export default function UnitPurchaseDetailPage() {
     setOpenForm(true);
   };
 
-  const openEditForm = (item: UnitTransactionItemDetail) => {
+  const openEditForm = (item: any) => {
     setEditingItem(item);
     setFormValues({
       color: item.color ?? '',
@@ -311,10 +313,6 @@ export default function UnitPurchaseDetailPage() {
                 <span>Quantity</span>
                 <span className="font-semibold text-slate-900">{qty}</span>
               </div>
-              {/* <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
-                <span className="font-medium text-slate-700">Total Pembelian</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
-              </div> */}
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>Total HPP</span>
                 <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalHpp)}</span>
@@ -342,20 +340,24 @@ export default function UnitPurchaseDetailPage() {
                 </div>
                 <h3 className="text-sm font-semibold text-slate-700">Rincian Biaya</h3>
               </div>
-              {/* <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>BBN</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
-              </div> */}
-              {/* <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>HPP</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', hppPerUnit)}</span>
-              </div> */}
               <div className="flex items-center justify-between text-sm text-slate-600">
                 <span>DPP</span>
                 <span className="font-semibold text-slate-900">
                   {currenciesFormat('idr', dppPerUnit)}
                   <span className="ml-2 font-light opacity-70">
                     ({(Number(unitItem?.dpp_tax_rate) / 100).toFixed(2)}%)
+                    {unitItem?.dpp_tax?.tax?.name && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex cursor-help p-0.5">
+                            <Info className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {unitItem?.dpp_tax?.tax?.name}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </span>
                 </span>
               </div>
@@ -467,6 +469,6 @@ export default function UnitPurchaseDetailPage() {
         isPending={importMutation.isPending}
         templateUrl="https://docs.google.com/spreadsheets/d/1UdemvHlkJrmTD3mK5N4hcI5OfwQi2T2yw-vZxwrmcGg/edit?usp=sharing"
       />
-    </DashboardLayout>
+    </DashboardLayout >
   );
 }

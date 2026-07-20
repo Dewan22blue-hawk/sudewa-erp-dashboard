@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
-import { ArrowDown, ArrowUp, ArrowUpDown, MoreVertical, Plus, Search } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -13,8 +12,9 @@ import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
-import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -50,6 +50,7 @@ export default function PurchaseTable({
   const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
   const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Debounce search
   useEffect(() => {
@@ -135,42 +136,12 @@ export default function PurchaseTable({
   const itemsPerPage = meta?.perPage ?? 25;
   const totalPages = meta?.lastPage ?? 1;
   const totalEntries = billingFilter === 'all' ? meta?.total ?? processedData.length : processedData.length;
-  const startIndex = totalEntries === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const endIndex = startIndex === 0 ? 0 : startIndex + processedData.length - 1;
 
-  const handleSort = (key: string) => {
-    setSortConfig((prev) => {
-      if (prev.key === key) {
-        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
-      }
-      return { key, direction: 'asc' };
-    });
-  };
-
-  const renderSortHeader = (key: string, label: string, alignment: 'left' | 'center' | 'right' = 'left') => {
-    const isSorted = sortConfig.key === key;
-    const justifyClass = alignment === 'right' ? 'justify-end' : alignment === 'center' ? 'justify-center' : 'justify-start';
-    const textAlignment = alignment === 'right' ? 'text-right' : alignment === 'center' ? 'text-center' : 'text-left';
-    return (
-      <TableHead
-        onClick={() => handleSort(key)}
-        className={`px-4 py-4 text-xs font-semibold uppercase text-slate-500 cursor-pointer select-none group whitespace-nowrap ${textAlignment}`}
-      >
-        <div className={`flex items-center gap-1 ${justifyClass}`}>
-          <span>{label}</span>
-          {isSorted ? (
-            sortConfig.direction === 'asc' ? (
-              <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
-            ) : (
-              <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
-            )
-          ) : (
-            <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0" />
-          )}
-        </div>
-      </TableHead>
-    );
-  };
+  const pagedData = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return processedData.slice(start, end);
+  }, [processedData, currentPage, itemsPerPage]);
 
   const handleItemsPerPageChange = (value: string) => {
     const parsed = Number(value);
@@ -185,46 +156,168 @@ export default function PurchaseTable({
     setLocalSearch(value);
   };
 
-  const renderPageButtons = () => {
-    const buttons = [] as number[];
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) buttons.push(i);
-    } else if (currentPage <= 3) {
-      buttons.push(1, 2, 3, 4, 5);
-    } else if (currentPage >= totalPages - 2) {
-      for (let i = totalPages - 4; i <= totalPages; i++) buttons.push(i);
-    } else {
-      buttons.push(currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2);
-    }
-
-    return buttons.map((pageNumber) => (
-      <Button
-        key={pageNumber}
-        variant="ghost"
-        size="sm"
-        className={cn(
-          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-          pageNumber === currentPage
-            ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-        )}
-        onClick={() => handlePageChange(pageNumber)}
-      >
-        {pageNumber}
-      </Button>
-    ));
+  const handleBulkDelete = () => {
+    selectedIds.forEach((id) => onDelete(id));
+    setSelectedIds(new Set());
   };
+
+  const columns: ColumnDef<UnitTransaction>[] = useMemo(
+    () => [
+      {
+        header: 'No',
+        alignment: 'center',
+        className: 'w-[60px]',
+        cell: (_, idx) => (currentPage - 1) * itemsPerPage + idx + 1,
+      },
+      {
+        header: 'No. Transaksi',
+        accessorKey: 'code',
+        sortable: true,
+        cell: (item) => (
+          <CopyBox text={item.code} />
+        ),
+      },
+      {
+        header: 'Tanggal',
+        accessorKey: 'created_at',
+        sortable: true,
+        cell: (item) => (item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy HH:mm') : '-'),
+      },
+      {
+        header: 'Supplier',
+        accessorKey: 'supplier',
+        sortable: true,
+        cell: (item) => item.supplier || '-',
+      },
+      {
+        header: 'Gudang',
+        accessorKey: 'warehouse',
+        sortable: true,
+        cell: (item) => item.warehouse || '-',
+      },
+      {
+        header: 'Bruto Total',
+        alignment: 'center',
+        accessorKey: 'transaction_bruto_total',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', item.transaction_bruto_total),
+      },
+      {
+        header: 'BBN Total',
+        alignment: 'center',
+        accessorKey: 'transaction_bbn_total',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', item.transaction_bbn_total),
+      },
+      {
+        header: 'Ekspedisi Total',
+        alignment: 'center',
+        accessorKey: 'expedition_fee_total',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', item.expedition_fee_total),
+      },
+      {
+        header: 'Biaya Lainnya',
+        alignment: 'center',
+        accessorKey: 'transaction_other_fee',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', item.transaction_other_fee),
+      },
+      {
+        header: 'DPP Total',
+        alignment: 'center',
+        className: 'font-semibold',
+        accessorKey: 'transaction_dpp_total',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', item.transaction_dpp_total),
+      },
+      {
+        header: 'PPN Total',
+        alignment: 'center',
+        accessorKey: 'transaction_ppn_total',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', item.transaction_ppn_total),
+      },
+      {
+        header: 'Sisa Pembayaran',
+        alignment: 'center',
+        accessorKey: 'remainingPayment',
+        sortable: true,
+        cell: (item) => currenciesFormat('idr', getRemainingPayment(item)),
+      },
+      {
+        header: 'Status Billing',
+        alignment: 'center',
+        accessorKey: 'billing',
+        sortable: true,
+        cell: (item) => {
+          const label = getBillingLabel(item);
+          return (
+            <Badge
+              className={cn(
+                'font-medium',
+                label === 'Lunas' && 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+                label === 'Belum Lunas' && 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+                label === 'Refund' && 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+              )}
+            >
+              {label}
+            </Badge>
+          );
+        },
+      },
+      {
+        header: 'Aksi',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (item) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>
+                <Eye className="mr-2 h-4 w-4" /> Detail
+              </DropdownMenuItem>
+              {canEdit && (
+                <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/edit`)}>
+                  <Pencil className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+              )}
+              {canDelete && (
+                <DropdownMenuItem
+                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                  onClick={() => onDelete(item.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [currentPage, itemsPerPage, slug, canEdit, canDelete, onDelete, getBillingLabel, router]
+  );
 
   return (
     <div className="space-y-4">
-      {/* Controls Bar — semua dalam satu baris dengan Search di sebelah kiri */}
+      {/* Controls Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* LEFT CONTROLS */}
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          {/* 1. Search */}
+          {/* Search */}
           <div className="relative w-full sm:w-[240px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input type="text" placeholder="Search No. Rangka / No. Mesin..." className="pl-8 bg-white h-9 border-slate-300" value={localSearch} onChange={(e) => handleSearch(e.target.value)} />
+            <Input
+              type="text"
+              placeholder="Search No. Rangka / No. Mesin..."
+              className="pl-8 bg-white h-9 border-slate-300"
+              value={localSearch}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
           </div>
 
           <Button
@@ -236,7 +329,7 @@ export default function PurchaseTable({
             Cari Data Kendaraan
           </Button>
 
-          {/* 4. Show + Page limit */}
+          {/* Show + Page limit */}
           <div className="flex items-center gap-2 whitespace-nowrap">
             <span className="text-sm font-medium text-slate-700">Show</span>
             <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
@@ -257,142 +350,45 @@ export default function PurchaseTable({
         {onAdd && (
           <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         )}
       </div>
 
-      <div className="relative overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
-        <Table>
-          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-            <TableRow>
-              {renderSortHeader('code', 'KODE BELI', 'left')}
-              {renderSortHeader('created_at', 'TANGGAL', 'center')}
-              {renderSortHeader('supplier', 'SUPPLIER', 'left')}
-              {renderSortHeader('transaction_bruto_total', 'TOTAL BRUTO', 'center')}
-              {renderSortHeader('transaction_bbn_total', 'BBN', 'center')}
-              {renderSortHeader('expedition_fee_total', 'BIAYA EKSPEDISI', 'center')}
-              {renderSortHeader('transaction_other_fee', 'BIAYA LAIN', 'center')}
-              {renderSortHeader('transaction_dpp_total', 'TOTAL DPP', 'center')}
-              {renderSortHeader('transaction_ppn_total', 'TOTAL PPN', 'center')}
-              {renderSortHeader('remainingPayment', 'KURANG BAYAR', 'center')}
-              {renderSortHeader('billing', 'BILLING', 'center')}
-              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {processedData.length === 0 ? (
-              <TableRow className="group">
-                <TableCell colSpan={100} className="text-center px-4 py-16 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              processedData.map((item) => (
-                <TableRow key={item.id} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
-                  {/* Kode Jual - Link biru */}
-                  <TableCell className="px-4 py-4 text-left text-sm font-medium">
-                    <CopyBox text={item.code || '-'} />
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{item.created_at ? format(new Date(item.created_at), 'dd MMM yyyy') : '-'}</TableCell>
-                  <TableCell className="text-left text-sm text-slate-700 px-4 py-4">
-                    <ReferenceLink href={`/dashboard/${slug}/supplier?search=${item.supplier}`}>
-                      {item.supplier || '-'}
-                    </ReferenceLink>
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bruto_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_bbn_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.expedition_fee_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_other_fee)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_dpp_total)}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">{currenciesFormat('idr', item.transaction_ppn_total)}</TableCell>
-                  <TableCell className={`text-center text-sm px-4 py-4 font-medium ${getRemainingPayment(item) > 0 ? 'text-red-500' : 'text-slate-700'}`}>{currenciesFormat('idr', getRemainingPayment(item))}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700 px-4 py-4">
-                    {isRefunded(item) ? (
-                      <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
-                        Sudah Refund
-                      </Badge>
-                    ) : item.isPaid ? (
-                      <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-700">
-                        Lunas
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="border-slate-300 bg-slate-50 text-slate-700">
-                        Belum Lunas
-                      </Badge>
-                    )}
-                  </TableCell>
-
-                  <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                        {canEdit && <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/edit/${item.id}`)}>Edit</DropdownMenuItem>}
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}`)}>Detail</DropdownMenuItem>
-
-                        {canEdit && (<DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" disabled={isRefunded(item)} onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/refund`)}>
-                          {isRefunded(item) ? 'Sudah Refund' : 'Refund'}
-                        </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer" onClick={() => window.open(`/dashboard/${slug}/transaksi/pembelian-unit/print/${item.id}`, '_blank')}>Print</DropdownMenuItem>
-                        {canDelete && <DropdownMenuItem onClick={() => onDelete(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-                          Hapus
-                        </DropdownMenuItem>}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        {loading && <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-sm text-muted-foreground">Memuat data...</div>}
-      </div>
-
-      {/* Pagination */}
-      {processedData.length > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
-          <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
-          <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-              disabled={currentPage <= 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Previous
-            </Button>
-            {renderPageButtons()}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-              disabled={currentPage >= totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
-      {/* Vehicle Search Modal */}
-      <SearchVehicleModal
-        open={isVehicleSearchOpen}
-        onOpenChange={setIsVehicleSearchOpen}
-        type="purchase"
+      <BaseTable
+        data={pagedData}
+        columns={columns}
+        loading={loading}
+        showCheckbox
+        selectedIds={selectedIds}
+        onSelectedIdsChange={setSelectedIds}
+        showLimitChange={false}
+        perPage={itemsPerPage}
+        onPerPageChange={(val) => {
+          handleItemsPerPageChange(val.toString());
+          onPageChange?.(1);
+        }}
+        meta={{
+          currentPage,
+          perPage: itemsPerPage,
+          lastPage: totalPages,
+          total: totalEntries,
+        }}
+        onPageChange={handlePageChange}
+        headerActions={
+          selectedIds.size > 0 && canDelete ? (
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Hapus Terpilih ({selectedIds.size})
+              </Button>
+            </div>
+          ) : null
+        }
       />
+
+      {/* Vehicle Search Modal */}
+      <SearchVehicleModal open={isVehicleSearchOpen} onOpenChange={setIsVehicleSearchOpen} type="purchase" />
     </div>
   );
 }

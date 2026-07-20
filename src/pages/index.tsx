@@ -4,6 +4,7 @@ import { ArrowRight, LayoutDashboard, BarChart3, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -90,9 +91,11 @@ export default function Home() {
 
         {/* ================= FIXED FOOTER IMAGE ================= */}
         <div className="fixed bottom-0 left-0 w-full pointer-events-none z-0">
-          <img
+          <Image
             src="/wajira-footer-design.png"
             alt="Wajira Illustration"
+            width={1920}
+            height={1080}
             className="w-full h-auto object-cover max-h-[90vh] mb-1 sm:max-h-[60vh] pointer-events-auto select-none"
             draggable="false"
           />

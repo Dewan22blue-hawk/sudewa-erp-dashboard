@@ -49,29 +49,29 @@ export default function DetailDOEkspedisiPage() {
     const tarifItems = tarifItemQuery.data?.data ?? [];
     const mergedOrderList: DoEkspedisiOrderList | null = detailQuery.data.orderList
       ? {
-          ...detailQuery.data.orderList,
-          tarifs: (tarifHeaders.length ? tarifHeaders : detailQuery.data.orderList.tarifs ?? []).map((tarif) => {
-            const matchedItems = tarifItems.filter((item) => {
-              const left = Number(item.doOrderListTarifId ?? 0);
-              const rightA = Number(tarif.id ?? 0);
-              const rightB = Number((tarif as any).tarifId ?? 0);
-              return left === rightA || (rightB && left === rightB);
-            });
-            const mappedTarifItems: DoEkspedisiOrderTarifLoadItem[] = matchedItems.map((item) => ({
-              id: Number(item.id ?? 0),
-              uuid: item.uuid,
-              loadContent: item.loadContent,
-              qty: Number(item.qty ?? 0),
-            }));
+        ...detailQuery.data.orderList,
+        tarifs: (tarifHeaders.length ? tarifHeaders : detailQuery.data.orderList.tarifs ?? []).map((tarif) => {
+          const matchedItems = tarifItems.filter((item) => {
+            const left = Number(item.doOrderListTarifId ?? 0);
+            const rightA = Number(tarif.id ?? 0);
+            const rightB = Number((tarif as any).tarifId ?? 0);
+            return left === rightA || (rightB && left === rightB);
+          });
+          const mappedTarifItems: DoEkspedisiOrderTarifLoadItem[] = matchedItems.map((item) => ({
+            id: Number(item.id ?? 0),
+            uuid: item.uuid,
+            loadContent: item.loadContent,
+            qty: Number(item.qty ?? 0),
+          }));
 
-            return {
-              ...tarif,
-              loadContent: tarif.loadContent || mappedTarifItems[0]?.loadContent || '-',
-              qty: tarif.qty || mappedTarifItems[0]?.qty || 0,
-              tarifItems: mappedTarifItems.length ? mappedTarifItems : tarif.tarifItems,
-            } satisfies DoEkspedisiOrderTarifItem;
-          }),
-        }
+          return {
+            ...tarif,
+            loadContent: tarif.loadContent || mappedTarifItems[0]?.loadContent || '-',
+            qty: tarif.qty || mappedTarifItems[0]?.qty || 0,
+            tarifItems: mappedTarifItems.length ? mappedTarifItems : tarif.tarifItems,
+          } satisfies DoEkspedisiOrderTarifItem;
+        }),
+      }
       : null;
 
     return {
@@ -255,7 +255,7 @@ export default function DetailDOEkspedisiPage() {
 
           <Button onClick={() => slug && id && router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div> */}
 

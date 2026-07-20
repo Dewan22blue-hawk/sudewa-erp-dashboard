@@ -82,12 +82,12 @@ export function GoodsIssueTable({
 
           <Button onClick={() => onAdd?.()} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
-        <Table>
+          <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE PENGELUARAN</TableHead>

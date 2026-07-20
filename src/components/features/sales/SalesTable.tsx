@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Plus } from 'lucide-react';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import { useCompany } from '@/contexts/CompanyContext';
 
@@ -232,7 +232,8 @@ export function SalesTable({ onAdd }: Props) {
           onClick={onAdd}
           className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white shadow-none hover:bg-[#152e4d] h-9"
         >
-          Tambah
+          <Plus className="mr-2 h-4 w-4" />
+          Tambah Data
         </button>
       )}
     </div>

@@ -580,7 +580,7 @@ export function OrderListForm({
         {/* Button Tambah Rute Baru di Bawah Rute Terakhir */}
         <Button type="button" onClick={() => { const currentVehicleType = watchedItems?.[0]?.vehicleType ?? 'fuso'; append({ localId: createItemId(), tarifId: '', vehicleType: currentVehicleType, loadingIn: '', loadingOut: '', deliveryDestination: '', cargoItems: [createCargoItem()], driverFee: 0, expeditionInvoice: 0, }); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="h-4 w-4" />
-          Tambah Rute Pengiriman
+          Tambah Data
         </Button>
 
 

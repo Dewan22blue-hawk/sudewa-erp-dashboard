@@ -193,106 +193,106 @@ export function VehicleDataTable({
           </Button>
           <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
       </div>
 
       <div className="overflow-x-auto rounded-[16px] border border-slate-200 bg-white shadow-sm">s*<Table>
-            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-              <TableRow className="border-slate-200 hover:bg-transparent">
-                <TableHead className="w-14 px-4 py-4 text-center">
-                  <Checkbox checked={allSelected} onCheckedChange={handleSelectAll} aria-label="Pilih semua data kendaraan" />
-                </TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Ditlantas</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Dealer</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Nama STNK</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Wilayah</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Tipe Motor</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Mesin</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Rangka</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Terima Faktur</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
+        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+          <TableRow className="border-slate-200 hover:bg-transparent">
+            <TableHead className="w-14 px-4 py-4 text-center">
+              <Checkbox checked={allSelected} onCheckedChange={handleSelectAll} aria-label="Pilih semua data kendaraan" />
+            </TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Kode Ditlantas</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Dealer</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Nama STNK</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Wilayah</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">Tipe Motor</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Mesin</TableHead>
+            <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Rangka</TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Faktur</TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Tgl Terima Faktur</TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 w-[80px] sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
+            <tr>
+              <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                  <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                  <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                </div>
+              </td>
+            </tr>
+          ) : items.length ? (
+            items.map((item) => (
+              <TableRow key={item.id} className={`group ${assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}`}>
+                <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <Checkbox
+                    checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
+                    disabled={assignedIds.includes(item.id)}
+                    onCheckedChange={(checked) => handleSelectRow(item.id, checked)}
+                    aria-label={`Pilih data kendaraan ${item.invoiceNumber}`}
+                  />
+                </TableCell>
+                <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">
+                  {item.ditlantasProcess?.[0]?.code || '-'}
+                </TableCell>
+                <TableCell className="max-w-[220px] px-4 py-4 text-sm text-slate-700 text-left">
+                  <div className="space-y-2">
+                    <div className="line-clamp-2 uppercase font-medium text-slate-900">{item.dealer?.namaDealer || '-'}</div>
+                    {assignedIds.includes(item.id) ? (
+                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+                        Sudah assign Ditlantas
+                      </span>
+                    ) : selectedIds.includes(item.id) ? (
+                      <span className="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-semibold text-sky-700">
+                        Siap di-assign
+                      </span>
+                    ) : null}
+                  </div>
+                </TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.stnkName || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.region?.name || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.motorcycleType || item.motorcycleModel || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-left font-medium">{item.machineNumber || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.chassisNumber || '-'}</TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceDate)}</TableCell>
+                <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceReceiveDate)}</TableCell>
+                <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4 text-slate-500" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[170px]">
+                      <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">Detail</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : items.length ? (
-                items.map((item) => (
-                  <TableRow key={item.id} className={`group ${assignedIds.includes(item.id) ? 'border-b border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50/60 transition-colors' : 'border-b border-slate-200 hover:bg-gray-50/70 transition-colors'}`}>
-                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <Checkbox
-                        checked={assignedIds.includes(item.id) || selectedIds.includes(item.id)}
-                        disabled={assignedIds.includes(item.id)}
-                        onCheckedChange={(checked) => handleSelectRow(item.id, checked)}
-                        aria-label={`Pilih data kendaraan ${item.invoiceNumber}`}
-                      />
-                    </TableCell>
-                    <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">
-                      {item.ditlantasProcess?.[0]?.code || '-'}
-                    </TableCell>
-                    <TableCell className="max-w-[220px] px-4 py-4 text-sm text-slate-700 text-left">
-                      <div className="space-y-2">
-                        <div className="line-clamp-2 uppercase font-medium text-slate-900">{item.dealer?.namaDealer || '-'}</div>
-                        {assignedIds.includes(item.id) ? (
-                          <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
-                            Sudah assign Ditlantas
-                          </span>
-                        ) : selectedIds.includes(item.id) ? (
-                          <span className="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-semibold text-sky-700">
-                            Siap di-assign
-                          </span>
-                        ) : null}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.stnkName || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.region?.name || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.motorcycleType || item.motorcycleModel || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left font-medium">{item.machineNumber || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-left">{item.chassisNumber || '-'}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceDate)}</TableCell>
-                    <TableCell className="px-4 py-4 text-sm text-slate-700 text-center">{formatDate(item.invoiceReceiveDate)}</TableCell>
-                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4 text-slate-500" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[170px]">
-                          <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">Detail</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow className="group">
-                  <TableCell colSpan={100} className="py-16 h-28 text-center text-sm text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-50 p-4 mb-2">
-                        <Search className="h-8 w-8 text-slate-400" />
-                      </div>
-                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-            </div>
+            ))
+          ) : (
+            <TableRow className="group">
+              <TableCell colSpan={100} className="py-16 h-28 text-center text-sm text-slate-500">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="rounded-full bg-slate-50 p-4 mb-2">
+                    <Search className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                  <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      </div>
 
       <div className="flex flex-col gap-4 px-1 pb-2 md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-slate-500">

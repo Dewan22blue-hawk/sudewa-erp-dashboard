@@ -314,6 +314,19 @@ export const unitTransactionItemService = {
       toDecimalString
     );
 
+    appendIfDefined(
+      form,
+      'dpp_tax_id',
+      payload.dpp_tax_id,
+      toIntegerString
+    );
+    appendIfDefined(
+      form,
+      'ppn_tax_id',
+      payload.ppn_tax_id,
+      toIntegerString
+    );
+
     const response = await apiClient.post<
       LaravelApiResponse<UnitTransactionItemApiModel>
     >(basePath, form);
@@ -373,6 +386,14 @@ export const unitTransactionItemService = {
 
     if (payload.price_per_unit_usd !== undefined) {
       params.append('price_per_unit_usd', Number(payload.price_per_unit_usd).toFixed(2));
+    }
+
+    if (payload.dpp_tax_id !== undefined && payload.dpp_tax_id !== null && String(payload.dpp_tax_id) !== '') {
+      params.append('dpp_tax_id', String(Math.trunc(Number(payload.dpp_tax_id))));
+    }
+
+    if (payload.ppn_tax_id !== undefined && payload.ppn_tax_id !== null && String(payload.ppn_tax_id) !== '') {
+      params.append('ppn_tax_id', String(Math.trunc(Number(payload.ppn_tax_id))));
     }
 
     const response = await apiClient.put(

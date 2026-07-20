@@ -272,12 +272,12 @@ export default function EditUnitPage() {
 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Alamat</Label>
-                    <Input value={form.alamat} readOnly disabled={isLoadingCustomerDetail} className="bg-transparent" placeholder="Alamat customer" />
+                    <Input value={form.alamat} readOnly disabled className="bg-transparent" placeholder="Alamat customer" />
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">NPWP</Label>
-                    <Input value={form.npwp} readOnly disabled={isLoadingCustomerDetail} className="bg-transparent" placeholder="NPWP customer" />
+                    <Input value={form.npwp} readOnly disabled className="bg-transparent" placeholder="NPWP customer" />
                   </div>
                 </div>
               }

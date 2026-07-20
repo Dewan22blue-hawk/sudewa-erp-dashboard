@@ -112,7 +112,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
       header: 'QTY',
       alignment: 'center',
       className: 'w-[100px] font-semibold',
-      cell: (item) => item.qty_total,
+      cell: (item) => item.qty_total + " Unit",
     },
     {
       header: 'Harga',
