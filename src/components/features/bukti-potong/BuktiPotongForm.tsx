@@ -119,11 +119,6 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
     const rawPph = parseCurrencyIDR(pphAmountStr);
     const rawPayment = parseCurrencyIDR(paymentAmountStr);
 
-    if (rawPph <= 0) {
-      toast.error('Nominal PPH wajib diisi.');
-      return;
-    }
-
     if (rawPayment <= 0) {
       toast.error('Jumlah pembayaran wajib diisi.');
       return;
@@ -139,12 +134,18 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
       source,
       no_invoice: noInvoice,
       withholding_number: withholdingNumber,
-      withholding_age: Number(withholdingAge),
-      pph_amount: rawPph,
       pph_description: pphDescription,
       payment_amount: rawPayment,
       payment_date: paymentDate,
     };
+
+    if (withholdingAge) {
+      payload.withholding_age = Number(withholdingAge);
+    }
+    
+    if (rawPph > 0) {
+      payload.pph_amount = rawPph;
+    }
 
     if (source === 'internal' && cashId) {
       payload.cash_id = Number(cashId);
@@ -261,27 +262,25 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Masa Bukti Potong <span className="text-red-500">*</span></Label>
+                  <Label>Masa Bukti Potong</Label>
                   <Input 
                     type="number"
-                    placeholder="Contoh: 1" 
+                    placeholder="Contoh: 1 (Opsional)" 
                     value={withholdingAge} 
                     onChange={(e) => setWithholdingAge(e.target.value)}
                     disabled={isPending}
                     className="h-11 bg-white"
-                    required
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Nominal PPH <span className="text-red-500">*</span></Label>
+                  <Label>Nominal PPH</Label>
                   <Input 
-                    placeholder="Rp 0" 
+                    placeholder="Rp 0 (Opsional)" 
                     value={pphAmountStr} 
                     onChange={handleCurrencyChange(setPphAmountStr)}
                     disabled={isPending}
                     className="h-11 bg-white"
-                    required
                   />
                 </div>
                 <div className="space-y-2">

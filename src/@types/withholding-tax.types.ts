@@ -77,8 +77,8 @@ export interface WithholdingTaxPayload {
   cash_id?: number | null;
   unit_transaction_id?: number | null;
   withholding_number: string;
-  withholding_age: number;
-  pph_amount: number;
+  withholding_age?: number;
+  pph_amount?: number;
   pph_description?: string | null;
   payment_amount: number;
   payment_date: string;

@@ -9,7 +9,7 @@ import type {
 } from '@/@types/withholding-tax.types';
 
 // Separate base paths for finance and transaction
-const financeBasePath = '/wapi/finance/withholding-tax';
+// const financeBasePath = '/wapi/finance/withholding-tax';
 const transactionBasePath = '/wapi/transaction/withholding-tax';
 
 const mapWithholdingTax = (item: any): WithholdingTaxItem => {
@@ -97,7 +97,7 @@ export const getWithholdingTaxList = async (params: WithholdingTaxListParams): P
 };
 
 export const getWithholdingTaxDetail = async (id: string | number): Promise<WithholdingTaxItem> => {
-  const response = await apiClient.get<LaravelApiResponse<any>>(`${financeBasePath}/${id}`);
+  const response = await apiClient.get<LaravelApiResponse<any>>(`${transactionBasePath}/${id}`);
   return mapWithholdingTax(ensureSuccess(response.data));
 };
 
@@ -115,12 +115,22 @@ export const createWithholdingTax = async (payload: WithholdingTaxPayload): Prom
 
 export const updateWithholdingTax = async (id: string | number, payload: WithholdingTaxPayload): Promise<WithholdingTaxItem> => {
   try {
-    // In Laravel, if updating with FormData, we usually POST with _method=PUT
-    const body = buildPayloadBody(payload);
-    body.append('_method', 'PUT');
+    const data = new URLSearchParams();
+    
+    if (payload.source) data.append('source', payload.source);
+    if (payload.cash_id != null) data.append('cash_id', String(payload.cash_id));
+    if (payload.unit_transaction_id != null) data.append('unit_transaction_id', String(payload.unit_transaction_id));
+    if (payload.withholding_number) data.append('withholding_number', payload.withholding_number);
+    if (payload.withholding_age != null && !Number.isNaN(payload.withholding_age)) data.append('withholding_age', String(payload.withholding_age));
+    if (payload.pph_amount != null && !Number.isNaN(payload.pph_amount)) data.append('pph_amount', String(payload.pph_amount));
+    if (payload.pph_description) data.append('pph_description', payload.pph_description);
+    if (payload.payment_amount != null && !Number.isNaN(payload.payment_amount)) data.append('payment_amount', String(payload.payment_amount));
+    if (payload.payment_date) data.append('payment_date', payload.payment_date);
+    if (payload.no_invoice) data.append('no_invoice', payload.no_invoice);
+    if (payload.company_id != null) data.append('company_id', String(payload.company_id));
 
-    const response = await apiClient.post<LaravelApiResponse<any>>(`${transactionBasePath}/${id}`, body, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await apiClient.put<LaravelApiResponse<any>>(`${transactionBasePath}/${id}`, data, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     return mapWithholdingTax(ensureSuccess(response.data));
   } catch (error) {
@@ -130,7 +140,7 @@ export const updateWithholdingTax = async (id: string | number, payload: Withhol
 };
 
 export const deleteWithholdingTax = async (id: string | number): Promise<void> => {
-  const response = await apiClient.delete<LaravelApiResponse<null>>(`${financeBasePath}/${id}`);
+  const response = await apiClient.delete<LaravelApiResponse<null>>(`${transactionBasePath}/${id}`);
   if (!response.data.status) {
     throw new ApiResponseError(response.data.message ?? 'Failed to delete withholding tax data');
   }
