@@ -21,6 +21,8 @@ type UnitTransactionItemApiModel = {
   hpp_per_unit_price?: string | number;
   dpp_per_unit_price?: string | number;
   ppn_per_unit_price?: string | number;
+  dpp_tax_rate?: string | number;
+  ppn_tax_rate?: string | number;
   hpp_total_price?: string | number;
   dpp_total_price?: string | number;
   ppn_total_price?: string | number;
@@ -104,6 +106,8 @@ const mapUnitTransactionItem = (item: UnitTransactionItemApiModel): UnitTransact
   hpp_total_price: toNumber(item.hpp_total_price),
   dpp_total_price: toNumber(item.dpp_total_price),
   ppn_total_price: toNumber(item.ppn_total_price),
+  dpp_tax_rate: toNumber(item.dpp_tax_rate),
+  ppn_tax_rate: toNumber(item.ppn_tax_rate),
 });
 
 const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransactionItemDetail => ({

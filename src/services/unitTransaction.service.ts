@@ -85,6 +85,8 @@ type UnitTransactionItemListApiModel = {
   ppn_per_unit_price?: number | string;
   dpp_total_price?: number | string;
   ppn_total_price?: number | string;
+  dpp_tax_rate?: number | string;
+  ppn_tax_rate?: number | string;
   created_at?: string;
   unit_transaction?: {
     id?: number | string;

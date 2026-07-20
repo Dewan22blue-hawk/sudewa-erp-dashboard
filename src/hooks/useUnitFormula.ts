@@ -26,6 +26,8 @@ export function useUnitFormula(form: UnitFormulaInput) {
           bbn_price: Number(form.bbn_price ?? 0),
           expedition_fee: Number(form.expedition_fee ?? 0),
           other_fee: Number(form.other_fee ?? 0),
+          dpp_tax_id: form.dpp_tax_id,
+          ppn_tax_id: form.ppn_tax_id,
         });
 
         if (!active) return;
@@ -42,7 +44,7 @@ export function useUnitFormula(form: UnitFormulaInput) {
       active = false;
       clearTimeout(handler);
     };
-  }, [form.qty_total, form.price, form.bbn_price, form.expedition_fee, form.other_fee]);
+  }, [form.qty_total, form.price, form.bbn_price, form.expedition_fee, form.other_fee, form.dpp_tax_id, form.ppn_tax_id]);
 
   return { formula, loading };
 }

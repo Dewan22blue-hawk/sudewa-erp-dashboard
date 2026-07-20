@@ -28,39 +28,43 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* SECTION 1: HEADER */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Pilih Tanggal</FormLabel>
-                <FormControl>
-                  <DatePicker value={field.value ? new Date(field.value) : undefined} onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')} disabled={isBusy} placeholder="Pick a date" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* SECTION 2: TRANSACTION INFO */}
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Transaksi</h3>
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nama Transaksi</FormLabel>
-                <FormControl>
-                  <Input className='h-[100px]' placeholder="Masukkan nama transaksi" {...field} disabled={isBusy} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-row gap-4 justify-content-between">
+            {/* SECTION 1: HEADER */}
+            <div className="w-full">
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Pilih Tanggal</FormLabel>
+                    <FormControl>
+                      <DatePicker value={field.value ? new Date(field.value) : undefined} onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')} disabled={isBusy} placeholder="Pick a date" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* SECTION 2: TRANSACTION INFO */}
+            <div className="space-y-4 w-full">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Transaksi</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Masukkan nama transaksi" {...field} disabled={isBusy} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
         </div>
 
         {/* SECTION 3: BANK (Grid Layout) */}
@@ -152,7 +156,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                       <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
                       <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
-                  </FormControl> 
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
