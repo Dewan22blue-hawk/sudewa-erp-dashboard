@@ -61,6 +61,7 @@ export interface WithholdingTaxItem {
   pph_description: string | null;
   payment_amount: number | null;
   payment_date: string | null;
+  no_invoice: string | null;
   created_at: string | null;
   updated_at: string | null;
   company?: WithholdingTaxCompany | null;
@@ -74,28 +75,27 @@ export interface WithholdingTaxPayload {
   company_id?: number | string;
   source: string;
   cash_id?: number | null;
-  do_invoice_id?: number | null;
   unit_transaction_id?: number | null;
-  bbn_bill_id?: number | null;
   withholding_number: string;
   withholding_age: number;
   pph_amount: number;
   pph_description?: string | null;
   payment_amount: number;
   payment_date: string;
+  no_invoice: string;
 }
 
 export interface WithholdingTaxListParams extends PaginationParams {
   source?: string;
   company_id?: number | string;
   cash_id?: number | string;
-  do_invoice_id?: number | string;
   withholding_number?: string;
   withholding_age?: number | string;
   pph_amount?: number | string;
   pph_description?: string;
   payment_amount?: number | string;
   payment_date?: string;
+  no_invoice?: string;
   order_by?: string;
   order_dir?: 'asc' | 'desc';
 }

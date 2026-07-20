@@ -154,13 +154,13 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
     const payload: WithholdingTaxPayload = {
       company_id: companyId,
       source,
-      do_invoice_id: Number(doInvoiceId),
       withholding_number: withholdingNumber,
       withholding_age: Number(withholdingAge),
       pph_amount: rawPph,
       pph_description: pphDescription,
       payment_amount: rawPayment,
       payment_date: paymentDate,
+      no_invoice: '',
     };
 
     if (source === 'internal' && cashId) {

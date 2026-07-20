@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Search, Plus, Download } from 'lucide-react';
+import { useRouter } from 'next/router';
 import type { WithholdingTaxItem } from '@/@types/withholding-tax.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import WithholdingTaxTable from '@/components/features/finance/withholding-tax/WithholdingTaxTable';
-import WithholdingTaxFormModal from '@/components/features/finance/withholding-tax/WithholdingTaxFormModal';
+import BuktiPotongTable from '@/components/features/bukti-potong/BuktiPotongTable';
+import BuktiPotongDeleteDialog from '@/components/features/bukti-potong/BuktiPotongDeleteDialog';
 import WithholdingTaxDetailModal from '@/components/features/finance/withholding-tax/WithholdingTaxDetailModal';
-import WithholdingTaxDeleteDialog from '@/components/features/finance/withholding-tax/WithholdingTaxDeleteDialog';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxes } from '@/hooks/useWithholdingTax';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
@@ -24,6 +24,10 @@ export default function BuktiPotongPage() {
   const canEdit = hasPermission('finance:edit');
   const canDelete = hasPermission('finance:delete');
   const [companyName, setCompanyName] = useState('');
+
+  const router = useRouter();
+  const slug = router.query.slug as string;
+  const base = (path: string) => (slug ? `/dashboard/${slug}${path}` : path);
 
   useEffect(() => {
     fetchUserCompanies()
@@ -45,7 +49,6 @@ export default function BuktiPotongPage() {
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
   const [sourceFilter, setSourceFilter] = useState<'internal' | 'client_supplier'>('internal');
   
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<WithholdingTaxItem | null>(null);
@@ -89,13 +92,11 @@ export default function BuktiPotongPage() {
   };
 
   const handleCreate = () => {
-    setSelectedItem(null);
-    setIsFormModalOpen(true);
+    router.push(base('/administrasi/bukti-potong/create'));
   };
 
   const handleEdit = (item: WithholdingTaxItem) => {
-    setSelectedItem(item);
-    setIsFormModalOpen(true);
+    router.push(base(`/administrasi/bukti-potong/${item.id}/edit`));
   };
 
   const handleView = (item: WithholdingTaxItem) => {
@@ -116,7 +117,7 @@ export default function BuktiPotongPage() {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Laporan Bukti Potong</h1>
+          <h1 className="text-2xl font-semibold text-slate-950">Bukti Potong</h1>
           <p className="text-sm text-slate-500">Kelola bukti potong dengan mudah</p>
         </div>
 
@@ -189,7 +190,7 @@ export default function BuktiPotongPage() {
             </div>
           </div>
 
-          <WithholdingTaxTable
+          <BuktiPotongTable
             data={data?.data ?? []}
             meta={data?.meta ?? null}
             isLoading={isLoading}
@@ -206,15 +207,7 @@ export default function BuktiPotongPage() {
           />
         </div>
 
-        <WithholdingTaxFormModal
-          isOpen={isFormModalOpen}
-          onClose={() => {
-            setIsFormModalOpen(false);
-            setSelectedItem(null);
-          }}
-          item={selectedItem}
-          companyId={companyNumber}
-        />
+
 
         <WithholdingTaxDetailModal
           isOpen={isDetailModalOpen}
@@ -225,7 +218,7 @@ export default function BuktiPotongPage() {
           itemId={selectedItem?.id ?? null}
         />
 
-        <WithholdingTaxDeleteDialog
+        <BuktiPotongDeleteDialog
           isOpen={isDeleteModalOpen}
           onClose={() => {
             setIsDeleteModalOpen(false);

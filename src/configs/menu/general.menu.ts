@@ -80,6 +80,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Penjualan Unit',
           href: base('/transaksi/penjualan-unit'),
         },
+        {
+          label: 'Bukti Potong',
+          href: base('/administrasi/bukti-potong'),
+        },
       ],
     },
     {
@@ -156,10 +160,6 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         {
           label: 'Aset',
           href: base('/finance/asset'),
-        },
-        {
-          label: 'Laporan Bukti Potong',
-          href: base('/finance/bukti-potong'),
         },
       ],
     },
