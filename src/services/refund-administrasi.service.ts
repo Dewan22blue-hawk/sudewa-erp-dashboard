@@ -98,12 +98,13 @@ export const refundAdministrasiService = {
   /**
    * GET Unit Transaction Refund List
    */
-  async getRefundList(params: { page?: number; per_page?: number; search?: string } = {}): Promise<UnitTransactionRefundListResponse> {
+  async getRefundList(params: { page?: number; per_page?: number; search?: string; unit_transaction_id?: string } = {}): Promise<UnitTransactionRefundListResponse> {
     const response = await apiClient.get<LaravelApiResponse<any>>(BASE_PATH, {
       params: {
         page: params.page ?? 1,
         per_page: params.per_page ?? 10,
         search: params.search || undefined,
+        unit_transaction_id: params.unit_transaction_id || undefined,
       }
     });
     const payload = ensureSuccess(response.data);

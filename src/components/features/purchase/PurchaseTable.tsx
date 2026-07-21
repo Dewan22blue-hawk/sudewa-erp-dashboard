@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
-import { Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Search, Trash2, RotateCcw } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -12,7 +12,6 @@ import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
-import { ReferenceLink } from '@/components/ui/reference-link';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
 
@@ -282,9 +281,14 @@ export default function PurchaseTable({
                 <Eye className="mr-2 h-4 w-4" /> Detail
               </DropdownMenuItem>
               {canEdit && (
-                <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/edit`)}>
-                  <Pencil className="mr-2 h-4 w-4" /> Edit
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/edit`)}>
+                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli`)}>
+                    <RotateCcw className="mr-2 h-4 w-4" /> Refund Beli
+                  </DropdownMenuItem>
+                </>
               )}
               {canDelete && (
                 <DropdownMenuItem
