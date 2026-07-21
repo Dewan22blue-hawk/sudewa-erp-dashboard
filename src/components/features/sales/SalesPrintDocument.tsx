@@ -3,13 +3,22 @@ import jsPDF from 'jspdf';
 import { Download, Printer } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import type { SalesItem } from '@/components/features/sales/sales.data';
-import type { UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils/currency';
 
+interface PrintItem {
+  id: string | number;
+  unit_type_name?: string;
+  color?: string;
+  chassis_number?: string;
+  machine_number?: string;
+  price?: number;
+  price_usd?: number;
+}
+
 interface Props {
   sales: SalesItem;
-  items: UnitTransactionItemDetail[];
+  items: PrintItem[];
   letterheadUrl: string;
   companyName: string;
   hideControls?: boolean;

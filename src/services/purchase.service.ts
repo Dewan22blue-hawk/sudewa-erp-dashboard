@@ -145,6 +145,8 @@ const mapUnits = (detail: UnitTransactionDetailApiModel): PurchaseUnit[] => {
       biayaBBN: 0,
       biayaEkspedisi: 0,
       biayaLain: 0,
+      dppTaxVersionId: '',
+      ppnTaxVersionId: '',
       hpp: total,
       dpp,
       ppn,

@@ -26,6 +26,7 @@ const appendRefundItemDetailIds = (formData: FormData, ids?: Array<string | numb
 };
 
 const mapItemDetail = (item: any): UnitTransactionItemDetail => ({
+  ...item,
   id: toString(item.id),
   unit_transaction_item_id: toString(item.unit_transaction_item_id),
   unit_type_name: item.unit_type_name ?? item.unit_type?.name ?? '-',
@@ -33,16 +34,10 @@ const mapItemDetail = (item: any): UnitTransactionItemDetail => ({
   color: item.color ?? '-',
   machine_number: item.machine_number ?? '-',
   chassis_number: item.chassis_number ?? '-',
-  in_stock: item.in_stock === true || item.in_stock === 1 || item.in_stock === '1',
-  is_forecast: item.is_forecast === true || item.is_forecast === 1 || item.is_forecast === '1',
+  in_stock: (item.in_stock === true || item.in_stock === 1 || item.in_stock === '1') ? '1' : '0',
+  is_forecast: (item.is_forecast === true || item.is_forecast === 1 || item.is_forecast === '1') ? '1' : '0',
   status: item.status ? String(item.status) : '',
   created_at: item.created_at ?? '',
-  pivot: item.pivot
-    ? {
-        unit_transaction_refund_id: item.pivot.unit_transaction_refund_id,
-        unit_transaction_item_detail_id: item.pivot.unit_transaction_item_detail_id,
-      }
-    : undefined,
 });
 
 const mapRefundPayment = (payment: any) => ({

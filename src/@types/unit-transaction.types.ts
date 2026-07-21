@@ -1,5 +1,4 @@
 import { PaginationMeta } from '@/@types/pagination.types';
-import { UnitTransactionItemDetail } from './ppn-pembelian.types';
 
 export interface UnitTransactionBillingHistoryCashPivot {
   unit_transaction_billing_history_id: string | number;
@@ -97,14 +96,18 @@ export interface UnitTransactionWarehouse {
 
 export interface UnitTransactionItemDetail {
   id: string;
+  unit_transaction_item_id: string;
   code: string;
-  created_at: string;
+  created_at: string | undefined;
   stock_state: string;
   max_capacity?: number;
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
   price?: number;
-  unit_type_name: string;
+  status?: string;
+  unit_type_name: string | undefined;
+  in_stock?: string | boolean | number | undefined;
+  is_forecast?: string | boolean | undefined;
   color?: string;
   chassis_number?: string;
   machine_number?: string;
@@ -132,6 +135,9 @@ export interface UnitTransactionDetail {
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
   price?: number;
+  in_stock?: string;
+  is_forecast?: string;
+  status?: string;
   unit_type_name: string;
   color?: string;
   chassis_number?: string;
@@ -149,6 +155,9 @@ export interface UnitTransactionDetail {
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
   unit_transaction_items?: any[];
+  pivot: {
+    unit_transaction_item_detail_id: number;
+  };
 }
 
 export interface UnitTransactionItem {

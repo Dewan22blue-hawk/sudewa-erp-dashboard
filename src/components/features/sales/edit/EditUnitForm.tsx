@@ -100,6 +100,7 @@ export function EditUnitForm({
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
     defaultValues: {
+      ...defaultValues,
       tipeUnit: defaultValues?.tipeUnit || '',
       qty: defaultValues?.qty ?? 1,
       harga: defaultValues?.harga || 0,
@@ -108,7 +109,6 @@ export function EditUnitForm({
       biayaLain: defaultValues?.biayaLain || 0,
       hargaUsd: defaultValues?.hargaUsd || 0,
       hargaPerUnitUsd: defaultValues?.hargaPerUnitUsd || 0,
-      ...defaultValues,
     },
   });
 

@@ -16,6 +16,9 @@ export interface PurchaseUnit {
   biayaEkspedisi: number;
   biayaLain: number;
 
+  dppTaxVersionId: string;
+  ppnTaxVersionId: string;
+
   hpp: number;
   dpp: number;
   ppn: number;
@@ -112,6 +115,8 @@ export interface CreatePurchaseUnitRequest {
   price: number;
   biayaBBN: number;
   biayaEkspedisi: number;
+  dppTaxVersionId: string;
+  ppnTaxVersionId: string;
   biayaLain: number;
 }
 

@@ -333,8 +333,8 @@ export default function EditNestedUnitPage() {
                 biayaLain: unit.other_fee,
                 priceUsd: unit.price_usd,
                 pricePerUnitUsd: unit.price_per_unit_usd,
-                dppTaxVersionId: unit.dpp_tax_id,
-                ppnTaxVersionId: unit.ppn_tax_id,
+                dppTaxVersionId: unit.dpp_tax_id != null ? String(unit.dpp_tax_id) : undefined,
+                ppnTaxVersionId: unit.ppn_tax_id != null ? String(unit.ppn_tax_id) : undefined,
               }}
               onSubmit={handleSubmit}
               onCancel={() => router.back()}

@@ -81,6 +81,8 @@ export type SalesApiModel = {
     hpp_total_price?: string | number;
     dpp_total_price?: string | number;
     ppn_total_price?: string | number;
+    dpp_tax_id?: number | string;
+    ppn_tax_id?: number | string;
     price_usd?: string | number;
     price_per_unit_usd?: string | number;
     unit_transaction_item_details?: Array<{
@@ -252,6 +254,8 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
     biayaBbn: toNumber(item.transaction_bbn_total),
     biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
+    dppTaxVersionId: item.unit_transaction_items?.[0]?.dpp_tax_id != null ? String(item.unit_transaction_items[0].dpp_tax_id) : '',
+    ppnTaxVersionId: item.unit_transaction_items?.[0]?.ppn_tax_id != null ? String(item.unit_transaction_items[0].ppn_tax_id) : '',
     totalHpp: totalDpp,
     totalDpp,
     totalPpn,
@@ -282,6 +286,8 @@ const mapSalesLineItem = (item: NonNullable<SalesApiModel['unit_transaction_item
     biayaBbn,
     biayaEkspedisi,
     biayaLain,
+    dppTaxVersionId: item.dpp_tax_id != null ? String(item.dpp_tax_id) : '',
+    ppnTaxVersionId: item.ppn_tax_id != null ? String(item.ppn_tax_id) : '',
     hpp,
     dpp,
     ppn,
@@ -317,6 +323,8 @@ export const mapSalesDetailToUI = (item: SalesApiModel): SalesItem => {
     biayaBbn: toNumber(item.transaction_bbn_total),
     biayaEkspedisi: toNumber(item.expedition_fee_total),
     biayaLain: toNumber(item.transaction_other_fee),
+    dppTaxVersionId: item.unit_transaction_items?.[0]?.dpp_tax_id != null ? String(item.unit_transaction_items[0].dpp_tax_id) : '',
+    ppnTaxVersionId: item.unit_transaction_items?.[0]?.ppn_tax_id != null ? String(item.unit_transaction_items[0].ppn_tax_id) : '',
     totalHpp: totalDpp,
     totalDpp,
     totalPpn,

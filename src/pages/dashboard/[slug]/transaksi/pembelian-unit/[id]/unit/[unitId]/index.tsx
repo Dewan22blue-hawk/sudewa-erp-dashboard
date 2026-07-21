@@ -111,8 +111,8 @@ export default function UnitPurchaseDetailPage() {
 
   const [openForm, setOpenForm] = useState(false);
   const [openImport, setOpenImport] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
   const [formValues, setFormValues] = useState({
     color: '',
     machine_number: '',
@@ -198,7 +198,7 @@ export default function UnitPurchaseDetailPage() {
 
     try {
       if (editingItem) {
-        await updateMutation.mutateAsync({ id: editingItem.id, payload });
+        await updateMutation.mutateAsync({ id: String(editingItem.id), payload });
         toast.success('Detail unit berhasil diperbarui');
       } else {
         await createMutation.mutateAsync(payload);
@@ -223,7 +223,7 @@ export default function UnitPurchaseDetailPage() {
     if (!deleteTarget) return;
 
     try {
-      await deleteMutation.mutateAsync({ id: deleteTarget.id, unitItemId });
+      await deleteMutation.mutateAsync({ id: String(deleteTarget.id), unitItemId });
       toast.success('Detail unit berhasil dihapus');
       setDeleteTarget(null);
     } catch (err: any) {

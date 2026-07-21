@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, Search } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useCreateFinanceBilling, useUpdateFinanceBilling, useDeleteFinanceBilling } from '@/hooks/useFinanceBilling';
@@ -327,6 +327,80 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     return akun ? (akun.name || `${akun.code} - ${akun.description}`) : '-';
   };
 
+  const columns = useMemo<ColumnDef<FinanceBilling>[]>(
+    () => [
+      {
+        header: 'No',
+        alignment: 'center',
+        className: 'w-12',
+        cell: (_, index) => index + 1,
+      },
+      {
+        header: 'Tanggal Bayar',
+        alignment: 'left',
+        cell: (fb) => <span className="text-slate-800">{formatDate(fb.payment_at)}</span>,
+      },
+      {
+        header: 'Akun',
+        alignment: 'left',
+        cell: (fb) => (
+          <ReferenceLink href={`/dashboard/${slugStr}/master/account?search=${encodeURIComponent(getKasLabel(fb.account_id))}`}>
+            {getAccountLabel(fb.account_id)}
+          </ReferenceLink>
+        ),
+      },
+      {
+        header: 'Kas',
+        alignment: 'left',
+        cell: (fb) => (
+          <ReferenceLink href={`/dashboard/${slugStr}/master/kas?search=${encodeURIComponent(getKasLabel(fb.cash_id))}`}>
+            {getKasLabel(fb.cash_id)}
+          </ReferenceLink>
+        ),
+      },
+      {
+        header: 'Nominal',
+        alignment: 'left',
+        cell: (fb) => (
+          <span className="font-semibold text-slate-900">
+            {currenciesFormat(fb?.cash?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr', fb.amount)}
+          </span>
+        ),
+      },
+      {
+        header: 'Catatan',
+        alignment: 'left',
+        cell: (fb) => <span className="text-slate-600 max-w-[200px] truncate block">{fb.note || '-'}</span>,
+      },
+      {
+        header: 'Aksi',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (fb) =>
+          !disabled ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" disabled={Boolean(cashFlowDetail?.is_paid)}>
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => openEditForm(fb)} className="cursor-pointer">
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDeleteTarget(fb)} className="cursor-pointer text-red-600 focus:text-red-600">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null,
+      },
+    ],
+    [disabled, cashFlowDetail?.is_paid, slugStr, kasOptions, akunOptions]
+  );
+
   return (
     <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -354,83 +428,17 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           <p className="text-sm text-slate-500 mt-1">Daftar finance billing yang terkait dengan transaksi ini</p>
         </div>
         {!disabled && (
-          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={Boolean(cashFlowDetail?.is_paid)}>
             <Plus className="mr-1.5 h-4 w-4" />
             Tambah Pembayaran
           </Button>
         )}
       </div>
 
-      {financeBillings.length === 0 && !isFormOpen ? (
-        <div className="flex min-h-32 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-slate-500">
-          Belum ada data pembayaran.
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="w-12 text-center">No</TableHead>
-                <TableHead>Tanggal Bayar</TableHead>
-                <TableHead>Akun</TableHead>
-                <TableHead>Kas</TableHead>
-                <TableHead className="text-right">Nominal</TableHead>
-                <TableHead>Catatan</TableHead>
-                <TableHead className="w-12 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {financeBillings.map((fb, index) => (
-                <TableRow key={fb.id} className="bg-white hover:bg-slate-50 transition-colors group">
-                  <TableCell className="text-center px-4 py-4">{index + 1}</TableCell>
-                  <TableCell className="text-slate-800">{formatDate(fb.payment_at)}</TableCell>
-                  <TableCell className="text-slate-800">
-                    <ReferenceLink href={`/dashboard/${slugStr}/master/account?search=${encodeURIComponent(getKasLabel(fb.account_id))}`}>
-                      {getAccountLabel(fb.account_id)}
-                    </ReferenceLink>
-                  </TableCell>
-                  <TableCell className="text-slate-800">
-                    <ReferenceLink href={`/dashboard/${slugStr}/master/kas?search=${encodeURIComponent(getKasLabel(fb.cash_id))}`}>
-                      {getKasLabel(fb.cash_id)}
-                    </ReferenceLink>
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-slate-900">
-                    {currenciesFormat(fb?.cash?.code?.toLowerCase().endsWith('_usd') ? 'usd' : 'idr', fb.amount)}
-                  </TableCell>
-                  <TableCell className="text-slate-600 max-w-[200px] truncate">{fb.note || '-'}</TableCell>
-                  <TableCell className="text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    {!disabled && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          {cashFlowDetail?.is_paid ? (
-                            <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" disabled>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          ) : (
-                            <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditForm(fb)} className="cursor-pointer">
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setDeleteTarget(fb)} className="cursor-pointer text-red-600 focus:text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <BaseTable
+        data={financeBillings}
+        columns={columns}
+      />
 
       {/* Summary */}
       <div className="flex flex-col items-end gap-2 border-t border-slate-100 pt-4 text-sm">
@@ -448,7 +456,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
 
       {/* Add / Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={(open) => { if (!open) closeForm(); }}>
-        <DialogContent className="sm:max-w-2xl max-h-[600px] overflow-y-auto w-full" id='finance-billing-form'>
+        <DialogContent className="sm:max-w-2xl max-h-[600px] overflow-y-auto w-full" id="finance-billing-form">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit Pembayaran' : 'Tambah Pembayaran Baru'}</DialogTitle>
           </DialogHeader>
