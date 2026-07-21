@@ -1,4 +1,4 @@
-import { StockUnit, StockStatus } from '@/@types/stock-unit.types';
+import { StockUnit, StockStatus, Status } from '@/@types/stock-unit.types';
 import type { PaginationParams } from '@/@types/pagination.types';
 import { apiClient } from '@/lib/api/client';
 import { buildLaravelPaginationQuery } from '@/lib/api/pagination';
@@ -30,7 +30,8 @@ const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
   warna: payload.color,
   noMesin: payload.machine_number,
   noRangka: payload.chassis_number,
-  status: (payload.stock_status ?? payload.status) as StockStatus, // Map from payload.stock_status, fallback to payload.status
+  status: (payload.status) as Status,
+  stockStatus: payload.stock_status as StockStatus,
 });
 
 type PaginatedStockUnitResponse = LaravelApiResponse<{

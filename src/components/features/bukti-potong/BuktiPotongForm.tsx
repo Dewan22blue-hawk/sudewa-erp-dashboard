@@ -12,6 +12,7 @@ import { useCreateWithholdingTax, useUpdateWithholdingTax, useWithholdingTaxDeta
 import { useKas } from '@/hooks/useKas';
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
+import { MoneyInput } from '@/components/ui/money-input';
 
 interface Props {
   item: WithholdingTaxItem | null;
@@ -54,38 +55,38 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
   }, [kasData]);
 
   useEffect(() => {
-      if (item) {
-        setSource((item.source as 'internal' | 'client_supplier') || 'internal');
-        setCashId(item.cash_id ? String(item.cash_id) : '');
-        setUnitTransactionId(item.unit_transaction_id ? String(item.unit_transaction_id) : '');
-        setNoInvoice(item.no_invoice || '');
-        setWithholdingNumber(item.withholding_number || '');
-        setWithholdingAge(item.withholding_age ? String(item.withholding_age) : '');
-        setPphAmountStr(item.pph_amount ? formatCurrency(item.pph_amount) : '');
-        setPphDescription(item.pph_description || '');
-        setPaymentAmountStr(item.payment_amount ? formatCurrency(item.payment_amount) : '');
-        // format date for input type="date"
-        if (item.payment_date) {
-          try {
-            const dateObj = new Date(item.payment_date);
-            setPaymentDate(dateObj.toISOString().split('T')[0]);
-          } catch (e) {
-            setPaymentDate(item.payment_date);
-          }
-        } else {
-          setPaymentDate('');
+    if (item) {
+      setSource((item.source as 'internal' | 'client_supplier') || 'internal');
+      setCashId(item.cash_id ? String(item.cash_id) : '');
+      setUnitTransactionId(item.unit_transaction_id ? String(item.unit_transaction_id) : '');
+      setNoInvoice(item.no_invoice || '');
+      setWithholdingNumber(item.withholding_number || '');
+      setWithholdingAge(item.withholding_age ? String(item.withholding_age) : '');
+      setPphAmountStr(item.pph_amount ? formatCurrency(item.pph_amount) : '');
+      setPphDescription(item.pph_description || '');
+      setPaymentAmountStr(item.payment_amount ? formatCurrency(item.payment_amount) : '');
+      // format date for input type="date"
+      if (item.payment_date) {
+        try {
+          const dateObj = new Date(item.payment_date);
+          setPaymentDate(dateObj.toISOString().split('T')[0]);
+        } catch (e) {
+          setPaymentDate(item.payment_date);
         }
       } else {
-        setSource('internal');
-        setCashId('');
-        setUnitTransactionId('');
-        setNoInvoice('');
-        setWithholdingNumber('');
-        setWithholdingAge('');
-        setPphAmountStr('');
-        setPphDescription('');
-        setPaymentAmountStr('');
         setPaymentDate('');
+      }
+    } else {
+      setSource('internal');
+      setCashId('');
+      setUnitTransactionId('');
+      setNoInvoice('');
+      setWithholdingNumber('');
+      setWithholdingAge('');
+      setPphAmountStr('');
+      setPphDescription('');
+      setPaymentAmountStr('');
+      setPaymentDate('');
     }
   }, [item]);
 
@@ -142,7 +143,7 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
     if (withholdingAge) {
       payload.withholding_age = Number(withholdingAge);
     }
-    
+
     if (rawPph > 0) {
       payload.pph_amount = rawPph;
     }
@@ -162,7 +163,7 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
 
     const onError = (error: unknown) => {
       let message = 'Terjadi kesalahan saat menyimpan data.';
-      
+
       // Handle ApiValidationError specifically
       if (error && typeof error === 'object' && 'fieldErrors' in error) {
         const fieldErrors = (error as any).fieldErrors;
@@ -175,7 +176,7 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
       } else if (error instanceof Error) {
         message = error.message;
       }
-      
+
       toast.error(message);
     };
 
@@ -187,147 +188,132 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
   };
 
   return (
-    <div className="bg-white p-8 rounded-[22px] border border-slate-200">
-          <form onSubmit={handleSubmit} className="space-y-8 pt-4">
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-slate-900 border-b pb-4">Informasi Tambahan</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Source</Label>
-                  <Select
-                    value={source}
-                    onValueChange={(val: string) => setSource(val as 'internal' | 'client_supplier')}
-                    disabled={isPending}
-                  >
-                    <SelectTrigger className="w-full h-11 bg-slate-50">
-                      <SelectValue placeholder="Pilih Source" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="internal">Internal</SelectItem>
-                      <SelectItem value="client_supplier">Client / Supplier</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Pilih Kas {source === 'internal' && <span className="text-red-500">*</span>}</Label>
-                  <SearchableSelect
-                    value={cashId}
-                    onChange={setCashId}
-                    options={kasOptions}
-                    placeholder="Select an item"
-                    searchPlaceholder="Cari Kas..."
-                    emptyText="Data tidak ditemukan"
-                    loading={isLoadingKas}
-                    disabled={source === 'client_supplier' || isPending}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Unit Transaction</Label>
-                  <Input 
-                    type="number"
-                    placeholder="Contoh: 2 (Opsional)" 
-                    value={unitTransactionId} 
-                    onChange={(e) => setUnitTransactionId(e.target.value)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                  />
-                </div>
-              </div>
-            </div>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Bukti Potong</h2>
+          <p className="text-sm text-gray-500 mt-1">Kelola detail informasi bukti potong dan biaya-biaya terkait</p>
+          <div className="my-6 h-px bg-muted/60" />
+        </div>
 
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-slate-900 border-b pb-4">Detail Bukti Potong</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <div className="space-y-2">
-                  <Label>Nomor Invoice <span className="text-red-500">*</span></Label>
-                  <Input 
-                    placeholder="Contoh: INV-PAKB-12/2932KN" 
-                    value={noInvoice} 
-                    onChange={(e) => setNoInvoice(e.target.value)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Nomor Bukti Potong <span className="text-red-500">*</span></Label>
-                  <Input 
-                    placeholder="Contoh: BPTR921031913" 
-                    value={withholdingNumber} 
-                    onChange={(e) => setWithholdingNumber(e.target.value)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Masa Bukti Potong</Label>
-                  <Input 
-                    type="number"
-                    placeholder="Contoh: 1 (Opsional)" 
-                    value={withholdingAge} 
-                    onChange={(e) => setWithholdingAge(e.target.value)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Nominal PPH</Label>
-                  <Input 
-                    placeholder="Rp 0 (Opsional)" 
-                    value={pphAmountStr} 
-                    onChange={handleCurrencyChange(setPphAmountStr)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Uang Muka PPH / Keterangan</Label>
-                  <Input 
-                    placeholder="Contoh: Dari Bukti Potong" 
-                    value={pphDescription} 
-                    onChange={(e) => setPphDescription(e.target.value)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Jumlah Pembayaran <span className="text-red-500">*</span></Label>
-                  <Input 
-                    placeholder="Rp 0" 
-                    value={paymentAmountStr} 
-                    onChange={handleCurrencyChange(setPaymentAmountStr)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tanggal Dibayar <span className="text-red-500">*</span></Label>
-                  <Input 
-                    type="date"
-                    value={paymentDate} 
-                    onChange={(e) => setPaymentDate(e.target.value)}
-                    disabled={isPending}
-                    className="h-11 bg-white"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
 
-            <div className="flex justify-center items-center gap-4 pt-6 mt-8">
-              <Button type="button" variant="ghost" onClick={onCancel} disabled={isPending} className="w-[140px] h-11 text-base font-semibold">
-                Batal
-              </Button>
-              <Button type="submit" className="w-[140px] h-11 text-base font-semibold bg-[#1f4163] hover:bg-[#183552] text-white" disabled={isPending}>
-                {isPending ? 'Menyimpan...' : 'Simpan'}
-              </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label>Sumber Bukti Potong</Label>
+            <Select
+              value={source}
+              onValueChange={(val: string) => setSource(val as 'internal' | 'client_supplier')}
+              disabled={isPending}
+            >
+              <SelectTrigger className="w-full bg-slate-50">
+                <SelectValue placeholder="Pilih Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="internal">Internal</SelectItem>
+                <SelectItem value="client_supplier">Client / Supplier</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Pilih Kas {source === 'internal' && <span className="text-red-500">*</span>}</Label>
+            <SearchableSelect
+              value={cashId}
+              onChange={setCashId}
+              options={kasOptions}
+              placeholder="Select an item"
+              searchPlaceholder="Cari Kas..."
+              emptyText="Data tidak ditemukan"
+              loading={isLoadingKas}
+              disabled={source === 'client_supplier' || isPending}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <span className="text-md font-bold text-slate-900 mb-5">Detail Bukti Potong</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
+
+          <div className="space-y-2">
+            <Label>Nomor Invoice <span className="text-red-500">*</span></Label>
+            <Input
+              placeholder="Contoh: INV-PAKB-12/2932KN"
+              value={noInvoice}
+              onChange={(e) => setNoInvoice(e.target.value)}
+              disabled={isPending}
+              className="bg-white"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Nomor Bukti Potong <span className="text-red-500">*</span></Label>
+            <Input
+              placeholder="Contoh: BPTR921031913"
+              value={withholdingNumber}
+              onChange={(e) => setWithholdingNumber(e.target.value)}
+              disabled={isPending}
+              className="bg-white"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Masa Bukti Potong</Label>
+            <div className="relative flex items-center">
+              <Input
+                type="number"
+                placeholder="Contoh: 1 (Opsional)"
+                value={withholdingAge}
+                onChange={(e) => setWithholdingAge(e.target.value)}
+                disabled={isPending}
+                className="bg-white pr-16"
+              />
+              <span className="absolute right-3 text-sm text-slate-500 pointer-events-none select-none bg-slate-200 px-2 py-1 rounded-md">
+                Bulan
+              </span>
             </div>
-          </form>
-    </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Nominal PPH</Label>
+            <MoneyInput name="pph_amount" value={Number(pphAmountStr) || 0} onChangeValue={(val) => setPphAmountStr(val.toString())} onBlur={() => { }} disabled={isPending} />
+          </div>
+          <div className="space-y-2">
+            <Label>Uang Muka PPH / Keterangan</Label>
+            <Input
+              placeholder="Contoh: Dari Bukti Potong"
+              value={pphDescription}
+              onChange={(e) => setPphDescription(e.target.value)}
+              disabled={isPending}
+              className="bg-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Jumlah Pembayaran <span className="text-red-500">*</span></Label>
+            <MoneyInput name="payment_amount" value={Number(paymentAmountStr) || 0} onChangeValue={(val) => setPaymentAmountStr(val.toString())} onBlur={() => { }} disabled={isPending} />
+          </div>
+          <div className="space-y-2">
+            <Label>Tanggal Dibayar <span className="text-red-500">*</span></Label>
+            <Input
+              type="date"
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(e.target.value)}
+              disabled={isPending}
+              className="bg-white"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-center items-center gap-4 pt-6 mt-8">
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isPending} className="w-[140px] text-base font-semibold">
+          Batal
+        </Button>
+        <Button type="submit" className="w-[140px] text-base font-semibold bg-[#1f4163] hover:bg-[#183552] text-white" disabled={isPending}>
+          {isPending ? 'Menyimpan...' : 'Simpan'}
+        </Button>
+      </div>
+    </form>
   );
 }

@@ -33,6 +33,7 @@ import {
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Textarea } from '@/components/ui/textarea';
 import { parseAndClampMoneyInput } from '@/lib/utils/money-input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const paymentSchema = z.object({
     bcaPayment: z.union([z.string(), z.number()]).transform(v => Number(v) || 0).pipe(z.number().min(0, 'Tidak boleh negatif')),
@@ -240,13 +241,6 @@ export function PurchasePaymentForm({
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h2 className="text-2xl font-semibold">Informasi Pembelian</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Kode Beli: {purchaseCode || '-'}</p>
-                <Separator className="my-4" />
-            </div>
-
             <div className="space-y-6">
                 {/* ── Section: Biaya ── */}
                 <div className="rounded-lg border">
@@ -404,7 +398,7 @@ export function PurchasePaymentForm({
                             </div>
                         </div>
 
-                        {/* Note + Tandai Lunas */}
+                        {/* Note */}
                         <div className="rounded-lg border">
                             <div className="border-b px-4 py-3">
                                 <h3 className="text-sm font-semibold text-muted-foreground">Catatan</h3>

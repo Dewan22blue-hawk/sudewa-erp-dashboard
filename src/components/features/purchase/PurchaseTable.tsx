@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -186,7 +187,11 @@ export default function PurchaseTable({
         header: 'Supplier',
         accessorKey: 'supplier',
         sortable: true,
-        cell: (item) => item.supplier || '-',
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${encodeURIComponent(item.supplier || '')}`}>
+            {item.supplier || '-'}
+          </ReferenceLink>
+        ),
       },
       {
         header: 'Gudang',
@@ -363,7 +368,6 @@ export default function PurchaseTable({
         data={pagedData}
         columns={columns}
         loading={loading}
-        showCheckbox
         selectedIds={selectedIds}
         onSelectedIdsChange={setSelectedIds}
         showLimitChange={false}

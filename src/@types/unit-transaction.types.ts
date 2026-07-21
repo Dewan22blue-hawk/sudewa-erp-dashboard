@@ -95,6 +95,34 @@ export interface UnitTransactionWarehouse {
   name: string;
 }
 
+export interface UnitTransactionItemDetail {
+  id: string;
+  code: string;
+  created_at: string;
+  stock_state: string;
+  max_capacity?: number;
+  person: UnitTransactionPerson;
+  warehouse: UnitTransactionWarehouse;
+  price?: number;
+  unit_type_name: string;
+  color?: string;
+  chassis_number?: string;
+  machine_number?: string;
+  unit_transaction_bruto_total: number;
+  unit_transaction_item_total_hpp: number;
+  unit_transaction_item_total_dpp: number;
+  unit_transaction_item_total_ppn: number;
+  unit_transaction_item_bruto_total: number;
+  transaction_bbn_total: number;
+  transaction_other_fee: number;
+  expedition_fee_total: number;
+  total_operational_fee?: number;
+  billing_summary?: UnitTransactionBillingSummary | null;
+  unit_transaction_billing?: UnitTransactionBilling | null;
+  unit_transaction_adjustments?: any[];
+  unit_transaction_items?: any[];
+}
+
 export interface UnitTransactionDetail {
   id: string;
   code: string;
@@ -103,6 +131,11 @@ export interface UnitTransactionDetail {
   max_capacity?: number;
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
+  price?: number;
+  unit_type_name: string;
+  color?: string;
+  chassis_number?: string;
+  machine_number?: string;
   unit_transaction_bruto_total: number;
   unit_transaction_item_total_hpp: number;
   unit_transaction_item_total_dpp: number;

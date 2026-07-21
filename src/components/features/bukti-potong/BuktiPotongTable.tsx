@@ -82,7 +82,7 @@ export default function WithholdingTaxTable({
         accessorKey: 'withholding_age',
         sortable: true,
         alignment: 'left',
-        cell: (item) => item.withholding_age || '-',
+        cell: (item) => item.withholding_age + ' Bulan' || '-',
       },
       {
         header: 'NOMINAL INVOICE',

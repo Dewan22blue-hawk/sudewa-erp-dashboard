@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertCircle } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,6 @@ import { useTypeUnits, useCreateTypeUnit } from '@/hooks/useTypeUnit';
 import { useBrands } from '@/hooks/useBrand';
 import { TypeUnit } from '@/@types/type-unit.types';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -312,7 +310,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Harga</FormLabel>
+                  <FormLabel className="text-sm font-medium">Harga Satuan</FormLabel>
                   <FormControl>
                     <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
                   </FormControl>

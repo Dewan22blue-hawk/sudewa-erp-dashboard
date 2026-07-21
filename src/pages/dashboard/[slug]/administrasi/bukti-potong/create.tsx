@@ -18,18 +18,19 @@ export default function CreateBuktiPotongPage() {
 
   return (
     <DashboardLayout>
-      <Head>
-        <title>Tambah Bukti Potong</title>
-      </Head>
-
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="h-8 w-8 rounded-full">
+      <div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleBack}
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-semibold text-slate-950">Tambah Bukti Potong</h1>
+          </button>
+          <h1 className="text-2xl font-semibold tracking-tight">Tambah Bukti Potong</h1>
         </div>
+      </div>
 
+      <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
         <BuktiPotongForm
           item={null}
           companyId={companyNumber}

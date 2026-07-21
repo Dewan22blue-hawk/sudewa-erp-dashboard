@@ -89,10 +89,12 @@ export default function StockUnitPage() {
     );
   }
 
+  console.log(data?.data);
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <PanelName />
+
 
         <StockUnitTable
           data={data?.data || []}

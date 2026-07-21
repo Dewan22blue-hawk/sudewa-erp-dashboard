@@ -12,11 +12,14 @@ export type StockStatus =
   | 'outbound_delivered'
   | 'outbound_return';
 
+export type Status = 'normal' | 'minor_damage' | 'major_damage' | 'returned' | 'refunded' | 'lost' | 'in_repair';
+
 export interface StockUnit {
   id: string;
   namaUnit: string;
   warna: string;
   noMesin: string;
   noRangka: string;
-  status: StockStatus;
+  status: Status;
+  stockStatus: StockStatus;
 }
