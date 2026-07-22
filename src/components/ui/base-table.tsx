@@ -341,11 +341,20 @@ export default function BaseTable<T>({
               <TableRow className="hover:bg-transparent border-none">
                 <TableCell colSpan={columns.length + (showCheckbox ? 1 : 0)} className="text-center px-4 py-16 bg-white border-none">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <p className="text-sm text-muted-foreground">Memuat data...</p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                          <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -389,12 +398,6 @@ export default function BaseTable<T>({
             )}
           </TableBody>
         </Table>
-        {loading && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-sm text-muted-foreground gap-2">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Memuat data...</span>
-          </div>
-        )}
       </div>
 
       {/* Pagination */}

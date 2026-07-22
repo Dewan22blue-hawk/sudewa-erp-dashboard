@@ -1,17 +1,14 @@
+import { useMemo } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
-import { cn } from '@/lib/utils';
-import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { getAccountCategoryLabel } from '@/lib/account';
 import type { Account } from '@/@types/account.types';
 import { useRouter } from 'next/router';
-import { MoreVertical, Lock, ArrowUp, ArrowDown, ArrowUpDown, Loader2, Search } from 'lucide-react';
-import { useTableSort } from '@/hooks/useTableSort';
+import { MoreVertical, Lock } from 'lucide-react';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 interface AccountTableProps {
   data: Account[];
@@ -29,255 +26,148 @@ interface AccountTableProps {
   onPageChange: (page: number) => void;
 }
 
-function SortIcon({ sortKey, currentSortKey, sortOrder }: { sortKey: string; currentSortKey: string; sortOrder: any }) {
-  const isActive = currentSortKey === sortKey;
-  if (isActive && sortOrder === 'asc')
-    return <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
-  if (isActive && sortOrder === 'desc')
-    return <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0 transition-colors" />;
-  return <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0 opacity-0 group-hover:opacity-70 transition-opacity duration-150" />;
-}
-
-export function AccountTable({ data, total, isLoading, page, perPage, selectedIds, onToggleAll, onToggleRow, onEdit, onDelete, onPageChange, canEdit, canDelete }: AccountTableProps) {
-  const { sortedData, sortKey, sortOrder, handleSort } = useTableSort({
-    data,
-  });
+export function AccountTable({
+  data,
+  total,
+  isLoading,
+  page,
+  perPage,
+  selectedIds,
+  onToggleAll,
+  onToggleRow,
+  onEdit,
+  onDelete,
+  onPageChange,
+  canEdit,
+  canDelete,
+}: AccountTableProps) {
   const router = useRouter();
-
-  const totalPages = Math.max(1, Math.ceil(total / perPage));
-  const pageIds = sortedData.map((item) => String(item.id));
-  const allChecked = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
-  const someChecked = pageIds.some((id) => selectedIds.has(id));
-  const start = total === 0 ? 0 : (page - 1) * perPage + 1;
-  const end = total === 0 ? 0 : Math.min(page * perPage, total);
-  const visiblePages = getVisiblePageNumbers(totalPages, page);
-  const showLastPageShortcut = visiblePages[visiblePages.length - 1] !== totalPages;
-
   const { slug } = router.query;
   const slugStr = typeof slug === 'string' ? slug : '';
 
-  return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
-        <Table>
-          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-            <TableRow className="hover:bg-[#f8f9fa]">
-              {/* Checkbox */}
-              <TableHead className="w-[52px] px-4 py-4 text-center">
-                <Checkbox
-                  checked={allChecked ? true : (someChecked ? 'indeterminate' : false)}
-                  onCheckedChange={(checked) => onToggleAll(Boolean(checked))}
-                  className="size-4 rounded border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
-                  aria-label="Pilih semua akun"
-                />
-              </TableHead>
-              {/* Kode Akun - left */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'code' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('code')}
-              >
-                <div className="flex items-center gap-1">
-                  KODE AKUN
-                  <SortIcon sortKey="code" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* Nama Akun - left */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'name' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('name')}
-              >
-                <div className="flex items-center gap-1">
-                  NAMA AKUN
-                  <SortIcon sortKey="name" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* Grup Akun - center */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-center text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'accountGroupCode' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('accountGroupCode')}
-              >
-                <div className="inline-flex items-center">
-                  {/* spacer kiri = lebar icon, agar teks benar-benar di tengah */}
-                  <span className="w-3 shrink-0" />
-                  <span>GRUP AKUN</span>
-                  <SortIcon sortKey="accountGroupCode" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* Kategori Akun - left */}
-              <TableHead
-                className={cn(
-                  'group px-4 py-4 text-left text-xs font-semibold uppercase cursor-pointer select-none transition-colors',
-                  sortKey === 'category' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-800'
-                )}
-                onClick={() => handleSort('category')}
-              >
-                <div className="flex items-center gap-1">
-                  KATEGORI AKUN
-                  <SortIcon sortKey="category" currentSortKey={sortKey as string} sortOrder={sortOrder} />
-                </div>
-              </TableHead>
-              {/* Action - center */}
-              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                ACTION
-              </TableHead>
-            </TableRow>
-          </TableHeader>
+  const handleSelectedIdsChange = (newSelected: Set<string>) => {
+    const pageIds = data.map((item) => String(item.id));
+    const allCheckedBefore = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+    const allCheckedAfter = pageIds.length > 0 && pageIds.every((id) => newSelected.has(id));
 
-          <TableBody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
-                </td>
-              </tr>
-            ) : data.length === 0 ? (
-              <TableRow className="group">
-                <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              sortedData.map((account) => {
-                const checked = selectedIds.has(String(account.id));
+    if (allCheckedBefore !== allCheckedAfter) {
+      onToggleAll(allCheckedAfter);
+    } else {
+      // Find the single difference
+      const added = pageIds.find((id) => newSelected.has(id) && !selectedIds.has(id));
+      if (added) {
+        onToggleRow(added, true);
+        return;
+      }
+      const removed = pageIds.find((id) => !newSelected.has(id) && selectedIds.has(id));
+      if (removed) {
+        onToggleRow(removed, false);
+      }
+    }
+  };
 
-                return (
-                  <TableRow key={account.id} data-state={checked ? 'selected' : undefined} className="group hover:bg-gray-50 transition-colors">
-                    {/* Checkbox */}
-                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={(value) => onToggleRow(String(account.id), Boolean(value))}
-                        className="size-4 rounded border-slate-300 data-[state=checked]:border-slate-900 data-[state=checked]:bg-slate-900"
-                        aria-label={`Pilih akun ${account.name}`}
-                      />
-                    </TableCell>
-                    {/* Kode Akun */}
-                    <TableCell className="px-4 py-4 text-sm font-medium text-gray-900">
-                      <div className="flex items-center gap-1.5">
-                        <CopyBox text={account.code} />
-                        {account.is_lock && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="inline-flex cursor-help p-0.5">
-                                <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              Akun ini merupakan data default yang tidak bisa dihapus!
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </TableCell>
-                    {/* Nama Akun */}
-                    <TableCell className="px-4 py-4 text-sm text-gray-900">{account.name}</TableCell>
-                    {/* Grup Akun - center */}
-                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
-                      <ReferenceLink href={`/dashboard/${slugStr}/master/account-group?search=${encodeURIComponent(account.accountGroupCode ?? account.accountGroupId ?? '')}`}>
-                        {account.accountGroupCode ?? '-'}
-                      </ReferenceLink>
-                    </TableCell>
-                    {/* Kategori Akun */}
-                    <TableCell className="px-4 py-4 text-sm text-gray-600">{getAccountCategoryLabel(account.category)}</TableCell>
-                    {/* Action */}
-                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                          <DropdownMenuItem
-                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
-                            disabled={account.is_lock || !canEdit}
-                            onSelect={(e) => {
-                              e.preventDefault();
-                              onEdit(account);
-                            }}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                            disabled={account.is_lock || !canDelete}
-                            onSelect={(e) => {
-                              e.preventDefault();
-                              onDelete(account);
-                            }}
-                          >
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+  const columns = useMemo<ColumnDef<Account>[]>(
+    () => [
+      {
+        header: 'KODE AKUN',
+        accessorKey: 'code',
+        sortable: true,
+        cell: (account) => (
+          <div className="flex items-center gap-1.5">
+            <CopyBox text={account.code} />
+            {account.is_lock && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex cursor-help p-0.5">
+                    <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Akun ini merupakan data default yang tidak bisa dihapus!
+                </TooltipContent>
+              </Tooltip>
             )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
-        <p>
-          Showing {start}-{end} of {total} data
-        </p>
-
-        <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-            Previous
-          </Button>
-
-          {visiblePages.map((pageNumber) => (
-            <Button
-              key={pageNumber}
-              variant="ghost"
-              size="sm"
-              className={cn(
-                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-                pageNumber === page
-                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-              )}
-              onClick={() => onPageChange(pageNumber)}
-            >
-              {pageNumber}
-            </Button>
-          ))}
-
-          {showLastPageShortcut && (
-            <>
-              <span className="px-1 text-sm text-slate-500">...</span>
-              <Button variant="ghost" size="sm" className="h-9 min-w-9 rounded-xl border border-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white" onClick={() => onPageChange(totalPages)}>
-                {totalPages}
+          </div>
+        ),
+      },
+      {
+        header: 'NAMA AKUN',
+        accessorKey: 'name',
+        sortable: true,
+      },
+      {
+        header: 'GRUP AKUN',
+        accessorKey: 'accountGroupCode',
+        sortable: true,
+        alignment: 'center',
+        cell: (account) => (
+          <ReferenceLink href={`/dashboard/${slugStr}/master/account-group?search=${encodeURIComponent(account.accountGroupCode ?? account.accountGroupId ?? '')}`}>
+            {account.accountGroupCode ?? '-'}
+          </ReferenceLink>
+        ),
+      },
+      {
+        header: 'KATEGORI AKUN',
+        accessorKey: 'category',
+        sortable: true,
+        cell: (account) => getAccountCategoryLabel(account.category),
+      },
+      {
+        header: 'ACTION',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (account) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <MoreVertical className="h-4 w-4" />
               </Button>
-            </>
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+              <DropdownMenuItem
+                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                disabled={account.is_lock || !canEdit}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onEdit(account);
+                }}
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                disabled={account.is_lock || !canDelete}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  onDelete(account);
+                }}
+              >
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [canEdit, canDelete, onEdit, onDelete, slugStr]
+  );
 
-          <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
-            Next
-          </Button>
-        </div>
-      </div>
-    </div>
+  return (
+    <BaseTable
+      data={data}
+      columns={columns}
+      loading={isLoading}
+      showCheckbox
+      selectedIds={selectedIds}
+      onSelectedIdsChange={handleSelectedIdsChange}
+      getRowId={(item) => String(item.id)}
+      meta={{
+        currentPage: page,
+        perPage: perPage,
+        lastPage: Math.max(1, Math.ceil(total / perPage)),
+        total: total,
+      }}
+      onPageChange={onPageChange}
+    />
   );
 }

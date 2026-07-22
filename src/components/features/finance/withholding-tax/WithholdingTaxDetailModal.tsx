@@ -21,7 +21,7 @@ export default function WithholdingTaxDetailModal({ isOpen, onClose, itemId }: P
   const { data, isLoading } = useWithholdingTaxDetail(isOpen ? itemId : null);
 
   const formatSource = (source: string) => {
-    if (source === 'client_supplier') return 'Client / Supplier';
+    if (source === 'external') return 'Client / Supplier';
     return source.charAt(0).toUpperCase() + source.slice(1);
   };
 
@@ -42,7 +42,7 @@ export default function WithholdingTaxDetailModal({ isOpen, onClose, itemId }: P
           </div>
         ) : data ? (
           <div className="space-y-6">
-            
+
             {/* Header Info */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
               <div>
@@ -65,7 +65,7 @@ export default function WithholdingTaxDetailModal({ isOpen, onClose, itemId }: P
 
             {/* Grid Layout for details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              
+
               {/* Left Column */}
               <div className="space-y-6">
                 <div>

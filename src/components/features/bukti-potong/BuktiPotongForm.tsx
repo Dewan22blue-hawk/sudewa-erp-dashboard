@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import type { WithholdingTaxItem, WithholdingTaxPayload } from '@/@types/withholding-tax.types';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -13,6 +13,8 @@ import { useKas } from '@/hooks/useKas';
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 import { MoneyInput } from '@/components/ui/money-input';
+import RequiredMark from '@/components/ui/required-mark';
+import { useRouter } from 'next/router';
 
 interface Props {
   item: WithholdingTaxItem | null;
@@ -27,7 +29,7 @@ const parseCurrencyIDR = (value: string): number => {
 };
 
 export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, onCancel }: Props) {
-  const [source, setSource] = useState<'internal' | 'client_supplier'>('internal');
+  const [source, setSource] = useState<'internal' | 'external'>('internal');
   const [cashId, setCashId] = useState<string>('');
   const [unitTransactionId, setUnitTransactionId] = useState<string>('');
   const [noInvoice, setNoInvoice] = useState<string>('');
@@ -54,9 +56,11 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
     }));
   }, [kasData]);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (item) {
-      setSource((item.source as 'internal' | 'client_supplier') || 'internal');
+      setSource((item.source as 'internal' | 'external') || 'internal');
       setCashId(item.cash_id ? String(item.cash_id) : '');
       setUnitTransactionId(item.unit_transaction_id ? String(item.unit_transaction_id) : '');
       setNoInvoice(item.no_invoice || '');
@@ -190,19 +194,12 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Bukti Potong</h2>
-          <p className="text-sm text-gray-500 mt-1">Kelola detail informasi bukti potong dan biaya-biaya terkait</p>
-          <div className="my-6 h-px bg-muted/60" />
-        </div>
-
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label>Sumber Bukti Potong</Label>
+            <Label>Sumber Bukti Potong <RequiredMark /></Label>
             <Select
               value={source}
-              onValueChange={(val: string) => setSource(val as 'internal' | 'client_supplier')}
+              onValueChange={(val: string) => setSource(val as 'internal' | 'external')}
               disabled={isPending}
             >
               <SelectTrigger className="w-full bg-slate-50">
@@ -210,12 +207,12 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="internal">Internal</SelectItem>
-                <SelectItem value="client_supplier">Client / Supplier</SelectItem>
+                <SelectItem value="external">Client, Supplier / Eksternal</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Pilih Kas {source === 'internal' && <span className="text-red-500">*</span>}</Label>
+            <Label>Pilih Kas <RequiredMark /></Label>
             <SearchableSelect
               value={cashId}
               onChange={setCashId}
@@ -224,7 +221,6 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
               searchPlaceholder="Cari Kas..."
               emptyText="Data tidak ditemukan"
               loading={isLoadingKas}
-              disabled={source === 'client_supplier' || isPending}
             />
           </div>
         </div>
@@ -235,7 +231,7 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
 
           <div className="space-y-2">
-            <Label>Nomor Invoice <span className="text-red-500">*</span></Label>
+            <Label>Nomor Invoice <RequiredMark /></Label>
             <Input
               placeholder="Contoh: INV-PAKB-12/2932KN"
               value={noInvoice}
@@ -246,7 +242,7 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
             />
           </div>
           <div className="space-y-2">
-            <Label>Nomor Bukti Potong <span className="text-red-500">*</span></Label>
+            <Label>Nomor Bukti Potong <RequiredMark /></Label>
             <Input
               placeholder="Contoh: BPTR921031913"
               value={withholdingNumber}
@@ -289,11 +285,11 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
           </div>
 
           <div className="space-y-2">
-            <Label>Jumlah Pembayaran <span className="text-red-500">*</span></Label>
+            <Label>Jumlah Pembayaran <RequiredMark /></Label>
             <MoneyInput name="payment_amount" value={Number(paymentAmountStr) || 0} onChangeValue={(val) => setPaymentAmountStr(val.toString())} onBlur={() => { }} disabled={isPending} />
           </div>
           <div className="space-y-2">
-            <Label>Tanggal Dibayar <span className="text-red-500">*</span></Label>
+            <Label>Tanggal Dibayar <RequiredMark /></Label>
             <Input
               type="date"
               value={paymentDate}

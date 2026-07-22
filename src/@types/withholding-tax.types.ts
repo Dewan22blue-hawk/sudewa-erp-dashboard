@@ -50,7 +50,7 @@ export interface WithholdingTaxDoInvoice {
 export interface WithholdingTaxItem {
   id: number;
   company_id: number | null;
-  source: 'internal' | 'external' | 'client_supplier' | string;
+  source: 'internal' | 'external' | string;
   cash_id: number | null;
   unit_transaction_id: number | null;
   bbn_bill_id: number | null;

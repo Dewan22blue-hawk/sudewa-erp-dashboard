@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import BuktiPotongForm from '@/components/features/bukti-potong/BuktiPotongForm';
@@ -24,16 +24,18 @@ export default function EditBuktiPotongPage() {
 
   return (
     <DashboardLayout>
-      <Head>
-        <title>Edit Bukti Potong</title>
-      </Head>
-
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="h-8 w-8 rounded-full">
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-semibold text-slate-950">Edit Bukti Potong</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1">
+            <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" />
+              Kembali
+            </button>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Form Edit Bukti Potong</h1>
+            <p className="text-sm text-muted-foreground">
+              Kelola data Bukti Potong
+            </p>
+          </div>
         </div>
 
         {isLoading ? (

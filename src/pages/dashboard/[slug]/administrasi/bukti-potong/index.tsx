@@ -47,7 +47,7 @@ export default function BuktiPotongPage() {
   const [perPage, setPerPage] = useState(25);
   const [orderBy, setOrderBy] = useState('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
-  const [sourceFilter, setSourceFilter] = useState<'internal' | 'client_supplier'>('internal');
+  const [sourceFilter, setSourceFilter] = useState<'internal' | 'external'>('internal');
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -159,8 +159,8 @@ export default function BuktiPotongPage() {
           <button
             type="button"
             className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${sourceFilter === 'internal'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              ? 'border-slate-900 text-slate-900'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
               }`}
             onClick={() => { setSourceFilter('internal'); setPage(1); }}
           >
@@ -168,11 +168,11 @@ export default function BuktiPotongPage() {
           </button>
           <button
             type="button"
-            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${sourceFilter === 'client_supplier'
-                ? 'border-slate-900 text-slate-900'
-                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${sourceFilter === 'external'
+              ? 'border-slate-900 text-slate-900'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
               }`}
-            onClick={() => { setSourceFilter('client_supplier'); setPage(1); }}
+            onClick={() => { setSourceFilter('external'); setPage(1); }}
           >
             Client / Supplier
           </button>

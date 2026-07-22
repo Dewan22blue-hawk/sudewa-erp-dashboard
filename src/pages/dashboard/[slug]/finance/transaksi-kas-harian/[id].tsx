@@ -15,6 +15,7 @@ import TogglePaymentStatusDialog from '@/components/features/kas-harian/TogglePa
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { cn } from '@/lib/utils';
+import { CopyBox } from '@/components/ui/copy-box';
 
 const LIVE_UPDATE_INTERVAL = 5000;
 
@@ -146,7 +147,7 @@ export default function KasHarianDetailPage() {
       </Head>
 
       {isLoading ? (
-        <div className="flex min-h-[50vh] items-center justify-center rounded-[30px] border border-slate-200 bg-white">
+        <div className="flex min-h-[50vh] items-center justify-center rounded-md border border-slate-200 bg-white">
           <div className="flex items-center gap-3 text-slate-500">
             <Loader2 className="h-5 w-5 animate-spin" />
             Memuat detail transaksi...
@@ -192,6 +193,7 @@ export default function KasHarianDetailPage() {
                   setTargetStatus(!cashFlowDetail.is_paid);
                   setIsToggleOpen(true);
                 }}
+                disabled={Number(remainingPayment) !== 0}
               >
                 {cashFlowDetail.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
               </Button>
@@ -199,7 +201,7 @@ export default function KasHarianDetailPage() {
           </div>
 
           {/* 1. GENERAL INFO CARD */}
-          <div className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+          <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-6">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kode Transaksi</label>
@@ -218,7 +220,7 @@ export default function KasHarianDetailPage() {
                       </Tooltip>
                     </TooltipProvider>
                   ) : null}
-                  <p className="text-base font-bold text-slate-900">{cashFlowDetail.code || '-'}</p>
+                  <CopyBox text={cashFlowDetail?.code || '-'} />
                 </div>
               </div>
               <div className="space-y-1">
@@ -226,7 +228,7 @@ export default function KasHarianDetailPage() {
                 <p className="text-base font-medium text-slate-800">{formatDate(cashFlowDetail.date)}</p>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Company</label>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Perusahaan</label>
                 <p className="text-base font-medium text-slate-800">{cashFlowDetail.company?.name || '-'}</p>
               </div>
               <div className="space-y-1 pt-4 border-t border-slate-100 md:border-t-0 md:pt-0">
@@ -248,7 +250,7 @@ export default function KasHarianDetailPage() {
             </div>
 
             {/* Divider */}
-            <div className="border-t border-slate-100 pt-6" />
+            <div className="border-t border-slate-100 pt-2" />
 
             <div className="grid gap-6 md:grid-cols-3">
               {/* TRANSACTION CATEGORY - Clickable */}
@@ -258,7 +260,7 @@ export default function KasHarianDetailPage() {
                   type="button"
                   onClick={() => setIsCategoryModalOpen(true)}
                   className={cn(
-                    'flex h-12 w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-left text-sm transition-all',
+                    'flex h-10 w-full items-center gap-2 rounded-md border border-slate-200 bg-white px-4 text-left text-sm transition-all',
                     'hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] cursor-pointer',
                   )}
                 >
@@ -278,11 +280,11 @@ export default function KasHarianDetailPage() {
                     value={transactionNote}
                     onChange={(event) => setTransactionNote(event.target.value)}
                     placeholder="Masukkan catatan transaksi..."
-                    className="min-h-12 h-12 py-3 resize-none rounded-xl border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors flex-1"
+                    className="resize-none rounded-xl border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors flex-1"
                   />
                   <Button
                     type="button"
-                    className="h-12 rounded-xl bg-[#18385b] px-6 text-white hover:bg-[#102843] transition-colors shrink-0"
+                    className="h-10 rounded-md bg-[#18385b] px-6 text-white hover:bg-[#102843] transition-colors shrink-0"
                     disabled={updateMutation.isPending}
                     onClick={() => void handleSaveData()}
                   >
@@ -403,7 +405,8 @@ export default function KasHarianDetailPage() {
           <TogglePaymentStatusDialog open={isToggleOpen} onOpenChange={setIsToggleOpen} data={cashFlowDetail} targetStatus={targetStatus} />
           <TransactionCategoryModal open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} cashFlowDetail={cashFlowDetail} />
         </div>
-      )}
-    </DashboardLayout>
+      )
+      }
+    </DashboardLayout >
   );
 }
