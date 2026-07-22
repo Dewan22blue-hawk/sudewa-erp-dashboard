@@ -31,6 +31,7 @@ interface Props {
   perPage?: number;
   onPerPageChange?: (value: number) => void;
   onPageChange?: (page: number) => void;
+  headerActions?: React.ReactNode;
 }
 
 export default function PenerimaanUnitTable({
@@ -42,6 +43,7 @@ export default function PenerimaanUnitTable({
   perPage = 25,
   onPerPageChange,
   onPageChange,
+  headerActions,
 }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
@@ -138,6 +140,7 @@ export default function PenerimaanUnitTable({
         onPerPageChange={onPerPageChange}
         meta={meta}
         onPageChange={onPageChange}
+        headerActions={headerActions}
       />
 
       {deleteId && (

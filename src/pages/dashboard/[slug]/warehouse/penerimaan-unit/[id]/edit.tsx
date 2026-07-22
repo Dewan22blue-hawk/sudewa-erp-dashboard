@@ -9,12 +9,16 @@ import PenerimaanUnitHeaderCard from '@/components/features/penerimaan-unit/Pene
 import PenerimaanUnitDetailTable from '@/components/features/penerimaan-unit/PenerimaanUnitDetailTable';
 import { useReceiptStock, useUpdateWarehouseActivity, useWarehouseActivityDetail } from '@/hooks/useWarehouseActivity';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/common/PageHeader';
+import { Badge } from '@/components/ui/badge';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 export default function EditPenerimaanUnitPage() {
   const router = useRouter();
-  const { id } = router.query as { id?: string; slug?: string };
+  const { id, slug } = router.query as { id?: string; slug?: string };
 
   const { data: detailData, isLoading } = useWarehouseActivityDetail(id);
+
   const header = detailData;
   const details = detailData?.unit_transaction_details ?? [];
   const loadingDetail = isLoading;
@@ -89,7 +93,6 @@ export default function EditPenerimaanUnitPage() {
       const apiError = error as { message?: string; details?: unknown };
       const details = apiError?.details;
 
-      // Backend can return details as an array of IDs; avoid showing unreadable "0: 123, 1: 456" toast.
       if (Array.isArray(details)) {
         toast.error(apiError?.message || 'Sebagian data detail tidak valid untuk proses receipt stock');
         return;
@@ -117,16 +120,25 @@ export default function EditPenerimaanUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 hover:bg-transparent" onClick={() => router.back()}>
-              <ChevronLeft className="h-6 w-6 text-gray-700" />
-            </Button>
-            <h1 className="text-xl font-bold text-gray-900">Data Penerimaan Unit</h1>
-          </div>
-        </div>
+        <PageHeader
+          title={`Penerimaan Unit`}
+          description={
+            <div className="flex items-center gap-2">
+              Kelola detail penerimaan stock unit
+              {header?.noPenerimaan && (
+                <ReferenceLink title='Kode Transaksi' href={`/dashboard/${slug}/warehouse/penerimaan-unit/${header?.id}`}>
+                  {header?.noPenerimaan}
+                </ReferenceLink>
+              )}
+            </div>
+          }
+        />
 
-        {isLoading || !header ? <div className="p-8 text-center text-gray-500">Loading...</div> : <PenerimaanUnitHeaderCard data={form} onChange={handleFieldChange} onBlur={handleSaveField} />}
+        {isLoading || !header ? (
+          <div className="p-8 text-center text-gray-500">Memuat data header...</div>
+        ) : (
+          <PenerimaanUnitHeaderCard data={form} onChange={handleFieldChange} onBlur={handleSaveField} />
+        )}
 
         <div className="bg-white rounded-xl border p-4 sm:p-5 space-y-4">
           <h2 className="text-sm font-semibold">Detail Penerimaan</h2>

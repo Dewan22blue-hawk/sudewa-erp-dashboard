@@ -8,6 +8,7 @@ import PenerimaanUnitTable from '@/components/features/penerimaan-unit/Penerimaa
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
@@ -60,10 +61,10 @@ export default function PenerimaanUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Data Penerimaan Unit</h1>
-          <p className="text-sm text-muted-foreground">Kelola dan lacak semua data penerimaan stock unit</p>
-        </div>
+        <PageHeader
+          title="Penerimaan Unit"
+          description="Kelola dan lacak semua data penerimaan stock unit"
+        />
 
         <div className="space-y-4">
           {isLoading ? (
@@ -86,6 +87,14 @@ export default function PenerimaanUnitPage() {
                 setCurrentPage(1);
               }}
               onPageChange={setCurrentPage}
+              headerActions={
+                canCreate && (
+                  <Button onClick={() => setOpenForm(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Penerimaan Unit
+                  </Button>
+                )
+              }
             />
           )}
         </div>

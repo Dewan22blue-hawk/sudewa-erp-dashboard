@@ -28,7 +28,8 @@ export interface TransformedReceiptUnitData {
   color: string;
   machineNumber: string;
   chassisNumber: string;
-  status: 'Lunas' | 'Belum Lunas';
+  status: string;
+  in_stock: boolean;
   unitTransactionId: number;
   received: boolean;
 }
