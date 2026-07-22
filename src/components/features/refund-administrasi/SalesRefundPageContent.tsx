@@ -119,7 +119,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
           <Table>
             <TableHeader>
               <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
-                {['NO', 'TANGGAL REFUND', 'KODE REFUND', 'NOMINAL REFUND', 'KURANG BAYAR', 'QTY', 'STATUS', 'ACTION'].map((header) => (
+                {['NO', 'TANGGAL REFUND', 'KODE REFUND', 'NOMINAL REFUND', 'KURANG BAYAR', 'QTY', 'STATUS', 'aksi'].map((header) => (
                   <TableHead key={header} className="h-12 px-4 text-center text-[14px] font-medium text-[#111827]">
                     {header}
                   </TableHead>
