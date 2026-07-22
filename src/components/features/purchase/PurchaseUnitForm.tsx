@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { useUnitFormula } from '@/hooks/useUnitFormula';
 import { useTaxes, useTaxDefault } from '@/hooks/useTax';
 import type { Tax } from '@/@types/tax.types';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
   onSubmit: (data: CreatePurchaseUnitFormValues) => void;
@@ -217,7 +218,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="typeUnitId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Tipe Unit (Opsional)</FormLabel>
+                  <FormLabel className="text-sm font-medium">Tipe Unit <RequiredMark /></FormLabel>
                   <div className="flex items-center gap-2">
                     <Popover open={openTypeSelect} onOpenChange={setOpenTypeSelect}>
                       <FormControl>
@@ -287,7 +288,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="qty"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">QTY</FormLabel>
+                  <FormLabel className="text-sm font-medium">QTY <RequiredMark /></FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -310,7 +311,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Harga Satuan</FormLabel>
+                  <FormLabel className="text-sm font-medium">Harga Satuan <RequiredMark /></FormLabel>
                   <FormControl>
                     <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
                   </FormControl>

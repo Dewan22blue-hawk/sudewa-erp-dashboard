@@ -27,9 +27,6 @@ export default function EditVehicleRegistrationPage() {
     try {
       if (typeof window !== 'undefined') {
         console.group('[VehicleRegistrationPage][Submit]');
-        console.log('registrationId', registrationId);
-        console.log('documentId', documentId);
-        console.log('registrationPayload', registrationPayload);
         console.groupEnd();
       }
 

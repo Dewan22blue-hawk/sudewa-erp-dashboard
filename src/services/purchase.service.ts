@@ -459,7 +459,6 @@ export const purchaseService = {
         acc[k] = v;
         return acc;
       }, {});
-      console.log('[createPurchase] form payload', preview);
     }
 
     const response = await apiClient.post<LaravelApiResponse<UnitTransactionDetailApiModel>>(basePath, form);

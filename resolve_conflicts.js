@@ -6,8 +6,6 @@ const unmergedFiles = statusOutput.split('\n')
   .filter(line => line.startsWith('UU '))
   .map(line => line.slice(3).trim());
 
-console.log(`Found ${unmergedFiles.length} unmerged files.`);
-
 let unknownConflicts = [];
 
 for (const file of unmergedFiles) {
@@ -80,15 +78,4 @@ for (const file of unmergedFiles) {
   }
 
   fs.writeFileSync(file, newLines.join('\n'));
-}
-
-if (unknownConflicts.length > 0) {
-  console.log(`There are ${unknownConflicts.length} unresolved conflicts:`);
-  unknownConflicts.forEach((uc, idx) => {
-    console.log(`\n--- Conflict ${idx + 1} in ${uc.file} ---`);
-    console.log(`HEAD:\n${uc.headText}`);
-    console.log(`REMOTE:\n${uc.remoteText}`);
-  });
-} else {
-  console.log('All conflicts resolved successfully based on heuristics!');
 }

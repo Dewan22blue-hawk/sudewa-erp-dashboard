@@ -49,6 +49,7 @@ export default function KasHarianTable({
   onToggleStatus,
   onPageChange,
 }: Props) {
+  console.log(data);
   const page = meta.currentPage;
   const [sortBy, setSortBy] = useState<string>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -205,12 +206,12 @@ export default function KasHarianTable({
               ) : null}
               {item.cashFlowId && onToggleStatus ? (
                 <>
-                  {item.isValid || !item.is_paid ? (
-                    <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
+                  {item.isValid && !item.is_paid ? (
+                    <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium" disabled={!item.isValid}>
                       Tandai Lunas
                     </DropdownMenuItem>
                   ) : (
-                    <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium">
+                    <DropdownMenuItem onClick={() => onToggleStatus(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer font-medium" disabled={!item.is_paid}>
                       Tandai Belum Lunas
                     </DropdownMenuItem>
                   )}

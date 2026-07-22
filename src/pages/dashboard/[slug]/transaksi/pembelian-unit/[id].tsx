@@ -263,12 +263,6 @@ export default function PurchaseDetailPage() {
       toast.success('Status pembelian diperbarui ke receipt dan stok warehouse berhasil diproses.');
     } catch (error: any) {
       const message = readApiError(error);
-      console.error('[purchase.handleReceipt] failed', {
-        purchaseId: purchase.id,
-        stockState: currentStockState,
-        error: message,
-        raw: error,
-      });
 
       toast.error(message || 'Gagal update state ke receipt', {
         action: {
@@ -356,7 +350,7 @@ export default function PurchaseDetailPage() {
             <Button
               type="button"
               variant="outline"
-              disabled={isPaid || isRefunded || updateBillingIsPaid.isPending}
+              disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
               className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => setIsMarkAsPaidDialogOpen(true)}
             >

@@ -70,7 +70,6 @@ export function GoodsReceiptEquipmentDetailTable({
           </TableRow>
         ) : (
           data.map((item, index) => {
-            console.log('GoodsReceiptEquipmentDetailTable item:', item);
             return (
               <TableRow key={item.id} className="group border-slate-200 bg-white hover:bg-slate-50 transition-colors">
                 <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">

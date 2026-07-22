@@ -29,7 +29,6 @@ export function PurchaseUnitTable({ units }: Props) {
   const confirmDelete = () => {
     if (deleteId) {
       // In a real app, this would be an API call
-      console.log('Deleting unit:', deleteId);
       toast.success('Unit deleted successfully');
       setDeleteId(null);
     }

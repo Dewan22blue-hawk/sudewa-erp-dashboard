@@ -47,9 +47,6 @@ export default function TransaksiRefundBeliPage() {
   const { data: purchase } = usePurchaseById(unitTransactionId || '');
   const { data: purcahseItemDetails } = usePurchaseUnitItemDetails(purchase?.id || '');
 
-  console.log(purchase)
-  console.log(purcahseItemDetails)
-
   function handleDetail(trxId: string, rfdId: string) {
     router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${trxId}/refund/${rfdId}`);
   }

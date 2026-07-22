@@ -79,17 +79,14 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
 
     // Action handlers
     const handleEdit = (item: InvoiceItem) => {
-        console.log('Edit item:', item)
         alert(`Edit: ${item.unitType}`)
     }
 
     const handleDetail = (item: InvoiceItem) => {
-        console.log('Detail item:', item)
         alert(`Detail: ${item.unitType}`)
     }
 
     const handleDelete = (item: InvoiceItem) => {
-        console.log('Delete item:', item)
         if (confirm(`Hapus ${item.unitType}?`)) {
             alert('Item deleted!')
         }

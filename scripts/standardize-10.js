@@ -37,14 +37,13 @@ function processFile(filePath) {
   let originalContent = content;
 
   for (const { pattern, replacement } of regexes) {
-      if (pattern.test(content)) {
-          content = content.replace(pattern, replacement);
-      }
+    if (pattern.test(content)) {
+      content = content.replace(pattern, replacement);
+    }
   }
 
   if (content !== originalContent) {
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Updated 10 to 25: ${filePath}`);
   }
 }
 
@@ -54,5 +53,3 @@ DIRECTORIES.forEach(dir => {
     processDirectory(fullPath);
   }
 });
-
-console.log('Perbaikan default perPage/limit 10 Selesai!');

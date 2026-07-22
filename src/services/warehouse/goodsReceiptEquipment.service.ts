@@ -158,7 +158,6 @@ export const getGoodsReceiptEquipments = async (
 export const getGoodsReceiptEquipmentById = async (id: number | string): Promise<GoodsReceiptEquipmentDetail> => {
   const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/${id}`);
   const data = ensureSuccess(response.data);
-  console.log('RAW getGoodsReceiptEquipmentById DATA:', data);
 
   return {
     ...mapReceipt(data),

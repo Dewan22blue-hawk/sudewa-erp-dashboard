@@ -44,8 +44,6 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
     Boolean(companyId),
   );
 
-  console.log(rows);
-
   const mappedFallback = useMemo(() => {
     const source = data ?? [];
     return source.map((item) => ({
