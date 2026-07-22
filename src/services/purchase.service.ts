@@ -276,6 +276,7 @@ const mapUnitTransactionItemList = (item: UnitTransactionItemListApiModel): Purc
 
   return {
     id: String(item.id ?? ''),
+    code: item.unit_transaction?.code ?? '-',
     unitTransactionId: item.unit_transaction_id ? String(item.unit_transaction_id) : '',
     unitTransactionCode: item.unit_transaction?.code,
     unitTypeId: item.unit_type_id ? String(item.unit_type_id) : undefined,
