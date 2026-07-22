@@ -11,12 +11,16 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() || 0;
-    if (latest > previous && latest > 120) {
-      setHidden(true); 
-    } else {
-      setHidden(false); 
+    const previous = scrollY.getPrevious();
+    
+    if (previous !== undefined) {
+      if (latest > previous && latest > 120) {
+        setHidden(true); 
+      } else if (latest < previous) {
+        setHidden(false); 
+      }
     }
+    
     setScrolled(latest > 30);
   });
 
