@@ -1,136 +1,111 @@
-import React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import React, { useMemo } from 'react';
 import { CashFlowItem } from '@/services/cashFlow.service';
-import { ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
-
+import { TableRow, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { TextTruncate } from '@/components/ui/text-truncate';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface LaporanKasTableProps {
-    data: CashFlowItem[];
-    totalPemasukan?: number;
-    totalPengeluaran?: number;
-    onSort?: (key: string) => void;
-    sortKey?: string;
-    sortOrder?: 'asc' | 'desc';
+  data: CashFlowItem[];
+  totalPemasukan?: number;
+  totalPengeluaran?: number;
+  onSort?: (key: string) => void;
+  sortKey?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
-export function LaporanKasTable({ 
-    data, 
-    totalPemasukan = 0, 
-    totalPengeluaran = 0,
-    onSort,
-    sortKey,
-    sortOrder
+const formatCurrency = (val: number) => {
+  return `Rp ${val.toLocaleString('id-ID')}`;
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return format(date, 'dd MMMM yyyy', { locale: id });
+};
+
+export function LaporanKasTable({
+  data,
+  totalPemasukan = 0,
+  totalPengeluaran = 0,
+  onSort,
+  sortKey,
+  sortOrder,
 }: LaporanKasTableProps) {
-    const formatCurrency = (val: number) => {
-        return `Rp ${val.toLocaleString('id-ID')}`;
-    };
+  const columns = useMemo<ColumnDef<CashFlowItem>[]>(
+    () => [
+      {
+        header: 'Tanggal',
+        accessorKey: 'date',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => formatDate(item.date),
+      },
+      {
+        header: 'Nota Reff',
+        accessorKey: 'code',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item?.code} />
+      },
+      {
+        header: 'Keterangan',
+        accessorKey: 'note',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <TextTruncate text={item.note || '-'} maxLength={20} />,
+      },
+      {
+        header: 'PEMASUKAN',
+        accessorKey: 'debet',
+        alignment: 'center',
+        cell: (item) => (
+          <span className="text-emerald-600 font-semibold">
+            {item.debet > 0 ? formatCurrency(item.debet) : '-'}
+          </span>
+        ),
+      },
+      {
+        header: 'PENGELUARAN',
+        accessorKey: 'credit',
+        alignment: 'center',
+        cell: (item) => (
+          <span className="text-rose-600 font-semibold">
+            {item.credit > 0 ? formatCurrency(item.credit) : '-'}
+          </span>
+        ),
+      },
+    ],
+    []
+  );
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        if (Number.isNaN(date.getTime())) return dateString;
-        return format(date, 'dd MMMM yyyy', { locale: id });
-    };
+  const footerRow = useMemo(
+    () => (
+      <TableRow className="group bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200">
+        <TableCell colSpan={3} className="px-4 py-4 text-right">
+          <span className="text-sm font-semibold text-slate-900 pr-12">Grand Total</span>
+        </TableCell>
+        <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
+          {formatCurrency(totalPemasukan)}
+        </TableCell>
+        <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
+          {formatCurrency(totalPengeluaran)}
+        </TableCell>
+      </TableRow>
+    ),
+    [totalPemasukan, totalPengeluaran]
+  );
 
-    const renderSortHeader = (title: string, key: string, align: 'left' | 'right' | 'center' = 'left') => {
-        const isSorted = sortKey === key;
-        const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-        return (
-            <button
-                type="button"
-                className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase transition-colors ${
-                    isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
-                } ${justifyClass}`}
-                onClick={() => onSort?.(key)}
-            >
-                <span>{title}</span>
-                {isSorted ? (
-                    sortOrder === 'asc' ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-                    ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-                    )
-                ) : (
-                    <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
-                )}
-            </button>
-        );
-    };
-
-    return (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto shadow-none">s*<Table>
-                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="hover:bg-transparent">
-                            <TableHead className="p-0 text-center w-[150px]">
-                                {renderSortHeader('Tanggal', 'date', 'center')}
-                            </TableHead>
-                            <TableHead className="p-0 text-left w-[150px]">
-                                {renderSortHeader('Nota Reff', 'code', 'left')}
-                            </TableHead>
-                            <TableHead className="p-0 text-left">
-                                {renderSortHeader('Keterangan', 'note', 'left')}
-                            </TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-center">PEMASUKAN</TableHead>
-                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 w-[200px] text-center">PENGELUARAN</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {data.map((item) => (
-                            <TableRow key={item.id} className="group border-slate-200 hover:bg-gray-50 transition-colors bg-white border-b">
-                                <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium text-center">
-                                    {formatDate(item.date)}
-                                </TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                    {item.code}
-                                </TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                    {item.note || '-'}
-                                </TableCell>
-                                <TableCell className="px-4 py-4 text-sm font-semibold text-emerald-600 text-center">
-                                    {item.debet > 0 ? formatCurrency(item.debet) : ''}
-                                </TableCell>
-                                <TableCell className="px-4 py-4 text-sm font-semibold text-rose-600 text-center">
-                                    {item.credit > 0 ? formatCurrency(item.credit) : ''}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {data.length === 0 && (
-                            <TableRow className="group">
-                                <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
-                            </TableRow>
-                        )}
-                        {/* Footer Totals Row */}
-                        <TableRow className="group bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200">
-                            <TableCell colSpan={3} className="px-4 py-4">
-                                <div className="text-right pr-12">
-                                    <span className="text-sm font-semibold text-slate-900">Grand Total</span>
-                                </div>
-                            </TableCell>
-                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
-                                {formatCurrency(totalPemasukan)}
-                            </TableCell>
-                            <TableCell className="px-4 py-4 text-sm font-bold text-slate-900 text-center">
-                                {formatCurrency(totalPengeluaran)}
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </div>
-    );
+  return (
+    <BaseTable
+      data={data}
+      columns={columns}
+      footer={footerRow}
+      sortBy={sortKey}
+      sortDirection={sortOrder}
+      onSortChange={onSort ? (key, direction) => onSort(key) : undefined}
+    />
+  );
 }

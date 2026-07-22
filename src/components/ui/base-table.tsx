@@ -59,6 +59,7 @@ export interface BaseTableProps<T> {
   selectedIds?: Set<string>;
   onSelectedIdsChange?: (ids: Set<string>) => void;
   getRowId?: (item: T) => string;
+  footer?: React.ReactNode;
 }
 
 export default function BaseTable<T>({
@@ -84,6 +85,7 @@ export default function BaseTable<T>({
   selectedIds,
   onSelectedIdsChange,
   getRowId,
+  footer,
 }: BaseTableProps<T>) {
   const [localSearch, setLocalSearch] = useState(search || '');
   const [internalSort, setInternalSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(
@@ -397,6 +399,7 @@ export default function BaseTable<T>({
               ))
             )}
           </TableBody>
+          {footer}
         </Table>
       </div>
 
