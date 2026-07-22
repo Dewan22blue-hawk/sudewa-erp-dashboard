@@ -36,8 +36,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen font-sans">
       {/* Left Side - Login Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center bg-white">
-        <div className="flex flex-col items-start bg-white rounded-lg border border-[#E5E5E5] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6 gap-6" style={{ width: '400px' }}>
+      <div className="relative flex w-full lg:w-1/2 items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 p-4 sm:p-8 overflow-hidden">
+        {/* Animated background blobs for the left side */}
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-red-100/50 blur-[80px] mix-blend-multiply opacity-60 animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] rounded-full bg-orange-100/50 blur-[80px] mix-blend-multiply opacity-60 animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+
+        {/* The Form Card */}
+        <div className="relative z-10 flex flex-col items-start bg-white/80 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] p-8 gap-6 w-full max-w-[400px] transition-all duration-500 hover:shadow-[0_16px_50px_-12px_rgba(0,0,0,0.15)] hover:-translate-y-1">
           {/* Header */}
           <div className="flex flex-col gap-2 w-full">
             <h1 className="text-[16px] font-semibold leading-6 text-[#0A0A0A]">Login to your account</h1>
