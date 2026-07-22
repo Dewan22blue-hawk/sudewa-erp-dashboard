@@ -134,15 +134,8 @@ export default function EditPenerimaanUnitPage() {
           }
         />
 
-        {isLoading || !header ? (
-          <div className="p-8 text-center text-gray-500">Memuat data header...</div>
-        ) : (
-          <PenerimaanUnitHeaderCard data={form} onChange={handleFieldChange} onBlur={handleSaveField} />
-        )}
-
-        <div className="bg-white rounded-xl border p-4 sm:p-5 space-y-4">
-          <h2 className="text-sm font-semibold">Detail Penerimaan</h2>
-          {loadingDetail ? <div className="p-6 text-center text-gray-500">Memuat detail...</div> : <PenerimaanUnitDetailTable data={details} personId={header?.person?.id} onTerima={handleTerima} onDelete={handleDelete} />}
+        <div className="bg-white rounded-xl border sm:p-5 space-y-4">
+          <PenerimaanUnitDetailTable data={details} personId={header?.person?.id} onTerima={handleTerima} onDelete={handleDelete} />
         </div>
       </div>
     </DashboardLayout>

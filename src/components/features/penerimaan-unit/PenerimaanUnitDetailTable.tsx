@@ -213,17 +213,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
             </Badge>
           );
         },
-      },
-      {
-        header: 'Action',
-        alignment: 'center',
-        sticky: 'right',
-        cell: (item) => (
-          <Button variant="ghost" size="icon" onClick={() => setConfirmDeleteIds([item.id])}>
-            <Trash size={16} className="text-red-600" />
-          </Button>
-        ),
-      },
+      }
     ],
     [filteredRows, selected, receivedIds, slug, currentPage, itemsPerPage]
   );
