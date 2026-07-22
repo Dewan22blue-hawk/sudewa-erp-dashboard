@@ -205,3 +205,12 @@ export const useDeletePurchaseUnitItemDetail = () => {
     },
   });
 };
+
+export const useUnitTransactionItemDetailsData = (id: string, params: { in_stock?: boolean; color?: string; machine_number?: string; chassis_number?: string; status?: string } = {}) => {
+  return useQuery({
+    queryKey: ['unit-transaction-item-details-data', id, params],
+    queryFn: () => purchaseService.getUnitTransactionItemDetailsData(id, params),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+};

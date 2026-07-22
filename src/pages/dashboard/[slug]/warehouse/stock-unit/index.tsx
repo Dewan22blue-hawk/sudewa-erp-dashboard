@@ -7,14 +7,8 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { StockStatus } from '@/@types/stock-unit.types';
-import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function StockUnitPage() {
-  const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('warehouse:create');
-  const canEdit = hasPermission('warehouse:edit');
-  const canDelete = hasPermission('warehouse:delete');
-
   const { companyId } = useCompany();
 
   const [search, setSearch] = useState('');
@@ -94,8 +88,6 @@ export default function StockUnitPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <PanelName />
-
-
         <StockUnitTable
           data={data?.data || []}
           isLoading={isLoading}

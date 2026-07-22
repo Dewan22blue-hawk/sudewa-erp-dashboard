@@ -122,7 +122,7 @@ export default function TransaksiRefundJualPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6">
         <PageHeader
           title="Refund Penjualan"
           description="Daftar transaksi refund penjualan unit"
@@ -146,11 +146,11 @@ export default function TransaksiRefundJualPage() {
           meta={
             refundQuery.data?.meta
               ? {
-                  currentPage: refundQuery.data.meta.currentPage,
-                  perPage: refundQuery.data.meta.perPage,
-                  lastPage: refundQuery.data.meta.lastPage,
-                  total: refundQuery.data.meta.total,
-                }
+                currentPage: refundQuery.data.meta.currentPage,
+                perPage: refundQuery.data.meta.perPage,
+                lastPage: refundQuery.data.meta.lastPage,
+                total: refundQuery.data.meta.total,
+              }
               : undefined
           }
           onPageChange={setPage}

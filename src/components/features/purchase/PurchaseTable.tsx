@@ -290,7 +290,7 @@ export default function PurchaseTable({
                   <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${item.id}/edit`)}>
                     <Pencil className="mr-2 h-4 w-4" /> Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli`)}>
+                  <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${item.id}`)}>
                     <RotateCcw className="mr-2 h-4 w-4" /> Refund Beli
                   </DropdownMenuItem>
                 </>

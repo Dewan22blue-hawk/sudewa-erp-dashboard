@@ -118,13 +118,6 @@ export default function StockUnitTable({
       alignment: 'center',
       cell: (item) => renderStatus(item.status),
     },
-    {
-      header: 'Status Unit',
-      accessorKey: 'stockStatus',
-      sortable: true,
-      alignment: 'center',
-      cell: (item) => renderStatus(item.stockStatus),
-    },
   ];
 
   const meta = {

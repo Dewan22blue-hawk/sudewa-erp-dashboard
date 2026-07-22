@@ -56,6 +56,8 @@ export interface Purchase {
   totalBiaya: number;
   totalPurchase: number;
 
+  unit_transaction_items: any[];
+
   totalPaid: number;
   remainingPayment: number;
 
@@ -137,6 +139,7 @@ export interface PurchasePaginatedResponse {
 
 export interface PurchaseUnitItemRow {
   id: string;
+  code: string;
   unitTransactionId: string;
   unitTransactionCode?: string;
   unitTypeId?: string;
@@ -154,6 +157,7 @@ export interface PurchaseUnitItemRow {
   totalDpp?: number;
   totalPpn?: number;
   totalPurchase?: number;
+  supplierName?: string;
   createdAt?: string;
 }
 

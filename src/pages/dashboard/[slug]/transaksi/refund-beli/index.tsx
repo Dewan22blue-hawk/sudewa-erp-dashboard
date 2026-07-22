@@ -9,10 +9,13 @@ import { useRefundList } from '@/hooks/useRefundAdministrasi';
 import { UnitTransactionRefund } from '@/@types/refund.type';
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
 import { Button } from '@/components/ui/button';
-import { Eye, MoreVertical, Pencil } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus } from 'lucide-react';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { CopyBox } from '@/components/ui/copy-box';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { usePurchaseById, usePurchaseUnitItemDetails } from '@/hooks/usePurchase';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -30,6 +33,10 @@ export default function TransaksiRefundBeliPage() {
   const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
 
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+
   const refundQuery = useRefundList({
     page,
     perPage,
@@ -37,12 +44,18 @@ export default function TransaksiRefundBeliPage() {
     unit_transaction_id: unitTransactionId,
   });
 
+  const { data: purchase } = usePurchaseById(unitTransactionId || '');
+  const { data: purcahseItemDetails } = usePurchaseUnitItemDetails(purchase?.id || '');
+
+  console.log(purchase)
+  console.log(purcahseItemDetails)
+
   function handleDetail(trxId: string, rfdId: string) {
     router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${trxId}/refund/${rfdId}`);
   }
 
   function handleEdit(trxId: string, rfdId: string) {
-    router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${trxId}/refund/${rfdId}/edit`);
+    router.push(`/dashboard/${slug}/transaksi/refund-beli/${rfdId}/edit?unit_transaction_id=${trxId}`);
   }
 
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
@@ -95,14 +108,7 @@ export default function TransaksiRefundBeliPage() {
         accessorKey: 'total_qty',
         sortable: true,
         alignment: 'left',
-        cell: (item) => item.total_qty ?? item.items?.length ?? 0,
-      },
-      {
-        header: 'STATUS',
-        accessorKey: 'status',
-        sortable: true,
-        alignment: 'left',
-        cell: (item) => <RefundStatusBadge status={item.status === 'approve' || item.status === 'reject' ? item.status : 'waiting'} />,
+        cell: (item) => item.total_qty + ' Unit',
       },
       {
         header: 'ACTION',
@@ -116,36 +122,14 @@ export default function TransaksiRefundBeliPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {/* <DropdownMenuItem onClick={() => handleEdit(item.id)} disabled={!canEdit}>
+              <DropdownMenuItem onClick={() => handleEdit(item.unit_transaction_id || item.transaction?.id || '', item.id)}>
                 <Pencil className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem> */}
-              <DropdownMenuItem onClick={() => handleDetail(item.unit_transaction_id, item.id)}>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleDetail(item.unit_transaction_id || item.transaction?.id || '', item.id)}>
                 <Eye className="mr-2 h-4 w-4" /> Detail / Kelola Unit
               </DropdownMenuItem>
-              {/* <DropdownMenuItem
-                className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                onClick={() => setUnitToDelete(item.id)}
-                disabled={!canDelete}
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> Hapus
-              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          // <Button
-          //   variant="outline"
-          //   size="sm"
-          //   className="gap-2"
-          //   onClick={() => {
-          //     const trxId = item.unit_transaction_id || item.transaction?.id;
-          //     if (trxId) {
-          //       router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${trxId}/refund/${item.id}`);
-          //     }
-          //   }}
-          // >
-          //   <Eye className="h-4 w-4" />
-          //   Detail
-          // </Button>
         ),
       },
     ],
@@ -154,10 +138,19 @@ export default function TransaksiRefundBeliPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6">
         <PageHeader
-          title="Refund Pembelian"
-          description="Daftar transaksi refund pembelian unit"
+          title={`Refund Pembelian`}
+          description={
+            <div className="flex items-center gap-2">
+              Daftar transaksi refund pembelian unit
+              {purchase?.code && (
+                <ReferenceLink title='Kode Transaksi' href={`/dashboard/${slug}/transaksi/pembelian-unit/${purchase?.id}`}>
+                  {purchase?.code}
+                </ReferenceLink>
+              )}
+            </div>
+          }
         />
 
         <BaseTable
@@ -185,6 +178,22 @@ export default function TransaksiRefundBeliPage() {
               }
               : undefined
           }
+          headerActions=
+          {(
+            <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
+              <div className="flex items-center gap-2">
+                {canCreate && (
+                  <Button
+                    onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli/create?unit_transaction_id=${unitTransactionId || ''}`)}
+                    className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Data Refund
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
           onPageChange={setPage}
         />
       </div>
