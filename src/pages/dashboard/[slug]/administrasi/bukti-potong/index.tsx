@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import BuktiPotongTable from '@/components/features/bukti-potong/BuktiPotongTable';
 import BuktiPotongDeleteDialog from '@/components/features/bukti-potong/BuktiPotongDeleteDialog';
-import WithholdingTaxDetailModal from '@/components/features/finance/withholding-tax/WithholdingTaxDetailModal';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxes } from '@/hooks/useWithholdingTax';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
@@ -49,7 +48,6 @@ export default function BuktiPotongPage() {
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
   const [sourceFilter, setSourceFilter] = useState<'internal' | 'external'>('internal');
 
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<WithholdingTaxItem | null>(null);
 
@@ -133,8 +131,7 @@ export default function BuktiPotongPage() {
   };
 
   const handleView = (item: WithholdingTaxItem) => {
-    setSelectedItem(item);
-    setIsDetailModalOpen(true);
+    router.push(base(`/administrasi/bukti-potong/${item.id}`));
   };
 
   const handleDelete = (item: WithholdingTaxItem) => {
@@ -237,15 +234,6 @@ export default function BuktiPotongPage() {
             currentSortDirection={orderSort}
           />
         </div>
-
-        <WithholdingTaxDetailModal
-          isOpen={isDetailModalOpen}
-          onClose={() => {
-            setIsDetailModalOpen(false);
-            setSelectedItem(null);
-          }}
-          itemId={selectedItem?.id ?? null}
-        />
 
         <BuktiPotongDeleteDialog
           isOpen={isDeleteModalOpen}
