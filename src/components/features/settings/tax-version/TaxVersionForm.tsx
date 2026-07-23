@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-import type { TaxVersion } from '@/services/taxVersion.service';
+import type { TaxVersion } from '@/services/tax.service';
 import { ClampedNumericInput } from '@/components/ui/clamped-numeric-input';
 
 const taxVersionSchema = z.object({

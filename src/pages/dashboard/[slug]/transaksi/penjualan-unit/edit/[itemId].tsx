@@ -89,7 +89,7 @@ export default function EditUnitPage() {
   // Initialize form state when details are loaded
   useEffect(() => {
     if (data?.raw) {
-      const initialCustomerId = String(data.raw.person_id ?? data.raw.person?.id ?? '');
+      const initialCustomerId = String((data.raw as any).person_id ?? data.raw.person?.id ?? '');
       setForm((prev) => ({
         ...prev,
         customerId: initialCustomerId,
@@ -161,7 +161,7 @@ export default function EditUnitPage() {
       }
 
       const customerId = Number(form.customerId);
-      const companyIdNumber = Number(companyId || data.raw.company_id || 0);
+      const companyIdNumber = Number(companyId || (data.raw as any).company_id || 0);
 
       if (!customerId) {
         toast.error('Customer wajib dipilih');
@@ -171,7 +171,7 @@ export default function EditUnitPage() {
       const payload = {
         company_id: companyIdNumber,
         person_id: customerId,
-        warehouse_id: Number(data.raw.warehouse?.id ?? data.raw.warehouse_id ?? 1),
+        warehouse_id: Number(data.raw.warehouse?.id ?? (data.raw as any).warehouse_id ?? 1),
         code: data.raw.code ?? invoiceCode,
         type: 'sales' as const,
         max_capacity: Number(data.raw.max_capacity ?? 1),

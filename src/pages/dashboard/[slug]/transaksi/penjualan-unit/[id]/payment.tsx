@@ -130,7 +130,7 @@ const hasCompleteSalesAssignmentsFromLatestSnapshot = async (salesId: string, fa
 
   try {
     const latest = await salesService.getSalesDetail(salesId);
-    return hasCompleteSalesAssignmentsForInvalidItems(latest?.raw, invalidItemIds);
+    return hasCompleteSalesAssignmentsForInvalidItems(latest, invalidItemIds);
   } catch {
     return false;
   }

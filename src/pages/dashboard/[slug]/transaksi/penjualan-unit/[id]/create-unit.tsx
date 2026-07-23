@@ -27,7 +27,7 @@ export default function CreateUnitPage() {
     sort_by: 'created_at',
     sort_order: 'asc',
     in_stock: 'true',
-    company_id: companyId || salesDetail?.raw?.company_id || 1
+    company_id: companyId || (salesDetail?.raw as any)?.company_id || 1
   });
 
   const { data: salesItemsResponse } = useSalesUnitItems(salesId);

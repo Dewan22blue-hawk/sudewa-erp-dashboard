@@ -76,14 +76,14 @@ export default function SalesUnitDetailPage() {
       unit_transaction_id: String(salesId ?? ''),
       unit_type_id: String(hit.unit_type_id ?? ''),
       qty_total: Number(hit.qty_total ?? 0),
-      unit_transaction_item_details: (hit.unit_transaction_item_details ?? []).map((detail) => ({
+      unit_transaction_item_details: (hit.unit_transaction_item_details ?? []).map((detail: any) => ({
         id: Number(detail?.id ?? 0),
         color: String(detail?.color ?? '-'),
         machine_number: String(detail?.machine_number ?? '-'),
         chassis_number: String(detail?.chassis_number ?? '-'),
         in_stock: true,
       })),
-      unit_transaction_item_sales: (hit.unit_transaction_item_sales ?? []).map((item) => ({
+      unit_transaction_item_sales: (hit.unit_transaction_item_sales ?? []).map((item: any) => ({
         id: Number(item?.id ?? 0),
         unit_transaction_item_id: Number(hit.id ?? 0),
         unit_transaction_item_detail_id: Number(item?.unit_transaction_item_detail_id ?? 0),
@@ -91,7 +91,7 @@ export default function SalesUnitDetailPage() {
     };
   }, [salesData?.raw?.unit_transaction_items, selectedUnitId, salesId]);
 
-  const companyId = String(salesData?.raw?.company_id ?? '1');
+  const companyId = String((salesData?.raw as any)?.company_id ?? '1');
   const fallbackUnitTypeId = String(fallbackUnitItemFromSales?.unit_type_id ?? '');
 
   const {
@@ -118,7 +118,7 @@ export default function SalesUnitDetailPage() {
   const requiredQty = Number(effectiveUnitItem?.qty_total ?? 0);
 
   const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
-    const mappedFromItemDetails = (effectiveUnitItem?.unit_transaction_item_details ?? []).map((detail) => ({
+    const mappedFromItemDetails = (effectiveUnitItem?.unit_transaction_item_details ?? []).map((detail: any) => ({
       id: toNumberId(detail?.id),
       color: String(detail?.color ?? '-'),
       machine_number: String(detail?.machine_number ?? '-'),
@@ -130,14 +130,14 @@ export default function SalesUnitDetailPage() {
     stockUnits.forEach((detail) => {
       detailLookup.set(detail.id, detail);
     });
-    mappedFromItemDetails.forEach((detail) => {
+    mappedFromItemDetails.forEach((detail: any) => {
       detailLookup.set(detail.id, detail);
     });
 
     const assignedBySales = (effectiveUnitItem?.unit_transaction_item_sales ?? [])
-      .map((row) => toNumberId(row?.unit_transaction_item_detail_id))
-      .filter((detailId) => detailId > 0)
-      .map((detailId) =>
+      .map((row: any) => toNumberId(row?.unit_transaction_item_detail_id))
+      .filter((detailId: number) => detailId > 0)
+      .map((detailId: number) =>
         detailLookup.get(detailId) ?? {
           id: detailId,
           color: '-',
@@ -155,7 +155,7 @@ export default function SalesUnitDetailPage() {
   }, [stockUnits, effectiveUnitItem?.unit_transaction_item_details, effectiveUnitItem?.unit_transaction_item_sales]);
 
   const assignedIds = useMemo(() => {
-    return assignedDetailRows.map((item) => item.id).filter((item) => item > 0);
+    return assignedDetailRows.map((item: any) => item.id).filter((item: number) => item > 0);
   }, [assignedDetailRows]);
 
   const pickerRows = useMemo(() => {
@@ -221,7 +221,7 @@ export default function SalesUnitDetailPage() {
   const toggleAllPage = (checked: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      const filteredRows = pickerRows.filter((item) => {
+      const filteredRows = pickerRows.filter((item: any) => {
         const query = search.trim().toLowerCase();
         if (!query) return true;
 
@@ -321,7 +321,7 @@ export default function SalesUnitDetailPage() {
     );
   }
 
-  const resolvedBillingHistories = (salesData?.raw?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
+  const resolvedBillingHistories = (salesData?.raw?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history: any) => ({
     id: String((history as any).id ?? ''),
     unit_transaction_billing_id: String((history as any).unit_transaction_billing_id ?? salesData?.raw?.unit_transaction_billing?.id ?? ''),
     unit_transaction_id: String(salesId ?? ''),
