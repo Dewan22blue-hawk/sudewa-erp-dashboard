@@ -36,7 +36,7 @@ function FeeField({ label, name, control }: { label: string; name: keyof FormVal
             value={field.value}
             onChangeValue={field.onChange}
             placeholder="Rp"
-            className="h-11 rounded-xl border-slate-200 bg-white"
+            className="h-11 rounded-md border-slate-200 bg-white"
           />
         )}
       />
@@ -82,7 +82,7 @@ export function BBNBillVehicleFeeForm({ vehicle, onSubmit, onCancel, isSubmittin
   return (
     <div className="space-y-7">
       <div className="flex items-center gap-2">
-        <Button type="button" onClick={onCancel} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+        <Button type="button" onClick={onCancel} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-[24px] font-semibold tracking-[-0.03em] text-slate-950">Ubah Data Detail STNK/BPKB</h1>
@@ -125,7 +125,7 @@ export function BBNBillVehicleFeeForm({ vehicle, onSubmit, onCancel, isSubmittin
           <Button type="button" variant="ghost" onClick={onCancel} className="text-sm font-medium text-slate-600 hover:text-slate-950">
             Batal
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="h-10 rounded-xl bg-[#1f4163] px-6 text-sm font-medium text-white hover:bg-[#183552]">
+          <Button type="submit" disabled={isSubmitting} className="h-10 rounded-md bg-[#1f4163] px-6 text-sm font-medium text-white hover:bg-[#183552]">
             <Save className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Menyimpan...' : 'Simpan'}
           </Button>

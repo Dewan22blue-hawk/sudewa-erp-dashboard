@@ -43,7 +43,7 @@ function SummaryField({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium text-slate-900">{label}</Label>
-      <Input value={value} readOnly className="rounded-xl border-slate-200 bg-white text-slate-500 shadow-sm" />
+      <Input value={value} readOnly className="rounded-md border-slate-200 bg-white text-slate-500 shadow-sm" />
     </div>
   );
 }
@@ -90,14 +90,14 @@ export default function BBNBillPaymentPage() {
     const fromDetail = detailQuery.data?.billings?.[0];
     return fromDetail
       ? {
-          id: fromDetail.id,
-          uuid: fromDetail.uuid,
-          bbnBillId: fromDetail.bbnBillId,
-          totalPayment: fromDetail.totalPayment,
-          createdAt: fromDetail.createdAt,
-          updatedAt: fromDetail.updatedAt,
-          bbnBill: null,
-        }
+        id: fromDetail.id,
+        uuid: fromDetail.uuid,
+        bbnBillId: fromDetail.bbnBillId,
+        totalPayment: fromDetail.totalPayment,
+        createdAt: fromDetail.createdAt,
+        updatedAt: fromDetail.updatedAt,
+        bbnBill: null,
+      }
       : null;
   }, [billingsQuery.data?.data, detailQuery.data?.billings, id]);
 
@@ -184,7 +184,7 @@ export default function BBNBillPaymentPage() {
       ) : (
         <div className="space-y-7">
           <div className="flex items-center gap-3">
-            <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
@@ -263,7 +263,7 @@ export default function BBNBillPaymentPage() {
                       <Controller
                         name="paidDate"
                         control={form.control}
-                        render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
+                        render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-md border-slate-200 shadow-sm" />}
                       />
                     </div>
                     <div className="space-y-2">
@@ -273,7 +273,7 @@ export default function BBNBillPaymentPage() {
                         control={form.control}
                         render={({ field }) => (
                           <Select value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger className="rounded-xl border-slate-200 bg-white shadow-sm">
+                            <SelectTrigger className="rounded-md border-slate-200 bg-white shadow-sm">
                               <SelectValue placeholder="Pilih kas masuk" />
                             </SelectTrigger>
                             <SelectContent>
@@ -292,7 +292,7 @@ export default function BBNBillPaymentPage() {
                       <Controller
                         name="amount"
                         control={form.control}
-                        render={({ field }) => <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="rounded-xl border-slate-200 shadow-sm" />}
+                        render={({ field }) => <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="rounded-md border-slate-200 shadow-sm" />}
                       />
                     </div>
                   </div>
@@ -301,13 +301,13 @@ export default function BBNBillPaymentPage() {
                     <SummaryField label="Kurang Bayar" value={formatCurrency(outstanding)} />
                     <div className="space-y-2 md:col-span-2">
                       <Label className="text-sm font-medium text-slate-900">Upload Bukti Pembayaran</Label>
-                        <Input
-                          type="file"
-                          className="rounded-xl border-slate-200 bg-white shadow-sm"
-                          onChange={(event) => {
-                            setProofName(event.target.files?.[0]?.name || '');
-                          }}
-                        />
+                      <Input
+                        type="file"
+                        className="rounded-md border-slate-200 bg-white shadow-sm"
+                        onChange={(event) => {
+                          setProofName(event.target.files?.[0]?.name || '');
+                        }}
+                      />
                       <p className="text-xs text-slate-400">
                         {proofName ? `File terpilih: ${proofName}` : 'UI bukti pembayaran sudah disiapkan. Endpoint saat ini belum menyediakan field upload file.'}
                       </p>
@@ -331,7 +331,7 @@ export default function BBNBillPaymentPage() {
                             toast.error(getApiErrorMessage(error));
                           }
                         }}
-                        className="rounded-xl"
+                        className="rounded-md"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Hapus Item
@@ -340,7 +340,7 @@ export default function BBNBillPaymentPage() {
                     <Button
                       type="submit"
                       disabled={createBillingMutation.isPending || createItemMutation.isPending || updateItemMutation.isPending}
-                      className="rounded-xl bg-[#16a34a] hover:bg-[#15803d]"
+                      className="rounded-md bg-[#16a34a] hover:bg-[#15803d]"
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {currentItem ? 'Simpan Perubahan' : 'Bayar'}
@@ -364,7 +364,7 @@ export default function BBNBillPaymentPage() {
                         toast.error(getApiErrorMessage(error));
                       }
                     }}
-                    className="rounded-xl border-slate-200"
+                    className="rounded-md border-slate-200"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Hapus Data Penagihan

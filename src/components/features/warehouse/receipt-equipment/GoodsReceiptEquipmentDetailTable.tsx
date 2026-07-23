@@ -93,13 +93,13 @@ export function GoodsReceiptEquipmentDetailTable({
                     <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
                       <DropdownMenuItem
                         onClick={() => onEdit(item)}
-                        className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
+                        className="cursor-pointer rounded-md px-3 py-2 text-[16px]"
                       >
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => onDelete(item)}
-                        className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
+                        className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
                       >
                         Hapus
                       </DropdownMenuItem>

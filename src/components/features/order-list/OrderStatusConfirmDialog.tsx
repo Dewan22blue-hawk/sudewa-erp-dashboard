@@ -40,8 +40,8 @@ export function OrderStatusConfirmDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} disabled={isUpdating} className="rounded-xl bg-[#1f4163] hover:bg-[#183552]">
+          <AlertDialogCancel className="rounded-md">Batal</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} disabled={isUpdating} className="rounded-md bg-[#1f4163] hover:bg-[#183552]">
             {isUpdating ? 'Menyimpan...' : 'Ya, Ubah Status'}
           </AlertDialogAction>
         </AlertDialogFooter>

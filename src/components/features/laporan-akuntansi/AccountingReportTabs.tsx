@@ -15,7 +15,7 @@ export default function AccountingReportTabs({
 }: AccountingReportTabsProps) {
   return (
     <div className="print:hidden overflow-x-auto">
-      <div className="inline-flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+      <div className="inline-flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
         {ACCOUNTING_REPORT_TABS.map((tab) => (
           <button
             key={tab.value}

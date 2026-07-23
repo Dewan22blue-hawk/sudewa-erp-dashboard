@@ -125,7 +125,7 @@ export default function PengeluaranUnitHeaderCard({
   const isDetail = mode === 'detail';
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 shadow-sm">
+    <div className="bg-white rounded-md border border-gray-200 p-6 space-y-6 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">Data Pengeluaran Unit</h2>
       </div>

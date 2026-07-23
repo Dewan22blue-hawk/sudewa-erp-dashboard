@@ -27,7 +27,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-            <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <Link href={resolvedBackHref}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Kembali
@@ -75,7 +75,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-sky-50 p-2 text-sky-600">
+            <div className="rounded-md bg-sky-50 p-2 text-sky-600">
               <ReceiptText className="h-5 w-5" />
             </div>
             <h3 className="text-base font-semibold text-gray-900">Informasi Transaksi</h3>
@@ -112,7 +112,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
 
         <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-violet-50 p-2 text-violet-600">
+            <div className="rounded-md bg-violet-50 p-2 text-violet-600">
               <ListChecks className="h-5 w-5" />
             </div>
             <h3 className="text-base font-semibold text-gray-900">Status Pembayaran</h3>

@@ -16,7 +16,7 @@ export default function RoleDetailPage() {
 
   const { data: role, isLoading: isLoadingRole, isError: isErrorRole, refetch } = useRoleDetail(id as string);
   const { data: userOptions = [], isLoading: isLoadingUsers } = useUserOptions();
-  
+
   const assignRoleMutation = useAssignRole();
   const revokeRoleMutation = useRevokeRole();
 
@@ -92,7 +92,7 @@ export default function RoleDetailPage() {
               {/* Card: Role Info Header (Without technical stuff like guard_name) */}
               <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <div className="h-10 w-10 rounded-md bg-indigo-50 flex items-center justify-center text-indigo-600">
                     <Shield size={20} />
                   </div>
                   <div>
@@ -111,7 +111,7 @@ export default function RoleDetailPage() {
 
                 {/* Dispatch/Assign Role UI (Not for admin role) */}
                 {role.name.toLowerCase() !== 'admin' && (
-                  <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 flex flex-col sm:flex-row items-end gap-3">
+                  <div className="bg-slate-50/50 p-4 rounded-md border border-slate-100 flex flex-col sm:flex-row items-end gap-3">
                     <div className="space-y-1.5 w-full sm:flex-1">
                       <label className="text-xs font-semibold text-gray-700">Dispatch Peran (Tambah Pengguna)</label>
                       <Select value={selectedUserId} onValueChange={setSelectedUserId}>
@@ -140,11 +140,11 @@ export default function RoleDetailPage() {
 
                 {/* Table Users */}
                 {!role.users || role.users.length === 0 ? (
-                  <div className="text-sm text-gray-500 bg-gray-50/50 rounded-xl p-8 text-center border border-dashed font-medium">
+                  <div className="text-sm text-gray-500 bg-gray-50/50 rounded-md p-8 text-center border border-dashed font-medium">
                     Tidak ada pengguna yang terdaftar pada peran ini.
                   </div>
                 ) : (
-                  <div className="border rounded-xl overflow-hidden bg-white">
+                  <div className="border rounded-md overflow-hidden bg-white">
                     <table className="min-w-full text-xs text-left">
                       <thead className="bg-slate-50/80 border-b">
                         <tr>
@@ -170,19 +170,18 @@ export default function RoleDetailPage() {
                               <div className="text-gray-500 mt-0.5">{user.email}</div>
                             </td>
                             <td className="px-4 py-3.5">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                                user.is_active === 1 
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${user.is_active === 1
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                   : 'bg-slate-50 text-slate-700 border-slate-200'
-                              }`}>
+                                }`}>
                                 {user.is_active === 1 ? 'Aktif' : 'Non-aktif'}
                               </span>
                             </td>
                             {role.name.toLowerCase() !== 'admin' && (
                               <td className="px-4 py-3.5 text-center">
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => setUserToRevoke({ id: user.id, name: user.name })}
                                   className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full"
                                   title="Revoke Peran / Lepas Peran"
@@ -208,13 +207,13 @@ export default function RoleDetailPage() {
               </div>
 
               {!role.permissions || role.permissions.length === 0 ? (
-                <div className="text-sm text-gray-500 bg-gray-50/50 rounded-xl p-8 text-center border border-dashed font-medium">
+                <div className="text-sm text-gray-500 bg-gray-50/50 rounded-md p-8 text-center border border-dashed font-medium">
                   Tidak ada izin akses yang terdaftar.
                 </div>
               ) : (
                 <div className="space-y-2 overflow-y-auto pr-1 flex-1">
                   {role.permissions.map((perm) => (
-                    <div key={perm.id} className="p-3 rounded-xl border border-slate-100 bg-slate-50/40 flex flex-col gap-1">
+                    <div key={perm.id} className="p-3 rounded-md border border-slate-100 bg-slate-50/40 flex flex-col gap-1">
                       <span className="font-mono text-xs font-bold text-indigo-700">{perm.name}</span>
                       <span className="text-[11px] text-gray-500 leading-normal font-medium">{perm.description || 'Tidak ada deskripsi.'}</span>
                     </div>
@@ -236,10 +235,10 @@ export default function RoleDetailPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4 flex gap-2">
-            <Button variant="outline" onClick={() => setUserToRevoke(null)} disabled={revokeRoleMutation.isPending} className="rounded-xl">
+            <Button variant="outline" onClick={() => setUserToRevoke(null)} disabled={revokeRoleMutation.isPending} className="rounded-md">
               Batal
             </Button>
-            <Button onClick={handleRevokeRole} disabled={revokeRoleMutation.isPending} className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl">
+            <Button onClick={handleRevokeRole} disabled={revokeRoleMutation.isPending} className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md">
               {revokeRoleMutation.isPending ? 'Memproses...' : 'Ya, Lepas'}
             </Button>
           </DialogFooter>

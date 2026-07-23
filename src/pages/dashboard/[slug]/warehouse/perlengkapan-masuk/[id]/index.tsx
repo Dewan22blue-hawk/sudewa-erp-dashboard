@@ -170,7 +170,7 @@ export default function PerlengkapanMasukDetailPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="space-y-1">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/perlengkapan-masuk`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali ke Daftar
@@ -188,14 +188,14 @@ export default function PerlengkapanMasukDetailPage() {
               <h2 className="text-[20px] font-semibold text-slate-950">Informasi Penerimaan</h2>
               <div className="flex gap-2">
                 {invoiceUrl ? (
-                  <Button variant="outline" asChild className="h-10 rounded-xl px-4 text-slate-700">
+                  <Button variant="outline" asChild className="h-10 rounded-md px-4 text-slate-700">
                     <a href={invoiceUrl} target="_blank" rel="noopener noreferrer">
                       <FileText className="mr-2 h-4 w-4" />
                       Unduh Invoice / Nota
                     </a>
                   </Button>
                 ) : null}
-                <Button onClick={() => setOpenInvoiceModal(true)} className="h-10 rounded-xl bg-[#1f4163] px-4 hover:bg-[#183552]">
+                <Button onClick={() => setOpenInvoiceModal(true)} className="h-10 rounded-md bg-[#1f4163] px-4 hover:bg-[#183552]">
                   {invoiceUrl ? 'Ganti Invoice' : 'Upload Invoice'}
                 </Button>
               </div>
@@ -204,25 +204,25 @@ export default function PerlengkapanMasukDetailPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Kode Penerimaan</label>
-                <Input value={transaction.code} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px]" />
+                <Input value={transaction.code} readOnly className="h-11 rounded-md border-slate-200 bg-slate-50 text-[15px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Tanggal Terima</label>
-                <Input value={formatDate(transaction.transactionDate)} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px]" />
+                <Input value={formatDate(transaction.transactionDate)} readOnly className="h-11 rounded-md border-slate-200 bg-slate-50 text-[15px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Supplier</label>
-                <Input value={transaction.supplier?.name ?? '-'} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px]" />
+                <Input value={transaction.supplier?.name ?? '-'} readOnly className="h-11 rounded-md border-slate-200 bg-slate-50 text-[15px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Lokasi</label>
-                <Input value={transaction.location ?? '-'} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px]" />
+                <Input value={transaction.location ?? '-'} readOnly className="h-11 rounded-md border-slate-200 bg-slate-50 text-[15px]" />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-[15px] font-medium text-slate-900">Keterangan</label>
-              <textarea value={transaction.description ?? ''} readOnly className="min-h-[74px] w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] outline-none" />
+              <textarea value={transaction.description ?? ''} readOnly className="min-h-[74px] w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] outline-none" />
             </div>
           </Card>
 
@@ -260,21 +260,21 @@ export default function PerlengkapanMasukDetailPage() {
                   </div>
 
                   {!billing.isPaid && (
-                    <Button onClick={() => setOpenPaymentModal(true)} className="w-full mt-4 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button onClick={() => setOpenPaymentModal(true)} className="w-full mt-4 h-10 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white">
                       Bayar Billing
                     </Button>
                   )}
 
-                  <Button onClick={handleDeleteBilling} variant="outline" className="w-full h-10 rounded-xl text-red-600 border-red-200 hover:bg-red-50">
+                  <Button onClick={handleDeleteBilling} variant="outline" className="w-full h-10 rounded-md text-red-600 border-red-200 hover:bg-red-50">
                     Hapus Billing
                   </Button>
                 </>
               ) : (
                 <div className="space-y-4 pt-2">
-                  <div className="rounded-xl bg-slate-50 p-4 text-center text-sm text-slate-500">
+                  <div className="rounded-md bg-slate-50 p-4 text-center text-sm text-slate-500">
                     Billing belum dibuat untuk transaksi ini.
                   </div>
-                  <Button onClick={handleCreateBilling} className="w-full h-10 rounded-xl bg-[#1f4163] hover:bg-[#183552] text-white">
+                  <Button onClick={handleCreateBilling} className="w-full h-10 rounded-md bg-[#1f4163] hover:bg-[#183552] text-white">
                     Buat Billing
                   </Button>
                 </div>
@@ -286,7 +286,7 @@ export default function PerlengkapanMasukDetailPage() {
         {billing && billing.payments && billing.payments.length > 0 && (
           <Card className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-none space-y-4">
             <h2 className="text-[18px] font-semibold text-slate-950">Riwayat Pembayaran</h2>
-            <div className="overflow-hidden rounded-xl border border-slate-200">
+            <div className="overflow-hidden rounded-md border border-slate-200">
               <Table>
                 <TableHeader className="bg-slate-50">
                   <TableRow>
@@ -329,7 +329,7 @@ export default function PerlengkapanMasukDetailPage() {
 
         <Card className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-none space-y-4">
           <h2 className="text-[18px] font-semibold text-slate-950">Daftar Barang Perlengkapan</h2>
-          <div className="overflow-hidden rounded-xl border border-slate-200">
+          <div className="overflow-hidden rounded-md border border-slate-200">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow className="hover:bg-transparent">

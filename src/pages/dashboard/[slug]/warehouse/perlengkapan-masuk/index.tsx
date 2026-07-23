@@ -217,7 +217,7 @@ export default function PerlengkapanMasukListPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+          <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none">
             <GoodsReceiptEquipmentTable
               data={transactionsQuery.data?.data ?? []}
               isLoading={transactionsQuery.isLoading}
@@ -244,7 +244,7 @@ export default function PerlengkapanMasukListPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
               >
@@ -256,7 +256,7 @@ export default function PerlengkapanMasukListPage() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                     pageNumber === page
                       ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                       : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -271,7 +271,7 @@ export default function PerlengkapanMasukListPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                  className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
                   onClick={() => setPage(totalPages)}
                 >
                   {totalPages}
@@ -280,7 +280,7 @@ export default function PerlengkapanMasukListPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
               >

@@ -13,7 +13,7 @@ export default function PurchaseSummaryCard({
     highlight
 }: Props) {
     return (
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
             <CardContent className="p-5">
                 <p className="text-sm text-muted-foreground">{label}</p>
                 <p

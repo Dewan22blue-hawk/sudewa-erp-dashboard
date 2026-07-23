@@ -196,7 +196,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border bg-white overflow-hidden">
+      <div className="rounded-md border bg-white overflow-hidden">
         <div className="border-b px-6 py-5">
           <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
           <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>

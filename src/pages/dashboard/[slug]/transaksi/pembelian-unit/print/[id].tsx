@@ -17,7 +17,7 @@ export default function PurchasePrintPage() {
   const id = router.isReady && typeof router.query.id === 'string' ? router.query.id : '';
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
-  
+
   const detailQuery = usePurchaseById(id);
   const detailsQuery = useUnitItemDetailsByTransactionId(id);
 
@@ -68,7 +68,7 @@ export default function PurchasePrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center justify-between rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
+        <div className="no-print flex items-center justify-between rounded-md border border-gray-200 bg-white px-5 py-4 shadow-none">
           <div className="flex items-center gap-3">
             <button
               type="button"

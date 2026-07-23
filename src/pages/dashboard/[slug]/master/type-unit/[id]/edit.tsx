@@ -126,7 +126,7 @@ export default function EditTypeUnitPage() {
         </div>
 
         {/* FORM CARD */}
-        <Card className="rounded-xl p-6">
+        <Card className="rounded-md p-6">
           <TypeUnitForm form={form} onSubmit={onSubmit} onCancel={handleCancel} isSubmitting={updateTypeUnit.isPending} submitLabel="Perbarui" />
         </Card>
       </div>

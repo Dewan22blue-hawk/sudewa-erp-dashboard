@@ -97,7 +97,7 @@ export default function EditNestedUnitPage() {
             const responseData = error?.response?.data;
             const errorMsg = responseData?.message || error?.message || 'Gagal memperbarui unit.';
             const validationErrors = responseData?.errors;
-            
+
             if (validationErrors && typeof validationErrors === 'object') {
                 const firstErrorKey = Object.keys(validationErrors)[0];
                 const firstErrorArray = validationErrors[firstErrorKey];
@@ -145,7 +145,7 @@ export default function EditNestedUnitPage() {
                     </div>
                 </div>
 
-                <Card className="rounded-xl">
+                <Card className="rounded-md">
                     <CardContent className="p-6">
                         <EditUnitForm
                             defaultValues={formData}

@@ -94,7 +94,7 @@ export function DriverTable({
                     size="sm"
                     onClick={() => onPageChange(p)}
                     className={cn(
-                        'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                        'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                         p === page
                             ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                             : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -130,12 +130,12 @@ export function DriverTable({
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
                 className={cn(
-                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
-                        ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                            ? 'border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
                 )}
             >
                 {p}
@@ -202,113 +202,113 @@ export function DriverTable({
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+            <div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none">
                 <Table className="min-w-[900px]">
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow className="hover:bg-[#f8f9fa]">
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
-                                    NAMA DRIVER
-                                </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
-                                    ALAMAT
-                                </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
-                                    KTP
-                                </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
-                                    PHONE
-                                </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
-                                    SIM
-                                </TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
-                                    TGL GABUNG
-                                </TableHead>
-                                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                    ACTION
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-    <tr>
-        <td colSpan={100} className="px-4 py-16 text-center bg-white">
-            <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-            </div>
-        </td>
-    </tr>
-) : drivers.length > 0 ? (
-                                drivers.map((driver) => (
-                                    <TableRow key={driver.id} className="group hover:bg-gray-50 transition-colors">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-900 text-left font-medium whitespace-nowrap">
-                                            {driver.name || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
-                                            <span className="line-clamp-2 max-w-[220px]">
-                                                {driver.address || '-'}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
-                                            {driver.identityNumber || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
-                                            {driver.phone || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
-                                            {driver.driveLicenseNumber || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
-                                            {formatDate(driver.joinedAt)}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                            <div className="flex justify-center">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
-                                                        <DropdownMenuItem
-                                                            onClick={() => onEdit(driver)}
-                                                            disabled={!canEdit}
-                                                            className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
-                                                        >
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={() => onDelete(driver)}
-                                                            disabled={!canDelete}
-                                                            className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-                                                        >
-                                                            Hapus
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow className="group">
-                                    <TableCell
-                                        colSpan={100}
-                                        className="h-32 text-center text-gray-505 py-16 text-sm"
-                                    >
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
+                                NAMA DRIVER
+                            </TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
+                                ALAMAT
+                            </TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
+                                KTP
+                            </TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">
+                                PHONE
+                            </TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
+                                SIM
+                            </TableHead>
+                            <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">
+                                TGL GABUNG
+                            </TableHead>
+                            <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                ACTION
+                            </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                                        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                                        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : drivers.length > 0 ? (
+                            drivers.map((driver) => (
+                                <TableRow key={driver.id} className="group hover:bg-gray-50 transition-colors">
+                                    <TableCell className="px-4 py-4 text-sm text-gray-900 text-left font-medium whitespace-nowrap">
+                                        {driver.name || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">
+                                        <span className="line-clamp-2 max-w-[220px]">
+                                            {driver.address || '-'}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
+                                        {driver.identityNumber || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-left whitespace-nowrap">
+                                        {driver.phone || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
+                                        {driver.driveLicenseNumber || '-'}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-600 text-center whitespace-nowrap">
+                                        {formatDate(driver.joinedAt)}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                        <div className="flex justify-center">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
+                                                    <DropdownMenuItem
+                                                        onClick={() => onEdit(driver)}
+                                                        disabled={!canEdit}
+                                                        className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+                                                    >
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onDelete(driver)}
+                                                        disabled={!canDelete}
+                                                        className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                                                    >
+                                                        Hapus
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            ))
+                        ) : (
+                            <TableRow className="group">
+                                <TableCell
+                                    colSpan={100}
+                                    className="h-32 text-center text-gray-505 py-16 text-sm"
+                                >
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                            <Search className="h-8 w-8 text-slate-400" />
+                                        </div>
+                                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
 
             {/* Pagination */}
@@ -324,7 +324,7 @@ export function DriverTable({
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                         >
                             Previous
                         </Button>
@@ -336,7 +336,7 @@ export function DriverTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                         >
                             Next
                         </Button>

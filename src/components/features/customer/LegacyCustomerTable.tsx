@@ -105,7 +105,7 @@ export function LegacyCustomerTable({ customers, onEdit, onDelete, onAdd, onImpo
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="relative overflow-hidden rounded-md border border-slate-200 bg-white">
         <div className={currentData.length > 0 ? 'pr-24' : undefined}>
           <Table className="min-w-[1040px]">
             <TableHeader className="bg-slate-50">

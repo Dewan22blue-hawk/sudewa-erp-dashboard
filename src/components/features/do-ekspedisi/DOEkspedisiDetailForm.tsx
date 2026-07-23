@@ -129,7 +129,7 @@ export function DOEkspedisiDetailForm({
                   searchPlaceholder="Cari customer..."
                   onSearchChange={onCustomerSearch}
                   disabled={readOnly}
-                  className={`h-12 rounded-xl ${errors.customerId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
+                  className={`h-12 rounded-md ${errors.customerId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
                 />
               )}
             />
@@ -138,19 +138,19 @@ export function DOEkspedisiDetailForm({
 
           <div className="space-y-2">
             <Label htmlFor="loadingIn">Loading In</Label>
-            <Input id="loadingIn" placeholder="Lokasi muat" disabled={readOnly} className="h-12 rounded-xl border-[#E5E7EB]" {...register('loadingIn', { required: readOnly ? false : 'Loading in wajib diisi' })} />
+            <Input id="loadingIn" placeholder="Lokasi muat" disabled={readOnly} className="h-12 rounded-md border-[#E5E7EB]" {...register('loadingIn', { required: readOnly ? false : 'Loading in wajib diisi' })} />
             {errors.loadingIn && <p className="text-xs text-red-500">{errors.loadingIn.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="loadingOut">Loading Out</Label>
-            <Input id="loadingOut" placeholder="Lokasi bongkar" disabled={readOnly} className="h-12 rounded-xl border-[#E5E7EB]" {...register('loadingOut', { required: readOnly ? false : 'Loading out wajib diisi' })} />
+            <Input id="loadingOut" placeholder="Lokasi bongkar" disabled={readOnly} className="h-12 rounded-md border-[#E5E7EB]" {...register('loadingOut', { required: readOnly ? false : 'Loading out wajib diisi' })} />
             {errors.loadingOut && <p className="text-xs text-red-500">{errors.loadingOut.message}</p>}
           </div>
 
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="destination">Tujuan Kirim</Label>
-            <Input id="destination" placeholder="Masukkan tujuan kirim" disabled={readOnly} className="h-12 rounded-xl border-[#E5E7EB]" {...register('destination', { required: readOnly ? false : 'Tujuan wajib diisi' })} />
+            <Input id="destination" placeholder="Masukkan tujuan kirim" disabled={readOnly} className="h-12 rounded-md border-[#E5E7EB]" {...register('destination', { required: readOnly ? false : 'Tujuan wajib diisi' })} />
             {errors.destination && <p className="text-xs text-red-500">{errors.destination.message}</p>}
           </div>
         </div>
@@ -171,7 +171,7 @@ export function DOEkspedisiDetailForm({
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
-                  className="h-12 rounded-xl border-[#E5E7EB]"
+                  className="h-12 rounded-md border-[#E5E7EB]"
                 />
               )}
             />
@@ -190,7 +190,7 @@ export function DOEkspedisiDetailForm({
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
-                  className="h-12 rounded-xl border-[#E5E7EB]"
+                  className="h-12 rounded-md border-[#E5E7EB]"
                 />
               )}
             />
@@ -198,12 +198,12 @@ export function DOEkspedisiDetailForm({
 
           <div className="space-y-2">
             <Label>PPN 11%</Label>
-            <Input readOnly value={formatCurrency(ppnPreview)} className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC]" />
+            <Input readOnly value={formatCurrency(ppnPreview)} className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC]" />
           </div>
 
           <div className="space-y-2">
             <Label>Fee 4%</Label>
-            <Input readOnly value={formatCurrency(feePreview)} className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC]" />
+            <Input readOnly value={formatCurrency(feePreview)} className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC]" />
           </div>
 
           <div className="space-y-2">
@@ -219,7 +219,7 @@ export function DOEkspedisiDetailForm({
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
-                  className="h-12 rounded-xl border-[#E5E7EB]"
+                  className="h-12 rounded-md border-[#E5E7EB]"
                 />
               )}
             />
@@ -238,7 +238,7 @@ export function DOEkspedisiDetailForm({
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="0"
                   disabled={readOnly}
-                  className="h-12 rounded-xl border-[#E5E7EB]"
+                  className="h-12 rounded-md border-[#E5E7EB]"
                 />
               )}
             />
@@ -251,7 +251,7 @@ export function DOEkspedisiDetailForm({
               rows={3}
               placeholder="Masukkan atensi atau catatan untuk driver"
               disabled={readOnly}
-              className="resize-none rounded-xl border-[#E5E7EB]"
+              className="resize-none rounded-md border-[#E5E7EB]"
               {...register('driverNote', { required: readOnly ? false : 'Catatan driver wajib diisi' })}
             />
             {errors.driverNote && <p className="text-xs text-red-500">{errors.driverNote.message}</p>}
@@ -263,7 +263,7 @@ export function DOEkspedisiDetailForm({
               id="mapsUrl"
               placeholder="https://maps.google.com/..."
               disabled={readOnly}
-              className="h-12 rounded-xl border-[#E5E7EB]"
+              className="h-12 rounded-md border-[#E5E7EB]"
               {...register('mapsUrl', { required: readOnly ? false : 'Maps URL wajib diisi' })}
             />
             {errors.mapsUrl && <p className="text-xs text-red-500">{errors.mapsUrl.message}</p>}
@@ -306,7 +306,7 @@ export function DOEkspedisiDetailForm({
                           id={`destinationStops.${index}.destination`}
                           placeholder="Masukkan tujuan kirim"
                           disabled={readOnly}
-                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          className="h-12 rounded-md border-[#E5E7EB]"
                           {...register(`destinationStops.${index}.destination` as const, {
                             required: readOnly ? false : 'Tujuan tambahan wajib diisi',
                           })}
@@ -320,7 +320,7 @@ export function DOEkspedisiDetailForm({
                           rows={3}
                           placeholder="Masukkan atensi atau catatan untuk driver"
                           disabled={readOnly}
-                          className="resize-none rounded-xl border-[#E5E7EB]"
+                          className="resize-none rounded-md border-[#E5E7EB]"
                           {...register(`destinationStops.${index}.driverNote` as const, {
                             required: readOnly ? false : 'Catatan driver tambahan wajib diisi',
                           })}
@@ -333,7 +333,7 @@ export function DOEkspedisiDetailForm({
                           id={`destinationStops.${index}.mapsUrl`}
                           placeholder="https://maps.google.com/..."
                           disabled={readOnly}
-                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          className="h-12 rounded-md border-[#E5E7EB]"
                           {...register(`destinationStops.${index}.mapsUrl` as const, {
                             required: readOnly ? false : 'Maps URL tambahan wajib diisi',
                           })}
@@ -352,7 +352,7 @@ export function DOEkspedisiDetailForm({
 
           <div className="space-y-2 md:col-span-2">
             <Label>PPH 2%</Label>
-            <Input readOnly value={formatCurrency(pphPreview)} className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC]" />
+            <Input readOnly value={formatCurrency(pphPreview)} className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC]" />
           </div>
         </div>
       </div>

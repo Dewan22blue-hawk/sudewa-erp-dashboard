@@ -66,14 +66,14 @@ export function UploadInvoiceModal({
               type="file"
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
               onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
-              className="block h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-2 file:py-1 file:text-sm"
+              className="block h-11 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-2 file:py-1 file:text-sm"
             />
 
             <div className="space-y-3">
-              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-300 text-[16px] font-medium">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-md border-slate-300 text-[16px] font-medium">
                 Batal
               </Button>
             </div>

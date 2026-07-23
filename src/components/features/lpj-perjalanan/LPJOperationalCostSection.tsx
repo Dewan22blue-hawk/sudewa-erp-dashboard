@@ -16,7 +16,7 @@ interface LPJOperationalCostSectionProps {
 
 export function LPJOperationalCostSection({ values, errors, totalKM, onValueChange }: LPJOperationalCostSectionProps) {
   return (
-    <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-6">
+    <section className="space-y-4 rounded-md border border-gray-200 bg-white p-6">
       <h4 className="text-lg font-semibold text-gray-900">KM & Biaya Operasional</h4>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

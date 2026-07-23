@@ -114,7 +114,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                         placeholder="Masukkan nama customer"
                         searchPlaceholder="Cari customer..."
                         emptyText="Customer tidak ditemukan."
-                        className="h-11 rounded-xl border-slate-200 bg-white text-slate-900"
+                        className="h-11 rounded-md border-slate-200 bg-white text-slate-900"
                       />
                     </FormControl>
                     <FormMessage />
@@ -134,7 +134,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                           value={field.value}
                           onChange={(date) => field.onChange(date ? date.toISOString().slice(0, 10) : '')}
                           placeholder="Pilih tanggal"
-                          className="h-11 rounded-xl border-slate-200 bg-white"
+                          className="h-11 rounded-md border-slate-200 bg-white"
                         />
                       </FormControl>
                       <FormMessage />
@@ -149,7 +149,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                     <FormItem>
                       <FormLabel>Perihal</FormLabel>
                       <FormControl>
-                        <Input {...field} className="h-11 rounded-xl border-slate-200" placeholder="Contoh: Invoice Ekspedisi" />
+                        <Input {...field} className="h-11 rounded-md border-slate-200" placeholder="Contoh: Invoice Ekspedisi" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -164,7 +164,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                   <FormItem>
                     <FormLabel>Isi Surat</FormLabel>
                     <FormControl>
-                      <Textarea {...field} className="min-h-[128px] rounded-xl border-slate-200" placeholder="Masukkan isi surat invoice" />
+                      <Textarea {...field} className="min-h-[128px] rounded-md border-slate-200" placeholder="Masukkan isi surat invoice" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -178,7 +178,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                   <FormItem>
                     <FormLabel>Deskripsi</FormLabel>
                     <FormControl>
-                      <Input {...field} className="h-11 rounded-xl border-slate-200" placeholder="Deskripsi tambahan invoice" />
+                      <Input {...field} className="h-11 rounded-md border-slate-200" placeholder="Deskripsi tambahan invoice" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -186,7 +186,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
               />
 
               <div className="space-y-3 pt-2">
-                <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-sm font-semibold hover:bg-[#183552]">
+                <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-sm font-semibold hover:bg-[#183552]">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -196,7 +196,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                     'Simpan'
                   )}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-200 text-sm font-semibold text-slate-700">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-md border-slate-200 text-sm font-semibold text-slate-700">
                   Batal
                 </Button>
               </div>

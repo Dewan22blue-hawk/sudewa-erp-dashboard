@@ -29,7 +29,7 @@ function ReadonlyField({ label, value, danger = false }: { label: string; value:
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-slate-900">{label}</p>
-      <Input value={value} readOnly className={`h-11 rounded-xl border-slate-200 bg-white ${danger ? 'text-red-500' : 'text-slate-500'}`} />
+      <Input value={value} readOnly className={`h-11 rounded-md border-slate-200 bg-white ${danger ? 'text-red-500' : 'text-slate-500'}`} />
     </div>
   );
 }
@@ -299,7 +299,7 @@ export default function BBNBillDetailPage() {
             </div>
             <div className="flex gap-3">
               <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/edit`}>
-                <Button variant="outline" className="h-11 rounded-xl border-slate-200 bg-white">
+                <Button variant="outline" className="h-11 rounded-md border-slate-200 bg-white">
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </Button>

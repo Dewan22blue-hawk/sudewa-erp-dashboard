@@ -118,7 +118,7 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
     };
 
     return (
-        <Card className="rounded-xl" style={{ border: '1px solid #E5E5E5' }}>
+        <Card className="rounded-md" style={{ border: '1px solid #E5E5E5' }}>
             {/* Card Header */}
             <CardHeader className="border-b" style={{ borderColor: '#E5E5E5' }}>
                 <div>

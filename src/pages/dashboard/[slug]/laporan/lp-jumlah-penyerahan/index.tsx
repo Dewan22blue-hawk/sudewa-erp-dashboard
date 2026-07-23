@@ -111,7 +111,7 @@ export default function LPJumlahPenyerahanPage() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page <= 1 || isLoading}
           onClick={() => setPage(page - 1)}
         >
@@ -123,7 +123,7 @@ export default function LPJumlahPenyerahanPage() {
             variant="ghost"
             size="sm"
             className={cn(
-              'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+              'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
               pageNumber === page
                 ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                 : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -139,7 +139,7 @@ export default function LPJumlahPenyerahanPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+            className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
             disabled={isLoading}
             onClick={() => setPage(pagination.lastPage)}
           >
@@ -149,7 +149,7 @@ export default function LPJumlahPenyerahanPage() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
           onClick={() => setPage(page + 1)}
         >
@@ -181,7 +181,7 @@ export default function LPJumlahPenyerahanPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
           {/* Tab triggers wrapped to look like pills */}
           <div className="flex no-print">
-            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
               <TabsTrigger value="stnk" className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer">
                 LP Jumlah Penyerahan STNK
               </TabsTrigger>
@@ -248,7 +248,7 @@ export default function LPJumlahPenyerahanPage() {
                 </div>
 
                 {/* Table Rendering */}
-                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+                <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -374,13 +374,13 @@ export default function LPJumlahPenyerahanPage() {
                         ) : (
                           <TableRow className="group">
                             <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                                <div className="flex flex-col items-center justify-center gap-2">
-                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                        <Search className="h-8 w-8 text-slate-400" />
-                                    </div>
-                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                              <div className="flex flex-col items-center justify-center gap-2">
+                                <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                  <Search className="h-8 w-8 text-slate-400" />
                                 </div>
+                                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )}

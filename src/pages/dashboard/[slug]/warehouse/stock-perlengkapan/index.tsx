@@ -93,7 +93,7 @@ export default function StockPerlengkapanPage() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page <= 1 || stockQuery.isLoading}
           onClick={() => setPage(page - 1)}
         >
@@ -105,7 +105,7 @@ export default function StockPerlengkapanPage() {
             variant="ghost"
             size="sm"
             className={cn(
-              'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+              'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
               pageNumber === page
                 ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                 : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -121,7 +121,7 @@ export default function StockPerlengkapanPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+            className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
             disabled={stockQuery.isLoading}
             onClick={() => setPage(totalPages)}
           >
@@ -131,7 +131,7 @@ export default function StockPerlengkapanPage() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page >= totalPages || totalData === 0 || stockQuery.isLoading}
           onClick={() => setPage(page + 1)}
         >
@@ -193,7 +193,7 @@ export default function StockPerlengkapanPage() {
                       key={tab.value}
                       type="button"
                       onClick={() => handleTabChange(tab.value)}
-                      className={isActive ? 'rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-950 shadow-sm' : 'rounded-xl px-4 py-2 text-sm text-slate-700'}
+                      className={isActive ? 'rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-950 shadow-sm' : 'rounded-md px-4 py-2 text-sm text-slate-700'}
                     >
                       {tab.label}
                     </button>
@@ -204,7 +204,7 @@ export default function StockPerlengkapanPage() {
           </div>
 
           {/* Table Container */}
-          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+          <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none">
             <div className="overflow-x-auto">
               <Table className={activeTab === 'keluar' ? 'min-w-[860px]' : 'min-w-[720px]'}>
                 <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -229,7 +229,7 @@ export default function StockPerlengkapanPage() {
                       <TableCell colSpan={activeTab === 'keluar' ? 6 : 5} className="h-28 px-4 py-4 text-center">
                         <div className="space-y-3">
                           <p className="text-sm text-red-500">Gagal memuat data stock material.</p>
-                          <Button variant="outline" className="rounded-xl border-slate-200" onClick={() => stockQuery.refetch()}>
+                          <Button variant="outline" className="rounded-md border-slate-200" onClick={() => stockQuery.refetch()}>
                             Coba Lagi
                           </Button>
                         </div>

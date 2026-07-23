@@ -1,19 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { TableRow, TableCell } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useGetWarehouseStockDetail } from '@/hooks/useLaporanWarehouse';
-import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -24,7 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { cn } from '@/lib/utils';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
+import { CopyBox } from '@/components/ui/copy-box';
 
 type StockDetailTabProps = {
   perPage: number;
@@ -129,22 +123,73 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
     onActionsChange?.({ print: handlePrint, download: handleDownload });
   }, [handleDownload, handlePrint, onActionsChange]);
 
-  // Generate pagination items
-  const pages: (number | string)[] = [];
-  const currentPage = pagination.current_page;
-  const lastPage = pagination.last_page;
-  
-  if (lastPage <= 5) {
-    for (let i = 1; i <= lastPage; i++) pages.push(i);
-  } else {
-    if (currentPage <= 3) {
-      pages.push(1, 2, 3, 4, '...', lastPage);
-    } else if (currentPage >= lastPage - 2) {
-      pages.push(1, '...', lastPage - 3, lastPage - 2, lastPage - 1, lastPage);
-    } else {
-      pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', lastPage);
-    }
-  }
+  const router = useRouter();
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
+
+  const columns = useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'SUPPLIER',
+        accessorKey: 'person',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => item.person ? <ReferenceLink href={`/dashboard/${slugStr}/master/supplier?search=${item.person}`}>
+          {item.person}
+        </ReferenceLink> : '-'
+      },
+      {
+        header: 'TIPE UNIT',
+        accessorKey: 'unit_type.name',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => item.unit_type?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/unit-type?search=${item.unit_type?.name}`}>
+          {item.unit_type?.name}
+        </ReferenceLink> : '-',
+      },
+      {
+        header: 'WARNA',
+        accessorKey: 'color',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => item.color || '-',
+      },
+      {
+        header: 'NO MESIN',
+        accessorKey: 'machine_number',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.machine_number || '-'} />
+      },
+      {
+        header: 'NO RANGKA',
+        accessorKey: 'chassis_number',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.chassis_number || '-'} />
+      },
+      {
+        header: 'HARGA BELI',
+        accessorKey: 'purchase_price',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => formatCurrency(item.purchase_price),
+      },
+    ],
+    [pagination.from]
+  );
+
+  const footerRow = useMemo(
+    () => (
+      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
+        <TableCell colSpan={6} className="px-4 py-4 text-center text-slate-900">
+          GRAND TOTAL
+        </TableCell>
+        <TableCell className="px-4 py-4 text-center text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
+      </TableRow>
+    ),
+    [grandTotalPurchase]
+  );
 
   return (
     <div className="space-y-4">
@@ -156,7 +201,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
             setMachineNumber(e.target.value);
             setPage(1);
           }}
-          className="w-40"
+          className="w-40 bg-white"
         />
         <Input
           placeholder="Cari No Rangka..."
@@ -165,7 +210,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
             setChassisNumber(e.target.value);
             setPage(1);
           }}
-          className="w-40"
+          className="w-40 bg-white"
         />
         <Input
           placeholder="Warna..."
@@ -174,10 +219,10 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
             setColor(e.target.value);
             setPage(1);
           }}
-          className="w-32"
+          className="w-32 bg-white"
         />
         <Select value={stockState || 'all'} onValueChange={(val) => { setStockState(val); setPage(1); }}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40 bg-white">
             <SelectValue placeholder="Stock State" />
           </SelectTrigger>
           <SelectContent>
@@ -187,7 +232,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
           </SelectContent>
         </Select>
         <Select value={inStock || 'all'} onValueChange={(val) => { setInStock(val); setPage(1); }}>
-          <SelectTrigger className="w-32">
+          <SelectTrigger className="w-32 bg-white">
             <SelectValue placeholder="In Stock" />
           </SelectTrigger>
           <SelectContent>
@@ -198,125 +243,25 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         </Select>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-              <TableRow>
-                 <TableHead className="w-16 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">SUPPLIER</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">TIPE UNIT</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">WARNA</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO MESIN</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left">NO RANGKA</TableHead>
-                <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">HARGA BELI</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                    <TableCell className="px-4 py-4"><Skeleton className="h-4 w-full" /></TableCell>
-                  </TableRow>
-                ))
-              ) : isError ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-16 px-4">
-                    <div className="flex flex-col items-center justify-center text-red-500">
-                      <AlertCircle className="h-8 w-8 mb-2" />
-                      <p className="text-sm">Gagal memuat data stock detail</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : rows.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
-                    Data tidak tersedia
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <>
-                  {rows.map((item, index) => (
-                    <TableRow key={`${item.id}-${index}`} className="border-b border-slate-200 hover:bg-gray-50 transition-colors">
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
-                        {(pagination.from > 0 ? pagination.from - 1 : 0) + index + 1}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.person || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm font-medium text-slate-900 text-left">{item.unit_type?.name || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.color || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.machine_number || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-left">{item.chassis_number || '-'}</TableCell>
-                      <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">{formatCurrency(item.purchase_price)}</TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
-                    <TableCell colSpan={6} className="px-4 py-4 text-center text-slate-900">
-                      GRAND TOTAL
-                    </TableCell>
-                    <TableCell className="px-4 py-4 text-center text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
-                  </TableRow>
-                </>
-              )}
-            </TableBody>
-          </Table>
+      {isError ? (
+        <div className="flex flex-col items-center justify-center text-red-500 py-16 bg-white rounded-md border border-gray-200">
+          <AlertCircle className="h-8 w-8 mb-2" />
+          <p className="text-sm">Gagal memuat data stock detail</p>
         </div>
-      </div>
-
-      {!isLoading && !isError && pagination.total > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1 no-print">
-          <div>
-            Showing {pagination.from || 0}–{pagination.to || 0} of {pagination.total} data
-          </div>
-          {lastPage > 1 && (
-            <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-              <Button
-                variant="ghost"
-                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage <= 1}
-              >
-                Previous
-              </Button>
-
-              {pages.map((p, idx) =>
-                p === '...' ? (
-                  <span key={`ellipsis-${idx}`} className="px-1 text-sm text-slate-500">
-                    ...
-                  </span>
-                ) : (
-                  <Button
-                    key={p}
-                    variant="ghost"
-                    className={cn(
-                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-                      p === currentPage
-                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-                    )}
-                    onClick={() => setPage(Number(p))}
-                  >
-                    {p}
-                  </Button>
-                )
-              )}
-
-              <Button
-                variant="ghost"
-                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
-                onClick={() => setPage((prev) => prev + 1)}
-                disabled={currentPage >= lastPage}
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </div>
+      ) : (
+        <BaseTable
+          data={rows}
+          columns={columns}
+          loading={isLoading}
+          footer={footerRow}
+          meta={{
+            currentPage: pagination.current_page,
+            perPage: pagination.per_page,
+            lastPage: pagination.last_page,
+            total: pagination.total,
+          }}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );

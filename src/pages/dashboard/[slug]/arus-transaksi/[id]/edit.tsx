@@ -105,7 +105,7 @@ export default function EditTransactionPage() {
                     <p className="text-sm text-muted-foreground">Ubah detail transaksi yang sudah ada</p>
                 </div>
 
-                <div className="rounded-xl border bg-white p-6 md:p-8">
+                <div className="rounded-md border bg-white p-6 md:p-8">
                     <TransactionForm
                         defaultValues={{
                             ...transaction,

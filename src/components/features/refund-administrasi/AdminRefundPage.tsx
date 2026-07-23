@@ -53,7 +53,7 @@ export function AdminRefundPage({ title, description, basePath, backHref, transa
     <DashboardLayout>
       <div className="space-y-6 p-4 md:p-6">
         <div className="flex items-start gap-4">
-          <Button onClick={() => router.push(backHref)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button onClick={() => router.push(backHref)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <PageHeader title={title} description={description} />

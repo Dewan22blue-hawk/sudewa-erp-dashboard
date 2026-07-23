@@ -111,12 +111,12 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
         <div className="flex justify-end">
           <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
 
         <div className="overflow-x-auto rounded-[10px] border border-[#D9DEE8] bg-white">
-        <Table>
+          <Table>
             <TableHeader>
               <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
                 {['NO', 'TANGGAL REFUND', 'KODE REFUND', 'NOMINAL REFUND', 'KURANG BAYAR', 'QTY', 'STATUS', 'ACTION'].map((header) => (
@@ -130,11 +130,11 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
               {refundQuery.isLoading ? (
                 <TableRow>
                   <TableCell colSpan={8} className="py-16 h-32 text-center text-[#6B7280]">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</TableCell>
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ) : refunds.length > 0 ? (
                 refunds.map((refund, index) => {
@@ -181,13 +181,13 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                 <TableRow>
                   <TableCell colSpan={100} className="py-16 h-28 text-center text-[#6B7280]">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -201,7 +201,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
           </div>
 
           <div className="overflow-x-auto bg-white">
-        <Table>
+            <Table>
               <TableHeader>
                 <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
                   {['Tanggal', 'TIPE UNIT', 'QTY', 'NOMINAL REFUND', 'KETERANGAN'].map((header) => (
@@ -225,14 +225,14 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                 ) : (
                   <TableRow>
                     <TableCell colSpan={100} className="py-16 h-24 text-center text-[#6B7280]">
-                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="flex flex-col items-center justify-center gap-2">
                         <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
+                          <Search className="h-8 w-8 text-slate-400" />
                         </div>
                         <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
                         <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

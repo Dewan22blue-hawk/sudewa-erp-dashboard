@@ -345,7 +345,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
               <Button
                 onClick={form.handleSubmit(onSubmit)}
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="w-full bg-[#1e3a5f] hover:bg-[#152e4d] gap-2 py-6 rounded-xl"
+                className="w-full bg-[#1e3a5f] hover:bg-[#152e4d] gap-2 py-6 rounded-md"
               >
                 {createMutation.isPending || updateMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -368,7 +368,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
               </div>
 
               {/* Search Filters for Table */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-md border border-slate-100">
                 <div className="space-y-1">
                   <span className="text-xs font-semibold text-slate-500">Warna</span>
                   <div className="relative">

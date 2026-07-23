@@ -95,7 +95,7 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
   });
 
   return (
-    <div className="w-full mt-6 bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm print:mt-0 print:bg-transparent print:rounded-none print:border-none print:shadow-none">
+    <div className="w-full mt-6 bg-white rounded-md overflow-hidden border border-gray-100 shadow-sm print:mt-0 print:bg-transparent print:rounded-none print:border-none print:shadow-none">
       <div className="w-full overflow-x-auto print:overflow-visible">
         <table className="w-full text-sm text-left whitespace-nowrap min-w-max print:whitespace-normal print:min-w-full">
           <thead className="bg-[#f8f9fa] border-b border-gray-100 print:bg-transparent print:border-gray-800">
@@ -144,13 +144,13 @@ export default function AssetReportTable({ data }: AssetReportTableProps) {
                   colSpan={100}
                   className="px-6 py-16 text-center text-gray-500 font-medium"
                 >
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
                 </td>
               </tr>
             )}

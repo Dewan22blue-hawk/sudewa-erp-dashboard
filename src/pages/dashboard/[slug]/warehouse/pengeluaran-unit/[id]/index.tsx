@@ -105,16 +105,16 @@ export default function DetailPengeluaranUnitPage() {
         </div>
 
         {detailQuery.isLoading ? (
-          <div className="p-8 text-center text-gray-500 bg-white rounded-xl border border-gray-100">Loading...</div>
+          <div className="p-8 text-center text-gray-500 bg-white rounded-md border border-gray-100">Loading...</div>
         ) : detailQuery.isError || !detailQuery.data ? (
-          <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm text-red-700 space-y-3">
+          <div className="rounded-md border border-red-100 bg-red-50 p-6 text-sm text-red-700 space-y-3">
             <p>{detailError}</p>
             <Button variant="outline" size="sm" onClick={() => void detailQuery.refetch()}>
               Coba Lagi
             </Button>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
+          <div className="bg-white rounded-md border border-gray-200 p-4 space-y-4">
             <PengeluaranUnitCreateTable
               data={dispatchTableQuery.data?.data ?? []}
               meta={tableMeta}

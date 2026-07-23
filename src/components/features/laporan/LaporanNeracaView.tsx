@@ -4,7 +4,7 @@ export default function LaporanNeracaView() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* HALAMAN 1: AKTIVA */}
-      <div className="bg-white border rounded-xl p-12 shadow-sm relative">
+      <div className="bg-white border rounded-md p-12 shadow-sm relative">
         {/* Header Section */}
         <div className="flex flex-col items-center justify-center mb-8 relative">
           <Image src="/wajira-logo.png" alt="Wajira Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
@@ -106,7 +106,7 @@ export default function LaporanNeracaView() {
       </div>
 
       {/* HALAMAN 2: PASIVA */}
-      <div className="bg-white border rounded-xl p-12 shadow-sm relative">
+      <div className="bg-white border rounded-md p-12 shadow-sm relative">
         {/* Header Section */}
         <div className="flex flex-col items-center justify-center mb-8 relative">
           <Image src="/wajira-logo.png" alt="Wajira Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />

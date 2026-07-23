@@ -14,15 +14,15 @@ interface VehicleEquipmentFormModalProps {
     isSaving?: boolean;
 }
 
-export function VehicleEquipmentFormModal({ 
-    isOpen, 
-    onClose, 
-    onSave, 
+export function VehicleEquipmentFormModal({
+    isOpen,
+    onClose,
+    onSave,
     initialData = null,
-    isSaving = false 
+    isSaving = false
 }: VehicleEquipmentFormModalProps) {
     const isEdit = !!initialData;
-    
+
     const { register, handleSubmit, reset, formState: { errors } } = useForm<VehicleEquipmentPayload>({
         defaultValues: {
             code: '',
@@ -71,9 +71,8 @@ export function VehicleEquipmentFormModal({
                         <Input
                             id="code"
                             placeholder="Tambahkan kode"
-                            className={`w-full bg-white border border-gray-200 rounded-xl h-11 text-sm font-medium focus:ring-1 focus:ring-slate-400 focus:border-slate-400 ${
-                                errors.code ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''
-                            }`}
+                            className={`w-full bg-white border border-gray-200 rounded-md h-11 text-sm font-medium focus:ring-1 focus:ring-slate-400 focus:border-slate-400 ${errors.code ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''
+                                }`}
                             {...register('code', { required: 'Kode barang wajib diisi' })}
                         />
                         {errors.code && (
@@ -89,9 +88,8 @@ export function VehicleEquipmentFormModal({
                         <Input
                             id="name"
                             placeholder="Tambahkan nama"
-                            className={`w-full bg-white border border-gray-200 rounded-xl h-11 text-sm font-medium focus:ring-1 focus:ring-slate-400 focus:border-slate-400 ${
-                                errors.name ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''
-                            }`}
+                            className={`w-full bg-white border border-gray-200 rounded-md h-11 text-sm font-medium focus:ring-1 focus:ring-slate-400 focus:border-slate-400 ${errors.name ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''
+                                }`}
                             {...register('name', { required: 'Nama barang wajib diisi' })}
                         />
                         {errors.name && (
@@ -101,19 +99,19 @@ export function VehicleEquipmentFormModal({
 
                     {/* Actions */}
                     <div className="flex flex-col space-y-2 pt-4">
-                        <Button 
-                            type="submit" 
+                        <Button
+                            type="submit"
                             disabled={isSaving}
-                            className="w-full bg-[#15305B] hover:bg-[#0E2140] font-semibold text-white h-11 rounded-xl text-sm"
+                            className="w-full bg-[#15305B] hover:bg-[#0E2140] font-semibold text-white h-11 rounded-md text-sm"
                         >
                             {isSaving ? 'Menyimpan...' : 'Simpan'}
                         </Button>
-                        <Button 
-                            type="button" 
-                            variant="outline" 
+                        <Button
+                            type="button"
+                            variant="outline"
                             onClick={onClose}
                             disabled={isSaving}
-                            className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold h-11 rounded-xl text-sm"
+                            className="w-full border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold h-11 rounded-md text-sm"
                         >
                             Batal
                         </Button>

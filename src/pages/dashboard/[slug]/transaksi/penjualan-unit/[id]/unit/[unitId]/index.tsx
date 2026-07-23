@@ -362,7 +362,7 @@ export default function SalesUnitDetailPage() {
 
         <SalesDetailCards data={salesData.ui} billingHistories={resolvedBillingHistories} />
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="space-y-4 p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>

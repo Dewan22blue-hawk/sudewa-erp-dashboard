@@ -152,13 +152,13 @@ export default function EditVehicleDocumentPage() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-4 border-t border-slate-100 pt-6">
-              <div className="rounded-xl bg-slate-50 px-4 py-2 text-sm">
+              <div className="rounded-md bg-slate-50 px-4 py-2 text-sm">
                 Total Kendaraan: <span className="font-semibold text-slate-900">{totalCount}</span>
               </div>
-              <div className="rounded-xl bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
+              <div className="rounded-md bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
                 Processed: <span className="font-semibold text-emerald-700">{processedCount}</span>
               </div>
-              <div className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">
+              <div className="rounded-md bg-amber-50 px-4 py-2 text-sm text-amber-800">
                 Unprocessed: <span className="font-semibold text-amber-700">{unprocessedCount}</span>
               </div>
             </div>

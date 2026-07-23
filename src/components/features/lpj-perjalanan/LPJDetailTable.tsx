@@ -18,8 +18,8 @@ export function LPJDetailTable({ items }: LPJDetailTableProps) {
   const totalPPH = items.reduce((acc, item) => acc + item.pph2, 0);
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-[#d5dce7]">
-        <Table className="min-w-250">
+    <div className="overflow-x-auto rounded-md border border-[#d5dce7]">
+      <Table className="min-w-250">
         <TableHeader className="bg-[#d9e5f7]">
           <TableRow>
             <TableHead className="text-[11px] font-semibold text-center">NO</TableHead>

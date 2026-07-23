@@ -61,13 +61,13 @@ export function BBNBillTable({
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search here"
-              className="rounded-xl border-slate-200 bg-white pl-10 shadow-sm"
+              className="rounded-md border-slate-200 bg-white pl-10 shadow-sm"
             />
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-700">Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="w-[70px] bg-white rounded-xl border-slate-200 shadow-sm cursor-pointer">
+              <SelectTrigger className="w-[70px] bg-white rounded-md border-slate-200 shadow-sm cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -143,7 +143,7 @@ export function BBNBillTable({
                         <MoreVertical className="h-4 w-4 text-slate-600" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[160px] rounded-xl bg-white shadow-md border border-slate-100">
+                    <DropdownMenuContent align="end" className="w-[160px] rounded-md bg-white shadow-md border border-slate-100">
                       <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer text-slate-700 hover:bg-slate-50">Detail</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onPay(item)} className="cursor-pointer text-slate-700 hover:bg-slate-50">Bayar Tagihan</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onPrint(item)} className="cursor-pointer text-slate-700 hover:bg-slate-50">Print</DropdownMenuItem>
@@ -173,7 +173,7 @@ export function BBNBillTable({
               variant={pageNumber === page ? 'outline' : 'ghost'}
               size="sm"
               onClick={() => onPageChange(pageNumber)}
-              className={pageNumber === page ? 'rounded-xl border-slate-200 bg-white' : 'text-slate-600'}
+              className={pageNumber === page ? 'rounded-md border-slate-200 bg-white' : 'text-slate-600'}
             >
               {pageNumber}
             </Button>

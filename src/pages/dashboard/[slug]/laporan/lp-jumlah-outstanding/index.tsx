@@ -231,7 +231,7 @@ export default function LPJumlahOutstandingPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tabs Navigation */}
           <div className="flex mb-4 no-print">
-            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
               <TabsTrigger
                 value="bpkb"
                 className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer"
@@ -282,165 +282,165 @@ export default function LPJumlahOutstandingPage() {
               </div>
 
               {/* Table Rendering (static header, dynamic body) */}
-              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+              <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                 <div className="overflow-x-auto">
                   <Table>
-                      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="hover:bg-[#f8f9fa]">
-                          <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                          <TableHead
-                            onClick={() => handleSort('stnk_name')}
-                            className={cn(
-                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                              sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                            )}
-                          >
-                            <div className="flex items-center gap-1">
-                              <span>{activeTab === 'bpkb' ? 'NAMA BPKB' : 'NAMA STNK'}</span>
-                              <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                      <TableRow className="hover:bg-[#f8f9fa]">
+                        <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
+                        <TableHead
+                          onClick={() => handleSort('stnk_name')}
+                          className={cn(
+                            "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                            sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <span>{activeTab === 'bpkb' ? 'NAMA BPKB' : 'NAMA STNK'}</span>
+                            <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          onClick={() => handleSort('region')}
+                          className={cn(
+                            "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                            sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <span>WILAYAH</span>
+                            <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          onClick={() => handleSort('dealer')}
+                          className={cn(
+                            "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                            sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <span>DEALER</span>
+                            <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          onClick={() => handleSort('vendor')}
+                          className={cn(
+                            "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                            sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <span>VENDOR</span>
+                            <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          onClick={() => handleSort('tnkb_number')}
+                          className={cn(
+                            "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                            sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <span>NO POLISI</span>
+                            <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
+                          JENIS
+                        </TableHead>
+                        <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
+                          NO RANGKA
+                        </TableHead>
+                        <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
+                          NO MESIN
+                        </TableHead>
+                        <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">
+                          STATUS
+                        </TableHead>
+                        <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
+                          KETERANGAN
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {isLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={11} className="h-32 text-center">
+                            <div className="flex items-center justify-center gap-2 text-slate-400">
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                              <span className="text-sm font-medium">Memuat data...</span>
                             </div>
-                          </TableHead>
-                          <TableHead
-                            onClick={() => handleSort('region')}
-                            className={cn(
-                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                              sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                            )}
-                          >
-                            <div className="flex items-center gap-1">
-                              <span>WILAYAH</span>
-                              <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
-                            </div>
-                          </TableHead>
-                          <TableHead
-                            onClick={() => handleSort('dealer')}
-                            className={cn(
-                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                              sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                            )}
-                          >
-                            <div className="flex items-center gap-1">
-                              <span>DEALER</span>
-                              <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
-                            </div>
-                          </TableHead>
-                          <TableHead
-                            onClick={() => handleSort('vendor')}
-                            className={cn(
-                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                              sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                            )}
-                          >
-                            <div className="flex items-center gap-1">
-                              <span>VENDOR</span>
-                              <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
-                            </div>
-                          </TableHead>
-                          <TableHead
-                            onClick={() => handleSort('tnkb_number')}
-                            className={cn(
-                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                              sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                            )}
-                          >
-                            <div className="flex items-center gap-1">
-                              <span>NO POLISI</span>
-                              <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                            </div>
-                          </TableHead>
-                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
-                            JENIS
-                          </TableHead>
-                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
-                            NO RANGKA
-                          </TableHead>
-                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
-                            NO MESIN
-                          </TableHead>
-                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-center">
-                            STATUS
-                          </TableHead>
-                          <TableHead className="text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap text-left">
-                            KETERANGAN
-                          </TableHead>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {isLoading ? (
-                          <TableRow>
-                            <TableCell colSpan={11} className="h-32 text-center">
-                              <div className="flex items-center justify-center gap-2 text-slate-400">
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                <span className="text-sm font-medium">Memuat data...</span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ) : isError ? (
-                          <TableRow>
-                            <TableCell colSpan={11} className="h-32 text-center text-red-600 font-semibold p-4">
-                              <p className="mb-0.5">Gagal memuat data laporan</p>
-                              <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
-                            </TableCell>
-                          </TableRow>
-                        ) : data.length > 0 ? (
-                          data.map((item, idx) => {
-                            const indexNumber = idx + 1 + (page - 1) * perPage;
-                            
-                            // Determine Names & Fallbacks
-                            const stnkName = item.stnk_name || item.vehicle_data?.stnk_name || '-';
-                            const region = item.region || item.vehicle_data?.regency || item.vehicle_data?.region?.name || '-';
-                            const dealer = item.dealer || item.vehicle_data?.dealer?.name || '-';
-                            
-                            let vendor = '-';
-                            if (item.vendor) {
-                              if (typeof item.vendor === 'string') {
-                                vendor = item.vendor;
-                              } else {
-                                vendor = item.vendor.name || '-';
-                              }
+                      ) : isError ? (
+                        <TableRow>
+                          <TableCell colSpan={11} className="h-32 text-center text-red-600 font-semibold p-4">
+                            <p className="mb-0.5">Gagal memuat data laporan</p>
+                            <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
+                          </TableCell>
+                        </TableRow>
+                      ) : data.length > 0 ? (
+                        data.map((item, idx) => {
+                          const indexNumber = idx + 1 + (page - 1) * perPage;
+
+                          // Determine Names & Fallbacks
+                          const stnkName = item.stnk_name || item.vehicle_data?.stnk_name || '-';
+                          const region = item.region || item.vehicle_data?.regency || item.vehicle_data?.region?.name || '-';
+                          const dealer = item.dealer || item.vehicle_data?.dealer?.name || '-';
+
+                          let vendor = '-';
+                          if (item.vendor) {
+                            if (typeof item.vendor === 'string') {
+                              vendor = item.vendor;
+                            } else {
+                              vendor = item.vendor.name || '-';
                             }
+                          }
 
-                            const vehicleType = item.vehicle_type || item.vehicle_data?.motorcycle_type || '-';
-                            const chassisNumber = item.chassis_number || item.vehicle_data?.chassis_number || '-';
-                            const machineNumber = item.machine_number || item.vehicle_data?.machine_number || '-';
+                          const vehicleType = item.vehicle_type || item.vehicle_data?.motorcycle_type || '-';
+                          const chassisNumber = item.chassis_number || item.vehicle_data?.chassis_number || '-';
+                          const machineNumber = item.machine_number || item.vehicle_data?.machine_number || '-';
 
-                            // Determine status and description
-                            const statusText = getOutstandingStatus(activeTab, item);
-                            const keterangan = getOutstandingKeterangan(activeTab, item);
+                          // Determine status and description
+                          const statusText = getOutstandingStatus(activeTab, item);
+                          const keterangan = getOutstandingKeterangan(activeTab, item);
 
-                            return (
-                              <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap text-left">{stnkName}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{region}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{dealer}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{vendor}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 whitespace-nowrap text-left">{item.tnkb_number || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{formatVehicleType(vehicleType)}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{chassisNumber}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{machineNumber}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-center whitespace-nowrap">{renderOutstandingStatusBadge(statusText)}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{keterangan}</TableCell>
-                              </TableRow>
-                            );
-                          })
-                        ) : (
-                          <TableRow className="group">
-                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                                <div className="flex flex-col items-center justify-center gap-2">
-                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                        <Search className="h-8 w-8 text-slate-400" />
-                                    </div>
-                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
+                          return (
+                            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
+                              <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap text-left">{stnkName}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{region}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{dealer}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{vendor}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm font-medium text-gray-900 whitespace-nowrap text-left">{item.tnkb_number || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{formatVehicleType(vehicleType)}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{chassisNumber}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{machineNumber}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-center whitespace-nowrap">{renderOutstandingStatusBadge(statusText)}</TableCell>
+                              <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-left">{keterangan}</TableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow className="group">
+                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                <Search className="h-8 w-8 text-slate-400" />
+                              </div>
+                              <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                              <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
                 </div>
+              </div>
             </div>
           </PrintLetterPage>
 
@@ -454,7 +454,7 @@ export default function LPJumlahOutstandingPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                   disabled={page <= 1 || isLoading}
                   onClick={() => setPage(page - 1)}
                 >
@@ -466,7 +466,7 @@ export default function LPJumlahOutstandingPage() {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                      'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                       pageNumber === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -483,7 +483,7 @@ export default function LPJumlahOutstandingPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                      className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
                       disabled={isLoading}
                       onClick={() => setPage(pagination.lastPage)}
                     >
@@ -494,7 +494,7 @@ export default function LPJumlahOutstandingPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                   disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
                   onClick={() => setPage(page + 1)}
                 >

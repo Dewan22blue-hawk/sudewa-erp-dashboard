@@ -52,7 +52,7 @@ export function SupplierFormModal({
                       <Input
                         {...field}
                         placeholder="Tambahkan nama supplier"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -70,7 +70,7 @@ export function SupplierFormModal({
                       <Input
                         {...field}
                         placeholder="Tambahkan PIC"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -88,7 +88,7 @@ export function SupplierFormModal({
                       <Input
                         {...field}
                         placeholder="Tambahkan nomer telepon"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                         onChange={(e) => {
                           field.onChange(sanitizePhone(e.target.value));
                         }}
@@ -110,7 +110,7 @@ export function SupplierFormModal({
                         {...field}
                         placeholder="Tambahkan NPWP"
                         maxLength={16}
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                         onChange={(e) => {
                           field.onChange(e.target.value.replace(/[^\d]/g, ''));
                         }}
@@ -131,7 +131,7 @@ export function SupplierFormModal({
                       <Textarea
                         {...field}
                         placeholder="Tambahkan Alamat"
-                        className="min-h-[100px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
+                        className="min-h-[100px] rounded-md border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none"
                       />
                     </FormControl>
                     <FormMessage />
@@ -141,10 +141,10 @@ export function SupplierFormModal({
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t bg-gray-50">
-              <Button type="button" variant="outline" className="flex-1 h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" className="flex-1 h-11 rounded-md border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="flex-1 h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
+              <Button type="submit" className="flex-1 h-11 rounded-md bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
                 {isSubmitting ? 'Menyimpan...' : submitLabel}
               </Button>
             </div>

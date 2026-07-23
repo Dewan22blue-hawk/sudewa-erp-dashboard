@@ -213,7 +213,7 @@ export default function DetailDOEkspedisiPage() {
                 toast.error(getApiErrorMessage(error));
               }
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#152e4d]"
+            className="inline-flex items-center gap-2 rounded-md bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#152e4d]"
           >
             <Printer className="h-4 w-4" />
             Print DO
@@ -230,7 +230,7 @@ export default function DetailDOEkspedisiPage() {
                 placeholder="Search here"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                className="h-12 rounded-xl border-[#E5E7EB] bg-white pl-11"
+                className="h-12 rounded-md border-[#E5E7EB] bg-white pl-11"
               />
             </div>
 
@@ -240,7 +240,7 @@ export default function DetailDOEkspedisiPage() {
                 setPerPage(Number(value));
                 setPage(1);
               }}>
-                <SelectTrigger className="h-12 w-[88px] rounded-xl border-[#E5E7EB] bg-white">
+                <SelectTrigger className="h-12 w-[88px] rounded-md border-[#E5E7EB] bg-white">
                   <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>

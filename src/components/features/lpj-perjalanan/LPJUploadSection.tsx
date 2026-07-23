@@ -42,7 +42,7 @@ interface LPJUploadSectionProps {
 
 export function LPJUploadSection({ values, errors, onFileChange }: LPJUploadSectionProps) {
   return (
-    <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-6">
+    <section className="space-y-4 rounded-md border border-gray-200 bg-white p-6">
       <h4 className="text-lg font-semibold text-gray-900">Foto Kondisi & Nota</h4>
 
       <div className="space-y-4">

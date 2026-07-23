@@ -53,7 +53,7 @@ export default function UserPage() {
               <p className="text-sm text-muted-foreground">Kelola data Pengguna</p>
             </div>
           </div>
-          <Card className="rounded-xl p-8 flex justify-center items-center h-[300px]">
+          <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
             <div className="text-muted-foreground animate-pulse">Loading...</div>
           </Card>
         </div>
@@ -71,7 +71,7 @@ export default function UserPage() {
               <p className="text-sm text-muted-foreground">Kelola data Pengguna</p>
             </div>
           </div>
-          <Card className="rounded-xl p-8 flex justify-center items-center h-[300px]">
+          <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
             <div className="text-destructive font-medium">Terjadi kesalahan saat mengambil data</div>
           </Card>
         </div>

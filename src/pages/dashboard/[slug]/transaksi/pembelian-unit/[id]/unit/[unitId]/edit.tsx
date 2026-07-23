@@ -23,8 +23,7 @@ const parseApiError = (err: any): string => {
     return Object.entries(details)
       .map(
         ([field, value]) =>
-          `${field}: ${
-            Array.isArray(value) ? value[0] : String(value)
+          `${field}: ${Array.isArray(value) ? value[0] : String(value)
           }`
       )
       .join(', ');
@@ -88,7 +87,7 @@ export default function EditNestedUnitPage() {
       // ======================
       const selectedTypeUnitId =
         data.typeUnitId !== undefined &&
-        data.typeUnitId !== null
+          data.typeUnitId !== null
           ? String(data.typeUnitId)
           : '';
 
@@ -320,7 +319,7 @@ export default function EditNestedUnitPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="p-6">
             <PurchaseUnitForm
               defaultValues={{

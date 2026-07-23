@@ -352,7 +352,7 @@ export const AccountListPage = () => {
 
           {selectedIds.size > 0 && (
             <div className="flex flex-wrap items-center gap-3">
-              <Button variant="outline" className="h-10 rounded-xl border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50" onClick={handleOpenBulkUpdate}>
+              <Button variant="outline" className="h-10 rounded-md border-gray-200 px-4 text-sm font-medium text-slate-800 shadow-none hover:bg-slate-50" onClick={handleOpenBulkUpdate}>
                 <PencilLine className="mr-1.5 h-4 w-4" />
                 Update
               </Button>

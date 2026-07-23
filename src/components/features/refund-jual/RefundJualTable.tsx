@@ -114,7 +114,7 @@ export default function RefundJualTable({
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[120px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+            <DropdownMenuContent align="end" className="min-w-[120px] rounded-md border-slate-200 p-1.5 shadow-lg">
               <DropdownMenuItem
                 onClick={() => setSelectedRefundId(item.id)}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
@@ -132,7 +132,7 @@ export default function RefundJualTable({
   return (
     <div className="space-y-4">
       {error ? (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-md p-6 text-center">
           <p className="text-sm text-red-600">{error}</p>
           {onRetry ? (
             <Button type="button" variant="outline" size="sm" onClick={onRetry} className="mt-3">

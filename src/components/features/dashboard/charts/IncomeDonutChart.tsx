@@ -48,7 +48,7 @@ export function IncomeDonutChart() {
 
   if (isLoading) {
     return (
-      <Card className="h-full rounded-xl">
+      <Card className="h-full rounded-md">
         <CardHeader>
           <CardTitle className="text-base font-semibold">Pemasukan</CardTitle>
         </CardHeader>
@@ -60,7 +60,7 @@ export function IncomeDonutChart() {
   }
 
   return (
-    <Card className="h-full rounded-xl shadow-sm">
+    <Card className="h-full rounded-md shadow-sm">
       <CardHeader>
         <CardTitle className="text-base font-semibold">Pemasukan</CardTitle>
       </CardHeader>

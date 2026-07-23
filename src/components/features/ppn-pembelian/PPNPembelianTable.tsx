@@ -207,7 +207,7 @@ export default function PPNPembelianTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-              <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">
+              <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-md px-3 py-2.5">
                 Edit
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -221,13 +221,13 @@ export default function PPNPembelianTable({
   return (
     <div className="space-y-4">
       {isFetching && !isLoading && (
-        <div className="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-2 text-xs text-blue-700">
+        <div className="rounded-md border border-blue-200 bg-blue-50/50 px-4 py-2 text-xs text-blue-700">
           Memperbarui data...
         </div>
       )}
 
       {isError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-center">
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-center">
           <p className="text-sm text-red-600 mb-2">{errorMessage ?? 'Gagal memuat data PPN pembelian'}</p>
           {onRetry && (
             <Button type="button" variant="outline" size="sm" onClick={onRetry}>

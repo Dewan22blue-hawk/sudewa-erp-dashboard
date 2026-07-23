@@ -33,7 +33,7 @@ function CompanySelector({ companies, companyId, setCompanyId }: { companies: Co
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <button className="flex w-full items-center justify-between rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
+        <button className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-1.5 text-left shadow-sm hover:bg-gray-50 transition-colors">
           <div className="flex flex-col overflow-hidden">
             <span className="text-[10px] uppercase font-semibold text-gray-400">Company</span>
             <span className="font-medium text-gray-900 truncate uppercase">{selectedCompany ? selectedCompany.name : 'Select Company'}</span>

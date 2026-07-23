@@ -44,7 +44,7 @@ export default function LaporanPembelianPage() {
 
   const exportToCSV = () => {
     let csvContent = "";
-    
+
     const getReportTitle = () => {
       switch (activeTab) {
         case 'per-tipe': return 'REKAP PEMBELIAN PER TIPE';
@@ -53,17 +53,17 @@ export default function LaporanPembelianPage() {
       }
     };
 
-    const periodText = startDate && endDate 
+    const periodText = startDate && endDate
       ? `Periode: ${format(new Date(startDate), 'dd/MM/yyyy')} s.d. ${format(new Date(endDate), 'dd/MM/yyyy')}`
       : 'Tahun 2026';
-      
+
     csvContent += `"${getReportTitle()}"\n`;
     csvContent += `"PT WAJIRA JAGRATARA MORINDO"\n`;
     csvContent += `"${periodText}"\n\n`;
 
     if (activeTab === 'per-nota') {
       csvContent += "NO,No Pembelian,TGL BELI,TIPE UNIT,QTY,HARGA BELI,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAINNYA,HPP,DPP,PPN,JUMLAH\n";
-      
+
       let index = 1;
       data.forEach((item) => {
         const items = item.unit_transaction_items || [];
@@ -105,7 +105,7 @@ export default function LaporanPembelianPage() {
       });
     } else if (activeTab === 'per-tipe') {
       csvContent += "NO,NO PEMBELIAN,TGL BELI,TIPE UNIT,QTY,HARGA,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAIN,TOTAL BELI\n";
-      
+
       data.forEach((item, idx) => {
         const items = item.unit_transaction_items || [];
         const unitTypes = Array.from(new Set(items.map(u => u.unit_type?.name).filter(Boolean))).join(', ');
@@ -114,7 +114,7 @@ export default function LaporanPembelianPage() {
         const biayaBbn = items.reduce((acc, curr) => acc + (curr.bbn_price * curr.qty_total), 0);
         const biayaEkspedisi = items.reduce((acc, curr) => acc + curr.expedition_fee, 0);
         const biayaLain = items.reduce((acc, curr) => acc + curr.other_fee, 0);
-        
+
         csvContent += `${idx + 1},`;
         csvContent += `"${item.code}",`;
         csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
@@ -128,7 +128,7 @@ export default function LaporanPembelianPage() {
       });
     } else {
       csvContent += "NO,NO PEMBELIAN,TGL BELI,NAMA SUPPLIER,QTY,HARGA,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAIN,TOTAL BELI\n";
-      
+
       data.forEach((item, idx) => {
         const items = item.unit_transaction_items || [];
         const qty = items.reduce((acc, curr) => acc + curr.qty_total, 0);
@@ -136,7 +136,7 @@ export default function LaporanPembelianPage() {
         const biayaBbn = items.reduce((acc, curr) => acc + (curr.bbn_price * curr.qty_total), 0);
         const biayaEkspedisi = items.reduce((acc, curr) => acc + curr.expedition_fee, 0);
         const biayaLain = items.reduce((acc, curr) => acc + curr.other_fee, 0);
-        
+
         csvContent += `${idx + 1},`;
         csvContent += `"${item.code}",`;
         csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
@@ -185,21 +185,21 @@ export default function LaporanPembelianPage() {
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
             {/* Tab triggers wrapped to look like pills */}
             <div className="flex no-print">
-              <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
-                <TabsTrigger 
-                  value="per-nota" 
+              <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
+                <TabsTrigger
+                  value="per-nota"
                   className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                 >
                   Laporan Pembelian Per Nota
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="per-tipe" 
+                <TabsTrigger
+                  value="per-tipe"
                   className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                 >
                   Laporan Pembelian Per Tipe
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="per-supplier" 
+                <TabsTrigger
+                  value="per-supplier"
                   className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                 >
                   Laporan Pembelian Per Supplier
@@ -221,7 +221,7 @@ export default function LaporanPembelianPage() {
                     PT WAJIRA JAGRATARA MORINDO
                   </p>
                   <p className="text-[13px] font-semibold text-gray-800 opacity-90">
-                    {startDate && endDate 
+                    {startDate && endDate
                       ? `Periode: ${format(new Date(startDate), 'dd/MM/yyyy')} s.d. ${format(new Date(endDate), 'dd/MM/yyyy')}`
                       : '2026'}
                   </p>

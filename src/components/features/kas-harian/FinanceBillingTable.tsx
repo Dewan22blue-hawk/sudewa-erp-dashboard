@@ -109,7 +109,7 @@ function SearchableSelect<T extends { id: number | string }>({
         variant="outline"
         role="combobox"
         className={cn(
-          'h-11 w-full justify-between rounded-xl border-slate-200 bg-white px-3 text-left font-normal hover:bg-white text-sm',
+          'h-11 w-full justify-between rounded-md border-slate-200 bg-white px-3 text-left font-normal hover:bg-white text-sm',
           !value && 'text-slate-400',
         )}
         disabled={disabled}
@@ -122,7 +122,7 @@ function SearchableSelect<T extends { id: number | string }>({
       </Button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-[calc(100%+0.25rem)] z-[130] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+        <div className="absolute left-0 right-0 top-[calc(100%+0.25rem)] z-[130] overflow-hidden rounded-md border border-slate-200 bg-white shadow-xl">
           <div className="border-b border-slate-100 p-2">
             <Input
               placeholder={searchPlaceholder}
@@ -497,7 +497,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             <div className="grid gap-4 md:grid-cols-2">
               {/* Nominal */}
               <div className="space-y-2">
-                <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
                   <div className="font-semibold">Maksimal nominal: {formatSelectedCurrency(maxPaymentAmount)}</div>
                   <div className="mt-0.5 text-amber-700">
                     Total transaksi {formatSelectedCurrency(cashFlowAmount)} - total terbayar {formatSelectedCurrency(totalPaid)}
@@ -539,7 +539,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
                 value={form.note}
                 onChange={(e) => setForm((prev) => ({ ...prev, note: e.target.value }))}
                 placeholder="Catatan pembayaran..."
-                className="min-h-20 resize-none rounded-xl"
+                className="min-h-20 resize-none rounded-md"
                 disabled={isLoading}
               />
             </div>

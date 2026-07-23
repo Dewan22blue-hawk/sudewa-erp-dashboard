@@ -33,7 +33,7 @@ export default function MonthlyVatReportView({
   report,
 }: MonthlyVatReportViewProps) {
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-none sm:p-6 print:rounded-none print:border print:shadow-none">
+    <section className="rounded-md border border-gray-200 bg-white p-4 shadow-none sm:p-6 print:rounded-none print:border print:shadow-none">
       <header className="space-y-1 pb-8 text-center">
         <h2 className="text-base font-semibold text-slate-900 sm:text-lg">
           {report.reportTitle}

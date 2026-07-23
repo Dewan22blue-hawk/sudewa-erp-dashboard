@@ -75,7 +75,7 @@ export function TransactionTable({ data, isLoading }: TransactionTableProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <div className="overflow-x-auto rounded-md border border-slate-200">
         <Table>
           <TableHeader className="bg-slate-100">
             <TableRow className='font-bold'>

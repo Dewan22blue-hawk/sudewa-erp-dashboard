@@ -155,7 +155,7 @@ export default function PembayaranHutangDetailPage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-gray-200">
+            <div className="overflow-hidden rounded-md border border-gray-200">
               <table className="w-full text-sm">
                 <thead className="bg-gray-100/80 text-xs font-semibold uppercase tracking-wide text-gray-600">
                   <tr className="border-b border-gray-200">

@@ -54,7 +54,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
     <DashboardLayout>
       <div className="space-y-6 p-4 md:p-6">
         <div className="flex items-start gap-4">
-          <Button onClick={() => router.push(backHref)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button onClick={() => router.push(backHref)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <PageHeader title={title} description="Detail refund, histori pembayaran, dan item yang direfund." />
@@ -129,14 +129,14 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
                 ) : (
                   <TableRow>
                     <TableCell colSpan={100} className="py-16 h-32 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="flex flex-col items-center justify-center gap-2">
                         <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
+                          <Search className="h-8 w-8 text-slate-400" />
                         </div>
                         <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
                         <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

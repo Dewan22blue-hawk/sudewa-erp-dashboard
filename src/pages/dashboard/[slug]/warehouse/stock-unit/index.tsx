@@ -62,7 +62,7 @@ export default function StockUnitPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <PanelName />
-          <Card className="rounded-xl p-6">
+          <Card className="rounded-md p-6">
             <div className="text-center text-muted-foreground">Memuat data...</div>
           </Card>
         </div>
@@ -75,7 +75,7 @@ export default function StockUnitPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <PanelName />
-          <Card className="rounded-xl p-6">
+          <Card className="rounded-md p-6">
             <div className="text-center text-destructive">Gagal memuat data</div>
           </Card>
         </div>

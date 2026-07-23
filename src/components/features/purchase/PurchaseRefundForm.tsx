@@ -170,7 +170,7 @@ export function PurchaseRefundForm({
                 <Input
                   value={purchase.code}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
 
@@ -180,7 +180,7 @@ export function PurchaseRefundForm({
                 <Input
                   value={purchase.person?.name ?? '-'}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
 
@@ -196,7 +196,7 @@ export function PurchaseRefundForm({
                         value={field.value ?? null}
                         onChange={field.onChange}
                         placeholder="Pilih tanggal"
-                        className="h-11 rounded-xl border-gray-200 bg-white text-slate-900 shadow-none"
+                        className="h-11 rounded-md border-gray-200 bg-white text-slate-900 shadow-none"
                       />
                     </FormControl>
                     <FormMessage />
@@ -212,7 +212,7 @@ export function PurchaseRefundForm({
                 <Input
                   value={formatCurrency(totalPurchase)}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
 
@@ -221,7 +221,7 @@ export function PurchaseRefundForm({
                 <Input
                   value={formatCurrency(totalPaid)}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
             </div>
@@ -237,7 +237,7 @@ export function PurchaseRefundForm({
                     <FormLabel className="text-sm font-medium text-slate-700">Kas Penerimaan Refund</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange} disabled={isCashEmpty || isFormDisabled}>
                       <FormControl>
-                        <SelectTrigger className="h-11 rounded-xl border-gray-200 bg-white text-slate-900 shadow-none">
+                        <SelectTrigger className="h-11 rounded-md border-gray-200 bg-white text-slate-900 shadow-none">
                           <SelectValue placeholder={isCashEmpty ? 'Kas tidak tersedia' : 'Pilih Kas'} />
                         </SelectTrigger>
                       </FormControl>
@@ -260,7 +260,7 @@ export function PurchaseRefundForm({
                 <Input
                   value={formatCurrency(nominalRefund)}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                   placeholder="Rp 0"
                 />
                 {selectedIds.size === 0 && (
@@ -270,7 +270,7 @@ export function PurchaseRefundForm({
             </div>
 
             {/* ── Tabel Unit Item Detail ── */}
-            <div className="overflow-x-auto rounded-xl border border-gray-200">
+            <div className="overflow-x-auto rounded-md border border-gray-200">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[#f8fafc] hover:bg-[#f8fafc]">
@@ -377,7 +377,7 @@ export function PurchaseRefundForm({
                   <FormControl>
                     <Textarea
                       placeholder="Contoh: Dikembalikan karena ada kecacatan"
-                      className="min-h-[100px] rounded-xl border-gray-200 bg-white px-3 py-2.5 text-slate-900 shadow-none placeholder:text-slate-400"
+                      className="min-h-[100px] rounded-md border-gray-200 bg-white px-3 py-2.5 text-slate-900 shadow-none placeholder:text-slate-400"
                       {...field}
                       value={field.value ?? ''}
                     />
@@ -401,7 +401,7 @@ export function PurchaseRefundForm({
               <Button
                 type="submit"
                 disabled={isFormDisabled || selectedIds.size === 0}
-                className="h-11 min-w-[120px] rounded-xl bg-[#284d74] px-6 text-sm font-medium text-white shadow-none hover:bg-[#1f3f5f] disabled:opacity-50"
+                className="h-11 min-w-[120px] rounded-md bg-[#284d74] px-6 text-sm font-medium text-white shadow-none hover:bg-[#1f3f5f] disabled:opacity-50"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {submitting ? 'Menyimpan...' : 'Simpan'}

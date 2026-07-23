@@ -147,7 +147,7 @@ export default function DataPPNPenjualanPage() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-9 px-3 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
+                className="h-9 px-3 rounded-md text-slate-500 hover:text-red-500 hover:bg-red-50 border border-slate-200 gap-1.5 text-xs font-medium"
                 onClick={() => {
                   setSearchInput('');
                   setSearch('');

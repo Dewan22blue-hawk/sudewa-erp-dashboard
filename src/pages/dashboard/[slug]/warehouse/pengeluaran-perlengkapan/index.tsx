@@ -135,7 +135,7 @@ export default function PengeluaranPerlengkapanIndex() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page <= 1 || transactionsQuery.isLoading}
           onClick={() => setPage(page - 1)}
         >
@@ -147,7 +147,7 @@ export default function PengeluaranPerlengkapanIndex() {
             variant="ghost"
             size="sm"
             className={cn(
-              'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+              'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
               pageNumber === page
                 ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                 : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -163,7 +163,7 @@ export default function PengeluaranPerlengkapanIndex() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+            className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
             disabled={transactionsQuery.isLoading}
             onClick={() => setPage(totalPages)}
           >
@@ -173,7 +173,7 @@ export default function PengeluaranPerlengkapanIndex() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
           disabled={page >= totalPages || totalData === 0 || transactionsQuery.isLoading}
           onClick={() => setPage(page + 1)}
         >
@@ -234,7 +234,7 @@ export default function PengeluaranPerlengkapanIndex() {
           </div>
 
           {/* Table Card */}
-          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+          <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none">
             <div className="overflow-x-auto">
               <GoodsIssueEquipmentTable
                 data={transactions}
@@ -289,11 +289,11 @@ export default function PengeluaranPerlengkapanIndex() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4 mt-6">
-            <AlertDialogCancel className="h-12 rounded-xl border-slate-300 px-5 text-[16px]">Batal</AlertDialogCancel>
+            <AlertDialogCancel className="h-12 rounded-md border-slate-300 px-5 text-[16px]">Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSubmit}
               disabled={deleteMutation.isPending}
-              className="h-12 rounded-xl bg-red-600 px-5 text-[16px] hover:bg-red-700 font-semibold"
+              className="h-12 rounded-md bg-red-600 px-5 text-[16px] hover:bg-red-700 font-semibold"
             >
               {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>

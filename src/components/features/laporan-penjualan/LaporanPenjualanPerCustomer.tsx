@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 export default function LaporanPenjualanPerCustomer({ data, pagination, isLoading, onPageChange }: Props) {
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-20 bg-white rounded-xl border border-gray-200">
+      <div className="flex justify-center items-center py-20 bg-white rounded-md border border-gray-200">
         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     );
@@ -33,7 +33,7 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
   const pages: (number | string)[] = [];
   const currentPage = pagination.currentPage;
   const lastPage = pagination.lastPage;
-  
+
   if (lastPage <= 5) {
     for (let i = 1; i <= lastPage; i++) pages.push(i);
   } else {
@@ -48,7 +48,7 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+      <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -93,13 +93,13 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
                 <TableRow>
                   <TableCell colSpan={100} className="px-4 py-16 text-center text-sm text-gray-500">
                     <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                     </div>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -117,7 +117,7 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
             <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
               <Button
                 variant="ghost"
-                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage <= 1}
               >
@@ -134,7 +134,7 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
                     key={p}
                     variant="ghost"
                     className={cn(
-                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                      'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                       p === currentPage
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -148,7 +148,7 @@ export default function LaporanPenjualanPerCustomer({ data, pagination, isLoadin
 
               <Button
                 variant="ghost"
-                className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage >= lastPage}
               >
