@@ -272,7 +272,7 @@ export function Topbar() {
               <>
                 {/* Backdrop handler to close search dropdown when user clicks outside */}
                 <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-                <div className="absolute left-0 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden">
+                <div className="absolute left-0 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-xl z-50 overflow-hidden">
                   {SearchResultsList}
                 </div>
               </>
@@ -314,7 +314,7 @@ export function Topbar() {
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-xl">
+            <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-md">
               <DropdownMenuItem onClick={handleProfileClick} className="cursor-pointer font-medium text-slate-900 text-[13px] py-2 px-3 rounded-lg hover:bg-slate-50 focus:bg-slate-50">
                 Profile
               </DropdownMenuItem>

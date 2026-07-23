@@ -83,7 +83,7 @@ export function FinanceRefundPage({ title, description, transactionType }: Finan
                 variant="outline"
                 size="sm"
                 onClick={() => updateQuery({ search: undefined, page: 1 })}
-                className="rounded-xl border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer h-9 text-xs px-3"
+                className="rounded-md border-slate-200 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer h-9 text-xs px-3"
               >
                 Reset
               </Button>

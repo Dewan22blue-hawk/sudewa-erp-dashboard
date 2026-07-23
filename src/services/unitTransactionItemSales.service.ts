@@ -143,6 +143,7 @@ const mapWarehouseStockUnit = (payload: UnitTypeDetailApiModel): WarehouseStockU
   machine_number: String(payload?.machine_number ?? payload?.no_mesin ?? '-'),
   chassis_number: String(payload?.chassis_number ?? payload?.no_rangka ?? '-'),
   in_stock: isOnHandUnit(payload),
+  status: String(payload?.status ?? payload?.stock_state ?? payload?.state ?? ''),
 });
 
 const appendUnitTransactionDetails = (form: FormData, ids: number[]) => {

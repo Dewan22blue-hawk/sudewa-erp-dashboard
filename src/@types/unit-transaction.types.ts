@@ -309,6 +309,7 @@ export interface WarehouseStockUnit {
   unit_type_id?: string;
   warehouse_id?: string;
   in_stock?: boolean;
+  status?: string | undefined;
 }
 
 export interface UnitTransactionItemSalesAssignment {

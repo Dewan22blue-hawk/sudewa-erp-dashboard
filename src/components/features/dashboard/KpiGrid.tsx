@@ -34,7 +34,7 @@ function AccountCard({ account }: { account: AccountOverview }) {
   return (
     <Card className="flex h-full flex-col space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-start gap-4">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color.bg}`}>
+        <div className={`flex h-10 w-10 items-center justify-center rounded-md ${color.bg}`}>
           <Icon className={`h-5 w-5 ${color.text}`} />
         </div>
         <div>
@@ -49,7 +49,7 @@ function AccountCard({ account }: { account: AccountOverview }) {
         <InfoRow label="Kredit" value={account.credit} currency={account.currency} colorClass="text-red-600" />
       </div>
 
-      <div className="mt-auto flex items-center justify-between rounded-xl bg-[#1B3B5A] px-4 py-3">
+      <div className="mt-auto flex items-center justify-between rounded-md bg-[#1B3B5A] px-4 py-3">
         <span className="text-xs font-semibold uppercase tracking-wide text-white">Saldo Akhir</span>
         <span className="text-sm font-semibold text-white">{formatMoney(account.closingBalance, account.currency)}</span>
       </div>

@@ -117,7 +117,7 @@ export function VehicleDataTable({
         <div className="grid gap-5 lg:grid-cols-[1.15fr_1.15fr_auto] lg:items-end">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-800">Tanggal Proses</label>
-            <DatePicker value={processDate} onChange={onProcessDateChange} placeholder="Pilih tanggal proses" className="h-11 rounded-xl bg-white" />
+            <DatePicker value={processDate} onChange={onProcessDateChange} placeholder="Pilih tanggal proses" className="h-11 rounded-md bg-white" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-800">Nama Vendor</label>
@@ -129,14 +129,14 @@ export function VehicleDataTable({
               placeholder="Pilih vendor"
               searchPlaceholder="Cari vendor..."
               emptyText="Vendor tidak ditemukan."
-              className="h-11 rounded-xl bg-white"
+              className="h-11 rounded-md bg-white"
             />
           </div>
           <div className="flex flex-wrap gap-2 lg:justify-end">
-            <Button variant="outline" onClick={handleResetAssign} className="h-11 rounded-xl px-5">
+            <Button variant="outline" onClick={handleResetAssign} className="h-11 rounded-md px-5">
               Reset
             </Button>
-            <Button onClick={onSubmitAssign} disabled={isAssigning} className="h-11 rounded-xl bg-[#22c55e] px-5 hover:bg-[#16a34a]">
+            <Button onClick={onSubmitAssign} disabled={isAssigning} className="h-11 rounded-md bg-[#22c55e] px-5 hover:bg-[#16a34a]">
               {isAssigning ? 'Memproses...' : 'Serahkan'}
             </Button>
           </div>
@@ -148,12 +148,12 @@ export function VehicleDataTable({
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative w-full md:w-[325px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-10" />
+              <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-md border-slate-200 bg-white pl-10" />
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-700">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-                <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white">
+                <SelectTrigger className="h-11 w-[90px] rounded-md border-slate-200 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,7 +299,7 @@ export function VehicleDataTable({
           Showing {startData}-{endData} of {totalData} data
         </div>
         <div className="flex items-center gap-1 text-sm text-slate-700">
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="rounded-xl px-3">
+          <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="rounded-md px-3">
             Previous
           </Button>
           {visiblePages[0] > 1 ? <span className="px-1 text-slate-400">...</span> : null}
@@ -309,13 +309,13 @@ export function VehicleDataTable({
               variant={pageNumber === page ? 'outline' : 'ghost'}
               size="sm"
               onClick={() => onPageChange(pageNumber)}
-              className="h-9 min-w-9 rounded-xl border-slate-200"
+              className="h-9 min-w-9 rounded-md border-slate-200"
             >
               {pageNumber}
             </Button>
           ))}
           {visiblePages[visiblePages.length - 1] < totalPages ? <span className="px-1 text-slate-400">...</span> : null}
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="rounded-xl px-3">
+          <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="rounded-md px-3">
             Next
           </Button>
         </div>

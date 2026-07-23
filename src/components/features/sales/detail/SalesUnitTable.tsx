@@ -16,11 +16,12 @@ interface Props {
   lineItems: SalesLineItem[];
   salesId: string;
   onAddUnit?: () => void;
+  canCreate?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
 }
 
-export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDelete }: Props) {
+export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEdit, canDelete }: Props) {
   const router = useRouter();
   const { data: unitItemsData, isLoading, isError } = useSalesUnitItems(salesId);
   const { data: typeUnits } = useTypeUnits();
@@ -94,12 +95,6 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
 
   const columns: ColumnDef<any>[] = useMemo(() => [
     {
-      header: 'No',
-      alignment: 'center',
-      className: 'w-[60px]',
-      cell: (_, idx) => (currentPage - 1) * perPage + idx + 1,
-    },
-    {
       header: 'Tipe Unit',
       cell: (item) => (
         <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${getUnitTypeName(item.unit_type_id)}`}>
@@ -111,7 +106,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
       header: 'QTY',
       alignment: 'center',
       className: 'w-[80px]',
-      cell: (item) => item.qty_total,
+      cell: (item) => item.qty_total + ' Unit',
     },
     {
       header: 'Harga Jual',
@@ -196,7 +191,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border bg-white overflow-hidden">
+      <div className="rounded-md border bg-white overflow-hidden">
         <div className="border-b px-6 py-5">
           <h3 className="text-xl font-semibold">Detail Penjualan Unit</h3>
           <p className="text-sm text-muted-foreground">Rincian lengkap unit yang dijual</p>
@@ -236,10 +231,10 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
                     Bulk Delete ({selectedIds.size})
                   </Button>
                 )}
-                {onAddUnit && canEdit && (
+                {onAddUnit && canCreate && (
                   <Button onClick={onAddUnit} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Unit
+                    Tambah Unit
                   </Button>
                 )}
               </div>

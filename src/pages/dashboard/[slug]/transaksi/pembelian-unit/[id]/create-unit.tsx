@@ -128,7 +128,7 @@ export default function CreatePurchaseUnitPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="p-6">
             <PurchaseUnitForm
               onSubmit={handleSubmit}

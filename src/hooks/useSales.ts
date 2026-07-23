@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { salesService, SalesPayload } from '@/services/sales.service';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
+import { mapSalesDetailToUI } from '@/services/sales.mapper';
 
 const salesKeys = {
   all: (companyId: string) => companyQueryKeys.list(companyId, 'sales-transactions'),
@@ -31,7 +32,13 @@ export const useSalesDetail = (id?: string) => {
 
   return useQuery({
     queryKey: companyId ? salesKeys.detail(companyId, id ?? '') : ['sales-transaction', 'unscoped', id],
-    queryFn: () => salesService.getSalesDetail(id as string, companyId ?? undefined),
+    queryFn: async () => {
+      const detail = await salesService.getSalesDetail(id as string, companyId ?? undefined);
+      return {
+        raw: detail,
+        ui: mapSalesDetailToUI(detail as any),
+      };
+    },
     enabled: !!id && Boolean(companyId),
     staleTime: 1000 * 60 * 5,
   });

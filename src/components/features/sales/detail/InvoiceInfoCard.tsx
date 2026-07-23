@@ -11,7 +11,7 @@ import { InvoiceInfo } from "./invoice.types"
 export function InvoiceInfoCard({ data }: { data: InvoiceInfo }) {
     return (
         <Card
-            className="rounded-xl"
+            className="rounded-md"
             style={{
                 border: '1px solid #E5E5E5',
                 padding: '24px'

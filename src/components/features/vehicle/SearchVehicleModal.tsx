@@ -120,10 +120,10 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
             <div className="w-full sm:w-1/3 space-y-1.5">
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cari Berdasarkan</label>
               <Select value={searchOf} onValueChange={setSearchOf}>
-                <SelectTrigger className="bg-white h-11 border-slate-200 rounded-xl shadow-none">
+                <SelectTrigger className="bg-white h-11 border-slate-200 rounded-md shadow-none">
                   <SelectValue placeholder="Pilih kriteria" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-slate-200">
+                <SelectContent className="rounded-md border-slate-200">
                   <SelectItem value="chassis_number">No. Rangka</SelectItem>
                   <SelectItem value="machine_number">No. Mesin</SelectItem>
                   <SelectItem value="color">Warna</SelectItem>
@@ -145,7 +145,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
                       void handleSearch(1);
                     }
                   }}
-                  className="bg-white h-11 border-slate-200 rounded-xl pr-10 shadow-none focus-visible:ring-indigo-500 focus-visible:border-indigo-500"
+                  className="bg-white h-11 border-slate-200 rounded-md pr-10 shadow-none focus-visible:ring-indigo-500 focus-visible:border-indigo-500"
                 />
                 <Search className="absolute right-3 top-3.5 h-4 w-4 text-slate-400" />
               </div>
@@ -155,7 +155,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
               type="button"
               onClick={() => void handleSearch(1)}
               disabled={loading}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 h-11 mt-6 rounded-xl w-full sm:w-auto shadow-none"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 h-11 mt-6 rounded-md w-full sm:w-auto shadow-none"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cari'}
             </Button>
@@ -163,7 +163,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
 
           {/* Results Table */}
           <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white">
-        <Table>
+            <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead className="text-xs font-bold uppercase text-slate-500 py-3.5">Kode Transaksi</TableHead>
@@ -255,7 +255,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
                   size="sm"
                   disabled={currentPage <= 1 || loading}
                   onClick={() => void handleSearch(currentPage - 1)}
-                  className="rounded-xl border-slate-200 h-9"
+                  className="rounded-md border-slate-200 h-9"
                 >
                   Sebelumnya
                 </Button>
@@ -264,7 +264,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
                   size="sm"
                   disabled={currentPage >= totalPages || loading}
                   onClick={() => void handleSearch(currentPage + 1)}
-                  className="rounded-xl border-slate-200 h-9"
+                  className="rounded-md border-slate-200 h-9"
                 >
                   Selanjutnya
                 </Button>

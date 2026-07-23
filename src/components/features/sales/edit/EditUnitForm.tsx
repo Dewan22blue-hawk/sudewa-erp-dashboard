@@ -117,7 +117,7 @@ export function EditUnitForm({
   const biayaBbn = Number(form.watch('biayaBbn') ?? defaultValues?.biayaBbn ?? 0);
   const biayaEkspedisi = Number(form.watch('biayaEkspedisi') ?? defaultValues?.biayaEkspedisi ?? 0);
   const biayaLain = Number(form.watch('biayaLain') ?? defaultValues?.biayaLain ?? 0);
-  const unitOptions = productOptions ?? PRODUCT_OPTIONS;
+  const unitOptions = productOptions;
 
   const { formula } = useUnitFormula({
     qty_total: qty,
@@ -156,7 +156,7 @@ export function EditUnitForm({
         <div>
           <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Penjualan</h2>
           <p className="text-sm text-gray-500 mt-1">Kelola detail informasi penjualan unit dan biaya-biaya terkait</p>
-          <div className="my-6 h-px bg-muted/60" />
+          <div className="h-px bg-muted/60" />
         </div>
 
         {prependFields}
@@ -201,7 +201,7 @@ export function EditUnitForm({
                                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
-                                  {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
+                                  {unitOptions?.find((option) => option.value === field.value)?.label ?? 'Select an item'}
                                 </span>
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </button>
@@ -213,7 +213,7 @@ export function EditUnitForm({
                               <CommandList>
                                 <CommandEmpty>Tipe Unit tidak ditemukan.</CommandEmpty>
                                 <CommandGroup>
-                                  {unitOptions.map((option) => (
+                                  {unitOptions?.map((option) => (
                                     <CommandItem key={option.value} value={option.label} onSelect={() => {
                                       field.onChange(option.value);
                                       setOpenTypeSelect(false);
@@ -235,7 +235,7 @@ export function EditUnitForm({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {unitOptions.map((option) => (
+                            {unitOptions?.map((option) => (
                               <SelectItem key={option.value} value={option.value}>
                                 {option.label}
                               </SelectItem>
@@ -325,7 +325,7 @@ export function EditUnitForm({
 
             {/* USD Inputs */}
             {isUsd && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-md border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
                 <FormField
                   control={form.control}
                   name="hargaUsd"

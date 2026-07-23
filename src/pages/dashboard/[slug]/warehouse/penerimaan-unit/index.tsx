@@ -68,9 +68,9 @@ export default function PenerimaanUnitPage() {
 
         <div className="space-y-4">
           {isLoading ? (
-            <div className="bg-white rounded-xl border p-8 text-center text-gray-500">Loading...</div>
+            <div className="bg-white rounded-md border p-8 text-center text-gray-500">Loading...</div>
           ) : isError ? (
-            <div className="bg-white rounded-xl border p-8 text-center text-red-500">{apiErrorMessage}</div>
+            <div className="bg-white rounded-md border p-8 text-center text-red-500">{apiErrorMessage}</div>
           ) : (
             <PenerimaanUnitTable
               data={data}

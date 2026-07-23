@@ -21,7 +21,7 @@ export function PurchaseDetailCards({ data }: Props) {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {/* Card 1: Informasi Penjualan */}
-      <Card className="rounded-xl border border-input shadow-sm h-full">
+      <Card className="rounded-md border border-input shadow-sm h-full">
         <CardContent className="p-6 flex flex-col h-full">
           <div className="flex items-center gap-3 mb-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
@@ -44,7 +44,7 @@ export function PurchaseDetailCards({ data }: Props) {
       </Card>
 
       {/* Card 2: Detail Penjualan */}
-      <Card className="rounded-xl border border-input shadow-sm h-full">
+      <Card className="rounded-md border border-input shadow-sm h-full">
         <CardContent className="p-6 flex flex-col h-full">
           <div className="flex items-center gap-3 mb-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
@@ -78,7 +78,7 @@ export function PurchaseDetailCards({ data }: Props) {
       </Card>
 
       {/* Card 3: Biaya Lainnya */}
-      <Card className="rounded-xl border border-input shadow-sm h-full">
+      <Card className="rounded-md border border-input shadow-sm h-full">
         <CardContent className="p-6 flex flex-col h-full">
           <div className="flex items-center gap-3 mb-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">

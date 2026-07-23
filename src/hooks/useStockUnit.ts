@@ -10,6 +10,7 @@ export const useStockUnits = (
     chassis_number?: string;
     color?: string;
     in_stock?: boolean;
+    status?: string;
   },
 ) =>
   useQuery({

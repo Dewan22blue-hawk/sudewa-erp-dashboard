@@ -7,7 +7,6 @@ import FinanceRefundApprovalModal from '@/components/features/finance-refund/Fin
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency } from '@/lib/utils/currency';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
@@ -42,7 +41,6 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   const [selectedRefund, setSelectedRefund] = useState<FinanceRefundRecord | null>(null);
   const router = useRouter();
   const { slug } = router.query;
-  const slugStr = typeof slug === 'string' ? slug : '';
 
   const columns = useMemo<ColumnDef<FinanceRefundRecord>[]>(
     () => {
@@ -65,7 +63,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         {
           accessorKey: 'partnerName',
           header: transactionType === 'sales' ? 'NAMA CUSTOMER' : 'NAMA SUPPLIER',
-          cell: ({ row }) => row?.original?.partnerName ? <ReferenceLink href={`/dashboard/${slugStr}/master/supplier/${row?.original?.partnerName}`}>{row?.original?.partnerName}</ReferenceLink> : '-'
+          cell: ({ row }) => row?.original?.partnerName ? <ReferenceLink href={`/dashboard/${slug}/master/supplier/${row?.original?.partnerName}`}>{row?.original?.partnerName}</ReferenceLink> : '-'
         },
         {
           accessorKey: 'totalTransaction',

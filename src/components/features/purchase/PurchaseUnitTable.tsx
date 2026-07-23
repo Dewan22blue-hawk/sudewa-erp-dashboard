@@ -210,7 +210,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
         </div>
       ) : null}
 
-      <div className="rounded-xl border bg-white overflow-hidden">
+      <div className="rounded-md border bg-white overflow-hidden">
         {/* Header */}
         <div className="border-b px-6 py-5">
           <h3 className="text-xl font-semibold">Detail Pembelian Unit</h3>

@@ -134,7 +134,7 @@ export default function EditPenerimaanUnitPage() {
           }
         />
 
-        <div className="bg-white rounded-xl border sm:p-5 space-y-4">
+        <div className="bg-white rounded-md border sm:p-5 space-y-4">
           <PenerimaanUnitDetailTable data={details} personId={header?.person?.id} onTerima={handleTerima} onDelete={handleDelete} />
         </div>
       </div>

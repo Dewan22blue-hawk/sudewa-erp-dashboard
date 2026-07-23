@@ -174,7 +174,7 @@ export default function LPJumlahTerimaPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tabs Navigation (Pills structure) */}
           <div className="flex mb-4 no-print">
-            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
               <TabsTrigger
                 value="bpkb"
                 className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer"
@@ -229,7 +229,7 @@ export default function LPJumlahTerimaPage() {
                 </div>
 
                 {/* Table Rendering (static header, dynamic body) */}
-                <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+                <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -771,7 +771,7 @@ export default function LPJumlahTerimaPage() {
                               <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
                                 <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-500">{indexNumber}</TableCell>
                                 <TableCell className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap text-left">{item.stnk_name || '-'}</TableCell>
-                                
+
                                 {activeTab === 'bpkb' && <TableCell className="px-4 py-4 text-sm font-medium whitespace-nowrap text-left">{(item as any).bpkb_number || '-'}</TableCell>}
                                 {activeTab === 'stnk' && <TableCell className="px-4 py-4 text-sm font-medium whitespace-nowrap text-left">{(item as any).stnk_number || '-'}</TableCell>}
 
@@ -783,7 +783,7 @@ export default function LPJumlahTerimaPage() {
                                 <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{item.chassis_number || '-'}</TableCell>
                                 <TableCell className="px-4 py-4 text-sm text-slate-600 font-mono whitespace-nowrap text-left">{item.machine_number || '-'}</TableCell>
                                 <TableCell className="px-4 py-4 text-sm text-slate-600 whitespace-nowrap text-center">{formatDateString(item.registration_date)}</TableCell>
-                                
+
                                 {(activeTab === 'bpkb' || activeTab === 'stnk') && (
                                   <TableCell className="px-4 py-4 text-sm text-center whitespace-nowrap">
                                     {activeTab === 'bpkb' && renderPhysicalStatus((item as any).bpkb_physical_status)}
@@ -796,13 +796,13 @@ export default function LPJumlahTerimaPage() {
                         ) : (
                           <TableRow className="group">
                             <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                                <div className="flex flex-col items-center justify-center gap-2">
-                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                        <Search className="h-8 w-8 text-slate-400" />
-                                    </div>
-                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                              <div className="flex flex-col items-center justify-center gap-2">
+                                <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                  <Search className="h-8 w-8 text-slate-400" />
                                 </div>
+                                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )}
@@ -810,68 +810,68 @@ export default function LPJumlahTerimaPage() {
                     </Table>
                   </div>
                 </div>
-            </div>
-          </PrintLetterPage>
+              </div>
+            </PrintLetterPage>
 
-          {/* Pagination Footer */}
-          {!isLoading && !isError && pagination.total > 0 && (
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
-              <p className="text-sm text-slate-500">
-                Showing {pagination.from}-{pagination.to} of {pagination.total} data
-              </p>
-              <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-                  disabled={page <= 1 || isLoading}
-                  onClick={() => setPage(page - 1)}
-                >
-                  Previous
-                </Button>
-                {visiblePages.map((pageNumber) => (
+            {/* Pagination Footer */}
+            {!isLoading && !isError && pagination.total > 0 && (
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
+                <p className="text-sm text-slate-500">
+                  Showing {pagination.from}-{pagination.to} of {pagination.total} data
+                </p>
+                <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
                   <Button
-                    key={pageNumber}
                     variant="ghost"
                     size="sm"
-                    className={cn(
-                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
-                      pageNumber === page
-                        ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                        : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-                    )}
-                    disabled={isLoading}
-                    onClick={() => setPage(pageNumber)}
+                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                    disabled={page <= 1 || isLoading}
+                    onClick={() => setPage(page - 1)}
                   >
-                    {pageNumber}
+                    Previous
                   </Button>
-                ))}
-                {pagination.lastPage > 5 && !visiblePages.includes(pagination.lastPage) && (
-                  <>
-                    <span className="px-1 text-slate-500">...</span>
+                  {visiblePages.map((pageNumber) => (
                     <Button
+                      key={pageNumber}
                       variant="ghost"
                       size="sm"
-                      className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                      className={cn(
+                        'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
+                        pageNumber === page
+                          ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
+                          : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
+                      )}
                       disabled={isLoading}
-                      onClick={() => setPage(pagination.lastPage)}
+                      onClick={() => setPage(pageNumber)}
                     >
-                      {pagination.lastPage}
+                      {pageNumber}
                     </Button>
-                  </>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-                  disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
-                  onClick={() => setPage(page + 1)}
-                >
-                  Next
-                </Button>
+                  ))}
+                  {pagination.lastPage > 5 && !visiblePages.includes(pagination.lastPage) && (
+                    <>
+                      <span className="px-1 text-slate-500">...</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                        disabled={isLoading}
+                        onClick={() => setPage(pagination.lastPage)}
+                      >
+                        {pagination.lastPage}
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                    disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
         </Tabs>
       </div>

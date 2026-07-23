@@ -292,6 +292,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                   <FormControl>
                     <Input
                       type="number"
+                      placeholder="QTY"
                       min="1"
                       value={field.value ?? ''}
                       onChange={(e) => {
@@ -344,7 +345,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
 
           {/* USD Inputs */}
           {isUsd && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-md border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
               <FormField
                 control={form.control}
                 name="priceUsd"

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useSalesUnitItems, useUpdateUnitItem } from '@/hooks/useUnitTransactionItem';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { useCompany } from '@/contexts/CompanyContext';
 
 /**
  * Edit Unit Page - Nested under Sales Detail
@@ -20,9 +21,15 @@ export default function EditNestedUnitPage() {
     const selectedUnitId = Array.isArray(unitId) ? unitId[0] : unitId;
     const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
 
+    const { companyId } = useCompany();
     const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
     const { data: itemResponse, isLoading: itemLoading } = useSalesUnitItems(salesId);
-    const { data: unitTypes, isLoading: typeUnitLoading } = useTypeUnits();
+    const { data: unitTypes, isLoading: typeUnitLoading } = useTypeUnits({
+        sort_by: 'created_at',
+        sort_order: 'asc',
+        in_stock: 'true',
+        company_id: companyId || salesDetail?.raw?.company_id || 1
+    });
     const updateMutation = useUpdateUnitItem();
 
     const item = (itemResponse?.data ?? []).find((row) => String(row.id) === String(selectedUnitId ?? ''));
@@ -97,7 +104,7 @@ export default function EditNestedUnitPage() {
             const responseData = error?.response?.data;
             const errorMsg = responseData?.message || error?.message || 'Gagal memperbarui unit.';
             const validationErrors = responseData?.errors;
-            
+
             if (validationErrors && typeof validationErrors === 'object') {
                 const firstErrorKey = Object.keys(validationErrors)[0];
                 const firstErrorArray = validationErrors[firstErrorKey];
@@ -145,7 +152,7 @@ export default function EditNestedUnitPage() {
                     </div>
                 </div>
 
-                <Card className="rounded-xl">
+                <Card className="rounded-md">
                     <CardContent className="p-6">
                         <EditUnitForm
                             defaultValues={formData}

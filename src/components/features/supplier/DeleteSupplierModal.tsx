@@ -22,10 +22,10 @@ export function DeleteSupplierModal({ open, onOpenChange, supplierName, onConfir
           </DialogHeader>
 
           <div className="mt-6 flex flex-col gap-3">
-            <Button className="h-11 rounded-xl bg-[#DC2626] text-[15px] font-medium text-white hover:bg-[#B91C1C]" onClick={onConfirm} disabled={isDeleting}>
+            <Button className="h-11 rounded-md bg-[#DC2626] text-[15px] font-medium text-white hover:bg-[#B91C1C]" onClick={onConfirm} disabled={isDeleting}>
               {isDeleting ? 'Menghapus...' : 'Hapus'}
             </Button>
-            <Button type="button" variant="outline" className="h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" className="h-11 rounded-md border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
               Batal
             </Button>
           </div>

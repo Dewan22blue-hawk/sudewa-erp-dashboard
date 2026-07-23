@@ -60,7 +60,7 @@ export default function CreateTransactionPage() {
                     <p className="text-sm text-muted-foreground">Masukkan detail transaksi operasional baru</p>
                 </div>
 
-                <div className="rounded-xl border bg-white p-6 md:p-8">
+                <div className="rounded-md border bg-white p-6 md:p-8">
                     <TransactionForm
                         defaultValues={{
                             date: new Date().toISOString().split('T')[0],

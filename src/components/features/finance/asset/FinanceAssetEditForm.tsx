@@ -79,7 +79,7 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+            <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-md">
                 <div className="space-y-6">
                     <div>
                         <h2 className="text-lg font-bold text-gray-900">Detail Informasi</h2>
@@ -135,7 +135,7 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
                             <Label className="text-sm font-semibold text-gray-900">Harga Beli</Label>
                             <MoneyInput
                                 value={initialData.price}
-                                onChangeValue={() => {}}
+                                onChangeValue={() => { }}
                                 disabled
                                 className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
                             />

@@ -46,8 +46,8 @@ export default function CreateInvoicePrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
-          <Button onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/detail/${id}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+        <div className="no-print flex items-center gap-3 rounded-md border border-gray-200 bg-white px-5 py-4 shadow-none">
+          <Button onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice/detail/${id}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-5 w-5 text-slate-700" />
           </Button>
           <div>

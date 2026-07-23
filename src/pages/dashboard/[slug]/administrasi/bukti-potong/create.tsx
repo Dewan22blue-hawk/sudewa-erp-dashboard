@@ -31,7 +31,7 @@ export default function CreateBuktiPotongPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
+      <div className="rounded-md border bg-white p-5 md:p-6 shadow-sm">
         <BuktiPotongForm
           item={null}
           companyId={companyNumber}

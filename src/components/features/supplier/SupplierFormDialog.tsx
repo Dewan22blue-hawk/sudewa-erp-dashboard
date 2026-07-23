@@ -42,7 +42,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                   <FormItem className="space-y-2">
                     <FormLabel className="text-[14px] font-medium text-[#171717]">Nama Supplier<RequiredMark /></FormLabel>
                     <FormControl>
-                      <Input placeholder="Tambahkan nama" className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]" {...field} />
+                      <Input placeholder="Tambahkan nama" className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -56,7 +56,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                   <FormItem className="space-y-2">
                     <FormLabel className="text-[14px] font-medium text-[#171717]">PIC</FormLabel>
                     <FormControl>
-                      <Input placeholder="Tambahkan PIC" className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]" {...field} />
+                      <Input placeholder="Tambahkan PIC" className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -72,7 +72,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                     <FormControl>
                       <Input
                         placeholder="Tambahkan nomer telepon"
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                         {...field}
                         onChange={(e) => {
                           field.onChange(sanitizePhone(e.target.value));
@@ -94,7 +94,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                       <Input
                         placeholder="Tambahkan NPWP"
                         maxLength={16}
-                        className="h-12 rounded-xl border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                         {...field}
                         onChange={(e) => {
                           field.onChange(e.target.value.replace(/[^\d]/g, ''));
@@ -113,7 +113,7 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
                   <FormItem className="space-y-2">
                     <FormLabel className="text-[14px] font-medium text-[#171717]">Alamat</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Tambahkan Alamat" className="min-h-[100px] rounded-xl border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none" {...field} />
+                      <Textarea placeholder="Tambahkan Alamat" className="min-h-[100px] rounded-md border-[#E4E4E7] px-4 py-3 text-[15px] placeholder:text-[#A1A1AA] resize-none" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -122,10 +122,10 @@ export function SupplierFormDialog({ open, onOpenChange, form, onSubmit, title, 
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t bg-gray-50">
-              <Button type="button" variant="outline" className="flex-1 h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" className="flex-1 h-11 rounded-md border-[#D4D4D8] text-[15px] text-[#171717]" onClick={() => onOpenChange(false)}>
                 Batal
               </Button>
-              <Button type="submit" className="flex-1 h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
+              <Button type="submit" className="flex-1 h-11 rounded-md bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={isSubmitting}>
                 {isSubmitting ? 'Menyimpan...' : submitLabel}
               </Button>
             </div>

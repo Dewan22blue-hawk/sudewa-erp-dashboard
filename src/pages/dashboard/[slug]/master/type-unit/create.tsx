@@ -76,7 +76,7 @@ export default function CreateTypeUnitPage() {
         </div>
 
         {/* FORM CARD */}
-        <Card className="rounded-xl p-6">
+        <Card className="rounded-md p-6">
           <TypeUnitForm form={form} onSubmit={onSubmit} onCancel={handleCancel} isSubmitting={createTypeUnit.isPending} submitLabel="Simpan" />
         </Card>
       </div>

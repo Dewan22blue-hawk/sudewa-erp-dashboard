@@ -163,7 +163,7 @@ export default function CreatePengeluaranUnitPage() {
         </div>
 
         {warehousesQuery.isError || suppliersQuery.isError ? (
-          <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm text-red-700 space-y-3">
+          <div className="rounded-md border border-red-100 bg-red-50 p-6 text-sm text-red-700 space-y-3">
             <p>{optionsError}</p>
             <Button
               variant="outline"
@@ -205,7 +205,7 @@ export default function CreatePengeluaranUnitPage() {
               onDescriptionChange={(value) => form.setValue('description', value, { shouldValidate: true })}
             />
 
-            <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            <div className="bg-white rounded-md border border-gray-200 p-6 space-y-4">
               <PengeluaranUnitCreateTable
                 data={dispatchTableQuery.data?.data ?? []}
                 meta={tableMeta}

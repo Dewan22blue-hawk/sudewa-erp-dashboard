@@ -13,7 +13,7 @@ import { InvoiceStatus } from "./invoice.types"
 export function InvoiceStatusCard({ data }: { data: InvoiceStatus }) {
     return (
         <Card
-            className="rounded-xl"
+            className="rounded-md"
             style={{
                 border: '1px solid #E5E5E5',
                 padding: '24px'

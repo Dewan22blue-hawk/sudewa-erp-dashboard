@@ -43,8 +43,8 @@ export default function EditBBNBillPage() {
       ditlantasProcessId: detailQuery.data.ditlantasProcess?.id
         ? String(detailQuery.data.ditlantasProcess.id)
         : detailQuery.data.dealerId
-        ? String(detailQuery.data.dealerId)
-        : '',
+          ? String(detailQuery.data.dealerId)
+          : '',
       billDate: toDateValue(detailQuery.data.billDate),
       paidDate: toDateValue(detailQuery.data.paidDate),
     });
@@ -91,7 +91,7 @@ export default function EditBBNBillPage() {
       ) : (
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button type="button" onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
@@ -136,7 +136,7 @@ export default function EditBBNBillPage() {
                       placeholder="Pilih kode proses Ditlantas"
                       searchPlaceholder="Cari proses Ditlantas..."
                       emptyText="Proses Ditlantas tidak ditemukan."
-                      className="h-11 rounded-xl border-slate-200"
+                      className="h-11 rounded-md border-slate-200"
                     />
                   )}
                 />
@@ -147,7 +147,7 @@ export default function EditBBNBillPage() {
                 <Controller
                   name="billDate"
                   control={form.control}
-                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
+                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-md border-slate-200 shadow-sm" />}
                 />
               </div>
 
@@ -156,12 +156,12 @@ export default function EditBBNBillPage() {
                 <Controller
                   name="paidDate"
                   control={form.control}
-                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-xl border-slate-200 shadow-sm" />}
+                  render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pilih tanggal" className="rounded-md border-slate-200 shadow-sm" />}
                 />
               </div>
 
               <div className="flex items-end justify-end">
-                <Button type="submit" disabled={updateMutation.isPending} className="rounded-xl bg-[#1e3a5f] px-6 hover:bg-[#152e4d]">
+                <Button type="submit" disabled={updateMutation.isPending} className="rounded-md bg-[#1e3a5f] px-6 hover:bg-[#152e4d]">
                   <Save className="mr-2 h-4 w-4" />
                   {updateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
                 </Button>

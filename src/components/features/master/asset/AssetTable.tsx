@@ -112,10 +112,10 @@ export function AssetTable({
                             </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                            <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer rounded-xl px-3 py-2.5 text-slate-700">
+                            <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer rounded-md px-3 py-2.5 text-slate-700">
                                 Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600">
+                            <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="cursor-pointer rounded-md px-3 py-2.5 text-red-600 focus:text-red-600">
                                 Hapus
                             </DropdownMenuItem>
                         </DropdownMenuContent>

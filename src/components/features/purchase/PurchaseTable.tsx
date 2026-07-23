@@ -164,12 +164,6 @@ export default function PurchaseTable({
   const columns: ColumnDef<UnitTransaction>[] = useMemo(
     () => [
       {
-        header: 'No',
-        alignment: 'center',
-        className: 'w-[60px]',
-        cell: (_, idx) => (currentPage - 1) * itemsPerPage + idx + 1,
-      },
-      {
         header: 'No. Transaksi',
         accessorKey: 'code',
         sortable: true,
@@ -332,7 +326,7 @@ export default function PurchaseTable({
           <Button
             type="button"
             variant="outline"
-            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-xl shadow-none px-4 whitespace-nowrap"
+            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-md shadow-none px-4 whitespace-nowrap"
             onClick={() => setIsVehicleSearchOpen(true)}
           >
             Cari Data Kendaraan

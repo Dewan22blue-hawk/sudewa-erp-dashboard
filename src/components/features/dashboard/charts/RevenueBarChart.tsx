@@ -70,7 +70,7 @@ export function RevenueBarChart() {
 
   if (isLoading) {
     return (
-      <Card className="h-full rounded-xl">
+      <Card className="h-full rounded-md">
         <CardHeader>
           <CardTitle className="text-base font-semibold">Tren Keuangan Bulanan</CardTitle>
         </CardHeader>
@@ -82,7 +82,7 @@ export function RevenueBarChart() {
   }
 
   return (
-    <Card className="h-full rounded-xl shadow-sm" style={{ maxWidth: '837px' }}>
+    <Card className="h-full rounded-md shadow-sm" style={{ maxWidth: '837px' }}>
       <CardHeader>
         <CardTitle className="text-base font-semibold">Tren Keuangan Bulanan</CardTitle>
       </CardHeader>

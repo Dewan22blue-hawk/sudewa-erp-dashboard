@@ -44,7 +44,7 @@ return (
 
 ## 3. Tombol Kembali Halaman Detail (Back Button)
 
-**Aturan**: Gunakan komponen `<Button>` variant ghost, size icon, `rounded-xl`, border `border-slate-200`, ikon `ArrowLeft` dari `lucide-react`.
+**Aturan**: Gunakan komponen `<Button>` variant ghost, size icon, `rounded-md`, border `border-slate-200`, ikon `ArrowLeft` dari `lucide-react`.
 
 ```tsx
 import { ArrowLeft } from 'lucide-react';
@@ -54,7 +54,7 @@ import { Button } from '@/components/ui/button';
   variant="ghost"
   size="icon"
   onClick={handleBack}
-  className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
+  className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer"
 >
   <ArrowLeft className="h-5 w-5 text-slate-700" />
 </Button>
@@ -74,7 +74,7 @@ import { Button } from '@/components/ui/button';
   </div>
 
   {/* Data Table */}
-  <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+  <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none">
     ...
   </div>
 </div>
@@ -146,7 +146,7 @@ import { Button } from '@/components/ui/button';
 
 ## 6. Input & Control Elements
 
-> ⚠️ **CATATAN**: Jangan gunakan `rounded-xl` pada Search Input, SelectTrigger pagination, dan DatePickerWithRange. `rounded-xl` hanya untuk *action buttons* dan back button.
+> ⚠️ **CATATAN**: Jangan gunakan `rounded-md` pada Search Input, SelectTrigger pagination, dan DatePickerWithRange. `rounded-md` hanya untuk *action buttons* dan back button.
 
 ### Search Input
 ```tsx
@@ -179,10 +179,10 @@ import { Button } from '@/components/ui/button';
 
 ## 7. Data Table Wrapper
 
-**Aturan**: Tabel dibungkus dalam `<div>` dengan `rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none`.
+**Aturan**: Tabel dibungkus dalam `<div>` dengan `rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none`.
 
 ```tsx
-<div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
+<div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none">
   <Table>
     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
       <TableRow className="hover:bg-[#f8f9fa]">
@@ -248,7 +248,7 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
       <MoreVertical className="h-4 w-4" />
     </Button>
   </DropdownMenuTrigger>
-  <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+  <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
     <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
       Edit
     </DropdownMenuItem>
@@ -280,7 +280,7 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
     {/* Previous */}
     <Button
       variant="ghost" size="sm"
-      className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+      className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
       disabled={page <= 1}
       onClick={() => onPageChange(page - 1)}
     >
@@ -293,7 +293,7 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
         key={pageNumber}
         variant="ghost" size="sm"
         className={cn(
-          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
           pageNumber === page
             ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
             : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -307,7 +307,7 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
     {/* Next */}
     <Button
       variant="ghost" size="sm"
-      className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+      className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
       disabled={page >= totalPages}
       onClick={() => onPageChange(page + 1)}
     >
@@ -321,7 +321,7 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
 
 ## 10. Action Buttons (Tambah, Export, Import)
 
-**Aturan**: Tidak perlu `rounded-xl` eksplisit karena button komponen sudah handle sendiri. Cukup set `w-full sm:w-auto` untuk responsivitas.
+**Aturan**: Tidak perlu `rounded-md` eksplisit karena button komponen sudah handle sendiri. Cukup set `w-full sm:w-auto` untuk responsivitas.
 
 ```tsx
 {/* Tambah */}
@@ -374,7 +374,7 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
 <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
   {/* Tab triggers wrapped to look like pills */}
   <div className="flex no-print">
-    <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl">
+    <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
       <TabsTrigger 
         value="per-nota" 
         className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
@@ -412,20 +412,20 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
 | Toolbar ↔ Table gap | `space-y-4` (wrapper) |
 | H1 | `text-2xl font-semibold` |
 | Subheader | `text-sm text-muted-foreground` |
-| TabsList (Pills) | `flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl` |
+| TabsList (Pills) | `flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md` |
 | TabsTrigger (Pills) | `rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm` |
 | Search Input | `pl-9 bg-white` |
 | Select pagination | `w-[70px] bg-white` |
-| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none` |
+| Table wrapper | `rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none` |
 | TableHeader | `bg-[#f8f9fa] border-b border-gray-200` |
 | TableHead / Cell | `px-4 py-4` |
 | Sticky Action Head | `sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
 | Sticky Action Cell | `sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
 | TableRow hover | `hover:bg-gray-50 transition-colors` |
-| Pagination btn | `h-9 rounded-xl` |
+| Pagination btn | `h-9 rounded-md` |
 | Pagination active | `border-slate-200 bg-white text-slate-950 shadow-sm` |
 | Action trigger | `h-8 w-8 rounded-full` |
-| DropdownMenuContent | `rounded-xl border-slate-200 p-1.5 shadow-lg` |
+| DropdownMenuContent | `rounded-md border-slate-200 p-1.5 shadow-lg` |
 | DropdownMenuItem | `rounded-lg px-3 py-2` |
 ---
 | Tambah button | `bg-[#1e3a5f] hover:bg-[#152e4d]` |
@@ -583,22 +583,22 @@ Ketentuan:
 | Toolbar ↔ Table gap | `space-y-4` (wrapper) |
 | H1 | `text-2xl font-semibold` |
 | Subheader | `text-sm text-muted-foreground` |
-| TabsList (Pills) | `flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl` |
+| TabsList (Pills) | `flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md` |
 | TabsTrigger (Pills) | `rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm` |
 | Search Input | `pl-9 bg-white` |
 | Select pagination | `w-[70px] bg-white` |
-| Table wrapper | `rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none` |
+| Table wrapper | `rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none` |
 | TableHeader | `bg-[#f8f9fa] border-b border-gray-200` |
 | TableHead / Cell | `px-4 py-4` |
 | Sticky Action Head | `sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
 | Sticky Action Cell | `sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]` |
 | TableRow hover | `hover:bg-gray-50 transition-colors` |
-| Pagination btn | `h-9 rounded-xl` |
+| Pagination btn | `h-9 rounded-md` |
 | Pagination active | `border-slate-200 bg-white text-slate-950 shadow-sm` |
 | Action trigger | `h-8 w-8 rounded-full` |
-| DropdownMenuContent | `rounded-xl border-slate-200 p-1.5 shadow-lg` |
+| DropdownMenuContent | `rounded-md border-slate-200 p-1.5 shadow-lg` |
 | DropdownMenuItem | `rounded-lg px-3 py-2` |
-| Back button | `h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50` |
+| Back button | `h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50` |
 | Tambah button | `bg-[#1e3a5f] hover:bg-[#152e4d]` |
 | Container Cetak A4 | `print-letter-page` |
 | Background Kop Surat | `print-letterhead` |

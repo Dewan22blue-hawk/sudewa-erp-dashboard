@@ -64,8 +64,8 @@ export function BBNTable({
                     onClick={() => onPageChange(p)}
                     className={
                         p === page
-                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
-                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                            : 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                     }
                 >
                     {p}
@@ -99,10 +99,10 @@ export function BBNTable({
                 onClick={() => typeof p === 'number' && onPageChange(p)}
                 className={
                     p === page
-                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                        ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                         : p === '...'
-                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
             >
                 {p}
@@ -173,91 +173,91 @@ export function BBNTable({
                 </div>
             </div>
 
-            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white">s*<Table>
-                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 w-[20%]">DEALER</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">KODE TNBK</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">WILAYAH</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">JENIS</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">UN NOTICE</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">GARWIL</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIRO/LOKET</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIAYA LAIN</TableHead>
-                                <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+            <div className="rounded-md overflow-x-auto border border-gray-200 bg-white">s*<Table>
+                <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                    <TableRow>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 w-[20%]">DEALER</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">KODE TNBK</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">WILAYAH</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center">JENIS</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">UN NOTICE</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">GARWIL</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIRO/LOKET</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4">BIAYA LAIN</TableHead>
+                        <TableHead className="text-xs font-semibold text-gray-600 uppercase px-4 py-4 text-center sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {isLoading ? (
+                        <tr>
+                            <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                                <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : bbns.length > 0 ? (
+                        bbns.map((item) => (
+                            <TableRow key={item.uuid} className="group bg-white hover:bg-slate-50 transition-colors">
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium">
+                                    {item.dealer?.namaDealer || item.dealer?.code || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
+                                    {item.tnbkCode || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase">
+                                    {item.region?.name || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase text-center font-medium">
+                                    {item.vehicleType || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    {formatCurrency(item.unNoticeFee)}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    {formatCurrency(item.garwilFee)}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    {formatCurrency(item.countershopFee)}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-600">
+                                    {item.otherFee === 0 ? '0' : formatCurrency(item.otherFee)}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4 text-gray-500" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-[160px]">
+                                            <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer text-gray-700">
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="text-red-600 cursor-pointer focus:text-red-600">
+                                                Hapus
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                <tr>
-                                    <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                                        <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                                            <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                                            <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : bbns.length > 0 ? (
-                                bbns.map((item) => (
-                                    <TableRow key={item.uuid} className="group bg-white hover:bg-slate-50 transition-colors">
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 font-medium">
-                                            {item.dealer?.namaDealer || item.dealer?.code || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 text-center">
-                                            {item.tnbkCode || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase">
-                                            {item.region?.name || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600 uppercase text-center font-medium">
-                                            {item.vehicleType || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                            {formatCurrency(item.unNoticeFee)}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                            {formatCurrency(item.garwilFee)}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                            {formatCurrency(item.countershopFee)}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-600">
-                                            {item.otherFee === 0 ? '0' : formatCurrency(item.otherFee)}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-[160px]">
-                                                    <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer text-gray-700">
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onDelete(item)} disabled={!canDelete} className="text-red-600 cursor-pointer focus:text-red-600">
-                                                        Hapus
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow className="group">
-                                    <TableCell colSpan={100} className="py-16 h-32 text-center text-gray-500">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                                <Search className="h-8 w-8 text-slate-400" />
-                                            </div>
-                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                        ))
+                    ) : (
+                        <TableRow className="group">
+                            <TableCell colSpan={100} className="py-16 h-32 text-center text-gray-500">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
             </div>
 
             <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
@@ -272,7 +272,7 @@ export function BBNTable({
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Previous
                         </Button>
@@ -284,7 +284,7 @@ export function BBNTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Next
                         </Button>

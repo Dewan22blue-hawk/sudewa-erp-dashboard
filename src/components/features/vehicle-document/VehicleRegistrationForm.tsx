@@ -213,7 +213,7 @@ export function VehicleRegistrationForm({ initialData, onSubmit, isSubmitting = 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+        <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h1 className="text-2xl font-semibold text-slate-900">Ubah Data Detail STNK/BPKB</h1>

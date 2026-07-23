@@ -172,7 +172,7 @@ export default function FinanceInvoiceTable({
 
   return (
     <div className="space-y-5">
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[1600px] text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>
@@ -253,7 +253,7 @@ export default function FinanceInvoiceTable({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
             onClick={() => onPageChange(page - 1)}
             disabled={!canGoPrevious}
           >
@@ -267,7 +267,7 @@ export default function FinanceInvoiceTable({
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                   pageNumber === page
                     ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                     : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
@@ -287,7 +287,7 @@ export default function FinanceInvoiceTable({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
             onClick={() => onPageChange(page + 1)}
             disabled={!canGoNext}
           >

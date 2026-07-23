@@ -39,7 +39,7 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
 
     const { companyId: localCompanyId } = useCompany();
     const { data: dealersResponse } = useDealers(localCompanyId ? String(localCompanyId) : null, { page: 1, perPage: 200, search: dealerSearch });
-    const { data: regionsResponse } = useRegions({ page: 1, perPage: 200, search: regionSearch }); 
+    const { data: regionsResponse } = useRegions({ page: 1, perPage: 200, search: regionSearch });
     const dealers = (dealersResponse as any)?.data || [];
     const regions = (regionsResponse as any)?.data || [];
 
@@ -88,7 +88,7 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
         <div className="space-y-6">
             {/* Header Form */}
             <div className="flex items-center gap-2">
-                <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
@@ -96,14 +96,14 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
 
             <Card className="p-6">
                 <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
-                    
+
                     {/* Section: Informasi Biaya */}
                     <div>
                         <h2 className="text-lg font-bold text-gray-900 mb-6 border-b pb-2">Informasi Biaya</h2>
-                        
+
                         <div className="bg-gray-50/50 rounded-lg p-6 border border-gray-100 space-y-6">
                             <h3 className="text-sm font-medium text-gray-500 mb-4">Detail</h3>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div className="space-y-2 lg:col-span-3">
                                     <Label htmlFor="dealerId" className="text-gray-900 font-medium">Nama Dealer</Label>
@@ -214,7 +214,7 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
                     {/* Section: Biaya */}
                     <div className="bg-gray-50/50 rounded-lg p-6 border border-gray-100 space-y-6">
                         <h3 className="text-sm font-medium text-gray-500 mb-4">Biaya</h3>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div className="space-y-2">
                                 <Label htmlFor="unNoticeFee" className="text-gray-900 font-medium">UN Notice</Label>
@@ -311,21 +311,21 @@ export function BBNForm({ initialData, onSubmit, isSubmitting, title }: BBNFormP
 
 // Simple Plus icon to render beside Jenis select as seen in mockup
 function Plus(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="M12 5v14" />
-    </svg>
-  )
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M5 12h14" />
+            <path d="M12 5v14" />
+        </svg>
+    )
 }

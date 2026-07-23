@@ -91,7 +91,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto shadow-none">
+      <div className="bg-white rounded-md border border-slate-200 overflow-x-auto shadow-none">
         {isFetching && !isLoading ? (
           <div className="border-b bg-blue-50/50 px-4 py-2 text-xs text-blue-700">
             Memperbarui data...
@@ -200,7 +200,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2.5">Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-md px-3 py-2.5">Edit</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -226,7 +226,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               size="sm"
               onClick={() => onPageChange(1)}
               disabled={!canGoPrevious}
-              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
             >
               First
             </Button>
@@ -237,7 +237,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
             size="sm"
             onClick={() => onPageChange(page - 1)}
             disabled={!canGoPrevious}
-            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
           >
             Previous
           </Button>
@@ -251,7 +251,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               disabled={p === page}
               onClick={() => onPageChange(p)}
               className={cn(
-                'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                 p === page
                   ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                   : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -267,7 +267,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
             size="sm"
             onClick={() => onPageChange(page + 1)}
             disabled={!canGoNext}
-            className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
           >
             Next
           </Button>
@@ -278,7 +278,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
               size="sm"
               onClick={() => onPageChange(meta.lastPage)}
               disabled={!canGoNext}
-              className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
+              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
             >
               Last
             </Button>

@@ -16,12 +16,12 @@ export default function FinanceAssetEditPage() {
 
     const handleSave = async (data: any) => {
         try {
-            await updateMutation.mutateAsync({ 
-                id: id as string, 
+            await updateMutation.mutateAsync({
+                id: id as string,
                 data: {
                     ...data,
                     description: data.description || `Penyusutan data asset ${id}`
-                } 
+                }
             });
             toast.success('Data aset berhasil diperbarui');
             router.push(`/dashboard/${slug}/finance/asset`);
@@ -52,7 +52,7 @@ export default function FinanceAssetEditPage() {
             <div className="space-y-8">
                 {/* Header */}
                 <div className="flex items-start gap-4">
-                    <button 
+                    <button
                         onClick={handleCancel}
                         className="mt-1 p-1 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
                     >
@@ -66,14 +66,14 @@ export default function FinanceAssetEditPage() {
 
                 {isLoading || !asset ? (
                     <div className="space-y-6">
-                        <Skeleton className="h-[400px] w-full rounded-xl" />
+                        <Skeleton className="h-[400px] w-full rounded-md" />
                         <div className="flex justify-center gap-4">
                             <Skeleton className="h-10 w-32 rounded-lg" />
                             <Skeleton className="h-10 w-32 rounded-lg" />
                         </div>
                     </div>
                 ) : (
-                    <FinanceAssetEditForm 
+                    <FinanceAssetEditForm
                         initialData={asset}
                         onSave={handleSave}
                         onCancel={handleCancel}

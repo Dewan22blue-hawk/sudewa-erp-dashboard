@@ -200,7 +200,7 @@ export default function MaterialReleaseListPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none">
+          <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none">
             <Table>
               <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                 <TableRow className="hover:bg-[#f8f9fa]">
@@ -249,7 +249,7 @@ export default function MaterialReleaseListPage() {
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
                                   <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                                     <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar/${item.id}/edit`}>Edit</Link>
                                   </DropdownMenuItem>
@@ -284,7 +284,7 @@ export default function MaterialReleaseListPage() {
           <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
             <p>Showing {startData}-{endData} of {totalData} data</p>
             <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-              <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" onClick={() => setPage(page - 1)} disabled={page <= 1}>
+              <Button variant="ghost" size="sm" className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" onClick={() => setPage(page - 1)} disabled={page <= 1}>
                 Previous
               </Button>
               {pageNumbers.map((pageNumber) => (
@@ -294,7 +294,7 @@ export default function MaterialReleaseListPage() {
                   size="sm"
                   onClick={() => setPage(pageNumber)}
                   className={cn(
-                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                     pageNumber === page
                       ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                       : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -305,11 +305,11 @@ export default function MaterialReleaseListPage() {
               ))}
               {totalPages > 5 && !pageNumbers.includes(totalPages) && <span className="px-2 text-slate-500">...</span>}
               {totalPages > 5 && !pageNumbers.includes(totalPages) && (
-                <Button variant="ghost" size="sm" onClick={() => setPage(totalPages)} className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white">
+                <Button variant="ghost" size="sm" onClick={() => setPage(totalPages)} className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white">
                   {totalPages}
                 </Button>
               )}
-              <Button variant="ghost" size="sm" className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
+              <Button variant="ghost" size="sm" className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
                 Next
               </Button>
             </div>

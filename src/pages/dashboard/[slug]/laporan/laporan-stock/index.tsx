@@ -176,7 +176,7 @@ export default function LaporanStockPage() {
                 </div>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="no-print flex w-full flex-col gap-4">
-                        <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-xl self-start">
+                        <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md self-start">
                             <TabsTrigger
                                 value="stock"
                                 className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"

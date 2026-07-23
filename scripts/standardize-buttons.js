@@ -88,7 +88,7 @@ function processFile(filePath) {
     const hasAction = /Export|Import|Download|Print/i.test(innerContent) || /<(Upload|Download|Printer)/.test(innerContent);
 
     if (hasArrowLeft) {
-      newAttrs = ` variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"`;
+      newAttrs = ` variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer"`;
     } else if (hasAdd) {
       newAttrs = ` className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"`;
     } else if (hasAction) {

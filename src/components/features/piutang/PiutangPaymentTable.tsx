@@ -41,7 +41,7 @@ export default function PiutangPaymentTable({ data }: Props) {
                 <span>Page</span>
             </div>
 
-            <div className="bg-[#f8fafc] rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-[#f8fafc] rounded-md border border-gray-200 overflow-hidden">
                 <table className="w-full text-sm">
                     <thead className="bg-[#f1f5f9] text-xs uppercase font-semibold text-gray-600">
                         <tr>

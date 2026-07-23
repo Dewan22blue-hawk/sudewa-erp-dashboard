@@ -14,7 +14,7 @@ export function TransactionSummaryCards({ totalBcaUsd, totalBcaIdr, totalCashIdr
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="h-40 animate-pulse bg-muted rounded-xl" />
+          <Card key={i} className="h-40 animate-pulse bg-muted rounded-md" />
         ))}
       </div>
     );
@@ -23,7 +23,7 @@ export function TransactionSummaryCards({ totalBcaUsd, totalBcaIdr, totalCashIdr
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* BCA USD */}
-      <Card className="p-6 rounded-xl border bg-white space-y-4">
+      <Card className="p-6 rounded-md border bg-white space-y-4">
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
             <Landmark className="h-6 w-6" />
@@ -42,7 +42,7 @@ export function TransactionSummaryCards({ totalBcaUsd, totalBcaIdr, totalCashIdr
       </Card>
 
       {/* BCA IDR */}
-      <Card className="p-6 rounded-xl border bg-white space-y-4">
+      <Card className="p-6 rounded-md border bg-white space-y-4">
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
             <CreditCard className="h-6 w-6" />
@@ -61,7 +61,7 @@ export function TransactionSummaryCards({ totalBcaUsd, totalBcaIdr, totalCashIdr
       </Card>
 
       {/* CASH IDR */}
-      <Card className="p-6 rounded-xl border bg-white space-y-4">
+      <Card className="p-6 rounded-md border bg-white space-y-4">
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
             <Wallet className="h-6 w-6" />

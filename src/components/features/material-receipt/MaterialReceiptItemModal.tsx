@@ -96,13 +96,13 @@ export function MaterialReceiptItemModal({
           <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">{orderCodeLabel}</Label>
-              <Input {...form.register('orderCode')} placeholder={orderCodePlaceholder} className="h-12 rounded-xl border-slate-200 px-4 text-[15px]" />
+              <Input {...form.register('orderCode')} placeholder={orderCodePlaceholder} className="h-12 rounded-md border-slate-200 px-4 text-[15px]" />
               {form.formState.errors.orderCode ? <p className="text-xs text-red-600">{form.formState.errors.orderCode.message}</p> : null}
             </div>
 
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">Kode Barang</Label>
-              <Input value={selectedMaterial?.code ?? ''} readOnly placeholder="Pilih nama barang terlebih dahulu" className="h-12 rounded-xl border-slate-200 px-4 text-[15px]" />
+              <Input value={selectedMaterial?.code ?? ''} readOnly placeholder="Pilih nama barang terlebih dahulu" className="h-12 rounded-md border-slate-200 px-4 text-[15px]" />
             </div>
 
             <div className="space-y-2">
@@ -120,7 +120,7 @@ export function MaterialReceiptItemModal({
                     emptyText="Material tidak ditemukan."
                     loading={isLoadingMaterials}
                     onSearchChange={onMaterialSearchChange}
-                    className="h-12 rounded-xl border-slate-200 bg-white px-4 text-[15px]"
+                    className="h-12 rounded-md border-slate-200 bg-white px-4 text-[15px]"
                   />
                 )}
               />
@@ -134,7 +134,7 @@ export function MaterialReceiptItemModal({
                 control={form.control}
                 name="price"
                 render={({ field }) => (
-                  <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-12 rounded-xl border-slate-200 px-4 text-[15px]" />
+                  <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-12 rounded-md border-slate-200 px-4 text-[15px]" />
                 )}
               />
               {form.formState.errors.price ? <p className="text-xs text-red-600">{form.formState.errors.price.message}</p> : null}
@@ -142,20 +142,20 @@ export function MaterialReceiptItemModal({
 
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">QTY</Label>
-              <Input type="number" min="0" {...form.register('qty', { valueAsNumber: true })} placeholder="0" className="h-12 rounded-xl border-slate-200 px-4 text-[15px]" />
+              <Input type="number" min="0" {...form.register('qty', { valueAsNumber: true })} placeholder="0" className="h-12 rounded-md border-slate-200 px-4 text-[15px]" />
               {form.formState.errors.qty ? <p className="text-xs text-red-600">{form.formState.errors.qty.message}</p> : null}
             </div>
 
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">Keterangan</Label>
-              <Textarea {...form.register('description')} rows={3} placeholder="Masukkan keterangan item" className="rounded-xl border-slate-200 px-4 py-3 text-[15px]" />
+              <Textarea {...form.register('description')} rows={3} placeholder="Masukkan keterangan item" className="rounded-md border-slate-200 px-4 py-3 text-[15px]" />
             </div>
 
             <div className="space-y-3 pt-2">
-              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-300 text-[16px] font-medium">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-md border-slate-300 text-[16px] font-medium">
                 Batal
               </Button>
             </div>

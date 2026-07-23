@@ -88,7 +88,7 @@ export default function RefundPaymentModal({ open, onClose, refund }: RefundPaym
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="grid gap-3 rounded-md border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-500">Nominal Refund</span>
               <span className="font-semibold text-slate-900">{formatCurrency(refund.refund_amount)}</span>

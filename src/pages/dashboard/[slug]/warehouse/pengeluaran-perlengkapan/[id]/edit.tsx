@@ -198,7 +198,7 @@ export default function PengeluaranPerlengkapanEditPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`}>
               <ArrowLeft className="mr-2 h-5 w-5" />
             </Link>
@@ -221,23 +221,23 @@ export default function PengeluaranPerlengkapanEditPage() {
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Kode Pengeluaran</label>
-                <Input value={transaction.code} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
+                <Input value={transaction.code} readOnly className="h-11 rounded-md border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Tanggal Pengeluaran</label>
-                <Input value={formatLongDate(transaction.transactionDate)} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
+                <Input value={formatLongDate(transaction.transactionDate)} readOnly className="h-11 rounded-md border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Driver</label>
-                <Input value={transaction.driver?.name ?? '-'} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
+                <Input value={transaction.driver?.name ?? '-'} readOnly className="h-11 rounded-md border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Nomor Polisi</label>
-                <Input value={transaction.vehicleFleet?.registrationNumber ?? '-'} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
+                <Input value={transaction.vehicleFleet?.registrationNumber ?? '-'} readOnly className="h-11 rounded-md border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <label className="text-[15px] font-medium text-slate-900">Keterangan</label>
-                <Textarea value={transaction.description ?? ''} readOnly rows={3} className="rounded-xl border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
+                <Textarea value={transaction.description ?? ''} readOnly rows={3} className="rounded-md border-slate-200 text-[16px] text-slate-500 bg-slate-50/50" />
               </div>
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function PengeluaranPerlengkapanEditPage() {
                   setPage(1);
                 }}
                 placeholder="Search equipment items..."
-                className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-none"
+                className="h-11 rounded-md border-slate-200 bg-white pl-11 shadow-none"
               />
             </div>
             <div className="flex items-center gap-3 text-[16px] text-slate-700">
@@ -267,7 +267,7 @@ export default function PengeluaranPerlengkapanEditPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white shadow-none">
+                <SelectTrigger className="h-11 w-[68px] rounded-md border-slate-200 bg-white shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -381,11 +381,11 @@ export default function PengeluaranPerlengkapanEditPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4 mt-6">
-            <AlertDialogCancel className="h-12 rounded-xl border-slate-300 px-5 text-[16px]">Batal</AlertDialogCancel>
+            <AlertDialogCancel className="h-12 rounded-md border-slate-300 px-5 text-[16px]">Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteItemSubmit}
               disabled={deleteItemMutation.isPending}
-              className="h-12 rounded-xl bg-red-600 px-5 text-[16px] hover:bg-red-700 font-semibold"
+              className="h-12 rounded-md bg-red-600 px-5 text-[16px] hover:bg-red-700 font-semibold"
             >
               {deleteItemMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>

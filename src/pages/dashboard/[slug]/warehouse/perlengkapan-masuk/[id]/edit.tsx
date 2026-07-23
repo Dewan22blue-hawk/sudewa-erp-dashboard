@@ -190,7 +190,7 @@ export default function PerlengkapanMasukEditPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/perlengkapan-masuk`}>
               <ArrowLeft className="mr-2 h-5 w-5" />
             </Link>
@@ -204,7 +204,7 @@ export default function PerlengkapanMasukEditPage() {
             <h2 className="text-[20px] font-semibold text-slate-950">Informasi Penerimaan</h2>
             <Button
               onClick={() => setHeaderOpen(true)}
-              className="h-10 rounded-xl border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 px-4 gap-2 text-[15px]"
+              className="h-10 rounded-md border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 px-4 gap-2 text-[15px]"
             >
               <Pencil className="h-4 w-4" />
               Edit Informasi
@@ -243,7 +243,7 @@ export default function PerlengkapanMasukEditPage() {
               {selectedIds.length > 0 && (
                 <Button
                   onClick={() => setDeleteTarget({} as any)}
-                  className="h-10 rounded-xl bg-red-600 px-4 hover:bg-red-700 text-white text-[15px]"
+                  className="h-10 rounded-md bg-red-600 px-4 hover:bg-red-700 text-white text-[15px]"
                 >
                   Hapus Terpilih ({selectedIds.length})
                 </Button>
@@ -265,13 +265,13 @@ export default function PerlengkapanMasukEditPage() {
                   setPage(1);
                 }}
                 placeholder="Cari item di sini"
-                className="h-[42px] rounded-xl border-slate-200 pl-11 shadow-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="h-[42px] rounded-md border-slate-200 pl-11 shadow-sm focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="flex items-center gap-3 text-[15px] text-slate-800">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(val) => { setPerPage(Number(val)); setPage(1); }}>
-                <SelectTrigger className="h-[42px] w-[58px] rounded-xl border-slate-200 shadow-sm">
+                <SelectTrigger className="h-[42px] w-[58px] rounded-md border-slate-200 shadow-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -284,7 +284,7 @@ export default function PerlengkapanMasukEditPage() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-slate-200">
+          <div className="overflow-hidden rounded-md border border-slate-200">
             <GoodsReceiptEquipmentDetailTable
               data={pageItems}
               selectedIds={selectedIds}
@@ -316,8 +316,8 @@ export default function PerlengkapanMasukEditPage() {
                     onClick={() => setPage(num)}
                     className={
                       num === safePage
-                        ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white'
-                        : 'h-10 min-w-10 rounded-xl'
+                        ? 'h-10 min-w-10 rounded-md border-slate-200 bg-white'
+                        : 'h-10 min-w-10 rounded-md'
                     }
                   >
                     {num}

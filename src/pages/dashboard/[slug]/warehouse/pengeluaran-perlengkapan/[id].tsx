@@ -49,7 +49,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
           <p className="text-[16px] text-red-600 font-medium mb-4">
             Gagal memuat data detail pengeluaran perlengkapan atau data tidak ditemukan.
           </p>
-          <Button variant="outline" className="rounded-xl" onClick={() => refetch()}>
+          <Button variant="outline" className="rounded-md" onClick={() => refetch()}>
             Coba Lagi
           </Button>
         </div>
@@ -63,7 +63,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
     <DashboardLayout>
       <div className="space-y-6 px-1">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`}>
               <ArrowLeft className="mr-2 h-5 w-5" />
             </Link>
@@ -76,13 +76,13 @@ export default function PengeluaranPerlengkapanDetailPage() {
             <div className="border-b border-slate-200 pb-5">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
             </div>
-            
+
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-1">
                 <span className="text-sm font-medium text-slate-500">Kode Pengeluaran</span>
                 <p className="text-[16px] font-semibold text-slate-900">{transaction.code}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <span className="text-sm font-medium text-slate-500">Tanggal Pengeluaran</span>
                 <p className="text-[16px] font-medium text-slate-900">{formatLongDate(transaction.transactionDate)}</p>
@@ -111,7 +111,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
 
             <div className="space-y-1">
               <span className="text-sm font-medium text-slate-500">Keterangan</span>
-              <p className="text-[16px] text-slate-800 bg-slate-50/50 rounded-xl p-3 border border-slate-100 min-h-16">
+              <p className="text-[16px] text-slate-800 bg-slate-50/50 rounded-md p-3 border border-slate-100 min-h-16">
                 {transaction.description || '-'}
               </p>
             </div>
@@ -119,7 +119,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
             <div className="space-y-2 pt-2 border-t border-slate-100">
               <span className="text-sm font-medium text-slate-500 block">Nota / Invoice</span>
               {transaction.invoiceFile ? (
-                <div className="inline-flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl p-3">
+                <div className="inline-flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-md p-3">
                   <FileText className="h-5 w-5 text-blue-600" />
                   <div className="text-left">
                     <p className="text-[14px] font-semibold text-slate-800">File Invoice Tersedia</p>

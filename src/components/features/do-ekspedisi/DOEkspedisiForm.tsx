@@ -190,7 +190,7 @@ export function DOEkspedisiForm({
               id="do_code"
               readOnly
               value={initialExpedition?.doCode ?? 'Akan dibuat otomatis setelah disimpan'}
-              className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC] text-slate-500"
+              className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC] text-slate-500"
             />
           </div>
 
@@ -205,7 +205,7 @@ export function DOEkspedisiForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Pick a date"
-                  className={`h-12 rounded-xl ${errors.date ? 'border-red-500' : 'border-[#E5E7EB]'}`}
+                  className={`h-12 rounded-md ${errors.date ? 'border-red-500' : 'border-[#E5E7EB]'}`}
                 />
               )}
             />
@@ -227,7 +227,7 @@ export function DOEkspedisiForm({
                   searchPlaceholder="Cari nomor polisi atau tipe..."
                   loading={vehicleLoading}
                   onSearchChange={onVehicleSearch}
-                  className={`h-12 rounded-xl ${errors.vehicleId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
+                  className={`h-12 rounded-md ${errors.vehicleId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
                 />
               )}
             />
@@ -250,7 +250,7 @@ export function DOEkspedisiForm({
                   searchPlaceholder="Cari driver..."
                   loading={driverLoading}
                   onSearchChange={onDriverSearch}
-                  className={`h-12 rounded-xl ${errors.driverId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
+                  className={`h-12 rounded-md ${errors.driverId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
                 />
               )}
             />
@@ -276,7 +276,7 @@ export function DOEkspedisiForm({
                   searchPlaceholder="Cari customer..."
                   loading={customerLoading}
                   onSearchChange={onCustomerSearch}
-                  className={`h-12 rounded-xl ${errors.customerId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
+                  className={`h-12 rounded-md ${errors.customerId ? 'border-red-500' : 'border-[#E5E7EB]'}`}
                 />
               )}
             />
@@ -288,7 +288,7 @@ export function DOEkspedisiForm({
             <Input
               id="loadingIn"
               placeholder="Lokasi muat"
-              className={`h-12 rounded-xl border-[#E5E7EB] ${errors.loadingIn ? 'border-red-500' : ''}`}
+              className={`h-12 rounded-md border-[#E5E7EB] ${errors.loadingIn ? 'border-red-500' : ''}`}
               {...register('loadingIn', { required: 'Loading in wajib diisi' })}
             />
             {errors.loadingIn && <p className="text-xs text-red-500">{errors.loadingIn.message}</p>}
@@ -299,7 +299,7 @@ export function DOEkspedisiForm({
             <Input
               id="loadingOut"
               placeholder="Lokasi bongkar"
-              className={`h-12 rounded-xl border-[#E5E7EB] ${errors.loadingOut ? 'border-red-500' : ''}`}
+              className={`h-12 rounded-md border-[#E5E7EB] ${errors.loadingOut ? 'border-red-500' : ''}`}
               {...register('loadingOut', { required: 'Loading out wajib diisi' })}
             />
             {errors.loadingOut && <p className="text-xs text-red-500">{errors.loadingOut.message}</p>}
@@ -310,7 +310,7 @@ export function DOEkspedisiForm({
             <Input
               id="destination"
               placeholder="Masukkan tujuan kirim"
-              className={`h-12 rounded-xl border-[#E5E7EB] ${errors.destination ? 'border-red-500' : ''}`}
+              className={`h-12 rounded-md border-[#E5E7EB] ${errors.destination ? 'border-red-500' : ''}`}
               {...register('destination', { required: 'Tujuan wajib diisi' })}
             />
             {errors.destination && <p className="text-xs text-red-500">{errors.destination.message}</p>}
@@ -328,7 +328,7 @@ export function DOEkspedisiForm({
                   value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Uang jalan driver"
-                  className={`h-12 rounded-xl border-[#E5E7EB] ${errors.driverFee ? 'border-red-500' : ''}`}
+                  className={`h-12 rounded-md border-[#E5E7EB] ${errors.driverFee ? 'border-red-500' : ''}`}
                 />
               )}
             />
@@ -346,7 +346,7 @@ export function DOEkspedisiForm({
                   value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Uang jalan tambahan"
-                  className={`h-12 rounded-xl border-[#E5E7EB] ${errors.otherFee ? 'border-red-500' : ''}`}
+                  className={`h-12 rounded-md border-[#E5E7EB] ${errors.otherFee ? 'border-red-500' : ''}`}
                 />
               )}
             />
@@ -358,7 +358,7 @@ export function DOEkspedisiForm({
               id="driverNote"
               rows={3}
               placeholder="Masukkan atensi atau catatan untuk driver"
-              className={`resize-none rounded-xl border-[#E5E7EB] ${errors.driverNote ? 'border-red-500' : ''}`}
+              className={`resize-none rounded-md border-[#E5E7EB] ${errors.driverNote ? 'border-red-500' : ''}`}
               {...register('driverNote', { required: 'Catatan driver wajib diisi' })}
             />
             {errors.driverNote && <p className="text-xs text-red-500">{errors.driverNote.message}</p>}
@@ -369,7 +369,7 @@ export function DOEkspedisiForm({
             <Input
               id="mapsUrl"
               placeholder="https://maps.google.com/..."
-              className={`h-12 rounded-xl border-[#E5E7EB] ${errors.mapsUrl ? 'border-red-500' : ''}`}
+              className={`h-12 rounded-md border-[#E5E7EB] ${errors.mapsUrl ? 'border-red-500' : ''}`}
               {...register('mapsUrl', { required: 'Maps URL wajib diisi' })}
             />
             {errors.mapsUrl && <p className="text-xs text-red-500">{errors.mapsUrl.message}</p>}
@@ -407,7 +407,7 @@ export function DOEkspedisiForm({
                         <Input
                           id={`destinationStops.${index}.destination`}
                           placeholder="Masukkan tujuan kirim"
-                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          className="h-12 rounded-md border-[#E5E7EB]"
                           {...register(`destinationStops.${index}.destination` as const, { required: 'Tujuan tambahan wajib diisi' })}
                         />
                       </div>
@@ -418,7 +418,7 @@ export function DOEkspedisiForm({
                           id={`destinationStops.${index}.driverNote`}
                           rows={3}
                           placeholder="Masukkan atensi atau catatan untuk driver"
-                          className="resize-none rounded-xl border-[#E5E7EB]"
+                          className="resize-none rounded-md border-[#E5E7EB]"
                           {...register(`destinationStops.${index}.driverNote` as const, { required: 'Catatan driver tambahan wajib diisi' })}
                         />
                       </div>
@@ -428,7 +428,7 @@ export function DOEkspedisiForm({
                         <Input
                           id={`destinationStops.${index}.mapsUrl`}
                           placeholder="https://maps.google.com/..."
-                          className="h-12 rounded-xl border-[#E5E7EB]"
+                          className="h-12 rounded-md border-[#E5E7EB]"
                           {...register(`destinationStops.${index}.mapsUrl` as const, { required: 'Maps URL tambahan wajib diisi' })}
                         />
                       </div>
@@ -459,7 +459,7 @@ export function DOEkspedisiForm({
                   value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Masukkan nominal invoice"
-                  className={`h-12 rounded-xl border-[#E5E7EB] ${errors.invoiceFee ? 'border-red-500' : ''}`}
+                  className={`h-12 rounded-md border-[#E5E7EB] ${errors.invoiceFee ? 'border-red-500' : ''}`}
                 />
               )}
             />
@@ -477,7 +477,7 @@ export function DOEkspedisiForm({
                   value={field.value ? toNumericValue(field.value) : undefined}
                   onChangeValue={(nextValue) => field.onChange(String(nextValue))}
                   placeholder="Masukkan biaya tambahan"
-                  className="h-12 rounded-xl border-[#E5E7EB]"
+                  className="h-12 rounded-md border-[#E5E7EB]"
                 />
               )}
             />
@@ -485,17 +485,17 @@ export function DOEkspedisiForm({
 
           <div className="space-y-2">
             <Label>PPN 11%</Label>
-            <Input readOnly value={formatCurrency(preview.ppn)} className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC]" />
+            <Input readOnly value={formatCurrency(preview.ppn)} className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC]" />
           </div>
 
           <div className="space-y-2">
             <Label>Fee 4%</Label>
-            <Input readOnly value={formatCurrency(preview.fee)} className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC]" />
+            <Input readOnly value={formatCurrency(preview.fee)} className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC]" />
           </div>
 
           <div className="space-y-2 md:col-span-2">
             <Label>PPH 2%</Label>
-            <Input readOnly value={formatCurrency(preview.pph)} className="h-12 rounded-xl border-[#E5E7EB] bg-[#F8FAFC]" />
+            <Input readOnly value={formatCurrency(preview.pph)} className="h-12 rounded-md border-[#E5E7EB] bg-[#F8FAFC]" />
           </div>
         </div>
       </div>

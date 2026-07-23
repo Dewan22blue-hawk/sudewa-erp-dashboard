@@ -116,12 +116,18 @@ const normalizeList = (
   return walk(data);
 };
 
-export const getTypeUnits = async (params?: { in_stock?: boolean }): Promise<TypeUnitListResponse> => {
+export const getTypeUnits = async (params?: {
+  in_stock?: boolean | string;
+  company_id?: number | string;
+  sort_by?: string;
+  sort_order?: string;
+}): Promise<TypeUnitListResponse> => {
   const response = await apiClient.get<TypeUnitListApiResponse>(basePath, {
     params: {
-      sort_by: 'created_at',
-      sort_order: 'desc',
+      sort_by: params?.sort_by || 'created_at',
+      sort_order: params?.sort_order || 'desc',
       in_stock: params?.in_stock,
+      company_id: params?.company_id,
     },
   });
   const data = ensureSuccess(response.data);

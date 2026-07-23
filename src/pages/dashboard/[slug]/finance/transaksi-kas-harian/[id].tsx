@@ -65,6 +65,8 @@ export default function KasHarianDetailPage() {
   const financeBillings = useMemo(() => cashFlowDetail?.finance_billings ?? [], [cashFlowDetail?.finance_billings]);
   const hasBillings = financeBillings.length > 0;
 
+  console.log(cashFlowDetail)
+
   const updateMutation = useUpdateKasHarian();
   const [transactionNote, setTransactionNote] = useState('');
 
@@ -163,7 +165,7 @@ export default function KasHarianDetailPage() {
           {/* HEADER */}
           <div className="flex items-center justify-between gap-4 w-full">
             <div className="flex items-center gap-4">
-              <Button onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <Button onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
                 <ArrowLeft className="h-5 w-5 text-slate-700" />
               </Button>
               <div>
@@ -188,12 +190,12 @@ export default function KasHarianDetailPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="h-10 rounded-xl px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50 transition-all"
+                className="h-10 rounded-md px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50 transition-all"
                 onClick={() => {
                   setTargetStatus(!cashFlowDetail.is_paid);
                   setIsToggleOpen(true);
                 }}
-                disabled={Number(remainingPayment) !== 0}
+                disabled={Number(remainingPayment) !== 0 && !cashFlowDetail?.is_valid}
               >
                 {cashFlowDetail.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
               </Button>
@@ -280,7 +282,7 @@ export default function KasHarianDetailPage() {
                     value={transactionNote}
                     onChange={(event) => setTransactionNote(event.target.value)}
                     placeholder="Masukkan catatan transaksi..."
-                    className="resize-none rounded-xl border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors flex-1"
+                    className="resize-none rounded-md border-slate-200 bg-white border-slate-300 focus:border-[#18385b] focus:ring-1 focus:ring-[#18385b] transition-colors flex-1"
                   />
                   <Button
                     type="button"
@@ -367,7 +369,7 @@ export default function KasHarianDetailPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-10 rounded-xl px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50"
+                    className="h-10 rounded-md px-4 text-xs font-semibold cursor-pointer border-slate-200 hover:bg-slate-50"
                     onClick={() => setSelectedFile(null)}
                     disabled={isUploading}
                   >
@@ -375,7 +377,7 @@ export default function KasHarianDetailPage() {
                   </Button>
                   <Button
                     type="button"
-                    className="h-10 rounded-xl bg-[#18385b] px-4 text-xs font-semibold text-white hover:bg-[#102843] transition-colors cursor-pointer"
+                    className="h-10 rounded-md bg-[#18385b] px-4 text-xs font-semibold text-white hover:bg-[#102843] transition-colors cursor-pointer"
                     onClick={() => void handleUploadProof(selectedFile)}
                     disabled={isUploading}
                   >
@@ -398,7 +400,7 @@ export default function KasHarianDetailPage() {
             <Button
               type="button"
               variant="outline"
-              className="h-11 rounded-xl border-slate-200 bg-white px-8 text-slate-700 hover:bg-slate-50 transition-colors"
+              className="h-11 rounded-md border-slate-200 bg-white px-8 text-slate-700 hover:bg-slate-50 transition-colors"
               onClick={() => router.back()}
             >
               Kembali ke Daftar Kas Harian

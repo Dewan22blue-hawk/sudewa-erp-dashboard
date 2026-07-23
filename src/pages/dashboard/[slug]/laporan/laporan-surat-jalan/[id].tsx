@@ -149,7 +149,7 @@ export default function LaporanSuratJalanDetailPage() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center gap-3">
-          <Button onClick={handleBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button onClick={handleBack} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-5 w-5 text-slate-700" />
           </Button>
           <div>
@@ -195,17 +195,17 @@ export default function LaporanSuratJalanDetailPage() {
 
           {/* Data Table */}
           {isLoading ? (
-            <div className="flex justify-center items-center py-24 w-full bg-white rounded-xl border border-slate-200">
+            <div className="flex justify-center items-center py-24 w-full bg-white rounded-md border border-slate-200">
               <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
             </div>
           ) : isError ? (
-            <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-xl border border-red-100 text-center p-6">
+            <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-md border border-red-100 text-center p-6">
               <p className="text-red-600 font-semibold mb-1">Gagal memuat rincian informasi surat jalan</p>
               <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
             </div>
           ) : filteredRows.length > 0 ? (
             <div className="space-y-4">
-              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+              <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
@@ -273,7 +273,7 @@ export default function LaporanSuratJalanDetailPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                     disabled={true}
                   >
                     Previous
@@ -281,7 +281,7 @@ export default function LaporanSuratJalanDetailPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-9 min-w-9 rounded-xl border border-slate-200 bg-white text-slate-950 shadow-sm"
+                    className="h-9 min-w-9 rounded-md border border-slate-200 bg-white text-slate-950 shadow-sm"
                     disabled={true}
                   >
                     1
@@ -289,7 +289,7 @@ export default function LaporanSuratJalanDetailPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                     disabled={true}
                   >
                     Next
@@ -298,7 +298,7 @@ export default function LaporanSuratJalanDetailPage() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col justify-center items-center py-12 text-center border border-slate-200 rounded-xl bg-white">
+            <div className="flex flex-col justify-center items-center py-12 text-center border border-slate-200 rounded-md bg-white">
               <p className="text-slate-500 font-medium text-sm">Tidak ada data laporan ditemukan.</p>
             </div>
           )}

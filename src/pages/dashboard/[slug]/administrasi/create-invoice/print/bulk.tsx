@@ -34,7 +34,7 @@ export default function BulkCreateInvoicePrintPage() {
   const { companyId } = useCompany();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const ids = React.useMemo(() => (router.isReady ? parseIds(router.query.ids) : []), [router.isReady, router.query.ids]);
-  
+
   const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
 
   React.useEffect(() => {
@@ -106,9 +106,9 @@ export default function BulkCreateInvoicePrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
+        <div className="no-print flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-5 py-4 shadow-none">
           <div className="flex items-center gap-3">
-            <Button onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button onClick={() => router.push(`/dashboard/${slug}/administrasi/create-invoice`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div>
@@ -122,14 +122,14 @@ export default function BulkCreateInvoicePrintPage() {
           </Button>
         </div>
 
-        <div ref={printRef} className="space-y-8 bg-slate-50 p-4 rounded-xl border border-gray-200 print:bg-white print:p-0 print:border-none print:space-y-0">
+        <div ref={printRef} className="space-y-8 bg-slate-50 p-4 rounded-md border border-gray-200 print:bg-white print:p-0 print:border-none print:space-y-0">
           {invoices.map((invoice) => {
             const draft = getInvoiceProcessDraft(invoice.id) ?? createProcessDraftPayload(invoice, buildProcessDefaults(invoice), undefined);
             const rows = buildDetailRows([invoice]);
             const payload = buildPrintPayload(invoice, rows, companyName, draft);
 
             return (
-              <div key={invoice.id} className="print-page bg-white shadow-md print:shadow-none p-4 print:p-0 rounded-xl border border-gray-200 print:border-none">
+              <div key={invoice.id} className="print-page bg-white shadow-md print:shadow-none p-4 print:p-0 rounded-md border border-gray-200 print:border-none">
                 <CreateInvoicePrintDocument
                   payload={payload}
                   letterheadUrl={letterheadUrl}

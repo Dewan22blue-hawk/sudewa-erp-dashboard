@@ -62,12 +62,12 @@ export function VehicleDocumentTable({
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative w-full md:w-[380px]">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-11" />
+            <Input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search here" className="h-11 rounded-md border-slate-200 bg-white pl-11" />
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-700">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-11 w-[90px] rounded-xl border-slate-200 bg-white">
+              <SelectTrigger className="h-11 w-[90px] rounded-md border-slate-200 bg-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -166,7 +166,7 @@ export function VehicleDocumentTable({
       <div className="flex flex-col gap-4 px-1 pb-2 md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-slate-500">Showing {startData}-{endData} of {totalData} data</div>
         <div className="flex items-center gap-1 text-sm text-slate-700">
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="rounded-xl px-3">Previous</Button>
+          <Button variant="ghost" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="rounded-md px-3">Previous</Button>
           {visiblePages[0] > 1 ? <span className="px-1 text-slate-400">...</span> : null}
           {visiblePages.map((pageNumber) => (
             <Button
@@ -174,13 +174,13 @@ export function VehicleDocumentTable({
               variant={pageNumber === page ? 'outline' : 'ghost'}
               size="sm"
               onClick={() => onPageChange(pageNumber)}
-              className="h-9 min-w-9 rounded-xl border-slate-200"
+              className="h-9 min-w-9 rounded-md border-slate-200"
             >
               {pageNumber}
             </Button>
           ))}
           {visiblePages[visiblePages.length - 1] < totalPages ? <span className="px-1 text-slate-400">...</span> : null}
-          <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="rounded-xl px-3">Next</Button>
+          <Button variant="ghost" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="rounded-md px-3">Next</Button>
         </div>
       </div>
     </div>

@@ -92,102 +92,102 @@ export function PurchaseMaterialDetailItemModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[calc(100vh-2rem)] overflow-hidden rounded-[20px] border border-slate-200 px-0 py-0 sm:max-w-[460px]">
         <div className="overflow-y-auto px-6 py-7">
-        <DialogHeader className="space-y-0">
-          <DialogTitle className="text-[20px] font-semibold text-slate-900">
-            {initialData ? editTitle : addTitle}
-          </DialogTitle>
-        </DialogHeader>
+          <DialogHeader className="space-y-0">
+            <DialogTitle className="text-[20px] font-semibold text-slate-900">
+              {initialData ? editTitle : addTitle}
+            </DialogTitle>
+          </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-5">
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">{codeLabel}</Label>
-            <Input value={transaction.code} readOnly className="h-12 rounded-xl border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm" />
-          </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-5">
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">{codeLabel}</Label>
+              <Input value={transaction.code} readOnly className="h-12 rounded-md border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm" />
+            </div>
 
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">Nomor Pembelian</Label>
-            <Input
-              {...form.register('orderCode')}
-              placeholder="Masukkan nomor pembelian"
-              className="h-12 rounded-xl border-slate-200 px-4 text-[16px] shadow-sm"
-            />
-            {form.formState.errors.orderCode ? <p className="text-sm text-red-600">{form.formState.errors.orderCode.message}</p> : null}
-          </div>
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">Nomor Pembelian</Label>
+              <Input
+                {...form.register('orderCode')}
+                placeholder="Masukkan nomor pembelian"
+                className="h-12 rounded-md border-slate-200 px-4 text-[16px] shadow-sm"
+              />
+              {form.formState.errors.orderCode ? <p className="text-sm text-red-600">{form.formState.errors.orderCode.message}</p> : null}
+            </div>
 
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">{counterpartyLabel}</Label>
-            <Input value={transaction.supplierName} readOnly className="h-12 rounded-xl border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm" />
-          </div>
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">{counterpartyLabel}</Label>
+              <Input value={transaction.supplierName} readOnly className="h-12 rounded-md border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm" />
+            </div>
 
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">{materialLabel}</Label>
-            <Controller
-              control={form.control}
-              name="materialId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value ? String(field.value) : ''}
-                  onChange={(value) => field.onChange(Number(value))}
-                  options={materialOptions}
-                  placeholder={isLoadingMaterials ? 'Memuat material...' : 'Pilih material'}
-                  searchPlaceholder="Cari material..."
-                  emptyText="Material tidak ditemukan."
-                  loading={isLoadingMaterials}
-                  onSearchChange={onMaterialSearchChange}
-                  className="h-12 rounded-xl border-slate-200 px-4 text-[16px] shadow-sm"
-                />
-              )}
-            />
-            {form.formState.errors.materialId ? <p className="text-sm text-red-600">{form.formState.errors.materialId.message}</p> : null}
-            {!isLoadingMaterials && materialOptions.length > 0 && materialSearch ? <p className="text-xs text-slate-500">Pencarian: {materialSearch}</p> : null}
-          </div>
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">{materialLabel}</Label>
+              <Controller
+                control={form.control}
+                name="materialId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value ? String(field.value) : ''}
+                    onChange={(value) => field.onChange(Number(value))}
+                    options={materialOptions}
+                    placeholder={isLoadingMaterials ? 'Memuat material...' : 'Pilih material'}
+                    searchPlaceholder="Cari material..."
+                    emptyText="Material tidak ditemukan."
+                    loading={isLoadingMaterials}
+                    onSearchChange={onMaterialSearchChange}
+                    className="h-12 rounded-md border-slate-200 px-4 text-[16px] shadow-sm"
+                  />
+                )}
+              />
+              {form.formState.errors.materialId ? <p className="text-sm text-red-600">{form.formState.errors.materialId.message}</p> : null}
+              {!isLoadingMaterials && materialOptions.length > 0 && materialSearch ? <p className="text-xs text-slate-500">Pencarian: {materialSearch}</p> : null}
+            </div>
 
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">{qtyLabel}</Label>
-            <Input
-              type="number"
-              min="0"
-              {...form.register('qty', { valueAsNumber: true })}
-              className="h-12 rounded-xl border-slate-200 px-4 text-[16px] shadow-sm"
-            />
-            {form.formState.errors.qty ? <p className="text-sm text-red-600">{form.formState.errors.qty.message}</p> : null}
-          </div>
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">{qtyLabel}</Label>
+              <Input
+                type="number"
+                min="0"
+                {...form.register('qty', { valueAsNumber: true })}
+                className="h-12 rounded-md border-slate-200 px-4 text-[16px] shadow-sm"
+              />
+              {form.formState.errors.qty ? <p className="text-sm text-red-600">{form.formState.errors.qty.message}</p> : null}
+            </div>
 
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">{priceLabel}</Label>
-            <Controller
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <MoneyInput
-                  value={field.value}
-                  onChangeValue={field.onChange}
-                  placeholder="Masukkan harga beli"
-                  className="h-12 rounded-xl border-slate-200 px-4 text-[16px] shadow-sm"
-                />
-              )}
-            />
-            {form.formState.errors.price ? <p className="text-sm text-red-600">{form.formState.errors.price.message}</p> : null}
-          </div>
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">{priceLabel}</Label>
+              <Controller
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <MoneyInput
+                    value={field.value}
+                    onChangeValue={field.onChange}
+                    placeholder="Masukkan harga beli"
+                    className="h-12 rounded-md border-slate-200 px-4 text-[16px] shadow-sm"
+                  />
+                )}
+              />
+              {form.formState.errors.price ? <p className="text-sm text-red-600">{form.formState.errors.price.message}</p> : null}
+            </div>
 
-          <div className="space-y-2.5">
-            <Label className="text-[16px] font-medium text-slate-900">{subtotalLabel}</Label>
-            <Input
-              value={`Rp${subtotal.toLocaleString('id-ID')}`}
-              readOnly
-              className="h-12 rounded-xl border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm"
-            />
-          </div>
+            <div className="space-y-2.5">
+              <Label className="text-[16px] font-medium text-slate-900">{subtotalLabel}</Label>
+              <Input
+                value={`Rp${subtotal.toLocaleString('id-ID')}`}
+                readOnly
+                className="h-12 rounded-md border-slate-200 px-4 text-[16px] text-slate-500 shadow-sm"
+              />
+            </div>
 
-          <div className="flex flex-col gap-3 pt-2">
-            <Button type="submit" disabled={isSubmitting} className="h-11 rounded-xl bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 rounded-xl border-slate-300 text-[16px] font-medium">
-              Batal
-            </Button>
-          </div>
-        </form>
+            <div className="flex flex-col gap-3 pt-2">
+              <Button type="submit" disabled={isSubmitting} className="h-11 rounded-md bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
+                {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 rounded-md border-slate-300 text-[16px] font-medium">
+                Batal
+              </Button>
+            </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

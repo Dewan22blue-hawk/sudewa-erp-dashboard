@@ -364,7 +364,7 @@ export function OrderListForm({
                     searchPlaceholder="Cari customer..."
                     loading={customerLoading}
                     onSearchChange={onCustomerSearch}
-                    className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] ${errors.customerId ? 'border-red-500' : ''}`}
+                    className={`h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] ${errors.customerId ? 'border-red-500' : ''}`}
                   />
                 )}
               />
@@ -417,7 +417,7 @@ export function OrderListForm({
                         searchPlaceholder="Cari tarif..."
                         loading={tarifLoading}
                         onSearchChange={onTarifSearch}
-                        className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] ${errors.items?.[index]?.tarifId ? 'border-red-500' : ''}`}
+                        className={`h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] ${errors.items?.[index]?.tarifId ? 'border-red-500' : ''}`}
                       />
                     )}
                   />
@@ -432,7 +432,7 @@ export function OrderListForm({
                     readOnly
                     value={item?.loadingIn ?? ''}
                     placeholder="Contoh: Surabaya"
-                    className="h-10 rounded-xl border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
+                    className="h-10 rounded-md border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
                   />
                 </div>
               </div>
@@ -445,7 +445,7 @@ export function OrderListForm({
                     readOnly
                     value={item?.loadingOut ?? ''}
                     placeholder="Contoh: Yogyakarta"
-                    className="h-10 rounded-xl border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
+                    className="h-10 rounded-md border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
                   />
                 </div>
 
@@ -453,7 +453,7 @@ export function OrderListForm({
                   <Label className="text-[14px] font-semibold text-slate-900">Tujuan Kirim</Label>
                   <Input
                     placeholder="Contoh: Nama PT"
-                    className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.deliveryDestination ? 'border-red-500' : ''}`}
+                    className={`h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.deliveryDestination ? 'border-red-500' : ''}`}
                     {...register(`items.${index}.deliveryDestination`, { required: 'Tujuan kirim wajib diisi' })}
                   />
                   {errors.items?.[index]?.deliveryDestination ? (
@@ -473,7 +473,7 @@ export function OrderListForm({
                         onValueChange={(value: OrderListVehicleType) => handleVehicleTypeChange(index, value)}
                         disabled={index > 0}
                       >
-                        <SelectTrigger className="h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none disabled:bg-slate-50 disabled:opacity-100 disabled:cursor-not-allowed">
+                        <SelectTrigger className="h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] shadow-none disabled:bg-slate-50 disabled:opacity-100 disabled:cursor-not-allowed">
                           <SelectValue placeholder="Pilih armada" />
                         </SelectTrigger>
                         <SelectContent>
@@ -490,7 +490,7 @@ export function OrderListForm({
               </div>
 
               {tarif ? (
-                <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
+                <div className="rounded-md border border-dashed border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
                   Tarif terpilih: {tarif.loadingIn || '-'} ke {tarif.loadingOut || '-'}
                 </div>
               ) : null}
@@ -523,7 +523,7 @@ export function OrderListForm({
                         <div className="flex-1 space-y-1">
                           <Input
                             placeholder="Contoh: Motor vario"
-                            className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
+                            className={`h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? 'border-red-500' : ''}`}
                             {...register(`items.${index}.cargoItems.${cargoIndex}.loadContent`, { required: 'Muatan wajib diisi' })}
                           />
                           {errors.items?.[index]?.cargoItems?.[cargoIndex]?.loadContent ? (
@@ -536,7 +536,7 @@ export function OrderListForm({
                             type="number"
                             min={0}
                             placeholder="0"
-                            className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
+                            className={`h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.items?.[index]?.cargoItems?.[cargoIndex]?.qty ? 'border-red-500' : ''}`}
                             {...register(`items.${index}.cargoItems.${cargoIndex}.qty`, {
                               valueAsNumber: true,
                               required: 'Qty wajib diisi',
@@ -555,7 +555,7 @@ export function OrderListForm({
                               variant="outline"
                               size="icon"
                               onClick={() => removeCargoItem(index, cargoIndex)}
-                              className="h-10 w-10 rounded-xl border-red-200 hover:bg-red-50"
+                              className="h-10 w-10 rounded-md border-red-200 hover:bg-red-50"
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />
                             </Button>
@@ -599,7 +599,7 @@ export function OrderListForm({
                   onChangeValue={field.onChange}
                   disabled
                   placeholder="Terisi otomatis by tipe armada"
-                  className="h-10 rounded-xl border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
+                  className="h-10 rounded-md border-[#E5E7EB] bg-slate-50 text-[15px] shadow-none cursor-default"
                 />
               )}
             />
@@ -616,7 +616,7 @@ export function OrderListForm({
                     value={field.value}
                     onChangeValue={field.onChange}
                     placeholder="Masukkan nominal invoice"
-                    className={`h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.invoiceBill ? 'border-red-500' : ''}`}
+                    className={`h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] shadow-none ${errors.invoiceBill ? 'border-red-500' : ''}`}
                   />
                 )}
               />
@@ -635,14 +635,14 @@ export function OrderListForm({
                     value={field.value}
                     onChangeValue={field.onChange}
                     placeholder="Masukkan nominal PPN"
-                    className="h-10 rounded-xl border-[#E5E7EB] bg-white text-[15px] shadow-none"
+                    className="h-10 rounded-md border-[#E5E7EB] bg-white text-[15px] shadow-none"
                   />
                 )}
               />
             </div>
           </div>
 
-          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
+          <div className="rounded-md border border-dashed border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
             Ringkasan biaya: UJ Driver {formatOrderCurrency(watchedUjDriver)} • Invoice {formatOrderCurrency(invoiceBill)} • PPN {formatOrderCurrency(watchedPpn)}
           </div>
         </section>
@@ -654,14 +654,14 @@ export function OrderListForm({
           variant="ghost"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="rounded-xl px-6 text-slate-700 font-semibold hover:bg-slate-100 transition text-[15px]"
+          className="rounded-md px-6 text-slate-700 font-semibold hover:bg-slate-100 transition text-[15px]"
         >
           Batal
         </Button>
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-xl bg-[#1e3a5f] px-6 h-10 hover:bg-[#152e4d] text-white font-semibold flex items-center gap-2 text-[15px] shadow-none"
+          className="rounded-md bg-[#1e3a5f] px-6 h-10 hover:bg-[#152e4d] text-white font-semibold flex items-center gap-2 text-[15px] shadow-none"
         >
           <Save className="h-4 w-4" />
           {isSubmitting ? 'Menyimpan...' : 'Simpan'}

@@ -202,7 +202,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
 
       <div className="mt-5 flex items-center gap-3 text-sm text-slate-700">
         <span>Show</span>
-        <div className="flex h-11 w-[58px] items-center justify-center rounded-xl border border-slate-200 bg-white">10</div>
+        <div className="flex h-11 w-[58px] items-center justify-center rounded-md border border-slate-200 bg-white">10</div>
         <span>Page</span>
       </div>
 
@@ -239,7 +239,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                         onChange={(event) => setDraft((previous) => ({ ...previous, note: event.target.value }))}
                         onKeyDown={(event) => handleEditorKeyDown(event, item.id)}
                         placeholder="Tulis rincian transaksi"
-                        className="h-11 rounded-xl border-slate-200"
+                        className="h-11 rounded-md border-slate-200"
                       />
                     ) : (
                       <span className="text-slate-800">{item.note || '-'}</span>
@@ -252,7 +252,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                         onChangeValue={(value) => setDraft((previous) => ({ ...previous, amount: value }))}
                         onKeyDown={(event) => handleEditorKeyDown(event, item.id)}
                         placeholder="Masukkan nominal bayar"
-                        className="h-11 rounded-xl border-slate-200"
+                        className="h-11 rounded-md border-slate-200"
                       />
                     ) : (
                       <span className="font-medium text-slate-900">{formatCurrency(item.totalAmount)}</span>
@@ -275,7 +275,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
                           <DropdownMenuItem onClick={() => handleEditRow(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             Edit
                           </DropdownMenuItem>
@@ -302,7 +302,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                     onChange={(event) => setDraft((previous) => ({ ...previous, note: event.target.value }))}
                     onKeyDown={(event) => handleEditorKeyDown(event, 'new')}
                     placeholder="Tulis rincian transaksi"
-                    className="h-11 rounded-xl border-slate-200 bg-white"
+                    className="h-11 rounded-md border-slate-200 bg-white"
                   />
                 </td>
                 <td className="px-4 py-3">
@@ -311,7 +311,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
                     onChangeValue={(value) => setDraft((previous) => ({ ...previous, amount: value }))}
                     onKeyDown={(event) => handleEditorKeyDown(event, 'new')}
                     placeholder="Masukkan nominal bayar"
-                    className="h-11 rounded-xl border-slate-200 bg-white"
+                    className="h-11 rounded-md border-slate-200 bg-white"
                   />
                 </td>
                 <td className="px-4 py-3 text-center">

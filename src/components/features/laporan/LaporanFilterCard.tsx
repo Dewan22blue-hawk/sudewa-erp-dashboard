@@ -35,7 +35,7 @@ export default function LaporanFilterCard() {
     }
 
     return (
-        <div className="bg-white rounded-xl border p-8 space-y-10 shadow-sm">
+        <div className="bg-white rounded-md border p-8 space-y-10 shadow-sm">
             <div className="flex flex-col space-y-6">
                 <div className="flex items-center">
                     <label className="w-48 text-sm font-medium text-gray-900">

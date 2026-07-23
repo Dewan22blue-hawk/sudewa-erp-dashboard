@@ -102,7 +102,7 @@ export default function KasHarianSummary({ data = [] }: KasHarianSummaryProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Informasi Akun */}
-      <Card className="rounded-xl border shadow-sm">
+      <Card className="rounded-md border shadow-sm">
         <CardContent className="p-6 space-y-4">
           <div className="flex items-start gap-4">
             <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
@@ -145,7 +145,7 @@ export default function KasHarianSummary({ data = [] }: KasHarianSummaryProps) {
       </Card>
 
       {/* Total Debit */}
-      <Card className="rounded-xl border shadow-sm">
+      <Card className="rounded-md border shadow-sm">
         <CardContent className="p-6 flex flex-col justify-between h-full">
           <div className="flex items-start gap-4">
             <div className="bg-green-100 p-3 rounded-lg text-green-600">
@@ -170,7 +170,7 @@ export default function KasHarianSummary({ data = [] }: KasHarianSummaryProps) {
       </Card>
 
       {/* Total Kredit */}
-      <Card className="rounded-xl border shadow-sm">
+      <Card className="rounded-md border shadow-sm">
         <CardContent className="p-6 flex flex-col justify-between h-full">
           <div className="flex items-start gap-4">
             <div className="bg-red-100 p-3 rounded-lg text-red-600">

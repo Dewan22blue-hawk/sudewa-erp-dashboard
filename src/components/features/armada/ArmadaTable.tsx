@@ -129,78 +129,78 @@ export function ArmadaTable({
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
-          <Table className="min-w-[1100px]">
-            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-              <TableRow>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO POLISI</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO MESIN</TableHead>
-                <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO RANGKA</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA STNK</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA KIR</TableHead>
-                <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : armadas.length > 0 ? (
-                armadas.map((armada) => {
-                  const stnkInfo = getRemainingLabel(armada.stnkAge);
-                  const kirInfo = getRemainingLabel(armada.kirAge);
+      <div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none">
+        <Table className="min-w-[1100px]">
+          <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+            <TableRow>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO POLISI</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">TIPE</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO MESIN</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO RANGKA</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA STNK</TableHead>
+              <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA KIR</TableHead>
+              <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={100} className="px-4 py-16 text-center bg-white">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : armadas.length > 0 ? (
+              armadas.map((armada) => {
+                const stnkInfo = getRemainingLabel(armada.stnkAge);
+                const kirInfo = getRemainingLabel(armada.kirAge);
 
-                  return (
-                    <TableRow key={armada.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-                      <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
-                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.type}</TableCell>
-                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700 font-medium whitespace-nowrap">{armada.machineNumber}</TableCell>
-                      <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.chassisNumber}</TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">
-                        <div>{formatDate(armada.stnkAge)}</div>
-                        {stnkInfo && (
-                          <div className="mt-1 flex justify-center">
-                            <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${stnkInfo.className.includes('#DC2626')
-                                ? 'bg-red-50 text-[#DC2626]'
-                                : stnkInfo.className.includes('#F59E0B')
-                                  ? 'bg-amber-50 text-[#F59E0B]'
-                                  : 'bg-green-50 text-[#16A34A]'
-                                }`}
-                            >
-                              <span>{stnkInfo.text}</span>
-                              {(stnkInfo.className.includes('#DC2626') || stnkInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
-                            </span>
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">
-                        <div>{formatDate(armada.kirAge)}</div>
-                        {kirInfo && (
-                          <div className="mt-1 flex justify-center">
-                            <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${kirInfo.className.includes('#DC2626')
-                                ? 'bg-red-50 text-[#DC2626]'
-                                : kirInfo.className.includes('#F59E0B')
-                                  ? 'bg-amber-50 text-[#F59E0B]'
-                                  : 'bg-green-50 text-[#16A34A]'
-                                }`}
-                            >
-                              <span>{kirInfo.text}</span>
-                              {(kirInfo.className.includes('#DC2626') || kirInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
-                            </span>
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                        <div className="flex justify-center">
+                return (
+                  <TableRow key={armada.id} className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
+                    <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 whitespace-nowrap">{armada.registrationNumber}</TableCell>
+                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.type}</TableCell>
+                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 font-medium whitespace-nowrap">{armada.machineNumber}</TableCell>
+                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 whitespace-nowrap">{armada.chassisNumber}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">
+                      <div>{formatDate(armada.stnkAge)}</div>
+                      {stnkInfo && (
+                        <div className="mt-1 flex justify-center">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${stnkInfo.className.includes('#DC2626')
+                              ? 'bg-red-50 text-[#DC2626]'
+                              : stnkInfo.className.includes('#F59E0B')
+                                ? 'bg-amber-50 text-[#F59E0B]'
+                                : 'bg-green-50 text-[#16A34A]'
+                              }`}
+                          >
+                            <span>{stnkInfo.text}</span>
+                            {(stnkInfo.className.includes('#DC2626') || stnkInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700 whitespace-nowrap">
+                      <div>{formatDate(armada.kirAge)}</div>
+                      {kirInfo && (
+                        <div className="mt-1 flex justify-center">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${kirInfo.className.includes('#DC2626')
+                              ? 'bg-red-50 text-[#DC2626]'
+                              : kirInfo.className.includes('#F59E0B')
+                                ? 'bg-amber-50 text-[#F59E0B]'
+                                : 'bg-green-50 text-[#16A34A]'
+                              }`}
+                          >
+                            <span>{kirInfo.text}</span>
+                            {(kirInfo.className.includes('#DC2626') || kirInfo.className.includes('#F59E0B')) && <CircleAlert className="h-3.5 w-3.5" />}
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                      <div className="flex justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -221,26 +221,26 @@ export function ArmadaTable({
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow className="group">
-                  <TableCell colSpan={100} className="h-32 text-center text-slate-500 px-4 py-16 text-sm">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-50 p-4 mb-2">
-                        <Search className="h-8 w-8 text-slate-400" />
                       </div>
-                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow className="group">
+                <TableCell colSpan={100} className="h-32 text-center text-slate-500 px-4 py-16 text-sm">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                      <Search className="h-8 w-8 text-slate-400" />
                     </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
@@ -255,7 +255,7 @@ export function ArmadaTable({
               size="sm"
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+              className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
             >
               Previous
             </Button>
@@ -269,10 +269,10 @@ export function ArmadaTable({
                 onClick={() => typeof item === 'number' && onPageChange(item)}
                 className={
                   item === page
-                    ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                    ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                     : item === '...'
-                      ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                      : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                      ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                      : 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
               >
                 {item}
@@ -284,7 +284,7 @@ export function ArmadaTable({
               size="sm"
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+              className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
             >
               Next
             </Button>

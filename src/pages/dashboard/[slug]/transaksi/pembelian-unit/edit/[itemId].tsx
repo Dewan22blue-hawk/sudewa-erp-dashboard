@@ -85,7 +85,7 @@ export default function EditPurchasePage() {
           </div>
         </div>
 
-        <Card className="rounded-xl border border-gray-200 shadow-none">
+        <Card className="rounded-md border border-gray-200 shadow-none">
           <CardContent className="p-6">
             <PurchaseForm defaultValues={defaultValues} onSubmit={handleSubmit} onCancel={() => router.back()} loading={updateMutation.isPending} companyId={companyId} />
           </CardContent>

@@ -23,7 +23,12 @@ export default function CreateUnitPage() {
   const salesId = Array.isArray(id) ? id[0] : id;
   const { data: salesDetail, isLoading: isLoadingDetail } = useSalesDetail(salesId);
   const createItemMutation = useCreateUnitItem();
-  const { data: typeUnitData, isLoading: isLoadingTypeUnits } = useTypeUnits({ in_stock: true });
+  const { data: typeUnitData, isLoading: isLoadingTypeUnits } = useTypeUnits({
+    sort_by: 'created_at',
+    sort_order: 'asc',
+    in_stock: 'true',
+    company_id: companyId || salesDetail?.raw?.company_id || 1
+  });
 
   const { data: salesItemsResponse } = useSalesUnitItems(salesId);
 
@@ -145,7 +150,7 @@ export default function CreateUnitPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="p-6">
             <EditUnitForm
               defaultValues={{

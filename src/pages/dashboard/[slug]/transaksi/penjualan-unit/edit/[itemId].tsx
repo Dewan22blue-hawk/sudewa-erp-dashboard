@@ -224,7 +224,7 @@ export default function EditUnitPage() {
         </div>
 
         {/* Form Card - Border 1px, Radius 12px, Padding 24px */}
-        <Card className="rounded-xl border border-gray-200 shadow-none">
+        <Card className="rounded-md border border-gray-200 shadow-none">
           <CardContent className="p-6">
             <EditUnitForm
               defaultValues={formData}

@@ -100,14 +100,14 @@ export default function VehicleEquipmentPage() {
 
                 {/* Loading / Error States */}
                 {isLoading ? (
-                    <Card className="rounded-xl border border-gray-200 bg-white p-12 shadow-none">
+                    <Card className="rounded-md border border-gray-200 bg-white p-12 shadow-none">
                         <div className="flex flex-col items-center justify-center space-y-3">
                             <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#15305B]"></div>
                             <p className="text-sm font-semibold text-gray-500">Memuat data perlengkapan...</p>
                         </div>
                     </Card>
                 ) : isError ? (
-                    <Card className="rounded-xl border border-red-100 bg-red-50/50 p-12 text-center shadow-none">
+                    <Card className="rounded-md border border-red-100 bg-red-50/50 p-12 text-center shadow-none">
                         <p className="text-sm font-semibold text-red-600">Gagal memuat data perlengkapan</p>
                     </Card>
                 ) : (

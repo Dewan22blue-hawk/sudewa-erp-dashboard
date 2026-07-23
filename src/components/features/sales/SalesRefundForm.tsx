@@ -166,7 +166,7 @@ export function SalesRefundForm({
                 <Input
                   value={sales.code}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
 
@@ -176,7 +176,7 @@ export function SalesRefundForm({
                 <Input
                   value={sales.person?.name ?? '-'}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
 
@@ -192,7 +192,7 @@ export function SalesRefundForm({
                         value={field.value ?? null}
                         onChange={field.onChange}
                         placeholder="Pilih tanggal"
-                        className="h-11 rounded-xl border-gray-200 bg-white text-slate-900 shadow-none"
+                        className="h-11 rounded-md border-gray-200 bg-white text-slate-900 shadow-none"
                       />
                     </FormControl>
                     <FormMessage />
@@ -208,7 +208,7 @@ export function SalesRefundForm({
                 <Input
                   value={formatCurrency(totalSales)}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
 
@@ -217,7 +217,7 @@ export function SalesRefundForm({
                 <Input
                   value={formatCurrency(totalPaid)}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                 />
               </div>
             </div>
@@ -233,7 +233,7 @@ export function SalesRefundForm({
                     <FormLabel className="text-sm font-medium text-slate-700">Kas Pengeluaran Refund</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange} disabled={isCashEmpty || isFormDisabled}>
                       <FormControl>
-                        <SelectTrigger className="h-11 rounded-xl border-gray-200 bg-white text-slate-900 shadow-none">
+                        <SelectTrigger className="h-11 rounded-md border-gray-200 bg-white text-slate-900 shadow-none">
                           <SelectValue placeholder={isCashEmpty ? 'Kas tidak tersedia' : 'Pilih Kas'} />
                         </SelectTrigger>
                       </FormControl>
@@ -256,7 +256,7 @@ export function SalesRefundForm({
                 <Input
                   value={formatCurrency(nominalRefund)}
                   readOnly
-                  className="h-11 rounded-xl border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
+                  className="h-11 rounded-md border-gray-200 bg-gray-50 text-slate-600 shadow-none focus-visible:ring-0"
                   placeholder="Rp 0"
                 />
                 {selectedIds.size === 0 && (
@@ -266,8 +266,8 @@ export function SalesRefundForm({
             </div>
 
             {/* ── Tabel Unit Item Detail ── */}
-            <div className="overflow-x-auto rounded-xl border border-gray-200">
-        <Table>
+            <div className="overflow-x-auto rounded-md border border-gray-200">
+              <Table>
                 <TableHeader>
                   <TableRow className="bg-[#f8fafc] hover:bg-[#f8fafc]">
                     <TableHead className="w-10 py-3 pl-4">
@@ -310,14 +310,14 @@ export function SalesRefundForm({
                   ) : unitItemDetails.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={100} className="py-16 text-center text-sm text-slate-400">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="rounded-full bg-slate-50 p-4 mb-2">
                             <Search className="h-8 w-8 text-slate-400" />
+                          </div>
+                          <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                          <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                         </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </TableCell>
+                      </TableCell>
                     </TableRow>
                   ) : (
                     sortedUnitItemDetails.map((detail) => {
@@ -373,7 +373,7 @@ export function SalesRefundForm({
                   <FormControl>
                     <Textarea
                       placeholder="Contoh: Dikembalikan karena ada kecacatan"
-                      className="min-h-[100px] rounded-xl border-gray-200 bg-white px-3 py-2.5 text-slate-900 shadow-none placeholder:text-slate-400"
+                      className="min-h-[100px] rounded-md border-gray-200 bg-white px-3 py-2.5 text-slate-900 shadow-none placeholder:text-slate-400"
                       {...field}
                       value={field.value ?? ''}
                     />
@@ -397,7 +397,7 @@ export function SalesRefundForm({
               <Button
                 type="submit"
                 disabled={isFormDisabled || selectedIds.size === 0}
-                className="h-11 min-w-[120px] rounded-xl bg-[#284d74] px-6 text-sm font-medium text-white shadow-none hover:bg-[#1f3f5f] disabled:opacity-50"
+                className="h-11 min-w-[120px] rounded-md bg-[#284d74] px-6 text-sm font-medium text-white shadow-none hover:bg-[#1f3f5f] disabled:opacity-50"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {submitting ? 'Menyimpan...' : 'Simpan'}

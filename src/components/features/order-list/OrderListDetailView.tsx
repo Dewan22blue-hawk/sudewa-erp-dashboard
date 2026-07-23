@@ -48,14 +48,14 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
 
   const summaryCargoItems = React.useMemo(() => {
     const map = new Map<string, number>();
-    
+
     orderTarifs.forEach((tarif) => {
       const items = tarif.tarifItems?.length
         ? tarif.tarifItems
         : tarif.loadContent
           ? [{ loadContent: tarif.loadContent, qty: Number(tarif.qty ?? 0) }]
           : [];
-          
+
       items.forEach((item) => {
         const name = String(item.loadContent || '').trim();
         if (!name) return;
@@ -63,7 +63,7 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         map.set(name, currentQty + Number(item.qty || 0));
       });
     });
-    
+
     return Array.from(map.entries()).map(([loadContent, qty], idx) => ({
       id: `summary-${idx}`,
       loadContent,
@@ -84,10 +84,10 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
         <div className="grid gap-6 md:grid-cols-2">
           <DetailField label="Nama Customer" value={data.customer?.name || '-'} />
           <DetailField label="Kode Order" value={data.code || '-'} />
-          
+
           <div className="md:col-span-2 space-y-2">
             <p className="text-sm text-slate-600 font-medium">Ringkasan (Summary) Total Muatan</p>
-            <div className="overflow-hidden rounded-xl border border-slate-200">
+            <div className="overflow-hidden rounded-md border border-slate-200">
               <table className="w-full border-collapse text-left text-sm text-slate-500">
                 <thead className="bg-slate-50 text-xs uppercase text-slate-700">
                   <tr>
@@ -108,14 +108,14 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
                   ) : (
                     <tr>
                       <td colSpan={100} className="px-4 py-16 text-center text-slate-400">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="rounded-full bg-slate-50 p-4 mb-2">
                             <Search className="h-8 w-8 text-slate-400" />
+                          </div>
+                          <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                          <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                         </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </td>
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -135,7 +135,7 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
                 : [];
 
             return (
-              <div key={item.id || index} className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-none">
+              <div key={item.id || index} className="rounded-md border border-slate-200 bg-white overflow-hidden shadow-none">
                 {/* Header Sub-Card */}
                 <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
                   <span className="text-sm font-semibold text-slate-800">
@@ -145,7 +145,7 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
                     {getOrderVehicleTypeLabel(data, item)}
                   </span>
                 </div>
-                
+
                 {/* Detail Fields */}
                 <div className="p-4 grid gap-4 md:grid-cols-3">
                   <div className="space-y-0.5">
@@ -186,14 +186,14 @@ export function OrderListDetailView({ data, onBack }: OrderListDetailViewProps) 
                         ) : (
                           <tr>
                             <td colSpan={100} className="px-3 py-16 text-center text-slate-400">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </td>
+                              <div className="flex flex-col items-center justify-center gap-2">
+                                <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                  <Search className="h-8 w-8 text-slate-400" />
+                                </div>
+                                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                              </div>
+                            </td>
                           </tr>
                         )}
                       </tbody>
