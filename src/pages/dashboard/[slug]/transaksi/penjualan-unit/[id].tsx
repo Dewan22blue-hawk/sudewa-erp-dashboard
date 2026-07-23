@@ -49,8 +49,6 @@ export default function SalesDetailPage() {
   const stockState = String(rawData?.stock_state ?? '').toLowerCase();
   const isRefunded = stockState === 'outbound_return';
 
-  console.log(data?.raw);
-
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
   const updateBillingIsPaid = useUpdateBillingIsPaid();
   const updateState = useUpdateUnitTransactionState();

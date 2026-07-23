@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { MoreVertical, Pencil, Plus, Trash, Lock, Play, Eye } from 'lucide-react';
 import type { Tax } from '@/services/tax.service';
 import type { PaginationMeta } from '@/@types/pagination.types';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface TaxTableProps {
   data: Tax[];
@@ -33,7 +34,7 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
         sortable: true,
         cell: (item) => (
           <div className="flex items-center gap-1.5">
-            <span className="font-semibold text-sm text-gray-900">{item.code}</span>
+            <CopyBox text={item.code} />
             {item.is_lock === 1 || item.is_lock === true ? (
               <Tooltip>
                 <TooltipTrigger asChild>
