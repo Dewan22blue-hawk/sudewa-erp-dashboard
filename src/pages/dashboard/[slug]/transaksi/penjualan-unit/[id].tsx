@@ -177,7 +177,7 @@ export default function SalesDetailPage() {
   };
 
   const handleMarkAsPaid = async () => {
-    const targetBillingId = String(currentBilling?.id || data?.unit_transaction_billing?.id || '');
+    const targetBillingId = String(currentBilling?.id || rawData?.unit_transaction_billing?.id || '');
     if (!targetBillingId) {
       toast.error('Data billing tidak ditemukan pada transaksi ini.');
       return;
@@ -196,8 +196,8 @@ export default function SalesDetailPage() {
     if (!salesId || !data) return;
 
     try {
-      const warehouseId = String(data.warehouse?.id ?? data.warehouse_id ?? '').trim();
-      const personId = String(data.person?.id ?? data.person_id ?? '').trim();
+      const warehouseId = String(rawData?.warehouse?.id ?? (rawData as any)?.warehouse_id ?? '').trim();
+      const personId = String(rawData?.person?.id ?? (rawData as any)?.person_id ?? '').trim();
 
       if (!warehouseId) {
         toast.error('warehouse_id belum tersedia pada transaksi ini.');
@@ -208,7 +208,7 @@ export default function SalesDetailPage() {
         return;
       }
 
-      const items = data.unit_transaction_items ?? [];
+      const items = rawData?.unit_transaction_items ?? [];
       if (items.length === 0) {
         toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Kirim Barang.');
         return;

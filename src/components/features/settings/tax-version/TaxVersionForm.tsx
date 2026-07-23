@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-import type { TaxVersion } from '@/services/taxVersion.service';
+import type { TaxVersion } from '@/services/tax.service';
 import { ClampedNumericInput } from '@/components/ui/clamped-numeric-input';
 
 const taxVersionSchema = z.object({
@@ -102,7 +102,7 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                     />
                   </FormControl>
                   <FormDescription>
-                    Masukkan nilai berupa persentase (%) atau nominal uang. "Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping)." 
+                    Masukkan nilai berupa persentase (%) atau nominal uang. &quot;Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping).&quot; 
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
