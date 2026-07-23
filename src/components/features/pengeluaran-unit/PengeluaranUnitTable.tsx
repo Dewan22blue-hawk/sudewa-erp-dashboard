@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { CopyBox } from '@/components/ui/copy-box';
+import { TextTruncate } from '@/components/ui/text-truncate';
 
 interface Props {
   data: PengeluaranUnit[];
@@ -104,7 +105,7 @@ export default function PengeluaranUnitTable({
     {
       header: 'KETERANGAN',
       alignment: 'left',
-      cell: (item) => item.description || '-',
+      cell: (item) => <TextTruncate text={item.description || '-'} maxLength={20} />
     },
     {
       header: 'Aksi',

@@ -32,7 +32,6 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
   const [confirmDeleteIds, setConfirmDeleteIds] = useState<number[]>([]);
   const [receivedIds, setReceivedIds] = useState<number[]>([]);
 
-
   const { rows, meta, isLoading, isError, error } = usePenerimaanReceiptTable(
     {
       companyId: companyId || '',
@@ -77,7 +76,8 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
   }, [filteredRows]);
 
   const receivedCount = useMemo(() => tableRows.filter((item) => receivedIds.includes(item.id)).length, [tableRows, receivedIds]);
-  const pendingCount = Math.max(0, tableRows.length - receivedCount);
+  const pendingCount = useMemo(() => tableRows.filter((item) => (item.status === 'normal' || item.status === 'Belum Lunas') && !receivedIds.includes(item.id)).length, [tableRows, receivedIds]);
+  const refundCount = useMemo(() => tableRows.filter((item) => item.status === 'refunded' || item.status === 'returned').length, [tableRows]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -139,14 +139,12 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         ),
       },
       {
-        header: 'NO',
-        alignment: 'left',
-        cell: (_, index) => (currentPage - 1) * itemsPerPage + index + 1,
-      },
-      {
         header: 'NO PEMBELIAN',
         accessorKey: 'purchaseCode',
         sortable: true,
+        cell: (item) => (
+          <CopyBox text={item.purchaseCode || ""} />
+        )
       },
       {
         header: 'TIPE UNIT',
@@ -260,6 +258,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Diterima ke stock: {receivedCount}</span>
                 <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">Belum diterima: {pendingCount}</span>
+                <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700">Refund / Return: {refundCount}</span>
               </div>
             </div>
 

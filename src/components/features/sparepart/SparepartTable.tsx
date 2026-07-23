@@ -6,6 +6,8 @@ import { MoreVertical, Plus, Upload } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: Sparepart[];
@@ -22,6 +24,9 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport, canEdi
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [sortState, setSortState] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'code', direction: 'asc' });
+  const router = useRouter();
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
 
   const filteredData = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -84,7 +89,9 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport, canEdi
         accessorKey: 'brand.name',
         sortable: true,
         alignment: 'left',
-        cell: (item) => item.brand?.name ?? item.brandId ?? '-',
+        cell: (item) => item.brand?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/brand?search=${item?.brand?.name}`}>
+          {item.brand?.name}
+        </ReferenceLink> : '-'
       },
       {
         header: 'TIPE UNIT',

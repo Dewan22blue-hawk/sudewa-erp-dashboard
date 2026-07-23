@@ -76,11 +76,6 @@ export default function StockUnitTable({
 
   const columns: ColumnDef<StockUnit>[] = [
     {
-      header: 'No',
-      alignment: 'left',
-      cell: (_item, index) => (page - 1) * perPage + index + 1,
-    },
-    {
       header: 'Nama Unit',
       accessorKey: 'namaUnit',
       sortable: true,
