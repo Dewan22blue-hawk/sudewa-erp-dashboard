@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
@@ -317,15 +317,15 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     }
   };
 
-  const getKasLabel = (cashId: number) => {
+  const getKasLabel = useCallback((cashId: number) => {
     const kas = kasOptions.find((k) => Number(k.id) === cashId);
     return kas ? (kas.cash_name || `${kas.code} - ${kas.description}`) : '-';
-  };
+  }, [kasOptions]);
 
-  const getAccountLabel = (cashId: number) => {
+  const getAccountLabel = useCallback((cashId: number) => {
     const akun = akunOptions.find((a) => Number(a.id) === cashId);
     return akun ? (akun.name || `${akun.code} - ${akun.description}`) : '-';
-  };
+  }, [akunOptions]);
 
   const columns = useMemo<ColumnDef<FinanceBilling>[]>(
     () => [
