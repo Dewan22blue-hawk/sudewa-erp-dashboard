@@ -65,6 +65,8 @@ export default function KasHarianDetailPage() {
   const financeBillings = useMemo(() => cashFlowDetail?.finance_billings ?? [], [cashFlowDetail?.finance_billings]);
   const hasBillings = financeBillings.length > 0;
 
+  console.log(cashFlowDetail)
+
   const updateMutation = useUpdateKasHarian();
   const [transactionNote, setTransactionNote] = useState('');
 
@@ -193,7 +195,7 @@ export default function KasHarianDetailPage() {
                   setTargetStatus(!cashFlowDetail.is_paid);
                   setIsToggleOpen(true);
                 }}
-                disabled={Number(remainingPayment) !== 0}
+                disabled={Number(remainingPayment) !== 0 && !cashFlowDetail?.is_valid}
               >
                 {cashFlowDetail.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
               </Button>

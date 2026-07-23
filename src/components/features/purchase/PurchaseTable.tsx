@@ -164,12 +164,6 @@ export default function PurchaseTable({
   const columns: ColumnDef<UnitTransaction>[] = useMemo(
     () => [
       {
-        header: 'No',
-        alignment: 'center',
-        className: 'w-[60px]',
-        cell: (_, idx) => (currentPage - 1) * itemsPerPage + idx + 1,
-      },
-      {
         header: 'No. Transaksi',
         accessorKey: 'code',
         sortable: true,

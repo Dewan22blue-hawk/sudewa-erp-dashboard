@@ -292,6 +292,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                   <FormControl>
                     <Input
                       type="number"
+                      placeholder="QTY"
                       min="1"
                       value={field.value ?? ''}
                       onChange={(e) => {
