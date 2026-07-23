@@ -102,7 +102,7 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                     />
                   </FormControl>
                   <FormDescription>
-                    Masukkan nilai berupa persentase (%) atau nominal uang. "Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping)." 
+                    Masukkan nilai berupa persentase (%) atau nominal uang. &quot;Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping).&quot; 
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
