@@ -13,6 +13,7 @@ export interface StockItem {
   stock_available: number;
   stock_forecast: number;
   purchase_price: number;
+  status?: string | undefined;
   person?: string;
 }
 
@@ -158,6 +159,7 @@ const mapStockItem = (item: unknown, brandMap?: Map<number, string>): StockItem 
     stock_forecast: toNumber(source.stock_forecast),
     purchase_price: toNumber(source.purchase_price),
     person: personName,
+    status: toString(source?.status),
   };
 };
 

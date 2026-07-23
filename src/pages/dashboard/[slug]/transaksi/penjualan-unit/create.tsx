@@ -45,7 +45,12 @@ export default function CreateSalesPage() {
   const createSalesMutation = useCreateSales();
   const createItemMutation = useCreateUnitItem();
   const createTypeUnitMutation = useCreateTypeUnit();
-  const { data: unitTypeData, isLoading: isLoadingUnitTypes } = useTypeUnits();
+  const { data: unitTypeData, isLoading: isLoadingUnitTypes } = useTypeUnits({
+    sort_by: 'created_at',
+    sort_order: 'asc',
+    in_stock: 'true',
+    company_id: companyId || 1
+  });
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
   const slugQuery = router.query.slug;
   const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';

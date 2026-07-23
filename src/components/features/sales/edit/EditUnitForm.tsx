@@ -117,7 +117,7 @@ export function EditUnitForm({
   const biayaBbn = Number(form.watch('biayaBbn') ?? defaultValues?.biayaBbn ?? 0);
   const biayaEkspedisi = Number(form.watch('biayaEkspedisi') ?? defaultValues?.biayaEkspedisi ?? 0);
   const biayaLain = Number(form.watch('biayaLain') ?? defaultValues?.biayaLain ?? 0);
-  const unitOptions = productOptions ?? PRODUCT_OPTIONS;
+  const unitOptions = productOptions;
 
   const { formula } = useUnitFormula({
     qty_total: qty,
@@ -201,7 +201,7 @@ export function EditUnitForm({
                                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
-                                  {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
+                                  {unitOptions?.find((option) => option.value === field.value)?.label ?? 'Select an item'}
                                 </span>
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </button>
@@ -213,7 +213,7 @@ export function EditUnitForm({
                               <CommandList>
                                 <CommandEmpty>Tipe Unit tidak ditemukan.</CommandEmpty>
                                 <CommandGroup>
-                                  {unitOptions.map((option) => (
+                                  {unitOptions?.map((option) => (
                                     <CommandItem key={option.value} value={option.label} onSelect={() => {
                                       field.onChange(option.value);
                                       setOpenTypeSelect(false);
@@ -235,7 +235,7 @@ export function EditUnitForm({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {unitOptions.map((option) => (
+                            {unitOptions?.map((option) => (
                               <SelectItem key={option.value} value={option.value}>
                                 {option.label}
                               </SelectItem>

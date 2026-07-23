@@ -5,7 +5,12 @@ import { TypeUnitPayload } from '@/@types/type-unit.types';
 const TYPE_UNIT_LIST_KEY = 'type-units';
 const TYPE_UNIT_ITEM_KEY = 'type-unit';
 
-export function useTypeUnits(params?: { in_stock?: boolean }) {
+export function useTypeUnits(params?: {
+  in_stock?: boolean | string;
+  company_id?: number | string;
+  sort_by?: string;
+  sort_order?: string;
+}) {
   return useQuery({
     queryKey: [TYPE_UNIT_LIST_KEY, params],
     queryFn: () => getTypeUnits(params),
