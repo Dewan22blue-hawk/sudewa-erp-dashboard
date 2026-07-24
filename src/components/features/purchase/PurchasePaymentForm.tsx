@@ -288,7 +288,7 @@ export function PurchasePaymentForm({
                             <p className="text-sm font-medium">Kurang Bayar</p>
                             <Input value={currenciesFormat('idr', projectedRemaining)} disabled />
                         </div>
-                        <div className="border-t w-full col-span-3 flex flex-row gap-4">
+                        <div className="border-t w-full col-span-3 flex flex-row gap-4 pt-4">
                             {/* Total Bayar USD */}
                             <div className="space-y-2 w-full">
                                 <p className="text-sm font-medium">Total Bayar (USD)</p>

@@ -21,5 +21,6 @@ export interface StockUnit {
   noMesin: string;
   noRangka: string;
   status: Status;
+  inStock: boolean;
   stockStatus: StockStatus;
 }

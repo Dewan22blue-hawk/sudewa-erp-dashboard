@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { format } from 'date-fns';
+import { id as idLocale } from 'date-fns/locale/id';
 import { Wallet, Trash, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,8 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency } from '@/lib/utils/currency';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { TextTruncate } from '@/components/ui/text-truncate';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
 import {
@@ -18,9 +20,6 @@ import {
     getHistoryUsdAmount,
     getHistoryTotalIdrEquivalent
 } from '@/utils/payment-helpers';
-import { Checkbox } from '@/components/ui/checkbox';
-import { format } from 'date-fns';
-import { id as idLocale } from 'date-fns/locale';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,6 +30,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { Textarea } from '@/components/ui/textarea';
+import { parseAndClampMoneyInput } from '@/lib/utils/money-input';
 
 const paymentSchema = z.object({
     bcaPayment: z.union([z.string(), z.number()]).transform(v => Number(v) || 0).pipe(z.number().min(0, 'Tidak boleh negatif')),
@@ -100,6 +102,9 @@ export function SalesPaymentForm({
     const paymentBca2 = Number(form.watch('bcaPayment2') ?? 0); // BCA IDR
     const totalPaymentInputIdr = paymentCash + paymentBca2;
 
+    const maxBca2 = Math.max(0, remainingPayment - paymentCash);
+    const maxCash = Math.max(0, remainingPayment - paymentBca2);
+
     const projectedTotalPaid = useMemo(() => totalPaid + totalPaymentInputIdr, [totalPaid, totalPaymentInputIdr]);
     const projectedRemaining = Math.max(0, totalTagihan - projectedTotalPaid);
 
@@ -152,15 +157,91 @@ export function SalesPaymentForm({
         return methods;
     };
 
+    const columns = useMemo<ColumnDef<UnitBillingHistory>[]>(
+        () => [
+            {
+                header: 'Tanggal',
+                accessorKey: 'payment_at',
+                sortable: true,
+                cell: (item) => (item.payment_at ? format(new Date(item.payment_at), 'dd MMMM yyyy', { locale: idLocale }) : '-'),
+            },
+            {
+                header: 'BCA USD',
+                cell: (item) => currenciesFormat('usd', getHistoryUsdAmount(item)),
+            },
+            {
+                header: 'BCA IDR',
+                cell: (item) => currenciesFormat('idr', getHistoryBcaIdrAmount(item)),
+            },
+            {
+                header: 'Cash',
+                cell: (item) => currenciesFormat('idr', getHistoryCashIdrAmount(item)),
+            },
+            {
+                header: 'Metode',
+                cell: (item) => {
+                    const methods = getPaymentMethods(item);
+                    return methods.length > 0 ? methods.join(', ') : '-';
+                },
+            },
+            {
+                header: 'Total',
+                alignment: 'right',
+                cell: (item) => {
+                    const total = getHistoryTotalIdrEquivalent(item);
+                    const usdAmount = getHistoryUsdAmount(item);
+                    const idrAmount = getHistoryBcaIdrAmount(item) + getHistoryCashIdrAmount(item);
+                    const isPureUsd = usdAmount > 0 && idrAmount === 0 && total === usdAmount;
+                    return (
+                        <span className="font-medium">
+                            {currenciesFormat(isPureUsd ? 'usd' : 'idr', total)}
+                        </span>
+                    );
+                },
+            },
+            {
+                header: 'Keterangan',
+                cell: (item) => <TextTruncate text={item.note || '-'} maxLength={10} />,
+            },
+            {
+                header: 'Bukti',
+                cell: (item) =>
+                    item.payment_proof ? (
+                        <a href={item.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                            Lihat
+                        </a>
+                    ) : (
+                        '-'
+                    ),
+            },
+            ...(onDeleteHistory
+                ? [
+                    {
+                        header: '',
+                        alignment: 'center' as const,
+                        sticky: 'right' as const,
+                        cell: (item: UnitBillingHistory) => (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setDeleteId(item.id)}
+                                disabled={loading}
+                                type="button"
+                            >
+                                <Trash className="w-4 h-4 text-red-500" />
+                            </Button>
+                        ),
+                    },
+                ]
+                : []),
+        ],
+        [loading, onDeleteHistory],
+    );
+
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-semibold">Informasi Penjualan</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Kode Jual: {salesCode || '-'}</p>
-                <Separator className="my-4" />
-            </div>
-
             <div className="space-y-6">
+                {/* ── Section: Biaya ── */}
                 <div className="rounded-lg border">
                     <div className="border-b px-4 py-3">
                         <h3 className="text-sm font-semibold text-muted-foreground">Biaya</h3>
@@ -168,33 +249,83 @@ export function SalesPaymentForm({
                     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Beli</p>
-                            <Input value={formatCurrency(totalDpp)} disabled />
+                            <Input value={currenciesFormat('idr', totalDpp)} disabled />
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total PPN</p>
-                            <Input value={formatCurrency(totalPpn)} disabled />
+                            <Input value={currenciesFormat('idr', totalPpn)} disabled />
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium">Total Biaya</p>
-                            <Input value={formatCurrency(totalTagihan)} disabled />
+                            <Input value={currenciesFormat('idr', totalTagihan)} disabled />
                         </div>
                     </div>
                 </div>
 
+                {/* ── Section: Invoice ── */}
+                <div className="rounded-lg border">
+                    <div className="border-b px-4 py-3">
+                        <h3 className="text-sm font-semibold text-muted-foreground">Biaya Invoice</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                        {/* Tanggal */}
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Tanggal</p>
+                            <Input
+                                type="date"
+                                value={form.watch('paymentDate')}
+                                disabled
+                            />
+                        </div>
+                        {/* Total Bayar */}
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Total Bayar</p>
+                            <Input value={currenciesFormat('idr', projectedTotalPaid)} disabled />
+                        </div>
+                        {/* Kurang Bayar */}
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">Kurang Bayar</p>
+                            <Input value={currenciesFormat('idr', projectedRemaining)} disabled />
+                        </div>
+                        <div className="border-t w-full col-span-3 flex flex-row gap-4 pt-4">
+                            {/* Total Bayar USD */}
+                            <div className="space-y-2 w-full">
+                                <p className="text-sm font-medium">Total Bayar (USD)</p>
+                                <Input value={currenciesFormat('usd', projectedTotalPaidUsd)} disabled className="w-full" />
+                            </div>
+                            {/* Kurang Bayar USD */}
+                            <div className="space-y-2 w-full">
+                                <p className="text-sm font-medium">Kurang Bayar (USD)</p>
+                                <Input value={currenciesFormat('usd', projectedRemainingUsd)} disabled className="w-full" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Validation warning */}
                 {validationMessage && (
                     <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
                         {validationMessage}
                     </div>
                 )}
 
+                {/* ── Section: Pembayaran ── */}
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 
                         <div className="rounded-lg border">
                             <div className="border-b px-4 py-3">
-                                <h3 className="text-sm font-semibold text-muted-foreground">Pembayaran</h3>
+                                <h3 className="text-sm font-semibold text-muted-foreground">Riwayat Pembayaran</h3>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                                <div className="space-y-2 md:col-span-3">
+                                    <p className="text-sm font-medium">Tanggal Bayar</p>
+                                    <Input
+                                        type="date"
+                                        value={form.watch('paymentDate')}
+                                        onChange={(e) => form.setValue('paymentDate', e.target.value)}
+                                    />
+                                </div>
                                 <FormField
                                     control={form.control}
                                     name="bcaPayment"
@@ -231,7 +362,10 @@ export function SalesPaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
-                                                    onChangeValue={field.onChange}
+                                                    onChangeValue={(val) => {
+                                                        const capped = parseAndClampMoneyInput(val, maxBca2);
+                                                        field.onChange(capped);
+                                                    }}
                                                     onBlur={field.onBlur}
                                                 />
                                             </FormControl>
@@ -249,7 +383,10 @@ export function SalesPaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
-                                                    onChangeValue={field.onChange}
+                                                    onChangeValue={(val) => {
+                                                        const capped = parseAndClampMoneyInput(val, maxCash);
+                                                        field.onChange(capped);
+                                                    }}
                                                     onBlur={field.onBlur}
                                                 />
                                             </FormControl>
@@ -260,50 +397,7 @@ export function SalesPaymentForm({
                             </div>
                         </div>
 
-                        {/* ── Section: Invoice ── */}
-                        <div className="rounded-lg border">
-                            <div className="border-b px-4 py-3">
-                                <h3 className="text-sm font-semibold text-muted-foreground">Invoice</h3>
-                            </div>
-                            <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
-                                {/* Tanggal */}
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Tanggal</p>
-                                    <Input
-                                        type="date"
-                                        value={form.watch('paymentDate')}
-                                        onChange={(e) => form.setValue('paymentDate', e.target.value)}
-                                    />
-                                </div>
-                                {/* Total Bayar */}
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Total Bayar</p>
-                                    <Input value={formatCurrency(projectedTotalPaid)} disabled />
-                                </div>
-                                {/* Kurang Bayar */}
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Kurang Bayar</p>
-                                    <Input value={formatCurrency(projectedRemaining)} disabled />
-                                </div>
-                                {/* Tanggal USD */}
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Tanggal (USD)</p>
-                                    <Input value="-" disabled />
-                                </div>
-                                {/* Total Bayar USD */}
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Total Bayar (USD)</p>
-                                    <Input value={formatCurrency(projectedTotalPaidUsd, 'USD')} disabled />
-                                </div>
-                                {/* Kurang Bayar USD */}
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Kurang Bayar (USD)</p>
-                                    <Input value={formatCurrency(projectedRemainingUsd, 'USD')} disabled />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Note + Tandai Lunas */}
+                        {/* Note */}
                         <div className="rounded-lg border">
                             <div className="border-b px-4 py-3">
                                 <h3 className="text-sm font-semibold text-muted-foreground">Catatan</h3>
@@ -314,30 +408,14 @@ export function SalesPaymentForm({
                                     name="note"
                                     render={({ field }) => (
                                         <FormItem className="flex-1 space-y-2">
-                                            <FormLabel className="text-sm font-medium">Note</FormLabel>
                                             <FormControl>
-                                                <Input
+                                                <Textarea
                                                     placeholder="Catatan pembayaran (opsional)"
                                                     {...field}
                                                     value={field.value ?? ''}
                                                 />
                                             </FormControl>
                                             <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="isPaid"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-center gap-2 rounded-md border px-4 py-3 w-fit">
-                                            <FormControl>
-                                                <Checkbox
-                                                    checked={field.value}
-                                                    onCheckedChange={(checked) => field.onChange(Boolean(checked))}
-                                                />
-                                            </FormControl>
-                                            <FormLabel className="text-sm cursor-pointer">Tandai Lunas</FormLabel>
                                         </FormItem>
                                     )}
                                 />
@@ -373,83 +451,17 @@ export function SalesPaymentForm({
                 </Form>
 
                 {/* ── Section: Histori Pembayaran ── */}
-                <div className="rounded-lg border">
-                    <div className="border-b px-4 py-3">
-                        <h3 className="text-sm font-semibold text-muted-foreground">Histori Pembayaran</h3>
+                <div className="rounded-lg border bg-white overflow-hidden">
+                    <div className="border-b px-4 py-3 bg-slate-50">
+                        <h3 className="text-sm font-semibold text-muted-foreground">Riwayat Pembayaran</h3>
                     </div>
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Tanggal</TableHead>
-                                    <TableHead>BCA USD</TableHead>
-                                    <TableHead>BCA IDR</TableHead>
-                                    <TableHead>Cash</TableHead>
-                                    <TableHead>Metode</TableHead>
-                                    <TableHead className="text-right">Total</TableHead>
-                                    <TableHead>Note</TableHead>
-                                    <TableHead>Bukti</TableHead>
-                                    <TableHead className="w-10"></TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {histories.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={100} className="py-16 h-20 text-center text-muted-foreground">
-                                            <div className="flex flex-col items-center justify-center gap-2">
-                                                <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                                    <Search className="h-8 w-8 text-slate-400" />
-                                                </div>
-                                                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    histories.map((item) => {
-                                        const total = getHistoryTotalIdrEquivalent(item);
-                                        const usdAmount = getHistoryUsdAmount(item);
-                                        const idrAmount = getHistoryBcaIdrAmount(item) + getHistoryCashIdrAmount(item);
-                                        const isPureUsd = usdAmount > 0 && idrAmount === 0 && total === usdAmount;
-
-                                        const methods = getPaymentMethods(item);
-                                        return (
-                                            <TableRow key={item.id}>
-                                                <TableCell>{item.payment_at ? format(new Date(item.payment_at), 'dd MMMM yyyy', { locale: idLocale }) : '-'}</TableCell>
-                                                <TableCell>{formatCurrency(usdAmount, 'USD')}</TableCell>
-                                                <TableCell>{formatCurrency(getHistoryBcaIdrAmount(item))}</TableCell>
-                                                <TableCell>{formatCurrency(getHistoryCashIdrAmount(item))}</TableCell>
-                                                <TableCell>{methods.length > 0 ? methods.join(', ') : '-'}</TableCell>
-                                                <TableCell className="text-right font-medium">{formatCurrency(total, isPureUsd ? 'USD' : 'IDR')}</TableCell>
-                                                <TableCell>{item.note || '-'}</TableCell>
-                                                <TableCell>
-                                                    {item.payment_proof ? (
-                                                        <a href={item.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                                                            Lihat
-                                                        </a>
-                                                    ) : (
-                                                        '-'
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {onDeleteHistory && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => setDeleteId(item.id)}
-                                                            disabled={loading}
-                                                            type="button"
-                                                        >
-                                                            <Trash className="w-4 h-4 text-red-500" />
-                                                        </Button>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
-                                )}
-                            </TableBody>
-                        </Table>
+                    <div className="p-4">
+                        <BaseTable
+                            data={histories ?? []}
+                            columns={columns}
+                            containerClassName="border-0 shadow-none rounded-none"
+                            headerRowClassName="bg-slate-50 hover:bg-slate-50 border-b"
+                        />
                     </div>
                 </div>
             </div>
