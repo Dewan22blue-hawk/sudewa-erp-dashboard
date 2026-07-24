@@ -83,7 +83,7 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
     <DashboardLayout>
       <div className="space-y-10 p-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`)}>
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`)}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-[22px] font-semibold text-[#111827]">Detail Refund Penjualan</h1>

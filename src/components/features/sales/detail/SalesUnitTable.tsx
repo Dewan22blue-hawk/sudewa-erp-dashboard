@@ -19,9 +19,10 @@ interface Props {
   canCreate?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  isPaid?: boolean;
 }
 
-export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEdit, canDelete }: Props) {
+export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEdit, canDelete, isPaid }: Props) {
   const router = useRouter();
   const { data: unitItemsData, isLoading, isError } = useSalesUnitItems(salesId);
   const { data: typeUnits } = useTypeUnits();
@@ -224,15 +225,18 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
                   <Button
                     size="sm"
                     variant="destructive"
-                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
-                    onClick={() => setIsBulkDeleteOpen(true)}
+                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending || isPaid}
+                    onClick={() => !isPaid ? setIsBulkDeleteOpen(true) : undefined}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Bulk Delete ({selectedIds.size})
                   </Button>
                 )}
                 {onAddUnit && canCreate && (
-                  <Button onClick={onAddUnit} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                  <Button
+                    onClick={!isPaid ? onAddUnit : undefined}
+                    className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+                    disabled={isPaid}>
                     <Plus className="h-4 w-4 mr-2" />
                     Tambah Unit
                   </Button>

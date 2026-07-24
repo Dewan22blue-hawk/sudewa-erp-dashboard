@@ -380,7 +380,7 @@ export default function SalesDetailPage() {
         <SalesDetailCards data={salesData} billingHistories={resolvedBillingHistories} />
 
         {/* Detail Unit Table */}
-        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} canEdit={canEdit} canDelete={canDelete} canCreate={canCreate} />
+        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} canEdit={canEdit} canDelete={canDelete} canCreate={canCreate} isPaid={isPaid} />
 
         {/* PAYMENT HISTORY TABLE */}
         <div className="space-y-3">

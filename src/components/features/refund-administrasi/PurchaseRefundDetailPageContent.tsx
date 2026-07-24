@@ -188,7 +188,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
       <div className="space-y-6">
         {/* BREADCRUMB HEADER */}
         <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}`)}>
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}`)}>
             Penjualan Unit
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />

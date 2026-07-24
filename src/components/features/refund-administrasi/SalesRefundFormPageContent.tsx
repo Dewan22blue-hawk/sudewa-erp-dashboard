@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Loader2, Search, Plus, Save, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Loader2, Search, Save, ChevronRight } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,67 +11,56 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { MoneyInput } from '@/components/ui/money-input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useCompany } from '@/contexts/CompanyContext';
-import { usePurchases, usePurchaseById, useUnitTransactionItemDetailsData } from '@/hooks/usePurchase';
-import { useCreateRefund, useUpdateRefund, useRefundDetail } from '@/hooks/useRefundAdministrasi';
+import { useCreateRefund, useUpdateRefund, useRefundDetail, useRefundSelectableItems } from '@/hooks/useRefundAdministrasi';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { toast } from 'sonner';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
 
-const refundFormSchema = z.object({
-  unit_transaction_id: z.string().min(1, 'Transaksi harus dipilih'),
-  refund_date: z.string().min(1, 'Tanggal refund harus diisi'),
-  refund_amount: z.number().min(1, 'Nominal refund harus lebih dari 0'),
-  note: z.string().min(1, 'Catatan / Alasan refund harus diisi'),
-  unit_transaction_item_detail_ids: z.array(z.number()).min(1, 'Pilih minimal satu unit untuk direfund'),
-});
-
-type RefundFormValues = z.infer<typeof refundFormSchema>;
-
-interface PurchaseRefundFormPageContentProps {
+interface SalesRefundFormPageContentProps {
+  transactionId: string;
   mode: 'create' | 'edit';
   refundId?: string;
 }
 
-export default function PurchaseRefundFormPageContent({ mode, refundId }: PurchaseRefundFormPageContentProps) {
+const displayDate = (value?: string) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toISOString().split('T')[0] || '';
+};
+
+export default function SalesRefundFormPageContent({ transactionId, mode, refundId }: SalesRefundFormPageContentProps) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const { companyId } = useCompany();
 
   // Search filter states for items checkbox table
   const [filterColor, setFilterColor] = useState('');
   const [filterMachineNumber, setFilterMachineNumber] = useState('');
   const [filterChassisNumber, setFilterChassisNumber] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-
-  const debouncedColor = useDebouncedValue(filterColor, 300);
-  const debouncedMachine = useDebouncedValue(filterMachineNumber, 300);
-  const debouncedChassis = useDebouncedValue(filterChassisNumber, 300);
 
   // Queries & Mutations
-  const { data: purchasesResponse } = usePurchases(companyId, { page: 1, perPage: 100 });
-  const purchaseList = purchasesResponse?.data ?? [];
-
   const createMutation = useCreateRefund();
   const updateMutation = useUpdateRefund();
 
   // Edit Mode Query
-  const refundDetailQuery = useRefundDetail(refundId);
+  const refundDetailQuery = useRefundDetail(mode === 'edit' && refundId ? refundId : undefined);
   const existingRefund = refundDetailQuery.data;
 
-  const form = useForm<RefundFormValues>({
-    resolver: zodResolver(refundFormSchema),
+  // Retrieve unit items and parent transaction data
+  const selectableItemsQuery = useRefundSelectableItems(transactionId);
+  const displayedItems = useMemo(() => {
+    if (mode === 'edit' && existingRefund) {
+      return existingRefund.items ?? [];
+    }
+    return selectableItemsQuery.items ?? [];
+  }, [existingRefund, mode, selectableItemsQuery.items]);
+
+  const form = useForm<CreateRefundFormValues>({
+    resolver: zodResolver(createRefundSchema),
     defaultValues: {
-      unit_transaction_id: '',
+      unit_transaction_id: transactionId,
       refund_date: new Date().toISOString().slice(0, 10),
       refund_amount: 0,
       note: '',
@@ -80,66 +68,43 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
     },
   });
 
-  const selectedTransactionId = form.watch('unit_transaction_id');
-  const selectedIds = form.watch('unit_transaction_item_detail_ids');
-
-  // Load Parent Transaction Details to Map Prices
-  const { data: parentPurchase, isLoading: isLoadingParent } = usePurchaseById(selectedTransactionId);
-
-  // Fetch Items from requested endpoint: /wapi/transaction/unit-transaction/unit-transaction/:id/get-item-details
-  const { data: itemDetails = [], isLoading: isLoadingItems } = useUnitTransactionItemDetailsData(
-    selectedTransactionId,
-    {
-      in_stock: true,
-      color: debouncedColor || undefined,
-      machine_number: debouncedMachine || undefined,
-      chassis_number: debouncedChassis || undefined,
-      status: 'normal',
-    }
-  );
+  const selectedIds = form.watch('unit_transaction_item_detail_ids') ?? [];
 
   // Prepopulate query params or existing refund values
   useEffect(() => {
-    if (router.query.unit_transaction_id && mode === 'create') {
-      form.setValue('unit_transaction_id', String(router.query.unit_transaction_id));
+    if (transactionId) {
+      form.setValue('unit_transaction_id', transactionId);
     }
-  }, [router.query.unit_transaction_id, mode, form]);
+  }, [transactionId, form]);
 
   useEffect(() => {
     if (mode === 'edit' && existingRefund) {
       form.reset({
-        unit_transaction_id: String(existingRefund.unit_transaction_id ?? existingRefund.transaction?.id ?? ''),
+        unit_transaction_id: String(existingRefund.unit_transaction_id ?? existingRefund.transaction?.id ?? transactionId),
         refund_date: existingRefund.refund_date?.slice(0, 10) || new Date().toISOString().slice(0, 10),
         refund_amount: Number(existingRefund.refund_amount || 0),
         note: existingRefund.note || '',
         unit_transaction_item_detail_ids: (existingRefund.items ?? []).map((item) => Number(item.pivot?.unit_transaction_item_detail_id || item.id)),
       });
     }
-  }, [existingRefund, mode, form]);
+  }, [existingRefund, mode, form, transactionId]);
 
-  // Combine items to resolve prices from parent transaction
-  const mappedItems = useMemo(() => {
-    return itemDetails.map((detail) => {
-      // Find matching item in transaction details to get price
-      const parentItem = parentPurchase?.units?.find(
-        (unit) => String(unit.typeUnitId) === String(detail.unit_transaction_item_id)
-      ) || parentPurchase?.unit_transaction_items?.find(
-        (item: any) => Number(item.id) === Number(detail.unit_transaction_item_id)
-      );
-
-      return {
-        ...detail,
-        price: detail.price !== undefined ? Number(detail.price) : Number(parentItem?.price ?? 0),
-      };
+  // Client-side filtering of unit items
+  const filteredItems = useMemo(() => {
+    return displayedItems.filter((item) => {
+      const matchColor = !filterColor || item.color?.toLowerCase().includes(filterColor.toLowerCase());
+      const matchMachine = !filterChassisNumber || item.machine_number?.toLowerCase().includes(filterMachineNumber.toLowerCase());
+      const matchChassis = !filterChassisNumber || item.chassis_number?.toLowerCase().includes(filterChassisNumber.toLowerCase());
+      return matchColor && matchMachine && matchChassis;
     });
-  }, [itemDetails, parentPurchase]);
+  }, [displayedItems, filterColor, filterMachineNumber, filterChassisNumber]);
 
   // Calculations for Summary
   const selectedItemsPriceSum = useMemo(() => {
-    return mappedItems
+    return displayedItems
       .filter((item) => selectedIds.includes(Number(item.id)))
       .reduce((sum, item) => sum + Number(item.price || 0), 0);
-  }, [mappedItems, selectedIds]);
+  }, [displayedItems, selectedIds]);
 
   const toggleItem = useCallback((id: number, checked: boolean) => {
     if (checked) {
@@ -149,27 +114,27 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
     }
   }, [selectedIds, form]);
 
-  const allSelected = mappedItems.length > 0 && mappedItems.every((item) => selectedIds.includes(Number(item.id)));
+  const allSelected = filteredItems.length > 0 && filteredItems.every((item) => selectedIds.includes(Number(item.id)));
 
   const toggleAllItems = useCallback((checked: boolean) => {
     if (checked) {
-      form.setValue('unit_transaction_item_detail_ids', mappedItems.map((item) => Number(item.id)));
+      form.setValue('unit_transaction_item_detail_ids', filteredItems.map((item) => Number(item.id)));
     } else {
       form.setValue('unit_transaction_item_detail_ids', []);
     }
-  }, [mappedItems, form]);
+  }, [filteredItems, form]);
 
-  const onSubmit = async (values: RefundFormValues) => {
+  const onSubmit = async (values: CreateRefundFormValues) => {
     try {
       if (mode === 'create') {
         await createMutation.mutateAsync({
           unit_transaction_id: values.unit_transaction_id,
           refund_date: values.refund_date,
-          refund_amount: values.refund_amount,
-          note: values.note,
-          unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids,
+          refund_amount: Number(values.refund_amount),
+          note: values.note || '',
+          unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids.map(Number),
         });
-        toast.success('Data refund berhasil dibuat');
+        toast.success('Data refund penjualan berhasil dibuat');
       } else {
         if (!refundId) return;
         await updateMutation.mutateAsync({
@@ -177,14 +142,14 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
           payload: {
             unit_transaction_id: values.unit_transaction_id,
             refund_date: values.refund_date,
-            refund_amount: values.refund_amount,
-            note: values.note,
-            unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids,
+            refund_amount: Number(values.refund_amount),
+            note: values.note || '',
+            unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids.map(Number),
           },
         });
-        toast.success('Data refund berhasil diperbarui');
+        toast.success('Data refund penjualan berhasil diperbarui');
       }
-      router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${values.unit_transaction_id}`);
+      router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menyimpan data refund');
     }
@@ -249,28 +214,28 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
       <div className="space-y-6">
         {/* BREADCRUMB HEADER */}
         <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi//${parentPurchase?.id}`)}>
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/`)}>
             Penjualan Unit
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${parentPurchase?.id}`)}>
-            Data Refund Pembelian
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`)}>
+            Data Refund Penjualan
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Tambah Data Refund</span>
+          <span className="font-medium text-slate-800">{mode === 'create' ? 'Tambah Data Refund' : 'Edit Data Refund'}</span>
         </div>
 
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${parentPurchase?.id}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Tambah Data Refund</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">{mode === 'create' ? 'Tambah Data Refund' : 'Edit Data Refund'}</h1>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span>Kode Beli:</span>
-                <span className="text-blue-600 font-semibold">{parentPurchase?.code}</span>
+                <span>Kode Jual:</span>
+                <span className="text-blue-600 font-semibold">{selectableItemsQuery.transactionQuery?.data?.code}</span>
               </div>
             </div>
           </div>
@@ -285,8 +250,8 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
 
               {/* Unit Transaction ID Select */}
               <div className="space-y-2">
-                <Label>Pilih Transaksi Pembelian</Label>
-                <Input value={parentPurchase?.code || 'Memuat...'} disabled className="bg-slate-50 font-medium" />
+                <Label>Pilih Transaksi Penjualan</Label>
+                <Input value={selectableItemsQuery.transactionQuery?.data?.code || 'Memuat...'} disabled className="bg-slate-50 font-medium" />
                 {form.formState.errors.unit_transaction_id && (
                   <p className="text-xs text-red-500">{form.formState.errors.unit_transaction_id.message}</p>
                 )}
@@ -365,7 +330,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
                 ) : (
                   <Save className="h-4 w-4" />
                 )}
-                Simpan Refund Beli
+                Simpan Refund Jual
               </Button>
             </div>
           </div>
@@ -375,7 +340,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 gap-2">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Unit Transaksi Pembelian</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Unit Transaksi Penjualan</h2>
                   <p className="text-xs text-slate-500">Pilih unit yang ingin direfund</p>
                 </div>
               </div>
@@ -423,15 +388,15 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
               </div>
 
               {/* The BaseTable Checkbox list */}
-              {selectedTransactionId ? (
+              {transactionId ? (
                 <BaseTable
-                  data={mappedItems}
+                  data={filteredItems}
                   columns={columns}
-                  loading={isLoadingItems || isLoadingParent}
+                  loading={selectableItemsQuery.transactionQuery.isLoading || selectableItemsQuery.itemDetailsQuery.isLoading}
                 />
               ) : (
                 <div className="h-48 flex flex-col items-center justify-center border border-dashed rounded-2xl text-slate-400 text-sm">
-                  Silakan pilih transaksi pembelian terlebih dahulu untuk melihat daftar unit
+                  Silakan pilih transaksi penjualan terlebih dahulu untuk melihat daftar unit
                 </div>
               )}
 
