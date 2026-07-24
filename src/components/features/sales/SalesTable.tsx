@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { PaginationMeta } from '@/@types/pagination.types';
-import { SalesItem } from './sales.data';
+import { UnitTransaction } from '@/@types/unit-transaction.types';
+import { cn } from '@/lib/utils';
 
 import {
   DropdownMenu,
@@ -21,9 +22,10 @@ import { MoreVertical, Plus, Search, Eye, Pencil, Trash2, RotateCcw, Printer } f
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { formatDate } from '@/lib/utils/format';
 
 export interface SalesTableProps {
-  data: SalesItem[];
+  data: UnitTransaction[];
   meta?: PaginationMeta;
   onDelete: (id: string) => void;
   onAdd?: () => void;
@@ -53,6 +55,8 @@ export function SalesTable({
 }: SalesTableProps) {
   const router = useRouter();
   const [localSearch, setLocalSearch] = useState(search || '');
+  const [billingFilter, setBillingFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'created_at', direction: 'desc' });
   const [isVehicleSearchOpen, setIsVehicleSearchOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -70,20 +74,86 @@ export function SalesTable({
     return () => clearTimeout(timer);
   }, [localSearch, onSearchChange, search]);
 
+  const isRefunded = (item: UnitTransaction) => String(item.stock_state ?? '').toLowerCase() === 'outbound_return' || Boolean(item.isRefunded);
+  const getBillingLabel = useCallback((item: UnitTransaction) => {
+    if (isRefunded(item)) return 'Refund';
+    return item.isPaid ? 'Lunas' : 'Belum Lunas';
+  }, []);
+
+  const getRemainingPayment = (item: UnitTransaction) => {
+    if (item.isPaid) return item.remainingPayment || 0;
+    if (!item.remainingPayment) return item.transaction_bruto_total || 0;
+    return item.remainingPayment || 0;
+  };
+
+  const processedData = useMemo(() => {
+    const filtered = data.filter((item) => {
+      if (billingFilter === 'paid') return Boolean(item.isPaid);
+      if (billingFilter === 'unpaid') return !Boolean(item.isPaid);
+      return true;
+    });
+
+    const sorted = [...filtered].sort((a, b) => {
+      const factor = sortConfig.direction === 'asc' ? 1 : -1;
+
+      const compareDate = (valueA?: string, valueB?: string) => {
+        const dateA = valueA ? new Date(valueA).getTime() : 0;
+        const dateB = valueB ? new Date(valueB).getTime() : 0;
+        return (dateA - dateB) * factor;
+      };
+
+      const compareNumber = (valueA?: number, valueB?: number) => ((Number(valueA ?? 0) - Number(valueB ?? 0)) * factor);
+      const compareText = (valueA?: string, valueB?: string) => (String(valueA ?? '').localeCompare(String(valueB ?? '')) * factor);
+
+      switch (sortConfig.key) {
+        case 'code':
+          return compareText(a.code, b.code);
+        case 'created_at':
+          return compareDate(a.created_at, b.created_at);
+        case 'supplier':
+          return compareText(a.supplier, b.supplier);
+        case 'warehouse':
+          return compareText(a.warehouse, b.warehouse);
+        case 'transaction_bruto_total':
+          return compareNumber(a.transaction_bruto_total, b.transaction_bruto_total);
+        case 'transaction_bbn_total':
+          return compareNumber(a.transaction_bbn_total, b.transaction_bbn_total);
+        case 'expedition_fee_total':
+          return compareNumber(a.expedition_fee_total, b.expedition_fee_total);
+        case 'transaction_other_fee':
+          return compareNumber(a.transaction_other_fee, b.transaction_other_fee);
+        case 'transaction_dpp_total':
+          return compareNumber(a.transaction_dpp_total, b.transaction_dpp_total);
+        case 'transaction_ppn_total':
+          return compareNumber(a.transaction_ppn_total, b.transaction_ppn_total);
+        case 'remainingPayment':
+          return compareNumber(getRemainingPayment(a), getRemainingPayment(b));
+        case 'stock_state':
+          return compareText(a.stock_state, b.stock_state);
+        case 'billing':
+          return compareText(getBillingLabel(a), getBillingLabel(b));
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [data, billingFilter, sortConfig, getBillingLabel]);
+
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? 25;
   const totalPages = meta?.lastPage ?? 1;
-  const totalEntries = meta?.total ?? data.length;
+  const totalEntries = billingFilter === 'all' ? meta?.total ?? processedData.length : processedData.length;
 
   const pagedData = useMemo(() => {
     // If backend pagination metadata is present, do not slice client-side
     if (meta) {
-      return data;
+      return processedData;
     }
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-    return data.slice(start, end);
-  }, [data, meta, currentPage, itemsPerPage]);
+    return processedData.slice(start, end);
+  }, [processedData, meta, currentPage, itemsPerPage]);
 
   const handleItemsPerPageChange = (value: string) => {
     const parsed = Number(value);
@@ -98,33 +168,33 @@ export function SalesTable({
     setLocalSearch(value);
   };
 
-  const columns: ColumnDef<SalesItem>[] = useMemo(
+  const columns: ColumnDef<UnitTransaction>[] = useMemo(
     () => [
       {
-        header: 'KODE JUAL',
-        accessorKey: 'kodeJual',
+        header: 'No. Transaksi',
+        accessorKey: 'code',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <CopyBox text={item.kodeJual} />,
+        cell: (item) => <CopyBox text={item.code} />,
       },
       {
-        header: 'TANGGAL',
-        accessorKey: 'tanggal',
+        header: 'Tanggal',
+        accessorKey: 'created_at',
         sortable: true,
         alignment: 'center',
-        cell: (item) => item.tanggal || '-',
+        cell: (item) => formatDate(item?.created_at) || '-',
       },
       {
-        header: 'CUSTOMER',
-        accessorKey: 'customer',
+        header: 'Customer',
+        accessorKey: 'supplier',
         sortable: true,
         alignment: 'left',
         cell: (item) => (
           <div className="flex items-center gap-2">
-            <ReferenceLink href={`/dashboard/${slug}/customer?search=${encodeURIComponent(item.customer || '')}`}>
-              {item.customer || '-'}
+            <ReferenceLink href={`/dashboard/${slug}/customer?search=${encodeURIComponent(item.supplier || '')}`}>
+              {item.supplier || '-'}
             </ReferenceLink>
-            {item.isRefunded && (
+            {isRefunded(item) && (
               <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
                 Sudah Refund
               </Badge>
@@ -133,54 +203,85 @@ export function SalesTable({
         ),
       },
       {
-        header: 'BIAYA EKSPEDISI',
-        accessorKey: 'biayaEkspedisi',
+        header: 'Gudang',
+        accessorKey: 'warehouse',
         sortable: true,
-        alignment: 'center',
-        cell: (item) => currenciesFormat('idr', item.biayaEkspedisi),
+        alignment: 'left',
+        cell: (item) => item.warehouse || '-',
       },
       {
-        header: 'TOTAL BIAYA',
-        accessorKey: 'totalBiaya',
+        header: 'Bruto Total',
+        accessorKey: 'transaction_bruto_total',
         sortable: true,
         alignment: 'center',
-        cell: (item) => currenciesFormat('idr', item.totalBiaya),
+        cell: (item) => currenciesFormat('idr', item.transaction_bruto_total),
       },
       {
-        header: 'TOTAL DPP',
-        accessorKey: 'totalDpp',
+        header: 'BBN Total',
+        accessorKey: 'transaction_bbn_total',
         sortable: true,
         alignment: 'center',
-        cell: (item) => currenciesFormat('idr', item.totalDpp),
+        cell: (item) => currenciesFormat('idr', item.transaction_bbn_total),
       },
       {
-        header: 'TOTAL PPN',
-        accessorKey: 'totalPpn',
+        header: 'Ekspedisi Total',
+        accessorKey: 'expedition_fee_total',
         sortable: true,
         alignment: 'center',
-        cell: (item) => currenciesFormat('idr', item.totalPpn),
+        cell: (item) => currenciesFormat('idr', item.expedition_fee_total),
       },
       {
-        header: 'TOTAL JUAL',
-        accessorKey: 'totalJual',
+        header: 'Biaya Lainnya',
+        accessorKey: 'transaction_other_fee',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => currenciesFormat('idr', item.transaction_other_fee),
+      },
+      {
+        header: 'DPP Total',
+        accessorKey: 'transaction_dpp_total',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => currenciesFormat('idr', item.transaction_dpp_total),
+      },
+      {
+        header: 'PPN Total',
+        accessorKey: 'transaction_ppn_total',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => currenciesFormat('idr', item.transaction_ppn_total),
+      },
+      {
+        header: 'Sisa Pembayaran',
+        accessorKey: 'remainingPayment',
         sortable: true,
         alignment: 'center',
         cell: (item) => (
-          <span className="font-semibold text-slate-900">
-            {currenciesFormat('idr', item.totalJual)}
+          <span className={cn(getRemainingPayment(item) !== 0 && 'text-red-600 font-semibold')}>
+            {currenciesFormat('idr', getRemainingPayment(item))}
           </span>
         ),
       },
       {
-        header: 'KURANG BAYAR',
-        accessorKey: 'kurangBayar',
-        sortable: true,
+        header: 'Status Billing',
         alignment: 'center',
-        cell: (item) => (
-          <span className="text-red-600 font-semibold">
-            {currenciesFormat('idr', item.kurangBayar)}
-          </span>
-        ),
+        accessorKey: 'billing',
+        sortable: true,
+        cell: (item) => {
+          const label = getBillingLabel(item);
+          return (
+            <Badge
+              className={cn(
+                'font-medium',
+                label === 'Lunas' && 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+                label === 'Belum Lunas' && 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+                label === 'Refund' && 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+              )}
+            >
+              {label}
+            </Badge>
+          );
+        },
       },
       {
         header: 'Aksi',
@@ -211,7 +312,7 @@ export function SalesTable({
                   <DropdownMenuItem
                     className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                     onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}/refund` : `/transaksi/penjualan-unit/${item.id}/refund`)}
-                    disabled={Boolean(item.isRefunded)}
+                    disabled={isRefunded(item)}
                   >
                     <RotateCcw className="mr-2 h-4 w-4" /> Refund Jual
                   </DropdownMenuItem>
@@ -236,7 +337,7 @@ export function SalesTable({
         ),
       },
     ],
-    [slug, canEdit, canDelete, onDelete, router]
+    [slug, canEdit, canDelete, onDelete, getBillingLabel, router]
   );
 
   const headerActions = (

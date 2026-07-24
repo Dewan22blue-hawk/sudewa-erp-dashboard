@@ -15,6 +15,7 @@ import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { formatDate } from '@/lib/utils/format';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -175,7 +176,7 @@ export default function PurchaseTable({
         header: 'Tanggal',
         accessorKey: 'created_at',
         sortable: true,
-        cell: (item) => (item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy HH:mm') : '-'),
+        cell: (item) => formatDate(item?.created_at) || '-',
       },
       {
         header: 'Supplier',
@@ -241,7 +242,9 @@ export default function PurchaseTable({
         alignment: 'center',
         accessorKey: 'remainingPayment',
         sortable: true,
-        cell: (item) => currenciesFormat('idr', getRemainingPayment(item)),
+        cell: (item) => <span className={cn(getRemainingPayment(item) !== 0 && 'text-red-600 font-semibold')}>
+          {currenciesFormat('idr', getRemainingPayment(item))}
+        </span>
       },
       {
         header: 'Status Billing',

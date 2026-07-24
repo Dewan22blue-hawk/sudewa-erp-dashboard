@@ -1,5 +1,6 @@
-import { SalesItem, SalesLineItem } from '@/components/features/sales/sales.data';
+import { SalesLineItem } from '@/components/features/sales/sales.data';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
+import { UnitTransaction } from '@/@types/unit-transaction.types';
 
 export type SalesApiModel = {
   id?: number | string;
@@ -227,11 +228,10 @@ export function mapSalesToUI(item: SalesApiModel): SalesListUI {
   };
 }
 
-export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
+export const mapSalesToTableItem = (item: SalesApiModel): UnitTransaction => {
   const mapped = mapSalesToUI(item);
   const totalDpp = getDppTotal(item);
   const totalPpn = getPpnTotal(item);
-  const totalBiaya = toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee);
   const totalJual = getBrutoTotal(item) || mapped.total;
   const totalBayar = Math.max(
     getTotalPaidFromBillingSummary(item),
@@ -242,29 +242,23 @@ export const mapSalesToTableItem = (item: SalesApiModel): SalesItem => {
 
   return {
     id: mapped.id,
-    kodeJual: mapped.code,
-    tanggal: formatDate(mapped.date),
-    customer: mapped.customerName,
-    stockState: mapped.stockState,
-    isRefunded: mapped.isRefunded,
+    code: mapped.code,
+    created_at: mapped.date,
+    supplier: mapped.customerName, // Set customer name as supplier field in UnitTransaction type
     warehouse: mapped.warehouseName,
-    tipeUnit: '-',
-    hargaSatuan: 0,
-    qty: toNumber(item.max_capacity),
-    biayaBbn: toNumber(item.transaction_bbn_total),
-    biayaEkspedisi: toNumber(item.expedition_fee_total),
-    biayaLain: toNumber(item.transaction_other_fee),
-    dppTaxVersionId: item.unit_transaction_items?.[0]?.dpp_tax_id != null ? String(item.unit_transaction_items[0].dpp_tax_id) : '',
-    ppnTaxVersionId: item.unit_transaction_items?.[0]?.ppn_tax_id != null ? String(item.unit_transaction_items[0].ppn_tax_id) : '',
-    totalHpp: totalDpp,
-    totalDpp,
-    totalPpn,
-    totalBiaya,
-    totalJual,
-    totalBayar,
-    kurangBayar,
-    lineItems: [],
-    units: [],
+    transaction_bruto_total: totalJual,
+    transaction_dpp_total: totalDpp,
+    transaction_ppn_total: totalPpn,
+    transaction_bbn_total: toNumber(item.transaction_bbn_total),
+    transaction_other_fee: toNumber(item.transaction_other_fee),
+    expedition_fee_total: toNumber(item.expedition_fee_total),
+    total_operational_fee: toNumber(item.transaction_bbn_total) + toNumber(item.transaction_other_fee),
+    stock_state: mapped.stockState,
+    isPaid: toBool(item.billing_summary?.is_paid ?? item.unit_transaction_billing?.is_paid),
+    paymentAt: null,
+    remainingPayment: kurangBayar,
+    tanggal: formatDate(mapped.date),
+    isRefunded: mapped.isRefunded,
   };
 };
 
