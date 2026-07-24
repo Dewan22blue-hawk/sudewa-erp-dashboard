@@ -65,8 +65,6 @@ export default function KasHarianDetailPage() {
   const financeBillings = useMemo(() => cashFlowDetail?.finance_billings ?? [], [cashFlowDetail?.finance_billings]);
   const hasBillings = financeBillings.length > 0;
 
-  console.log(cashFlowDetail)
-
   const updateMutation = useUpdateKasHarian();
   const [transactionNote, setTransactionNote] = useState('');
 

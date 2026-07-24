@@ -203,7 +203,7 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
         cell: (item) => formatNumber(item.remaining_qty),
       },
     ],
-    [type, safeTablePage]
+    [type, slugStr]
   );
 
   const footerRow = useMemo(

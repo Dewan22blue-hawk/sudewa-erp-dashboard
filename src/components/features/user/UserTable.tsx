@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { User } from '@/@types/user.types';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
     setCurrentPage(1);
   };
 
-  const handleToggleStatus = async (user: User, checked: boolean) => {
+  const handleToggleStatus = useCallback(async (user: User, checked: boolean) => {
     try {
       if (checked) {
         await activateMutation.mutateAsync(user.id);
@@ -64,7 +64,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
     } catch (error: any) {
       toast.error(error.message || 'Gagal mengubah status user');
     }
-  };
+  }, [activateMutation, deactivateMutation]);
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -180,7 +180,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         },
       },
     ],
-    [onEdit, onDelete, activateMutation.isPending, deactivateMutation.isPending, activateMutation.variables, deactivateMutation.variables]
+    [onEdit, onDelete, activateMutation.isPending, deactivateMutation.isPending, activateMutation.variables, deactivateMutation.variables, handleToggleStatus]
   );
 
   const headerActions = useMemo(

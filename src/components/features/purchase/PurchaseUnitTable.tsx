@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -50,10 +50,10 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
     });
   }, [items, allDetails]);
 
-  const getUnitTypeName = (id?: string | number) => {
+  const getUnitTypeName = useCallback((id?: string | number) => {
     if (!id) return '-';
     return typeUnits?.data?.find((type) => String(type.id) === String(id))?.name ?? String(id);
-  };
+  }, [typeUnits]);
 
   // DELETE HANDLER
   const handleDeleteConfirm = async () => {
@@ -85,13 +85,13 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
   };
 
   // ACTIONS
-  const handleDetail = (unitId: string) => {
+  const handleDetail = useCallback((unitId: string) => {
     router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${unitId}`);
-  };
+  }, [router, slug, purchaseId]);
 
-  const handleEdit = (unitId: string) => {
+  const handleEdit = useCallback((unitId: string) => {
     router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/unit/${unitId}/edit`);
-  };
+  }, [router, slug, purchaseId]);
 
   const columns: ColumnDef<UnitTransactionItem>[] = useMemo(() => [
     {
@@ -183,7 +183,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
         </DropdownMenu>
       ),
     },
-  ], [currentPage, perPage, slug, typeUnits, canEdit, canDelete]);
+  ], [currentPage, perPage, slug, canEdit, canDelete, getUnitTypeName, handleDetail, handleEdit]);
 
   return (
     <div className="space-y-4">

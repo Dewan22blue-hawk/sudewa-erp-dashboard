@@ -302,7 +302,7 @@ export default function PurchaseTable({
         ),
       },
     ],
-    [currentPage, itemsPerPage, slug, canEdit, canDelete, onDelete, getBillingLabel, router]
+    [slug, canEdit, canDelete, onDelete, getBillingLabel, router]
   );
 
   return (

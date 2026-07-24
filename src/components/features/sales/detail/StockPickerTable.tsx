@@ -106,8 +106,6 @@ export function StockPickerTable({
     }
   }, [pagedRows, selectedIds, onToggleOne]);
 
-  console.log(pagedRows)
-
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
     {
       header: 'Warna',
@@ -144,7 +142,7 @@ export function StockPickerTable({
       alignment: 'center',
       cell: (item) => renderStatus(item?.status ?? ''),
     },
-  ], [currentPage, perPage]);
+  ], []);
 
   return (
     <div className="space-y-4">

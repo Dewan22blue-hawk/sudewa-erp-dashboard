@@ -49,7 +49,6 @@ export default function KasHarianTable({
   onToggleStatus,
   onPageChange,
 }: Props) {
-  console.log(data);
   const page = meta.currentPage;
   const [sortBy, setSortBy] = useState<string>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');

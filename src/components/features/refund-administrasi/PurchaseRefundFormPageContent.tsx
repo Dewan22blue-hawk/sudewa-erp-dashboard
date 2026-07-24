@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -141,23 +141,23 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
       .reduce((sum, item) => sum + Number(item.price || 0), 0);
   }, [mappedItems, selectedIds]);
 
-  const toggleItem = (id: number, checked: boolean) => {
+  const toggleItem = useCallback((id: number, checked: boolean) => {
     if (checked) {
       form.setValue('unit_transaction_item_detail_ids', [...selectedIds, id]);
     } else {
       form.setValue('unit_transaction_item_detail_ids', selectedIds.filter((item) => item !== id));
     }
-  };
+  }, [selectedIds, form]);
 
   const allSelected = mappedItems.length > 0 && mappedItems.every((item) => selectedIds.includes(Number(item.id)));
 
-  const toggleAllItems = (checked: boolean) => {
+  const toggleAllItems = useCallback((checked: boolean) => {
     if (checked) {
       form.setValue('unit_transaction_item_detail_ids', mappedItems.map((item) => Number(item.id)));
     } else {
       form.setValue('unit_transaction_item_detail_ids', []);
     }
-  };
+  }, [mappedItems, form]);
 
   const onSubmit = async (values: RefundFormValues) => {
     try {
@@ -241,7 +241,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
         cell: (item) => currenciesFormat('idr', Number(item.price || 0)),
       },
     ],
-    [selectedIds, allSelected, mappedItems]
+    [selectedIds, allSelected, toggleAllItems, toggleItem]
   );
 
   return (

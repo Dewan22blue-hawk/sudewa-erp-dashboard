@@ -86,7 +86,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         cell: (item) => formatDate(item.created_at),
       },
     ],
-    [],
+    [slug],
   );
 
 
@@ -130,7 +130,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         )
       },
       {
-        header: 'ACTION',
+        header: 'aksi',
         alignment: 'left',
         sticky: 'right',
         cell: (payment) => (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Check, Trash, ArrowDown } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -83,24 +83,24 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
     setCurrentPage(1);
   }, [itemsPerPage, search, receivedFilter]);
 
-  const isSelectionDisabled = (item: any) => {
+  const isSelectionDisabled = useCallback((item: any) => {
     return receivedIds.includes(item.id) || item.status === 'refunded' || item.status === 'returned';
-  };
+  }, [receivedIds]);
 
-  const toggleSelect = (item: any) => {
+  const toggleSelect = useCallback((item: any) => {
     if (isSelectionDisabled(item)) return;
     const id = item.id;
     setSelected((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
-  };
+  }, [isSelectionDisabled]);
 
-  const toggleAll = () => {
+  const toggleAll = useCallback(() => {
     if (filteredRows.length === 0) return;
     const selectableRows = filteredRows.filter((d) => !isSelectionDisabled(d));
     const allIds = selectableRows.map((d) => d.id);
     if (allIds.length === 0) return;
     const isAllSelected = allIds.every((id) => selected.includes(id));
     setSelected((prev) => (isAllSelected ? prev.filter((id) => !allIds.includes(id)) : Array.from(new Set([...prev, ...allIds]))));
-  };
+  }, [filteredRows, isSelectionDisabled, selected]);
 
   const handleTerima = async () => {
     if (selected.length === 0) return;
@@ -211,7 +211,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         },
       }
     ],
-    [filteredRows, selected, receivedIds, slug, currentPage, itemsPerPage]
+    [filteredRows, selected, receivedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]
   );
 
   return (

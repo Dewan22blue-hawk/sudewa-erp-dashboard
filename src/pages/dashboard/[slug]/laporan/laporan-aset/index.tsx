@@ -164,7 +164,7 @@ export default function LaporanAssetPage() {
         cell: (item) => currenciesFormat('idr', item.final_value || 0),
       },
     ],
-    [page, perPage]
+    [slugStr]
   );
 
   return (

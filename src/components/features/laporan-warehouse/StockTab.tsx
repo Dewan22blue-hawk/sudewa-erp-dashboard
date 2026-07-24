@@ -154,7 +154,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
         cell: (item) => formatNumber(item.qty),
       },
     ],
-    []
+    [slugStr]
   );
 
   const footerRow = useMemo(

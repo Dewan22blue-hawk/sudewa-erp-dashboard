@@ -127,7 +127,7 @@ export default function RefundBeliTable({
         ),
       },
     ],
-    []
+    [slugStr]
   );
 
   return (

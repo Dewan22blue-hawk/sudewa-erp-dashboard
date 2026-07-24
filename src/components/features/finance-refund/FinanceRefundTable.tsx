@@ -12,6 +12,7 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { TextTruncate } from '@/components/ui/text-truncate';
 
 interface FinanceRefundTableProps {
   data: FinanceRefundRecord[];
@@ -41,6 +42,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   const [selectedRefund, setSelectedRefund] = useState<FinanceRefundRecord | null>(null);
   const router = useRouter();
   const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
 
   const columns = useMemo<ColumnDef<FinanceRefundRecord>[]>(
     () => {
@@ -48,22 +50,28 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         {
           accessorKey: 'refundCode',
           header: 'KODE REFUND',
-          cell: ({ row }) => <CopyBox text={row.original.refundCode} />
+          cell: ({ row }) => <CopyBox text={row.original.refundCode} />,
         },
         {
           accessorKey: 'transactionCode',
           header: transactionType === 'sales' ? 'NO PENJUALAN' : 'NO PEMBELIAN',
-          cell: ({ row }) => <CopyBox text={row.original.transactionCode} />,
+          cell: ({ row }) => (
+            <ReferenceLink
+              href={`/dashboard/${slugStr}/transaksi/pembelian-unit/${row?.original?.transactionId}`}
+            >
+              {row?.original?.transactionCode}
+            </ReferenceLink>
+          )
+        },
+        {
+          accessorKey: 'partnerName',
+          header: transactionType === 'sales' ? 'NAMA CUSTOMER' : 'NAMA SUPPLIER',
+          cell: ({ row }) => <ReferenceLink href={`/dashboard/${slugStr}/master/supplier?search=${row?.original?.partnerName}`}>{row?.original?.partnerName}</ReferenceLink>,
         },
         {
           accessorKey: 'refundDate',
           header: 'TANGGAL',
           cell: ({ row }) => <span className="text-slate-800 font-normal">{formatDate(row.original.refundDate)}</span>,
-        },
-        {
-          accessorKey: 'partnerName',
-          header: transactionType === 'sales' ? 'NAMA CUSTOMER' : 'NAMA SUPPLIER',
-          cell: ({ row }) => row?.original?.partnerName ? <ReferenceLink href={`/dashboard/${slug}/master/supplier/${row?.original?.partnerName}`}>{row?.original?.partnerName}</ReferenceLink> : '-'
         },
         {
           accessorKey: 'totalTransaction',
@@ -82,12 +90,16 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         {
           accessorKey: 'cashName',
           header: transactionType === 'sales' ? 'KAS KELUAR' : 'KAS MASUK',
-          cell: ({ row }) => <span className="text-slate-800 font-normal">{row.original.cashName || '-'}</span>,
+          cell: ({ row }) => row?.original?.cashName ? (
+            <ReferenceLink href={`/dashboard/${slugStr}/master/kas?search=${row?.original?.cashName}`}>
+              {row?.original?.cashName}
+            </ReferenceLink >
+          ) : <span>-</span>
         },
         {
           accessorKey: 'note',
           header: 'KETERANGAN',
-          cell: ({ row }) => <span className="text-slate-500 font-normal text-xs line-clamp-2 max-w-xs">{row.original.note || '-'}</span>,
+          cell: ({ row }) => <TextTruncate maxLength={20} text={row.original.note || '-'}></TextTruncate>,
         },
       ];
 
@@ -99,7 +111,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         },
         {
           id: 'actions',
-          header: 'ACTION',
+          header: 'aksi',
           cell: ({ row }) => (
             <Button
               size="sm"
@@ -110,7 +122,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 setSelectedRefund(row.original);
               }}
             >
-              Approval
+              Setujui
             </Button>
           ),
         }
@@ -118,7 +130,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
 
       return baseColumns;
     },
-    [transactionType],
+    [transactionType, slugStr],
   );
 
   const table = useReactTable({

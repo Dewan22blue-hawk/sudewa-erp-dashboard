@@ -547,6 +547,7 @@ export function EditUnitForm({
                         type="button"
                         role="combobox"
                         aria-expanded={openDppTaxSelect}
+                        aria-controls="dpp-tax-list"
                         disabled={readOnly}
                         className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
                       >
@@ -559,7 +560,7 @@ export function EditUnitForm({
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
                         <CommandInput placeholder="Cari pajak..." />
-                        <CommandList>
+                        <CommandList id="dpp-tax-list">
                           <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
                           <CommandGroup>
                             {taxOptions.map((tax) =>
@@ -602,6 +603,7 @@ export function EditUnitForm({
                         type="button"
                         role="combobox"
                         aria-expanded={openPpnTaxSelect}
+                        aria-controls="ppn-tax-list"
                         disabled={readOnly}
                         className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
                       >
@@ -614,7 +616,7 @@ export function EditUnitForm({
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
                         <CommandInput placeholder="Cari pajak..." />
-                        <CommandList>
+                        <CommandList id="ppn-tax-list">
                           <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
                           <CommandGroup>
                             {taxOptions.map((tax) =>
