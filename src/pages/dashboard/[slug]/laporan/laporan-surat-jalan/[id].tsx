@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Search, Loader2, ArrowLeft, Download } from 'lucide-react';
+import { Search, ArrowLeft, Download } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 import { useExpeditionReportDetail } from '@/hooks/report/useExpeditionReport';
+import { formatMoney } from '@/lib/utils/format';
 
 export default function LaporanSuratJalanDetailPage() {
   const router = useRouter();
@@ -27,11 +27,7 @@ export default function LaporanSuratJalanDetailPage() {
   // Formatting helpers
   const formatIDR = (value?: number | null) => {
     if (value === null || value === undefined || value === 0) return '-';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(value);
+    return formatMoney(value, 'IDR');
   };
 
   // Back navigation handler
@@ -97,6 +93,65 @@ export default function LaporanSuratJalanDetailPage() {
       row.muatan.toLowerCase().includes(term)
     );
   });
+
+  const columns: ColumnDef<any>[] = useMemo(() => [
+    {
+      header: 'NO',
+      id: 'no',
+      alignment: 'center',
+      cell: (item) => <span className="font-medium text-slate-500 text-sm">{item.no}</span>,
+    },
+    {
+      header: 'CUSTOMER',
+      accessorKey: 'customer',
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap text-sm">{item.customer}</span>,
+    },
+    {
+      header: 'LOKASI',
+      accessorKey: 'lokasi',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.lokasi}</span>,
+    },
+    {
+      header: 'LOADING IN',
+      accessorKey: 'loadingIn',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.loadingIn}</span>,
+    },
+    {
+      header: 'LOADING OUT',
+      accessorKey: 'loadingOut',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.loadingOut}</span>,
+    },
+    {
+      header: 'UJ DRIVER',
+      accessorKey: 'ujDriver',
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatIDR(item.ujDriver)}</span>,
+    },
+    {
+      header: 'UJ LAINNYA',
+      accessorKey: 'ujLainnya',
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatIDR(item.ujLainnya)}</span>,
+    },
+    {
+      header: 'INVOICE',
+      accessorKey: 'invoice',
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatIDR(item.invoice)}</span>,
+    },
+    {
+      header: 'INV TAMBAHAN',
+      accessorKey: 'invTambahan',
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatIDR(item.invTambahan)}</span>,
+    },
+    {
+      header: 'PPN',
+      accessorKey: 'ppn',
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap text-sm">{formatIDR(item.ppn)}</span>,
+    },
+    {
+      header: 'MUATAN',
+      accessorKey: 'muatan',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.muatan}</span>,
+    },
+  ], []);
 
   // Client-side CSV exporter
   const handleExport = () => {
@@ -194,114 +249,20 @@ export default function LaporanSuratJalanDetailPage() {
           </div>
 
           {/* Data Table */}
-          {isLoading ? (
-            <div className="flex justify-center items-center py-24 w-full bg-white rounded-md border border-slate-200">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-            </div>
-          ) : isError ? (
-            <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-md border border-red-100 text-center p-6">
-              <p className="text-red-600 font-semibold mb-1">Gagal memuat rincian informasi surat jalan</p>
-              <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
-            </div>
-          ) : filteredRows.length > 0 ? (
-            <div className="space-y-4">
-              <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                      <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-12 text-center text-xs font-semibold text-slate-500 uppercase px-4 py-4">NO</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">CUSTOMER</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">LOKASI</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">LOADING IN</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">LOADING OUT</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">UJ DRIVER</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">UJ LAINNYA</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">INVOICE</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">INV TAMBAHAN</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">PPN</TableHead>
-                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-left whitespace-nowrap">MUATAN</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredRows.map((row: any) => (
-                        <TableRow key={row.no} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                          <TableCell className="text-center font-medium text-slate-500 text-sm">{row.no}</TableCell>
-                          <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">
-                            {row.customer}
-                          </TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap text-sm">
-                            {row.lokasi}
-                          </TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap text-sm">
-                            {row.loadingIn}
-                          </TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap text-sm">
-                            {row.loadingOut}
-                          </TableCell>
-                          <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">
-                            {formatIDR(row.ujDriver)}
-                          </TableCell>
-                          <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">
-                            {formatIDR(row.ujLainnya)}
-                          </TableCell>
-                          <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">
-                            {formatIDR(row.invoice)}
-                          </TableCell>
-                          <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">
-                            {formatIDR(row.invTambahan)}
-                          </TableCell>
-                          <TableCell className="font-semibold text-gray-900 whitespace-nowrap text-sm">
-                            {formatIDR(row.ppn)}
-                          </TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap text-sm">
-                            {row.muatan}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-
-              {/* Pagination Footer */}
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
-                <p className="text-sm text-slate-500">
-                  Showing 1-{filteredRows.length} of {filteredRows.length} data
-                </p>
-                <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
-                    disabled={true}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 min-w-9 rounded-md border border-slate-200 bg-white text-slate-950 shadow-sm"
-                    disabled={true}
-                  >
-                    1
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
-                    disabled={true}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col justify-center items-center py-12 text-center border border-slate-200 rounded-md bg-white">
-              <p className="text-slate-500 font-medium text-sm">Tidak ada data laporan ditemukan.</p>
-            </div>
-          )}
+          <div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none w-full">
+            <BaseTable
+              data={filteredRows}
+              columns={columns}
+              loading={isLoading}
+              meta={{
+                currentPage: 1,
+                perPage: Number(perPage),
+                lastPage: 1,
+                total: filteredRows.length,
+              }}
+              onPageChange={() => {}}
+            />
+          </div>
         </div>
       </div>
     </DashboardLayout>

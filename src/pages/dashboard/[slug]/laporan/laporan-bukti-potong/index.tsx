@@ -15,6 +15,8 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { formatDate } from '@/lib/utils/format';
+import { getVisiblePageNumbers } from '@/lib/api/pagination';
+import Head from 'next/head';
 
 export default function LaporanBuktiPotongPage() {
   const router = useRouter();
@@ -38,7 +40,7 @@ export default function LaporanBuktiPotongPage() {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
       setPage(1);
-    }, 500);
+    }, 400);
     return () => clearTimeout(timer);
   }, [searchInput]);
 
@@ -94,52 +96,19 @@ export default function LaporanBuktiPotongPage() {
     }
   };
 
-  const getPageNumbers = () => {
-    const { currentPage, lastPage } = pagination;
-    const delta = 2;
-    const range: number[] = [];
-    const rangeWithDots: (number | string)[] = [];
-    let l: number | undefined;
-
-    for (let i = 1; i <= lastPage; i++) {
-      if (i === 1 || i === lastPage || (i >= currentPage - delta && i <= currentPage + delta)) {
-        range.push(i);
-      }
-    }
-
-    range.forEach((i) => {
-      if (l) {
-        if (i - l === 2) {
-          rangeWithDots.push(l + 1);
-        } else if (i - l !== 1) {
-          rangeWithDots.push('...');
-        }
-      }
-      rangeWithDots.push(i);
-      l = i;
-    });
-
-    return rangeWithDots;
-  };
+  const visiblePages = getVisiblePageNumbers(pagination.lastPage, pagination.currentPage, 5);
 
   return (
     <DashboardLayout>
+      <Head>
+        <title>Laporan Bukti Potong - Wajira Dashboard</title>
+      </Head>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
           <div>
             <h1 className="text-2xl font-semibold">Laporan Bukti Potong</h1>
             <p className="text-sm text-muted-foreground">Pantau semua data PPh dan Bukti Potong Pajak</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" className="w-full sm:w-auto">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d] text-white">
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </Button>
           </div>
         </div>
 
@@ -191,6 +160,17 @@ export default function LaporanBuktiPotongPage() {
                 <span>Page</span>
               </div>
             </div>
+          </div>
+          
+          <div className="flex items-center gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+            <Button variant="outline" className="w-full sm:w-auto">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+            <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d] text-white">
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
           </div>
         </div>
 
@@ -248,26 +228,24 @@ export default function LaporanBuktiPotongPage() {
                       Previous
                     </Button>
 
-                    {getPageNumbers().map((pageNumber, idx) => (
-                      typeof pageNumber === 'number' ? (
-                        <Button
-                          key={idx}
-                          variant={pageNumber === pagination.currentPage ? 'outline' : 'ghost'}
-                          size="sm"
-                          onClick={() => setPage(pageNumber)}
-                          className={cn(
-                            "h-9 min-w-9 rounded-md border-slate-200 text-[13px] font-semibold cursor-pointer",
-                            pageNumber === pagination.currentPage
-                              ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
-                              : "text-slate-600 hover:bg-slate-100"
-                          )}
-                        >
-                          {pageNumber}
-                        </Button>
-                      ) : (
-                        <span key={idx} className="px-1.5 text-slate-400">...</span>
-                      )
+                    {visiblePages[0] > 1 && <span className="px-1.5 text-slate-400">...</span>}
+                    {visiblePages.map((pageNumber) => (
+                      <Button
+                        key={pageNumber}
+                        variant={pageNumber === pagination.currentPage ? 'outline' : 'ghost'}
+                        size="sm"
+                        onClick={() => setPage(pageNumber)}
+                        className={cn(
+                          "h-9 min-w-9 rounded-md border-slate-200 text-[13px] font-semibold cursor-pointer",
+                          pageNumber === pagination.currentPage
+                            ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
+                            : "text-slate-600 hover:bg-slate-100"
+                        )}
+                      >
+                        {pageNumber}
+                      </Button>
                     ))}
+                    {visiblePages[visiblePages.length - 1] < pagination.lastPage && <span className="px-1.5 text-slate-400">...</span>}
 
                     <Button
                       variant="ghost"

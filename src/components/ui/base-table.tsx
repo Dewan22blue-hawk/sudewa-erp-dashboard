@@ -29,6 +29,7 @@ export interface BaseTableProps<T> {
   search?: string;
   onSearchChange?: (value: string) => void;
   headerActions?: React.ReactNode;
+  headerGroups?: React.ReactNode; // Optional extra grouped header rows
 
   // Show / Limit page props
   showLimitChange?: boolean;
@@ -80,6 +81,7 @@ export default function BaseTable<T>({
   defaultSort,
   meta,
   onPageChange,
+  headerGroups,
   headerRowClassName = 'bg-[#f8f9fa]',
   containerClassName,
   showCheckbox = false,
@@ -289,6 +291,7 @@ export default function BaseTable<T>({
       <div className={cn('relative overflow-hidden rounded-md border border-slate-200 bg-white shadow-none', containerClassName)}>
         <Table className="w-max min-w-full">
           <TableHeader className={cn('border-b border-gray-200', headerRowClassName)}>
+            {headerGroups && headerGroups}
             <TableRow className="hover:bg-transparent border-none">
               {showCheckbox && (
                 <TableHead className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
