@@ -46,11 +46,6 @@ export default function UnitPurchaseDetailPage() {
   const columns = useMemo(
     () => [
       {
-        header: 'NO',
-        alignment: 'left' as const,
-        cell: (_: any, index: number) => index + 1,
-      },
-      {
         header: 'Nomor Mesin',
         accessorKey: 'machine_number',
         sortable: true,

@@ -190,9 +190,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
               <FormItem>
                 <FormLabel>Keterangan</FormLabel>
                 <FormControl>
-                  {/* <Textarea placeholder="Masukkan Keterangan" className="resize-none h-24" {...field} disabled={isBusy} /> */}
                   <Input placeholder="Masukkan Keterangan" {...field} disabled={isBusy} />
-                  {/* <Textarea placeholder="Masukkan Keterangan" className="resize-none h-24" {...field} disabled={isBusy} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -201,7 +199,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
         </div>
 
         {/* ACTION BUTTONS */}
-        <div className="flex justify-end gap-3 pt-6 border-t">
+        <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isBusy}>
             Batal
           </Button>

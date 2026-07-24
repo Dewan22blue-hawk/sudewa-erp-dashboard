@@ -58,11 +58,6 @@ export default function TransaksiRefundBeliPage() {
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
     () => [
       {
-        header: 'NO',
-        alignment: 'left',
-        cell: (_, index) => (page - 1) * perPage + index + 1,
-      },
-      {
         header: 'TANGGAL REFUND',
         accessorKey: 'refund_date',
         sortable: true,

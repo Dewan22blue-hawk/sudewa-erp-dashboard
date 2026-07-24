@@ -330,12 +330,6 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
   const columns = useMemo<ColumnDef<FinanceBilling>[]>(
     () => [
       {
-        header: 'No',
-        alignment: 'center',
-        className: 'w-12',
-        cell: (_, index) => index + 1,
-      },
-      {
         header: 'Tanggal Bayar',
         alignment: 'left',
         cell: (fb) => <span className="text-slate-800">{formatDate(fb.payment_at)}</span>,
@@ -428,7 +422,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           <p className="text-sm text-slate-500 mt-1">Daftar finance billing yang terkait dengan transaksi ini</p>
         </div>
         {!disabled && (
-          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={Boolean(cashFlowDetail?.is_paid)}>
+          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={Boolean(cashFlowDetail?.is_paid) || (remainingPayment <= 0)}>
             <Plus className="mr-1.5 h-4 w-4" />
             Tambah Pembayaran
           </Button>

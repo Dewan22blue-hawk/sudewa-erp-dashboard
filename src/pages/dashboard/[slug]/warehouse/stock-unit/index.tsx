@@ -57,6 +57,8 @@ export default function StockUnitPage() {
     )
   }
 
+  console.log(data?.data)
+
   if (isLoading) {
     return (
       <DashboardLayout>

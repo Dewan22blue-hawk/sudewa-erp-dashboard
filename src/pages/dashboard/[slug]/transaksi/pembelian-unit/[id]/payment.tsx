@@ -277,7 +277,7 @@ export default function PurchasePaymentPage() {
                             <ArrowLeft className="h-5 w-5 text-slate-700" />
                         </Button>
                         <div className="space-y-1">
-                            <h1 className="text-2xl font-semibold text-slate-900">Detail Data Pembelian</h1>
+                            <h1 className="text-2xl font-semibold text-slate-900">Billing Pembelian Unit</h1>
                             <div className="text-sm text-muted-foreground flex items-center gap-2">
                                 <span>Kode Beli:</span>
                                 <span className="text-blue-600 font-semibold">{purchase.code}</span>

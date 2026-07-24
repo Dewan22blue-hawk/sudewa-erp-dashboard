@@ -109,7 +109,6 @@ export default function EditTransactionPage() {
           <TransactionForm
             defaultValues={{
               ...transaction,
-              // Ensure date format needs
             }}
             onSubmit={handleSubmit}
             onCancel={() => router.push(basePath)}
