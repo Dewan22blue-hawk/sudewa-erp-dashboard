@@ -7,7 +7,7 @@ import { Company } from '@/services/company.service';
 import { AuthService } from '@/features/auth/services/auth.service';
 import { setStoredPermissions } from '@/lib/session/storage';
 
-const ALWAYS_ALLOWED = ['Dashboard', 'Settings'];
+const ALWAYS_ALLOWED = ['Dashboard', 'Settings', 'Pengaturan'];
 
 const MENU_PERMISSION_MAP: Record<string, string[]> = {
     'Master Data': ['master-data:list'],

@@ -90,9 +90,6 @@ export default function TaxPage() {
     router.push(`/dashboard/${slug}/settings/tax/${tax.id}/detail`);
   };
 
-  const handleViewVersion = (tax: Tax) => {
-    router.push(`/dashboard/${slug}/settings/tax/${tax.id}`);
-  };
 
   const handleSubmit = (values: { code: string; name: string }) => {
     if (selectedTax) {
@@ -135,7 +132,6 @@ export default function TaxPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewDetail={handleViewDetail}
-            onViewVersion={handleViewVersion}
           />
         </div>
 

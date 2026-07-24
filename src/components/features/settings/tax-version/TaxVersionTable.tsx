@@ -52,7 +52,7 @@ export const TaxVersionTable = ({ data, meta, search, page, perPage, isLoading =
         header: 'NILAI/RATE',
         accessorKey: 'rate',
         sortable: true,
-        cell: (item) => <span className="text-sm text-gray-900">{item.rate}</span>,
+        cell: (item) => <span className="text-sm text-gray-900">{item.rate}%</span>,
       },
       {
         header: 'BERLAKU DARI',

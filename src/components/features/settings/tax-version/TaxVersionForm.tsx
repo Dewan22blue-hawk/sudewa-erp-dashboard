@@ -92,14 +92,20 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                 <FormItem>
                   <FormLabel>Nilai/Rate</FormLabel>
                   <FormControl>
-                    <ClampedNumericInput
-                      placeholder="Masukkan rate/nilai"
-                      value={field.value}
-                      onChangeValue={field.onChange}
-                      disabled={isSubmitting}
-                      // e.g. clapping value, usually no tax over 100% or extremely large numbers for fixed amounts
-                      max={9999999999}
-                    />
+                    <div className="relative">
+                      <ClampedNumericInput
+                        placeholder="Masukkan rate/nilai"
+                        value={field.value}
+                        onChangeValue={field.onChange}
+                        disabled={isSubmitting}
+                        // e.g. clapping value, usually no tax over 100% or extremely large numbers for fixed amounts
+                        max={9999999999}
+                        className="pr-8"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                        %
+                      </div>
+                    </div>
                   </FormControl>
                   <FormDescription>
                     Masukkan nilai berupa persentase (%) atau nominal uang. &quot;Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping).&quot; 
