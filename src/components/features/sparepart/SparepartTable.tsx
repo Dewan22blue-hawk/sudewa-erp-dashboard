@@ -164,7 +164,7 @@ export function SparepartTable({ data, onEdit, onDelete, onAdd, onImport, canEdi
         ),
       },
     ],
-    [canEdit, canDelete, onEdit, onDelete]
+    [canEdit, canDelete, onEdit, onDelete, slugStr]
   );
 
   return (

@@ -398,7 +398,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           ) : null,
       },
     ],
-    [disabled, cashFlowDetail?.is_paid, slugStr, kasOptions, akunOptions]
+    [disabled, cashFlowDetail?.is_paid, slugStr, getAccountLabel, getKasLabel]
   );
 
   return (

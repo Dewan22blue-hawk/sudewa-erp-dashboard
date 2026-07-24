@@ -170,119 +170,59 @@ export const OrderListTable = React.memo(function OrderListTable({
                 </TableCell>
               </TableRow>
             ) : null}
-            {!isLoading && data.length === 0 ? (
-              <TableRow className="group">
-                <TableCell colSpan={100} className="py-16 h-28 text-center text-sm text-slate-500">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : null}
 
             {!isLoading
               ? data.map((item) => {
                 const primaryTarif = getPrimaryTarifItem(item);
-                {
-                  !isLoading
-                  ? data.map((item) => {
-                    const primaryTarif = getPrimaryTarifItem(item);
 
-                    return (
-                      <TableRow key={item.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
-                        <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.code || '-'}</TableCell>
-                        <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
-                        return (
-                        <TableRow key={item.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
-                          <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.code || '-'}</TableCell>
-                          <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
+                return (
+                  <TableRow key={item.id} className="group border-slate-100 transition-colors hover:bg-slate-50/70">
+                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.code || '-'}</TableCell>
+                    <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">{item.customer?.name || '-'}</TableCell>
 
-                          <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                            {item.tarifs.length > 1 ? (
-                              <div className="flex flex-col items-start text-left gap-1">
-                                {item.tarifs.map((t, idx) => (
-                                  <div key={t.id || idx} className="whitespace-nowrap">
-                                    <span>{idx + 1}. {t.loadingIn || '-'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              primaryTarif?.loadingIn || item.loadingIn || '-'
-                            )}
-                          </TableCell>
-                          <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                            {item.tarifs.length > 1 ? (
-                              <div className="flex flex-col items-start text-left gap-1">
-                                {item.tarifs.map((t, idx) => (
-                                  <div key={t.id || idx} className="whitespace-nowrap">
-                                    <span>{idx + 1}. {t.loadingIn || '-'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              primaryTarif?.loadingIn || item.loadingIn || '-'
-                            )}
-                          </TableCell>
+                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                      {item.tarifs.length > 1 ? (
+                        <div className="flex flex-col items-start text-left gap-1">
+                          {item.tarifs.map((t, idx) => (
+                            <div key={t.id || idx} className="whitespace-nowrap">
+                              <span>{idx + 1}. {t.loadingIn || '-'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        primaryTarif?.loadingIn || item.loadingIn || '-'
+                      )}
+                    </TableCell>
 
-                          <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">
-                            {item.tarifs.length > 1 ? (
-                              <div className="flex flex-col items-start text-left gap-1">
-                                {item.tarifs.map((t, idx) => (
-                                  <div key={t.id || idx}>
-                                    <span>{idx + 1}. {t.deliveryDestination || '-'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              primaryTarif?.deliveryDestination || '-'
-                            )}
-                          </TableCell>
-                          <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">
-                            {item.tarifs.length > 1 ? (
-                              <div className="flex flex-col items-start text-left gap-1">
-                                {item.tarifs.map((t, idx) => (
-                                  <div key={t.id || idx}>
-                                    <span>{idx + 1}. {t.deliveryDestination || '-'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              primaryTarif?.deliveryDestination || '-'
-                            )}
-                          </TableCell>
+                    <TableCell className="min-w-[180px] px-4 py-4 text-left text-sm text-slate-700">
+                      {item.tarifs.length > 1 ? (
+                        <div className="flex flex-col items-start text-left gap-1">
+                          {item.tarifs.map((t, idx) => (
+                            <div key={t.id || idx}>
+                              <span>{idx + 1}. {t.deliveryDestination || '-'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        primaryTarif?.deliveryDestination || '-'
+                      )}
+                    </TableCell>
 
-                          <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                            {item.tarifs.length > 1 ? (
-                              <div className="flex flex-col items-start text-left gap-1">
-                                {item.tarifs.map((t, idx) => (
-                                  <div key={t.id || idx} className="whitespace-nowrap">
-                                    <span>{idx + 1}. {t.loadingOut || '-'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              primaryTarif?.loadingOut || item.loadingOut || '-'
-                            )}
-                          </TableCell>
-                          <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
-                            {item.tarifs.length > 1 ? (
-                              <div className="flex flex-col items-start text-left gap-1">
-                                {item.tarifs.map((t, idx) => (
-                                  <div key={t.id || idx} className="whitespace-nowrap">
-                                    <span>{idx + 1}. {t.loadingOut || '-'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              primaryTarif?.loadingOut || item.loadingOut || '-'
-                            )}
-                          </TableCell>
+                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                      {item.tarifs.length > 1 ? (
+                        <div className="flex flex-col items-start text-left gap-1">
+                          {item.tarifs.map((t, idx) => (
+                            <div key={t.id || idx} className="whitespace-nowrap">
+                              <span>{idx + 1}. {t.loadingOut || '-'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        primaryTarif?.loadingOut || item.loadingOut || '-'
+                      )}
+                    </TableCell>
 
-                          <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{getOrderVehicleTypeLabel(item, primaryTarif)}</TableCell>
+                    <TableCell className="px-4 py-4 text-center text-sm text-slate-700">{getOrderVehicleTypeLabel(item, primaryTarif)}</TableCell>
                           <TableCell className="px-4 py-4 text-right text-sm text-slate-700">{formatOrderCurrency(item.ujDriver)}</TableCell>
                           <TableCell className="px-4 py-4 text-right text-sm text-slate-700">
                             {formatOrderCurrency(item.billInvoice)}
@@ -366,20 +306,12 @@ export const OrderListTable = React.memo(function OrderListTable({
                             </div>
                           </TableCell>
                         </TableRow>
-                        );
-              })
-              : null}
-                      </TableBody>
+                      );
+                    })
+                    : null}
+          </TableBody>
         </Table>
       </div>
-    </TableCell>
-                  </TableRow >
-                );
-              })
-              : null}
-          </TableBody >
-        </Table >
-      </div >
 
   <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1">
     <p>Showing {startData}-{endData} of {totalData} data</p>
@@ -424,6 +356,6 @@ export const OrderListTable = React.memo(function OrderListTable({
       </Button>
     </div>
   </div>
-    </div >
+    </div>
   );
 });

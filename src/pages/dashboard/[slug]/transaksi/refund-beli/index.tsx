@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -47,13 +47,13 @@ export default function TransaksiRefundBeliPage() {
   const { data: purchase } = usePurchaseById(unitTransactionId || '');
   const { data: purcahseItemDetails } = usePurchaseUnitItemDetails(purchase?.id || '');
 
-  function handleDetail(trxId: string, rfdId: string) {
+  const handleDetail = useCallback((trxId: string, rfdId: string) => {
     router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${trxId}/refund/${rfdId}`);
-  }
+  }, [router, slug]);
 
-  function handleEdit(trxId: string, rfdId: string) {
+  const handleEdit = useCallback((trxId: string, rfdId: string) => {
     router.push(`/dashboard/${slug}/transaksi/refund-beli/${rfdId}/edit?unit_transaction_id=${trxId}`);
-  }
+  }, [router, slug]);
 
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
     () => [
@@ -130,7 +130,7 @@ export default function TransaksiRefundBeliPage() {
         ),
       },
     ],
-    [page, perPage, router, slug],
+    [page, perPage, handleDetail, handleEdit],
   );
 
   return (

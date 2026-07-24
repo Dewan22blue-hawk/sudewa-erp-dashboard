@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -36,13 +36,13 @@ export default function RolesPage() {
     }
   };
 
-  const handleAdd = () => {
+  const handleAdd = useCallback(() => {
     router.push(`/dashboard/${slug}/settings/roles/create`);
-  };
+  }, [router, slug]);
 
-  const handleEdit = (role: Role) => {
+  const handleEdit = useCallback((role: Role) => {
     router.push(`/dashboard/${slug}/settings/roles/${role.id}/edit`);
-  };
+  }, [router, slug]);
 
   // Filter Logic
   const filteredData = useMemo(() => {
@@ -120,7 +120,7 @@ export default function RolesPage() {
         ),
       },
     ],
-    [slug]
+    [slug, handleEdit, router]
   );
 
   const headerActions = useMemo(
@@ -130,7 +130,7 @@ export default function RolesPage() {
         Tambah Role
       </Button>
     ),
-    [isLoading, slug]
+    [isLoading, handleAdd]
   );
 
   return (

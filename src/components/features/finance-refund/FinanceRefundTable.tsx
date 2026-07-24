@@ -81,14 +81,12 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
           cell: ({ row }) => (
             <span className="text-slate-800 font-normal">
               {currenciesFormat('idr', row.original.totalTransaction ?? 0)}
-              {currenciesFormat('idr', row.original.totalTransaction ?? 0)}
             </span>
           ),
         },
         {
           accessorKey: 'refundAmount',
           header: 'TOTAL REFUND',
-          cell: ({ row }) => <span className="text-slate-800 font-normal">{currenciesFormat('idr', row.original.refundAmount)}</span>,
           cell: ({ row }) => <span className="text-slate-800 font-normal">{currenciesFormat('idr', row.original.refundAmount)}</span>,
         },
         {
@@ -134,7 +132,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
 
       return baseColumns;
     },
-    [transactionType],
+    [transactionType, slugStr],
   );
 
   const table = useReactTable({
@@ -176,8 +174,6 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                             type="button"
                             className={`flex items-center gap-1 select-none w-full px-4 py-4 text-xs font-semibold uppercase ${isSortable ? 'cursor-pointer group' : 'cursor-default'
                               } ${isSortedActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
-                            className={`flex items-center gap-1 select-none w-full px-4 py-4 text-xs font-semibold uppercase ${isSortable ? 'cursor-pointer group' : 'cursor-default'
-                              } ${isSortedActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
                             onClick={header.column.getToggleSortingHandler()}
                             disabled={!isSortable}
                           >
@@ -208,11 +204,6 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                       <span className="text-sm font-medium text-slate-500">Memuat data...</span>
                     </div>
                   </TableCell>
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
-                </TableCell>
                 </TableRow>
               ) : table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map((row) => (
@@ -241,56 +232,48 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                   </div>
                   <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
                   <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  <div className="rounded-full bg-slate-50 p-4 mb-2">
-                    <Search className="h-8 w-8 text-slate-400" />
-                  </div>
-                  <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                  <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
                 </div>
               </TableCell>
-            </TableCell>
-          </TableRow>
+            </TableRow>
               )}
         </TableBody>
       </Table>
-    </div >
+    </div>
 
-      <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between py-2">
-        <div>
-          Showing {start}-{end} of {total} data
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="font-semibold text-slate-600">
-            Previous
-          </Button>
-          {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
-            <Button
-              key={pageNumber}
-              variant={pageNumber === page ? 'outline' : 'ghost'}
-              size="sm"
-              className="w-9"
-              onClick={() => onPageChange(pageNumber)}
-            >
-              {pageNumber}
-            </Button>
-          ))}
-          <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)} className="font-semibold text-slate-600">
-            Next
-          </Button>
-        </div>
+    <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between py-2">
+      <div>
+        Showing {start}-{end} of {total} data
       </div>
-      </div >
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="font-semibold text-slate-600">
+          Previous
+        </Button>
+        {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
+          <Button
+            key={pageNumber}
+            variant={pageNumber === page ? 'outline' : 'ghost'}
+            size="sm"
+            className="w-9"
+            onClick={() => onPageChange(pageNumber)}
+          >
+            {pageNumber}
+          </Button>
+        ))}
+        <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)} className="font-semibold text-slate-600">
+          Next
+        </Button>
+      </div>
+    </div>
+    </div>
 
-    {
-      selectedRefund?(
-        <FinanceRefundApprovalModal
-          open = { Boolean(selectedRefund) }
-          onClose = {() => setSelectedRefund(null)
-}
-refund = { selectedRefund }
-transactionType = { transactionType }
-  />
-      ) : null}
+    {selectedRefund ? (
+      <FinanceRefundApprovalModal
+        open={Boolean(selectedRefund)}
+        onClose={() => setSelectedRefund(null)}
+        refund={selectedRefund}
+        transactionType={transactionType}
+      />
+    ) : null}
     </>
   );
 }

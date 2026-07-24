@@ -140,9 +140,13 @@ export default function BaseTable<T>({
     return () => clearTimeout(timer);
   }, [localSearch, onSearchChange, search]);
 
-  const activeSort = onSortChange
-    ? { key: sortBy || '', direction: sortDirection || 'asc' }
-    : internalSort;
+  const activeSort = useMemo(
+    () =>
+      onSortChange
+        ? { key: sortBy || '', direction: sortDirection || 'asc' }
+        : internalSort,
+    [onSortChange, sortBy, sortDirection, internalSort]
+  );
 
   const handleSort = (key: string) => {
     const nextDirection =

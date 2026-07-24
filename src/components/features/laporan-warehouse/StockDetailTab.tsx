@@ -176,7 +176,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         cell: (item) => formatCurrency(item.purchase_price),
       },
     ],
-    [pagination.from]
+    [slugStr]
   );
 
   const footerRow = useMemo(

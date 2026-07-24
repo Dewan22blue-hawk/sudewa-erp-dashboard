@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -60,10 +60,10 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
     return items.slice(start, start + perPage);
   }, [currentPage, perPage, items]);
 
-  const getUnitTypeName = (id?: string) => {
+  const getUnitTypeName = useCallback((id?: string) => {
     if (!id) return '-';
     return typeUnits?.data?.find((unitType) => String(unitType.id) === String(id))?.name ?? '-';
-  };
+  }, [typeUnits]);
 
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
@@ -187,7 +187,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
         </DropdownMenu>
       ),
     },
-  ], [currentPage, perPage, slug, typeUnits, canEdit, canDelete, basePath, salesId, router]);
+  ], [slug, canEdit, canDelete, basePath, salesId, router, getUnitTypeName]);
 
   return (
     <div className="space-y-4">

@@ -86,7 +86,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         cell: (item) => formatDate(item.created_at),
       },
     ],
-    [],
+    [slug],
   );
 
 

@@ -215,7 +215,7 @@ export default function PPNPembelianTable({
         ),
       },
     ],
-    [onEdit]
+    [onEdit, slug]
   );
 
   return (
