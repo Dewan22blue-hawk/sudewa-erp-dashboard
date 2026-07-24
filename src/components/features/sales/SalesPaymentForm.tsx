@@ -33,6 +33,7 @@ import {
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Textarea } from '@/components/ui/textarea';
 import { parseAndClampMoneyInput } from '@/lib/utils/money-input';
+import { formatDate } from '@/lib/utils/format';
 
 const paymentSchema = z.object({
     bcaPayment: z.union([z.string(), z.number()]).transform(v => Number(v) || 0).pipe(z.number().min(0, 'Tidak boleh negatif')),
@@ -163,7 +164,7 @@ export function SalesPaymentForm({
                 header: 'Tanggal',
                 accessorKey: 'payment_at',
                 sortable: true,
-                cell: (item) => (item.payment_at ? format(new Date(item.payment_at), 'dd MMMM yyyy', { locale: idLocale }) : '-'),
+                cell: (item) => item.payment_at ? formatDate(item.payment_at) : '-'
             },
             {
                 header: 'BCA USD',

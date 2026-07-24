@@ -24,6 +24,7 @@ import {
   formatShortDate,
   getCashLabel,
 } from '@/components/features/tagihan-bbn/utils';
+import { formatDate } from '@/lib/utils/format';
 
 function ReadonlyField({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
   return (
@@ -213,7 +214,7 @@ export default function BBNBillDetailPage() {
       {
         header: 'Tanggal',
         alignment: 'left',
-        cell: (item) => formatShortDate(item.paidDate),
+        cell: (item) => formatDate(item.paidDate),
       },
       {
         header: 'Keterangan Bayar',

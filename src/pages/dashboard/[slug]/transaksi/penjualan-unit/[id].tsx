@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { formatDate } from '@/lib/utils/format';
 
 /**
  * Detail Data Penjualan Unit - Image 4
@@ -92,11 +93,7 @@ export default function SalesDetailPage() {
         alignment: 'left',
         cell: (item) =>
           item.payment_at
-            ? new Date(item.payment_at).toLocaleDateString('id-ID', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })
+            ? formatDate(item?.payment_at)
             : '-',
       },
       {

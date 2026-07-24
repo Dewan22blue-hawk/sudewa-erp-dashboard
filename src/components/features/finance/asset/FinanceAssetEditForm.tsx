@@ -82,7 +82,7 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
             <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-md">
                 <div className="space-y-6">
                     <div>
-                        <h2 className="text-lg font-bold text-gray-900">Detail Informasi</h2>
+                        <h2 className="text-lg font-bold text-gray-900">Informasi Aset</h2>
                         <div className="h-px bg-gray-100 mt-4" />
                     </div>
 
@@ -167,6 +167,8 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
                                     <MoneyInput
                                         id="depreciation"
                                         value={field.value}
+                                        readOnly
+                                        disabled
                                         onChangeValue={field.onChange}
                                         placeholder="Contoh: Rp 100.000"
                                     />
@@ -184,6 +186,8 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
                                 render={({ field }) => (
                                     <MoneyInput
                                         id="final_value"
+                                        readOnly
+                                        disabled
                                         value={field.value}
                                         onChangeValue={field.onChange}
                                         placeholder="Masukkan nilai akhir"

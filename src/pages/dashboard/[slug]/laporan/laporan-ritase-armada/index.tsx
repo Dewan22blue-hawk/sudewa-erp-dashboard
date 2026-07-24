@@ -122,7 +122,7 @@ export default function LaporanRitaseArmadaPage() {
       header: 'TANGGAL',
       id: 'tanggal',
       alignment: 'center',
-      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.tanggal)}</span>,
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatDate(item.tanggal)}</span>,
     },
     {
       header: 'NO POLISI',

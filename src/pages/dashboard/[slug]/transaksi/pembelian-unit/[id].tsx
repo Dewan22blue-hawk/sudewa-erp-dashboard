@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { formatDate } from '@/lib/utils/format';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -117,11 +118,7 @@ export default function PurchaseDetailPage() {
         alignment: 'left',
         cell: (history) =>
           history.payment_at
-            ? new Date(history.payment_at).toLocaleDateString('id-ID', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })
+            ? formatDate(history?.payment_at)
             : '-',
       },
       {
