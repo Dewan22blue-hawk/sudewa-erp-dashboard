@@ -106,8 +106,6 @@ export function StockPickerTable({
     }
   }, [pagedRows, selectedIds, onToggleOne]);
 
-  console.log(pagedRows)
-
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
     {
       header: 'Warna',

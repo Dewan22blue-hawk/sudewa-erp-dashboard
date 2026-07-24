@@ -63,8 +63,6 @@ export default function PurchaseDetailPage() {
   const updateBillingIsPaid = useUpdateBillingIsPaid();
   const { data: typeUnits } = useTypeUnits();
 
-  console.log(purchase);
-
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
 
   const billingSummary = purchase?.billing_summary;

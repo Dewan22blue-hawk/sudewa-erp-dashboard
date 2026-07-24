@@ -44,8 +44,6 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
   const { slug } = router.query;
   const slugStr = typeof slug === 'string' ? slug : '';
 
-  console.log(data);
-
   const columns = useMemo<ColumnDef<FinanceRefundRecord>[]>(
     () => {
       const baseColumns: ColumnDef<FinanceRefundRecord>[] = [
@@ -207,73 +205,73 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 </TableRow>
               ) : table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
-              onClick={() => setSelectedRefund(row.original)}
-            >
-              {row.getVisibleCells().map((cell) => {
-                const align = getColumnAlignment(cell.column.id);
-                const alignClass = align === 'center' ? 'text-center' : 'text-left';
-                return (
-                  <TableCell key={cell.id} className={`py-4 px-4 ${alignClass} ${cell.column.id === 'actions' ? 'sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : ''}`}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  <TableRow
+                    key={row.id}
+                    className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
+                    onClick={() => setSelectedRefund(row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const align = getColumnAlignment(cell.column.id);
+                      const alignClass = align === 'center' ? 'text-center' : 'text-left';
+                      return (
+                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass} ${cell.column.id === 'actions' ? 'sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : ''}`}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className="group">
+                  <TableCell colSpan={100} className="py-16 h-40 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="rounded-full bg-slate-50 p-4 mb-2">
+                        <Search className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    </div>
                   </TableCell>
-                );
-              })}
-            </TableRow>
-            ))
-            ) : (
-            <TableRow className="group">
-              <TableCell colSpan={100} className="py-16 h-40 text-center text-slate-500">
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <div className="rounded-full bg-slate-50 p-4 mb-2">
-                    <Search className="h-8 w-8 text-slate-400" />
-                  </div>
-                  <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                  <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                </div>
-              </TableCell>
-            </TableRow>
+                </TableRow>
               )}
-        </TableBody>
-      </Table>
-    </div>
+            </TableBody>
+          </Table>
+        </div>
 
-    <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between py-2">
-      <div>
-        Showing {start}-{end} of {total} data
+        <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between py-2">
+          <div>
+            Showing {start}-{end} of {total} data
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="font-semibold text-slate-600">
+              Previous
+            </Button>
+            {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
+              <Button
+                key={pageNumber}
+                variant={pageNumber === page ? 'outline' : 'ghost'}
+                size="sm"
+                className="w-9"
+                onClick={() => onPageChange(pageNumber)}
+              >
+                {pageNumber}
+              </Button>
+            ))}
+            <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)} className="font-semibold text-slate-600">
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="font-semibold text-slate-600">
-          Previous
-        </Button>
-        {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
-          <Button
-            key={pageNumber}
-            variant={pageNumber === page ? 'outline' : 'ghost'}
-            size="sm"
-            className="w-9"
-            onClick={() => onPageChange(pageNumber)}
-          >
-            {pageNumber}
-          </Button>
-        ))}
-        <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)} className="font-semibold text-slate-600">
-          Next
-        </Button>
-      </div>
-    </div>
-    </div>
 
-    {selectedRefund ? (
-      <FinanceRefundApprovalModal
-        open={Boolean(selectedRefund)}
-        onClose={() => setSelectedRefund(null)}
-        refund={selectedRefund}
-        transactionType={transactionType}
-      />
-    ) : null}
+      {selectedRefund ? (
+        <FinanceRefundApprovalModal
+          open={Boolean(selectedRefund)}
+          onClose={() => setSelectedRefund(null)}
+          refund={selectedRefund}
+          transactionType={transactionType}
+        />
+      ) : null}
     </>
   );
 }
