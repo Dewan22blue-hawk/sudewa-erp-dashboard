@@ -75,6 +75,7 @@ export interface UnitTransaction {
   stock_state: string;
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;
+  isRefunded: boolean | string | null;
   paymentAt: string | null;
   remainingPayment: number;
 }

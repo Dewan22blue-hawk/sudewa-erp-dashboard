@@ -1,4 +1,4 @@
-import { SalesLineItem } from '@/components/features/sales/sales.data';
+import { SalesItem, SalesLineItem } from '@/components/features/sales/sales.data';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
 
@@ -181,9 +181,9 @@ const sumLineItems = (
 const getBrutoTotal = (item: SalesApiModel): number =>
   toNumber(
     item.unit_transaction_bruto_total ??
-      item.unit_transaction_item_bruto_total ??
-      item.unit_transaction_item_total_bruto ??
-      item.transaction_bruto_total,
+    item.unit_transaction_item_bruto_total ??
+    item.unit_transaction_item_total_bruto ??
+    item.transaction_bruto_total,
   );
 
 const getDppTotal = (item: SalesApiModel): number => {
@@ -243,7 +243,6 @@ export const mapSalesToTableItem = (item: SalesApiModel): UnitTransaction => {
   return {
     id: mapped.id,
     code: mapped.code,
-    created_at: mapped.date,
     supplier: mapped.customerName, // Set customer name as supplier field in UnitTransaction type
     warehouse: mapped.warehouseName,
     transaction_bruto_total: totalJual,
@@ -257,7 +256,7 @@ export const mapSalesToTableItem = (item: SalesApiModel): UnitTransaction => {
     isPaid: toBool(item.billing_summary?.is_paid ?? item.unit_transaction_billing?.is_paid),
     paymentAt: null,
     remainingPayment: kurangBayar,
-    tanggal: formatDate(mapped.date),
+    created_at: formatDate(mapped.date),
     isRefunded: mapped.isRefunded,
   };
 };

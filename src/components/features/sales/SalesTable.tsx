@@ -74,7 +74,7 @@ export function SalesTable({
     return () => clearTimeout(timer);
   }, [localSearch, onSearchChange, search]);
 
-  const isRefunded = (item: UnitTransaction) => String(item.stock_state ?? '').toLowerCase() === 'outbound_return' || Boolean(item.isRefunded);
+  const isRefunded = (item: UnitTransaction) => String(item.stock_state ?? '').toLowerCase() === 'outbound_return';
   const getBillingLabel = useCallback((item: UnitTransaction) => {
     if (isRefunded(item)) return 'Refund';
     return item.isPaid ? 'Lunas' : 'Belum Lunas';
