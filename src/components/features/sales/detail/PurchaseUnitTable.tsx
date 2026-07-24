@@ -57,11 +57,6 @@ export function PurchaseUnitTable({ units }: Props) {
 
   const columns: ColumnDef<UnitItem>[] = [
     {
-      id: 'no',
-      header: () => <div className="text-center font-semibold text-slate-500 uppercase px-4 py-4 text-xs">No</div>,
-      cell: ({ row }) => <div className="text-center px-4 py-4 text-sm text-slate-500">{row.index + 1 + pagination.pageIndex * pagination.pageSize}</div>,
-    },
-    {
       accessorKey: 'color',
       header: () => renderSortHeader('color', 'WARNA'),
       cell: ({ row }) => <div className="px-4 py-4 text-sm text-slate-700 text-left">{row.original.color}</div>,

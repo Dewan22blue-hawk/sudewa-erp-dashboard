@@ -95,12 +95,6 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid, canEdit, c
 
   const columns: ColumnDef<UnitTransactionItem>[] = useMemo(() => [
     {
-      header: 'No',
-      alignment: 'center',
-      className: 'w-[60px]',
-      cell: (_, idx) => (currentPage - 1) * perPage + idx + 1,
-    },
-    {
       header: 'Tipe Unit',
       cell: (item) => (
         <ReferenceLink href={`/dashboard/${slug}/master-data/tipe-unit?search=${getUnitTypeName(item.unit_type_id)}`}>

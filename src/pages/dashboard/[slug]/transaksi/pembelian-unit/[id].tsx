@@ -108,12 +108,6 @@ export default function PurchaseDetailPage() {
   const historyColumns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'No',
-        alignment: 'center',
-        className: 'w-12',
-        cell: (_, index) => index + 1,
-      },
-      {
         header: 'Tanggal',
         alignment: 'left',
         cell: (history) =>
