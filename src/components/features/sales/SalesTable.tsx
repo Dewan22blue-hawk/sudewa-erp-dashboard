@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MoreVertical, Plus } from 'lucide-react';
+import { MoreVertical, Plus, Eye, Pencil, RotateCcw, Printer, Trash2 } from 'lucide-react';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import { useCompany } from '@/contexts/CompanyContext';
 
@@ -183,34 +183,34 @@ export function SalesTable({ onAdd }: Props) {
               onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/edit/${item.id}` : `/transaksi/penjualan-unit/edit/${item.id}`)}
               disabled={!canEdit}
             >
-              Edit
+              <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}` : `/transaksi/penjualan-unit/${item.id}`)}
             >
-              Detail
+              <Eye className="mr-2 h-4 w-4" /> Detail
             </DropdownMenuItem>
             <DropdownMenuItem
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}/refund` : `/transaksi/penjualan-unit/${item.id}/refund`)}
               disabled={Boolean(item.isRefunded) || !canEdit}
             >
-              {item.isRefunded ? 'Sudah Refund' : 'Refund'}
+              <RotateCcw className="mr-2 h-4 w-4" /> {item.isRefunded ? 'Sudah Refund' : 'Refund'}
             </DropdownMenuItem>
             <DropdownMenuItem
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               onClick={() => window.open(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/print/${item.id}` : `/transaksi/penjualan-unit/print/${item.id}`, '_blank')}
               disabled={!canEdit}
             >
-              Print
+              <Printer className="mr-2 h-4 w-4" /> Print
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setDeleteTarget(item)}
               className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
               disabled={!canDelete}
             >
-              Hapus
+              <Trash2 className="mr-2 h-4 w-4" /> Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

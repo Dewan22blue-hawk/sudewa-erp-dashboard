@@ -250,10 +250,13 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
   </DropdownMenuTrigger>
   <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
     <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-      Edit
+      <Eye className="mr-2 h-4 w-4" /> Detail
+    </DropdownMenuItem>
+    <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+      <Pencil className="mr-2 h-4 w-4" /> Edit
     </DropdownMenuItem>
     <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-      Hapus
+      <Trash2 className="mr-2 h-4 w-4" /> Hapus
     </DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
@@ -825,3 +828,64 @@ return (
 2. Semua fitur (No Data *empty state*, UI Loading Spinner berkedip, UI Server Error, Paginasi seragam) otomatis di-handle secara konsisten oleh satu pembungkus `BaseTable`.
 3. Sorting logic terintegrasi dengan mulus pada property `onSortChange`.
 
+---
+
+## 20. Standarisasi Validasi Maksimal Checkbox (Data Selection)
+
+**Aturan**: Ketika sebuah tabel atau *list* menyediakan fungsionalitas pemilihan baris via Checkbox (misal: Alokasi Unit, Penagihan Parsial) yang memiliki **kuantitas maksimal yang diizinkan (`requiredQty`)**, *frontend* **wajib** melakukan validasi ketat langsung pada UI sebelum memperbarui *state*.
+
+**Larangan Keras**:
+- **Dilarang** membiarkan *user* men-ceklis item melebihi kuota lalu baru memunculkan error pada saat tombol "Submit/Simpan" diklik.
+- **Dilarang** mengandalkan logika validasi *backend* saja. Jika *user* melakukan *bypass* pada *disabled state* dari tombol Submit, *frontend* harus tetap menggagalkan pengiriman jika kuota terlampaui.
+
+**Standar Implementasi `toggleOne` (Single Checkbox)**:
+Jika *user* mencoba men-ceklis baris baru saat kuota sudah penuh, tolak perubahan *state* secara eksplisit dan munculkan pesan `toast.error`.
+
+```tsx
+const toggleOne = (stockId: number, checked: boolean) => {
+  if (checked && selectedIds.size >= requiredQty) {
+    toast.error(`Maksimal ${requiredQty} unit yang dapat dipilih`);
+    return;
+  }
+  setSelectedIds((prev) => {
+    const next = new Set(prev);
+    if (checked) next.add(stockId);
+    else next.delete(stockId);
+    return next;
+  });
+};
+```
+
+**Standar Implementasi `toggleAllPage` (Bulk Checkbox / Select All)**:
+Saat *user* menekan tombol "Pilih Semua", sistem harus berhitung sisa kuota (`requiredQty - selectedIds.size`). Sistem **hanya boleh** men-ceklis baris hingga sisa kuota tersebut habis, dan mengabaikan baris sisanya secara otomatis. Munculkan pesan sukses interaktif atau *error* penolakan yang komunikatif.
+
+```tsx
+const toggleAllPage = (checked: boolean) => {
+  if (checked && selectedIds.size >= requiredQty) {
+    toast.error(`Maksimal ${requiredQty} unit yang dapat dipilih`);
+    return;
+  }
+  setSelectedIds((prev) => {
+    const next = new Set(prev);
+    const pageRows = // ... data baris pada halaman saat ini ...
+
+    if (checked) {
+      let remaining = requiredQty - next.size;
+      pageRows.forEach((item) => {
+        if (!next.has(item.id) && remaining > 0) {
+          next.add(item.id);
+          remaining--;
+        }
+      });
+      // (Opsional) Beri notifikasi UI jika berhasil men-ceklis maksimal
+      if (remaining === 0 && pageRows.length > 0 && next.size === requiredQty) {
+        toast.success(`Berhasil memilih ${requiredQty} unit (maksimal)`);
+      }
+    } else {
+      pageRows.forEach((item) => next.delete(item.id));
+    }
+
+    return next;
+  });
+};
+```

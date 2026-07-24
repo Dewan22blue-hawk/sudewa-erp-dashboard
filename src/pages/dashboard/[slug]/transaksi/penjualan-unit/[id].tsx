@@ -218,7 +218,9 @@ export default function SalesDetailPage() {
       const incompleteItems: string[] = [];
       items.forEach((item: any) => {
         const qty = Number(item.qty_total ?? 0);
-        const assignedCount = (item.unit_transaction_item_sales ?? []).length;
+        const assignedBySales = (item.unit_transaction_item_sales ?? []).length;
+        const assignedByDetails = (item.unit_transaction_item_details ?? []).length;
+        const assignedCount = Math.max(assignedBySales, assignedByDetails);
         if (qty !== assignedCount) {
           const typeName = item.unit_type?.name || `Tipe #${item.unit_type_id}`;
           incompleteItems.push(`${typeName} (Qty: ${qty}, Assigned: ${assignedCount})`);
@@ -234,8 +236,11 @@ export default function SalesDetailPage() {
       }
 
       const detailIds = items
-        .flatMap((item: any) => item.unit_transaction_item_sales ?? [])
-        .map((row: any) => Number(row.unit_transaction_item_detail_id))
+        .flatMap((item: any) => {
+          const salesIds = (item.unit_transaction_item_sales ?? []).map((row: any) => Number(row.unit_transaction_item_detail_id));
+          const detailIds = (item.unit_transaction_item_details ?? []).map((row: any) => Number(row.id));
+          return salesIds.length > 0 ? salesIds : detailIds;
+        })
         .filter((val: number) => Number.isFinite(val) && val > 0);
 
       if (detailIds.length === 0) {

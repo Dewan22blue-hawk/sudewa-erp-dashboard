@@ -147,11 +147,11 @@ export default function SalesUnitDetailPage() {
         },
       );
 
-    if (assignedBySales.length > 0) {
-      return assignedBySales;
+    if (mappedFromItemDetails.length > 0) {
+      return mappedFromItemDetails;
     }
 
-    return mappedFromItemDetails;
+    return assignedBySales;
   }, [stockUnits, effectiveUnitItem?.unit_transaction_item_details, effectiveUnitItem?.unit_transaction_item_sales]);
 
   const assignedIds = useMemo(() => {
@@ -207,6 +207,10 @@ export default function SalesUnitDetailPage() {
   const hasRequiredRouteParams = Boolean(salesId && selectedUnitId);
 
   const toggleOne = (stockId: number, checked: boolean) => {
+    if (checked && selectedIds.size >= requiredQty) {
+      toast.error(`Maksimal ${requiredQty} unit yang dapat dipilih`);
+      return;
+    }
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (checked) {
@@ -219,6 +223,10 @@ export default function SalesUnitDetailPage() {
   };
 
   const toggleAllPage = (checked: boolean) => {
+    if (checked && selectedIds.size >= requiredQty) {
+      toast.error(`Maksimal ${requiredQty} unit yang dapat dipilih`);
+      return;
+    }
     setSelectedIds((prev) => {
       const next = new Set(prev);
       const filteredRows = pickerRows.filter((item: any) => {
@@ -236,7 +244,16 @@ export default function SalesUnitDetailPage() {
       const pageRows = filteredRows.slice(start, start + perPage);
 
       if (checked) {
-        pageRows.forEach((item) => next.add(item.id));
+        let remaining = requiredQty - next.size;
+        pageRows.forEach((item) => {
+          if (!next.has(item.id) && remaining > 0) {
+            next.add(item.id);
+            remaining--;
+          }
+        });
+        if (remaining === 0 && pageRows.length > 0 && next.size === requiredQty) {
+          toast.success(`Berhasil memilih ${requiredQty} unit (maksimal)`);
+        }
       } else {
         pageRows.forEach((item) => next.delete(item.id));
       }
@@ -268,9 +285,11 @@ export default function SalesUnitDetailPage() {
     }
 
     try {
+      const isUpdate = assignedIds.length > 0;
       await assignMutation.mutateAsync({
         unitTransactionItemId: selectedUnitId,
         unitTransactionDetails: ids,
+        isUpdate,
       });
 
       toast.success('Stock berhasil di-assign ke item sales');
