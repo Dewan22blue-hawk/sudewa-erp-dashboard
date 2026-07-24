@@ -3,7 +3,7 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, CreditCard } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { toast } from 'sonner';
 import { useCreateSales } from '@/hooks/useSales';
@@ -286,19 +286,26 @@ export default function CreateSalesPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(salesPath)}>
+        <div className="flex items-center gap-2 text-sm text-slate-500 print:hidden">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
             Penjualan Unit
           </span>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">Tambah Penjualan</span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Tambah Data Penjualan</span>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <PageHeader title="Tambah Penjualan Unit" description="" />
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Kode Jual</span>
-            <span className="text-blue-600 font-medium">{generatedCode}</span>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Data Penjualan</h1>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Kode Jual:</span>
+                <span className="font-semibold text-blue-600">{generatedCode}</span>
+              </div>
+            </div>
           </div>
         </div>
 
