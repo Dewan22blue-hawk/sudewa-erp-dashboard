@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AssetFormData } from './AssetFormModal';
 import type { Asset } from '@/@types/asset.types';
-import { MoneyInput } from '@/components/ui/money-input';
 
 interface EditAssetModalProps {
     isOpen: boolean;
@@ -51,10 +50,7 @@ function EditAssetInnerForm({ initialData, onClose, onSave }: InnerProps) {
             company_id: initialData.company_id,
             name: initialData.name || '',
             code: initialData.code || '',
-            purchase_date: initialData.purchase_date || '',
             type: initialData.type || 'inventory',
-            price: initialData.price || '',
-            serial_number: initialData.serial_number || '',
         }
     });
 
@@ -75,18 +71,6 @@ function EditAssetInnerForm({ initialData, onClose, onSave }: InnerProps) {
                     className={errors.code ? 'border-red-500' : ''}
                 />
                 <p className="text-xs text-gray-500">Opsional. Tidak perlu diisi jika kode aset dikelola oleh sistem.</p>
-            </div>
-
-            {/* Tanggal Beli */}
-            <div className="space-y-2">
-                <Label htmlFor="edit-purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
-                <Input
-                    id="edit-purchase_date"
-                    type="date"
-                    {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
-                    className={errors.purchase_date ? 'border-red-500' : ''}
-                />
-                {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
             </div>
 
             {/* Nama Barang */}
@@ -123,36 +107,6 @@ function EditAssetInnerForm({ initialData, onClose, onSave }: InnerProps) {
                     )}
                 />
                 {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
-            </div>
-
-            {/* Harga Beli */}
-            <div className="space-y-2">
-                <Label htmlFor="edit-price" className="text-gray-900 font-medium">Harga Beli</Label>
-                <Controller
-                    control={control}
-                    name="price"
-                    rules={{ required: 'Harga wajib diisi' }}
-                    render={({ field }) => (
-                        <MoneyInput
-                            id="edit-price"
-                            placeholder="Nominal"
-                            value={Number(field.value)}
-                            onChangeValue={(v) => field.onChange(v)}
-                            className={errors.price ? 'border-red-500' : ''}
-                        />
-                    )}
-                />
-                {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
-            </div>
-
-            {/* Serial Number */}
-            <div className="space-y-2">
-                <Label htmlFor="edit-serial_number" className="text-gray-900 font-medium">Serial Number</Label>
-                <Input
-                    id="edit-serial_number"
-                    placeholder="Contoh: AWS0001"
-                    {...register('serial_number')}
-                />
             </div>
 
             <div className="flex flex-col space-y-2 pt-2">

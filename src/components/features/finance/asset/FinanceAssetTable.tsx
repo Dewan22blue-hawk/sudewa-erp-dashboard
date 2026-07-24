@@ -22,6 +22,7 @@ interface FinanceAssetTableProps {
     onPerPageChange: (perPage: number) => void;
     onExport: () => void;
     isExporting?: boolean;
+    onAdd?: () => void;
     onEdit: (asset: FinanceAsset) => void;
     onDelete: (asset: FinanceAsset) => void;
     onDetail?: (asset: FinanceAsset) => void;
@@ -39,6 +40,7 @@ export function FinanceAssetTable({
     onPerPageChange,
     onExport,
     isExporting = false,
+    onAdd,
     onEdit,
     onDelete,
     onDetail,
@@ -78,9 +80,15 @@ export function FinanceAssetTable({
 
                 <div className="flex items-center gap-2">
                     <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
-                        <Download className="h-4 w-4" />
+                        <Download className="h-4 w-4 mr-2" />
                         {isExporting ? 'Exporting...' : 'Export'}
                     </Button>
+                    {onAdd && (
+                        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                            <svg className="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                            Tambah Data
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -99,6 +107,7 @@ export function FinanceAssetTable({
                             <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">UMUR EKONOMIS</TableHead>
                             <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">PENYUSUTAN/BULAN</TableHead>
                             <TableHead className="text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4">NILAI AKHIR</TableHead>
+                            <TableHead className="text-left text-xs font-semibold uppercase text-slate-500 px-4 py-4">KETERANGAN</TableHead>
                             <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-semibold text-slate-500 uppercase sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -128,22 +137,23 @@ export function FinanceAssetTable({
                             assets.map((asset, index) => (
                                 <TableRow key={asset.id} className="group border-b hover:bg-gray-50/70 border-slate-100 last:border-0 transition-colors">
                                     <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{(page - 1) * perPage + index + 1}</TableCell>
-                                    <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">{asset.code}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm font-medium text-slate-900 uppercase">{asset.asset?.code || asset.code || '-'}</TableCell>
                                     <TableCell className="px-4 py-4 text-center text-sm text-slate-500">
-                                        {asset.purchase_date ? format(new Date(asset.purchase_date), 'dd/MM/yyyy') : '-'}
+                                        {(asset.purchase_date || (asset.asset as any)?.purchase_date) ? format(new Date(asset.purchase_date || (asset.asset as any)?.purchase_date), 'dd/MM/yyyy') : '-'}
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{asset.name}</TableCell>
-                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">{asset.type}</TableCell>
-                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">{asset.serial_number || '-'}</TableCell>
-                                    <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.price, 'IDR')}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{asset.asset?.name || asset.name || '-'}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">{asset.asset?.type || asset.type || '-'}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700 uppercase">{asset.serial_number || (asset.asset as any)?.serial_number || '-'}</TableCell>
+                                    <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.price || (asset.asset as any)?.price || 0, 'IDR')}</TableCell>
                                     <TableCell className="px-4 py-4 text-center text-sm text-slate-500">{asset.economic_age ? `${asset.economic_age} TAHUN` : '-'}</TableCell>
                                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.depreciation_per_month ?? asset.depreciation ?? 0, 'IDR')}</TableCell>
                                     <TableCell className="px-4 py-4 text-center text-sm font-medium text-slate-900">{formatMoney(asset.final_value ?? 0, 'IDR')}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{asset.description || '-'}</TableCell>
                                     <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                                         <div className="flex justify-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-gray-400">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>

@@ -6,34 +6,34 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoneyInput } from '@/components/ui/money-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { FinanceAsset, FinanceAssetPayload } from '@/@types/finance-asset.types';
+import type { FinanceAssetPayload } from '@/@types/finance-asset.types';
 import { useAssets } from '@/hooks/useAsset';
 import { useCompany } from '@/contexts/CompanyContext';
 import { Save } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
-interface FinanceAssetEditFormProps {
-    initialData: FinanceAsset;
-    onSave: (data: Partial<FinanceAssetPayload>) => void;
+interface FinanceAssetCreateFormProps {
+    onSave: (data: FinanceAssetPayload) => void;
     onCancel: () => void;
     isSaving?: boolean;
 }
 
-export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving = false }: FinanceAssetEditFormProps) {
+export function FinanceAssetCreateForm({ onSave, onCancel, isSaving = false }: FinanceAssetCreateFormProps) {
     const { companyId } = useCompany();
-    const { data: assetsData, isLoading: isLoadingAssets } = useAssets(companyId, { perPage: 1000 });
+    // Use large perPage to get all assets for the select dropdown
+    const { data: assetsData, isLoading: isLoadingAssets } = useAssets(companyId, { perPage: 1000 }); 
     const assetsList = assetsData?.data || [];
 
     const { register, handleSubmit, control, setValue, watch } = useForm<FinanceAssetPayload>({
         defaultValues: {
-            asset_id: initialData.asset_id || 0,
-            price: initialData.price || 0,
-            purchase_date: initialData.purchase_date ? initialData.purchase_date.split('T')[0].split(' ')[0] : '',
-            economic_age: initialData.economic_age || 0,
-            description: initialData.description || '',
-            serial_number: initialData.serial_number || '',
-            depreciation: initialData.depreciation || 0,
-            final_value: initialData.final_value || 0,
+            asset_id: 0,
+            price: 0,
+            purchase_date: '',
+            economic_age: 0,
+            description: '',
+            serial_number: '',
+            depreciation: 0,
+            final_value: 0,
         }
     });
 
@@ -42,21 +42,17 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
     const price = watch('price') || 0;
     const totalMonths = economicAge > 0 ? economicAge * 12 : 0;
 
-    // Ref to track first render — skip auto-calculate on initial page load
-    // so we don't override saved data from the database.
     const isFirstRender = useRef(true);
 
-    // UX Helper: Auto-calculate when economic_age changes
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
-            return; // Skip: preserve the saved depreciation & final_value
+            return;
         }
         if (totalMonths > 0 && Number(price) > 0) {
             const monthlyDepreciation = Math.round(Number(price) / totalMonths);
             setValue('depreciation', monthlyDepreciation);
 
-            // Nilai akhir buku = harga beli - akumulasi penyusutan.
             const finalValue = Math.max(0, Number(price) - (monthlyDepreciation * totalMonths));
             setValue('final_value', Math.round(finalValue));
             return;
@@ -65,24 +61,6 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
         setValue('depreciation', 0);
         setValue('final_value', Number(price) > 0 ? Math.round(Number(price)) : 0);
     }, [price, setValue, totalMonths]);
-
-    // UX Helper: Recalculate final_value when user manually overrides depreciation
-    const isFirstDepreciationRender = useRef(true);
-    useEffect(() => {
-        if (isFirstDepreciationRender.current) {
-            isFirstDepreciationRender.current = false;
-            return;
-        }
-        if (totalMonths > 0 && Number(depreciation) >= 0 && Number(price) > 0) {
-            const finalValue = Math.max(0, Number(price) - (Number(depreciation) * totalMonths));
-            setValue('final_value', Math.round(finalValue));
-            return;
-        }
-
-        if (Number(price) >= 0) {
-            setValue('final_value', Math.round(Number(price)));
-        }
-    }, [depreciation, price, setValue, totalMonths]);
 
     const onSubmit = (data: FinanceAssetPayload) => {
         onSave(data);
@@ -93,7 +71,7 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
             <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-md">
                 <div className="space-y-6">
                     <div>
-                        <h2 className="text-lg font-bold text-gray-900">Detail Informasi Aset Finance</h2>
+                        <h2 className="text-lg font-bold text-gray-900">Tambah Aset Finance</h2>
                         <div className="h-px bg-gray-100 mt-4" />
                     </div>
 
@@ -115,12 +93,6 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
                                                     {asset.code} - {asset.name}
                                                 </SelectItem>
                                             ))}
-                                            {/* Render fallback if initialData's asset isn't loaded yet */}
-                                            {field.value && !assetsList.find(a => String(a.id) === String(field.value)) && initialData.asset && (
-                                                <SelectItem value={String(field.value)}>
-                                                    {initialData.asset.code || initialData.code} - {initialData.asset.name || initialData.name}
-                                                </SelectItem>
-                                            )}
                                         </SelectContent>
                                     </Select>
                                 )}
