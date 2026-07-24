@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, DollarSignIcon, FileText, Info, ListTodoIcon, Loader2, MoreVertical, Plus, Upload } from 'lucide-react';
+import { ArrowLeft, ChevronRight, DollarSignIcon, FileText, Info, ListTodoIcon, Loader2, MoreVertical, Plus, Upload } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
@@ -253,162 +253,179 @@ export default function UnitPurchaseDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 pb-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="space-y-1">
-            <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </button>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Detail Pembelian Unit</h1>
-            <p className="text-sm text-muted-foreground">
-              Invoice <span className="text-blue-600 font-medium">{purchase.code}</span>
-            </p>
+        <div className="space-y-6">
+          {/* BREADCRUMB HEADER */}
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}>
+              Pembelian Unit
+            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+            <span className="font-medium text-slate-800">Detail Pembelian</span>
+
+            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+            <span className="font-medium text-slate-800">Detail Pembelian Unit</span>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Card className="border-slate-200">
-            <CardContent className="p-5 space-y-2">
+          {/* HEADLINE & ACTIONS */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <ArrowLeft className="h-5 w-5 text-slate-700" />
+              </Button>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-semibold text-slate-900">Detail Data Pembelian</h1>
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span>Kode Beli:</span>
+                  <span className="text-blue-600 font-semibold">{purchase.code}</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-md bg-blue-50">
-                  <FileText className="h-5 w-5 text-blue-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-700">Informasi Invoice</h3>
-              </div>
-              <div className="text-sm text-slate-600">
-                <p>Nomor Pembelian</p>
-                <p className="font-semibold text-slate-900">
-                  <CopyBox text={purchase.code} />
-                </p>
-              </div>
-              <div className="text-sm text-slate-600">
-                <p>Tipe Unit</p>
-                <p className="font-semibold text-slate-900">
-                  <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitTypeName}`}>{unitTypeName}</ReferenceLink>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-2">
 
-          <Card className="border-slate-200">
-            <CardContent className="p-5 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-md bg-green-50">
-                  <DollarSignIcon className="h-5 w-5 text-green-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-700">Detail Pembelian</h3>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Harga Unit</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', price)}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>BBN</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Quantity</span>
-                <span className="font-semibold text-slate-900">{qty}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Total HPP</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalHpp)}</span>
-              </div>
-              {unitItem?.price_usd ? (
-                <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100 mt-2">
-                  <span className="font-medium">Total Harga (USD)</span>
-                  <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_usd))}</span>
-                </div>
-              ) : null}
-              {unitItem?.price_per_unit_usd ? (
-                <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100">
-                  <span className="font-medium">Harga Satuan (USD)</span>
-                  <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_per_unit_usd))}</span>
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-200">
-            <CardContent className="p-5 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-md bg-yellow-50">
-                  <ListTodoIcon className="h-5 w-5 text-yellow-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-700">Rincian Biaya</h3>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>DPP</span>
-                <span className="font-semibold text-slate-900">
-                  {currenciesFormat('idr', dppPerUnit)}
-                  <span className="ml-2 font-light opacity-70">
-                    ({(Number(unitItem?.dpp_tax_rate) / 100).toFixed(2)}%)
-                    {unitItem?.dpp_tax?.tax?.name && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="inline-flex cursor-help p-0.5">
-                            <Info className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {unitItem?.dpp_tax?.tax?.name}
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                  </span>
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>PPN</span>
-                <span className="font-semibold text-slate-900">
-                  {currenciesFormat('idr', ppnPerUnit)}
-                  <span className="ml-2 font-light opacity-70">
-                    ({(Number(unitItem?.ppn_tax_rate) / 100).toFixed(2)}%)
-                  </span>
-                </span>
-              </div>
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
-                <span className="font-medium text-slate-700">Total Pembelian</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="border border-slate-200 shadow-sm">
-          <CardContent className="p-4 space-y-4">
-            <BaseTable
-              data={details ?? []}
-              columns={columns}
-              headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
-              defaultSort={{ key: 'payment_date', direction: 'desc' }}
-              headerActions=
-              {(
-                <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
-                  <div>
-                    <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Detail Unit</h2>
-                    <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-blue-50">
+                    <FileText className="h-5 w-5 text-blue-500" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    {canCreate && (
-                      <>
-                        <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
-                          <Upload className="h-4 w-4 mr-2" />
-                          Import
-                        </Button>
-                        <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Tambah Detail Unit
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                  <h3 className="text-sm font-semibold text-slate-700">Informasi Invoice</h3>
                 </div>
-              )}
-            />
-          </CardContent>
-        </Card>
+                <div className="text-sm text-slate-600">
+                  <p>Nomor Pembelian</p>
+                  <p className="font-semibold text-slate-900">
+                    <CopyBox text={purchase.code} />
+                  </p>
+                </div>
+                <div className="text-sm text-slate-600">
+                  <p>Tipe Unit</p>
+                  <p className="font-semibold text-slate-900">
+                    <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitTypeName}`}>{unitTypeName}</ReferenceLink>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-green-50">
+                    <DollarSignIcon className="h-5 w-5 text-green-500" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-700">Detail Pembelian</h3>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>Harga Unit</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', price)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>BBN</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>Quantity</span>
+                  <span className="font-semibold text-slate-900">{qty}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>Total HPP</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalHpp)}</span>
+                </div>
+                {unitItem?.price_usd ? (
+                  <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100 mt-2">
+                    <span className="font-medium">Total Harga (USD)</span>
+                    <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_usd))}</span>
+                  </div>
+                ) : null}
+                {unitItem?.price_per_unit_usd ? (
+                  <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100">
+                    <span className="font-medium">Harga Satuan (USD)</span>
+                    <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_per_unit_usd))}</span>
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-yellow-50">
+                    <ListTodoIcon className="h-5 w-5 text-yellow-500" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-700">Rincian Biaya</h3>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>DPP</span>
+                  <span className="font-semibold text-slate-900">
+                    {currenciesFormat('idr', dppPerUnit)}
+                    <span className="ml-2 font-light opacity-70">
+                      ({(Number(unitItem?.dpp_tax_rate) / 100).toFixed(2)}%)
+                      {unitItem?.dpp_tax?.tax?.name && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex cursor-help p-0.5">
+                              <Info className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {unitItem?.dpp_tax?.tax?.name}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </span>
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>PPN</span>
+                  <span className="font-semibold text-slate-900">
+                    {currenciesFormat('idr', ppnPerUnit)}
+                    <span className="ml-2 font-light opacity-70">
+                      ({(Number(unitItem?.ppn_tax_rate) / 100).toFixed(2)}%)
+                    </span>
+                  </span>
+                </div>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+                  <span className="font-medium text-slate-700">Total Pembelian</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border border-slate-200 shadow-sm">
+            <CardContent className="p-4 space-y-4">
+              <BaseTable
+                data={details ?? []}
+                columns={columns}
+                headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
+                defaultSort={{ key: 'payment_date', direction: 'desc' }}
+                headerActions=
+                {(
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
+                    <div>
+                      <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Detail Unit</h2>
+                      <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {canCreate && (
+                        <>
+                          <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Import
+                          </Button>
+                          <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Tambah Detail Unit
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <Dialog open={openForm} onOpenChange={setOpenForm}>

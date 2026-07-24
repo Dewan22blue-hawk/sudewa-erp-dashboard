@@ -39,7 +39,7 @@ export function SupplierFormModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -110,6 +110,7 @@ export function SupplierFormModal({
                         {...field}
                         placeholder="Tambahkan NPWP"
                         maxLength={16}
+                        minLength={15}
                         className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
                         onChange={(e) => {
                           field.onChange(e.target.value.replace(/[^\d]/g, ''));

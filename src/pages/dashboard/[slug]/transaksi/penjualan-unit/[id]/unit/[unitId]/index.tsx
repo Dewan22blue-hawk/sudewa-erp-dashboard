@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Loader2, ChevronRight, Badge } from 'lucide-react';
 import { toast } from 'sonner';
 import { WarehouseStockUnit } from '@/@types/unit-transaction.types';
 import { StockPickerTable } from '@/components/features/sales/detail/StockPickerTable';
@@ -352,11 +352,18 @@ export default function SalesUnitDetailPage() {
         </div>
 
         {/* Title Section */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Detail Penjualan Unit</h1>
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <span>Kode Jual:</span>
-            <span className="font-semibold text-blue-600">{salesCode}</span>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Data Penjualan</h1>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Kode Jual:</span>
+                <span className="font-semibold text-blue-600">{salesCode}</span>
+              </div>
+            </div>
           </div>
         </div>
 
