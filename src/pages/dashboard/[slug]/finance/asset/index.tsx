@@ -55,6 +55,10 @@ export default function FinanceAssetPage() {
         router.push(`/dashboard/${slug}/finance/asset/${asset.id}/edit`);
     };
 
+    const handleAdd = () => {
+        router.push(`/dashboard/${slug}/finance/asset/create`);
+    };
+
     const handleDetail = (asset: FinanceAsset) => {
         router.push(`/dashboard/${slug}/finance/asset/${asset.id}`);
     };
@@ -109,6 +113,7 @@ export default function FinanceAssetPage() {
                     }}
                     onExport={handleExport}
                     isExporting={exportMutation.isPending}
+                    onAdd={canCreate ? handleAdd : undefined}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onDetail={handleDetail}

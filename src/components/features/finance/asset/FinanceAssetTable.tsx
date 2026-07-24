@@ -37,6 +37,7 @@ interface FinanceAssetTableProps {
     onPerPageChange: (perPage: number) => void;
     onExport: () => void;
     isExporting?: boolean;
+    onAdd?: () => void;
     onEdit: (asset: FinanceAsset) => void;
     onDelete: (asset: FinanceAsset) => void;
     onDetail?: (asset: FinanceAsset) => void;
@@ -54,6 +55,7 @@ export function FinanceAssetTable({
     onPerPageChange,
     onExport,
     isExporting = false,
+    onAdd,
     onEdit,
     onDelete,
     onDetail,

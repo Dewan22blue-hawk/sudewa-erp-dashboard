@@ -59,9 +59,54 @@ export const getFinanceAssetById = async (id: string | number): Promise<FinanceA
     };
 };
 
+export const createFinanceAsset = async (data: FinanceAssetPayload): Promise<void> => {
+    try {
+        const params = new URLSearchParams();
+        params.append('asset_id', String(data.asset_id));
+        params.append('price', String(data.price));
+        params.append('purchase_date', data.purchase_date);
+        params.append('economic_age', String(data.economic_age));
+        if (data.description !== undefined && data.description !== null) {
+            params.append('description', data.description);
+        }
+        if (data.serial_number !== undefined && data.serial_number !== null) {
+            params.append('serial_number', data.serial_number);
+        }
+        if (data.depreciation !== undefined && data.depreciation !== null) {
+            params.append('depreciation', String(data.depreciation));
+        }
+        if (data.final_value !== undefined && data.final_value !== null) {
+            params.append('final_value', String(data.final_value));
+        }
+
+        const response = await apiClient.post<LaravelApiResponse<any>>(basePath, params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        const result = response.data;
+        if (!result.status) {
+            throw new ApiResponseError(result.message ?? 'Failed to create finance asset');
+        }
+    } catch (error) {
+        if (error instanceof ApiValidationError) throw error;
+        throw error;
+    }
+};
+
 export const updateFinanceAsset = async (id: string | number, data: Partial<FinanceAssetPayload>): Promise<void> => {
     try {
         const params = new URLSearchParams();
+        if (data.asset_id !== undefined && data.asset_id !== null) {
+            params.append('asset_id', String(data.asset_id));
+        }
+        if (data.price !== undefined && data.price !== null) {
+            params.append('price', String(data.price));
+        }
+        if (data.purchase_date !== undefined && data.purchase_date !== null) {
+            params.append('purchase_date', data.purchase_date);
+        }
         if (data.economic_age !== undefined && data.economic_age !== null) {
             params.append('economic_age', String(data.economic_age));
         }
@@ -73,6 +118,9 @@ export const updateFinanceAsset = async (id: string | number, data: Partial<Fina
         }
         if (data.description !== undefined && data.description !== null) {
             params.append('description', data.description);
+        }
+        if (data.serial_number !== undefined && data.serial_number !== null) {
+            params.append('serial_number', data.serial_number);
         }
 
         const response = await apiClient.put<LaravelApiResponse<any>>(`${basePath}/${id}`, params, {

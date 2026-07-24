@@ -6,16 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AssetType } from '@/@types/asset.types';
-import { MoneyInput } from '@/components/ui/money-input';
 
 export interface AssetFormData {
     company_id: number;
     name: string;
     code?: string;
-    purchase_date: string;
     type: AssetType;
-    price: string | number;
-    serial_number?: string;
 }
 
 interface AssetFormModalProps {
@@ -31,10 +27,7 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
             company_id: companyId,
             name: '',
             code: '',
-            purchase_date: '',
             type: 'inventory',
-            price: '',
-            serial_number: '',
         }
     });
 
@@ -44,10 +37,7 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                 company_id: companyId,
                 name: '',
                 code: '',
-                purchase_date: '',
                 type: 'inventory',
-                price: '',
-                serial_number: '',
             });
         }
     }, [isOpen, reset, companyId]);
@@ -103,16 +93,6 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                         {errors.type && <p className="text-red-500 text-xs">{errors.type.message}</p>}
                     </div>
 
-                    {/* Serial Number */}
-                    <div className="space-y-2">
-                        <Label htmlFor="serial_number" className="text-gray-900 font-medium">Serial Number</Label>
-                        <Input
-                            id="serial_number"
-                            placeholder="Contoh: AWS0001"
-                            {...register('serial_number')}
-                        />
-                    </div>
-
                     {/* Nama Barang */}
                     <div className="space-y-2">
                         <Label htmlFor="name" className="text-gray-900 font-medium">Nama Barang</Label>
@@ -123,38 +103,6 @@ export function AssetFormModal({ isOpen, onClose, onSave, companyId }: AssetForm
                             className={errors.name ? 'border-red-500' : ''}
                         />
                         {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
-                    </div>
-
-                    {/* Tanggal Beli */}
-                    <div className="space-y-2">
-                        <Label htmlFor="purchase_date" className="text-gray-900 font-medium">Tanggal Beli</Label>
-                        <Input
-                            id="purchase_date"
-                            type="date"
-                            {...register('purchase_date', { required: 'Tanggal beli wajib diisi' })}
-                            className={errors.purchase_date ? 'border-red-500' : ''}
-                        />
-                        {errors.purchase_date && <p className="text-red-500 text-xs">{errors.purchase_date.message}</p>}
-                    </div>
-
-                    {/* Harga Beli */}
-                    <div className="space-y-2">
-                        <Label htmlFor="price" className="text-gray-900 font-medium">Harga Beli</Label>
-                        <Controller
-                            control={control}
-                            name="price"
-                            rules={{ required: 'Harga wajib diisi' }}
-                            render={({ field }) => (
-                                <MoneyInput
-                                    id="price"
-                                    placeholder="Nominal"
-                                    value={Number(field.value)}
-                                    onChangeValue={(v) => field.onChange(v)}
-                                    className={errors.price ? 'border-red-500' : ''}
-                                />
-                            )}
-                        />
-                        {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
                     </div>
 
                     <div className="flex flex-col space-y-2 pt-2">

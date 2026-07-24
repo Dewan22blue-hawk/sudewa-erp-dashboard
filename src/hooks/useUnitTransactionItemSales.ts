@@ -35,11 +35,13 @@ export const useAssignUnitItemSales = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: { unitTransactionItemId: string; unitTransactionDetails: number[] }) => unitTransactionItemSalesService.assignStock(payload),
+    mutationFn: (payload: { unitTransactionItemId: string; unitTransactionDetails: number[]; isUpdate?: boolean }) => unitTransactionItemSalesService.assignStock(payload),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['stock-units', variables.unitTransactionItemId] });
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', variables.unitTransactionItemId] });
-      queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('sales-transactions'),
+      });
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items'] });
     },
   });
@@ -69,8 +71,9 @@ export const useDispatchStockLifecycle = () => {
       return { activityId };
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['sales-transaction', variables.transactionId] });
-      queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes('sales-transactions'),
+      });
       queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', variables.transactionId] });
       queryClient.invalidateQueries({ queryKey: ['stock-units'] });
     },

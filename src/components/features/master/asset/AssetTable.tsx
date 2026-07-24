@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Upload } from 'lucide-react';
 import type { Asset } from '@/@types/asset.types';
-import { formatDateUI } from '@/lib/utils/date';
 import { CopyBox } from '@/components/ui/copy-box';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface AssetTableProps {
     assets: Asset[];
@@ -77,28 +75,8 @@ export function AssetTable({
                 cell: (item) => formatAssetType(item.type),
             },
             {
-                header: 'SERIAL NUMBER',
-                accessorKey: 'serial_number',
-                className: 'uppercase',
-                cell: (item) => <CopyBox text={item.serial_number || '-'} />,
-            },
-            {
                 header: 'NAMA BARANG',
                 accessorKey: 'name',
-            },
-            {
-                header: 'TGL BELI',
-                accessorKey: 'purchase_date',
-                alignment: 'center',
-                className: 'whitespace-nowrap',
-                cell: (item) => formatDateUI(item.purchase_date),
-            },
-            {
-                header: 'HARGA BELI',
-                accessorKey: 'price',
-                alignment: 'center',
-                className: 'font-medium text-slate-900',
-                cell: (item) => currenciesFormat('idr', item.price),
             },
             {
                 header: 'Aksi',
