@@ -19,6 +19,7 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface FinanceRefundApprovalModalProps {
   open: boolean;
@@ -95,6 +96,8 @@ export default function FinanceRefundApprovalModal({ open, onClose, refund, tran
     }
   };
 
+  console.log(refund);
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-8xl overflow-hidden p-0 rounded-md border border-[#E4E4E7] bg-white">
@@ -126,6 +129,10 @@ export default function FinanceRefundApprovalModal({ open, onClose, refund, tran
                       {refund.partnerName}
                     </ReferenceLink>
                   </div>
+                  <div className="flex items-center justify-between gap-6">
+                    <dt className="text-slate-500">Nominal Refund</dt>
+                    {currenciesFormat('idr', refund.refundAmount ?? 0)}
+                  </div>
                 </dl>
 
                 <div className="mt-5 rounded-md border border-[#E4E4E7] bg-slate-50 p-4">
@@ -149,8 +156,8 @@ export default function FinanceRefundApprovalModal({ open, onClose, refund, tran
                             <SelectValue placeholder="Pilih status" />
                           </SelectTrigger>
                           <SelectContent onPointerDownOutside={(e) => e.preventDefault()}>
-                            <SelectItem value="waiting">Menunggu</SelectItem>
                             <SelectItem value="approve">Setujui</SelectItem>
+                            <SelectItem value="waiting">Menunggu</SelectItem>
                             <SelectItem value="reject">Tolak</SelectItem>
                           </SelectContent>
                         </Select>
@@ -165,7 +172,7 @@ export default function FinanceRefundApprovalModal({ open, onClose, refund, tran
                       control={control}
                       name="cash_id"
                       render={({ field }) => (
-                        <Select value={field.value ? String(field.value) : ''} onValueChange={field.onChange} disabled={selectedStatus === 'approve'}>
+                        <Select value={field.value ? String(field.value) : ''} onValueChange={field.onChange}>
                           <SelectTrigger className="rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]">
                             <SelectValue placeholder={selectedStatus === 'approve' ? 'Pilih cash account' : 'Cash account hanya diperlukan saat approve'} />
                           </SelectTrigger>

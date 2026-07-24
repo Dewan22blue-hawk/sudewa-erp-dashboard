@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { SalesPaymentForm, PaymentFormData } from '@/components/features/sales/SalesPaymentForm';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSalesDetail } from '@/hooks/useSales';
@@ -17,6 +17,7 @@ import {
 } from '@/hooks/useUnitBilling';
 import { salesService } from '@/services/sales.service';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
+import { Button } from '@/components/ui/button';
 
 const readApiError = (error: any): string => {
   const stringifyDetail = (value: unknown): string => {
@@ -340,16 +341,30 @@ export default function PaymentPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button onClick={() => router.back()} className="mb-2 inline-flex text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-          </button>
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}>
+            Penjualan Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Detail Pembelian</span>
 
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">Pembayaran Unit</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Jual</span>
-              <span className="text-blue-600 font-medium">{salesData.kodeJual}</span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Billing Penjualan Unit</span>
+        </div>
+
+        {/* HEADLINE & ACTIONS */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Billing Penjualan Unit</h1>
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{salesData.kodeJual}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -122,7 +122,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
                 setSelectedRefund(row.original);
               }}
             >
-              Setujui
+              {row?.original?.status === 'approve' ? 'Sudah disetujui' : 'Setujui'}
             </Button>
           ),
         }

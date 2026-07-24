@@ -7,6 +7,7 @@ import RequiredMark from '@/components/ui/required-mark';
 import { Textarea } from '@/components/ui/textarea';
 import type { UseFormReturn } from 'react-hook-form';
 import { sanitizePhone } from '@/lib/utils/format';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface CustomerFormModalProps {
   open: boolean;
@@ -39,7 +40,7 @@ export function CustomerFormModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -110,7 +111,12 @@ export function CustomerFormModal({
                       <Input
                         {...field}
                         placeholder="Tambahkan NPWP"
+                        maxLength={16}
+                        minLength={15}
                         className="h-12 rounded-md border-[#E4E4E7] px-4 text-[15px] placeholder:text-[#A1A1AA]"
+                        onChange={(e) => {
+                          field.onChange(e.target.value.replace(/[^\d]/g, ''));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -123,7 +129,14 @@ export function CustomerFormModal({
                 name="map_link"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-[14px] font-medium text-[#171717]">Maps</FormLabel>
+                    <FormLabel className="text-[14px] font-medium text-[#171717]">
+                      <div className="flex flex-row justify-between w-full">
+                        <span>
+                          Maps
+                        </span>
+                        <ReferenceLink href="https://www.google.com/maps" target="_blank">gmaps</ReferenceLink>
+                      </div>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -168,6 +181,6 @@ export function CustomerFormModal({
           </form>
         </Form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 }

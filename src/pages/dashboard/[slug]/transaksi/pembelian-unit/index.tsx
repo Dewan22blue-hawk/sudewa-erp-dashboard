@@ -59,29 +59,24 @@ export default function PurchasePage() {
           <div className="flex gap-2"></div>
         </div>
 
-        {isLoading && !data ? (
-          <div>Loading...</div>
-        ) : (
-          <div className="space-y-3">
-            <PurchaseTable
-              data={data?.data ?? []}
-              meta={data?.meta}
-              onDelete={(id) => setSelectedId(id)}
-              onAdd={canCreate ? () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`) : undefined}
-              slug={slug as string}
-              onPageChange={setPage}
-              onPerPageChange={(value) => {
-                setPerPage(value);
-                setPage(1);
-              }}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              loading={isLoading || isFetching}
-              search={search}
-              onSearchChange={(val) => { setSearch(val); setPage(1); }}
-            />
-          </div>
-        )}
+        <PurchaseTable
+          data={data?.data ?? []}
+          meta={data?.meta}
+          onDelete={(id) => setSelectedId(id)}
+          onAdd={canCreate ? () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/create`) : undefined}
+          slug={slug as string}
+          onPageChange={setPage}
+          onPerPageChange={(value) => {
+            setPerPage(value);
+            setPage(1);
+          }}
+          canEdit={canEdit}
+          canDelete={canDelete}
+          loading={isLoading || isFetching}
+          search={search}
+          onSearchChange={(val) => { setSearch(val); setPage(1); }}
+        />
+
         <DeletePurchaseDialog open={!!selectedId} onClose={() => setSelectedId(null)} onConfirm={handleDelete} loading={deleteMutation.isPending} />
       </div>
     </DashboardLayout>

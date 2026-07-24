@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useCurrentBilling, useBillingHistory, useUpdateBillingIsPaid } from '@/hooks/useUnitBilling';
 import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
-import { useDispatchStockLifecycle } from '@/hooks/useUnitTransactionItemSales';
 import { mapSalesDetailCard, mapSalesDetailToUI } from '@/services/sales.mapper';
+import { warehouseActivityService } from '@/services/warehouseActivity.service';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { useQueryClient } from '@tanstack/react-query';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import {
   Dialog,
@@ -23,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { formatDate } from '@/lib/utils/format';
 
 /**
  * Detail Data Penjualan Unit - Image 4
@@ -50,9 +52,9 @@ export default function SalesDetailPage() {
   const isRefunded = stockState === 'outbound_return';
 
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
   const updateBillingIsPaid = useUpdateBillingIsPaid();
   const updateState = useUpdateUnitTransactionState();
-  const dispatchMutation = useDispatchStockLifecycle();
 
   const SALES_PREPARE_STOCK_STATE = 'outbound_in_transit';
   const SALES_DELIVERED_STOCK_STATE = 'outbound_delivered';
@@ -91,11 +93,7 @@ export default function SalesDetailPage() {
         alignment: 'left',
         cell: (item) =>
           item.payment_at
-            ? new Date(item.payment_at).toLocaleDateString('id-ID', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })
+            ? formatDate(item?.payment_at)
             : '-',
       },
       {
@@ -218,9 +216,7 @@ export default function SalesDetailPage() {
       const incompleteItems: string[] = [];
       items.forEach((item: any) => {
         const qty = Number(item.qty_total ?? 0);
-        const assignedBySales = (item.unit_transaction_item_sales ?? []).length;
-        const assignedByDetails = (item.unit_transaction_item_details ?? []).length;
-        const assignedCount = Math.max(assignedBySales, assignedByDetails);
+        const assignedCount = (item.unit_type_sold_details ?? []).length;
         if (qty !== assignedCount) {
           const typeName = item.unit_type?.name || `Tipe #${item.unit_type_id}`;
           incompleteItems.push(`${typeName} (Qty: ${qty}, Assigned: ${assignedCount})`);
@@ -236,11 +232,8 @@ export default function SalesDetailPage() {
       }
 
       const detailIds = items
-        .flatMap((item: any) => {
-          const salesIds = (item.unit_transaction_item_sales ?? []).map((row: any) => Number(row.unit_transaction_item_detail_id));
-          const detailIds = (item.unit_transaction_item_details ?? []).map((row: any) => Number(row.id));
-          return salesIds.length > 0 ? salesIds : detailIds;
-        })
+        .flatMap((item: any) => item.unit_type_sold_details ?? [])
+        .map((row: any) => Number(row.id ?? row.unit_transaction_item_detail_id))
         .filter((val: number) => Number.isFinite(val) && val > 0);
 
       if (detailIds.length === 0) {
@@ -258,17 +251,29 @@ export default function SalesDetailPage() {
         stockStateForWarehouse = SALES_PREPARE_STOCK_STATE;
       }
 
-      await dispatchMutation.mutateAsync({
-        transactionId: String(salesId),
-        personId,
+      if (stockStateForWarehouse !== SALES_PREPARE_STOCK_STATE) {
+        toast.error('State transaksi harus outbound_in_transit sebelum membuat warehouse activity.');
+        return;
+      }
+
+      const activityId = await warehouseActivityService.createIssueActivity({
+        unitTransactionId: String(salesId),
         warehouseId,
-        unitTransactionDetails: detailIds,
+        personId,
+        unitTransactionItemId: String(items[0]?.id ?? ''),
       });
+
+      await warehouseActivityService.dispatchStock(activityId, detailIds);
 
       await updateState.mutateAsync({
         id: salesId,
         stockState: SALES_DELIVERED_STOCK_STATE,
       });
+
+      await queryClient.invalidateQueries({ queryKey: ['sales-transaction', salesId] });
+      await queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
+      await queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', salesId] });
+      await queryClient.invalidateQueries({ queryKey: ['stock-units'] });
 
       toast.success('Status penjualan diperbarui ke delivered dan stok berhasil dikirim.');
     } catch (error: any) {

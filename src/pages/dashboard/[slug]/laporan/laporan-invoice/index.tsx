@@ -79,7 +79,7 @@ export default function LaporanInvoicePage() {
     {
       header: 'TANGGAL',
       id: 'tanggal',
-      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.date)}</span>,
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatDate(item.date)}</span>,
     },
     {
       header: 'NO POLISI',

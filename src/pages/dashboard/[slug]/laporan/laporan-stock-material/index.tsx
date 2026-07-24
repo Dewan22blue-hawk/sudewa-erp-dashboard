@@ -121,7 +121,7 @@ export default function LaporanStockMaterialPage() {
       sortable: true,
       alignment: 'center' as const,
       cell: (item: any) => <span className="text-slate-700 whitespace-nowrap">{
-        item.goods_transaction?.transaction_date ? formatDateString(item.goods_transaction.transaction_date) : '-'
+        item.goods_transaction?.transaction_date ? formatDate(item.goods_transaction.transaction_date) : '-'
       }</span>
     }] : []),
     {

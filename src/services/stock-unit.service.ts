@@ -20,7 +20,7 @@ interface StockUnitApiModel {
   stock_state: string; // Keep stock_state for API request params
   status: string; // Use 'status' directly from API response
   stock_status?: string; // Field from BE
-  in_stock: boolean;
+  stock_available: boolean;
   type_unit_name?: string;
 }
 
@@ -31,6 +31,7 @@ const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
   noMesin: payload.machine_number,
   noRangka: payload.chassis_number,
   status: (payload.status) as Status,
+  inStock: (payload.stock_available),
   stockStatus: payload.stock_status as StockStatus,
 });
 

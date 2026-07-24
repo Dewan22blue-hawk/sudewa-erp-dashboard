@@ -103,7 +103,7 @@ export default function LaporanSuratJalanPage() {
     {
       header: 'TANGGAL',
       id: 'date',
-      cell: (item) => <span className="text-slate-600">{formatDateString(item.date)}</span>,
+      cell: (item) => <span className="text-slate-600">{formatDate(item.date)}</span>,
     },
     {
       header: 'CUSTOMER',

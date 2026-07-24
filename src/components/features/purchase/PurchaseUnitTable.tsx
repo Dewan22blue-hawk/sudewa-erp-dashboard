@@ -22,7 +22,7 @@ interface Props {
   canDelete: boolean;
 }
 
-export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, canEdit, canDelete }: Props) {
+export default function PurchaseUnitTable({ purchaseId, slug, isPaid, canEdit, canDelete }: Props) {
   const router = useRouter();
   const { data, isLoading, isError } = usePurchaseUnitItems(purchaseId);
   const { data: typeUnits } = useTypeUnits();
@@ -166,7 +166,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleEdit(item.id)} disabled={!canEdit}>
+            <DropdownMenuItem onClick={() => !isPaid && handleEdit(item.id)} disabled={!canEdit || isPaid}>
               <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleDetail(item.id)}>
@@ -174,8 +174,8 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-600 focus:text-red-600 focus:bg-red-50"
-              onClick={() => setUnitToDelete(item.id)}
-              disabled={!canDelete}
+              onClick={() => !isPaid && setUnitToDelete(item.id)}
+              disabled={!canDelete || isPaid}
             >
               <Trash2 className="mr-2 h-4 w-4" /> Hapus
             </DropdownMenuItem>
@@ -243,13 +243,16 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
                 <Button
                   size="sm"
                   variant="destructive"
-                  disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
-                  onClick={() => setBulkDeleteOpen(true)}
+                  disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending && isPaid}
+                  onClick={() => !isPaid && setBulkDeleteOpen(true)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Bulk Delete ({selectedIds.size})
                 </Button>
-                <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Button
+                  onClick={() => !isPaid && router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)}
+                  className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+                  disabled={isPaid}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Unit
                 </Button>

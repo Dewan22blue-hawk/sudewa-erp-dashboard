@@ -9,7 +9,7 @@ import { useRefundList } from '@/hooks/useRefundAdministrasi';
 import { UnitTransactionRefund } from '@/@types/refund.type';
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
 import { Button } from '@/components/ui/button';
-import { Eye, MoreVertical, Pencil, Plus } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Eye, MoreVertical, Pencil, Plus } from 'lucide-react';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { CopyBox } from '@/components/ui/copy-box';
@@ -57,11 +57,6 @@ export default function TransaksiRefundBeliPage() {
 
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
     () => [
-      {
-        header: 'NO',
-        alignment: 'left',
-        cell: (_, index) => (page - 1) * perPage + index + 1,
-      },
       {
         header: 'TANGGAL REFUND',
         accessorKey: 'refund_date',
@@ -136,19 +131,29 @@ export default function TransaksiRefundBeliPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <PageHeader
-          title={`Refund Pembelian`}
-          description={
-            <div className="flex items-center gap-2">
-              Daftar transaksi refund pembelian unit
-              {purchase?.code && (
-                <ReferenceLink title='Kode Transaksi' href={`/dashboard/${slug}/transaksi/pembelian-unit/${purchase?.id}`}>
-                  {purchase?.code}
-                </ReferenceLink>
-              )}
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
+            Pembelian Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Data Refund Pembelian</span>
+        </div>
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Data Refund Pembelian</h1>
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{purchase?.code}</span>
+              </div>
             </div>
-          }
-        />
+          </div>
+        </div>
 
         <BaseTable
           data={refundQuery.data?.data ?? []}

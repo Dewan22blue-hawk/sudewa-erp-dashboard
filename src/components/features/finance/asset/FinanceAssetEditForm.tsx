@@ -186,7 +186,9 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
                                 render={({ field }) => (
                                     <MoneyInput
                                         id="depreciation"
-                                        value={Number(field.value)}
+                                        value={field.value}
+                                        readOnly
+                                        disabled
                                         onChangeValue={field.onChange}
                                         placeholder="Rp 0"
                                         className="bg-white border-gray-200"
@@ -205,7 +207,9 @@ export function FinanceAssetEditForm({ initialData, onSave, onCancel, isSaving =
                                 render={({ field }) => (
                                     <MoneyInput
                                         id="final_value"
-                                        value={Number(field.value)}
+                                        readOnly
+                                        disabled
+                                        value={field.value}
                                         onChangeValue={field.onChange}
                                         placeholder="Rp 0"
                                         className="bg-white border-gray-200"

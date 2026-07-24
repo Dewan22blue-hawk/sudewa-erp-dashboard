@@ -14,7 +14,7 @@ import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ArrowLeft, ChevronRight, CreditCard, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, Loader2, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { TextTruncate } from '@/components/ui/text-truncate';
@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { formatDate } from '@/lib/utils/format';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -117,11 +118,7 @@ export default function PurchaseDetailPage() {
         alignment: 'left',
         cell: (history) =>
           history.payment_at
-            ? new Date(history.payment_at).toLocaleDateString('id-ID', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })
+            ? formatDate(history?.payment_at)
             : '-',
       },
       {
@@ -384,7 +381,7 @@ export default function PurchaseDetailPage() {
         <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
         {/* UNIT TABLE */}
-        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} />
+        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} isPaid={isPaid} />
 
         {/* PAYMENT HISTORY TABLE */}
         <div className="space-y-3">
@@ -410,6 +407,16 @@ export default function PurchaseDetailPage() {
             <DialogDescription className="pt-2">
               Apakah Anda yakin ingin menandai transaksi ini sebagai <strong>Lunas</strong>?
             </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Proses ini akan menambah data baru pada <b>Administrasi Arus Transaksi</b> dan <b>Finance Transaksi Kas Harian</b>, dan data <b>Administrasi</b> yang sudah dibilling tidak bisa dirubah data didalamnya.
+                </span>
+              </div>
+            </div>
           </DialogHeader>
           <DialogFooter className="mt-4 flex justify-end gap-2">
             <Button

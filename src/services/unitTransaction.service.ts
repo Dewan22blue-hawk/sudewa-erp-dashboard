@@ -18,6 +18,7 @@ type UnitTransactionApiModel = {
   transaction_bbn_total?: string | number;
   transaction_other_fee?: string | number;
   expedition_fee_total?: string | number;
+  has_returned_data?: boolean | string;
   person?: {
     id?: number | string;
     name?: string;
@@ -89,6 +90,7 @@ type UnitTransactionItemListApiModel = {
   dpp_tax_rate?: number | string;
   ppn_tax_rate?: number | string;
   created_at?: string;
+  has_returned_data?: boolean | string;
   unit_transaction?: {
     id?: number | string;
     person_id?: number | string;
@@ -202,6 +204,7 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
     : null,
   isPaid: Boolean(item.unit_transaction_billing?.is_paid || item.billing_summary?.is_paid),
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
+  isRefunded: item?.has_returned_data ?? null,
   remainingPayment: toNumber(item.billing_summary?.remaining_payment),
 });
 
@@ -250,6 +253,7 @@ const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): 
         unit_transaction_billing: null,
         isPaid: false,
         paymentAt: null,
+        isRefunded: row?.has_returned_data ?? false,
         remainingPayment: 0,
       });
       return;

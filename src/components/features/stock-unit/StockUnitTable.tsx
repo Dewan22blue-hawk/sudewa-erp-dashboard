@@ -107,7 +107,14 @@ export default function StockUnitTable({
       cell: (item) => <CopyBox text={item.noRangka} />,
     },
     {
-      header: 'Status',
+      header: 'Status Stok',
+      accessorKey: 'status',
+      sortable: true,
+      alignment: 'center',
+      cell: (item) => item?.inStock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
+    },
+    {
+      header: 'Kondisi Stok',
       accessorKey: 'status',
       sortable: true,
       alignment: 'center',
@@ -121,6 +128,8 @@ export default function StockUnitTable({
     lastPage: Math.max(1, Math.ceil(totalData / perPage)),
     total: totalData,
   };
+
+  console.log(data);
 
   return (
     <BaseTable
