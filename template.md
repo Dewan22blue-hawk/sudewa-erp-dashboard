@@ -738,3 +738,90 @@ const handleExport = () => {
 };
 ```
 
+---
+
+## 19. Standarisasi Tabel Multi-Tab dengan BaseTable (Dynamic Columns)
+
+**Aturan**: Ketika sebuah halaman laporan atau modul memiliki beberapa tab yang menampilkan jenis data serupa tetapi dengan beberapa kolom spesifik yang berbeda (misal: Tab BPKB, STNK, TNKB), **JANGAN** membuat elemen `<Table>` (atau `BaseTable`) terpisah secara manual untuk setiap tab, karena hal ini menghasilkan kode markup yang sangat berlebihan (bloat) dan rentan terhadap inkonsistensi layout (khususnya padding, sorting, dan aksi).
+
+Sebagai gantinya, gunakan **Satu instance `BaseTable`** dengan pola **Dynamic Columns** di mana kita memanfaatkan *spread operator* `...` dan `conditional statement` berdasarkan `activeTab` di dalam array konfigurasi kolom.
+
+### Contoh Pola Dynamic Columns:
+
+```tsx
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+
+// State Tab yang Sedang Aktif
+const [activeTab, setActiveTab] = useState<'bpkb' | 'stnk'>('bpkb');
+
+// Konfigurasi Kolom Dinamis (Merespon perubahan activeTab)
+const columns: ColumnDef<any>[] = [
+  {
+    header: 'NO',
+    id: 'no',
+    alignment: 'center',
+    cell: (_, idx) => <span className="font-medium text-slate-500">{idx + 1 + (page - 1) * perPage}</span>,
+  },
+  {
+    header: `NAMA ${activeTab.toUpperCase()}`,
+    accessorKey: 'nama',
+    sortable: true,
+    cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap">{item.nama || '-'}</span>,
+  },
+  // Kolom hanya muncul saat Tab BPKB
+  ...(activeTab === 'bpkb' ? [{
+    header: 'NOMOR BPKB',
+    accessorKey: 'bpkb_number',
+    sortable: true,
+    cell: (item: any) => <span className="font-medium text-gray-900 whitespace-nowrap">{item.bpkb_number || '-'}</span>,
+  }] : []),
+  // Kolom hanya muncul saat Tab STNK
+  ...(activeTab === 'stnk' ? [{
+    header: 'NOMOR STNK',
+    accessorKey: 'stnk_number',
+    sortable: true,
+    cell: (item: any) => <span className="font-medium text-gray-900 whitespace-nowrap">{item.stnk_number || '-'}</span>,
+  }] : []),
+  {
+    header: 'WILAYAH',
+    accessorKey: 'region',
+    sortable: true,
+    cell: (item) => <span className="text-slate-600 whitespace-nowrap">{item.region || '-'}</span>,
+  },
+];
+
+// Implementasi Render
+return (
+  <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val)}>
+    {/* Tab Triggers ... */}
+    
+    <div className="mt-4">
+      <BaseTable
+        data={data}
+        columns={columns}
+        loading={isLoading}
+        meta={{
+          currentPage: page,
+          perPage: perPage,
+          lastPage: pagination.lastPage,
+          total: pagination.total
+        }}
+        onPageChange={setPage}
+        sortBy={sortBy}
+        sortDirection={sortOrder}
+        onSortChange={(key, dir) => {
+          setSortBy(key);
+          setSortOrder(dir);
+          setPage(1); // Reset page saat merubah sort
+        }}
+      />
+    </div>
+  </Tabs>
+);
+```
+
+**Kelebihan pola ini**:
+1. Menghilangkan redundansi >500 baris kode jika dibandingkan dengan menyusun `<Table>` satu persatu.
+2. Semua fitur (No Data *empty state*, UI Loading Spinner berkedip, UI Server Error, Paginasi seragam) otomatis di-handle secara konsisten oleh satu pembungkus `BaseTable`.
+3. Sorting logic terintegrasi dengan mulus pada property `onSortChange`.
+

@@ -1,26 +1,24 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { Search, Printer, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableRow, TableHead } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 import { useCompany } from '@/contexts/CompanyContext';
 import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 import { PrintLetterPage } from '@/components/common/PrintLetterPage';
-import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { formatDate } from '@/lib/utils/format';
-import { cn } from '@/lib/utils';
 
 // Mock Data
 const MOCK_RITASE = [
@@ -32,7 +30,6 @@ const MOCK_RITASE = [
   { id: 6, tanggal: '2026-02-12', noPolisi: 'AB 0000 XX', tipe: 'FUSO', driver: 'Ahmad Syahroni', invEkspedisi: 1500000, biayaTambahan: null, ujDriver: 500000, biayaLainnya: null, invEkspedisiPendapatan: 2000000, tambahan: 0, ppn: 0, labaRugi: 1500000, ritase: 12 },
   { id: 7, tanggal: '2026-02-12', noPolisi: 'AB 0000 XX', tipe: 'FUSO', driver: 'Ahmad Syahroni', invEkspedisi: 1500000, biayaTambahan: null, ujDriver: 500000, biayaLainnya: null, invEkspedisiPendapatan: 2000000, tambahan: 0, ppn: 0, labaRugi: 1500000, ritase: 12 },
   { id: 8, tanggal: '2026-02-12', noPolisi: 'AB 0000 XX', tipe: 'FUSO', driver: 'Ahmad Syahroni', invEkspedisi: 1500000, biayaTambahan: null, ujDriver: 500000, biayaLainnya: null, invEkspedisiPendapatan: 2000000, tambahan: 0, ppn: 0, labaRugi: 1500000, ritase: 12 },
-
 ];
 
 const MOCK_MAINTENANCE = [
@@ -44,10 +41,7 @@ const MOCK_MAINTENANCE = [
   { id: 6, noPolisi: 'AB 1555 BGT', tipe: 'TOWING', driverPic: 'Gogon', sparepart: 'Seatbelt', qty: 1, keterangan: 'Ganti seatbelt', tglPerbaikan: '2026-06-02' },
   { id: 7, noPolisi: 'AB 1555 BGT', tipe: 'TOWING', driverPic: 'Gogon', sparepart: 'Seatbelt', qty: 1, keterangan: 'Ganti seatbelt', tglPerbaikan: '2026-06-02' },
   { id: 8, noPolisi: 'AB 1555 BGT', tipe: 'TOWING', driverPic: 'Gogon', sparepart: 'Seatbelt', qty: 1, keterangan: 'Ganti seatbelt', tglPerbaikan: '2026-06-02' },
-
 ];
-
-
 
 export default function LaporanRitaseArmadaPage() {
   const router = useRouter();
@@ -118,75 +112,240 @@ export default function LaporanRitaseArmadaPage() {
   });
   const paginatedMaintenance = filteredMaintenance.slice(startIndex, startIndex + limit);
 
-  const totalRecords = activeTab === 'ritase' ? filteredRitase.length : filteredMaintenance.length;
-  const lastPage = Math.ceil(totalRecords / limit) || 1;
-  const visiblePages = getVisiblePageNumbers(lastPage, page, 5);
-
   const handleOpenEdit = () => {
     setEditRitaseValue('');
     setIsEditModalOpen(true);
   };
 
+  const ritaseColumns: ColumnDef<any>[] = useMemo(() => [
+    {
+      header: 'TANGGAL',
+      id: 'tanggal',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.tanggal)}</span>,
+    },
+    {
+      header: 'NO POLISI',
+      id: 'noPolisi',
+      alignment: 'center',
+      cell: (item) => <span className="font-mono text-sm text-slate-700 whitespace-nowrap">{item.noPolisi}</span>,
+    },
+    {
+      header: 'TIPE',
+      id: 'tipe',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.tipe}</span>,
+    },
+    {
+      header: 'DRIVER',
+      id: 'driver',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.driver}</span>,
+    },
+    {
+      header: 'INV EKSPEDISI',
+      id: 'invEkspedisi1',
+      alignment: 'center',
+      headerClassName: 'border-r border-slate-200',
+      cell: (item) => <span className="text-slate-800 font-medium whitespace-nowrap text-sm">{formatIDR(item.invEkspedisi)}</span>,
+      className: 'border-r border-slate-100',
+    },
+    {
+      header: 'BIAYA TAMBAHAN',
+      id: 'biayaTambahan',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatIDR(item.biayaTambahan)}</span>,
+    },
+    {
+      header: 'UJ DRIVER',
+      id: 'ujDriver',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatIDR(item.ujDriver)}</span>,
+    },
+    {
+      header: 'BIAYA LAINNYA',
+      id: 'biayaLainnya',
+      alignment: 'center',
+      headerClassName: 'border-r border-slate-200',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatIDR(item.biayaLainnya)}</span>,
+      className: 'border-r border-slate-100',
+    },
+    {
+      header: 'INV EKSPEDISI',
+      id: 'invEkspedisi2',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-800 font-medium whitespace-nowrap text-sm">{formatIDR(item.invEkspedisiPendapatan)}</span>,
+    },
+    {
+      header: 'TAMBAHAN',
+      id: 'tambahan',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatIDR(item.tambahan)}</span>,
+    },
+    {
+      header: 'PPN',
+      id: 'ppn',
+      alignment: 'center',
+      headerClassName: 'border-r border-slate-200',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatIDR(item.ppn)}</span>,
+      className: 'border-r border-slate-100',
+    },
+    {
+      header: 'LABA/RUGI',
+      id: 'labaRugi',
+      alignment: 'center',
+      headerClassName: 'border-r border-slate-200',
+      cell: (item) => <span className="text-slate-800 font-medium whitespace-nowrap text-sm">{formatIDR(item.labaRugi)}</span>,
+      className: 'border-r border-slate-100',
+    },
+    {
+      header: 'RITASE',
+      id: 'ritase',
+      alignment: 'center',
+      headerClassName: 'border-r border-slate-200',
+      cell: (item) => <span className="text-slate-800 font-medium whitespace-nowrap text-sm">{item.ritase}</span>,
+      className: 'border-r border-slate-100',
+    },
+    {
+      header: 'Aksi',
+      id: 'aksi',
+      alignment: 'center',
+      sticky: 'right',
+      cell: () => (
+        <div className="flex justify-center">
+          <Button variant="ghost" size="icon" onClick={handleOpenEdit} className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    }
+  ], []);
+
+  const maintenanceColumns: ColumnDef<any>[] = useMemo(() => [
+    {
+      header: 'NO',
+      id: 'no',
+      alignment: 'center',
+      cell: (_, idx) => <span className="font-medium text-slate-500 text-sm">{idx + 1 + (page - 1) * limit}</span>,
+    },
+    {
+      header: 'NO POLISI',
+      id: 'noPolisi',
+      cell: (item) => <span className="font-mono text-sm text-slate-700 whitespace-nowrap">{item.noPolisi}</span>,
+    },
+    {
+      header: 'TIPE',
+      id: 'tipe',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.tipe}</span>,
+    },
+    {
+      header: 'DRIVER/PIC',
+      id: 'driverPic',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.driverPic}</span>,
+    },
+    {
+      header: 'SPAREPART',
+      id: 'sparepart',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.sparepart}</span>,
+    },
+    {
+      header: 'QTY',
+      id: 'qty',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-800 font-medium whitespace-nowrap text-sm">{item.qty}</span>,
+    },
+    {
+      header: 'KETERANGAN',
+      id: 'keterangan',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{item.keterangan}</span>,
+    },
+    {
+      header: 'TGL PERBAIKAN',
+      id: 'tglPerbaikan',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.tglPerbaikan)}</span>,
+    }
+  ], [page, limit]);
+
+  const ritaseHeaderGroups = (
+    <TableRow className="hover:bg-transparent border-b border-slate-200">
+      <TableHead colSpan={5} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+        LAPORAN TARGET INCOME EKSPEDISI PT WAJIRA JAGRATARA MORINDO
+      </TableHead>
+      <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+        BIAYA DAN PENGELUARAN
+      </TableHead>
+      <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+        PENDAPATAN
+      </TableHead>
+      <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+        KETERANGAN
+      </TableHead>
+      <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+        DATA TARGET
+      </TableHead>
+      <TableHead className="bg-slate-50 sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px] no-print"></TableHead>
+    </TableRow>
+  );
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex justify-between items-center no-print">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Laporan Ritase Armada</h1>
-            <p className="text-sm text-slate-500">Laporan ritase armada yang sudah dilakukan</p>
+        <div className="no-print">
+          <h1 className="text-2xl font-semibold">Laporan Ritase Armada</h1>
+          <p className="text-sm text-muted-foreground">Laporan ritase armada yang sudah dilakukan</p>
+        </div>
+
+        {/* Search + Print row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[300px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search here"
+                className="pl-9 bg-white"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
+              <span>Show</span>
+              <Select value={perPage} onValueChange={setPerPage}>
+                <SelectTrigger className="w-[70px] bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>Page</span>
+            </div>
           </div>
           <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
+            <Printer className="mr-2 h-4 w-4" /> Print
           </Button>
         </div>
 
         <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as 'ritase' | 'maintenance')} className="w-full">
-          {/* Tabs Navigation & Filtering Block */}
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print mb-6">
-            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-md w-fit">
+          {/* Tabs Navigation */}
+          <div className="flex mb-4 no-print">
+            <TabsList className="flex h-auto p-1 bg-gray-50 border border-gray-100 rounded-md">
               <TabsTrigger
                 value="ritase"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
               >
                 Laporan Ritase Armada
               </TabsTrigger>
               <TabsTrigger
                 value="maintenance"
-                className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
+                className="rounded-lg px-6 py-2.5 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
               >
                 Laporan Maintenance Armada
               </TabsTrigger>
             </TabsList>
-
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-2">
-              <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="relative w-full sm:w-[300px]">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search here"
-                    className="pl-9 bg-white rounded-md border-slate-200 shadow-sm"
-                  />
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-                  <span>Show</span>
-                  <Select value={perPage} onValueChange={setPerPage}>
-                    <SelectTrigger className="w-[80px] rounded-md border-slate-200 bg-white shadow-sm cursor-pointer">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem className="cursor-pointer" value="5">5</SelectItem>
-                      <SelectItem className="cursor-pointer" value="25">25</SelectItem>
-                      <SelectItem className="cursor-pointer" value="50">50</SelectItem>
-                      <SelectItem className="cursor-pointer" value="100">100</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span>Page</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           <PrintLetterPage
@@ -209,172 +368,23 @@ export default function LaporanRitaseArmadaPage() {
               </div>
 
               <div className="rounded-md border border-slate-200 bg-white overflow-x-auto shadow-none w-full">
-                <Table>
-                  <TableHeader className="bg-slate-50 border-b border-slate-200">
-                    {activeTab === 'ritase' && (
-                      <>
-                        {/* Group Headers */}
-                        <TableRow className="hover:bg-transparent border-b border-slate-200">
-                          <TableHead colSpan={5} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                            LAPORAN TARGET INCOME EKSPEDISI PT WAJIRA JAGRATARA MORINDO
-                          </TableHead>
-                          <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                            BIAYA DAN PENGELUARAN
-                          </TableHead>
-                          <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                            PENDAPATAN
-                          </TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                            KETERANGAN
-                          </TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                            DATA TARGET
-                          </TableHead>
-                          <TableHead className="bg-slate-50"></TableHead>
-                        </TableRow>
-                        {/* Normal Headers */}
-                        <TableRow className="hover:bg-transparent">
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TANGGAL</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO POLISI</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">DRIVER</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">INV EKSPEDISI</TableHead>
-
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">BIAYA TAMBAHAN</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UJ DRIVER</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">BIAYA LAINNYA</TableHead>
-
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">INV EKSPEDISI</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TAMBAHAN</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">PPN</TableHead>
-
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">LABA/RUGI</TableHead>
-
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">RITASE</TableHead>
-
-                          <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-bold text-slate-700 uppercase sticky right-0 bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">Aksi</TableHead>
-                        </TableRow>
-                      </>
-                    )}
-
-                    {activeTab === 'maintenance' && (
-                      <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO POLISI</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">DRIVER/PIC</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">SPAREPART</TableHead>
-                        <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">QTY</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">KETERANGAN</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TGL PERBAIKAN</TableHead>
-                      </TableRow>
-                    )}
-                  </TableHeader>
-                  <TableBody>
-                    {activeTab === 'ritase' && (
-                      paginatedRitase.length > 0 ? paginatedRitase.map((item, idx) => (
-                        <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatDateString(item.tanggal)}</TableCell>
-                          <TableCell className="text-center font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{item.driver}</TableCell>
-                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{formatIDR(item.invEkspedisi)}</TableCell>
-
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.biayaTambahan)}</TableCell>
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.ujDriver)}</TableCell>
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap border-r border-slate-100">{formatIDR(item.biayaLainnya)}</TableCell>
-
-                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap">{formatIDR(item.invEkspedisiPendapatan)}</TableCell>
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.tambahan)}</TableCell>
-                          <TableCell className="text-center text-slate-600 whitespace-nowrap border-r border-slate-100">{formatIDR(item.ppn)}</TableCell>
-
-                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{formatIDR(item.labaRugi)}</TableCell>
-
-                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{item.ritase}</TableCell>
-
-                          <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-100 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">
-                            <div className="flex justify-center">
-                              <Button variant="ghost" size="icon" onClick={handleOpenEdit} className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )) : (
-                        <TableRow className="group">
-                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                <Search className="h-8 w-8 text-slate-400" />
-                              </div>
-                              <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                              <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )}
-
-                    {activeTab === 'maintenance' && (
-                      paginatedMaintenance.length > 0 ? paginatedMaintenance.map((item, idx) => (
-                        <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
-                          <TableCell className="text-center font-medium text-slate-500 whitespace-nowrap">{item.id}</TableCell>
-                          <TableCell className="font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap">{item.driverPic}</TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap">{item.sparepart}</TableCell>
-                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap">{item.qty}</TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap">{item.keterangan}</TableCell>
-                          <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.tglPerbaikan)}</TableCell>
-                        </TableRow>
-                      )) : (
-                        <TableRow className="group">
-                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                <Search className="h-8 w-8 text-slate-400" />
-                              </div>
-                              <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                              <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )}
-                  </TableBody>
-                </Table>
+                <BaseTable
+                  data={activeTab === 'ritase' ? paginatedRitase : paginatedMaintenance}
+                  columns={activeTab === 'ritase' ? ritaseColumns : maintenanceColumns}
+                  loading={false}
+                  headerGroups={activeTab === 'ritase' ? ritaseHeaderGroups : undefined}
+                  headerRowClassName="bg-slate-50"
+                  meta={{
+                    currentPage: page,
+                    perPage: limit,
+                    lastPage: Math.ceil((activeTab === 'ritase' ? filteredRitase.length : filteredMaintenance.length) / limit) || 1,
+                    total: activeTab === 'ritase' ? filteredRitase.length : filteredMaintenance.length,
+                  }}
+                  onPageChange={setPage}
+                />
               </div>
             </div>
           </PrintLetterPage>
-
-          {/* Pagination */}
-          <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between no-print">
-            <div className="text-sm text-slate-500">
-              Showing {totalRecords === 0 ? 0 : startIndex + 1}-{Math.min(startIndex + limit, totalRecords)} of {totalRecords} data
-            </div>
-            {totalRecords > 0 && (
-              <div className="flex items-center gap-1 text-sm text-slate-700">
-                <Button variant="ghost" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1} className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer">Previous</Button>
-                {visiblePages[0] > 1 && <span className="px-1.5 text-slate-400">...</span>}
-                {visiblePages.map((pageNumber) => (
-                  <Button
-                    key={pageNumber}
-                    variant={pageNumber === page ? 'outline' : 'ghost'}
-                    size="sm"
-                    onClick={() => setPage(pageNumber)}
-                    className={cn(
-                      "h-9 min-w-9 rounded-md border-slate-200 text-[13px] font-semibold cursor-pointer",
-                      pageNumber === page ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-slate-600 hover:bg-slate-100"
-                    )}
-                  >
-                    {pageNumber}
-                  </Button>
-                ))}
-                {visiblePages[visiblePages.length - 1] < lastPage && <span className="px-1.5 text-slate-400">...</span>}
-                <Button variant="ghost" size="sm" onClick={() => setPage(page + 1)} disabled={page >= lastPage} className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer">Next</Button>
-              </div>
-            )}
-          </div>
         </Tabs>
       </div>
 

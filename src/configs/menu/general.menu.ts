@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText, Shield } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText, Shield, Settings } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getGeneralMenus = (slug: string): MenuItem[] => {
@@ -206,8 +206,8 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
       ],
     },
     {
-      label: 'Settings',
-      icon: Shield, // re-using Shield or another icon
+      label: 'Pengaturan',
+      icon: Settings,
       children: [
         {
           label: 'Pajak',

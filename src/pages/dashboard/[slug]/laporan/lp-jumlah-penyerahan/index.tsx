@@ -1,25 +1,23 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
+import { Search, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 import { useJumlahPenyerahanReport } from '@/hooks/report/useJumlahPenyerahanReport';
 import { useCompany } from '@/contexts/CompanyContext';
 import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 import { PrintLetterPage } from '@/components/common/PrintLetterPage';
-import { getVisiblePageNumbers } from '@/lib/api/pagination';
-import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils/format';
 
 export default function LPJumlahPenyerahanPage() {
@@ -69,8 +67,6 @@ export default function LPJumlahPenyerahanPage() {
     sortOrder,
   });
 
-  const visiblePages = getVisiblePageNumbers(pagination.lastPage, page, 5);
-
   const formatVehicleType = (type?: string | null) => {
     if (!type) return '-';
     const t = type.toLowerCase().trim();
@@ -87,76 +83,100 @@ export default function LPJumlahPenyerahanPage() {
     return format(date, 'dd MMMM yyyy', { locale: id });
   };
 
-  // Sorting handler
-  const handleSort = (field: string) => {
-    if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(field);
-      setSortOrder('desc');
-    }
-    setPage(1);
-  };
+  const columns: ColumnDef<any>[] = useMemo(() => [
+    {
+      header: 'NO',
+      id: 'no',
+      alignment: 'center',
+      cell: (_, idx) => <span className="font-medium text-slate-500">{idx + 1 + (page - 1) * perPage}</span>,
+    },
+    {
+      header: activeTab === 'bpkb' ? 'NAMA BPKB' : 'NAMA STNK',
+      accessorKey: 'stnk_name',
+      sortable: true,
+      cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap">{item.stnk_name || item.vehicle_data?.stnk_name || '-'}</span>,
+    },
+    {
+      header: 'WILAYAH',
+      accessorKey: 'region',
+      sortable: true,
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap">{item.region || item.vehicle_data?.region?.name || '-'}</span>,
+    },
+    {
+      header: 'DEALER',
+      accessorKey: 'dealer',
+      sortable: true,
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap">{item.dealer || item.vehicle_data?.dealer?.name || '-'}</span>,
+    },
+    {
+      header: 'VENDOR',
+      accessorKey: 'vendor',
+      sortable: true,
+      cell: (item) => {
+        let vendor = '-';
+        if (item.vendor) {
+          if (typeof item.vendor === 'string') {
+            vendor = item.vendor;
+          } else {
+            vendor = item.vendor.name || '-';
+          }
+        }
+        return <span className="text-slate-600 whitespace-nowrap">{vendor}</span>;
+      },
+    },
+    {
+      header: 'NO POLISI',
+      accessorKey: 'tnkb_number',
+      sortable: true,
+      cell: (item) => <span className="font-medium text-gray-900 whitespace-nowrap">{item.tnkb_number || '-'}</span>,
+    },
+    {
+      header: 'JENIS',
+      id: 'jenis',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap">{formatVehicleType(item.vehicle_type || item.vehicle_data?.motorcycle_type)}</span>,
+    },
+    {
+      header: 'NO RANGKA',
+      id: 'no_rangka',
+      cell: (item) => <span className="text-slate-600 font-mono text-xs whitespace-nowrap">{item.chassis_number || item.vehicle_data?.chassis_number || '-'}</span>,
+    },
+    {
+      header: 'NO MESIN',
+      id: 'no_mesin',
+      cell: (item) => <span className="text-slate-600 font-mono text-xs whitespace-nowrap">{item.machine_number || item.vehicle_data?.machine_number || '-'}</span>,
+    },
+    {
+      header: 'TGL DAFTAR',
+      id: 'tgl_daftar',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap">{formatDateString(item.process_date || item.stnk_registration_date || item.bpkb_registration_date)}</span>,
+    },
+    {
+      header: activeTab === 'stnk' ? 'TGL TERIMA STNK' : 
+              activeTab === 'bpkb' ? 'TGL TERIMA BPKB' : 
+              activeTab === 'skpd' ? 'TGL TERIMA SKPD' : 'TGL TERIMA TNKB',
+      id: 'tgl_terima',
+      alignment: 'center',
+      cell: (item) => {
+        let val = '-';
+        if (activeTab === 'stnk') val = item.stnk_received_date;
+        else if (activeTab === 'bpkb') val = item.bpkb_received_date;
+        else if (activeTab === 'skpd') val = item.skpd_received_date;
+        else if (activeTab === 'tnkb') val = item.tnkb_received_date;
+        return <span className="text-slate-600 whitespace-nowrap">{formatDateString(val)}</span>;
+      },
+    },
+    {
+      header: 'TGL PENYERAHAN',
+      id: 'tgl_penyerahan',
+      alignment: 'center',
+      cell: (item) => <span className="text-slate-600 whitespace-nowrap">{formatDateString(item.customer_delivery_date)}</span>,
+    },
+  ], [activeTab, page, perPage]);
 
   // Print triggering handler
   const handlePrint = () => {
     window.print();
-  };
-
-  const renderPagination = () => {
-    const showLastPage = pagination.lastPage > 5 && !visiblePages.includes(pagination.lastPage);
-
-    return (
-      <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-          disabled={page <= 1 || isLoading}
-          onClick={() => setPage(page - 1)}
-        >
-          Previous
-        </Button>
-        {visiblePages.map((pageNumber) => (
-          <Button
-            key={pageNumber}
-            variant="ghost"
-            size="sm"
-            className={cn(
-              'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
-              pageNumber === page
-                ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-            )}
-            disabled={isLoading}
-            onClick={() => setPage(pageNumber)}
-          >
-            {pageNumber}
-          </Button>
-        ))}
-        {showLastPage && <span className="px-1 text-slate-500">...</span>}
-        {showLastPage && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
-            disabled={isLoading}
-            onClick={() => setPage(pagination.lastPage)}
-          >
-            {pagination.lastPage}
-          </Button>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
-          disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </Button>
-      </div>
-    );
   };
 
   return (
@@ -217,6 +237,7 @@ export default function LPJumlahPenyerahanPage() {
                       <SelectValue placeholder="25" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
                       <SelectItem value="25">25</SelectItem>
                       <SelectItem value="50">50</SelectItem>
                       <SelectItem value="100">100</SelectItem>
@@ -248,158 +269,29 @@ export default function LPJumlahPenyerahanPage() {
                 </div>
 
                 {/* Table Rendering */}
-                <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        <TableRow className="hover:bg-[#f8f9fa]">
-                          <TableHead className="w-12 px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO</TableHead>
-                          <TableHead onClick={() => handleSort('stnk_name')} className="cursor-pointer select-none px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            {activeTab === 'bpkb' ? 'NAMA BPKB' : 'NAMA STNK'} <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                          </TableHead>
-                          <TableHead onClick={() => handleSort('region')} className="cursor-pointer select-none px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            WILAYAH <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                          </TableHead>
-                          <TableHead onClick={() => handleSort('dealer')} className="cursor-pointer select-none px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            DEALER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                          </TableHead>
-                          <TableHead onClick={() => handleSort('vendor')} className="cursor-pointer select-none px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            VENDOR <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                          </TableHead>
-                          <TableHead onClick={() => handleSort('tnkb_number')} className="cursor-pointer select-none px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            NO POLISI <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                          </TableHead>
-                          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            JENIS
-                          </TableHead>
-                          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            NO RANGKA
-                          </TableHead>
-                          <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            NO MESIN
-                          </TableHead>
-                          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            TGL DAFTAR
-                          </TableHead>
-                          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            {activeTab === 'stnk' && 'TGL TERIMA STNK'}
-                            {activeTab === 'bpkb' && 'TGL TERIMA BPKB'}
-                            {activeTab === 'skpd' && 'TGL TERIMA SKPD'}
-                            {activeTab === 'tnkb' && 'TGL TERIMA TNKB'}
-                          </TableHead>
-                          <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">
-                            TGL PENYERAHAN
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {isLoading ? (
-                          <TableRow>
-                            <TableCell colSpan={12} className="h-32 text-center">
-                              <div className="flex items-center justify-center gap-2 text-slate-400">
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                <span className="text-sm font-medium">Memuat data...</span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ) : isError ? (
-                          <TableRow>
-                            <TableCell colSpan={12} className="h-32 text-center text-red-600 font-semibold p-4">
-                              <p className="mb-0.5">Gagal memuat data laporan</p>
-                              <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
-                            </TableCell>
-                          </TableRow>
-                        ) : data.length > 0 ? (
-                          data.map((item, idx) => {
-                            const indexNumber = idx + 1 + (page - 1) * perPage;
-
-                            // Determine STNK Name
-                            const stnkName = item.stnk_name || item.vehicle_data?.stnk_name || '-';
-                            // Determine Region
-                            const region = item.region || item.vehicle_data?.region?.name || '-';
-                            // Determine Dealer
-                            const dealer = item.dealer || item.vehicle_data?.dealer?.name || '-';
-
-                            // Determine Vendor
-                            let vendor = '-';
-                            if (item.vendor) {
-                              if (typeof item.vendor === 'string') {
-                                vendor = item.vendor;
-                              } else {
-                                vendor = item.vendor.name || '-';
-                              }
-                            }
-
-                            // Determine Vehicle Type/Jenis
-                            const vehicleType = item.vehicle_type || item.vehicle_data?.motorcycle_type || '-';
-                            // Determine Chassis Number
-                            const chassisNumber = item.chassis_number || item.vehicle_data?.chassis_number || '-';
-                            // Determine Machine Number
-                            const machineNumber = item.machine_number || item.vehicle_data?.machine_number || '-';
-
-                            // Determine TGL DAFTAR field
-                            const tglDaftar = formatDateString(item.process_date || item.stnk_registration_date || item.bpkb_registration_date);
-
-                            // Determine TGL TERIMA field dynamically
-                            let tglTerimaValue = '-';
-                            if (activeTab === 'stnk') {
-                              tglTerimaValue = formatDateString(item.stnk_received_date);
-                            } else if (activeTab === 'bpkb') {
-                              tglTerimaValue = formatDateString(item.bpkb_received_date);
-                            } else if (activeTab === 'skpd') {
-                              tglTerimaValue = formatDateString(item.skpd_received_date);
-                            } else if (activeTab === 'tnkb') {
-                              tglTerimaValue = formatDateString(item.tnkb_received_date);
-                            }
-
-                            return (
-                              <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                <TableCell className="px-4 py-4 text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
-                                <TableCell className="px-4 py-4 text-left font-semibold text-gray-900 whitespace-nowrap text-sm">{stnkName}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{region}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{dealer}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{vendor}</TableCell>
-                                <TableCell className="px-4 py-4 text-left font-medium text-gray-900 whitespace-nowrap text-sm">{item.tnkb_number || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{formatVehicleType(vehicleType)}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 font-mono text-xs whitespace-nowrap">{chassisNumber}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 font-mono text-xs whitespace-nowrap">{machineNumber}</TableCell>
-
-                                {/* Dates rendering */}
-                                <TableCell className="px-4 py-4 text-center text-slate-600 whitespace-nowrap text-sm">{tglDaftar}</TableCell>
-                                <TableCell className="px-4 py-4 text-center text-slate-600 whitespace-nowrap text-sm">{tglTerimaValue}</TableCell>
-                                <TableCell className="px-4 py-4 text-center text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.customer_delivery_date)}</TableCell>
-                              </TableRow>
-                            );
-                          })
-                        ) : (
-                          <TableRow className="group">
-                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                              <div className="flex flex-col items-center justify-center gap-2">
-                                <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                  <Search className="h-8 w-8 text-slate-400" />
-                                </div>
-                                <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
+                <div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none w-full">
+                  <BaseTable
+                    data={data}
+                    columns={columns}
+                    loading={isLoading}
+                    meta={{
+                      currentPage: page,
+                      perPage: perPage,
+                      lastPage: pagination.lastPage,
+                      total: pagination.total,
+                    }}
+                    onPageChange={setPage}
+                    sortBy={sortBy}
+                    sortDirection={sortOrder}
+                    onSortChange={(key, dir) => {
+                      setSortBy(key);
+                      setSortOrder(dir);
+                      setPage(1);
+                    }}
+                  />
                 </div>
               </div>
             </PrintLetterPage>
-
-            {/* Pagination Footer */}
-            {!isLoading && !isError && pagination.total > 0 && (
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print">
-                <p className="text-sm text-slate-500">
-                  Showing {pagination.from}-{pagination.to} of {pagination.total} data
-                </p>
-                {renderPagination()}
-              </div>
-            )}
           </div>
         </Tabs>
       </div>

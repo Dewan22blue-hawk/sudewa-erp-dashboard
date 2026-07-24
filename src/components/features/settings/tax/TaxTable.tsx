@@ -20,12 +20,11 @@ interface TaxTableProps {
   onEdit: (tax: Tax) => void;
   onDelete: (tax: Tax) => void;
   onViewDetail: (tax: Tax) => void;
-  onViewVersion: (tax: Tax) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
 }
 
-export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onViewDetail, onViewVersion, onPageChange, onPerPageChange }: TaxTableProps) => {
+export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onViewDetail, onPageChange, onPerPageChange }: TaxTableProps) => {
   const columns = useMemo<ColumnDef<Tax>[]>(
     () => [
       {
@@ -76,13 +75,6 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
                 Lihat Detail
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onViewVersion(item)}
-                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Daftar Versi Pajak
-              </DropdownMenuItem>
-              <DropdownMenuItem
                 onClick={() => onEdit(item)}
                 disabled={item.is_lock === 1 || item.is_lock === true}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
@@ -103,7 +95,7 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
         ),
       },
     ],
-    [onEdit, onDelete, onViewDetail, onViewVersion],
+    [onEdit, onDelete, onViewDetail],
   );
 
   return (
