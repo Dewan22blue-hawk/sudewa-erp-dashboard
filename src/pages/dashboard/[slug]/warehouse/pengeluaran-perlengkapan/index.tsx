@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -186,21 +187,17 @@ export default function PengeluaranPerlengkapanIndex() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">
-              Data Pengeluaran Perlengkapan
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Kelola dan lacak semua transaksi pengeluaran perlengkapan kendaraan
-            </p>
-          </div>
-          {canCreate && (
-            <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-              <Plus className="mr-2 h-4 w-4" /> Tambah
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Data Pengeluaran Perlengkapan"
+          subtitle="Kelola dan lacak semua transaksi pengeluaran perlengkapan kendaraan"
+          actions={
+            canCreate && (
+              <Button onClick={() => setFormOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="mr-2 h-4 w-4" /> Tambah
+              </Button>
+            )
+          }
+        />
 
         <div className="space-y-4">
           {/* Filters and Search */}

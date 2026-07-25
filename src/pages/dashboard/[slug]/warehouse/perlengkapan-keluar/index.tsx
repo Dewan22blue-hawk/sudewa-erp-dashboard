@@ -5,6 +5,7 @@ import { useQueries } from '@tanstack/react-query';
 import { MoreVertical, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { MaterialReceiptFormModal } from '@/components/features/material-receipt/MaterialReceiptFormModal';
 import { UploadInvoiceModal } from '@/components/features/material-receipt/UploadInvoiceModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -161,19 +162,18 @@ export default function MaterialReleaseListPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Pengeluaran Perlengkapan</h1>
-            <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock perlengkapan</p>
-          </div>
-
-          {canCreate && (
-            <Button onClick={() => { setEditingTransaction(null); setOpenForm(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Data Pengeluaran Perlengkapan"
+          subtitle="Kelola dan lacak semua data pengeluaran stock perlengkapan"
+          actions={
+            canCreate && (
+              <Button onClick={() => { setEditingTransaction(null); setOpenForm(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah
+              </Button>
+            )
+          }
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

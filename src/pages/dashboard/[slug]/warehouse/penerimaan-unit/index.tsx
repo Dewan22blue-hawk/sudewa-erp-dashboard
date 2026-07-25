@@ -8,7 +8,7 @@ import PenerimaanUnitTable from '@/components/features/penerimaan-unit/Penerimaa
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
@@ -63,7 +63,7 @@ export default function PenerimaanUnitPage() {
       <div className="space-y-6">
         <PageHeader
           title="Penerimaan Unit"
-          description="Kelola dan lacak semua data penerimaan stock unit"
+          subtitle="Kelola dan lacak semua data penerimaan stock unit"
         />
 
         <div className="space-y-4">

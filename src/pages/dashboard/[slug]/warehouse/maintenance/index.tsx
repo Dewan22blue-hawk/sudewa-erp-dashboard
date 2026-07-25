@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { Search } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -136,10 +137,10 @@ export default function MaintenanceListPage() {
       </Head>
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Data Maintenance</h1>
-          <p className="text-sm text-muted-foreground">Kelola dan lacak semua armada yang membutuhkan maintenance</p>
-        </div>
+        <PageHeader
+          title="Data Maintenance"
+          subtitle="Kelola dan lacak semua armada yang membutuhkan maintenance"
+        />
 
         <div className="space-y-4">
           {/* Filters and Search */}

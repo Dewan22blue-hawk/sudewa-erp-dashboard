@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowLeft, FileText, Download } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -62,14 +63,14 @@ export default function PengeluaranPerlengkapanDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 px-1">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`}>
-              <ArrowLeft className="mr-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold text-slate-950">Detail Pengeluaran Perlengkapan</h1>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`) },
+            { label: 'Detail' }
+          ]}
+          title="Detail Pengeluaran Perlengkapan"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`)}
+        />
 
         <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
           <div className="space-y-6">
