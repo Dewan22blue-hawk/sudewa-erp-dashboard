@@ -112,7 +112,7 @@ export default function TransaksiRefundJualPage() {
         ),
       },
     ],
-    [page, perPage, router, slug],
+    [router, slug],
   );
 
   return (

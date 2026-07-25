@@ -242,7 +242,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
         cell: (item) => currenciesFormat('idr', Number(item.price || 0)),
       },
     ],
-    [selectedIds, allSelected, toggleAllItems, toggleItem]
+    [slug, selectedIds, allSelected, toggleAllItems, toggleItem]
   );
 
   return (

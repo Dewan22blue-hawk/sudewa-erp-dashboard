@@ -191,7 +191,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
         </DropdownMenu>
       ),
     },
-  ], [slug, canEdit, canDelete, basePath, salesId, router, getUnitTypeName]);
+  ], [slug, canEdit, canDelete, basePath, salesId, router, getUnitTypeName, isPaid]);
 
   return (
     <div className="space-y-4">

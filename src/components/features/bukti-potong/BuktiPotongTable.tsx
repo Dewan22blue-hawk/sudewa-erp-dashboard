@@ -150,7 +150,7 @@ export default function WithholdingTaxTable({
         ),
       },
     ],
-    [page, perPage, onView, onEdit, onDelete]
+    [onView, onEdit, onDelete]
   );
 
   return (
