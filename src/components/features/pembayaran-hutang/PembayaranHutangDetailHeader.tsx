@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import { Progress } from '@/components/ui/progress';
 import { formatCurrency } from '@/lib/utils/currency';
 import { ArrowLeft, Building2, CalendarDays, CheckCircle2, ListChecks, ReceiptText } from 'lucide-react';
@@ -24,31 +25,27 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-            <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <Link href={resolvedBackHref}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali
-              </Link>
-            </Button>
+      <PageHeader
+        breadcrumbs={[
+            { label: resolvedBackHref.includes('data-hutang') && !resolvedBackHref.includes('pembayaran') ? 'Data Hutang' : 'Data Pembayaran Hutang', onClick: () => router.push(resolvedBackHref) },
+            { label: 'Detail Hutang Pembelian' }
+        ]}
+        title="Detail Hutang Pembelian"
+        subtitle={
+          <>
+            <span>Invoice <span className="font-medium text-gray-900">{data.code}</span> milik <span className="font-medium text-gray-900">{data.person.name}</span></span>
             <Badge variant={summary.is_paid ? 'default' : 'outline'} className={summary.is_paid ? 'bg-emerald-600 text-white' : 'text-gray-600'}>
               {summary.is_paid ? 'Lunas' : 'Belum Lunas'}
             </Badge>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Detail Hutang Pembelian</h1>
-            <p className="text-sm text-gray-500">
-              Invoice <span className="font-medium text-gray-900">{data.code}</span> milik <span className="font-medium text-gray-900">{data.person.name}</span>
-            </p>
-          </div>
-        </div>
-
-        <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-          Tambah Pembayaran
-        </Button>
-      </div>
+          </>
+        }
+        onBack={() => router.push(resolvedBackHref)}
+        actions={
+          <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+            Tambah Pembayaran
+          </Button>
+        }
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border bg-white p-5 shadow-sm">

@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import FinanceBillingTable from '@/components/features/kas-harian/FinanceBillingTable';
 import TransactionCategoryModal from '@/components/features/kas-harian/TransactionCategoryModal';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -146,14 +147,7 @@ export default function KasHarianDetailPage() {
         <title>Detail & Pembayaran Kas Harian - Wajira Dashboard</title>
       </Head>
 
-      {/* BREADCRUMB HEADER */}
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/finance/transaksi-kas-harian`)}>
-          Transaksi Kas Harian
-        </span>
-        <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-        <span className="font-medium text-slate-800">Detail Transaksi</span>
-      </div>
+
 
       {isLoading ? (
         <div className="flex min-h-[50vh] items-center justify-center rounded-md border border-slate-200 bg-white">
@@ -169,31 +163,27 @@ export default function KasHarianDetailPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* HEADER */}
-          <div className="flex items-center justify-between gap-4 w-full">
-            <div className="flex items-center gap-4">
-              <Button onClick={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                <ArrowLeft className="h-5 w-5 text-slate-700" />
-              </Button>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-semibold">
-                    {hasBillings ? (remainingPayment > 0 ? 'Pembayaran Kas Harian' : 'Detail Pembayaran') : 'Detail Transaksi'}
-                  </h1>
-                  <span className={cn(
+          <PageHeader
+            breadcrumbs={[
+              { label: 'Transaksi Kas Harian', onClick: () => router.push(`/dashboard/${slug}/finance/transaksi-kas-harian`) },
+              { label: 'Detail Transaksi' }
+            ]}
+            title={hasBillings ? (remainingPayment > 0 ? 'Pembayaran Kas Harian' : 'Detail Pembayaran') : 'Detail Transaksi'}
+            subtitle={
+              <>
+                <span>{hasBillings ? 'Detail transaksi kas dan pembayaran tagihan' : 'Detail transaksi kas harian'}</span>
+                <span className={cn(
                     "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
                     cashFlowDetail.is_paid
                       ? "bg-green-50 text-green-700 border border-green-200"
                       : "bg-amber-50 text-amber-700 border border-amber-200"
-                  )}>
-                    {cashFlowDetail.is_paid ? 'Lunas' : 'Belum Lunas'}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">{hasBillings ? 'Detail transaksi kas dan pembayaran tagihan' : 'Detail transaksi kas harian'}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
+                )}>
+                  {cashFlowDetail.is_paid ? 'Lunas' : 'Belum Lunas'}
+                </span>
+              </>
+            }
+            onBack={() => router.push(typeof slug === 'string' ? `/dashboard/${slug}/finance/transaksi-kas-harian` : '/dashboard')}
+            actions={
               <Button
                 type="button"
                 variant="outline"
@@ -206,8 +196,8 @@ export default function KasHarianDetailPage() {
               >
                 {cashFlowDetail.is_paid ? 'Tandai Belum Lunas' : 'Tandai Lunas'}
               </Button>
-            </div>
-          </div>
+            }
+          />
 
           {/* 1. GENERAL INFO CARD */}
           <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-6">

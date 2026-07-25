@@ -1,5 +1,6 @@
 import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { FinanceAssetCreateForm } from '@/components/features/finance/asset/FinanceAssetCreateForm';
 import { useCreateFinanceAsset } from '@/hooks/useFinanceAsset';
 import { useRouter } from 'next/router';
@@ -33,10 +34,15 @@ export default function FinanceAssetCreatePage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-slate-950">Tambah Aset Finance</h1>
-                    <p className="text-sm text-slate-500">Masukkan detail aset finance baru</p>
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Aset', onClick: handleCancel },
+                        { label: 'Tambah Aset' }
+                    ]}
+                    title="Tambah Aset Finance"
+                    subtitle="Masukkan detail aset finance baru"
+                    onBack={handleCancel}
+                />
 
                 <div className="max-w-4xl">
                     <FinanceAssetCreateForm

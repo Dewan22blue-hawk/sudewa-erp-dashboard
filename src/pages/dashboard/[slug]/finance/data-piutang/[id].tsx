@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import PembayaranHutangPaymentDialog from '@/components/features/pembayaran-hutang/PembayaranHutangPaymentDialog';
 import { usePenerimaanPiutangDetail } from '@/hooks/usePenerimaanPiutangDetail';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -122,26 +123,25 @@ export default function PiutangDetailPage() {
             ) : (
                 <div className="space-y-6">
                     <div className="space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
-                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                            <div className="space-y-2">
-                                <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                                    <Link href={slug ? `/dashboard/${slug}/finance/data-piutang` : '/dashboard'}>
-                                        <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Kembali
-                                    </Link>
+                        <PageHeader
+                            breadcrumbs={[
+                                { label: 'Data Piutang', onClick: () => router.push(slug ? `/dashboard/${slug}/finance/data-piutang` : '/dashboard') },
+                                { label: 'Detail' }
+                            ]}
+                            title="Data Piutang"
+                            subtitle={
+                                <>
+                                    <span>No Penjualan:</span>
+                                    <span className="font-medium text-sky-600">{detail.code}</span>
+                                </>
+                            }
+                            onBack={() => router.push(slug ? `/dashboard/${slug}/finance/data-piutang` : '/dashboard')}
+                            actions={
+                                <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                                    Tambah Penerimaan
                                 </Button>
-                                <div>
-                                    <h1 className="text-2xl font-semibold text-gray-900">Data Piutang</h1>
-                                    <p className="text-sm text-gray-500">
-                                        No Penjualan <span className="font-medium text-sky-600">{detail.code}</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                                Tambah Penerimaan
-                            </Button>
-                        </div>
+                            }
+                        />
 
                         <div className="grid gap-4 lg:grid-cols-2">
                             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">

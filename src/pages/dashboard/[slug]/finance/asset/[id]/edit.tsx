@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { ChevronLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { FinanceAssetEditForm } from '@/components/features/finance/asset/FinanceAssetEditForm';
 import { useFinanceAssetDetail, useUpdateFinanceAsset } from '@/hooks/useFinanceAsset';
 import { toast } from 'sonner';
@@ -50,19 +51,15 @@ export default function FinanceAssetEditPage() {
     return (
         <DashboardLayout>
             <div className="space-y-8">
-                {/* Header */}
-                <div className="flex items-start gap-4">
-                    <button
-                        onClick={handleCancel}
-                        className="mt-1 p-1 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
-                    >
-                        <ChevronLeft className="h-6 w-6 text-gray-900" />
-                    </button>
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-bold text-gray-900">Edit Aset</h1>
-                        <p className="text-sm text-gray-500">Edit data aset inventaris</p>
-                    </div>
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Aset', onClick: handleCancel },
+                        { label: 'Edit Aset' }
+                    ]}
+                    title="Edit Aset"
+                    subtitle="Edit data aset inventaris"
+                    onBack={handleCancel}
+                />
 
                 {isLoading || !asset ? (
                     <div className="space-y-6">

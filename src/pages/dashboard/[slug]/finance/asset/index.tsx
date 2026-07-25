@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { FinanceAssetTable } from '@/components/features/finance/asset/FinanceAssetTable';
 import { useFinanceAssets, useDeleteFinanceAsset, useExportFinanceAsset } from '@/hooks/useFinanceAsset';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -91,10 +92,10 @@ export default function FinanceAssetPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-slate-950">Aset</h1>
-                    <p className="text-sm text-slate-500">Kelola seluruh aset dengan mudah</p>
-                </div>
+                <PageHeader
+                    title="Aset"
+                    subtitle="Kelola seluruh aset dengan mudah"
+                />
 
                 <FinanceAssetTable
                     assets={filteredAssets}

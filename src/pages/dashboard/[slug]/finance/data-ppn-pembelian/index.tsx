@@ -6,6 +6,7 @@ import type { PPNPembelian } from '@/@types/ppn-pembelian.types';
 import PPNPembelianFormDialog from '@/components/features/ppn-pembelian/PPNPembelianFormDialog';
 import PPNPembelianTable from '@/components/features/ppn-pembelian/PPNPembelianTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -89,12 +90,10 @@ export default function DataPPNPembelianPage() {
       </Head>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Data PPN Pembelian</h1>
-            <p className="text-sm text-slate-500">Kelola dan lacak semua data PPN pembelian unit langsung dari report backend.</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data PPN Pembelian"
+          subtitle="Kelola dan lacak semua data PPN pembelian unit langsung dari report backend."
+        />
 
         <div className="space-y-4">
           <div className="flex items-center gap-2 flex-wrap no-print">
