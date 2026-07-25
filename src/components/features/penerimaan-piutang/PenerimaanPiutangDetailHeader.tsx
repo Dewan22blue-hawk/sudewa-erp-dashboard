@@ -1,6 +1,7 @@
 import { PenerimaanPiutangDetail } from "@/@types/penerimaan-piutang.types"
-import { CalendarDays, FileText, ListChecks, User, ChevronLeft } from "lucide-react"
+import { CalendarDays, FileText, ListChecks, User } from "lucide-react"
 import { useRouter } from "next/router"
+import { PageHeader } from '@/components/ui/page-header'
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils/currency"
 
@@ -14,28 +15,20 @@ export default function PenerimaanPiutangDetailHeader({ data }: Props) {
 
     return (
         <div className="space-y-6 mb-6">
-            {/* Header Title with Back Button */}
-            <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => router.back()}
-                        className="h-10 w-10"
-                    >
-                        <ChevronLeft size={24} className="text-gray-600" />
-                    </Button>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            Data Penerimaan Piutang
-                        </h1>
-                        <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                            <span>No Pembelian</span>
-                            <span className="text-blue-600 font-medium">{data.code}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <PageHeader
+                breadcrumbs={[
+                    { label: 'Data Penerimaan Piutang', onClick: () => router.back() },
+                    { label: 'Detail' }
+                ]}
+                title="Data Penerimaan Piutang"
+                subtitle={
+                    <>
+                        <span>No Transaksi:</span>
+                        <span className="text-blue-600 font-medium">{data.code}</span>
+                    </>
+                }
+                onBack={() => router.back()}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Informasi Pembayaran Hutang Card */}

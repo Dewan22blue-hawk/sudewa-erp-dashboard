@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import type { KasHarian, KasHarianListItem } from '@/@types/kas-harian.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -171,12 +172,10 @@ export default function KasHarianPage() {
       </Head>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Arus Transaksi Kas Harian</h1>
-            <p className="text-sm text-muted-foreground">Kelola arus transaksi kas harian</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Arus Transaksi Kas Harian"
+          subtitle="Kelola arus transaksi kas harian"
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">

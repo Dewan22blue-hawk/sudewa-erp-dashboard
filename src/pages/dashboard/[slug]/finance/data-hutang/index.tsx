@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import DataHutangTable from '@/components/features/data-hutang/DataHutangTable';
 import { useDataHutang } from '@/hooks/useDataHutang';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
@@ -35,19 +36,18 @@ export default function DataHutangPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex items-center justify-between gap-4 no-print">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-950">Data Hutang</h1>
-                        <p className="text-sm text-slate-500">Kelola data hutang</p>
-                    </div>
-
-                    {query.isFetching ? (
-                        <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Memuat data...
-                        </span>
-                    ) : null}
-                </div>
+                <PageHeader
+                    title="Data Hutang"
+                    subtitle="Kelola data hutang"
+                    actions={
+                        query.isFetching ? (
+                            <span className="inline-flex items-center gap-2 text-sm text-slate-500">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Memuat data...
+                            </span>
+                        ) : null
+                    }
+                />
 
                 <DataHutangTable
                     data={query.data?.data ?? []}

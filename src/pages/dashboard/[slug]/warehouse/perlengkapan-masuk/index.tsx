@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -173,19 +174,18 @@ export default function PerlengkapanMasukListPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Penerimaan Perlengkapan Kendaraan</h1>
-            <p className="text-sm text-muted-foreground">Kelola dan lacak semua transaksi perlengkapan masuk</p>
-          </div>
-
-          {canCreate && (
-            <Button onClick={() => setOpenForm(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Penerimaan Perlengkapan Kendaraan"
+          subtitle="Kelola dan lacak semua transaksi perlengkapan masuk"
+          actions={
+            canCreate && (
+              <Button onClick={() => setOpenForm(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah
+              </Button>
+            )
+          }
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

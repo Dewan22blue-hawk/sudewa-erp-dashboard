@@ -9,7 +9,7 @@ import PengeluaranUnitCreateTable from '@/components/features/pengeluaran-unit/P
 import { Button } from '@/components/ui/button';
 import { useDispatchPengeluaranStock, useDispatchUnitRows, usePengeluaranUnitById } from '@/hooks/usePengeluaranUnit';
 import { toast } from 'sonner';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 import { ReferenceLink } from '@/components/ui/reference-link';
 
 const getErrorMessageText = (error: unknown, fallback: string): string => {
@@ -88,21 +88,24 @@ export default function DetailPengeluaranUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <PageHeader
-            title="Pengeluaran Unit"
-            description={
-              <div className="flex items-center gap-2">
-                Kelola detail pengeluaran stock unit
-                {detailQuery?.data?.activityNumber && (
-                  <ReferenceLink title='Kode Transaksi' href={`/dashboard/${slug}/warehouse/pengeluaran-unit/${id}`}>
-                    {detailQuery?.data?.activityNumber}
-                  </ReferenceLink>
-                )}
-              </div>
-            }
-          />
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Unit', onClick: () => router.push(`/dashboard/${slug}/warehouse/pengeluaran-unit`) },
+            { label: 'Detail' }
+          ]}
+          title="Pengeluaran Unit"
+          subtitle={
+            <div className="flex items-center gap-2">
+              Kelola detail pengeluaran stock unit
+              {detailQuery?.data?.activityNumber && (
+                <ReferenceLink title='Kode Transaksi' href={`/dashboard/${slug}/warehouse/pengeluaran-unit/${id}`}>
+                  {detailQuery?.data?.activityNumber}
+                </ReferenceLink>
+              )}
+            </div>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/pengeluaran-unit`)}
+        />
 
         {detailQuery.isLoading ? (
           <div className="p-8 text-center text-gray-500 bg-white rounded-md border border-gray-100">Loading...</div>

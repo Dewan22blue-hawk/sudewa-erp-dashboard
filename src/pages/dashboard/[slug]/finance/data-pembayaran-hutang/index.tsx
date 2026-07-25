@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import PembayaranHutangTable from '@/components/features/pembayaran-hutang/PembayaranHutangTable';
 import { useDeletePembayaranHutang, usePembayaranHutang } from '@/hooks/usePembayaranHutang';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
@@ -53,19 +54,18 @@ export default function DataPembayaranHutangPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between gap-4 no-print">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Data Pembayaran Hutang</h1>
-            <p className="text-sm text-slate-500">Kelola data pembayaran hutang</p>
-          </div>
-
-          {query.isFetching ? (
-            <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-              Memuat data...
-            </span>
-          ) : null}
-        </div>
+        <PageHeader
+          title="Data Pembayaran Hutang"
+          subtitle="Kelola data pembayaran hutang"
+          actions={
+            query.isFetching ? (
+              <span className="inline-flex items-center gap-2 text-sm text-slate-500">
+                <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                Memuat data...
+              </span>
+            ) : null
+          }
+        />
 
         <PembayaranHutangTable
           data={query.data?.data ?? []}

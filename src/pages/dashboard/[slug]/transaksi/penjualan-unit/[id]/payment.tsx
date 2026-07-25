@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SalesPaymentForm, PaymentFormData } from '@/components/features/sales/SalesPaymentForm';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
@@ -341,33 +342,21 @@ export default function PaymentPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Detail Pembelian</span>
-
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Billing Penjualan Unit</span>
-        </div>
-
-        {/* HEADLINE & ACTIONS */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <ArrowLeft className="h-5 w-5 text-slate-700" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Billing Penjualan Unit</h1>
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span>Kode Beli:</span>
-                <span className="text-blue-600 font-semibold">{salesData.kodeJual}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Detail Penjualan', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`) },
+            { label: 'Billing Penjualan Unit' }
+          ]}
+          title="Billing Penjualan Unit"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="text-blue-600 font-semibold">{salesData.kodeJual}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}
+        />
 
         <Card className="rounded-md">
           <CardContent className="p-6">

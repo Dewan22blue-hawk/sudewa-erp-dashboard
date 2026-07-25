@@ -6,6 +6,7 @@ import Head from 'next/head';
 import { Search, Printer } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -249,14 +250,16 @@ export default function LPJumlahOutstandingPage() {
       </Head>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Jumlah Outstanding</h1>
-            <p className="text-sm text-muted-foreground">Laporan jumlah data outstanding dokumen kendaraan</p>
-          </div>
-          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="mr-2 h-4 w-4" /> Print
-          </Button>
+        <div className="no-print">
+          <PageHeader
+            title="Laporan Jumlah Outstanding"
+            subtitle="Laporan jumlah data outstanding dokumen kendaraan"
+            actions={
+              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+                <Printer className="mr-2 h-4 w-4" /> Print
+              </Button>
+            }
+          />
         </div>
 
         {/* Tabs Wrapper */}

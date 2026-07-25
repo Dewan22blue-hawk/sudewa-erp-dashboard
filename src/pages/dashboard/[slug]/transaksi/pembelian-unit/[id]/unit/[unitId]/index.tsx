@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ArrowLeft, ChevronRight, DollarSignIcon, FileText, Info, ListTodoIcon, Loader2, MoreVertical, Plus, Upload } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useCreateUnitItemDetail, useDeleteUnitItemDetail, useImportUnitItemDetails, useUnitItemDetails, useUnitTransactionItemById, useUpdateUnitItemDetail } from '@/hooks/useUnitItemDetail';
@@ -249,33 +250,21 @@ export default function UnitPurchaseDetailPage() {
     <DashboardLayout>
       <div className="space-y-6 pb-10">
         <div className="space-y-6">
-          {/* BREADCRUMB HEADER */}
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}>
-              Pembelian Unit
-            </span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-            <span className="font-medium text-slate-800">Detail Pembelian</span>
-
-            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-            <span className="font-medium text-slate-800">Detail Pembelian Unit</span>
-          </div>
-
-          {/* HEADLINE & ACTIONS */}
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                <ArrowLeft className="h-5 w-5 text-slate-700" />
-              </Button>
-              <div className="space-y-1">
-                <h1 className="text-2xl font-semibold text-slate-900">Detail Data Pembelian</h1>
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span>Kode Beli:</span>
-                  <span className="text-blue-600 font-semibold">{purchase.code}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <PageHeader
+            breadcrumbs={[
+              { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+              { label: 'Detail Pembelian', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`) },
+              { label: 'Detail Pembelian Unit' }
+            ]}
+            title="Detail Data Pembelian"
+            subtitle={
+              <>
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{purchase.code}</span>
+              </>
+            }
+            onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}
+          />
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Card className="border-slate-200">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { useUsers } from '@/hooks/useUser';
 import { UserTable } from '@/components/features/user/UserTable';
@@ -47,12 +48,10 @@ export default function UserPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Pengguna</h1>
-              <p className="text-sm text-muted-foreground">Kelola data Pengguna</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Pengguna"
+            subtitle="Kelola data Pengguna"
+          />
           <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
             <div className="text-muted-foreground animate-pulse">Loading...</div>
           </Card>
@@ -65,12 +64,10 @@ export default function UserPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Pengguna</h1>
-              <p className="text-sm text-muted-foreground">Kelola data Pengguna</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Pengguna"
+            subtitle="Kelola data Pengguna"
+          />
           <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
             <div className="text-destructive font-medium">Terjadi kesalahan saat mengambil data</div>
           </Card>
@@ -83,12 +80,10 @@ export default function UserPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Pengguna</h1>
-            <p className="text-sm text-muted-foreground">Kelola data Penngguna</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Pengguna"
+          subtitle="Kelola data Pengguna"
+        />
 
         {/* TABLE CARD */}
         <div className="">

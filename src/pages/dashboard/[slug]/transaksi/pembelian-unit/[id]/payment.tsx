@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from "next/router"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, ChevronRight, Loader2 } from "lucide-react"
 import { PaymentFormData, PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
@@ -258,33 +259,21 @@ export default function PurchasePaymentPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                {/* BREADCRUMB HEADER */}
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}>
-                        Pembelian Unit
-                    </span>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-                    <span className="font-medium text-slate-800">Detail Pembelian</span>
-
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-                    <span className="font-medium text-slate-800">Billing Pembelian Unit</span>
-                </div>
-
-                {/* HEADLINE & ACTIONS */}
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div className="flex items-center gap-4">
-                        <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                            <ArrowLeft className="h-5 w-5 text-slate-700" />
-                        </Button>
-                        <div className="space-y-1">
-                            <h1 className="text-2xl font-semibold text-slate-900">Billing Pembelian Unit</h1>
-                            <div className="text-sm text-muted-foreground flex items-center gap-2">
-                                <span>Kode Beli:</span>
-                                <span className="text-blue-600 font-semibold">{purchase.code}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+                        { label: 'Detail Pembelian', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`) },
+                        { label: 'Billing Pembelian Unit' }
+                    ]}
+                    title="Billing Pembelian Unit"
+                    subtitle={
+                        <>
+                            <span>Kode Beli:</span>
+                            <span className="text-blue-600 font-semibold">{purchase.code}</span>
+                        </>
+                    }
+                    onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}
+                />
 
                 <Card className="rounded-md">
                     <CardContent className="p-6">

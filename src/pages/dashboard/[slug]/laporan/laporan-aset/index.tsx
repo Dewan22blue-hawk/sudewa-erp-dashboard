@@ -6,6 +6,7 @@ import { Printer, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -171,14 +172,16 @@ export default function LaporanAssetPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex justify-between items-center no-print">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Laporan Aset</h1>
-            <p className="text-sm text-slate-500">Laporan data aset perusahaan</p>
-          </div>
-          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="h-4.5 w-4.5 text-slate-700 hover:text-slate-900 transition-colors" /> Print
-          </Button>
+        <div className="no-print">
+          <PageHeader
+            title="Laporan Aset"
+            subtitle="Laporan data aset perusahaan"
+            actions={
+              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+                <Printer className="h-4.5 w-4.5 text-slate-700 hover:text-slate-900 transition-colors mr-2" /> Print
+              </Button>
+            }
+          />
         </div>
 
         {/* Filtering Block (Search and Show Page dropdown) */}

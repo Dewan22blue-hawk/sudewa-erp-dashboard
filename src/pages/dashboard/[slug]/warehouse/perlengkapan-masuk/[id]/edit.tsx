@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Pencil, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -189,14 +190,14 @@ export default function PerlengkapanMasukEditPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 px-1">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/perlengkapan-masuk`}>
-              <ArrowLeft className="mr-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold text-slate-950">Data Penerimaan Perlengkapan</h1>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penerimaan Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/perlengkapan-masuk`) },
+            { label: 'Edit' }
+          ]}
+          title="Data Penerimaan Perlengkapan"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/perlengkapan-masuk`)}
+        />
 
         {/* Transaction Header Info Card */}
         <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">

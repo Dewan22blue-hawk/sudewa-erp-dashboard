@@ -9,7 +9,7 @@ import PenerimaanUnitHeaderCard from '@/components/features/penerimaan-unit/Pene
 import PenerimaanUnitDetailTable from '@/components/features/penerimaan-unit/PenerimaanUnitDetailTable';
 import { useReceiptStock, useUpdateWarehouseActivity, useWarehouseActivityDetail } from '@/hooks/useWarehouseActivity';
 import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 import { Badge } from '@/components/ui/badge';
 import { ReferenceLink } from '@/components/ui/reference-link';
 
@@ -121,8 +121,12 @@ export default function EditPenerimaanUnitPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <PageHeader
-          title={`Penerimaan Unit`}
-          description={
+          breadcrumbs={[
+            { label: 'Penerimaan Unit', onClick: () => router.push(`/dashboard/${slug}/warehouse/penerimaan-unit`) },
+            { label: 'Edit' }
+          ]}
+          title="Penerimaan Unit"
+          subtitle={
             <div className="flex items-center gap-2">
               Kelola detail penerimaan stock unit
               {header?.noPenerimaan && (
@@ -132,6 +136,7 @@ export default function EditPenerimaanUnitPage() {
               )}
             </div>
           }
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/penerimaan-unit`)}
         />
 
         <div className="bg-white rounded-md border sm:p-5 space-y-4">

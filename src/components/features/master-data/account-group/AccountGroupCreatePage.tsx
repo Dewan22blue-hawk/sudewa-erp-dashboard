@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { Card } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AccountGroupForm } from './AccountGroupForm';
 import { accountGroupSchema, type AccountGroupFormValues } from '@/scheme/account-group.schema';
 import { useCreateAccountGroup } from '@/hooks/useAccountGroup';
@@ -12,6 +13,8 @@ import { useCompany } from '@/contexts/CompanyContext';
 
 export const AccountGroupCreatePage = () => {
   const router = useRouter();
+  const slug = router.query.slug as string;
+  const backPath = slug ? `/dashboard/${slug}/master/account-group` : '/master-data/account-group';
   const form = useForm<AccountGroupFormValues>({
     resolver: zodResolver(accountGroupSchema),
     defaultValues: {
@@ -25,8 +28,6 @@ export const AccountGroupCreatePage = () => {
   const createMutation = useCreateAccountGroup();
 
   const handleSubmit = async (values: AccountGroupFormValues) => {
-    const slug = router.query.slug as string;
-    const backPath = slug ? `/dashboard/${slug}/master/account-group` : '/master-data/account-group';
 
     try {
       await createMutation.mutateAsync({
@@ -48,20 +49,21 @@ export const AccountGroupCreatePage = () => {
   };
 
   const onCancel = () => {
-    const slug = router.query.slug as string;
-    const backPath = slug ? `/dashboard/${slug}/master/account-group` : '/master-data/account-group';
     router.push(backPath);
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Tambah Grup Akun</h1>
-            <p className="text-sm text-muted-foreground">Buat grup akun baru untuk mengelompokkan akun</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Tambah Grup Akun"
+          subtitle="Buat grup akun baru untuk mengelompokkan akun"
+          breadcrumbs={[
+            { label: 'Grup Akun', onClick: onCancel },
+            { label: 'Tambah Grup Akun' }
+          ]}
+          onBack={onCancel}
+        />
 
         <Card>
           <AccountGroupForm form={form} onSubmit={handleSubmit} onCancel={onCancel} isSubmitting={createMutation.isPending} />

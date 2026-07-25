@@ -9,6 +9,7 @@ import { ChevronLeft, Save } from 'lucide-react';
 import PengeluaranUnitHeaderCard from '@/components/features/pengeluaran-unit/PengeluaranUnitHeaderCard';
 import PengeluaranUnitCreateTable from '@/components/features/pengeluaran-unit/PengeluaranUnitCreateTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import {
   useDispatchPengeluaranStock,
@@ -141,14 +142,14 @@ export default function EditPengeluaranUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 hover:bg-transparent" onClick={() => router.back()}>
-              <ChevronLeft className="h-6 w-6 text-gray-700" />
-            </Button>
-            <h1 className="text-xl font-bold text-gray-900">Edit Data Pengeluaran Unit</h1>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Unit', onClick: () => router.back() },
+            { label: 'Edit Data' }
+          ]}
+          title="Edit Data Pengeluaran Unit"
+          onBack={() => router.back()}
+        />
 
         {detailQuery.isLoading ? (
           <div className="p-8 text-center text-gray-500 bg-white rounded-md border border-gray-100">Loading...</div>

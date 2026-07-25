@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Input } from '@/components/ui/input';
@@ -197,8 +198,10 @@ export default function LaporanStockPerlengkapanPage() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className="no-print">
-          <h1 className="text-2xl font-semibold">Laporan Stock Perlengkapan</h1>
-          <p className="text-sm text-muted-foreground">Laporan stock perlengkapan, penerimaan barang, dan pengeluaran barang</p>
+          <PageHeader
+            title="Laporan Stock Perlengkapan"
+            subtitle="Laporan stock perlengkapan, penerimaan barang, dan pengeluaran barang"
+          />
         </div>
 
         {/* Search + Print row */}

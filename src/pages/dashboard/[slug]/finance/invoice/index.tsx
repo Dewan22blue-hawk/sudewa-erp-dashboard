@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { Search } from 'lucide-react';
 import type { DoInvoice } from '@/@types/create-invoice.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -78,10 +79,10 @@ export default function FinanceInvoicePage() {
       </Head>
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Invoice Terbuat</h1>
-          <p className="text-sm text-muted-foreground">Kelola invoice ekspedisi dengan mudah</p>
-        </div>
+        <PageHeader
+          title="Invoice Terbuat"
+          subtitle="Kelola invoice ekspedisi dengan mudah"
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

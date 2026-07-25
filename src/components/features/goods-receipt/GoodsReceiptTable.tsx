@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { MoreVertical, Plus, Search, Loader2 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -54,10 +55,10 @@ export function GoodsReceiptTable({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Data Penerimaan Material</h1>
-        <p className="text-sm text-muted-foreground">Kelola dan lacak semua data penerimaan stock material</p>
-      </div>
+      <PageHeader
+        title="Data Penerimaan Material"
+        subtitle="Kelola dan lacak semua data penerimaan stock material"
+      />
 
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

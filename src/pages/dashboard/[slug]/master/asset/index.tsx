@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AssetTable } from '@/components/features/master/asset/AssetTable';
 import { AssetFormModal, AssetFormData } from '@/components/features/master/asset/AssetFormModal';
 import { EditAssetModal } from '@/components/features/master/asset/EditAssetModal';
@@ -113,12 +114,10 @@ export default function AssetPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Aset</h1>
-            <p className="text-sm text-muted-foreground">Kelola data aset perusahaan dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data Aset"
+          subtitle="Kelola data aset perusahaan dengan mudah"
+        />
 
         {/* Content */}
         <AssetTable

@@ -7,6 +7,7 @@ import { TaxVersionTable } from '@/components/features/settings/tax-version/TaxV
 import { TaxVersionForm, TaxVersionFormValues } from '@/components/features/settings/tax-version/TaxVersionForm';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import Head from 'next/head';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Lock } from 'lucide-react';
@@ -120,22 +121,15 @@ export default function TaxDetailPage() {
       </Head>
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.push(`/dashboard/${slug}/settings/tax`)}
-                className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-              >
-                <ArrowLeft className="h-5 w-5 text-slate-700" />
-              </Button>
-              <div>
-                <h1 className="text-2xl font-semibold">Detail Pajak</h1>
-                <p className="text-sm text-muted-foreground">Lihat detail informasi pajak dan riwayat versinya</p>
-              </div>
-            </div>
-          </div>
+          <PageHeader
+            breadcrumbs={[
+              { label: 'Data Pajak', onClick: () => router.push(`/dashboard/${slug}/settings/tax`) },
+              { label: 'Detail' }
+            ]}
+            title="Detail Pajak"
+            subtitle="Lihat detail informasi pajak dan riwayat versinya"
+            onBack={() => router.push(`/dashboard/${slug}/settings/tax`)}
+          />
 
           <Card className="border-0 shadow-sm rounded-xl">
             <CardHeader className="border-b px-6 py-4">

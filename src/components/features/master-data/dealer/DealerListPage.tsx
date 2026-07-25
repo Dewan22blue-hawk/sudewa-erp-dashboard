@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { useCompany } from '@/contexts/CompanyContext';
 import { DataImportModal } from '../../master-data/DataImportModal';
@@ -25,13 +26,11 @@ export const DealerListPage = () => {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Dealer</h1>
-                        <p className="text-sm text-muted-foreground">Kelola data dealer</p>
-                    </div>
-                    <div className="flex gap-2">
-                        {canCreate && (
+                <PageHeader
+                    title="Dealer"
+                    subtitle="Kelola data dealer"
+                    actions={
+                        canCreate && (
                             <>
                                 <Button onClick={() => setOpenImport(true)} variant="outline" className="w-full sm:w-auto">
                                     Import
@@ -40,9 +39,9 @@ export const DealerListPage = () => {
                                     + Tambah
                                 </Button>
                             </>
-                        )}
-                    </div>
-                </div>
+                        )
+                    }
+                />
 
                 <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
                     Table data dealer akan segera hadir.

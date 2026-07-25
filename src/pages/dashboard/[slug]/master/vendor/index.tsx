@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { VendorTable } from '@/components/features/vendor/VendorTable';
 import { VendorFormModal, VendorFormData } from '@/components/features/vendor/VendorFormModal';
 import { EditVendorModal } from '@/components/features/vendor/EditVendorModal';
@@ -130,12 +131,10 @@ export default function VendorPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Vendor</h1>
-            <p className="text-sm text-muted-foreground">Kelola data vendor dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data Vendor"
+          subtitle="Kelola data vendor dengan mudah"
+        />
 
         {/* Content */}
         <VendorTable

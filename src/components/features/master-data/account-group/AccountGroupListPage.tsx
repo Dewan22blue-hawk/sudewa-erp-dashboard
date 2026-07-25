@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AccountGroupTable } from './AccountGroupTable';
 import { AccountGroupFormModal } from './AccountGroupFormModal';
 import { useAccountGroups, useDeleteAccountGroup, useCreateAccountGroup, useUpdateAccountGroup, useImportAccountGroup } from '@/hooks/useAccountGroup';
@@ -129,12 +130,10 @@ export const AccountGroupListPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Grup Akun</h1>
-            <p className="text-sm text-muted-foreground">Kelola grup akun untuk mengatur akun transaksi</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Grup Akun"
+          subtitle="Kelola grup akun untuk mengatur akun transaksi"
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

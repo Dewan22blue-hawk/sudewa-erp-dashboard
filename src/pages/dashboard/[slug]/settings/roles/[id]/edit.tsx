@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -86,15 +87,15 @@ export default function EditRolePage() {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full h-10 w-10">
-            <ChevronLeft size={20} />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-950 tracking-tight">Ubah Peran</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Edit detail peran dan perbarui daftar permissions.</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Hak Akses', onClick: () => router.push(`/dashboard/${slug}/settings/roles`) },
+            { label: 'Edit' }
+          ]}
+          title="Ubah Peran"
+          subtitle="Edit detail peran dan perbarui daftar permissions."
+          onBack={handleBack}
+        />
 
         {isLoadingRole ? (
           <div className="bg-white rounded-2xl border p-12 text-center text-gray-500 font-medium">

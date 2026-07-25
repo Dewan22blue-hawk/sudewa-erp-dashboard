@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AccountTable } from '@/components/features/account/AccountTable';
 import { AccountImportModal } from '@/components/features/account/AccountImportModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -289,12 +290,10 @@ export const AccountListPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Akun</h1>
-            <p className="text-sm text-muted-foreground">Kelola akun finance dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Akun"
+          subtitle="Kelola akun finance dengan mudah"
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

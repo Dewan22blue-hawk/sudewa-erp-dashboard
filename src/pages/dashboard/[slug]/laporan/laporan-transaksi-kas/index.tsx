@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { LaporanKasTable } from '@/components/features/laporan-kas/LaporanKasTable';
 import { Loader2, Search, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -102,15 +103,17 @@ export default function LaporanTransaksiKasPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Transaksi Kas</h1>
-            <p className="text-sm text-muted-foreground">Pantau semua pemasukan dan pengeluaran</p>
-          </div>
-          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </Button>
+        <div className="no-print">
+          <PageHeader
+            title="Laporan Transaksi Kas"
+            subtitle="Pantau semua pemasukan dan pengeluaran"
+            actions={
+              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+                <Printer className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+            }
+          />
         </div>
 
         {/* Filters */}

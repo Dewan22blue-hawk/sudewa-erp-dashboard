@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -35,17 +36,14 @@ export default function GoodsReceiptDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/penerimaan-material`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-[24px] font-semibold text-slate-900">Data Penerimaan Material</h1>
-            <p className="text-[13px] text-slate-400">Detail</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Penerimaan Material', onClick: () => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`) },
+            { label: 'Detail' }
+          ]}
+          title="Data Penerimaan Material"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`)}
+        />
 
         <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-6">

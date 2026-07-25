@@ -14,6 +14,7 @@ import { WarehouseStockUnit } from '@/@types/unit-transaction.types';
 import { StockPickerTable } from '@/components/features/sales/detail/StockPickerTable';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSalesDetail } from '@/hooks/useSales';
@@ -385,34 +386,21 @@ export default function SalesUnitDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}>
-            Detail Penjualan
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Detail Unit</span>
-        </div>
-
-        {/* Title Section */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <ArrowLeft className="h-5 w-5 text-slate-700" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Data Penjualan</h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Kode Jual:</span>
-                <span className="font-semibold text-blue-600">{salesCode}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Detail Penjualan', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`) },
+            { label: 'Detail Unit' }
+          ]}
+          title="Data Penjualan"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="font-semibold text-blue-600">{salesCode}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}
+        />
 
         <SalesDetailCards data={salesData.ui} billingHistories={resolvedBillingHistories} unitType={unitTypeData} />
 

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,18 +102,18 @@ export const BrandListPage = () => {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Merk Unit Tipe</h1>
-                        <p className="text-sm text-muted-foreground">Kelola semua merk unit tipe</p>
-                    </div>
-                    {canCreate && (
-                        <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                            <Plus className="h-4 w-4" />
-                            Tambah Merk
-                        </Button>
-                    )}
-                </div>
+                <PageHeader
+                    title="Merk Unit Tipe"
+                    subtitle="Kelola semua merk unit tipe"
+                    actions={
+                        canCreate && (
+                            <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                                <Plus className="h-4 w-4" />
+                                Tambah Merk
+                            </Button>
+                        )
+                    }
+                />
 
                 <Card className="p-6">
                     {isError ? (

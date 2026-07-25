@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { BBNTable } from '@/components/features/bbn/BBNTable';
 import { DeleteBBNModal } from '@/components/features/bbn/DeleteBBNModal';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
@@ -102,12 +103,10 @@ export default function BBNPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Biaya</h1>
-            <p className="text-sm text-muted-foreground">Kelola data biaya dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data Biaya"
+          subtitle="Kelola data biaya dengan mudah"
+        />
 
         {/* Content */}
         <BBNTable

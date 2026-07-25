@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, FileText, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { UploadInvoiceModal } from '@/components/features/material-receipt/UploadInvoiceModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -169,18 +170,22 @@ export default function PerlengkapanMasukDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="space-y-1">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/perlengkapan-masuk`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali ke Daftar
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">Detail Penerimaan Perlengkapan</h1>
-          <p className="text-[16px] text-slate-500">
-            Kode Transaksi <span className="font-medium text-[#1f4163]">{transaction.code}</span>
-          </p>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penerimaan Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/perlengkapan-masuk`) },
+            { label: 'Detail' }
+          ]}
+          title="Detail Penerimaan Perlengkapan"
+          subtitle={
+            <div className="flex items-center gap-2">
+              Detail transaksi penerimaan perlengkapan
+              {transaction?.code && (
+                <span className="font-medium text-[#1f4163]">Kode Transaksi: {transaction.code}</span>
+              )}
+            </div>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/perlengkapan-masuk`)}
+        />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="col-span-2 rounded-[20px] border border-slate-200 bg-white p-6 shadow-none space-y-6">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LaporanPenjualanFilter from '@/components/features/laporan-penjualan/LaporanPenjualanFilter';
 import LaporanPenjualanPerNota from '@/components/features/laporan-penjualan/LaporanPenjualanPerNota';
@@ -148,8 +149,10 @@ export default function LaporanPenjualanPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div className="no-print">
-                    <h1 className="text-2xl font-semibold">Laporan Penjualan</h1>
-                    <p className="text-sm text-muted-foreground">Pantau semua transaksi penjualan</p>
+                    <PageHeader
+                        title="Laporan Penjualan"
+                        subtitle="Pantau semua transaksi penjualan"
+                    />
                 </div>
 
                 <div className="space-y-4">

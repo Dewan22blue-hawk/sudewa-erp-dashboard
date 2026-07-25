@@ -8,6 +8,7 @@ import LaporanPembelianPerNotaView from "@/components/features/laporan-pembelian
 import LaporanPembelianPerTypeView from "@/components/features/laporan-pembelian/LaporanPembelianPerTypeView"
 import LaporanPembelianPerSupplierView from "@/components/features/laporan-pembelian/LaporanPembelianPerSupplierView"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
@@ -43,24 +44,16 @@ export default function DetailLaporanPembelianPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <Button onClick={() => router.push(`/dashboard/${slug}/laporan/laporan-pembelian`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                            <ArrowLeft className="h-5 w-5 text-slate-700" />
-                        </Button>
-                        <div>
-                            <h1 className="text-2xl font-semibold">
-                                {getReportTitle()}
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Lihat detail laporan pembelian
-                            </p>
-                        </div>
-                    </div>
-
-                    <LaporanPembelianHeaderAction />
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Laporan Pembelian', onClick: () => router.push(`/dashboard/${slug}/laporan/laporan-pembelian`) },
+                        { label: 'Detail Laporan' }
+                    ]}
+                    title={getReportTitle()}
+                    subtitle="Lihat detail laporan pembelian"
+                    onBack={() => router.push(`/dashboard/${slug}/laporan/laporan-pembelian`)}
+                    actions={<LaporanPembelianHeaderAction />}
+                />
 
                 {type === "per-nota" && (
                     <LaporanPembelianPerNotaView data={(data as any) || []} />
