@@ -33,7 +33,11 @@ export function FinanceRefundPage({ title, description, transactionType }: Finan
     transactionType,
   });
 
+  console.log(transactionType);
+
+
   const data = useMemo(() => refundQuery.data?.data ?? [], [refundQuery.data?.data]);
+  console.log(data);
 
   return (
     <DashboardLayout>

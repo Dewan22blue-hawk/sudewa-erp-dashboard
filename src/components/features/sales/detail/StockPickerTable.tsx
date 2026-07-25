@@ -11,7 +11,8 @@ import { useRouter } from 'next/router';
 interface StockPickerTableProps {
   units: WarehouseStockUnit[];
   selectedIds: Set<number>;
-  unitType?: TypeUnit
+  unitType?: TypeUnit;
+  isPaid?: boolean;
   onToggleOne: (id: number, checked: boolean) => void;
   onToggleAllPage: (checked: boolean) => void;
   currentPage: number;
@@ -67,6 +68,7 @@ export function StockPickerTable({
   units,
   selectedIds,
   unitType,
+  isPaid,
   onToggleOne,
   currentPage,
   perPage,
@@ -117,7 +119,7 @@ export function StockPickerTable({
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
     {
       header: 'Nama Tipe Unit',
-      cell: (item) => unitType?.name ? <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitType?.name}`}>{unitType?.name}</ReferenceLink> : '-'
+      cell: () => unitType?.name ? <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitType?.name}`}>{unitType?.name}</ReferenceLink> : '-'
     },
     {
       header: 'Warna',
@@ -171,7 +173,7 @@ export function StockPickerTable({
           onPerPageChange(val);
           onPageChange(1);
         }}
-        showCheckbox
+        showCheckbox={!isPaid}
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}

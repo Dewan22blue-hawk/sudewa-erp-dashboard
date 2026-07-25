@@ -1,23 +1,22 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { ChevronLeft, LogOut, MoreVertical, Plus, Search } from 'lucide-react';
+import { ChevronRight, MoreVertical, Plus, ArrowLeft, FileText, Package } from 'lucide-react';
 import type { UnitTransactionRefundPayment } from '@/@types/refund.type';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from '@/components/ui/card';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useDeleteRefundPayment, useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
-import { formatCurrency } from '@/lib/utils/currency';
+import { useDeleteRefundPayment, useRefundDetail } from '@/hooks/useRefundAdministrasi';
 import { toast } from 'sonner';
-import PurchaseRefundFormModal from './PurchaseRefundFormModal';
 import PurchaseRefundPaymentDetailModal from './PurchaseRefundPaymentDetailModal';
-import { refundInputClassName, refundPrimaryButtonClassName } from './purchase-refund.styles';
 import { RefundPaymentProgressBadge } from '@/components/features/refund/RefundPaymentProgressBadge';
 import { getRefundPaymentProgressStatus } from '@/components/features/refund/refund.utils';
-import { LoadingState } from '@/components/ui/loading-state';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { Badge } from '@/components/ui/badge';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -29,14 +28,11 @@ const formatDate = (value?: string) => {
 export default function SalesRefundDetailPageContent({ transactionId, refundId }: { transactionId: string; refundId: string }) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const [editingRefund, setEditingRefund] = useState(false);
   const [isAddDetailOpen, setIsAddDetailOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<UnitTransactionRefundPayment | null>(null);
   const [deletingPayment, setDeletingPayment] = useState<UnitTransactionRefundPayment | null>(null);
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const deletePaymentMutation = useDeleteRefundPayment();
 
-  const transactionQuery = useRefundTransactionDetail(transactionId);
   const refundQuery = useRefundDetail(refundId);
   const refund = refundQuery.data;
 
@@ -44,13 +40,109 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
   const lessPayment = Math.max(0, Number(refund?.refund_amount || 0) - totalPaid);
   const qty = refund?.items?.length ?? 0;
 
-  const toggleItem = (itemId: string, checked: boolean) => {
-    setSelectedItemIds((current) => (checked ? [...current, itemId] : current.filter((id) => id !== itemId)));
-  };
+  const unitColumns = useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'TIPE UNIT',
+        alignment: 'left',
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item?.unit_transaction_item?.unit_type?.name}`}>
+            {item?.unit_transaction_item?.unit_type?.name || '-'}
+          </ReferenceLink>
+        )
+      },
+      {
+        header: 'WARNA',
+        alignment: 'left',
+        cell: (item) => item.color || '-',
+      },
+      {
+        header: 'NO. MESIN',
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.machine_number || '-'} />,
+      },
+      {
+        header: 'NO. RANGKA',
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.chassis_number || '-'} />,
+      },
+      {
+        header: 'STATUS UNIT',
+        alignment: 'left',
+        cell: (item) => (
+          <Badge variant="outline" className={`${item.status === 'refunded' || item.status === 'returned' ? 'border-orange-200 bg-orange-50 text-orange-700' : item.status === 'receive' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-700'} font-semibold`}>
+            {item.status || '-'}
+          </Badge>
+        ),
+      },
+      {
+        header: 'TANGGAL DIBUAT',
+        alignment: 'left',
+        cell: (item) => formatDate(item.created_at),
+      },
+    ],
+    [slug],
+  );
 
-  const toggleAll = (checked: boolean) => {
-    setSelectedItemIds(checked ? (refund?.items ?? []).map((item) => item.id) : []);
-  };
+  const columns = useMemo<ColumnDef<UnitTransactionRefundPayment>[]>(
+    () => [
+      {
+        header: 'KODE REFUND',
+        accessorKey: 'code',
+        sortable: true,
+        alignment: 'left',
+        cell: (payment) => <CopyBox text={payment.code || '-'} />,
+      },
+      {
+        header: 'TANGGAL BAYAR REFUND',
+        accessorKey: 'payment_date',
+        sortable: true,
+        alignment: 'left',
+        cell: (payment) => formatDate(payment.payment_date),
+      },
+      {
+        header: 'NOMINAL BAYAR',
+        accessorKey: 'amount',
+        sortable: true,
+        alignment: 'left',
+        cell: (payment) => currenciesFormat('idr', payment.amount),
+      },
+      {
+        header: 'KETERANGAN',
+        accessorKey: 'note',
+        sortable: true,
+        alignment: 'left',
+        cell: (payment) => (
+          <Badge variant="outline" className="border-gray-200 bg-gray-50 text-gray-700 font-semibold">
+            {payment.note || 'Terbayar'}
+          </Badge>
+        )
+      },
+      {
+        header: 'aksi',
+        alignment: 'left',
+        sticky: 'right',
+        cell: (payment) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-[#111827]">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
+              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => setEditingPayment(payment)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeletingPayment(payment)}>
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [],
+  );
 
   const handleDeletePayment = async () => {
     if (!deletingPayment) return;
@@ -64,7 +156,7 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
     }
   };
 
-  if (refundQuery.isLoading || transactionQuery.isLoading) {
+  if (refundQuery.isLoading) {
     return (
       <DashboardLayout>
         <LoadingState variant="page" />
@@ -82,38 +174,33 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
 
   return (
     <DashboardLayout>
-      <div className="space-y-10 p-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-[#111827]" onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`)}>
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-[22px] font-semibold text-[#111827]">Detail Refund Penjualan</h1>
+      <div className="space-y-6">
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}`)}>
+            Penjualan Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`)}>
+            Data Refund Penjualan
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">Detail Data Refund Penjualan</span>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Kode Refund</label>
-            <Input readOnly value={refund.code || ''} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Nominal Refund</label>
-            <Input readOnly value={formatCurrency(refund.refund_amount)} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Tanggal Refund</label>
-            <Input readOnly value={formatDate(refund.refund_date)} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Kurang Bayar</label>
-            <Input readOnly value={formatCurrency(lessPayment)} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">Tipe</label>
-            <Input readOnly value={refund.items?.[0]?.unit_type_name || refund.note || ''} className={refundInputClassName} />
-          </div>
-          <div>
-            <label className="mb-2 block text-[14px] font-medium text-[#111827]">QTY</label>
-            <Input readOnly value={String(qty)} className={refundInputClassName} />
+        {/* HEADLINE & ACTIONS */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Detail Data Refund Penjualan</h1>
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>Kode Refund:</span>
+                <span className="text-blue-600 font-semibold">{refund.code}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -122,125 +209,107 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
           <p className="text-sm text-slate-600">Pembayaran refund hanya bisa ditambahkan setelah refund ini tersimpan.</p>
         </div>
 
-        <div className="space-y-5">
-          <div className="flex justify-end">
-            <Button onClick={() => setIsAddDetailOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-              <Plus className="h-4 w-4" />
-              Tambah Pembayaran Refund
-            </Button>
-          </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Card 1: Informasi Refund */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="p-5 space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-md bg-blue-50">
+                  <FileText className="h-5 w-5 text-blue-500" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-700">Informasi Refund</h3>
+              </div>
+              <div className="text-sm text-slate-600 mt-3 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-slate-400">Kode Refund</p>
+                    <p className="font-semibold text-slate-900">
+                      <CopyBox text={refund.code || '-'} />
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">Tanggal Refund</p>
+                    <p className="font-semibold text-slate-900">{formatDate(refund.refund_date)}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+                  <span className="text-xs text-slate-400">Nominal Refund</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', refund.refund_amount)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Total Terbayar</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPaid)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-500">Kurang Bayar</span>
+                  <span className="font-bold text-emerald-600">{currenciesFormat('idr', lessPayment)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="overflow-x-auto rounded-[10px] border border-[#D9DEE8] bg-white">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-[#E9EEF5] hover:bg-[#E9EEF5]">
-                  {['NO', 'TANGGAL REFUND', 'NOMINAL BAYAR', 'KETERANGAN', 'aksi'].map((header) => (
-                    <TableHead key={header} className="h-12 px-4 text-center text-[14px] font-medium text-[#111827]">
-                      {header}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(refund.payments ?? []).length > 0 ? (
-                  refund.payments?.map((payment, index) => (
-                    <TableRow key={payment.id} className="border-[#E5E7EB] hover:bg-white">
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{index + 1}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatDate(payment.payment_date)}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell className="px-4 py-3 text-center text-sm text-[#111827]">{payment.note || 'Terbayar'}</TableCell>
-                      <TableCell className="px-4 py-3 text-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#111827]">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
-                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => setEditingPayment(payment)}>
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeletingPayment(payment)}>
-                              Hapus
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={100} className="py-16 h-24 text-center text-[#6B7280]">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                          <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          {/* Card 2: Informasi Unit */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="p-5 space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-md bg-yellow-50">
+                  <Package className="h-5 w-5 text-yellow-500" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-700">Informasi Unit</h3>
+              </div>
+              <div className="text-sm text-slate-600 mt-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Quantity</span>
+                  <span className="font-semibold text-slate-900">{qty}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs text-slate-400">Alasan Refund</span>
+                  <p className="text-slate-900 p-2 rounded-md bg-slate-50 w-full">
+                    {refund?.note || '-'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Tabel Detail Unit yang Direfund */}
         <div className="space-y-4">
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="text-[18px] font-semibold text-[#111827]">Detail Unit yang direfund</h2>
-              <p className="mt-1 text-sm text-[#6B7280]">Rincian lengkap unit yang direfund</p>
-            </div>
-            <Button className="h-10 rounded-[10px] bg-[#EF2B2D] px-5 text-sm font-medium text-white hover:bg-[#D92527]" onClick={() => setIsAddDetailOpen(true)}>
-              <LogOut className="h-4 w-4" />
-              Refund
-            </Button>
+          <div>
+            <h2 className="text-base font-semibold text-slate-800">Detail Unit yang Direfund</h2>
+            <p className="text-xs text-slate-500">Rincian item detail unit yang termasuk dalam refund ini</p>
           </div>
-
-          <div className="overflow-x-auto bg-white">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-[#EEFCF5] hover:bg-[#EEFCF5]">
-                  <TableHead className="w-[56px] px-4 text-center">
-                    <Checkbox
-                      checked={(refund.items?.length ?? 0) > 0 && selectedItemIds.length === (refund.items?.length ?? 0)}
-                      onCheckedChange={(checked) => toggleAll(Boolean(checked))}
-                    />
-                  </TableHead>
-                  {['No', 'WARNA', 'NOMOR MESIN', 'NOMOR RANGKA'].map((header) => (
-                    <TableHead key={header} className="h-11 px-4 text-[14px] font-medium text-[#111827]">
-                      {header}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(refund.items ?? []).length > 0 ? (
-                  refund.items?.map((item, index) => (
-                    <TableRow key={item.id} className="border-[#E5E7EB] hover:bg-white">
-                      <TableCell className="px-4 py-3 text-center">
-                        <Checkbox checked={selectedItemIds.includes(item.id)} onCheckedChange={(checked) => toggleItem(item.id, Boolean(checked))} />
-                      </TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{index + 1}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{item.color || '-'}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{item.machine_number || '-'}</TableCell>
-                      <TableCell className="px-4 py-3 text-sm text-[#111827]">{item.chassis_number || '-'}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-[#6B7280]">
-                      Tidak ada unit refund.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <BaseTable
+            data={refund.items ?? []}
+            columns={unitColumns}
+            headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
+          />
         </div>
 
-        <PurchaseRefundFormModal open={editingRefund} onClose={() => setEditingRefund(false)} transactionId={transactionId} refund={refund} entityLabel="penjualan" />
+        {/* Tabel Pembayaran Refund */}
+        <div className="space-y-4">
+          <BaseTable
+            data={refund.payments ?? []}
+            columns={columns}
+            headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
+            defaultSort={{ key: 'payment_date', direction: 'desc' }}
+            headerActions={
+              <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-slate-800">Riwayat Pembayaran Refund</h2>
+                  <p className="text-xs text-slate-500">Daftar transaksi pembayaran refund yang telah dicatat</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button onClick={() => setIsAddDetailOpen(true)} disabled={lessPayment === 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Pembayaran Refund
+                  </Button>
+                </div>
+              </div>
+            }
+          />
+        </div>
+
         <PurchaseRefundPaymentDetailModal open={isAddDetailOpen} onClose={() => setIsAddDetailOpen(false)} refund={refund} entityLabel="Penjualan" />
         <PurchaseRefundPaymentDetailModal open={Boolean(editingPayment)} onClose={() => setEditingPayment(null)} refund={refund} payment={editingPayment} entityLabel="Penjualan" />
 

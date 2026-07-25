@@ -311,7 +311,7 @@ export default function SalesDetailPage() {
           onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}
           subtitle={
             <>
-              <span>Kode Jual:</span>
+              <span>Kode Jual: </span>
               <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
               {isPaid ? (
                 <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
