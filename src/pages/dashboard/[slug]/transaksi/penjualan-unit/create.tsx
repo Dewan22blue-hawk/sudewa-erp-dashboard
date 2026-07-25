@@ -319,7 +319,7 @@ export default function CreateSalesPage() {
             }}
             prependFields={
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">Tanggal</Label>
                   <Input
                     type="date"
@@ -329,7 +329,7 @@ export default function CreateSalesPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">Customer</Label>
                   <Popover open={isCustomerOpen} onOpenChange={setIsCustomerOpen}>
                     <PopoverTrigger asChild>
@@ -359,12 +359,12 @@ export default function CreateSalesPage() {
                   </Popover>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">Alamat</Label>
                   <Input value={form.alamat} readOnly disabled className="bg-transparent" placeholder="Alamat customer" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">NPWP</Label>
                   <Input value={form.npwp} readOnly disabled className="bg-transparent" placeholder="NPWP customer" />
                 </div>
