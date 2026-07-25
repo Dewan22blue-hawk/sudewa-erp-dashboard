@@ -202,14 +202,15 @@ export default function PengeluaranUnitCreateTable({
               <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">WARNA</TableHead>
               <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO MESIN</TableHead>
               <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">NO RANGKA</TableHead>
-              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS PENGELUARAN</TableHead>
+              <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">STATUS STOCK</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading ? (
               <TableRow className="group">
-                <TableCell colSpan={8} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                <TableCell colSpan={9} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                   <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
                     <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
                     <span className="text-sm font-medium text-slate-500">Memuat data...</span>
@@ -218,7 +219,7 @@ export default function PengeluaranUnitCreateTable({
               </TableRow>
             ) : isError ? (
               <TableRow className="group">
-                <TableCell colSpan={8} className="px-4 py-8 text-center text-red-600 text-sm">
+                <TableCell colSpan={9} className="px-4 py-8 text-center text-red-600 text-sm">
                   <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
                     <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
                     <span className="text-sm font-medium text-slate-500">Memuat data...</span>
@@ -254,6 +255,15 @@ export default function PengeluaranUnitCreateTable({
                       <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Dikeluarkan</Badge>
                     ) : (
                       <Badge variant="outline" className="border-amber-200 text-amber-700">Belum Dikeluarkan</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                    {item.inStock === true ? (
+                      <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>
+                    ) : item.inStock === false ? (
+                      <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>
                     )}
                   </TableCell>
                 </TableRow>

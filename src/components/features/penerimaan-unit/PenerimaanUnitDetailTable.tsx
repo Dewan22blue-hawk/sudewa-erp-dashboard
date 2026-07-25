@@ -209,6 +209,20 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
             </Badge>
           );
         },
+      },
+      {
+        header: 'STATUS STOCK',
+        accessorKey: 'in_stock',
+        sortable: true,
+        cell: (item) => {
+          if (item.in_stock === true) {
+             return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+          }
+          if (item.in_stock === false) {
+             return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
+          }
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+        }
       }
     ],
     [filteredRows, selected, receivedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]

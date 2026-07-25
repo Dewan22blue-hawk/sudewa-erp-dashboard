@@ -10,6 +10,7 @@ import { DispatchUnitTableRow } from '@/@types/pengeluaran-unit.types';
 import DeletePengeluaranUnitDialog from './DeletePengeluaranUnitDialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface Props {
     data: DispatchUnitTableRow[];
@@ -165,6 +166,7 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                             {renderSortHeader('color', 'WARNA')}
                             {renderSortHeader('machineNumber', 'NO MESIN')}
                             {renderSortHeader('chassisNumber', 'NO RANGKA')}
+                            {renderSortHeader('inStock', 'STATUS STOCK')}
                         </TableRow>
                     </TableHeader>
 
@@ -181,6 +183,15 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                                     <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.color}</TableCell>
                                     <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.machineNumber}</TableCell>
                                     <TableCell className="px-4 py-4 text-left text-sm text-slate-700">{item.chassisNumber}</TableCell>
+                                    <TableCell className="px-4 py-4 text-left text-sm text-slate-700">
+                                        {item.inStock === true ? (
+                                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>
+                                        ) : item.inStock === false ? (
+                                            <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>
+                                        ) : (
+                                            <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>
+                                        )}
+                                    </TableCell>
                                 </TableRow>
                             ))
                         ) : (
