@@ -171,19 +171,22 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)} disabled={!canEdit}>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
+            {!isPaid && (
+              <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)} disabled={!canEdit && isPaid}>
+                <Pencil className="mr-2 h-4 w-4" /> Edit
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}>
               <Eye className="mr-2 h-4 w-4" /> Detail
             </DropdownMenuItem>
-            <DropdownMenuItem
+            {!isPaid && (<DropdownMenuItem
               className="text-red-600 focus:bg-red-50 focus:text-red-600"
-              onClick={() => setDeleteId(item.id)}
-              disabled={!canDelete}
+              onClick={() => !isPaid && setDeleteId(item.id)}
+              disabled={!canDelete && isPaid}
             >
               <Trash2 className="mr-2 h-4 w-4" /> Hapus
             </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -203,7 +206,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
             data={pagedData}
             columns={columns}
             loading={isLoading || isError}
-            showCheckbox
+            showCheckbox={!isPaid}
             selectedIds={selectedIds}
             onSelectedIdsChange={setSelectedIds}
             showLimitChange

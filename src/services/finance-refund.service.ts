@@ -63,8 +63,7 @@ const mapFinanceRefund = (item: any): FinanceRefundRecord => {
 
 export const financeRefundService = {
   async getRefundList(params: FinanceRefundQueryParams = {}): Promise<FinanceRefundListResponse> {
-    const isSales = params.transactionType === 'sales';
-    const urlPath = isSales ? '/wapi/finance/refund' : '/wapi/finance/finance-refund';
+    const urlPath = '/wapi/finance/finance-refund';
 
     const response = await apiClient.get<LaravelApiResponse<any>>(urlPath, {
       params: {

@@ -193,7 +193,7 @@ export default function SalesUnitDetailPage() {
       const bSelected = selectedIds.has(b.id) ? 1 : 0;
       return bSelected - aSelected;
     });
-    
+
     return result;
   }, [stockUnits, assignedDetailRows, selectedIds]);
 
@@ -417,6 +417,7 @@ export default function SalesUnitDetailPage() {
               units={pickerRows}
               selectedIds={selectedIds}
               unitType={unitTypeData}
+              isPaid={salesData?.raw?.unit_transaction_billing?.is_paid}
               onToggleOne={toggleOne}
               onToggleAllPage={toggleAllPage}
               currentPage={currentPage}
@@ -430,7 +431,7 @@ export default function SalesUnitDetailPage() {
                 <Button
                   size="sm"
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending}
+                  disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending || !!salesData?.raw?.unit_transaction_billing?.is_paid}
                   onClick={() => setIsAssignDialogOpen(true)}
                 >
                   {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}

@@ -77,18 +77,18 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
     () => [
       {
-        header: 'TANGGAL REFUND',
-        accessorKey: 'refund_date',
-        sortable: true,
-        alignment: 'left',
-        cell: (item) => formatDate(item.refund_date),
-      },
-      {
         header: 'KODE REFUND',
         accessorKey: 'code',
         sortable: true,
         alignment: 'left',
         cell: (item) => <CopyBox text={item.code} />,
+      },
+      {
+        header: 'TANGGAL REFUND',
+        accessorKey: 'refund_date',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => formatDate(item.refund_date),
       },
       {
         header: 'NOMINAL REFUND',
