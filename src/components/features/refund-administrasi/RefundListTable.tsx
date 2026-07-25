@@ -32,16 +32,16 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
     () => [
       {
-        header: 'Tanggal Refund',
-        accessorKey: 'refund_date',
-        sortable: true,
-        cell: (item) => <span className="font-medium text-slate-900">{formatDate(item.refund_date)}</span>,
-      },
-      {
         header: 'Kode Refund',
         accessorKey: 'code',
         sortable: true,
         cell: (item) => <span className="font-medium text-slate-900">{item.code}</span>,
+      },
+      {
+        header: 'Tanggal Refund',
+        accessorKey: 'refund_date',
+        sortable: true,
+        cell: (item) => <span className="font-medium text-slate-900">{formatDate(item.refund_date)}</span>,
       },
       {
         header: 'Qty Unit',
@@ -105,11 +105,11 @@ export default function RefundListTable({ data, meta, isLoading = false, slug, t
       meta={
         meta
           ? {
-              currentPage: page,
-              perPage: meta.perPage,
-              lastPage: meta.lastPage,
-              total: meta.total,
-            }
+            currentPage: page,
+            perPage: meta.perPage,
+            lastPage: meta.lastPage,
+            total: meta.total,
+          }
           : undefined
       }
       onPageChange={onPageChange}

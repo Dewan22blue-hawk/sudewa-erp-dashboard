@@ -39,9 +39,11 @@ export default function TransaksiRefundJualPage() {
   const columns = useMemo<ColumnDef<UnitTransactionRefund>[]>(
     () => [
       {
-        header: 'NO',
+        header: 'KODE REFUND',
+        accessorKey: 'code',
+        sortable: true,
         alignment: 'left',
-        cell: (_, index) => (page - 1) * perPage + index + 1,
+        cell: (item) => <CopyBox text={item.code} />,
       },
       {
         header: 'TANGGAL REFUND',
@@ -49,13 +51,6 @@ export default function TransaksiRefundJualPage() {
         sortable: true,
         alignment: 'left',
         cell: (item) => formatDate(item.refund_date),
-      },
-      {
-        header: 'KODE REFUND',
-        accessorKey: 'code',
-        sortable: true,
-        alignment: 'left',
-        cell: (item) => <CopyBox text={item.code} />,
       },
       {
         header: 'NOMINAL REFUND',

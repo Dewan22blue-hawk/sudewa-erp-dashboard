@@ -12,13 +12,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { MoneyInput } from '@/components/ui/money-input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useCompany } from '@/contexts/CompanyContext';
 import { usePurchases, usePurchaseById, useUnitTransactionItemDetailsData } from '@/hooks/usePurchase';
 import { useCreateRefund, useUpdateRefund, useRefundDetail } from '@/hooks/useRefundAdministrasi';
@@ -265,7 +258,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
             Data Refund Pembelian
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Tambah Data Refund Pembelian</span>
+          <span className="font-medium text-slate-800">DetailData Refund Pembelian</span>
         </div>
 
         {/* HEADLINE & ACTIONS */}

@@ -44,11 +44,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
   const unitColumns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'NO',
-        alignment: 'left',
-        cell: (_, index) => index + 1,
-      },
-      {
         header: 'TIPE UNIT',
         alignment: 'left',
         cell: (item) => (
@@ -93,11 +88,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
 
   const columns = useMemo<ColumnDef<UnitTransactionRefundPayment>[]>(
     () => [
-      {
-        header: 'NO',
-        alignment: 'left',
-        cell: (_, index) => index + 1,
-      },
       {
         header: 'KODE REFUND',
         accessorKey: 'code',
@@ -197,7 +187,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
             Data Refund Pembelian
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Tambah Data Refund Pembelian</span>
+          <span className="font-medium text-slate-800">Detail Data Refund Pembelian</span>
         </div>
 
         {/* HEADLINE & ACTIONS */}
@@ -207,7 +197,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Tambah Data Refund Pembelian</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">Detail Data Refund Pembelian</h1>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span>Kode Refund:</span>
                 <span className="text-blue-600 font-semibold">{refund.code}</span>
