@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, CreditCard, Loader2, Search, User } from 'lucide-react';
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, CreditCard, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import PembayaranHutangPaymentDialog from '@/components/features/pembayaran-hutang/PembayaranHutangPaymentDialog';
 import { usePenerimaanPiutangDetail } from '@/hooks/usePenerimaanPiutangDetail';
 import { formatCurrency } from '@/lib/utils/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 
 type PaymentRow = {
     id: number;
@@ -109,12 +110,7 @@ export default function PiutangDetailPage() {
     return (
         <DashboardLayout>
             {isLoading ? (
-                <div className="flex min-h-[50vh] items-center justify-center rounded-2xl border bg-white">
-                    <div className="flex items-center gap-3 text-gray-500">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Memuat detail piutang...
-                    </div>
-                </div>
+                <LoadingState variant="page" text="Memuat detail piutang..." />
             ) : errorMessage || !detail ? (
                 <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-red-700">
                     <p className="font-medium">{errorMessage ?? 'Data tidak ditemukan'}</p>

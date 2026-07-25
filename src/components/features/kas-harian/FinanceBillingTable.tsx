@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, MoreVertical } from 'lucide-react';
+import {  Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -21,6 +21,7 @@ import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { FinanceBilling, FinanceBillingPayload } from '@/@types/finance-billing.types';
 import type { KasHarian } from '@/@types/kas-harian.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -551,7 +552,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                   Menyimpan...
                 </>
               ) : (
@@ -582,7 +583,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             >
               {deleteMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                   Menghapus...
                 </>
               ) : (

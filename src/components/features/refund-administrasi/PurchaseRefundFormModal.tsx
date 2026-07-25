@@ -2,7 +2,7 @@ import { useEffect, useMemo, useCallback } from 'react';
 import { z } from 'zod';
 import { type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarDays, Loader2, PackageSearch } from 'lucide-react';
+import { CalendarDays, PackageSearch } from 'lucide-react';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { useCreateRefund, useRefundDetail, useRefundSelectableItems, useUpdateRefund } from '@/hooks/useRefundAdministrasi';
 import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { refundInputClassName, refundLabelClassName, refundPrimaryButtonClassName, refundSecondaryButtonClassName } from './purchase-refund.styles';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Badge } from '@/components/ui/badge';
+import { LoadingState } from '@/components/ui/loading-state';
 import {
   Form,
   FormControl,
@@ -380,7 +381,7 @@ export default function PurchaseRefundFormModal({
                                   <TableRow>
                                     <TableCell colSpan={9} className="h-28 text-center text-[#6B7280]">
                                       <div className="flex items-center justify-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingState variant="inline" text={null} />
                                         Memuat unit transaksi...
                                       </div>
                                     </TableCell>
@@ -486,7 +487,7 @@ export default function PurchaseRefundFormModal({
               ) : (
                 <>
                   <Button type="submit" className={`w-full ${refundPrimaryButtonClassName}`} disabled={isPending}>
-                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {isPending ? <LoadingState variant="inline" text={null} /> : null}
                     Simpan
                   </Button>
                   <Button type="button" variant="outline" className={`w-full ${refundSecondaryButtonClassName}`} onClick={onClose} disabled={isPending}>

@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { MoreVertical, Loader2, Search } from 'lucide-react';
+import { MoreVertical, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { GoodsIssueEquipment } from '@/@types/goods-issue-equipment.types';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface GoodsIssueEquipmentTableProps {
   data: GoodsIssueEquipment[];
@@ -51,10 +52,7 @@ export function GoodsIssueEquipmentTable({
         {isLoading ? (
           <TableRow className="group">
             <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-              <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-              </div>
+              <LoadingState variant="section" text="Memuat data..." />
             </TableCell>
           </TableRow>
         ) : data.length === 0 ? (

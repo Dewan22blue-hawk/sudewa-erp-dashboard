@@ -1,7 +1,8 @@
+import { LoadingState } from '@/components/ui/loading-state';
 import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+
 import type { FinanceRefundRecord, RefundTransactionType } from '@/@types/finance-refund.types';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { useApproveFinanceRefund } from '@/hooks/useFinanceRefund';
@@ -198,7 +199,7 @@ export default function FinanceRefundApprovalModal({ open, onClose, refund, tran
               Batal
             </Button>
             <Button type="submit" className="w-[160px] rounded-md bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]" disabled={approveMutation.isPending}>
-              {approveMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" /> : null}
+              {approveMutation.isPending ? <LoadingState variant="inline" text={null} /> : null}
               {approveMutation.isPending ? 'Menyimpan...' : 'Simpan Approval'}
             </Button>
           </div>

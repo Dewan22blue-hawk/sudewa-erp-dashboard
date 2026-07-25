@@ -159,7 +159,7 @@ export default function SalesRefundDetailPageContent({ transactionId, refundId }
   if (refundQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="p-10 text-center text-[#6B7280]">Memuat detail refund penjualan...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

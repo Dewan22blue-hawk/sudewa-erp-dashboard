@@ -34,6 +34,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { id } from 'date-fns/locale';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -216,7 +217,7 @@ export default function MaterialReleaseListPage() {
               <TableBody>
                 {transactionsQuery.isLoading || transactionsQuery.isFetching ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-28 text-center text-slate-500">Memuat data pengeluaran perlengkapan...</TableCell>
+                    <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat data pengeluaran perlengkapan..." /></TableCell>
                   </TableRow>
                 ) : (transactionsQuery.data?.data ?? []).length === 0 ? (
                   <TableRow>

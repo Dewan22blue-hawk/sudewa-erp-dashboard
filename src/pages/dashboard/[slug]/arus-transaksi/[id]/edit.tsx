@@ -12,6 +12,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { ChevronRight } from 'lucide-react';
 
 import { TransactionFormValues } from '@/scheme/transaction.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditTransactionPage() {
     const router = useRouter();
@@ -79,9 +80,7 @@ export default function EditTransactionPage() {
     if (isFetching) {
         return (
             <DashboardLayout>
-                <div className="flex items-center justify-center h-[50vh]">
-                    <span className="animate-pulse text-muted-foreground">Loading data...</span>
-                </div>
+                <LoadingState variant="page" />
             </DashboardLayout>
         );
     }

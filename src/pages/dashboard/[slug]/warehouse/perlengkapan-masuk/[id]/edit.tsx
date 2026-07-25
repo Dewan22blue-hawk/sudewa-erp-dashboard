@@ -29,6 +29,7 @@ import type { GoodsTransactionDetailEquipment } from '@/@types/goods-receipt-equ
 import type { GoodsReceiptEquipmentFormValues, GoodsReceiptEquipmentItemFormValues } from '@/scheme/goods-receipt-equipment.schema';
 
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const getErrorMessage = (error: any): string => {
   return getApiErrorMessage(error);
@@ -170,9 +171,7 @@ export default function PerlengkapanMasukEditPage() {
   if (query.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
-          Memuat data edit penerimaan perlengkapan...
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

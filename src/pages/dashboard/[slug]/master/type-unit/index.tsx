@@ -11,6 +11,7 @@ import { DataImportModal } from '@/components/features/master-data/DataImportMod
 import type { TypeUnit } from '@/@types/type-unit.types';
 import { useCompany } from '@/contexts/CompanyContext';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function TypeUnitPage() {
   const router = useRouter();
@@ -109,7 +110,7 @@ export default function TypeUnitPage() {
             subtitle="Kelola semua tipe unit"
           />
           <Card className="rounded-md p-6">
-            <div className="text-center text-muted-foreground">Loading...</div>
+            <LoadingState variant="page" />
           </Card>
         </div>
       </DashboardLayout>

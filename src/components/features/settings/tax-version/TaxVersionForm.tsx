@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import type { TaxVersion } from '@/services/tax.service';
 import { ClampedNumericInput } from '@/components/ui/clamped-numeric-input';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const taxVersionSchema = z.object({
   name: z.string().min(1, 'Nama versi wajib diisi'),
@@ -170,7 +170,7 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                 Batal
               </Button>
               <Button type="submit" disabled={isSubmitting} className="bg-[#1e3a5f] hover:bg-[#152e4d]">
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting && <LoadingState variant="inline" text={null} />}
                 Simpan
               </Button>
             </DialogFooter>

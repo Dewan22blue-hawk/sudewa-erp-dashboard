@@ -21,6 +21,7 @@ import {
 } from '@/hooks/usePengeluaranUnit';
 import { PengeluaranUnitFormSchemaValues, pengeluaranUnitFormSchema } from '@/scheme/pengeluaran-unit.schema';
 import { toSavePayload } from '@/services/pengeluaran-unit.service';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const getErrorMessageText = (error: unknown, fallback: string): string => {
   if (!error || typeof error !== 'object' || !('message' in error)) {
@@ -152,7 +153,7 @@ export default function EditPengeluaranUnitPage() {
         />
 
         {detailQuery.isLoading ? (
-          <div className="p-8 text-center text-gray-500 bg-white rounded-md border border-gray-100">Loading...</div>
+          <LoadingState variant="page" />
         ) : detailQuery.isError || !detailQuery.data ? (
           <div className="rounded-md border border-red-100 bg-red-50 p-6 text-sm text-red-700 space-y-3">
             <p>{detailError}</p>

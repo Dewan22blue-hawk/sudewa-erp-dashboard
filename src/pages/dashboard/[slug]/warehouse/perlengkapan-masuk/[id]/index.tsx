@@ -30,6 +30,7 @@ import {
   resolveInvoiceUrl,
 } from '@/components/features/warehouse/receipt-equipment/goodsReceiptEquipment.utils';
 import type { GoodsReceiptEquipmentPaymentFormValues } from '@/scheme/goods-receipt-equipment.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const getErrorMessage = (error: any): string => {
   if (error instanceof ApiValidationError) {
@@ -145,9 +146,7 @@ export default function PerlengkapanMasukDetailPage() {
   if (transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
-          Memuat detail penerimaan perlengkapan...
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { MoreVertical, Search, Loader2, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, Search, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { LiabilityListItem, LiabilityListMeta } from '@/types/pembayaran-hutang.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   data: LiabilityListItem[];
@@ -176,10 +177,7 @@ export default function PembayaranHutangTable({ data, meta, loading, error, sear
             {loading && data.length === 0 ? (
               <tr>
                 <td colSpan={showActions ? 9 : 8} className="px-4 py-12 text-center text-slate-500">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
+                  <LoadingState variant="section" text="Memuat data..." />
                 </td>
               </tr>
             ) : sortedData.length > 0 ? (

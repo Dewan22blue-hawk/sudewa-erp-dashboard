@@ -1,3 +1,4 @@
+import { LoadingState } from '@/components/ui/loading-state';
 import { useState } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { PageHeader } from "@/components/ui/page-header"
@@ -44,7 +45,7 @@ export default function SparepartPage() {
                         subtitle="Kelola semua sparepart"
                     />
                     <Card className="rounded-md p-6">
-                        <div className="text-center text-muted-foreground">Loading...</div>
+                        <LoadingState variant="page" />
                     </Card>
                 </div>
             </DashboardLayout>

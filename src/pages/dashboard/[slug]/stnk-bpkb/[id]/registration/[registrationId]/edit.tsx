@@ -5,6 +5,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { VehicleRegistrationForm } from '@/components/features/vehicle-document/VehicleRegistrationForm';
 import { useUpdateVehicleRegistration, useVehicleDocumentDetail } from '@/hooks/useVehicleDocument';
 import type { VehicleRegistrationPayload } from '@/@types/vehicle-document.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditVehicleRegistrationPage() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function EditVehicleRegistrationPage() {
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat detail registrasi...</div>
+        <LoadingState variant="page" />
       ) : detailQuery.isError || !registration ? (
         <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
           <p className="text-red-500">Detail registrasi tidak ditemukan.</p>

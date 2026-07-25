@@ -1,4 +1,4 @@
-import { CheckCircle2, Download, MoreVertical, Plus, Search, Upload, Loader2 } from 'lucide-react';
+import { CheckCircle2, Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import type { VehicleData } from '@/@types/vehicle-data.types';
 import { SearchableSelect, type SearchableSelectOption } from './SearchableSelect';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface VehicleDataTableProps {
   items: VehicleData[];
@@ -220,10 +221,7 @@ export function VehicleDataTable({
           {isLoading ? (
             <tr>
               <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                  <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                  <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                </div>
+                <LoadingState variant="section" text="Memuat data..." />
               </td>
             </tr>
           ) : items.length ? (

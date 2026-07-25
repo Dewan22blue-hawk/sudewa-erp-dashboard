@@ -5,9 +5,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import type { Tax } from '@/services/tax.service';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const taxSchema = z.object({
   code: z.string().min(1, 'Kode pajak wajib diisi'),
@@ -91,7 +91,7 @@ export function TaxForm({ open, onOpenChange, initialData, onSubmit, isSubmittin
                 Batal
               </Button>
               <Button type="submit" disabled={isSubmitting} className="bg-[#1e3a5f] hover:bg-[#152e4d]">
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting && <LoadingState variant="inline" text={null} />}
                 Simpan
               </Button>
             </DialogFooter>

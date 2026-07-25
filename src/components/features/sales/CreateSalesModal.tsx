@@ -123,7 +123,7 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
                             biayaLain: 0,
                         }}
                         prependFields={
-                            <div className="grid grid-cols-1 gap-6 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium">Customer</Label>
                                     <Popover open={isCustomerOpen} onOpenChange={setIsCustomerOpen}>

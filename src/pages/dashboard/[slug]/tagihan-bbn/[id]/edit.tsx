@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useDitlantasProcessOptions } from '@/hooks/useVehicleDocument';
 import { useBBNBillDetail, useUpdateBBNBill } from '@/hooks/useBBNBill';
 import { toDateValue, toPayloadDate } from '@/components/features/tagihan-bbn/utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 type FormValues = {
   ditlantasProcessId: string;
@@ -82,7 +83,7 @@ export default function EditBBNBillPage() {
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat data tagihan BBN...</div>
+        <LoadingState variant="page" />
       ) : detailQuery.isError || !detailQuery.data ? (
         <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
           <p className="text-red-500">Data tagihan BBN tidak ditemukan.</p>

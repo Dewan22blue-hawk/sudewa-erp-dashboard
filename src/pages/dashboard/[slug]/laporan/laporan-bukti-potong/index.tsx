@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { LaporanBuktiPotongTable } from '@/components/features/laporan-bukti-potong/LaporanBuktiPotongTable';
-import { Loader2, Search, Printer, Download } from 'lucide-react';
+import {  Search, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -18,6 +18,7 @@ import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { formatDate } from '@/lib/utils/format';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import Head from 'next/head';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function LaporanBuktiPotongPage() {
   const router = useRouter();
@@ -179,7 +180,7 @@ export default function LaporanBuktiPotongPage() {
         <div className="pt-4">
           {isLoading ? (
             <div className="flex justify-center items-center py-20 bg-white rounded-md border border-gray-200 shadow-sm">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              <LoadingState variant="page" />
             </div>
           ) : (
             <>

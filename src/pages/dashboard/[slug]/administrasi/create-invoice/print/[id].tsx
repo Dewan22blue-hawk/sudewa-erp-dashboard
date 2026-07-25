@@ -9,6 +9,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useCompany } from '@/contexts/CompanyContext';
 import { getLetterheadByCompanyId, resolveCompanyId } from '@/lib/print-letterhead';
 import { useDoInvoiceDetail } from '@/hooks/useDoInvoice';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function CreateInvoicePrintPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function CreateInvoicePrintPage() {
   }, [companyId, slug]);
 
   if (!router.isReady || detailQuery.isLoading) {
-    return <DashboardLayout><div className="py-20 text-center text-sm text-slate-500">Memuat invoice...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!detailQuery.data) {

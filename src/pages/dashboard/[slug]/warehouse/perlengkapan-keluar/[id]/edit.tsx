@@ -38,6 +38,7 @@ import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { materialTransactionSchema, type MaterialTransactionFormValues, type MaterialTransactionItemFormValues } from '@/scheme/material-transaction.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const toDateValue = (value?: string) => {
   if (!value) return undefined;
@@ -211,7 +212,7 @@ export default function MaterialReleaseEditPage() {
   if (transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat data pengeluaran perlengkapan...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -381,7 +382,7 @@ export default function MaterialReleaseEditPage() {
             <TableBody>
               {itemsQuery.isLoading || itemsQuery.isFetching ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-slate-500">Memuat item material...</TableCell>
+                  <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat item material..." /></TableCell>
                 </TableRow>
               ) : items.length === 0 ? (
                 <TableRow>

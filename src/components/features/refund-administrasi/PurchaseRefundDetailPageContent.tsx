@@ -17,6 +17,7 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Badge } from '@/components/ui/badge';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -160,7 +161,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
   if (refundQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="p-10 text-center text-[#6B7280]">Memuat detail refund pembelian...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

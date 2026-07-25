@@ -716,7 +716,65 @@ import { CopyBox } from '@/components/ui/copy-box';
 
 ---
 
-## 18. Standar Frontend Logic & React Query (Data Fetching, Search, Sort, Export)
+## 18. Standarisasi Indikator Loading (Loading State)
+
+Untuk menyeragamkan tampilan UI/UX saat proses pengambilan data (fetching/loading), **wajib** menggunakan komponen `<LoadingState />` (`src/components/ui/loading-state.tsx`) di seluruh aplikasi (Halaman, Tabel, Form, Button).
+
+**Tujuan**:
+- Menghindari kode *boilerplate* merender `<Loader2>` secara manual berulang kali.
+- Menjaga konsistensi jarak (*padding*, *margin*, dan *alignment*) dan transisi *layout* di seluruh menu aplikasi Wajira.
+- Memberikan fleksibilitas pada berbagai konteks loading (Halaman Penuh, Bagian Kecil, atau Teks Searah).
+
+> 🚫 **PERINGATAN KERAS**: 
+> **DILARANG KERAS** menggunakan custom string loading secara manual seperti: 
+> `<div className="text-center">Loading...</div>` atau `<div className="p-10">Memuat data...</div>`. 
+> Segala bentuk aktivitas *loading state* (baik itu table, page, atau button) **WAJIB** menggunakan `<LoadingState />` yang telah disediakan, tanpa terkecuali, agar UI tidak terlihat "belang" dan tetap terstandarisasi.
+
+**Aturan Penggunaan Variant:**
+
+1. **`variant="page"` (Default)**
+   Digunakan sebagai pengganti loading saat memuat keseluruhan *page* (misalnya di halaman index atau halaman detail). Variant ini mengamankan tinggi minimum (`50vh`) agar footer/layout tidak lompat (*layout shift*).
+   ```tsx
+   import { LoadingState } from '@/components/ui/loading-state';
+
+   if (isLoading) {
+     return (
+       <DashboardLayout>
+         <LoadingState variant="page" />
+       </DashboardLayout>
+     );
+   }
+   ```
+
+2. **`variant="section"`**
+   Digunakan untuk memuat bagian tertentu dari halaman yang berukuran kecil atau menengah, misalnya saat memuat isi Card, daftar dropdown, atau modal. Variant ini memiliki padding vertikal moderat (`py-10`).
+   ```tsx
+   <Card>
+     <CardContent>
+       {isDataLoading ? <LoadingState variant="section" /> : <DataTampil />}
+     </CardContent>
+   </Card>
+   ```
+
+3. **`variant="inline"`**
+   Digunakan untuk loading berukuran kecil yang letaknya berdampingan dengan teks atau aksi (*inline flex*). Cocok untuk tombol aksi atau label indikator asinkron.
+   ```tsx
+   <Button disabled={isSubmitting}>
+     {isSubmitting ? <LoadingState variant="inline" text="Menyimpan..." iconClassName="text-white" /> : "Simpan"}
+   </Button>
+   ```
+
+4. **`variant="fullscreen"`**
+   Digunakan apabila terdapat aksi krusial berdurasi lama (misal: Submit Laporan Besar, Upload File) yang mewajibkan seluruh layar terkunci dengan *backdrop blur*.
+
+**Catatan Kustomisasi:**
+- Teks default adalah `"Memuat data..."`. Anda dapat menggantinya menggunakan props `text="Sedang sinkronisasi..."`.
+- Jika Anda tidak menginginkan teks sama sekali, cukup lewatkan prop `text={null}`.
+- Prop `iconClassName` berguna jika Anda ingin mengubah warna loading indicator pada background gelap (contoh: `text-white`).
+
+---
+
+## 19. Standar Frontend Logic & React Query (Data Fetching, Search, Sort, Export)
 
 Selain standar UI visual, wajib mematuhi panduan implementasi fungsional berikut agar performa dan pengalaman pengguna *(User Experience)* seragam.
 

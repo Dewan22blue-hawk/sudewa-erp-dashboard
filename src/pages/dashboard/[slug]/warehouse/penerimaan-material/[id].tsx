@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { InvoicePreviewModal } from '@/components/features/goods-receipt/InvoicePreviewModal';
 import { useGoodsReceipt } from '@/hooks/useGoodsReceipt';
 import { formatCurrency, formatLongDate, getReceiptBilling } from '@/components/features/goods-receipt/goods-receipt.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function GoodsReceiptDetailPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function GoodsReceiptDetailPage() {
   const payments = billing?.payments ?? [];
 
   if (query.isLoading) {
-    return <DashboardLayout><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat detail penerimaan material...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!receipt) {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useGoodsIssueEquipmentDetail } from '@/hooks/warehouse/useGoodsIssueEquipment';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatLongDate = (value?: string) => {
   if (!value) return '-';
@@ -36,9 +37,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
-          Memuat data detail pengeluaran perlengkapan...
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

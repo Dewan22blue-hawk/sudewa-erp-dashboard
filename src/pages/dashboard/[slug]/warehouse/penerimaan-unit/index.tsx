@@ -1,4 +1,5 @@
 'use client';
+import { LoadingState } from '@/components/ui/loading-state';
 
 import { useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
@@ -68,7 +69,7 @@ export default function PenerimaanUnitPage() {
 
         <div className="space-y-4">
           {isLoading ? (
-            <div className="bg-white rounded-md border p-8 text-center text-gray-500">Loading...</div>
+            <LoadingState variant="page" />
           ) : isError ? (
             <div className="bg-white rounded-md border p-8 text-center text-red-500">{apiErrorMessage}</div>
           ) : (

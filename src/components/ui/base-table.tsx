@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 import { cn } from '@/lib/utils';
 
 export interface ColumnDef<T> {
@@ -353,10 +354,7 @@ export default function BaseTable<T>({
                 <TableCell colSpan={columns.length + (showCheckbox ? 1 : 0)} className="text-center px-4 py-16 bg-white border-none">
                   <div className="flex flex-col items-center justify-center gap-2">
                     {loading ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <p className="text-sm text-muted-foreground">Memuat data...</p>
-                      </>
+                      <LoadingState variant="section" text="Memuat data..." />
                     ) : (
                       <>
                         <div className="rounded-full bg-slate-50 p-4 mb-2">

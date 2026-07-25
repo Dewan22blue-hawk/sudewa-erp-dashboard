@@ -156,7 +156,7 @@ export function EditUnitForm({
         <div>
           <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Penjualan</h2>
           <p className="text-sm text-gray-500 mt-1">Kelola detail informasi penjualan unit dan biaya-biaya terkait</p>
-          <div className="h-px bg-muted/60" />
+          <div className="my-6 h-px bg-muted/60" />
         </div>
 
         {prependFields}

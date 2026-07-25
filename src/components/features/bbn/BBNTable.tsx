@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Upload, Download, Loader2 } from 'lucide-react';
+import { Search, Plus, MoreVertical, Upload, Download } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import type { BBN } from '@/@types/bbn.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface BBNTableProps {
     bbns: BBN[];
@@ -191,10 +192,7 @@ export function BBNTable({
                     {isLoading ? (
                         <tr>
                             <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                                <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                                </div>
+                                <LoadingState variant="section" text="Memuat data..." />
                             </td>
                         </tr>
                     ) : bbns.length > 0 ? (

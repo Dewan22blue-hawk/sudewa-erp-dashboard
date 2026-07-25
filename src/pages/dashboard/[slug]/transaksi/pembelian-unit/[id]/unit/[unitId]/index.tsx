@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, ChevronRight, DollarSignIcon, FileText, Info, ListTodoIcon, Loader2, MoreVertical, Plus, Upload } from 'lucide-react';
+import { ArrowLeft, ChevronRight, DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
@@ -20,6 +20,7 @@ import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const parseApiError = (err: any): string => {
   const details = err?.details ?? err?.response?.data?.errors;
@@ -228,9 +229,7 @@ export default function UnitPurchaseDetailPage() {
   if (purchaseLoading || unitItemLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

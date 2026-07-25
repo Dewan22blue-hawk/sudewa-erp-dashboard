@@ -6,10 +6,11 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useCreateUnitItem, usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { useMemo } from 'react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const parseApiError = (err: any): string => {
   const details = err?.details ?? err?.response?.data?.errors;
@@ -103,9 +104,7 @@ export default function CreatePurchaseUnitPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

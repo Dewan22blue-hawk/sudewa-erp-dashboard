@@ -1,3 +1,4 @@
+import { LoadingState } from '@/components/ui/loading-state';
 import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -56,9 +57,7 @@ export default function StockUnitPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <PageHeader title="Data Unit Stok" subtitle="Kelola dan lacak semua unit stok" />
-          <Card className="rounded-md p-6">
-            <div className="text-center text-muted-foreground">Memuat data...</div>
-          </Card>
+          <LoadingState variant="page" />
         </div>
       </DashboardLayout>
     );

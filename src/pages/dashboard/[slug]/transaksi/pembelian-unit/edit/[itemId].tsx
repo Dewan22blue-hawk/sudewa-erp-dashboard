@@ -5,9 +5,10 @@ import { PageHeader } from '@/components/ui/page-header';
 import PurchaseForm from '@/components/features/purchase/PurchaseForm';
 import { usePurchaseById, useUpdatePurchase } from '@/hooks/usePurchase';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditPurchasePage() {
   const router = useRouter();
@@ -45,9 +46,7 @@ export default function EditPurchasePage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

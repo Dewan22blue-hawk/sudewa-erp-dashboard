@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Paperclip, Upload } from 'lucide-react';
+import {  Paperclip, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { useCreatePembayaranHutangPayment } from '@/hooks/usePembayaranHutang';
 import type { CreateLiabilityPaymentPayload } from '@/types/pembayaran-hutang.types';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKas } from '@/hooks/useKas';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const resolveCashId = (
   cashes: any[] | undefined,
@@ -313,7 +314,7 @@ export default function PembayaranHutangPaymentDialog({ open, onOpenChange, bill
             <Button type="submit" disabled={isBusy || !billingId} className="bg-primary text-primary-foreground hover:bg-primary/90">
               {isBusy ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                   Menyimpan
                 </span>
               ) : (

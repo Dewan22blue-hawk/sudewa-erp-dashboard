@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Search, Loader2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Badge } from '@/components/ui/badge';
 import { unitTransactionService } from '@/services/unitTransaction.service';
 import { toast } from 'sonner';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   open: boolean;
@@ -157,7 +158,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
               disabled={loading}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 h-11 mt-6 rounded-md w-full sm:w-auto shadow-none"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cari'}
+              {loading ? <LoadingState variant="inline" text={null} /> : 'Cari'}
             </Button>
           </div>
 
@@ -178,10 +179,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={6} className="h-48 text-center text-slate-500">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
-                        <span className="text-sm font-medium">Mencari data...</span>
-                      </div>
+                      <LoadingState variant="section" text="Mencari data..." />
                     </TableCell>
                   </TableRow>
                 ) : results.length === 0 ? (

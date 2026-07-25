@@ -4,11 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Loader2, Search } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Search } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateUI } from '@/lib/utils/date';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   data: PPNPenjualan[];
@@ -121,10 +122,7 @@ export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, h
             {isLoading ? (
               <tr>
                 <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
+                  <LoadingState variant="section" text="Memuat data..." />
                 </td>
               </tr>
             ) : isError ? (

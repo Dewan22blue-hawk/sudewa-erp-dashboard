@@ -35,6 +35,7 @@ import {
 import { useMaterials } from '@/hooks/useMaterial';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { goodsIssueSchema, type GoodsIssueFormValues, type GoodsIssueItemFormValues } from '@/scheme/goods-issue.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const toDateValue = (value?: string) => {
   if (!value) return undefined;
@@ -176,7 +177,7 @@ export default function GoodsIssueEditPage() {
     }
   };
 
-  if (query.isLoading) return <DashboardLayout><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat data edit pengeluaran material...</div></DashboardLayout>;
+  if (query.isLoading) return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   if (!issue) return <DashboardLayout><div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran material tidak ditemukan.</div></DashboardLayout>;
 
   return (

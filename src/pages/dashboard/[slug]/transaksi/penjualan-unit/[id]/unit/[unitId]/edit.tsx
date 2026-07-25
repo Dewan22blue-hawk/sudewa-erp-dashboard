@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import { useSalesUnitItems, useUpdateUnitItem } from '@/hooks/useUnitTransaction
 import { useSalesDetail } from '@/hooks/useSales';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useCompany } from '@/contexts/CompanyContext';
+import { LoadingState } from '@/components/ui/loading-state';
 
 /**
  * Edit Unit Page - Nested under Sales Detail
@@ -119,9 +120,7 @@ export default function EditNestedUnitPage() {
     if (salesLoading || itemLoading || typeUnitLoading) {
         return (
             <DashboardLayout>
-                <div className="flex h-[50vh] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
+                <LoadingState variant="page" />
             </DashboardLayout>
         );
     }
