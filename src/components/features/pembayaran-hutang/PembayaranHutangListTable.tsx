@@ -1,7 +1,8 @@
-import { ExternalLink, Search } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils/currency';
 import type { LiabilityPaymentHistory } from '@/types/pembayaran-hutang.types';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 
 interface Props {
     data: LiabilityPaymentHistory[]
@@ -23,80 +24,84 @@ export default function PembayaranHutangListTable({ data }: Props) {
 
     const total = rows.reduce((acc, item) => acc + item.cash_payment_amount + item.bca_payment_amount + item.bca_payment_usd_amount, 0)
 
+    const columns: ColumnDef<LiabilityPaymentHistory>[] = [
+        {
+            header: 'No',
+            alignment: 'left',
+            cell: (_, index) => <span className="text-gray-600">{index + 1}</span>,
+        },
+        {
+            header: 'Tanggal Bayar',
+            alignment: 'left',
+            cell: (item) => <span className="text-gray-700">{formatDate(item.payment_at || item.created_at)}</span>,
+        },
+        {
+            header: 'Cash Payment',
+            alignment: 'right',
+            cell: (item) => <span className="font-medium text-gray-900">{formatCurrency(item.cash_payment_amount)}</span>,
+        },
+        {
+            header: 'BCA Payment',
+            alignment: 'right',
+            cell: (item) => (
+                <div className="space-y-1">
+                    <div className="font-medium text-gray-900">{formatCurrency(item.bca_payment_amount)}</div>
+                    {item.bca_payment_usd_amount > 0 ? <div className="text-xs text-gray-500">{formatCurrency(item.bca_payment_usd_amount, 'USD')}</div> : null}
+                </div>
+            ),
+        },
+        {
+            header: 'Total',
+            alignment: 'right',
+            cell: (item) => {
+                const totalPayment = item.cash_payment_amount + item.bca_payment_amount + item.bca_payment_usd_amount;
+                return <span className="font-semibold text-emerald-600">{formatCurrency(totalPayment)}</span>;
+            },
+        },
+        {
+            header: 'Keterangan',
+            alignment: 'left',
+            cell: (item) => <span className="text-gray-600">{item.note || '-'}</span>,
+        },
+        {
+            header: 'Bukti Bayar',
+            alignment: 'left',
+            cell: (item) => {
+                const proofUrl = item.payment_proof;
+                return proofUrl ? (
+                    <Button variant="outline" size="sm" asChild>
+                        <a href={proofUrl} target="_blank" rel="noreferrer">
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Lihat Bukti
+                        </a>
+                    </Button>
+                ) : (
+                    <span className="text-gray-400">-</span>
+                );
+            },
+        },
+    ];
+
+    const footer = (
+        <tfoot className="border-t bg-gray-50/80">
+            <tr className="font-semibold text-gray-900">
+                <td colSpan={4} className="px-4 py-4 text-right">
+                    Sub Total
+                </td>
+                <td className="px-4 py-4 text-right">{formatCurrency(total)}</td>
+                <td colSpan={2}></td>
+            </tr>
+        </tfoot>
+    );
+
     return (
         <div className="space-y-4">
-            <div className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-100/80 text-xs font-semibold uppercase tracking-wide text-gray-600">
-                        <tr className="border-b border-gray-200">
-                            <th className="px-4 py-3 text-left">No</th>
-                            <th className="px-4 py-3 text-left">Tanggal Bayar</th>
-                            <th className="px-4 py-3 text-right">Cash Payment</th>
-                            <th className="px-4 py-3 text-right">BCA Payment</th>
-                            <th className="px-4 py-3 text-right">Total</th>
-                            <th className="px-4 py-3 text-left">Keterangan</th>
-                            <th className="px-4 py-3 text-left">Bukti Bayar</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {rows.length > 0 ? (
-                            rows.map((item, index) => {
-                                const totalPayment = item.cash_payment_amount + item.bca_payment_amount + item.bca_payment_usd_amount;
-                                const proofUrl = item.payment_proof;
-
-                                return (
-                                    <tr key={item.id} className="transition-colors hover:bg-gray-50/70">
-                                        <td className="px-4 py-4 text-gray-600">{index + 1}</td>
-                                        <td className="px-4 py-4 text-gray-700">{formatDate(item.payment_at || item.created_at)}</td>
-                                        <td className="px-4 py-4 text-right font-medium text-gray-900">{formatCurrency(item.cash_payment_amount)}</td>
-                                        <td className="px-4 py-4 text-right font-medium text-gray-900">
-                                            <div className="space-y-1">
-                                                <div>{formatCurrency(item.bca_payment_amount)}</div>
-                                                {item.bca_payment_usd_amount > 0 ? <div className="text-xs text-gray-500">{formatCurrency(item.bca_payment_usd_amount, 'USD')}</div> : null}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-right font-semibold text-emerald-600">{formatCurrency(totalPayment)}</td>
-                                        <td className="px-4 py-4 text-gray-600">{item.note || '-'}</td>
-                                        <td className="px-4 py-4">
-                                            {proofUrl ? (
-                                                <Button variant="outline" size="sm" asChild>
-                                                    <a href={proofUrl} target="_blank" rel="noreferrer">
-                                                        <ExternalLink className="mr-2 h-4 w-4" />
-                                                        Lihat Bukti
-                                                    </a>
-                                                </Button>
-                                            ) : (
-                                                <span className="text-gray-400">-</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                            <Search className="h-8 w-8 text-slate-400" />
-                                        </div>
-                                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                    <tfoot className="border-t bg-gray-50/80">
-                        <tr className="font-semibold text-gray-900">
-                            <td colSpan={4} className="px-4 py-4 text-right">
-                                Sub Total
-                            </td>
-                            <td className="px-4 py-4 text-right">{formatCurrency(total)}</td>
-                            <td colSpan={2}></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+            <BaseTable
+                data={rows}
+                columns={columns}
+                footer={footer}
+                headerRowClassName="bg-gray-100/80 text-gray-600"
+            />
         </div>
     )
 }

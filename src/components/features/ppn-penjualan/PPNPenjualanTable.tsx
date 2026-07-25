@@ -1,15 +1,14 @@
+import { useMemo } from 'react';
 import type { PPNPenjualan } from '@/@types/ppn-penjualan.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowUpDown, ArrowUp, ArrowDown, MoreVertical, Search } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 import { formatDateUI } from '@/lib/utils/date';
-import { LoadingState } from '@/components/ui/loading-state';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface Props {
   data: PPNPenjualan[];
@@ -36,253 +35,212 @@ const formatDate = (value: string | null) => {
 };
 
 const renderStatusBadge = (hasValue: boolean, readyLabel: string, emptyLabel: string) => (
-  <Badge className={hasValue ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-amber-100 text-amber-700 hover:bg-amber-100'}>
+  <Badge className={hasValue ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 shadow-none' : 'bg-amber-100 text-amber-700 hover:bg-amber-100 shadow-none'}>
     {hasValue ? readyLabel : emptyLabel}
   </Badge>
 );
 
-const SkeletonRow = () => (
-  <tr className="border-b border-slate-100">
-    {Array.from({ length: 15 }).map((_, index) => (
-      <td key={index} className="px-4 py-4">
-        <Skeleton className="h-4 w-full max-w-[140px]" />
-      </td>
-    ))}
-  </tr>
-);
+export default function PPNPenjualanTable({
+  data,
+  meta,
+  sortBy,
+  sortDirection,
+  hasNextPage,
+  isTotalExact,
+  isLoading,
+  isFetching,
+  isError,
+  errorMessage,
+  onRetry,
+  onEdit,
+  onSortChange,
+  onPageChange,
+}: Props) {
 
-export default function PPNPenjualanTable({ data, meta, sortBy, sortDirection, hasNextPage, isTotalExact, isLoading, isFetching, isError, errorMessage, onRetry, onEdit, onSortChange, onPageChange }: Props) {
-  const page = meta.currentPage;
-  const hasData = data.length > 0;
-  const startIndex = hasData ? (page - 1) * meta.perPage + 1 : 0;
-  const endIndex = hasData ? startIndex + data.length - 1 : 0;
-  const canGoPrevious = page > 1;
-  const canGoNext = isTotalExact ? page < meta.lastPage : hasNextPage;
-  const pageNumbers = isTotalExact
-    ? Array.from({ length: Math.min(5, meta.lastPage) }, (_, index) => {
-      if (meta.lastPage <= 5) return index + 1;
-      if (page <= 3) return index + 1;
-      if (page >= meta.lastPage - 2) return meta.lastPage - 4 + index;
-      return page - 2 + index;
-    })
-    : [page];
-
-  const renderSortHeader = (title: string, sortKey: string, align: 'left' | 'right' | 'center' = 'left') => {
-    const isSorted = sortBy === sortKey;
-    const justifyClass = align === 'right' ? 'justify-end w-full' : align === 'center' ? 'justify-center w-full' : 'justify-start';
-    return (
-      <button
-        type="button"
-        className={`flex items-center gap-1 cursor-pointer select-none group w-full px-4 py-4 text-xs font-semibold uppercase ${isSorted ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
-        onClick={() => onSortChange(sortKey)}
-      >
-        <span>{title}</span>
-        {isSorted ? (
-          sortDirection === 'asc' ? (
-            <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
-          ) : (
-            <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
-          )
-        ) : (
-          <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
-        )}
-      </button>
-    );
-  };
+  const columns = useMemo<ColumnDef<PPNPenjualan>[]>(
+    () => [
+      {
+        header: 'Kode Invoice',
+        accessorKey: 'code',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <span className="font-medium text-blue-600 whitespace-nowrap">{item.code}</span>
+      },
+      {
+        header: 'Tanggal Jual',
+        accessorKey: 'sales_date',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="text-slate-500 whitespace-nowrap">{formatDate(item.sales_date)}</span>,
+      },
+      {
+        header: 'Customer',
+        accessorKey: 'customer',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <span className="text-slate-700">{item.customer}</span>
+      },
+      {
+        header: 'Tanggal FPM',
+        accessorKey: 'fpm_date',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => {
+          const hasFpm = Boolean(item.fpm_date);
+          return (
+            <div className="space-y-1">
+              <div>{formatDate(item.fpm_date)}</div>
+              {renderStatusBadge(hasFpm, 'FPM Terisi', 'Belum FPM')}
+            </div>
+          );
+        },
+      },
+      {
+        header: 'MASA NSFPM',
+        accessorKey: 'nsfpm_age',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => {
+          const hasNsfpmAge = Boolean(item.nsfpm_age);
+          return (
+            <div className="space-y-1">
+              <div>{formatDate(item.nsfpm_age)}</div>
+              {renderStatusBadge(hasNsfpmAge, 'NSFPM Terisi', 'Belum NSFPM')}
+            </div>
+          );
+        },
+      },
+      {
+        header: 'Nomor NSFP',
+        alignment: 'center',
+        cell: (item) => {
+          const hasNsfpNumber = Boolean(item.nsfp_number && item.nsfp_number.trim() !== '');
+          return (
+            <div className="space-y-1 flex flex-col items-center">
+              <div>{item.nsfp_number || '-'}</div>
+              {renderStatusBadge(hasNsfpNumber, 'Sudah Input', 'Belum Input')}
+            </div>
+          );
+        },
+      },
+      {
+        header: 'QTY',
+        accessorKey: 'qty',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="text-slate-700">{item.qty}</span>,
+      },
+      {
+        header: 'Tipe Unit',
+        accessorKey: 'unit_type.name',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => (
+          <div>
+            <div className="font-medium text-slate-900">{item.unit_type.name}</div>
+            <div className="text-xs text-slate-500">{item.unit_type.code}</div>
+          </div>
+        ),
+      },
+      {
+        header: 'No Mesin',
+        alignment: 'left',
+        cell: (item) => (
+          <span className="text-slate-700">{item.unit_transaction_item_detail?.machine_number ?? '-'}</span>
+        ),
+      },
+      {
+        header: 'No Rangka',
+        alignment: 'left',
+        cell: (item) => (
+          <span className="text-slate-700">{item.unit_transaction_item_detail?.chassis_number ?? '-'}</span>
+        ),
+      },
+      {
+        header: 'Harga Unit',
+        accessorKey: 'unit_price',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.unit_price)}</span>,
+      },
+      {
+        header: 'DPP',
+        accessorKey: 'dpp_amount',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.dpp_amount)}</span>,
+      },
+      {
+        header: 'PPN 11%',
+        accessorKey: 'ppn_11',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.ppn_11)}</span>,
+      },
+      {
+        header: 'Total Bayar',
+        accessorKey: 'payment_amount',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.payment_amount)}</span>,
+      },
+      {
+        header: 'Action',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (item) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+              <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-md px-3 py-2.5">
+                Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [onEdit]
+  );
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-md border border-slate-200 overflow-x-auto shadow-none">
-        {isFetching && !isLoading ? (
-          <div className="border-b bg-blue-50/50 px-4 py-2 text-xs text-blue-700">
-            Memperbarui data...
-          </div>
-        ) : null}
-        <table className="min-w-[1800px] w-full text-sm">
-          <thead className="bg-[#f8f9fa] border-b border-gray-200">
-            <tr>
-              <th className="p-0 text-left">{renderSortHeader('Kode Invoice', 'code', 'left')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Tanggal Jual', 'sales_date', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Customer', 'customer', 'left')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Tanggal FPM', 'fpm_date', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('MASA NSFPM', 'nsfpm_age', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">Nomor NSFP</th>
-              <th className="p-0 text-left">{renderSortHeader('QTY', 'qty', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Tipe Unit', 'unit_type.name', 'left')}</th>
-              <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Mesin</th>
-              <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">No Rangka</th>
-              <th className="p-0 text-left">{renderSortHeader('Harga Unit', 'unit_price', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('DPP', 'dpp_amount', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('PPN 11%', 'ppn_11', 'center')}</th>
-              <th className="p-0 text-left">{renderSortHeader('Total Bayar', 'payment_amount', 'center')}</th>
-              <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                  <LoadingState variant="section" text="Memuat data..." />
-                </td>
-              </tr>
-            ) : isError ? (
-              <tr>
-                <td colSpan={15} className="px-4 py-10 text-center">
-                  <div className="space-y-3">
-                    <p className="text-sm text-red-600">{errorMessage ?? 'Gagal memuat data PPN penjualan'}</p>
-                    {onRetry ? (
-                      <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-                        Retry
-                      </Button>
-                    ) : null}
-                  </div>
-                </td>
-              </tr>
-            ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              data.map((item) => {
-                const hasFpm = Boolean(item.fpm_date);
-                const hasNsfpmAge = Boolean(item.nsfpm_age);
-                const hasNsfpNumber = Boolean(item.nsfp_number && item.nsfp_number.trim() !== '');
-
-                return (
-                  <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-                    <td className="px-4 py-4 text-left font-medium text-blue-600 whitespace-nowrap">{item.code}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500 whitespace-nowrap">{formatDate(item.sales_date)}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.customer}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">
-                      <div className="space-y-1">
-                        <div>{formatDate(item.fpm_date)}</div>
-                        {renderStatusBadge(hasFpm, 'FPM Terisi', 'Belum FPM')}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">
-                      <div className="space-y-1">
-                        <div>{formatDate(item.nsfpm_age)}</div>
-                        {renderStatusBadge(hasNsfpmAge, 'NSFPM Terisi', 'Belum NSFPM')}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">
-                      <div className="space-y-1">
-                        <div>{item.nsfp_number || '-'}</div>
-                        {renderStatusBadge(hasNsfpNumber, 'Sudah Input', 'Belum Input')}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-700">{item.qty}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">
-                      <div className="font-medium text-slate-900">{item.unit_type.name}</div>
-                      <div className="text-xs text-slate-500">{item.unit_type.code}</div>
-                    </td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.unit_transaction_item_detail.machine_number}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.unit_transaction_item_detail.chassis_number}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.unit_price)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.dpp_amount)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.ppn_11)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.payment_amount)}</td>
-                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-md px-3 py-2.5">Edit</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between px-1 py-4">
-        <div>
-          {isTotalExact
-            ? `Showing ${startIndex}-${endIndex} of ${meta.total} data`
-            : `Showing ${startIndex}-${endIndex} on page ${page}${hasNextPage ? ' (lebih banyak data tersedia)' : ''}`}
+      {isFetching && !isLoading && (
+        <div className="rounded-md border border-blue-200 bg-blue-50/50 px-4 py-2 text-xs text-blue-700">
+          Memperbarui data...
         </div>
-        <div className="flex items-center gap-1.5 self-end lg:self-auto text-slate-800">
-          {isTotalExact ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onPageChange(1)}
-              disabled={!canGoPrevious}
-              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
-            >
-              First
-            </Button>
-          ) : null}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onPageChange(page - 1)}
-            disabled={!canGoPrevious}
-            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
-          >
-            Previous
-          </Button>
+      )}
 
-          {pageNumbers.map((p, idx) => (
-            <Button
-              key={idx}
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={p === page}
-              onClick={() => onPageChange(p)}
-              className={cn(
-                'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
-                p === page
-                  ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
-                  : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
-              )}
-            >
-              {p}
+      {isError && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-center">
+          <p className="text-sm text-red-600 mb-2">{errorMessage ?? 'Gagal memuat data PPN penjualan'}</p>
+          {onRetry && (
+            <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+              Retry
             </Button>
-          ))}
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onPageChange(page + 1)}
-            disabled={!canGoNext}
-            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
-          >
-            Next
-          </Button>
-          {isTotalExact ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onPageChange(meta.lastPage)}
-              disabled={!canGoNext}
-              className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none"
-            >
-              Last
-            </Button>
-          ) : null}
+          )}
         </div>
-      </div>
+      )}
+
+      <BaseTable
+        data={data}
+        columns={columns}
+        loading={isLoading}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSortChange={(key) => onSortChange(key)}
+        meta={{
+          currentPage: meta.currentPage,
+          perPage: meta.perPage,
+          lastPage: isTotalExact ? meta.lastPage : (hasNextPage ? meta.currentPage + 1 : meta.currentPage),
+          total: isTotalExact ? meta.total : (hasNextPage ? (meta.currentPage * meta.perPage) + 1 : meta.currentPage * meta.perPage),
+        }}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }
