@@ -889,3 +889,58 @@ const toggleAllPage = (checked: boolean) => {
   });
 };
 ```
+
+---
+
+## 21. Standarisasi Modal Konfirmasi Aksi Kritis
+
+**Aturan**: Setiap tombol aksi yang memicu perubahan status signifikan pada transaksi atau data kritis (misal: "Tandai Lunas", "Terima Barang", "Kirim Barang", "Unit Terjual") **wajib** menggunakan Modal Konfirmasi (`Dialog`) sebelum aksi tersebut dieksekusi, tidak boleh memanggil fungsi API secara langsung dari tombol.
+
+**Standar Komponen Modal Konfirmasi**:
+1. Gunakan komponen `Dialog` dari `@/components/ui/dialog`.
+2. Sertakan kotak informasi bergaya peringatan yang konsisten dengan ikon `Info` dari `lucide-react` di dalam `DialogHeader`.
+3. Modal harus tertutup otomatis (*state* diubah menjadi `false`) setelah proses API sukses, maupun saat gagal atau terhenti di validasi *frontend*.
+
+**Contoh Implementasi**:
+
+```tsx
+<Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+  <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>Konfirmasi Kirim Barang</DialogTitle>
+      <DialogDescription className="pt-2">
+        Apakah Anda yakin ingin mengirim barang ini?
+      </DialogDescription>
+      {/* Kotak Informasi Wajib */}
+      <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+        <div className="flex gap-2">
+          <span>
+            <Info />
+          </span>
+          <span>
+            Dengan klik kirim barang maka akan mengurangi stock <b>Warehouse</b> dan barang akan dikirim ke pembeli.
+          </span>
+        </div>
+      </div>
+    </DialogHeader>
+    <DialogFooter className="mt-4 flex justify-end gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => setIsConfirmDialogOpen(false)}
+        disabled={isPending}
+      >
+        Batal
+      </Button>
+      <Button
+        type="button"
+        className="bg-blue-600 hover:bg-blue-700 text-white" // Sesuaikan warna, misal: emerald-600 untuk aksi positif
+        onClick={handleExecuteAction}
+        disabled={isPending}
+      >
+        {isPending ? 'Memproses...' : 'Ya, Kirim Barang'}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```

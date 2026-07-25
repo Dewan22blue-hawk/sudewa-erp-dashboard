@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Wallet, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Wallet, AlertTriangle, Info } from 'lucide-react';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
 import { toast } from 'sonner';
@@ -52,6 +52,7 @@ export default function SalesDetailPage() {
   const isRefunded = stockState === 'outbound_return';
 
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
+  const [isDeliveryDialogOpen, setIsDeliveryDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const updateBillingIsPaid = useUpdateBillingIsPaid();
   const updateState = useUpdateUnitTransactionState();
@@ -199,16 +200,19 @@ export default function SalesDetailPage() {
 
       if (!warehouseId) {
         toast.error('warehouse_id belum tersedia pada transaksi ini.');
+        setIsDeliveryDialogOpen(false);
         return;
       }
       if (!personId) {
         toast.error('person_id belum tersedia pada transaksi ini.');
+        setIsDeliveryDialogOpen(false);
         return;
       }
 
       const items = rawData?.unit_transaction_items ?? [];
       if (items.length === 0) {
         toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Kirim Barang.');
+        setIsDeliveryDialogOpen(false);
         return;
       }
 
@@ -228,6 +232,7 @@ export default function SalesDetailPage() {
           `Belum semua unit dialokasikan:\n- ${incompleteItems.join('\n- ')}\n\nSilakan klik tombol Action > Detail pada tabel di bawah untuk memilih stock unit yang ingin dialokasikan.`,
           { duration: 8000 }
         );
+        setIsDeliveryDialogOpen(false);
         return;
       }
 
@@ -238,6 +243,7 @@ export default function SalesDetailPage() {
 
       if (detailIds.length === 0) {
         toast.error('Belum ada unit terpilih untuk dikirim.');
+        setIsDeliveryDialogOpen(false);
         return;
       }
 
@@ -253,6 +259,7 @@ export default function SalesDetailPage() {
 
       if (stockStateForWarehouse !== SALES_PREPARE_STOCK_STATE) {
         toast.error('State transaksi harus outbound_in_transit sebelum membuat warehouse activity.');
+        setIsDeliveryDialogOpen(false);
         return;
       }
 
@@ -276,8 +283,10 @@ export default function SalesDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['stock-units'] });
 
       toast.success('Status penjualan diperbarui ke delivered dan stok berhasil dikirim.');
+      setIsDeliveryDialogOpen(false);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal mengirim barang.');
+      setIsDeliveryDialogOpen(false);
     }
   };
 
@@ -349,7 +358,7 @@ export default function SalesDetailPage() {
               variant="outline"
               className="bg-white hover:bg-gray-50 border-gray-200"
               disabled={!canDeliver || updateState.isPending}
-              onClick={handleDelivery}
+              onClick={() => setIsDeliveryDialogOpen(true)}
             >
               {isAlreadyDelivered ? 'Sudah Terkirim' : updateState.isPending ? 'Memproses...' : 'Kirim Barang'}
             </Button>
@@ -405,6 +414,16 @@ export default function SalesDetailPage() {
             <DialogDescription className="pt-2">
               Apakah Anda yakin ingin menandai transaksi ini sebagai <strong>Lunas</strong>?
             </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Proses ini akan menambah data baru pada <b>Administrasi Arus Transaksi</b> dan <b>Finance Transaksi Kas Harian</b>, dan data <b>Administrasi</b> yang sudah dibilling tidak bisa dirubah data didalamnya.
+                </span>
+              </div>
+            </div>
           </DialogHeader>
           <DialogFooter className="mt-4 flex justify-end gap-2">
             <Button
@@ -422,6 +441,46 @@ export default function SalesDetailPage() {
               disabled={updateBillingIsPaid.isPending}
             >
               {updateBillingIsPaid.isPending ? 'Memproses...' : 'Ya, Tandai Lunas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* CONFIRMATION DIALOG KIRIM BARANG */}
+      <Dialog open={isDeliveryDialogOpen} onOpenChange={setIsDeliveryDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Kirim Barang</DialogTitle>
+            <DialogDescription className="pt-2">
+              Apakah Anda yakin ingin mengirim barang ini?
+            </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Dengan klik kirim barang maka akan mengurangi stock <b>Warehouse</b> dan barang akan dikirim ke pembeli.
+                </span>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDeliveryDialogOpen(false)}
+              disabled={updateState.isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleDelivery}
+              disabled={updateState.isPending}
+            >
+              {updateState.isPending ? 'Memproses...' : 'Ya, Kirim Barang'}
             </Button>
           </DialogFooter>
         </DialogContent>
