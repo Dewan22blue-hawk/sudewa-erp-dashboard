@@ -56,6 +56,12 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
         cell: (item) => <span className="text-sm text-gray-900">{item.name}</span>,
       },
       {
+        header: 'JUMLAH VERSI PAJAK',
+        accessorKey: 'tax_version_count',
+        sortable: true,
+        cell: (item) => <span className="text-sm text-gray-900">{item.tax_version_count || 0} Versi</span>,
+      },
+      {
         header: 'ACTION',
         alignment: 'center',
         sticky: 'right',

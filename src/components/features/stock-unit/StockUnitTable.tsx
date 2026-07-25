@@ -129,8 +129,6 @@ export default function StockUnitTable({
     total: totalData,
   };
 
-  console.log(data);
-
   return (
     <BaseTable
       data={data}

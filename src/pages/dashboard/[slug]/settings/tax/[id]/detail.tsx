@@ -163,6 +163,10 @@ export default function TaxDetailPage() {
                       <span className="text-base text-slate-900">-</span>
                     )}
                   </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">Jumlah Versi Pajak</p>
+                    <p className="text-base text-slate-900">{tax?.tax_version_count ?? 0} Versi</p>
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -173,7 +177,7 @@ export default function TaxDetailPage() {
               <h2 className="text-lg font-semibold">Daftar Versi Pajak</h2>
               <p className="text-sm text-muted-foreground">Kelola riwayat nilai/rate pajak untuk {tax?.name || 'pajak ini'}</p>
             </div>
-            
+
             <TaxVersionTable
               data={taxVersionsData?.data?.data || []}
               meta={taxVersionsData?.data ? {

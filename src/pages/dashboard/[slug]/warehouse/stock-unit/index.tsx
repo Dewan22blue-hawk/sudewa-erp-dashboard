@@ -48,10 +48,6 @@ export default function StockUnitPage() {
     }
   }, [data]);
 
-
-
-  console.log(data?.data)
-
   if (isLoading) {
     return (
       <DashboardLayout>

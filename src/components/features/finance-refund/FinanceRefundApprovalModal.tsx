@@ -97,8 +97,6 @@ export default function FinanceRefundApprovalModal({ open, onClose, refund, tran
     }
   };
 
-  console.log(refund);
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-8xl overflow-hidden p-0 rounded-md border border-[#E4E4E7] bg-white">
