@@ -65,6 +65,7 @@ export default function PurchaseDetailPage() {
   const { data: typeUnits } = useTypeUnits();
 
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
+  const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
 
   const billingSummary = purchase?.billing_summary;
   const totalTagihan = Number(billingSummary?.grand_total ?? purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
@@ -175,14 +176,17 @@ export default function PurchaseDetailPage() {
 
       if (!warehouseId) {
         toast.error('warehouse_id belum tersedia pada transaksi ini.');
+        setIsReceiveDialogOpen(false);
         return;
       }
       if (!personId) {
         toast.error('person_id belum tersedia pada transaksi ini.');
+        setIsReceiveDialogOpen(false);
         return;
       }
       if (unitItems.length === 0) {
         toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -209,6 +213,7 @@ export default function PurchaseDetailPage() {
           `Detail unit belum lengkap:\n- ${incompleteItems.join('\n- ')}\n\nSilakan klik tombol Action > Detail / Kelola Unit pada tabel di bawah untuk melengkapi nomor rangka, nomor mesin, dan warna setiap unit.`,
           { duration: 8000 }
         );
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -219,6 +224,7 @@ export default function PurchaseDetailPage() {
 
       if (detailIds.length === 0) {
         toast.error('Detail unit transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -234,6 +240,7 @@ export default function PurchaseDetailPage() {
 
       if (stockStateForWarehouse !== PURCHASE_PREPARE_STOCK_STATE) {
         toast.error('State transaksi harus inbound_incoming_goods sebelum membuat warehouse activity.');
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -252,6 +259,7 @@ export default function PurchaseDetailPage() {
       });
 
       toast.success('Status pembelian diperbarui ke receipt dan stok warehouse berhasil diproses.');
+      setIsReceiveDialogOpen(false);
     } catch (error: any) {
       const message = readApiError(error);
 
@@ -263,6 +271,7 @@ export default function PurchaseDetailPage() {
           },
         },
       });
+      setIsReceiveDialogOpen(false);
     }
   };
 
@@ -352,7 +361,7 @@ export default function PurchaseDetailPage() {
               variant="outline"
               className="bg-white hover:bg-gray-50 border-gray-200"
               disabled={!canReceive || updateState.isPending}
-              onClick={handleReceipt}
+              onClick={() => setIsReceiveDialogOpen(true)}
             >
               {isAlreadyReceived ? 'Sudah Diterima' : updateState.isPending ? 'Memproses...' : 'Terima Barang'}
             </Button>
@@ -428,6 +437,46 @@ export default function PurchaseDetailPage() {
               disabled={updateBillingIsPaid.isPending}
             >
               {updateBillingIsPaid.isPending ? 'Memproses...' : 'Ya, Tandai Lunas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* CONFIRMATION DIALOG TERIMA BARANG */}
+      <Dialog open={isReceiveDialogOpen} onOpenChange={setIsReceiveDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Terima Barang</DialogTitle>
+            <DialogDescription className="pt-2">
+              Apakah Anda yakin ingin menerima barang ini?
+            </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Dengan klik terima barang maka akan <b>Masuk ke Warehouse</b>.
+                </span>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsReceiveDialogOpen(false)}
+              disabled={updateState.isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleReceipt}
+              disabled={updateState.isPending}
+            >
+              {updateState.isPending ? 'Memproses...' : 'Ya, Terima Barang'}
             </Button>
           </DialogFooter>
         </DialogContent>
