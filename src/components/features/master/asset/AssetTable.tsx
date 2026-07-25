@@ -58,12 +58,6 @@ export function AssetTable({
     const columns = useMemo<ColumnDef<Asset>[]>(
         () => [
             {
-                header: 'NO',
-                alignment: 'center',
-                className: 'w-12',
-                cell: (_item, index) => (page - 1) * perPage + index + 1,
-            },
-            {
                 header: 'KODE ASET',
                 accessorKey: 'code',
                 className: 'font-medium text-slate-900 uppercase',

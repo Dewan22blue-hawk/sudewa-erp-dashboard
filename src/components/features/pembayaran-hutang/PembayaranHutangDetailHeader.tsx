@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { formatCurrency } from '@/lib/utils/currency';
 import { ArrowLeft, Building2, CalendarDays, CheckCircle2, ListChecks, ReceiptText } from 'lucide-react';
 import type { LiabilityDetail } from '@/types/pembayaran-hutang.types';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface Props {
   data: LiabilityDetail;
@@ -81,7 +82,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <p className="text-sm text-gray-500">Nomor Transaksi</p>
-              <p className="mt-1 font-medium text-gray-900">{data.code}</p>
+              <CopyBox text={data.code} />
             </div>
             <div>
               <p className="text-sm text-gray-500">Billing ID</p>

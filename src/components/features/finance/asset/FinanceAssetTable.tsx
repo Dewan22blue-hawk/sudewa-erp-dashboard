@@ -76,7 +76,7 @@ export function FinanceAssetTable({
                 accessorKey: 'serial_number',
                 alignment: 'left',
                 className: 'uppercase',
-                cell: (item) => <CopyBox text={item.serial_number || '-'} />
+                cell: (item) => item.serial_number ? <CopyBox text={item.serial_number} /> : <Badge variant='outline' className='bg-slate-100 text-slate-500 border-slate-200'>belum ditambahkan</Badge>
             },
             {
                 header: 'TGL BELI',

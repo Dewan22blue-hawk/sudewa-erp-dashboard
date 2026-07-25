@@ -146,10 +146,10 @@ export default function CreatePurchasePage() {
         console.debug('create purchase payload', payload);
       }
 
-      await mutation.mutateAsync(payload);
+      const response = await mutation.mutateAsync(payload);
 
-      toast.success('Pembelian berhasil dibuat');
-      router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
+      toast.success(`Pembelian berhasil dibuat dengan nomor Transaksi ${response?.code}`);
+      router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${response?.id}`);
     } catch (err: any) {
       const statusCode = err?.statusCode ?? err?.response?.status;
       const apiMessage = err?.message;

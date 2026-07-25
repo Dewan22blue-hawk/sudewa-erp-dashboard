@@ -5,6 +5,9 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
 import { MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: WithholdingTaxItem[];
@@ -43,17 +46,16 @@ export default function WithholdingTaxTable({
   currentSortBy,
   currentSortDirection,
 }: Props) {
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
+
   const columns: ColumnDef<WithholdingTaxItem>[] = [
     {
-      header: 'NO',
-      alignment: 'center',
-      headerClassName: 'w-16',
-      cell: (_, index) => {
-        const page = meta?.currentPage ?? 1;
-        const perPage = meta?.perPage ?? 10;
-        const startIndex = data.length > 0 ? (page - 1) * perPage + 1 : 0;
-        return startIndex > 0 ? startIndex + index : index + 1;
-      }
+      header: 'NO INVOICE',
+      accessorKey: 'do_invoice.code',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => <CopyBox text={item.do_invoice?.code || '-'} />,
     },
     {
       header: 'TGL INVOICE',
@@ -63,25 +65,18 @@ export default function WithholdingTaxTable({
       cell: (item) => <span className="text-slate-500 whitespace-nowrap">{formatDate(item.do_invoice?.date)}</span>,
     },
     {
-      header: 'NO INVOICE',
-      accessorKey: 'do_invoice.code',
+      header: 'NO BUKPOT',
+      accessorKey: 'withholding_number',
       sortable: true,
       alignment: 'left',
-      cell: (item) => <span className="font-medium text-slate-900">{item.do_invoice?.code || '-'}</span>,
+      cell: (item) => <CopyBox text={item.withholding_number || '-'} />,
     },
     {
       header: 'NAMA CUSTOMER',
       accessorKey: 'customer.name',
       sortable: true,
       alignment: 'left',
-      cell: (item) => <span className="text-slate-700">{item.do_invoice?.customer?.name ?? '-'}</span>,
-    },
-    {
-      header: 'NO BUKPOT',
-      accessorKey: 'withholding_number',
-      sortable: true,
-      alignment: 'left',
-      cell: (item) => <span className="text-slate-700">{item.withholding_number || '-'}</span>,
+      cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${encodeURIComponent(item.do_invoice?.customer?.name ?? '-')}`}>{item.do_invoice?.customer?.name ?? '-'}</ReferenceLink>,
     },
     {
       header: 'MASA BUKPOT',

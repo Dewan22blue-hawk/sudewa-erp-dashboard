@@ -23,7 +23,7 @@ export default function Home() {
         <title>Wajira Dashboard</title>
       </Head>
 
-      <div className="relative min-h-screen bg-gradient-to-b from-background to-slate-50/50 pb-40">
+      <div className="relative min-h-screen bg-gradient-to-b from-background to-slate-50/50 pb-40 flex flex-col justify-center">
         {/* ================= HERO ================= */}
         <main className="relative z-[100] mx-auto max-w-7xl px-6 py-24 sm:py-32 flex flex-col items-center justify-center min-h-[60vh]">
           <section className="mx-auto max-w-4xl text-center space-y-8">
