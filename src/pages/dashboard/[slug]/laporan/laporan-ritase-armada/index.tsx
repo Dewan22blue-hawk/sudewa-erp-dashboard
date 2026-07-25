@@ -6,6 +6,7 @@ import { Search, Printer, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { TableRow, TableHead } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -292,8 +293,10 @@ export default function LaporanRitaseArmadaPage() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className="no-print">
-          <h1 className="text-2xl font-semibold">Laporan Ritase Armada</h1>
-          <p className="text-sm text-muted-foreground">Laporan ritase armada yang sudah dilakukan</p>
+          <PageHeader
+            title="Laporan Ritase Armada"
+            subtitle="Laporan ritase armada yang sudah dilakukan"
+          />
         </div>
 
         {/* Search + Print row */}

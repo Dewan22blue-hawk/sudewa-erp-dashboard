@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Search, ArrowLeft, Download } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -203,15 +204,15 @@ export default function LaporanSuratJalanDetailPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-center gap-3">
-          <Button onClick={handleBack} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <ArrowLeft className="h-5 w-5 text-slate-700" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-semibold">Informasi Surat Jalan</h1>
-            <p className="text-sm text-muted-foreground">Informasi lengkap mengenai surat jalan</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Laporan Surat Jalan', onClick: () => router.push(`/dashboard/${slug}/laporan/laporan-surat-jalan`) },
+            { label: 'Detail' }
+          ]}
+          title="Informasi Surat Jalan"
+          subtitle="Informasi lengkap mengenai surat jalan"
+          onBack={handleBack}
+        />
 
         <div className="space-y-4">
           {/* Filters and Search Row */}

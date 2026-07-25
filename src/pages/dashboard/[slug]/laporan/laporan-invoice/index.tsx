@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -163,14 +164,16 @@ export default function LaporanInvoicePage() {
       </Head>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Invoice</h1>
-            <p className="text-sm text-muted-foreground">Laporan data invoice ekspedisi</p>
-          </div>
-          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="mr-2 h-4 w-4" /> Print
-          </Button>
+        <div className="no-print">
+          <PageHeader
+            title="Laporan Invoice"
+            subtitle="Laporan data invoice ekspedisi"
+            actions={
+              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+                <Printer className="mr-2 h-4 w-4" /> Print
+              </Button>
+            }
+          />
         </div>
 
         <div className="space-y-4">

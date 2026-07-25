@@ -9,6 +9,7 @@ import LaporanStockDetailView from "@/components/features/laporan-stock/LaporanS
 import POOutstandingView from "@/components/features/laporan-stock/POOutstandingView"
 import SOOutstandingView from "@/components/features/laporan-stock/SOOutstandingView"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
@@ -45,24 +46,16 @@ export default function DetailLaporanStockPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <Button onClick={() => router.push(`/dashboard/${slug}/laporan/laporan-stock`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                            <ArrowLeft className="h-5 w-5 text-slate-700" />
-                        </Button>
-                        <div>
-                            <h1 className="text-2xl font-semibold">
-                                {getReportTitle()}
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Lihat detail laporan stock gudang dan order transaksi
-                            </p>
-                        </div>
-                    </div>
-
-                    <LaporanStockHeaderAction />
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Laporan Stock', onClick: () => router.push(`/dashboard/${slug}/laporan/laporan-stock`) },
+                        { label: 'Detail Laporan' }
+                    ]}
+                    title={getReportTitle()}
+                    subtitle="Lihat detail laporan stock gudang dan order transaksi"
+                    onBack={() => router.push(`/dashboard/${slug}/laporan/laporan-stock`)}
+                    actions={<LaporanStockHeaderAction />}
+                />
 
                 {type === "laporan-stock" && (
                     <LaporanStockView data={(data as any) || []} />

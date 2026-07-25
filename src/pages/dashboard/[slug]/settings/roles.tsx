@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { useRoles, useDeleteRole } from '@/hooks/useRole';
 import { Role } from '@/@types/role.types';
@@ -136,10 +137,10 @@ export default function RolesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 grid grid-cols-1">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Hak Akses</h1>
-          <p className="text-sm text-gray-500">Kelola Hak dan Izin Akses.</p>
-        </div>
+        <PageHeader
+          title="Hak Akses"
+          subtitle="Kelola Hak dan Izin Akses."
+        />
 
         <BaseTable
           data={currentData}

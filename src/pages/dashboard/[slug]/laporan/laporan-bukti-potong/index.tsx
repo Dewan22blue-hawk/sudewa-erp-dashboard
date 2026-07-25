@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { LaporanBuktiPotongTable } from '@/components/features/laporan-bukti-potong/LaporanBuktiPotongTable';
 import { Loader2, Search, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -105,11 +106,11 @@ export default function LaporanBuktiPotongPage() {
       </Head>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Bukti Potong</h1>
-            <p className="text-sm text-muted-foreground">Pantau semua data PPh dan Bukti Potong Pajak</p>
-          </div>
+        <div className="no-print">
+          <PageHeader
+            title="Laporan Bukti Potong"
+            subtitle="Pantau semua data PPh dan Bukti Potong Pajak"
+          />
         </div>
 
         {/* Filters */}

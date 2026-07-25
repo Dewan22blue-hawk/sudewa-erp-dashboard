@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LaporanPembelianFilter from '@/components/features/laporan-pembelian/LaporanPembelianFilter';
 import LaporanPembelianPerNota from '@/components/features/laporan-pembelian/LaporanPembelianPerNota';
@@ -167,8 +168,10 @@ export default function LaporanPembelianPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="no-print">
-          <h1 className="text-2xl font-semibold">Laporan Pembelian</h1>
-          <p className="text-sm text-muted-foreground">Pantau semua transaksi pembelian</p>
+          <PageHeader
+            title="Laporan Pembelian"
+            subtitle="Pantau semua transaksi pembelian"
+          />
         </div>
 
         <div className="space-y-4">

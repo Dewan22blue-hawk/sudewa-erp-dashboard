@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Input } from '@/components/ui/input';
@@ -211,8 +212,10 @@ export default function LPJumlahTerimaPage() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className="no-print">
-          <h1 className="text-2xl font-semibold">Laporan Jumlah Terima</h1>
-          <p className="text-sm text-muted-foreground">Laporan jumlah data masuk ke sistem</p>
+          <PageHeader
+            title="Laporan Jumlah Terima"
+            subtitle="Laporan jumlah data masuk ke sistem"
+          />
         </div>
 
         {/* Search + Print row */}

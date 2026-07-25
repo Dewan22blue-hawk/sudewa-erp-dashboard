@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -67,15 +68,15 @@ export default function RoleDetailPage() {
     <DashboardLayout>
       <div className="max-w-5xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full h-10 w-10">
-            <ChevronLeft size={20} />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-950 tracking-tight">Detail Peran</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Lihat informasi peran, kelola penugasan pengguna, dan daftar izin akses.</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Hak Akses', onClick: () => router.push(`/dashboard/${slug}/settings/roles`) },
+            { label: 'Detail' }
+          ]}
+          title="Detail Peran"
+          subtitle="Lihat informasi peran, kelola penugasan pengguna, dan daftar izin akses."
+          onBack={handleBack}
+        />
 
         {isLoadingRole ? (
           <div className="bg-white rounded-2xl border p-12 text-center text-gray-500 font-medium">
