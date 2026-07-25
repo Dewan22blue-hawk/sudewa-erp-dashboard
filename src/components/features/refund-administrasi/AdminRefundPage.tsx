@@ -60,22 +60,22 @@ export function AdminRefundPage({ title, description, basePath, backHref, transa
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <Label className="text-xs font-medium uppercase tracking-wide text-slate-500">Kode Transaksi</Label>
             <p className="mt-2 text-lg font-semibold text-slate-900">{transactionCode || 'Memuat...'}</p>
             <p className="mt-1 text-sm text-slate-500">{transactionQuery.data?.person?.name || '-'}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <Label className="text-xs font-medium uppercase tracking-wide text-slate-500">Total Refund</Label>
             <p className="mt-2 text-lg font-semibold text-slate-900">{formatCurrency(totalRefund)}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <Label className="text-xs font-medium uppercase tracking-wide text-slate-500">Total Pembayaran Refund</Label>
             <p className="mt-2 text-lg font-semibold text-emerald-700">{formatCurrency(totalPaid)}</p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full max-w-md">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />

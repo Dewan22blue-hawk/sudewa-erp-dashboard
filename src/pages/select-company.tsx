@@ -96,7 +96,7 @@ export default function SelectCompanyPage() {
 
       {/* ===== CONTENT CARD ===== */}
       <div className="relative z-10 w-full max-w-[480px]">
-        <Card className="w-full bg-white border border-[rgba(0,0,0,0.06)] shadow-[0px_10px_30px_rgba(0,0,0,0.08)] rounded-2xl p-8">
+        <Card className="w-full bg-white border border-[rgba(0,0,0,0.06)] shadow-[0px_10px_30px_rgba(0,0,0,0.08)] rounded-md p-8">
           {/* LOGO */}
           <div className="flex justify-center mb-8">
             <div className="relative w-[100px] h-[100px]">

@@ -188,7 +188,7 @@ export default function SalesMaterialDetailPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail penjualan material tidak ditemukan.</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail penjualan material tidak ditemukan.</div>
       </DashboardLayout>
     );
   }
@@ -206,7 +206,7 @@ export default function SalesMaterialDetailPage() {
           <h1 className="text-[24px] font-semibold text-slate-900">Detail Penjualan</h1>
         </div>
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-6">
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="space-y-3">
@@ -268,7 +268,7 @@ export default function SalesMaterialDetailPage() {
           </Button>
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
           <Table>
             <TableHeader className="bg-slate-100">
               <TableRow className="border-slate-200">
@@ -304,7 +304,7 @@ export default function SalesMaterialDetailPage() {
                             <MoreVertical className="h-4 w-4 text-slate-700" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40 rounded-2xl border-slate-200 p-2 shadow-lg">
+                        <DropdownMenuContent align="end" className="w-40 rounded-md border-slate-200 p-2 shadow-lg">
                           <DropdownMenuItem
                             onClick={() => {
                               setEditingItem(item);

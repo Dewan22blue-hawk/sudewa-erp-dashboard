@@ -117,7 +117,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
 
         <div className="space-y-6 py-2">
           {/* Search Controls */}
-          <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center bg-slate-50 p-4 rounded-md border border-slate-100">
             <div className="w-full sm:w-1/3 space-y-1.5">
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cari Berdasarkan</label>
               <Select value={searchOf} onValueChange={setSearchOf}>
@@ -163,7 +163,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
           </div>
 
           {/* Results Table */}
-          <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white">
+          <div className="relative overflow-x-auto rounded-md border border-slate-100 bg-white">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>

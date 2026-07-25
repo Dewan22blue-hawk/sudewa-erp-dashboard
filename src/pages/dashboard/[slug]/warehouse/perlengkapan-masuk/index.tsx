@@ -331,11 +331,11 @@ export default function PerlengkapanMasukListPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4">
-            <AlertDialogCancel className="h-14 rounded-2xl border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
+            <AlertDialogCancel className="h-14 rounded-md border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
-              className="h-14 rounded-2xl bg-red-600 px-7 text-[18px] hover:bg-red-700"
+              className="h-14 rounded-md bg-red-600 px-7 text-[18px] hover:bg-red-700"
             >
               {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>

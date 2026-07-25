@@ -112,35 +112,35 @@ export default function DetailPenerimaanPiutangPage() {
       {isLoading ? (
         <LoadingState variant="page" text="Memuat detail penerimaan..." />
       ) : errorMessage || !detail ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-red-700">
+        <div className="rounded-md border border-red-200 bg-red-50 px-6 py-5 text-red-700">
           <p className="font-medium">{errorMessage ?? 'Data tidak ditemukan'}</p>
           <p className="mt-1 text-sm text-red-600">Pastikan parameter ID pada URL valid.</p>
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
-              <PageHeader
-                breadcrumbs={[
-                  { label: 'Data Penerimaan Piutang', onClick: () => router.push(slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard') },
-                  { label: 'Detail' }
-                ]}
-                title="Data Penerimaan Piutang"
-                subtitle={
-                  <>
-                    <span>No Penjualan:</span>
-                    <span className="font-medium text-sky-600">{detail.code}</span>
-                  </>
-                }
-                onBack={() => router.push(slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard')}
-                actions={
-                  <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                    Tambah Penerimaan
-                  </Button>
-                }
-              />
+          <div className="space-y-6 rounded-md border bg-white p-6 shadow-sm">
+            <PageHeader
+              breadcrumbs={[
+                { label: 'Data Penerimaan Piutang', onClick: () => router.push(slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard') },
+                { label: 'Detail' }
+              ]}
+              title="Data Penerimaan Piutang"
+              subtitle={
+                <>
+                  <span>No Penjualan:</span>
+                  <span className="font-medium text-sky-600">{detail.code}</span>
+                </>
+              }
+              onBack={() => router.push(slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard')}
+              actions={
+                <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                  Tambah Penerimaan
+                </Button>
+              }
+            />
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
                 <div className="mb-5 flex items-center gap-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                     <CreditCard className="h-4 w-4" />
@@ -166,7 +166,7 @@ export default function DetailPenerimaanPiutangPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
                 <div className="mb-5 flex items-center gap-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-rose-500">
                     <CreditCard className="h-4 w-4" />
@@ -203,7 +203,7 @@ export default function DetailPenerimaanPiutangPage() {
             </div>
           </div>
 
-          <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+          <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
             <div className="space-y-1">
               <h2 className="text-base font-semibold text-gray-900">Data Penerimaan Piutang</h2>
               <p className="text-sm text-gray-500">Kolom: No, KODE TERIMA, TANGGAL, KAS MASUK, JUMLAH TERIMA.</p>

@@ -390,7 +390,7 @@ export function DOEkspedisiForm({
             {fields.length > 0 ? (
               <div className="space-y-4">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="rounded-2xl border border-[#E5E7EB] bg-[#F8FAFC] p-4">
+                  <div key={field.id} className="rounded-md border border-[#E5E7EB] bg-[#F8FAFC] p-4">
                     <div className="mb-4 flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-slate-800">Tujuan #{index + 2}</p>
                       <Button type="button" variant="ghost" className="h-8 px-2 text-red-600 hover:text-red-700" onClick={() => remove(index)}>
@@ -437,7 +437,7 @@ export function DOEkspedisiForm({
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#D7DEE7] bg-[#F8FAFC] px-4 py-5 text-sm text-slate-500">
+              <div className="rounded-md border border-dashed border-[#D7DEE7] bg-[#F8FAFC] px-4 py-5 text-sm text-slate-500">
                 Belum ada destinasi tambahan.
               </div>
             )}

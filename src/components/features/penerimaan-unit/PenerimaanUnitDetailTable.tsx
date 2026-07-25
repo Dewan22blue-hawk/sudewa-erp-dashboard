@@ -216,10 +216,10 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         sortable: true,
         cell: (item) => {
           if (item.in_stock === true) {
-             return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
           if (item.in_stock === false) {
-             return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
           }
           return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
         }
@@ -297,7 +297,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
       />
 
       <AlertDialog open={confirmDeleteIds.length > 0} onOpenChange={(open) => !open && setConfirmDeleteIds([])}>
-        <AlertDialogContent className="max-w-[420px] rounded-2xl p-6 gap-6">
+        <AlertDialogContent className="max-w-[420px] rounded-md p-6 gap-6">
           <AlertDialogHeader className="text-left space-y-3">
             <AlertDialogTitle className="text-xl font-bold text-gray-900">Hapus Data Ini?</AlertDialogTitle>
             <AlertDialogDescription className="text-[15px] text-gray-500 font-normal">

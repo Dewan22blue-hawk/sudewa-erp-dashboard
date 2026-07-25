@@ -199,7 +199,7 @@ export default function GoodsReceiptEditPage() {
   }
 
   if (!receipt) {
-    return <DashboardLayout><div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data penerimaan material tidak ditemukan.</div></DashboardLayout>;
+    return <DashboardLayout><div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Data penerimaan material tidak ditemukan.</div></DashboardLayout>;
   }
 
   return (
@@ -214,7 +214,7 @@ export default function GoodsReceiptEditPage() {
           onBack={() => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`)}
         />
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
           <form onSubmit={form.handleSubmit(handleUpdateHeader)} className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-6">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Penerimaan</h2>
@@ -330,7 +330,7 @@ export default function GoodsReceiptEditPage() {
           </Button>
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
           <Table>
             <TableHeader className="bg-slate-100">
               <TableRow className="border-slate-200">
@@ -380,7 +380,7 @@ export default function GoodsReceiptEditPage() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
+                      <DropdownMenuContent align="end" className="w-36 rounded-md border-slate-200 p-2 shadow-lg">
                         <DropdownMenuItem onClick={() => { setEditingItem(item); setItemOpen(true); }} className="cursor-pointer rounded-md px-3 py-2 text-[16px]">Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setDeleteTarget(item)} className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
                       </DropdownMenuContent>

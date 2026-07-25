@@ -220,7 +220,7 @@ export default function MaterialReleaseEditPage() {
   if (!transactionQuery.data) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
       </DashboardLayout>
     );
   }
@@ -486,8 +486,8 @@ export default function MaterialReleaseEditPage() {
             <AlertDialogDescription className="text-[18px] text-slate-500">Apa anda yakin ingin menghapus data ini?</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4">
-            <AlertDialogCancel className="h-14 rounded-2xl border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteItems} disabled={deleteItemMutation.isPending} className="h-14 rounded-2xl bg-red-600 px-7 text-[18px] hover:bg-red-700">
+            <AlertDialogCancel className="h-14 rounded-md border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteItems} disabled={deleteItemMutation.isPending} className="h-14 rounded-md bg-red-600 px-7 text-[18px] hover:bg-red-700">
               {deleteItemMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -6,14 +6,14 @@ function processFile(filePath) {
   let originalContent = content;
 
   // Pattern 1: Nested loader with text
-  // <div className="flex min-h-[50vh] items-center justify-center rounded-2xl border bg-white">
+  // <div className="flex min-h-[50vh] items-center justify-center rounded-md border bg-white">
   //     <div className="flex items-center gap-3 text-gray-500">
   //         <Loader2 className="h-5 w-5 animate-spin" />
   //         Memuat detail...
   //     </div>
   // </div>
   const nestedLoaderPattern = /<div className="flex min-h-\[50vh\] items-center justify-center[^>]*>\s*<div className="flex items-center gap-3 text-gray-500">\s*<Loader2 className="h-5 w-5 animate-spin" \/>\s*(Memuat[^<]*)\s*<\/div>\s*<\/div>/g;
-  
+
   // Pattern 2: Standalone loading text in reports (h-8 w-8)
   const reportLoaderPattern = /<Loader2 className="h-8 w-8 animate-spin text-gray-400" \/>/g;
 
@@ -50,7 +50,7 @@ function processFile(filePath) {
         content = "import { LoadingState } from '@/components/ui/loading-state';\n" + content;
       }
     }
-    
+
     const loader2Count = (content.match(/Loader2/g) || []).length;
     if (loader2Count === 1) { // Only the import remains
       content = content.replace(/,\s*Loader2/, '');

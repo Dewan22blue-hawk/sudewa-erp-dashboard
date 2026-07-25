@@ -91,7 +91,7 @@ export default function CreateRolePage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Card: Role Name */}
-          <div className="bg-white rounded-2xl border p-6 space-y-4 shadow-sm">
+          <div className="bg-white rounded-md border p-6 space-y-4 shadow-sm">
             <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
               <Shield className="text-indigo-600 h-4 w-4" />
               Informasi Utama Peran
@@ -111,7 +111,7 @@ export default function CreateRolePage() {
           </div>
 
           {/* Card: Permissions Selection */}
-          <div className="bg-white rounded-2xl border p-6 space-y-6 shadow-sm">
+          <div className="bg-white rounded-md border p-6 space-y-6 shadow-sm">
             <div className="flex items-center justify-between border-b pb-4">
               <div>
                 <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">

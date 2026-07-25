@@ -281,7 +281,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Form Fields Card */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-5">
               <h2 className="text-lg font-semibold text-slate-900 border-b pb-2">Informasi Refund</h2>
 
               {/* Unit Transaction ID Select */}
@@ -373,7 +373,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
 
           {/* Unit Details Checkbox Table */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 gap-2">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">Unit Transaksi Pembelian</h2>
@@ -431,7 +431,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
                   loading={isLoadingItems || isLoadingParent}
                 />
               ) : (
-                <div className="h-48 flex flex-col items-center justify-center border border-dashed rounded-2xl text-slate-400 text-sm">
+                <div className="h-48 flex flex-col items-center justify-center border border-dashed rounded-md text-slate-400 text-sm">
                   Silakan pilih transaksi pembelian terlebih dahulu untuk melihat daftar unit
                 </div>
               )}

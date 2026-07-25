@@ -32,7 +32,7 @@ export function OrderStatusConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-2xl border-slate-200">
+      <AlertDialogContent className="rounded-md border-slate-200">
         <AlertDialogHeader>
           <AlertDialogTitle>Konfirmasi Ubah Status</AlertDialogTitle>
           <AlertDialogDescription>

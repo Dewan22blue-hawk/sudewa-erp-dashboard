@@ -104,7 +104,7 @@ export default function HutangDetailPage() {
             {isLoading ? (
                 <LoadingState variant="page" text="Memuat detail hutang..." />
             ) : errorMessage || !detail ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-red-700">
+                <div className="rounded-md border border-red-200 bg-red-50 px-6 py-5 text-red-700">
                     <p className="font-medium">{errorMessage ?? 'Data tidak ditemukan'}</p>
                     <p className="mt-1 text-sm text-red-600">Pastikan parameter ID pada URL valid.</p>
                 </div>
@@ -117,7 +117,7 @@ export default function HutangDetailPage() {
                         backHref={typeof router.query.slug === 'string' ? `/dashboard/${router.query.slug}/finance/data-hutang` : '/dashboard'}
                     />
 
-                    <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+                    <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
                         <div className="space-y-1">
                             <h2 className="text-base font-semibold text-gray-900">Data Hutang</h2>
                         </div>

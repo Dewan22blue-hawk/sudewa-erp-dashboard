@@ -12,7 +12,7 @@ interface DeleteSupplierModalProps {
 export function DeleteSupplierModal({ open, onOpenChange, supplierName, onConfirm, isDeleting = false }: DeleteSupplierModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[400px] rounded-2xl border-0 bg-white p-0 shadow-2xl sm:max-w-[400px]">
+      <DialogContent className="max-w-[400px] rounded-md border-0 bg-white p-0 shadow-2xl sm:max-w-[400px]">
         <div className="px-6 py-6">
           <DialogHeader className="space-y-1 text-left">
             <DialogTitle className="text-[18px] font-semibold text-[#171717]">Hapus Data Supplier</DialogTitle>

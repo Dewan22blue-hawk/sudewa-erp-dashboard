@@ -186,7 +186,7 @@ export default function StockPerlengkapanPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
               <span className="text-sm font-medium text-slate-900">Status Perlengkapan:</span>
-              <div className="inline-flex w-fit items-center rounded-2xl bg-[#f3f3f3] p-1">
+              <div className="inline-flex w-fit items-center rounded-md bg-[#f3f3f3] p-1">
                 {tabOptions.map((tab) => {
                   const isActive = tab.value === activeTab;
                   return (

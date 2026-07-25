@@ -171,10 +171,10 @@ export default function KasHarianDetailPage() {
               <>
                 <span>{hasBillings ? 'Detail transaksi kas dan pembayaran tagihan' : 'Detail transaksi kas harian'}</span>
                 <span className={cn(
-                    "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
-                    cashFlowDetail.is_paid
-                      ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  "px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
+                  cashFlowDetail.is_paid
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-amber-50 text-amber-700 border border-amber-200"
                 )}>
                   {cashFlowDetail.is_paid ? 'Lunas' : 'Belum Lunas'}
                 </span>
@@ -340,7 +340,7 @@ export default function KasHarianDetailPage() {
             </div>
 
             <div className="space-y-3">
-              <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center hover:bg-slate-100/50 transition-colors">
+              <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center hover:bg-slate-100/50 transition-colors">
                 <Upload className="mb-3 h-7 w-7 text-slate-500" />
                 <span className="text-sm font-medium text-slate-700">
                   {selectedFile ? selectedFile.name : (proofUrl ? 'Klik untuk ganti bukti pembayaran' : 'Klik untuk upload bukti pembayaran')}

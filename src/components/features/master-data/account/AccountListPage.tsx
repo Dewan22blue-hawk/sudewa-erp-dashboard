@@ -403,10 +403,10 @@ export const AccountListPage = () => {
             </AlertDialogHeader>
 
             <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
-              <AlertDialogAction className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleDelete} disabled={deleteMutation.isPending}>
+              <AlertDialogAction className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleDelete} disabled={deleteMutation.isPending}>
                 {deleteMutation.isPending ? 'Menghapus...' : 'Ya'}
               </AlertDialogAction>
-              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
+              <AlertDialogCancel className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
                 Tidak
               </AlertDialogCancel>
             </AlertDialogFooter>
@@ -443,14 +443,14 @@ export const AccountListPage = () => {
                   onSearchChange={handleGroupSearch}
                   onLoadMore={handleLoadMoreGroups}
                   hasMore={hasMoreGroups}
-                  className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300 bg-white"
+                  className="h-14 rounded-md border-slate-200 px-4 text-base shadow-none focus:ring-slate-300 bg-white"
                 />
               </div>
 
               <div className="space-y-2.5">
                 <label className="block text-base font-semibold text-slate-900">Kategori Laporan</label>
                 <Select value={bulkForm.category} onValueChange={(value) => setBulkForm((previous) => ({ ...previous, category: value }))}>
-                  <SelectTrigger className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300">
+                  <SelectTrigger className="h-14 rounded-md border-slate-200 px-4 text-base shadow-none focus:ring-slate-300">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
@@ -465,10 +465,10 @@ export const AccountListPage = () => {
             </div>
 
             <div className="mt-8 flex flex-col gap-3">
-              <Button className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateRequest}>
+              <Button className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateRequest}>
                 Simpan
               </Button>
-              <Button variant="outline" className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" onClick={() => setOpenBulkUpdate(false)}>
+              <Button variant="outline" className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" onClick={() => setOpenBulkUpdate(false)}>
                 Batal
               </Button>
             </div>
@@ -493,10 +493,10 @@ export const AccountListPage = () => {
             </AlertDialogHeader>
 
             <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
-              <AlertDialogAction className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateConfirm} disabled={bulkSubmitting}>
+              <AlertDialogAction className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateConfirm} disabled={bulkSubmitting}>
                 {bulkSubmitting ? 'Menyimpan...' : 'Ya'}
               </AlertDialogAction>
-              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" disabled={bulkSubmitting}>
+              <AlertDialogCancel className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" disabled={bulkSubmitting}>
                 Tidak
               </AlertDialogCancel>
             </AlertDialogFooter>

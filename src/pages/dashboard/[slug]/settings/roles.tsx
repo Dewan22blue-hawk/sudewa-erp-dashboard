@@ -187,13 +187,13 @@ export default function RolesPage() {
 
             <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
               <AlertDialogAction
-                className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]"
+                className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]"
                 onClick={handleDeleteRole}
                 disabled={deleteMutation.isPending}
               >
                 {deleteMutation.isPending ? 'Menghapus...' : 'Ya'}
               </AlertDialogAction>
-              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
+              <AlertDialogCancel className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
                 Tidak
               </AlertDialogCancel>
             </AlertDialogFooter>

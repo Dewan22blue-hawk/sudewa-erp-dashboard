@@ -393,7 +393,7 @@ export default function LaporanRitaseArmadaPage() {
 
       {/* Edit Ritase Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px] p-6 rounded-2xl bg-white shadow-xl">
+        <DialogContent className="sm:max-w-[425px] p-6 rounded-md bg-white shadow-xl">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-xl font-bold text-slate-900">Edit Ritase</DialogTitle>
             <DialogDescription className="text-[14px] text-slate-500 mt-1">

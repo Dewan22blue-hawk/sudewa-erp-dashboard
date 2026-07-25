@@ -281,7 +281,7 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
 export function DeleteBBNBillDialog({ open, onOpenChange, onConfirm, isDeleting = false, bill }: DeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[420px] rounded-2xl border border-slate-200">
+      <DialogContent className="max-w-[420px] rounded-md border border-slate-200">
         <DialogHeader>
           <DialogTitle className="text-[18px] font-semibold text-slate-900">Hapus Tagihan BBN</DialogTitle>
         </DialogHeader>

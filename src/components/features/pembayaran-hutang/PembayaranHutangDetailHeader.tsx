@@ -27,8 +27,8 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
     <div className="space-y-6">
       <PageHeader
         breadcrumbs={[
-            { label: resolvedBackHref.includes('data-hutang') && !resolvedBackHref.includes('pembayaran') ? 'Data Hutang' : 'Data Pembayaran Hutang', onClick: () => router.push(resolvedBackHref) },
-            { label: 'Detail Hutang Pembelian' }
+          { label: resolvedBackHref.includes('data-hutang') && !resolvedBackHref.includes('pembayaran') ? 'Data Hutang' : 'Data Pembayaran Hutang', onClick: () => router.push(resolvedBackHref) },
+          { label: 'Detail Hutang Pembelian' }
         ]}
         title="Detail Hutang Pembelian"
         subtitle={
@@ -48,19 +48,19 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Total Hutang</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">{formatCurrency(summary.grand_total)}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Total Dibayar</p>
           <p className="mt-2 text-2xl font-semibold text-emerald-600">{formatCurrency(summary.total_paid)}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Sisa Hutang</p>
           <p className="mt-2 text-2xl font-semibold text-rose-600">{formatCurrency(summary.remaining_payment)}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Persentase</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">{percentage.toFixed(0)}%</p>
           <div className="mt-3">
@@ -70,7 +70,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="rounded-md bg-sky-50 p-2 text-sky-600">
               <ReceiptText className="h-5 w-5" />
@@ -107,7 +107,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
           </div>
         </div>
 
-        <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="rounded-md bg-violet-50 p-2 text-violet-600">
               <ListChecks className="h-5 w-5" />

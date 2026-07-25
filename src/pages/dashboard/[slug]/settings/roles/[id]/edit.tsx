@@ -101,14 +101,14 @@ export default function EditRolePage() {
         {isLoadingRole ? (
           <LoadingState variant="page" />
         ) : isErrorRole || !role ? (
-          <div className="bg-white rounded-2xl border p-12 text-center text-red-500 font-medium">
+          <div className="bg-white rounded-md border p-12 text-center text-red-500 font-medium">
             Gagal memuat data peran atau peran tidak ditemukan.
           </div>
         ) : (
           /* Form */
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Card: Role Name */}
-            <div className="bg-white rounded-2xl border p-6 space-y-4 shadow-sm">
+            <div className="bg-white rounded-md border p-6 space-y-4 shadow-sm">
               <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <Shield className="text-indigo-600 h-4 w-4" />
                 Informasi Utama Peran
@@ -128,7 +128,7 @@ export default function EditRolePage() {
             </div>
 
             {/* Card: Permissions Selection */}
-            <div className="bg-white rounded-2xl border p-6 space-y-6 shadow-sm">
+            <div className="bg-white rounded-md border p-6 space-y-6 shadow-sm">
               <div className="flex items-center justify-between border-b pb-4">
                 <div>
                   <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
@@ -193,8 +193,8 @@ export default function EditRolePage() {
                               <label
                                 key={perm.id}
                                 className={`flex items-start gap-3 p-3 rounded-md border transition-all cursor-pointer select-none ${isSelected
-                                    ? 'border-indigo-600/30 bg-indigo-50/20'
-                                    : 'border-gray-100 bg-gray-50/20 hover:bg-gray-50/60'
+                                  ? 'border-indigo-600/30 bg-indigo-50/20'
+                                  : 'border-gray-100 bg-gray-50/20 hover:bg-gray-50/60'
                                   }`}
                               >
                                 <div className="pt-0.5">

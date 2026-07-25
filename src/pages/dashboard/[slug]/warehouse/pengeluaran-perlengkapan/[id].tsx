@@ -45,7 +45,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
   if (isError || !transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center">
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center">
           <p className="text-[16px] text-red-600 font-medium mb-4">
             Gagal memuat data detail pengeluaran perlengkapan atau data tidak ditemukan.
           </p>
@@ -71,7 +71,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
           onBack={() => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`)}
         />
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none">
           <div className="space-y-6">
             <div className="border-b border-slate-200 pb-5">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
@@ -143,7 +143,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
         {/* Detail Items Card */}
         <div className="space-y-3">
           <h3 className="text-[18px] font-semibold text-slate-900 px-1">Daftar Perlengkapan Keluar</h3>
-          <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+          <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-none">
             <Table>
               <TableHeader className="bg-slate-100/90">
                 <TableRow className="border-slate-200 hover:bg-transparent">

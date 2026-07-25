@@ -42,29 +42,29 @@ export default function DOEkspedisiPrintPage() {
     const tarifItems = tarifItemQuery.data?.data ?? [];
     const mergedOrderList: DoEkspedisiOrderList | null = detailQuery.data.orderList
       ? {
-          ...detailQuery.data.orderList,
-          tarifs: (tarifHeaders.length ? tarifHeaders : detailQuery.data.orderList.tarifs ?? []).map((tarif) => {
-            const matchedItems = tarifItems.filter((item) => {
-              const left = Number(item.doOrderListTarifId ?? 0);
-              const rightA = Number(tarif.id ?? 0);
-              const rightB = Number((tarif as any).tarifId ?? 0);
-              return left === rightA || (rightB && left === rightB);
-            });
-            const mappedTarifItems: DoEkspedisiOrderTarifLoadItem[] = matchedItems.map((item) => ({
-              id: Number(item.id ?? 0),
-              uuid: item.uuid,
-              loadContent: item.loadContent,
-              qty: Number(item.qty ?? 0),
-            }));
+        ...detailQuery.data.orderList,
+        tarifs: (tarifHeaders.length ? tarifHeaders : detailQuery.data.orderList.tarifs ?? []).map((tarif) => {
+          const matchedItems = tarifItems.filter((item) => {
+            const left = Number(item.doOrderListTarifId ?? 0);
+            const rightA = Number(tarif.id ?? 0);
+            const rightB = Number((tarif as any).tarifId ?? 0);
+            return left === rightA || (rightB && left === rightB);
+          });
+          const mappedTarifItems: DoEkspedisiOrderTarifLoadItem[] = matchedItems.map((item) => ({
+            id: Number(item.id ?? 0),
+            uuid: item.uuid,
+            loadContent: item.loadContent,
+            qty: Number(item.qty ?? 0),
+          }));
 
-            return {
-              ...tarif,
-              loadContent: tarif.loadContent || mappedTarifItems[0]?.loadContent || '-',
-              qty: tarif.qty || mappedTarifItems[0]?.qty || 0,
-              tarifItems: mappedTarifItems.length ? mappedTarifItems : tarif.tarifItems,
-            } satisfies DoEkspedisiOrderTarifItem;
-          }),
-        }
+          return {
+            ...tarif,
+            loadContent: tarif.loadContent || mappedTarifItems[0]?.loadContent || '-',
+            qty: tarif.qty || mappedTarifItems[0]?.qty || 0,
+            tarifItems: mappedTarifItems.length ? mappedTarifItems : tarif.tarifItems,
+          } satisfies DoEkspedisiOrderTarifItem;
+        }),
+      }
       : null;
 
     return {
@@ -106,7 +106,7 @@ export default function DOEkspedisiPrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4">
+        <div className="no-print flex items-center justify-between rounded-md border border-slate-200 bg-white px-5 py-4">
           <div className="flex items-center gap-3">
             <button
               type="button"

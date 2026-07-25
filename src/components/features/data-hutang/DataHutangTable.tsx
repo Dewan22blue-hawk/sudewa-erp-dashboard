@@ -6,6 +6,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { LiabilityListItem, LiabilityListMeta } from '@/types/pembayaran-hutang.types';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { formatDate } from '@/lib/utils/format';
 
 type Props = {
   data: LiabilityListItem[];
@@ -29,44 +32,39 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
 
   const columns: ColumnDef<LiabilityListItem>[] = [
     {
-      header: 'NO',
-      alignment: 'center',
-      cell: (_, index) => <span className="text-slate-500">{startIndex + index}</span>,
-    },
-    {
       header: 'NO PEMBELIAN',
       accessorKey: 'code',
       sortable: true,
       alignment: 'left',
-      cell: (item) => <span className="font-medium text-slate-900">{item.code}</span>,
+      cell: (item) => <CopyBox text={item.code} />,
     },
     {
       header: 'TANGGAL',
       accessorKey: 'date',
       sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-slate-500">{item.date}</span>,
+      cell: (item) => formatDate(item.date),
     },
     {
       header: 'NAMA SUPPLIER',
       accessorKey: 'supplier_name',
       sortable: true,
       alignment: 'left',
-      cell: (item) => <span className="text-slate-700">{item.supplier_name}</span>,
+      cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${item?.supplier_name}`}>{item?.supplier_name}</ReferenceLink>,
     },
     {
       header: 'TOTAL BELI',
       accessorKey: 'grand_total',
       sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.grand_total)}</span>,
+      cell: (item) => currenciesFormat('idr', item.grand_total),
     },
     {
       header: 'TOTAL BAYAR',
       accessorKey: 'total_paid',
       sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.total_paid)}</span>,
+      cell: (item) => currenciesFormat('idr', item.total_paid),
     },
     {
       header: 'AMOUNT HUTANG',
@@ -86,7 +84,7 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+          <DropdownMenuContent align="end" className="min-w-[100px] rounded-md p-2">
             <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5">
               {slug ? <Link href={`/dashboard/${slug}/finance/data-hutang/${item.id}`}>Detail</Link> : <span className="cursor-not-allowed text-slate-400">Detail</span>}
             </DropdownMenuItem>

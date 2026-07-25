@@ -84,7 +84,7 @@ export default function MaterialReleaseDetailPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
       </DashboardLayout>
     );
   }

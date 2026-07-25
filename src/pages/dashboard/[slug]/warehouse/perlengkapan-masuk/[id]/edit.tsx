@@ -179,7 +179,7 @@ export default function PerlengkapanMasukEditPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
           Data penerimaan perlengkapan tidak ditemukan.
         </div>
       </DashboardLayout>
@@ -199,7 +199,7 @@ export default function PerlengkapanMasukEditPage() {
         />
 
         {/* Transaction Header Info Card */}
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none">
           <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
             <h2 className="text-[20px] font-semibold text-slate-950">Informasi Penerimaan</h2>
             <Button
@@ -236,7 +236,7 @@ export default function PerlengkapanMasukEditPage() {
         </Card>
 
         {/* Detail Items Listing Card */}
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none space-y-6">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none space-y-6">
           <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
             <h2 className="text-[20px] font-semibold text-slate-950">Detail Perlengkapan</h2>
             <div className="flex flex-wrap gap-2">
@@ -373,13 +373,13 @@ export default function PerlengkapanMasukEditPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4">
-            <AlertDialogCancel className="h-14 rounded-2xl border-slate-300 px-7 text-[18px]">
+            <AlertDialogCancel className="h-14 rounded-md border-slate-300 px-7 text-[18px]">
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteItemSubmit}
               disabled={deleteItemMutation.isPending}
-              className="h-14 rounded-2xl bg-red-600 px-7 text-[18px] hover:bg-red-700"
+              className="h-14 rounded-md bg-red-600 px-7 text-[18px] hover:bg-red-700"
             >
               {deleteItemMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>

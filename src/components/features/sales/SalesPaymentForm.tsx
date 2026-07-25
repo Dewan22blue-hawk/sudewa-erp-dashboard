@@ -468,7 +468,7 @@ export function SalesPaymentForm({
             </div>
 
             <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
-                <AlertDialogContent className="rounded-2xl border-slate-200">
+                <AlertDialogContent className="rounded-md border-slate-200">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hapus Histori Pembayaran</AlertDialogTitle>
                         <AlertDialogDescription>

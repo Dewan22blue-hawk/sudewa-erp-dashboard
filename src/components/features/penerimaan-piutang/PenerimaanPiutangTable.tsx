@@ -117,7 +117,7 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                             <MoreVertical className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                    <DropdownMenuContent align="end" className="min-w-[100px] rounded-md p-2">
                         <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5">
                             {slug ? <Link href={`/dashboard/${slug}/finance/data-penerimaan-piutang/${item.id}`}>Detail</Link> : <span className="cursor-not-allowed text-slate-400">Detail</span>}
                         </DropdownMenuItem>

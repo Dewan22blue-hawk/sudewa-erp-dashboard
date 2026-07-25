@@ -32,7 +32,7 @@ function AccountCard({ account }: { account: AccountOverview }) {
   const color = palette[paletteKey];
 
   return (
-    <Card className="flex h-full flex-col space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <Card className="flex h-full flex-col space-y-6 rounded-md border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-start gap-4">
         <div className={`flex h-10 w-10 items-center justify-center rounded-md ${color.bg}`}>
           <Icon className={`h-5 w-5 ${color.text}`} />
@@ -58,7 +58,7 @@ function AccountCard({ account }: { account: AccountOverview }) {
 }
 
 function SkeletonCard() {
-  return <Skeleton className="h-[210px] rounded-2xl" />;
+  return <Skeleton className="h-[210px] rounded-md" />;
 }
 
 export function KpiGrid({ accounts, isLoading }: KpiGridProps) {

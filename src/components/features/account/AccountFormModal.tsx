@@ -60,7 +60,7 @@ export function AccountFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-[480px] rounded-2xl border-0 p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" showCloseButton={false}>
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-[480px] rounded-md border-0 p-0 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" showCloseButton={false}>
         <DialogHeader className="space-y-1 border-b border-slate-100 px-5 py-4 text-left sm:px-6 flex-shrink-0">
           <DialogTitle className="text-lg font-semibold tracking-tight text-slate-950">{title}</DialogTitle>
           <DialogDescription className="text-xs text-slate-500">{description}</DialogDescription>

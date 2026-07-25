@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import {
-    
+
     Upload,
     Mail,
     Shield
@@ -125,7 +125,7 @@ export default function ProfilePage() {
                 <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     {/* LEFT COLUMN: Foto Profil */}
                     <div className="lg:col-span-1">
-                        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+                        <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-6">
                             <div className="border-b border-slate-100 pb-4">
                                 <h2 className="text-base font-semibold text-slate-900">Foto Profil</h2>
                                 <p className="text-xs text-muted-foreground mt-0.5">Unggah foto profil terbaru Anda.</p>
@@ -151,7 +151,7 @@ export default function ProfilePage() {
                                 )}
 
                                 {/* Drag/Click File Uploader Box */}
-                                <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-5 text-center hover:bg-slate-100/70 transition">
+                                <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 px-5 py-5 text-center hover:bg-slate-100/70 transition">
                                     <Upload className="mb-2 h-6 w-6 text-slate-500" />
                                     <span className="text-sm font-medium text-slate-700">
                                         {avatarFile ? avatarFile.name : 'Klik untuk upload gambar'}
@@ -184,7 +184,7 @@ export default function ProfilePage() {
                     {/* RIGHT COLUMN: Detail Pribadi & Informasi Akun */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Card 2: Detail Pribadi */}
-                        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+                        <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-6">
                             <div className="border-b border-slate-100 pb-4">
                                 <h2 className="text-base font-semibold text-slate-900">Detail Pribadi</h2>
                                 <p className="text-xs text-muted-foreground mt-0.5">Informasi nama dan identitas Anda.</p>
@@ -236,7 +236,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Card 3: Informasi Akun */}
-                        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+                        <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-6">
                             <div className="border-b border-slate-100 pb-4">
                                 <h2 className="text-base font-semibold text-slate-900">Informasi Akun</h2>
                                 <p className="text-xs text-muted-foreground mt-0.5">Detail sistem dan hak akses akun Anda.</p>

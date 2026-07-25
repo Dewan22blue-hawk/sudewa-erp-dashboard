@@ -187,7 +187,7 @@ export default function PengeluaranPerlengkapanEditPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
           Data pengeluaran perlengkapan tidak ditemukan.
         </div>
       </DashboardLayout>
@@ -207,7 +207,7 @@ export default function PengeluaranPerlengkapanEditPage() {
         />
 
         {/* Transaction Header Info Card */}
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none">
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-5">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
@@ -300,7 +300,7 @@ export default function PengeluaranPerlengkapanEditPage() {
         </div>
 
         {/* Detail Items Table Card */}
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+        <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-none">
           <div className="overflow-x-auto">
             <GoodsIssueEquipmentDetailTable
               data={pageItems}

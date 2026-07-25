@@ -134,7 +134,7 @@ export function FinanceAssetTable({
                                 <MoreVertical className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-md p-2">
                             <DropdownMenuItem className="cursor-pointer rounded-md px-3 py-2.5" onClick={() => onDetail?.(item)}>
                                 Detail
                             </DropdownMenuItem>

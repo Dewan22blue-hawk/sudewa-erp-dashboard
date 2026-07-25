@@ -172,10 +172,10 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
   const columns: ColumnDef<FinanceBillingItem & { totalAmount: number }>[] = [
     {
       header: (
-        <Checkbox 
-          checked={allSelected} 
-          onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} 
-          disabled={disabled || !hasRows || isBusy} 
+        <Checkbox
+          checked={allSelected}
+          onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+          disabled={disabled || !hasRows || isBusy}
         />
       ),
       alignment: 'center',
@@ -343,7 +343,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
       </div>
 
       {disabled && (
-        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Detail transaksi inline hanya tersedia untuk data transaksi kas harian yang berasal dari fractal pembayaran.
         </div>
       )}
@@ -359,7 +359,7 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
           data={rows}
           columns={columns}
           footer={newRowFooter}
-          containerClassName="rounded-2xl border border-slate-200 shadow-none overflow-hidden"
+          containerClassName="rounded-md border border-slate-200 shadow-none overflow-hidden"
           headerRowClassName="bg-[#f3f6fb] text-[13px] font-semibold uppercase text-slate-800 border-b-0"
         />
       </div>
