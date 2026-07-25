@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, ChevronRight, Badge } from 'lucide-react';
+import { ArrowLeft, Loader2, ChevronRight, Badge, Info } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { WarehouseStockUnit } from '@/@types/unit-transaction.types';
 import { StockPickerTable } from '@/components/features/sales/detail/StockPickerTable';
@@ -116,6 +124,7 @@ export default function SalesUnitDetailPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
 
   const assignMutation = useAssignUnitItemSales();
   const dispatchMutation = useDispatchStockLifecycle();
@@ -278,22 +287,26 @@ export default function SalesUnitDetailPage() {
   const handleAssignStock = async () => {
     if (!selectedUnitId) {
       toast.error('Unit transaction item tidak valid');
+      setIsAssignDialogOpen(false);
       return;
     }
 
     if (!requiredQty || requiredQty <= 0) {
       toast.error('Qty item tidak valid');
+      setIsAssignDialogOpen(false);
       return;
     }
 
     const ids = Array.from(selectedIds);
     if (ids.length === 0) {
       toast.error('Pilih minimal 1 stock unit');
+      setIsAssignDialogOpen(false);
       return;
     }
 
     if (ids.length !== requiredQty) {
       toast.error(`Jumlah unit yang dipilih harus sama dengan qty item (${requiredQty})`);
+      setIsAssignDialogOpen(false);
       return;
     }
 
@@ -306,8 +319,10 @@ export default function SalesUnitDetailPage() {
       });
 
       toast.success('Stock berhasil di-assign ke item sales');
+      setIsAssignDialogOpen(false);
     } catch (error: any) {
       toast.error(readApiError(error));
+      setIsAssignDialogOpen(false);
     }
   };
 
@@ -428,7 +443,7 @@ export default function SalesUnitDetailPage() {
                   size="sm"
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending}
-                  onClick={handleAssignStock}
+                  onClick={() => setIsAssignDialogOpen(true)}
                 >
                   {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}
                 </Button>
@@ -441,6 +456,46 @@ export default function SalesUnitDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* CONFIRMATION DIALOG ASSIGN UNIT */}
+      <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Unit Terjual</DialogTitle>
+            <DialogDescription className="pt-2">
+              Apakah Anda yakin ingin menetapkan unit ini sebagai barang terjual?
+            </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Dengan memilih <b>Unit Terjual</b>, unit stock ini akan dialokasikan untuk transaksi ini dan tidak bisa dipilih oleh transaksi penjualan lainnya.
+                </span>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAssignDialogOpen(false)}
+              disabled={assignMutation.isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleAssignStock}
+              disabled={assignMutation.isPending}
+            >
+              {assignMutation.isPending ? 'Memproses...' : 'Ya, Tetapkan Unit'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
