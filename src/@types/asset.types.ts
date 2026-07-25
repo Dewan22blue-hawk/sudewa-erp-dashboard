@@ -18,6 +18,9 @@ export interface AssetPayload {
     name: string;
     code?: string;
     type: AssetType;
+    purchase_date?: string;
+    price?: number;
+    serial_number?: string;
 }
 
 export type AssetListResponse = PaginatedResult<Asset>;

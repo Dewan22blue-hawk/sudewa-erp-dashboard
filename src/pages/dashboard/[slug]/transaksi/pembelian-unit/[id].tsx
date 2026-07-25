@@ -384,7 +384,7 @@ export default function PurchaseDetailPage() {
         <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
         {/* UNIT TABLE */}
-        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} isPaid={isPaid} />
+        <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} />
 
         {/* PAYMENT HISTORY TABLE */}
         <div className="space-y-3">

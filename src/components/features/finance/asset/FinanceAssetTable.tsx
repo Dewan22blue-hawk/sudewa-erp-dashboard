@@ -149,7 +149,7 @@ export function FinanceAssetTable({
                 ),
             },
         ],
-        [page, perPage, onEdit, onDelete, onDetail]
+        [onEdit, onDelete, onDetail]
     );
 
     const headerActions = useMemo(

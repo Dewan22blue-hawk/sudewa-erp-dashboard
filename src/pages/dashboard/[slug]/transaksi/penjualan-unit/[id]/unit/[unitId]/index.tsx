@@ -142,7 +142,7 @@ export default function SalesUnitDetailPage() {
     }));
 
     const detailLookup = new Map<number, WarehouseStockUnit>();
-    stockUnits.forEach((detail) => {
+    stockUnits.forEach((detail: WarehouseStockUnit) => {
       detailLookup.set(detail.id, detail);
     });
     mappedFromItemDetails.forEach((detail: any) => {

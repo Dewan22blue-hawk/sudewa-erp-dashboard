@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, Tag, Upload, Info, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Tag, Upload, Info, Save, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FinanceBillingTable from '@/components/features/kas-harian/FinanceBillingTable';
@@ -145,6 +145,15 @@ export default function KasHarianDetailPage() {
       <Head>
         <title>Detail & Pembayaran Kas Harian - Wajira Dashboard</title>
       </Head>
+
+      {/* BREADCRUMB HEADER */}
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/finance/transaksi-kas-harian`)}>
+          Transaksi Kas Harian
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+        <span className="font-medium text-slate-800">Detail Transaksi</span>
+      </div>
 
       {isLoading ? (
         <div className="flex min-h-[50vh] items-center justify-center rounded-md border border-slate-200 bg-white">

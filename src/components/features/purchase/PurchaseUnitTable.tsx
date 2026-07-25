@@ -177,7 +177,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid, canEdit, c
         </DropdownMenu>
       ),
     },
-  ], [currentPage, perPage, slug, canEdit, canDelete, getUnitTypeName, handleDetail, handleEdit]);
+  ], [slug, canEdit, canDelete, isPaid, getUnitTypeName, handleDetail, handleEdit]);
 
   return (
     <div className="space-y-4">

@@ -69,7 +69,8 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
     },
   });
 
-  const selectedIds = form.watch('unit_transaction_item_detail_ids') ?? [];
+  const rawSelectedIds = form.watch('unit_transaction_item_detail_ids');
+  const selectedIds = useMemo<number[]>(() => rawSelectedIds ?? [], [rawSelectedIds]);
 
   // Prepopulate query params or existing refund values
   useEffect(() => {
@@ -124,8 +125,6 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
       form.setValue('unit_transaction_item_detail_ids', []);
     }
   }, [filteredItems, form]);
-
-  console.log(filteredItems);
 
   const onSubmit = async (values: CreateRefundFormValues) => {
     try {
@@ -215,7 +214,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
         cell: (item) => currenciesFormat('idr', Number(item.price || 0)),
       },
     ],
-    [selectedIds, allSelected, toggleAllItems, toggleItem]
+    [selectedIds, allSelected, toggleAllItems, toggleItem, slug]
   );
 
   return (

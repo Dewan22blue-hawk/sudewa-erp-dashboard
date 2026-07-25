@@ -154,7 +154,7 @@ export function StockPickerTable({
       alignment: 'center',
       cell: (item) => renderStatus(item?.status ?? ''),
     },
-  ], [unitType]);
+  ], [unitType, slug]);
 
   return (
     <div className="space-y-4">

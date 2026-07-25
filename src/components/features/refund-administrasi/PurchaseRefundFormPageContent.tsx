@@ -27,6 +27,7 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { toast } from 'sonner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 const refundFormSchema = z.object({
   unit_transaction_id: z.string().min(1, 'Transaksi harus dipilih'),
@@ -206,6 +207,12 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
             onCheckedChange={(checked) => toggleItem(Number(item.id), Boolean(checked))}
           />
         ),
+      },
+      {
+        header: 'NAMA TIPE UNIT',
+        accessorKey: 'unit_type_name',
+        sortable: true,
+        cell: (item) => item?.unit_type_name ? <ReferenceLink href={`/dashboard/${slug}/master/tipe-unit?search=${item?.unit_type_name}`}>{item?.unit_type_name}</ReferenceLink> : '-'
       },
       {
         header: 'WARNA',

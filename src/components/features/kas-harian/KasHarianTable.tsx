@@ -73,13 +73,6 @@ export default function KasHarianTable({
   const columns = useMemo<ColumnDef<KasHarianListItem>[]>(
     () => [
       {
-        header: 'TANGGAL',
-        accessorKey: 'date',
-        sortable: true,
-        alignment: 'center',
-        cell: (item) => formatDate(item.date),
-      },
-      {
         header: 'NOTA REFF',
         accessorKey: 'code',
         sortable: true,
@@ -103,6 +96,13 @@ export default function KasHarianTable({
             <CopyBox text={`${item.code || '-'}`} />
           </div>
         ),
+      },
+      {
+        header: 'TANGGAL',
+        accessorKey: 'date',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => formatDate(item.date),
       },
       {
         header: 'KETERANGAN',

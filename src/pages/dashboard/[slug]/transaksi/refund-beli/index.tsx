@@ -125,7 +125,7 @@ export default function TransaksiRefundBeliPage() {
         ),
       },
     ],
-    [page, perPage, handleDetail, handleEdit],
+    [handleDetail, handleEdit],
   );
 
   return (

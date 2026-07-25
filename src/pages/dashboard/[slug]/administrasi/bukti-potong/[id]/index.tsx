@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, Loader2, Info, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,15 @@ export default function BuktiPotongDetailPage() {
       <Head>
         <title>Detail Bukti Potong - Wajira Dashboard</title>
       </Head>
+
+      {/* BREADCRUMB HEADER */}
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/administrasi/bukti-potong`)}>
+          Bukti Potong
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+        <span className="font-medium text-slate-800">Detail Bukti Potong</span>
+      </div>
 
       {isLoading ? (
         <div className="flex min-h-[50vh] items-center justify-center rounded-md border border-slate-200 bg-white">
@@ -174,7 +183,7 @@ export default function BuktiPotongDetailPage() {
               <div>Diupdate: {formatDate(data.updated_at)}</div>
             </div>
           </div>
-          
+
           {/* FOOTER */}
           <div className="flex justify-center pt-4">
             <Button
