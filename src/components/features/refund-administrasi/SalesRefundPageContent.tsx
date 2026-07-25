@@ -215,7 +215,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                     className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah Data Refund Penjualan
+                    Tambah Data Data Refund Penjualan
                   </Button>
                 )}
               </div>

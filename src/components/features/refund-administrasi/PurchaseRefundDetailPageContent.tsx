@@ -304,7 +304,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
                 <div className="flex items-center gap-2">
                   <Button onClick={() => setIsAddDetailOpen(true)} disabled={lessPayment === 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah Pembayaran Refund
+                    Tambah Data Pembayaran Refund
                   </Button>
                 </div>
               </div>

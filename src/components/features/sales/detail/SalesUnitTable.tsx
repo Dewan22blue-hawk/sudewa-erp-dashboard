@@ -241,7 +241,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
                     className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
                     disabled={isPaid}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah Unit
+                    Tambah Data Unit
                   </Button>
                 )}
               </div>

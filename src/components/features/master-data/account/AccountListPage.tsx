@@ -342,7 +342,7 @@ export const AccountListPage = () => {
                   </Button>
                   <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah
+                    Tambah Data
                   </Button>
                 </>
               )}
