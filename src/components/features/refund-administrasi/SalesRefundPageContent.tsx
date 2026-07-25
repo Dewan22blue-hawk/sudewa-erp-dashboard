@@ -61,7 +61,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
       return;
     }
 
-    router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund/${refund.id}/edit`);
+    router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/${refund.id}/edit`);
   }, [router, slug, transactionId]);
 
   const handleDeletePrompt = useCallback((refund: UnitTransactionRefund) => {
@@ -138,7 +138,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
                   <Pencil className="mr-2 h-4 w-4" /> Edit
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund/${item.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/${item.id}`)}>
                 <Eye className="mr-2 h-4 w-4" /> Detail / Kelola Unit
               </DropdownMenuItem>
               {canEdit && (
@@ -159,7 +159,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
       <div className="space-y-6">
         {/* BREADCRUMB HEADER */}
         <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/`)}>
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
             Penjualan Unit
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
@@ -168,7 +168,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
@@ -211,7 +211,7 @@ export default function SalesRefundPageContent({ transactionId }: { transactionI
               <div className="flex items-center gap-2">
                 {canCreate && (
                   <Button
-                    onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund/create`)}
+                    onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/create`)}
                     className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
                   >
                     <Plus className="h-4 w-4 mr-2" />

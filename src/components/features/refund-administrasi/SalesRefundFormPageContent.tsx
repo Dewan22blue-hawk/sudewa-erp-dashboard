@@ -218,7 +218,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
             Penjualan Unit
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`)}>
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`)}>
             Data Refund Penjualan
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
@@ -228,7 +228,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
