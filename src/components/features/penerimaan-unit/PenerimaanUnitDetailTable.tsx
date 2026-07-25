@@ -183,28 +183,28 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         sortable: true,
         cell: (item) => {
           let text = '-';
-          let background;
+          let background = 'border-slate-200 bg-slate-50 text-slate-700';
           switch (item?.status) {
             case 'returned':
               text = 'Return';
-              background = 'bg-red-500';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
               break;
             case 'refunded':
               text = 'Refund';
-              background = 'bg-red-500';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
               break;
             case 'normal':
               text = 'Normal';
-              background = 'bg-green-500';
+              background = 'border-emerald-200 bg-emerald-50 text-emerald-700';
               break;
             default:
               text = 'Belum Diterima';
-              background = 'bg-yellow-500';
+              background = 'border-amber-200 bg-amber-50 text-amber-700';
               break;
           }
 
           return (
-            <Badge variant='outline' className="font-semibold border-slate-200 bg-slate-50 text-slate-700">
+            <Badge variant='outline' className={`font-semibold ${background}`}>
               {text}
             </Badge>
           );

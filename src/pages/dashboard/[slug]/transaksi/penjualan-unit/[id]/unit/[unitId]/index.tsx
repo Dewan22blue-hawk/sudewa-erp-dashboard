@@ -177,8 +177,15 @@ export default function SalesUnitDetailPage() {
       }
     });
 
-    return Array.from(merged.values());
-  }, [stockUnits, assignedDetailRows]);
+    const result = Array.from(merged.values());
+    result.sort((a, b) => {
+      const aSelected = selectedIds.has(a.id) ? 1 : 0;
+      const bSelected = selectedIds.has(b.id) ? 1 : 0;
+      return bSelected - aSelected;
+    });
+    
+    return result;
+  }, [stockUnits, assignedDetailRows, selectedIds]);
 
   useEffect(() => {
     const next = new Set(assignedIds);
