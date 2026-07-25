@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { MoreVertical, Plus, Trash2, Search } from 'lucide-react';
+import { MoreVertical, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { FinanceBillingItem } from '@/@types/finance-billing.types';
 import { useCreateFinanceBillingItem, useDeleteFinanceBillingItem, useUpdateFinanceBillingItem } from '@/hooks/useFinanceBilling';
@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 type EditableRowId = number | 'new';
 
@@ -28,8 +30,6 @@ const defaultDraft: DraftRow = {
   note: '',
   amount: 0,
 };
-
-import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   void fallback;
@@ -169,6 +169,154 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
     }
   };
 
+  const columns: ColumnDef<FinanceBillingItem & { totalAmount: number }>[] = [
+    {
+      header: (
+        <Checkbox 
+          checked={allSelected} 
+          onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} 
+          disabled={disabled || !hasRows || isBusy} 
+        />
+      ),
+      alignment: 'center',
+      headerClassName: 'w-12 px-4 py-3',
+      className: 'w-12 px-4 py-3',
+      cell: (item) => (
+        <Checkbox
+          checked={selectedIds.includes(item.id)}
+          onCheckedChange={(checked) => handleToggleSelected(item.id, Boolean(checked))}
+          disabled={disabled || isBusy || editingId === item.id}
+        />
+      ),
+    },
+    {
+      header: 'No',
+      alignment: 'left',
+      headerClassName: 'w-16 px-4 py-3',
+      className: 'w-16 px-4 py-3',
+      cell: (_, index) => <span className="text-slate-600">{index + 1}</span>,
+    },
+    {
+      header: 'Keterangan',
+      alignment: 'left',
+      className: 'px-4 py-3',
+      cell: (item) => {
+        const isEditing = editingId === item.id;
+        if (isEditing) {
+          return (
+            <Input
+              value={draft.note}
+              onChange={(event) => setDraft((previous) => ({ ...previous, note: event.target.value }))}
+              onKeyDown={(event) => handleEditorKeyDown(event, item.id)}
+              placeholder="Tulis rincian transaksi"
+              className="h-11 rounded-md border-slate-200"
+            />
+          );
+        }
+        return <span className="text-slate-800">{item.note || '-'}</span>;
+      },
+    },
+    {
+      header: 'Nominal Bayar',
+      alignment: 'left',
+      headerClassName: 'w-[320px] px-4 py-3',
+      className: 'w-[320px] px-4 py-3',
+      cell: (item) => {
+        const isEditing = editingId === item.id;
+        if (isEditing) {
+          return (
+            <MoneyInput
+              value={draft.amount}
+              onChangeValue={(value) => setDraft((previous) => ({ ...previous, amount: value }))}
+              onKeyDown={(event) => handleEditorKeyDown(event, item.id)}
+              placeholder="Masukkan nominal bayar"
+              className="h-11 rounded-md border-slate-200"
+            />
+          );
+        }
+        return <span className="font-medium text-slate-900">{formatCurrency(item.totalAmount)}</span>;
+      },
+    },
+    {
+      header: 'Aksi',
+      alignment: 'center',
+      sticky: 'right',
+      headerClassName: 'w-20 px-4 py-3',
+      className: 'w-20 px-4 py-3',
+      cell: (item) => {
+        const isEditing = editingId === item.id;
+        if (isEditing) {
+          return (
+            <div className="flex items-center justify-center gap-2">
+              <Button type="button" size="sm" className="h-9 rounded-lg bg-[#18385b] px-3 hover:bg-[#102843]" disabled={isBusy} onClick={() => void handleSave(item.id)}>
+                Simpan
+              </Button>
+              <Button type="button" size="sm" variant="outline" className="h-9 rounded-lg border-slate-200 px-3" disabled={isBusy} onClick={resetEditor}>
+                Batal
+              </Button>
+            </div>
+          );
+        }
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={disabled || isBusy}>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
+              <DropdownMenuItem onClick={() => handleEditRow(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => void handleDeleteOne(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const newRowFooter = editingId === 'new' ? (
+    <tfoot>
+      <tr className="bg-slate-50/60">
+        <td className="px-4 py-3 text-center w-12 border-t border-slate-200">
+          <Checkbox checked={false} disabled />
+        </td>
+        <td className="px-4 py-3 text-slate-600 w-16 border-t border-slate-200">{rows.length + 1}</td>
+        <td className="px-4 py-3 border-t border-slate-200">
+          <Input
+            value={draft.note}
+            onChange={(event) => setDraft((previous) => ({ ...previous, note: event.target.value }))}
+            onKeyDown={(event) => handleEditorKeyDown(event, 'new')}
+            placeholder="Tulis rincian transaksi"
+            className="h-11 rounded-md border-slate-200 bg-white"
+          />
+        </td>
+        <td className="px-4 py-3 w-[320px] border-t border-slate-200">
+          <MoneyInput
+            value={draft.amount}
+            onChangeValue={(value) => setDraft((previous) => ({ ...previous, amount: value }))}
+            onKeyDown={(event) => handleEditorKeyDown(event, 'new')}
+            placeholder="Masukkan nominal bayar"
+            className="h-11 rounded-md border-slate-200 bg-white"
+          />
+        </td>
+        <td className="px-4 py-3 text-center w-20 sticky right-0 bg-slate-50/60 z-10 border-l border-t border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-center gap-2">
+            <Button type="button" size="sm" className="h-9 rounded-lg bg-[#18385b] px-3 hover:bg-[#102843]" disabled={isBusy} onClick={() => void handleSave('new')}>
+              Simpan
+            </Button>
+            <Button type="button" size="sm" variant="outline" className="h-9 rounded-lg border-slate-200 px-3" disabled={isBusy} onClick={resetEditor}>
+              Batal
+            </Button>
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+  ) : undefined;
+
   return (
     <div className="rounded-[22px] border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -194,154 +342,26 @@ export default function TransactionDetailInlineTable({ items, financeBillingId, 
         </div>
       </div>
 
-      {disabled ? (
+      {disabled && (
         <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Detail transaksi inline hanya tersedia untuk data transaksi kas harian yang berasal dari fractal pembayaran.
         </div>
-      ) : null}
+      )}
 
-      <div className="mt-5 flex items-center gap-3 text-sm text-slate-700">
-        <span>Show</span>
-        <div className="flex h-11 w-[58px] items-center justify-center rounded-md border border-slate-200 bg-white">10</div>
-        <span>Page</span>
-      </div>
+      <div className="mt-5 space-y-4">
+        <div className="flex items-center gap-3 text-sm text-slate-700">
+          <span>Show</span>
+          <div className="flex h-11 w-[58px] items-center justify-center rounded-md border border-slate-200 bg-white">10</div>
+          <span>Page</span>
+        </div>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200">
-        <table className="w-full min-w-[820px] text-sm">
-          <thead className="bg-[#f3f6fb] text-[13px] font-semibold uppercase text-slate-800">
-            <tr>
-              <th className="w-12 px-4 py-3 text-center">
-                <Checkbox checked={allSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} disabled={disabled || !hasRows || isBusy} />
-              </th>
-              <th className="w-16 px-4 py-3 text-left">No</th>
-              <th className="px-4 py-3 text-left">Keterangan</th>
-              <th className="w-[320px] px-4 py-3 text-left">Nominal Bayar</th>
-              <th className="w-20 px-4 py-3 text-center sticky right-0 bg-[#f3f6fb] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {rows.map((item, index) => {
-              const isEditing = editingId === item.id;
-              return (
-                <tr key={item.id} className="bg-white hover:bg-slate-50 transition-colors group">
-                  <td className="px-4 py-3 text-center">
-                    <Checkbox
-                      checked={selectedIds.includes(item.id)}
-                      onCheckedChange={(checked) => handleToggleSelected(item.id, Boolean(checked))}
-                      disabled={disabled || isBusy || isEditing}
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{index + 1}</td>
-                  <td className="px-4 py-3">
-                    {isEditing ? (
-                      <Input
-                        value={draft.note}
-                        onChange={(event) => setDraft((previous) => ({ ...previous, note: event.target.value }))}
-                        onKeyDown={(event) => handleEditorKeyDown(event, item.id)}
-                        placeholder="Tulis rincian transaksi"
-                        className="h-11 rounded-md border-slate-200"
-                      />
-                    ) : (
-                      <span className="text-slate-800">{item.note || '-'}</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {isEditing ? (
-                      <MoneyInput
-                        value={draft.amount}
-                        onChangeValue={(value) => setDraft((previous) => ({ ...previous, amount: value }))}
-                        onKeyDown={(event) => handleEditorKeyDown(event, item.id)}
-                        placeholder="Masukkan nominal bayar"
-                        className="h-11 rounded-md border-slate-200"
-                      />
-                    ) : (
-                      <span className="font-medium text-slate-900">{formatCurrency(item.totalAmount)}</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    {isEditing ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Button type="button" size="sm" className="h-9 rounded-lg bg-[#18385b] px-3 hover:bg-[#102843]" disabled={isBusy} onClick={() => void handleSave(item.id)}>
-                          Simpan
-                        </Button>
-                        <Button type="button" size="sm" variant="outline" className="h-9 rounded-lg border-slate-200 px-3" disabled={isBusy} onClick={resetEditor}>
-                          Batal
-                        </Button>
-                      </div>
-                    ) : (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button type="button" variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={disabled || isBusy}>
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
-                          <DropdownMenuItem onClick={() => handleEditRow(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => void handleDeleteOne(item.id)} className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-
-            {editingId === 'new' ? (
-              <tr className="bg-slate-50/60">
-                <td className="px-4 py-3 text-center">
-                  <Checkbox checked={false} disabled />
-                </td>
-                <td className="px-4 py-3 text-slate-600">{rows.length + 1}</td>
-                <td className="px-4 py-3">
-                  <Input
-                    value={draft.note}
-                    onChange={(event) => setDraft((previous) => ({ ...previous, note: event.target.value }))}
-                    onKeyDown={(event) => handleEditorKeyDown(event, 'new')}
-                    placeholder="Tulis rincian transaksi"
-                    className="h-11 rounded-md border-slate-200 bg-white"
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  <MoneyInput
-                    value={draft.amount}
-                    onChangeValue={(value) => setDraft((previous) => ({ ...previous, amount: value }))}
-                    onKeyDown={(event) => handleEditorKeyDown(event, 'new')}
-                    placeholder="Masukkan nominal bayar"
-                    className="h-11 rounded-md border-slate-200 bg-white"
-                  />
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button type="button" size="sm" className="h-9 rounded-lg bg-[#18385b] px-3 hover:bg-[#102843]" disabled={isBusy} onClick={() => void handleSave('new')}>
-                      Simpan
-                    </Button>
-                    <Button type="button" size="sm" variant="outline" className="h-9 rounded-lg border-slate-200 px-3" disabled={isBusy} onClick={resetEditor}>
-                      Batal
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ) : null}
-
-            {!hasRows && editingId !== 'new' ? (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
+        <BaseTable
+          data={rows}
+          columns={columns}
+          footer={newRowFooter}
+          containerClassName="rounded-2xl border border-slate-200 shadow-none overflow-hidden"
+          headerRowClassName="bg-[#f3f6fb] text-[13px] font-semibold uppercase text-slate-800 border-b-0"
+        />
       </div>
     </div>
   );
