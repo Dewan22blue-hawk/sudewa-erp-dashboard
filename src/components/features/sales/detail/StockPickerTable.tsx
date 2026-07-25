@@ -4,10 +4,14 @@ import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { TypeUnit } from '@/@types/type-unit.types';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface StockPickerTableProps {
   units: WarehouseStockUnit[];
   selectedIds: Set<number>;
+  unitType?: TypeUnit
   onToggleOne: (id: number, checked: boolean) => void;
   onToggleAllPage: (checked: boolean) => void;
   currentPage: number;
@@ -62,6 +66,7 @@ const renderStatus = (status: string) => {
 export function StockPickerTable({
   units,
   selectedIds,
+  unitType,
   onToggleOne,
   currentPage,
   perPage,
@@ -80,6 +85,9 @@ export function StockPickerTable({
       return [item.color, item.machine_number, item.chassis_number].some((field) => String(field ?? '').toLowerCase().includes(query));
     });
   }, [units, searchValue]);
+
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
   const totalPages = Math.max(1, Math.ceil(filteredUnits.length / perPage));
   const pagedRows = useMemo(() => {
@@ -107,6 +115,10 @@ export function StockPickerTable({
   }, [pagedRows, selectedIds, onToggleOne]);
 
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
+    {
+      header: 'Nama Tipe Unit',
+      cell: (item) => unitType?.name ? <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitType?.name}`}>{unitType?.name}</ReferenceLink> : '-'
+    },
     {
       header: 'Warna',
       accessorKey: 'color',
@@ -142,7 +154,7 @@ export function StockPickerTable({
       alignment: 'center',
       cell: (item) => renderStatus(item?.status ?? ''),
     },
-  ], []);
+  ], [unitType]);
 
   return (
     <div className="space-y-4">

@@ -1,18 +1,20 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, DollarSign, CreditCard, Calendar, User } from 'lucide-react';
+import { FileText, DollarSign, CreditCard, Calendar, User, Motorbike } from 'lucide-react';
 import { SalesItem } from '../sales.data';
 import { useRouter } from 'next/router';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { getHistoryTotalIdrEquivalent, getHistoryUsdAmount, getHistoryBcaIdrAmount, getHistoryCashIdrAmount } from '@/utils/payment-helpers';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { TypeUnit } from '@/@types/type-unit.types';
 
 interface Props {
   data: SalesItem;
   billingHistories?: any[];
+  unitType?: TypeUnit;
 }
 
-export function SalesDetailCards({ data, billingHistories = [] }: Props) {
+export function SalesDetailCards({ data, billingHistories = [], unitType }: Props) {
   const router = useRouter();
   const totalDppFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.dpp ?? 0), 0);
   const totalPpnFromItems = (data.lineItems ?? []).reduce((sum, item) => sum + Number(item.ppn ?? 0), 0);
@@ -66,6 +68,16 @@ export function SalesDetailCards({ data, billingHistories = [] }: Props) {
                 <User className="h-4 w-4 text-slate-500" />
                 <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${data.customer}`}>
                   {data.customer}
+                </ReferenceLink>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <p>Nama Tipe Unit</p>
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                <Motorbike className="h-4 w-4 text-slate-500" />
+                <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${unitType?.name}`}>
+                  {unitType?.name}
                 </ReferenceLink>
               </div>
             </div>

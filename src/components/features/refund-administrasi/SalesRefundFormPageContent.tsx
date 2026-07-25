@@ -149,7 +149,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
         });
         toast.success('Data refund penjualan berhasil diperbarui');
       }
-      router.push(`/dashboard/${slug}/transaksi//${transactionId}/refund`);
+      router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menyimpan data refund');
     }
@@ -222,7 +222,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
             Data Refund Penjualan
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">{mode === 'create' ? 'Tambah Data Refund' : 'Edit Data Refund'}</span>
+          <span className="font-medium text-slate-800">{mode === 'create' ? 'Tambah Data Refund Penjualan' : 'Edit Data Refund Penjualan'}</span>
         </div>
 
         {/* HEADLINE & ACTIONS */}
@@ -232,7 +232,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">{mode === 'create' ? 'Tambah Data Refund' : 'Edit Data Refund'}</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">{mode === 'create' ? 'Tambah Data Refund Penjualan' : 'Edit Data Refund Penjualan'}</h1>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span>Kode Jual:</span>
                 <span className="text-blue-600 font-semibold">{selectableItemsQuery.transactionQuery?.data?.code}</span>

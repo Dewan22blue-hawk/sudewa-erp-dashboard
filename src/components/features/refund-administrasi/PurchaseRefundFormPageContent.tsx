@@ -257,7 +257,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
             Data Refund Pembelian
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Tambah Data Refund</span>
+          <span className="font-medium text-slate-800">Tambah Data Refund Pembelian</span>
         </div>
 
         {/* HEADLINE & ACTIONS */}
@@ -267,7 +267,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Tambah Data Refund</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">Tambah Data Refund Pembelian</h1>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span>Kode Beli:</span>
                 <span className="text-blue-600 font-semibold">{parentPurchase?.code}</span>

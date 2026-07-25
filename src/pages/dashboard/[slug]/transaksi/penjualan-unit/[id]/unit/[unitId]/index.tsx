@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useStockUnits, useAssignUnitItemSales, useDispatchStockLifecycle } from '@/hooks/useUnitTransactionItemSales';
 import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
+import { useTypeUnit } from '@/hooks/useTypeUnit';
 
 const readApiError = (error: any): string => {
   const statusCode = error?.statusCode ?? error?.response?.status;
@@ -92,7 +93,7 @@ export default function SalesUnitDetailPage() {
   }, [salesData?.raw?.unit_transaction_items, selectedUnitId, salesId]);
 
   const companyId = String((salesData?.raw as any)?.company_id ?? '1');
-  const fallbackUnitTypeId = String(fallbackUnitItemFromSales?.unit_type_id ?? '');
+  const fallbackUnitTypeId = String(fallbackUnitItemFromSales?.unit_type_id ?? selectedUnitId ?? '');
 
   const {
     unitItem,
@@ -105,6 +106,11 @@ export default function SalesUnitDetailPage() {
   } = useStockUnits(selectedUnitId, { companyId, unitTypeIdFallback: fallbackUnitTypeId });
 
   const effectiveUnitItem = unitItem ?? fallbackUnitItemFromSales;
+
+  const {
+    data: unitTypeData,
+    isLoading: unitTypeLoading,
+  } = useTypeUnit(fallbackUnitTypeId);
 
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -161,11 +167,11 @@ export default function SalesUnitDetailPage() {
   const pickerRows = useMemo(() => {
     const merged = new Map<number, WarehouseStockUnit>();
 
-    stockUnits.forEach((item) => {
+    stockUnits.forEach((item: any) => {
       merged.set(item.id, item);
     });
 
-    assignedDetailRows.forEach((item) => {
+    assignedDetailRows.forEach((item: any) => {
       if (!merged.has(item.id)) {
         merged.set(item.id, item);
       }
@@ -386,7 +392,7 @@ export default function SalesUnitDetailPage() {
           </div>
         </div>
 
-        <SalesDetailCards data={salesData.ui} billingHistories={resolvedBillingHistories} />
+        <SalesDetailCards data={salesData.ui} billingHistories={resolvedBillingHistories} unitType={unitTypeData} />
 
         <Card className="rounded-md">
           <CardContent className="space-y-4 p-6">
@@ -400,6 +406,7 @@ export default function SalesUnitDetailPage() {
             <StockPickerTable
               units={pickerRows}
               selectedIds={selectedIds}
+              unitType={unitTypeData}
               onToggleOne={toggleOne}
               onToggleAllPage={toggleAllPage}
               currentPage={currentPage}
