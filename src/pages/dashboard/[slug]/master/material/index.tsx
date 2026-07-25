@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { MaterialTable } from '@/components/features/material/MaterialTable';
 import { MaterialFormModal, MaterialFormData } from '@/components/features/material/MaterialFormModal';
 import { EditMaterialModal } from '@/components/features/material/EditMaterialModal';
@@ -114,12 +115,10 @@ export default function MaterialPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Material</h1>
-            <p className="text-sm text-muted-foreground">Kelola data material dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data Material"
+          subtitle="Kelola data material dengan mudah"
+        />
 
         {/* Content */}
         <MaterialTable

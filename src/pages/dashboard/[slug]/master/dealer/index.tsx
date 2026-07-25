@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { DealerTable } from '@/components/features/dealer/DealerTable';
 import { DealerFormModal, DealerFormData } from '@/components/features/dealer/DealerFormModal';
 import { EditDealerModal } from '@/components/features/dealer/EditDealerModal';
@@ -114,12 +115,10 @@ export default function DealerPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Dealer</h1>
-            <p className="text-sm text-muted-foreground">Kelola akun Dealer dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Dealer"
+          subtitle="Kelola akun Dealer dengan mudah"
+        />
 
         {/* Content */}
         <DealerTable

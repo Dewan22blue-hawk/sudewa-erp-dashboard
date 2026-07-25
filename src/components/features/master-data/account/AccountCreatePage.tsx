@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { Card } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AccountForm } from './AccountForm';
 import { accountSchema, type AccountFormValues } from '@/scheme/account-master.schema';
 import { useAccountGroups } from '@/hooks/useAccountGroup';
@@ -136,12 +137,15 @@ export const AccountCreatePage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Tambah Akun</h1>
-            <p className="text-sm text-muted-foreground">Buat akun baru dan hubungkan ke grup akun</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Tambah Akun"
+          subtitle="Buat akun baru dan hubungkan ke grup akun"
+          breadcrumbs={[
+            { label: 'Akun', onClick: () => router.push(basePath) },
+            { label: 'Tambah Akun' }
+          ]}
+          onBack={() => router.push(basePath)}
+        />
 
         <Card className="p-6">
           <AccountForm

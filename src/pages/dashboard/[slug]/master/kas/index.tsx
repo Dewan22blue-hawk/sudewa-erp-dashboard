@@ -1,4 +1,5 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { useKas } from '@/hooks/useKas';
 import { KasTable } from '@/components/features/kas/KasTable';
@@ -16,12 +17,10 @@ export default function KasPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Kas</h1>
-              <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Kas"
+            subtitle="Kelola Kas Keuangan"
+          />
           <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
             <div className="text-muted-foreground animate-pulse">Loading...</div>
           </Card>
@@ -34,12 +33,10 @@ export default function KasPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Kas</h1>
-              <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Kas"
+            subtitle="Kelola Kas Keuangan"
+          />
           <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
             <div className="text-destructive font-medium">Terjadi kesalahan saat mengambil data</div>
           </Card>
@@ -52,12 +49,10 @@ export default function KasPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Kas</h1>
-            <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Kas"
+          subtitle="Kelola Kas Keuangan"
+        />
 
         {/* TABLE CARD */}
         <div className="">

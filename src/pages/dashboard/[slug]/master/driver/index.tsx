@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { DriverTable } from '@/components/features/driver/DriverTable';
 import { DriverFormModal } from '@/components/features/driver/DriverFormModal';
 import { DeleteDriverModal } from '@/components/features/driver/DeleteDriverModal';
@@ -155,12 +156,10 @@ export default function DriverPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Driver</h1>
-                        <p className="text-sm text-muted-foreground">Kelola data driver dengan mudah</p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Driver"
+                    subtitle="Kelola data driver dengan mudah"
+                />
 
                 {/* Content */}
                 <DriverTable

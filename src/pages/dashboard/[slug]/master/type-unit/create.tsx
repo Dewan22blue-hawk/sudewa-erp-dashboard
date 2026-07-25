@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useCreateTypeUnit } from '@/hooks/useTypeUnit';
@@ -60,20 +61,16 @@ export default function CreateTypeUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={handleCancel}>
-            Tipe Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0" />
-          <span className="font-medium text-foreground">Tambah Tipe Unit</span>
-        </div>
-
-        {/* Title */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-950">Tambahkan Tipe Unit</h1>
-          <p className="text-sm text-muted-foreground">Masukkan detail tipe baru</p>
-        </div>
+        {/* HEADER */}
+        <PageHeader
+          title="Tambahkan Tipe Unit"
+          subtitle="Masukkan detail tipe baru"
+          breadcrumbs={[
+            { label: 'Tipe Unit', onClick: handleCancel },
+            { label: 'Tambah Tipe Unit' }
+          ]}
+          onBack={handleCancel}
+        />
 
         {/* FORM CARD */}
         <Card className="rounded-md p-6">

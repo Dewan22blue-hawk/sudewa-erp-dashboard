@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useTypeUnits, useDeleteTypeUnit, useImportTypeUnit } from '@/hooks/useTypeUnit';
@@ -103,12 +104,10 @@ export default function TypeUnitPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Tipe Unit</h1>
-              <p className="text-sm text-muted-foreground">Kelola semua tipe unit</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Tipe Unit"
+            subtitle="Kelola semua tipe unit"
+          />
           <Card className="rounded-md p-6">
             <div className="text-center text-muted-foreground">Loading...</div>
           </Card>
@@ -121,12 +120,10 @@ export default function TypeUnitPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Tipe Unit</h1>
-              <p className="text-sm text-muted-foreground">Kelola semua tipe unit</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Tipe Unit"
+            subtitle="Kelola semua tipe unit"
+          />
           <Card className="rounded-md p-6">
             <div className="text-center text-destructive">Gagal memuat data</div>
           </Card>
@@ -139,12 +136,10 @@ export default function TypeUnitPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Tipe Unit</h1>
-            <p className="text-sm text-muted-foreground">Kelola semua tipe unit</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Tipe Unit"
+          subtitle="Kelola semua tipe unit"
+        />
 
         {/* TABLE CARD */}
         <div className="">

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { PageHeader } from "@/components/ui/page-header"
 import { Card } from "@/components/ui/card"
 import { useSpareparts, useImportSparepart } from "@/hooks/useSparepart"
 import { SparepartTable } from "@/components/features/sparepart/SparepartTable"
@@ -38,14 +39,10 @@ export default function SparepartPage() {
         return (
             <DashboardLayout>
                 <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-semibold">Sparepart</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Kelola semua sparepart
-                            </p>
-                        </div>
-                    </div>
+                    <PageHeader
+                        title="Sparepart"
+                        subtitle="Kelola semua sparepart"
+                    />
                     <Card className="rounded-md p-6">
                         <div className="text-center text-muted-foreground">Loading...</div>
                     </Card>
@@ -58,14 +55,10 @@ export default function SparepartPage() {
         return (
             <DashboardLayout>
                 <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-semibold">Sparepart</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Kelola semua sparepart
-                            </p>
-                        </div>
-                    </div>
+                    <PageHeader
+                        title="Sparepart"
+                        subtitle="Kelola semua sparepart"
+                    />
                     <Card className="rounded-md p-6">
                         <div className="text-center text-destructive">Gagal memuat data</div>
                     </Card>
@@ -78,14 +71,10 @@ export default function SparepartPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 {/* HEADER */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Sparepart</h1>
-                        <p className="text-sm text-muted-foreground">
-                            Kelola semua sparepart
-                        </p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Sparepart"
+                    subtitle="Kelola semua sparepart"
+                />
 
                 {/* TABLE CARD */}
                 <div className="">

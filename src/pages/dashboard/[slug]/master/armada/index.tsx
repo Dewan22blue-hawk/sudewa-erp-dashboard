@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { ArmadaTable } from '@/components/features/armada/ArmadaTable';
 import { DeleteArmadaModal } from '@/components/features/armada/DeleteArmadaModal';
 import { DataImportModal } from '@/components/features/master-data/DataImportModal';
@@ -83,12 +84,10 @@ export default function ArmadaPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Armada</h1>
-            <p className="text-sm text-muted-foreground">Kelola data armada dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Armada"
+          subtitle="Kelola data armada dengan mudah"
+        />
 
         <ArmadaTable
           armadas={armadas}
