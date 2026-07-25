@@ -1,6 +1,7 @@
+import { LoadingState } from '@/components/ui/loading-state';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, Info, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Info, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -44,11 +45,8 @@ export default function BuktiPotongDetailPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex min-h-[50vh] items-center justify-center rounded-md border border-slate-200 bg-white">
-          <div className="flex items-center gap-3 text-slate-500">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Memuat detail bukti potong...
-          </div>
+        <div className="rounded-md border border-slate-200 bg-white">
+          <LoadingState variant="page" text="Memuat detail bukti potong..." />
         </div>
       ) : errorMessage || !data ? (
         <div className="rounded-[30px] border border-red-200 bg-red-50 px-6 py-5 text-red-700">

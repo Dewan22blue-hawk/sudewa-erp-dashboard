@@ -10,6 +10,7 @@ import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useUnitItemDetailsByTransactionId } from '@/hooks/useUnitItemDetail';
 import PurchasePrintDocument from '@/components/features/purchase/PurchasePrintDocument';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function PurchasePrintPage() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function PurchasePrintPage() {
   if (!router.isReady || detailQuery.isLoading || detailsQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat data pembelian...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

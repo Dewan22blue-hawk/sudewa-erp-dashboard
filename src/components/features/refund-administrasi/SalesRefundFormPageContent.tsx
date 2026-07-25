@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Loader2, Search, Save, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, Save, ChevronRight } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { toast } from 'sonner';
 import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface SalesRefundFormPageContentProps {
   transactionId: string;
@@ -334,7 +335,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
                 className="w-full bg-[#1e3a5f] hover:bg-[#152e4d] gap-2 py-6 rounded-md"
               >
                 {createMutation.isPending || updateMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                 ) : (
                   <Save className="h-4 w-4" />
                 )}

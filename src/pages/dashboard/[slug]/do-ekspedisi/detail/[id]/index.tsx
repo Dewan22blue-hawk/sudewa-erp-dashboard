@@ -11,6 +11,7 @@ import { useDeleteDoEkspedisiItem, useDoEkspedisiDetail } from '@/hooks/useDoEks
 import { useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
 import { useProcessDoExpedition } from '@/hooks/useDoInvoice';
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { LoadingState } from '@/components/ui/loading-state';
 
 // pagination helper removed (unused in print/detail view)
 
@@ -112,7 +113,7 @@ export default function DetailDOEkspedisiPage() {
   if (detailQuery.isLoading || tarifQuery.isLoading || tarifItemQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center text-slate-500">Memuat detail DO Ekspedisi...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

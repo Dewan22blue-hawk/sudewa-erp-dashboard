@@ -8,7 +8,7 @@ import { financeRefundService } from '@/services/finance-refund.service';
 import { useKas } from '@/hooks/useKas';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface FinanceRefundApprovalModalProps {
   open: boolean;
@@ -88,7 +88,7 @@ export default function FinanceRefundApprovalModal({ open, onClose, refundId, on
               disabled={approveMutation.isPending || !selectedKas}
               className="bg-[#1f304f] hover:bg-[#1a2842] text-white"
             >
-              {approveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {approveMutation.isPending ? <LoadingState variant="inline" text={null} /> : null}
               Approve
             </Button>
           </div>

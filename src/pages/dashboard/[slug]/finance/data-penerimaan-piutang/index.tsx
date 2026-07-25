@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -8,6 +7,7 @@ import { useDeletePenerimaanPiutang, usePenerimaanPiutang } from '@/hooks/usePen
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { PenerimaanPiutang } from '@/@types/penerimaan-piutang.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DataPenerimaanPiutangPage() {
     const { hasPermission } = usePermissionGuard();
@@ -60,7 +60,7 @@ export default function DataPenerimaanPiutangPage() {
                     actions={
                         query.isFetching ? (
                             <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                                <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                                <LoadingState variant="inline" text={null} />
                                 Memuat data...
                             </span>
                         ) : null
@@ -97,7 +97,7 @@ export default function DataPenerimaanPiutangPage() {
                         <AlertDialogAction onClick={handleDelete} className="bg-orange-600 hover:bg-orange-700" disabled={deleteMutation.isPending}>
                             {deleteMutation.isPending ? (
                                 <span className="inline-flex items-center gap-2">
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <LoadingState variant="inline" text={null} />
                                     Menghapus
                                 </span>
                             ) : (

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, ArrowUp, ArrowDown, Loader2, Search } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
 import type { FinanceRefundRecord, RefundTransactionType } from '@/@types/finance-refund.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import FinanceRefundApprovalModal from '@/components/features/finance-refund/FinanceRefundApprovalModal';
@@ -13,6 +13,7 @@ import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { TextTruncate } from '@/components/ui/text-truncate';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface FinanceRefundTableProps {
   data: FinanceRefundRecord[];
@@ -197,10 +198,7 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
               {isLoading ? (
                 <TableRow className="group">
                   <TableCell colSpan={columns.length} className="py-16 h-40 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
+                    <LoadingState variant="section" text="Memuat data..." />
                   </TableCell>
                 </TableRow>
               ) : table.getRowModel().rows.length > 0 ? (

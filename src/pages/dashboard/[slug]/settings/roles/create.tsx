@@ -9,6 +9,7 @@ import { usePermissions } from '@/hooks/usePermission';
 import { useCreateRole } from '@/hooks/useRole';
 import { toast } from 'sonner';
 import { ChevronLeft, Shield } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function CreateRolePage() {
   const router = useRouter();
@@ -144,7 +145,7 @@ export default function CreateRolePage() {
             </div>
 
             {isLoadingPerms ? (
-              <div className="py-8 text-center text-sm text-gray-500 font-medium">Memuat daftar permissions...</div>
+              <LoadingState variant="page" />
             ) : Object.keys(groupedPermissions).length === 0 ? (
               <div className="py-8 text-center text-sm text-gray-500 font-medium">Tidak ada permissions tersedia.</div>
             ) : (

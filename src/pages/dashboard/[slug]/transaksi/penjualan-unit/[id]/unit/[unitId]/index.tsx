@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Loader2, ChevronRight, Badge, Info } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Badge, Info } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,7 @@ import { useSalesDetail } from '@/hooks/useSales';
 import { useStockUnits, useAssignUnitItemSales, useDispatchStockLifecycle } from '@/hooks/useUnitTransactionItemSales';
 import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
 import { useTypeUnit } from '@/hooks/useTypeUnit';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const readApiError = (error: any): string => {
   const statusCode = error?.statusCode ?? error?.response?.status;
@@ -330,9 +331,7 @@ export default function SalesUnitDetailPage() {
   if (!router.isReady && !hasRequiredRouteParams) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -351,9 +350,7 @@ export default function SalesUnitDetailPage() {
   if (salesLoading || isUnitItemLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

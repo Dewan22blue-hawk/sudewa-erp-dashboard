@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Loader2, Search, Plus, Save, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, Plus, Save, ChevronRight } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,7 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { toast } from 'sonner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const refundFormSchema = z.object({
   unit_transaction_id: z.string().min(1, 'Transaksi harus dipilih'),
@@ -368,7 +369,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
                 className="w-full bg-[#1e3a5f] hover:bg-[#152e4d] gap-2 py-6 rounded-md"
               >
                 {createMutation.isPending || updateMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                 ) : (
                   <Save className="h-4 w-4" />
                 )}

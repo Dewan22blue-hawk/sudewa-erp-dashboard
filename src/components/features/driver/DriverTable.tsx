@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, MoreVertical, Download, Upload, Loader2 } from 'lucide-react';
+import { Search, Plus, MoreVertical, Download, Upload } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/table';
 import type { Driver } from '@/@types/driver.types';
 import { cn } from '@/lib/utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface DriverTableProps {
     drivers: Driver[];
@@ -233,10 +234,7 @@ export function DriverTable({
                         {isLoading ? (
                             <tr>
                                 <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                                        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                                        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                                    </div>
+                                    <LoadingState variant="section" text="Memuat data..." />
                                 </td>
                             </tr>
                         ) : drivers.length > 0 ? (

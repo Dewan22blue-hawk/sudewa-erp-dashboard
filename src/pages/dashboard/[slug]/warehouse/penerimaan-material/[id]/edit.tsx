@@ -35,6 +35,7 @@ import { useSuppliers } from '@/hooks/useSupplier';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { goodsReceiptSchema, type GoodsReceiptFormValues, type GoodsReceiptItemFormValues } from '@/scheme/goods-receipt.schema';
 import { formatCurrency } from '@/components/features/goods-receipt/goods-receipt.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const toDateValue = (value?: string) => {
   if (!value) return undefined;
@@ -194,7 +195,7 @@ export default function GoodsReceiptEditPage() {
   };
 
   if (query.isLoading) {
-    return <DashboardLayout><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat data edit penerimaan material...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!receipt) {

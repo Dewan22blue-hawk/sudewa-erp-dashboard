@@ -29,6 +29,7 @@ import type { MaterialTransactionDetailItem } from '@/@types/material-transactio
 import { PurchaseMaterialDetailItemModal } from '@/components/features/material-purchase/PurchaseMaterialDetailItemModal';
 import { PurchaseMaterialPaymentModal } from '@/components/features/material-purchase/PurchaseMaterialPaymentModal';
 import type { MaterialTransactionBillingFormValues, MaterialTransactionItemFormValues } from '@/scheme/material-transaction.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '';
@@ -179,7 +180,7 @@ export default function PurchaseMaterialDetailPage() {
   if (transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat detail pembelian material...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -293,7 +294,7 @@ export default function PurchaseMaterialDetailPage() {
             <TableBody>
               {transactionQuery.isFetching && filteredItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-28 text-center text-slate-500">Memuat detail item...</TableCell>
+                  <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat detail item..." /></TableCell>
                 </TableRow>
               ) : paginatedItems.length === 0 ? (
                 <TableRow>

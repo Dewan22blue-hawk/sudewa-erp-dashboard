@@ -25,6 +25,7 @@ import {
   getCashLabel,
 } from '@/components/features/tagihan-bbn/utils';
 import { formatDate } from '@/lib/utils/format';
+import { LoadingState } from '@/components/ui/loading-state';
 
 function ReadonlyField({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
   return (
@@ -285,7 +286,7 @@ export default function BBNBillDetailPage() {
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat detail tagihan BBN...</div>
+        <LoadingState variant="page" />
       ) : detailQuery.isError || !detailQuery.data ? (
         <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
           <p className="text-red-500">Detail tagihan BBN tidak ditemukan.</p>

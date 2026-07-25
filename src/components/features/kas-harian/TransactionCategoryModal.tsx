@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useUpdateKasHarian } from '@/hooks/useKasHarian';
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import type { KasHarian } from '@/@types/kas-harian.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const TRANSACTION_CATEGORY_OPTIONS = [
   { value: 'general', label: 'Umum (General)' },
@@ -99,7 +99,7 @@ export default function TransactionCategoryModal({ open, onOpenChange, cashFlowD
           >
             {updateMutation.isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <LoadingState variant="inline" text={null} />
                 Menyimpan...
               </>
             ) : (

@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import {
   MoreVertical,
   Plus,
-  Loader2,
   ArrowLeft,
   ChevronRight,
   AlertTriangle,
@@ -34,6 +33,7 @@ const PURCHASE_RECEIVED_STATE_SET = new Set(['receipt', 'inbound_receipt']);
 
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -348,7 +348,7 @@ export default function PurchaseRefundPageContent({ transactionId }: { transacti
     return (
       <DashboardLayout>
         <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <LoadingState variant="page" />
         </div>
       </DashboardLayout>
     );

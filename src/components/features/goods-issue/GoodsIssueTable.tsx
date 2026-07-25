@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { MoreVertical, Plus, Search, Loader2 } from 'lucide-react';
+import { MoreVertical, Plus, Search } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import type { GoodsIssue } from '@/@types/goods-issue.types';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatDate, getIssueStatusLabel } from './goods-issue.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface GoodsIssueTableProps {
   slug: string;
@@ -103,10 +104,7 @@ export function GoodsIssueTable({
               {isLoading ? (
                 <TableRow className="group">
                   <TableCell colSpan={6} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
+                    <LoadingState variant="section" text="Memuat data..." />
                   </TableCell>
                 </TableRow>
               ) : data.length === 0 ? (

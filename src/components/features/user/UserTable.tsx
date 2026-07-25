@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { User } from '@/@types/user.types';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Loader2, MoreVertical, Plus, Info } from 'lucide-react';
+import {  MoreVertical, Plus, Info } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
@@ -10,6 +10,7 @@ import { useActivateUser, useDeactivateUser } from '@/hooks/useUser';
 import { toast } from 'sonner';
 import { CopyBox } from '@/components/ui/copy-box';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   data: User[];
@@ -115,7 +116,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
           if (isUpdating) {
             return (
               <div className="flex items-center justify-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
+                <LoadingState variant="inline" text={null} />
                 <span className="text-xs font-medium text-slate-400 italic">Memproses...</span>
               </div>
             );

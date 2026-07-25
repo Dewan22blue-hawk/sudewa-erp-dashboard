@@ -1,11 +1,12 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import BuktiPotongForm from '@/components/features/bukti-potong/BuktiPotongForm';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useWithholdingTaxDetail } from '@/hooks/useWithholdingTax';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditBuktiPotongPage() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function EditBuktiPotongPage() {
 
         <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-6">
           {isLoading ? (
-            <div className="flex justify-center p-10"><Loader2 className="animate-spin h-8 w-8 text-slate-500" /></div>
+            <LoadingState variant="page" />
           ) : (
             <BuktiPotongForm
               item={data || null}

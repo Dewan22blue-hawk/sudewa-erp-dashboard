@@ -13,6 +13,7 @@ import {
 import { useCompany } from '@/contexts/CompanyContext';
 import { BBNBillPrintDocument } from '@/components/features/tagihan-bbn/BBNBillPrintDocument';
 import { formatBillCode, getCashLabel } from '@/components/features/tagihan-bbn/utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function BBNBillPrintPage() {
   const router = useRouter();
@@ -94,7 +95,7 @@ export default function BBNBillPrintPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat data tagihan BBN...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import {
-    Loader2,
+    
     Upload,
     Mail,
     Shield
@@ -13,6 +13,7 @@ import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 import { AuthService } from '@/features/auth/services/auth.service';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const getAvatarUrl = (path?: string | null) => {
     if (!path) return null;
@@ -108,9 +109,7 @@ export default function ProfilePage() {
     if (isLoading) {
         return (
             <DashboardLayout>
-                <div className="flex h-[50vh] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
-                </div>
+                <LoadingState variant="page" />
             </DashboardLayout>
         );
     }
@@ -285,7 +284,7 @@ export default function ProfilePage() {
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <LoadingState variant="inline" text={null} />
                                         Menyimpan...
                                     </>
                                 ) : (

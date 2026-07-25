@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import DataHutangTable from '@/components/features/data-hutang/DataHutangTable';
 import { useDataHutang } from '@/hooks/useDataHutang';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DataHutangPage() {
     const { hasPermission } = usePermissionGuard();
@@ -42,7 +42,7 @@ export default function DataHutangPage() {
                     actions={
                         query.isFetching ? (
                             <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <LoadingState variant="inline" text={null} />
                                 Memuat data...
                             </span>
                         ) : null

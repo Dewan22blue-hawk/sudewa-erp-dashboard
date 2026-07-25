@@ -9,6 +9,7 @@ import { usePermissions } from '@/hooks/usePermission';
 import { useRoleDetail, useUpdateRole } from '@/hooks/useRole';
 import { toast } from 'sonner';
 import { ChevronLeft, Shield } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditRolePage() {
   const router = useRouter();
@@ -98,9 +99,7 @@ export default function EditRolePage() {
         />
 
         {isLoadingRole ? (
-          <div className="bg-white rounded-2xl border p-12 text-center text-gray-500 font-medium">
-            Memuat data peran...
-          </div>
+          <LoadingState variant="page" />
         ) : isErrorRole || !role ? (
           <div className="bg-white rounded-2xl border p-12 text-center text-red-500 font-medium">
             Gagal memuat data peran atau peran tidak ditemukan.
@@ -163,7 +162,7 @@ export default function EditRolePage() {
               </div>
 
               {isLoadingPerms ? (
-                <div className="py-8 text-center text-sm text-gray-500 font-medium">Memuat daftar permissions...</div>
+                <LoadingState variant="page" />
               ) : Object.keys(groupedPermissions).length === 0 ? (
                 <div className="py-8 text-center text-sm text-gray-500 font-medium">Tidak ada permissions tersedia.</div>
               ) : (

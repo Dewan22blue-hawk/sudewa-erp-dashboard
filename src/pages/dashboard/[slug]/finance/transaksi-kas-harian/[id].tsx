@@ -17,6 +17,7 @@ import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { cn } from '@/lib/utils';
 import { CopyBox } from '@/components/ui/copy-box';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const LIVE_UPDATE_INTERVAL = 5000;
 
@@ -150,11 +151,8 @@ export default function KasHarianDetailPage() {
 
 
       {isLoading ? (
-        <div className="flex min-h-[50vh] items-center justify-center rounded-md border border-slate-200 bg-white">
-          <div className="flex items-center gap-3 text-slate-500">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Memuat detail transaksi...
-          </div>
+        <div className="rounded-md border border-slate-200 bg-white">
+          <LoadingState variant="page" text="Memuat detail transaksi..." />
         </div>
       ) : errorMessage || !cashFlowDetail ? (
         <div className="rounded-[30px] border border-red-200 bg-red-50 px-6 py-5 text-red-700">
@@ -289,7 +287,7 @@ export default function KasHarianDetailPage() {
                   >
                     {updateMutation.isPending ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <LoadingState variant="inline" text={null} />
                         Menyimpan...
                       </>
                     ) : (
@@ -380,7 +378,7 @@ export default function KasHarianDetailPage() {
                   >
                     {isUploading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <LoadingState variant="inline" text={null} />
                         Mengunggah...
                       </>
                     ) : (

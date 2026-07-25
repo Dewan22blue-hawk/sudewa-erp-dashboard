@@ -5,7 +5,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
-import { Eye, Loader2, FileDown, FileCheck, FileText, FileSpreadsheet, FileX, FileUp, FileEdit } from 'lucide-react';
+import { Eye, FileDown, FileCheck, FileText, FileSpreadsheet, FileX, FileUp, FileEdit } from 'lucide-react';
 
 import { FinanceOverview } from '@/components/features/dashboard/FinanceOverview';
 import { FinanceChart } from '@/components/features/dashboard/FinanceChart';
@@ -17,6 +17,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import { Card } from '@/components/ui/card';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface StatDetail {
   bpkb: number;
@@ -281,7 +282,7 @@ export default function DashboardPage() {
               onClick={handleShowData}
               disabled={isLoadingDisplay}
             >
-              {isLoadingDisplay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
+              {isLoadingDisplay ? <LoadingState variant="inline" text={null} /> : <Eye className="h-4 w-4" />}
               Show
             </Button>
           </div>

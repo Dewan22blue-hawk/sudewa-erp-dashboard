@@ -1,10 +1,11 @@
 import { format } from 'date-fns';
-import { Pencil, Search, Loader2 } from 'lucide-react';
+import { Pencil, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import type { VehicleDocumentItem } from '@/@types/vehicle-document.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   items: VehicleDocumentItem[];
@@ -84,10 +85,7 @@ export function VehicleDocumentDetailTable({ items, search, isLoading = false, p
               {isLoading ? (
                 <tr>
                   <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
+                    <LoadingState variant="section" text="Memuat data..." />
                   </td>
                 </tr>
               ) : items.length ? (

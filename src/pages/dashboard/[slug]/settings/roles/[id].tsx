@@ -10,6 +10,7 @@ import { useUserOptions, useAssignRole, useRevokeRole } from '@/hooks/useUser';
 import { toast } from 'sonner';
 import { ChevronLeft, Shield, UserPlus, UserMinus } from 'lucide-react';
 import { ApiResponseError } from '@/lib/api/response';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function RoleDetailPage() {
   const router = useRouter();
@@ -79,9 +80,7 @@ export default function RoleDetailPage() {
         />
 
         {isLoadingRole ? (
-          <div className="bg-white rounded-2xl border p-12 text-center text-gray-500 font-medium">
-            Memuat data peran...
-          </div>
+          <LoadingState variant="page" />
         ) : isErrorRole || !role ? (
           <div className="bg-white rounded-2xl border p-12 text-center text-red-500 font-medium">
             Gagal memuat detail peran atau peran tidak ditemukan.

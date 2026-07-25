@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, Search, SendHorizontal, Loader2 } from 'lucide-react';
+import { Check, Search, SendHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,7 @@ import { DispatchUnitTableRow } from '@/@types/pengeluaran-unit.types';
 import { PaginationMeta } from '@/@types/pagination.types';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   data: DispatchUnitTableRow[];
@@ -211,19 +212,13 @@ export default function PengeluaranUnitCreateTable({
             {isLoading ? (
               <TableRow className="group">
                 <TableCell colSpan={9} className="text-center px-4 py-4 sticky right-0 bg-white  z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
+                  <LoadingState variant="section" text="Memuat data..." />
                 </TableCell>
               </TableRow>
             ) : isError ? (
               <TableRow className="group">
                 <TableCell colSpan={9} className="px-4 py-8 text-center text-red-600 text-sm">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
+                  <LoadingState variant="section" text="Memuat data..." />
                 </TableCell>
               </TableRow>
             ) : filteredData.length === 0 ? (

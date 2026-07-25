@@ -12,6 +12,7 @@ import { ensureSuccess, LaravelApiResponse } from '@/lib/api/response';
 import { useSalesDetail } from '@/hooks/useSales';
 import SalesPrintDocument from '@/components/features/sales/SalesPrintDocument';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function SalesPrintPage() {
   const router = useRouter();
@@ -123,7 +124,7 @@ export default function SalesPrintPage() {
   if (!router.isReady || detailQuery.isLoading || detailsQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat data penjualan...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

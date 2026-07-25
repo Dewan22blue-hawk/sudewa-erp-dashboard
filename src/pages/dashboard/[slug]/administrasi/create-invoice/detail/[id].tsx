@@ -10,6 +10,7 @@ import { useDoInvoiceDetail, useProcessDoInvoice } from '@/hooks/useDoInvoice';
 
 
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function CreateInvoiceDetailPage() {
   const router = useRouter();
@@ -74,7 +75,7 @@ export default function CreateInvoiceDetailPage() {
   };
 
   if (!router.isReady || detailQuery.isLoading) {
-    return <DashboardLayout><div className="py-20 text-center text-sm text-slate-500">Memuat detail invoice...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!detailQuery.data) {

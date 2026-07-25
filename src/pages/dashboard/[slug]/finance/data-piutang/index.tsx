@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import DataPiutangTable from "@/components/features/data-piutang/DataPiutangTable"
 import { useDataPiutang } from "@/hooks/useDataPiutang"
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DataPiutangPage() {
     const { hasPermission } = usePermissionGuard();
@@ -45,7 +46,7 @@ export default function DataPiutangPage() {
                     actions={
                         query.isFetching ? (
                             <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <LoadingState variant="inline" text={null} />
                                 Memuat data...
                             </span>
                         ) : null

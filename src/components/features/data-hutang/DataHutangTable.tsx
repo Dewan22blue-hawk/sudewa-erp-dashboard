@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ChevronLeft, ChevronRight, Loader2, MoreVertical, Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreVertical, Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { LiabilityListItem, LiabilityListMeta } from '@/types/pembayaran-hutang.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 type Props = {
   data: LiabilityListItem[];
@@ -165,10 +166,7 @@ export default function DataHutangTable({ data, meta, loading, error, search, pe
             {loading && data.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
+                  <LoadingState variant="section" text="Memuat data..." />
                 </td>
               </tr>
             ) : sortedData.length > 0 ? (

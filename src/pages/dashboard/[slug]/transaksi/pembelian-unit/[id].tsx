@@ -15,7 +15,7 @@ import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ArrowLeft, ChevronRight, CreditCard, Loader2, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { TextTruncate } from '@/components/ui/text-truncate';
@@ -28,6 +28,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils/format';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -279,9 +280,7 @@ export default function PurchaseDetailPage() {
   if (isLoading || unitItemsLoading || billingLoading || historyLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

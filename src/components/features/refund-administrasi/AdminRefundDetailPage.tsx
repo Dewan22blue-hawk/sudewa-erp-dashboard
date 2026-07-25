@@ -9,6 +9,7 @@ import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadg
 import RefundPaymentModal from '@/components/features/refund-administrasi/RefundPaymentModal';
 import { useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
 import { formatCurrency } from '@/lib/utils/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface AdminRefundDetailPageProps {
   title: string;
@@ -34,7 +35,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
   if (refundQuery.isLoading || transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="p-8 text-center text-slate-500">Memuat detail refund...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

@@ -10,6 +10,7 @@ import { useTypeUnit, useUpdateTypeUnit } from '@/hooks/useTypeUnit';
 import { typeUnitSchema, type TypeUnitFormValues } from '@/scheme/type-unit.schema';
 import { TypeUnitForm } from '@/components/features/type-unit/TypeUnitForm';
 import { ChevronRight } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditTypeUnitPage() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function EditTypeUnitPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="text-center text-muted-foreground p-10">Loading...</div>
+          <LoadingState variant="page" />
         </div>
       </DashboardLayout>
     );

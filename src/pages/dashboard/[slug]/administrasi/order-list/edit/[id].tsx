@@ -25,6 +25,7 @@ import { useTarifs } from '@/hooks/useTarif';
 import { ApiValidationError } from '@/lib/api/response';
 import { composeOrderListWithTarifs } from '@/services/order-list.service';
 import { summarizeTarifCargoItems } from '@/components/features/order-list/order-list.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const isItemChangedTarif = (initialItem: any, currentItem: OrderListFormItemValue) =>
   Number(initialItem?.tarifId ?? 0) !== Number(currentItem.tarifId || 0);
@@ -282,7 +283,7 @@ export default function EditOrderListPage() {
   if (!router.isReady || detailQuery.isLoading || tarifItemQuery.isLoading || tarifLoadItemQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat data order list...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

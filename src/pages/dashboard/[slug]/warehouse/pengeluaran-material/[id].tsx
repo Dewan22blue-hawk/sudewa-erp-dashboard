@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { InvoicePreviewModal } from '@/components/features/goods-receipt/InvoicePreviewModal';
 import { useGoodsIssue } from '@/hooks/useGoodsIssue';
 import { formatCurrency, formatLongDate, getIssueBilling } from '@/components/features/goods-issue/goods-issue.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function GoodsIssueDetailPage() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function GoodsIssueDetailPage() {
   const billing = useMemo(() => getIssueBilling(issue), [issue]);
   const payments = billing?.payments ?? [];
 
-  if (query.isLoading) return <DashboardLayout><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat detail pengeluaran material...</div></DashboardLayout>;
+  if (query.isLoading) return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   if (!issue) return <DashboardLayout><div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail pengeluaran material tidak ditemukan.</div></DashboardLayout>;
 
   return (

@@ -5,7 +5,7 @@ import { useRouter } from "next/router"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, ChevronRight, Loader2 } from "lucide-react"
+import { ArrowLeft, ChevronRight } from "lucide-react"
 import { PaymentFormData, PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import {
@@ -20,6 +20,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const readApiError = (error: any): string => {
     const stringifyDetail = (value: unknown): string => {
@@ -236,9 +237,7 @@ export default function PurchasePaymentPage() {
     if (purchaseLoading || billingLoading || historyLoading) {
         return (
             <DashboardLayout>
-                <div className="flex h-[50vh] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
+                <LoadingState variant="page" />
             </DashboardLayout>
         )
     }

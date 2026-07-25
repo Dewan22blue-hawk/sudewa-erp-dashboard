@@ -6,6 +6,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiDetailForm, type DOEkspedisiDetailFormData } from '@/components/features/do-ekspedisi/DOEkspedisiDetailForm';
 import { useDoEkspedisiCustomerLookup, useDoEkspedisiDetail, useDoEkspedisiItemDetail, useDoEkspedisiItemDestinations, useUpdateDoEkspedisiItem } from '@/hooks/useDoEkspedisi';
 import { syncDoEkspedisiItemDestinations } from '@/lib/do-ekspedisi/item-destination-sync';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditDOEkspedisiItemPage() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function EditDOEkspedisiItemPage() {
   if (detailQuery.isLoading || destinationQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center text-slate-500">Memuat detail item DO...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

@@ -14,6 +14,7 @@ import {
   useUpdateDoEkspedisiItem,
 } from '@/hooks/useDoEkspedisi';
 import { syncDoEkspedisiItemDestinations } from '@/lib/do-ekspedisi/item-destination-sync';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const toApiDate = (value?: Date) => {
   if (!value) return '';
@@ -111,7 +112,7 @@ export default function EditDOEkspedisiPage() {
   if (detailQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center text-slate-500">Memuat data DO Ekspedisi...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

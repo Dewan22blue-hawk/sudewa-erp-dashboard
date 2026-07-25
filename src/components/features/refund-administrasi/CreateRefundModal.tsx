@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, PackageSearch } from 'lucide-react';
+import {  PackageSearch } from 'lucide-react';
 import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
 import { useCreateRefund, useRefundSelectableItems } from '@/hooks/useRefundAdministrasi';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const parseCurrencyInput = (value: string) => {
   const numericValue = value.replace(/[^\d]/g, '');
@@ -196,7 +197,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
                   <TableRow>
                     <TableCell colSpan={9} className="h-36">
                       <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <LoadingState variant="inline" text={null} />
                         Memuat item transaksi...
                       </div>
                     </TableCell>
@@ -249,7 +250,7 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
               Batal
             </Button>
             <Button type="submit" className="min-w-36" disabled={createRefundMutation.isPending || isLoading}>
-              {createRefundMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {createRefundMutation.isPending ? <LoadingState variant="inline" text={null} /> : null}
               Simpan Refund
             </Button>
           </DialogFooter>

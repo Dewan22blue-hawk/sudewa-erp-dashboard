@@ -14,6 +14,7 @@ import { MoneyInput } from '@/components/ui/money-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKas } from '@/hooks/useKas';
+import { LoadingState } from '@/components/ui/loading-state';
 import {
   useBBNBillBillingItems,
   useBBNBillBillings,
@@ -175,7 +176,7 @@ export default function BBNBillPaymentPage() {
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat pembayaran STNK &amp; BPKB...</div>
+        <LoadingState variant="page" />
       ) : detailQuery.isError || !detailQuery.data ? (
         <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
           <p className="text-red-500">Data tagihan BBN tidak ditemukan.</p>

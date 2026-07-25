@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import {
@@ -12,6 +12,7 @@ import {
 import { toast } from 'sonner';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/ui/loading-state';
 
 // ======================
 // ERROR PARSER
@@ -269,9 +270,7 @@ export default function EditNestedUnitPage() {
   if (isLoading || isUnitLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

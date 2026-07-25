@@ -8,6 +8,7 @@ import { useDoEkspedisiDetail } from '@/hooks/useDoEkspedisi';
 import { useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
 import { Button } from '@/components/ui/button';
 import type { DoEkspedisi, DoEkspedisiOrderList, DoEkspedisiOrderTarifItem, DoEkspedisiOrderTarifLoadItem } from '@/@types/do-ekspedisi.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DOEkspedisiPrintPage() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function DOEkspedisiPrintPage() {
   if (!router.isReady || detailQuery.isLoading || tarifQuery.isLoading || tarifItemQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat detail DO Ekspedisi...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
