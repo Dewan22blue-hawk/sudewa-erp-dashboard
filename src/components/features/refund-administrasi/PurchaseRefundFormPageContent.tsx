@@ -47,15 +47,10 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
   const [filterColor, setFilterColor] = useState('');
   const [filterMachineNumber, setFilterMachineNumber] = useState('');
   const [filterChassisNumber, setFilterChassisNumber] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
 
   const debouncedColor = useDebouncedValue(filterColor, 300);
   const debouncedMachine = useDebouncedValue(filterMachineNumber, 300);
   const debouncedChassis = useDebouncedValue(filterChassisNumber, 300);
-
-  // Queries & Mutations
-  const { data: purchasesResponse } = usePurchases(companyId, { page: 1, perPage: 100 });
-  const purchaseList = purchasesResponse?.data ?? [];
 
   const createMutation = useCreateRefund();
   const updateMutation = useUpdateRefund();
@@ -155,9 +150,10 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
   }, [mappedItems, form]);
 
   const onSubmit = async (values: RefundFormValues) => {
+    let newRefundId = null;
     try {
       if (mode === 'create') {
-        await createMutation.mutateAsync({
+        const response = await createMutation.mutateAsync({
           unit_transaction_id: values.unit_transaction_id,
           refund_date: values.refund_date,
           refund_amount: values.refund_amount,
@@ -165,6 +161,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
           unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids,
         });
         toast.success('Data refund berhasil dibuat');
+        newRefundId = response.id;
       } else {
         if (!refundId) return;
         await updateMutation.mutateAsync({
@@ -178,8 +175,10 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
           },
         });
         toast.success('Data refund berhasil diperbarui');
+        newRefundId = refundId;
       }
-      router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${values.unit_transaction_id}`);
+
+      router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${values.unit_transaction_id}/refund/${newRefundId}`);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menyimpan data refund');
     }

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, ChevronRight, DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload } from 'lucide-react';
+import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
@@ -19,8 +19,48 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { ReferenceLink } from '@/components/ui/reference-link';
-import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import BaseTable from '@/components/ui/base-table';
 import { LoadingState } from '@/components/ui/loading-state';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+const statusConfig: Record<string, { label: string; className: string }> = {
+  // Backend enum statuses
+  normal: { label: 'Normal', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  minor_damage: { label: 'Minor Damage', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+  major_damage: { label: 'Major Damage', className: 'border-red-200 bg-red-50 text-red-700 font-semibold' },
+  returned: { label: 'Returned', className: 'border-purple-200 bg-purple-50 text-purple-700 font-semibold' },
+  refunded: { label: 'Refunded', className: 'border-orange-200 bg-orange-50 text-orange-700 font-semibold' },
+  lost: { label: 'Lost', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+  in_repair: { label: 'In Repair', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+
+  // Fallback / legacy statuses
+  draft: { label: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-medium' },
+  cancel: { label: 'Cancel', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  rejected: { label: 'Rejected', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  prepare: { label: 'Prepare', className: 'border-amber-200 bg-amber-50 text-amber-700 font-medium' },
+  inbound_purcase_order: { label: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_incoming_goods: { label: 'In Transit', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_receipt: { label: 'Available', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  inbound_return: { label: 'Refund', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_reserved: { label: 'Reserved', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_in_transit: { label: 'In Transit', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-medium' },
+  outbound_delivered: { label: 'Delivered', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-medium' },
+  outbound_return: { label: 'Return', className: 'border-rose-200 bg-rose-50 text-rose-700 font-medium' },
+};
+
+const renderStatus = (status: string) => {
+  const config = statusConfig[status] ?? {
+    label: status ? status.replace(/_/g, ' ') : '-',
+    className: 'border-slate-200 bg-slate-50 text-slate-700 font-medium',
+  };
+
+  return (
+    <Badge variant="outline" className={cn('capitalize', config.className)}>
+      {config.label}
+    </Badge>
+  );
+};
 
 const parseApiError = (err: any): string => {
   const details = err?.details ?? err?.response?.data?.errors;
@@ -71,6 +111,20 @@ export default function UnitPurchaseDetailPage() {
         cell: (details: any) => details.color,
       },
       {
+        header: 'Status Stok',
+        accessorKey: 'in_stock',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (details: any) => details.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
+      },
+      {
+        header: 'Kondisi Stok',
+        accessorKey: 'status',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (details: any) => renderStatus(details.status),
+      },
+      {
         header: 'aksi',
         alignment: 'left' as const,
         sticky: 'right' as const,
@@ -82,12 +136,12 @@ export default function UnitPurchaseDetailPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
-              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(details)}>
+              {canEdit && <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(details)}>
                 Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(details)}>
+              </DropdownMenuItem>}
+              {canDelete && !isPaid && <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(details)}>
                 Hapus
-              </DropdownMenuItem>
+              </DropdownMenuItem>}
             </DropdownMenuContent>
           </DropdownMenu>
         ),
@@ -117,6 +171,7 @@ export default function UnitPurchaseDetailPage() {
   });
 
   const details = detailResponse?.data ?? [];
+  const isPaid = purchase?.unit_transaction_billing?.is_paid;
 
   const unitTypeName = useMemo(() => {
     if (!unitItem?.unit_type_id) return '-';
@@ -390,7 +445,7 @@ export default function UnitPurchaseDetailPage() {
                       <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {canCreate && (
+                      {canCreate && !isPaid && (
                         <>
                           <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
                             <Upload className="h-4 w-4 mr-2" />
