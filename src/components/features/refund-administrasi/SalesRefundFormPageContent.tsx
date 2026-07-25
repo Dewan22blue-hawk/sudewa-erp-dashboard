@@ -17,6 +17,7 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { toast } from 'sonner';
 import { createRefundSchema, type CreateRefundFormValues } from '@/schemas/refund.schema';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 interface SalesRefundFormPageContentProps {
   transactionId: string;
@@ -124,6 +125,8 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
     }
   }, [filteredItems, form]);
 
+  console.log(filteredItems);
+
   const onSubmit = async (values: CreateRefundFormValues) => {
     try {
       if (mode === 'create') {
@@ -171,6 +174,12 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
             onCheckedChange={(checked) => toggleItem(Number(item.id), Boolean(checked))}
           />
         ),
+      },
+      {
+        header: 'TIPE UNIT',
+        accessorKey: 'unit_type_name',
+        sortable: true,
+        cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item?.unit_type_name}`}>{item?.unit_type_name}</ReferenceLink>
       },
       {
         header: 'WARNA',
