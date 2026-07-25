@@ -42,6 +42,46 @@ return (
 
 ---
 
+## 2.1 Standarisasi Header Halaman (PageHeader)
+
+**Aturan**: Untuk seluruh halaman **Detail, Create, Edit, dan Payment** (terutama di dalam modul Transaksi/Administrasi), **WAJIB** menggunakan komponen `PageHeader` (`src/components/ui/page-header.tsx`) menggantikan struktur HTML manual. Komponen ini sudah mengatur layout flex, spacing, dan styling responsif secara seragam.
+
+**Komponen `PageHeader` memiliki properti berikut:**
+- `breadcrumbs`: Array navigasi (opsional). Elemen terakhir akan dirender sebagai teks tebal.
+- `onBack`: Fungsi tombol kembali. Jika diisi, tombol `ArrowLeft` akan muncul otomatis.
+- `title`: Judul utama halaman (string atau ReactNode).
+- `subtitle`: Subjudul atau Metadata khusus (contoh: Kode Unik Transaksi, Badge Status).
+- `actions`: Kumpulan komponen tombol (seperti Bayar, Edit, Print) diletakkan di sisi kanan.
+
+**Contoh Penggunaan:**
+```tsx
+import { PageHeader } from '@/components/ui/page-header';
+
+<PageHeader
+  breadcrumbs={[
+    { label: 'Pembelian Unit', onClick: () => router.push('/...') },
+    { label: 'Detail Pembelian' }
+  ]}
+  onBack={() => router.push('/...')}
+  title="Data Pembelian"
+  subtitle={
+    <>
+      <span>Kode Beli:</span>
+      <span className="text-blue-600 font-semibold">PBL-001</span>
+      <Badge variant="outline">Lunas</Badge>
+    </>
+  }
+  actions={
+    <>
+      <Button variant="outline">Print</Button>
+      <Button>Terima Barang</Button>
+    </>
+  }
+/>
+```
+
+---
+
 ## 3. Tombol Kembali Halaman Detail (Back Button)
 
 **Aturan**: Gunakan komponen `<Button>` variant ghost, size icon, `rounded-md`, border `border-slate-200`, ikon `ArrowLeft` dari `lucide-react`.

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
@@ -299,74 +300,65 @@ export default function PurchaseDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
-            Pembelian Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Detail Pembelian</span>
-        </div>
-
-        {/* HEADLINE & ACTIONS */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <ArrowLeft className="h-5 w-5 text-slate-700" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Data Pembelian</h1>
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span>Kode Beli:</span>
-                <span className="text-blue-600 font-semibold">{purchase.code}</span>
-                {isPaid ? (
-                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
-                    Lunas
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
-                    Belum Lunas
-                  </Badge>
-                )}
-                {isAlreadyReceived ? (
-                  <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                    Stok Diterima
-                  </Badge>
-                ) : null}
-                {isRefunded ? (
-                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
-                    Sudah Refund
-                  </Badge>
-                ) : null}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
-              <CreditCard className="mr-2 h-4 w-4" />
-              {isPaid ? 'Sudah Dibayar' : 'Bayar'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-              onClick={() => setIsMarkAsPaidDialogOpen(true)}
-            >
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-white hover:bg-gray-50 border-gray-200"
-              disabled={!canReceive || updateState.isPending}
-              onClick={() => setIsReceiveDialogOpen(true)}
-            >
-              {isAlreadyReceived ? 'Sudah Diterima' : updateState.isPending ? 'Memproses...' : 'Terima Barang'}
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+            { label: 'Detail Pembelian' }
+          ]}
+          title="Data Pembelian"
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+          subtitle={
+            <>
+              <span>Kode Beli:</span>
+              <span className="text-blue-600 font-semibold">{purchase.code}</span>
+              {isPaid ? (
+                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                  Lunas
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                  Belum Lunas
+                </Badge>
+              )}
+              {isAlreadyReceived ? (
+                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
+                  Stok Diterima
+                </Badge>
+              ) : null}
+              {isRefunded ? (
+                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                  Sudah Refund
+                </Badge>
+              ) : null}
+            </>
+          }
+          actions={
+            <>
+              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                {isPaid ? 'Sudah Dibayar' : 'Bayar'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
+                className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setIsMarkAsPaidDialogOpen(true)}
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-white hover:bg-gray-50 border-gray-200"
+                disabled={!canReceive || updateState.isPending}
+                onClick={() => setIsReceiveDialogOpen(true)}
+              >
+                {isAlreadyReceived ? 'Sudah Diterima' : updateState.isPending ? 'Memproses...' : 'Terima Barang'}
+              </Button>
+            </>
+          }
+        />
 
         {isRefunded ? (
           <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">

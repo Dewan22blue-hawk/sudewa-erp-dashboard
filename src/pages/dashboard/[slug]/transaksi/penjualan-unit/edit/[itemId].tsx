@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
@@ -205,23 +206,20 @@ export default function EditUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(basePath)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0" />
-          <span className="font-medium text-foreground">Edit Penjualan</span>
-        </div>
-
-        {/* Title */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-950">Edit Penjualan</h1>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Kode Jual</span>
-            <span className="text-blue-600 font-medium">{invoiceCode}</span>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(basePath) },
+            { label: 'Edit Penjualan' }
+          ]}
+          title="Edit Penjualan"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="text-blue-600 font-medium">{invoiceCode}</span>
+            </>
+          }
+          onBack={() => router.push(basePath)}
+        />
 
         {/* Form Card - Border 1px, Radius 12px, Padding 24px */}
         <Card className="rounded-md border border-gray-200 shadow-none">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Wallet, AlertTriangle, Info } from 'lucide-react';
@@ -301,69 +302,60 @@ export default function SalesDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-slate-500 print:hidden">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Detail Penjualan</span>
-        </div>
-
-        {/* Header Section */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <ArrowLeft className="h-5 w-5 text-slate-700" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Data Penjualan</h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Kode Jual:</span>
-                <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
-                {isPaid ? (
-                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
-                    Lunas
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
-                    Belum Lunas
-                  </Badge>
-                )}
-                {isAlreadyDelivered ? (
-                  <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                    Stok Terkirim
-                  </Badge>
-                ) : null}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
-              <CreditCard className="mr-2 h-4 w-4" />
-              {isPaid ? 'Sudah Dibayar' : 'Bayar'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={Boolean(isPaid)}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-              onClick={() => setIsMarkAsPaidDialogOpen(true)}
-            >
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-white hover:bg-gray-50 border-gray-200"
-              disabled={!canDeliver || updateState.isPending}
-              onClick={() => setIsDeliveryDialogOpen(true)}
-            >
-              {isAlreadyDelivered ? 'Sudah Terkirim' : updateState.isPending ? 'Memproses...' : 'Kirim Barang'}
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Detail Penjualan' }
+          ]}
+          title="Data Penjualan"
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
+              {isPaid ? (
+                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                  Lunas
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                  Belum Lunas
+                </Badge>
+              )}
+              {isAlreadyDelivered ? (
+                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
+                  Stok Terkirim
+                </Badge>
+              ) : null}
+            </>
+          }
+          actions={
+            <>
+              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                {isPaid ? 'Sudah Dibayar' : 'Bayar'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={Boolean(isPaid)}
+                className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setIsMarkAsPaidDialogOpen(true)}
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-white hover:bg-gray-50 border-gray-200"
+                disabled={!canDeliver || updateState.isPending}
+                onClick={() => setIsDeliveryDialogOpen(true)}
+              >
+                {isAlreadyDelivered ? 'Sudah Terkirim' : updateState.isPending ? 'Memproses...' : 'Kirim Barang'}
+              </Button>
+            </>
+          }
+        />
 
         {/* Print Header - Visible only on Print */}
         <div className="hidden print:block mb-8">

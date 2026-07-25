@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { ArrowLeft, ChevronLeft, ChevronRight, CreditCard } from 'lucide-react';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 import { toast } from 'sonner';
 import { useCreateSales } from '@/hooks/useSales';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -285,29 +285,20 @@ export default function CreateSalesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-slate-500 print:hidden">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Tambah Data Penjualan</span>
-        </div>
-
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <ArrowLeft className="h-5 w-5 text-slate-700" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Data Penjualan</h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Kode Jual:</span>
-                <span className="font-semibold text-blue-600">{generatedCode}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Tambah Data Penjualan' }
+          ]}
+          title="Data Penjualan"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="font-semibold text-blue-600">{generatedCode}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}
+        />
 
         <div className="rounded-md border bg-white p-5 md:p-6 shadow-sm">
           <EditUnitForm
