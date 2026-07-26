@@ -85,6 +85,29 @@ export default function UnitPurchaseDetailPage() {
   const purchaseId = String(id ?? '');
   const unitItemId = String(unitId ?? '');
 
+  const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
+  const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
+  const { data: detailResponse } = useUnitItemDetails(unitItemId);
+  const { data: typeUnits } = useTypeUnits();
+
+  const createMutation = useCreateUnitItemDetail();
+  const updateMutation = useUpdateUnitItemDetail();
+  const deleteMutation = useDeleteUnitItemDetail();
+  const importMutation = useImportUnitItemDetails();
+
+  const [openForm, setOpenForm] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
+  const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
+  const [formValues, setFormValues] = useState({
+    color: '',
+    machine_number: '',
+    chassis_number: '',
+  });
+
+  const details = detailResponse?.data ?? [];
+  const isPaid = purchase?.unit_transaction_billing?.is_paid;
+
   const columns = useMemo(
     () => [
       {
@@ -149,29 +172,6 @@ export default function UnitPurchaseDetailPage() {
     ],
     [canDelete, canEdit, isPaid],
   );
-
-  const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
-  const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
-  const { data: detailResponse } = useUnitItemDetails(unitItemId);
-  const { data: typeUnits } = useTypeUnits();
-
-  const createMutation = useCreateUnitItemDetail();
-  const updateMutation = useUpdateUnitItemDetail();
-  const deleteMutation = useDeleteUnitItemDetail();
-  const importMutation = useImportUnitItemDetails();
-
-  const [openForm, setOpenForm] = useState(false);
-  const [openImport, setOpenImport] = useState(false);
-  const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
-  const [formValues, setFormValues] = useState({
-    color: '',
-    machine_number: '',
-    chassis_number: '',
-  });
-
-  const details = detailResponse?.data ?? [];
-  const isPaid = purchase?.unit_transaction_billing?.is_paid;
 
   const unitTypeName = useMemo(() => {
     if (!unitItem?.unit_type_id) return '-';
