@@ -157,7 +157,7 @@ export function CreateSalesModal({ isOpen, onClose, onSuccess }: CreateSalesModa
                                                                 }}
                                                             >
                                                                 <Check className={cn('mr-2 h-4 w-4', selectedCustomer?.id === option.id ? 'opacity-100' : 'opacity-0')} />
-                                                                {option.code ? `${option.code} - ` : ''}{option.name}
+                                                                {option.code ? `${option.code} -` : ''}{option.name}
                                                             </CommandItem>
                                                         ))}
                                                     </CommandGroup>
