@@ -226,10 +226,15 @@ export default function CreateSalesPage() {
       }
 
       // Create transaction and its unit item atomically
-      await createSalesMutation.mutateAsync(transactionPayload);
+      const createdSales = await createSalesMutation.mutateAsync(transactionPayload);
+      const createdId = createdSales?.id;
 
       toast.success('Penjualan unit berhasil ditambahkan');
-      router.push(salesPath);
+      if (createdId) {
+        router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${createdId}`);
+      } else {
+        router.push(salesPath);
+      }
     } catch (error) {
       const message = readErrorMessage(error);
       if (message.toLowerCase().includes('no stock available')) {

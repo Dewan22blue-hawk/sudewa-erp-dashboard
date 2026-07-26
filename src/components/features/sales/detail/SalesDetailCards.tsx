@@ -71,16 +71,6 @@ export function SalesDetailCards({ data, billingHistories = [], unitType }: Prop
                 </ReferenceLink>
               </div>
             </div>
-
-            <div className="space-y-1">
-              <p>Nama Tipe Unit</p>
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <Motorbike className="h-4 w-4 text-slate-500" />
-                <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${unitType?.name}`}>
-                  {unitType?.name}
-                </ReferenceLink>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>

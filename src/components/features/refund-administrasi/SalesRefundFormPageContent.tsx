@@ -117,15 +117,19 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
     }
   }, [selectedIds, form]);
 
-  const allSelected = filteredItems.length > 0 && filteredItems.every((item) => selectedIds.includes(Number(item.id)));
+  const selectableFilteredItems = useMemo(() => {
+    return filteredItems.filter((item) => item.status !== 'returned' && item.status !== 'refunded');
+  }, [filteredItems]);
+
+  const allSelected = selectableFilteredItems.length > 0 && selectableFilteredItems.every((item) => selectedIds.includes(Number(item.id)));
 
   const toggleAllItems = useCallback((checked: boolean) => {
     if (checked) {
-      form.setValue('unit_transaction_item_detail_ids', filteredItems.map((item) => Number(item.id)));
+      form.setValue('unit_transaction_item_detail_ids', selectableFilteredItems.map((item) => Number(item.id)));
     } else {
       form.setValue('unit_transaction_item_detail_ids', []);
     }
-  }, [filteredItems, form]);
+  }, [selectableFilteredItems, form]);
 
   const onSubmit = async (values: CreateRefundFormValues) => {
     try {
@@ -152,7 +156,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
         });
         toast.success('Data refund penjualan berhasil diperbarui');
       }
-      router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund`);
+      router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/${mode === 'create' ? createMutation.data?.id : refundId}`);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menyimpan data refund');
     }
@@ -172,6 +176,7 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
           <Checkbox
             checked={selectedIds.includes(Number(item.id))}
             onCheckedChange={(checked) => toggleItem(Number(item.id), Boolean(checked))}
+            disabled={item?.status === 'returned' || item?.status === 'refunded'}
           />
         ),
       },

@@ -9,7 +9,7 @@ import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetail
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
 import { toast } from 'sonner';
 import { useSalesDetail } from '@/hooks/useSales';
-import { useCurrentBilling, useBillingHistory, useUpdateBillingIsPaid } from '@/hooks/useUnitBilling';
+import { useCurrentBilling, useBillingHistory, useUpdateBillingIsPaid, useUnitBillings } from '@/hooks/useUnitBilling';
 import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
 import { mapSalesDetailCard, mapSalesDetailToUI } from '@/services/sales.mapper';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
@@ -46,6 +46,8 @@ export default function SalesDetailPage() {
   const salesData = data?.ui ?? null;
   const rawData = data?.raw ?? null;
 
+  const { data: billings = [] } = useUnitBillings(data?.raw?.id);
+
   const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(salesId ?? ''));
   const billingId = String(currentBilling?.id ?? '');
   const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(salesId ?? ''));
@@ -67,8 +69,10 @@ export default function SalesDetailPage() {
   const billingSummary = rawData?.billing_summary;
   const totalTagihan = Number(billingSummary?.grand_total ?? rawData?.unit_transaction_bruto_total ?? 0);
   const totalPaid = Number(billingSummary?.total_paid ?? 0);
-  const isPaidFromBilling = billingSummary?.is_paid ?? rawData?.unit_transaction_billing?.is_paid;
-  const isPaid = billingSummary?.is_paid ?? (Boolean(isPaidFromBilling) || (totalPaid >= totalTagihan && totalTagihan > 0));
+
+  const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
+  const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
+
   const canDeliver = isPaid && !isAlreadyDelivered && !isRefunded;
   const resolvedBillingHistories =
     billingHistories.length > 0
@@ -331,14 +335,17 @@ export default function SalesDetailPage() {
           }
           actions={
             <>
-              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
+              <Button
+                disabled={isRefunded}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handlePayment}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 {isPaid ? 'Sudah Dibayar' : 'Bayar'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                disabled={Boolean(isPaid)}
+                disabled={isPaid || !rawData?.unit_transaction_billing}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => setIsMarkAsPaidDialogOpen(true)}
               >

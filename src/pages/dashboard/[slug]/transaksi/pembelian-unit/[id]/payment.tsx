@@ -81,7 +81,7 @@ const readCheckRightAmountError = (error: any): string => {
         })
         .join('; ');
 
-    return `Pembayaran belum bisa diproses. Detail unit belum lengkap -> ${detailText}.`;
+    return `Pembayaran belum bisa diproses. Detail unit belum lengkap asd ${detailText}.`;
 };
 
 const getInvalidItemIds = (error: any): string[] => {
