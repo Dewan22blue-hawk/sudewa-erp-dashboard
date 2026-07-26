@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getTypeUnits, getTypeUnitById, createTypeUnit, updateTypeUnit, deleteTypeUnit, importTypeUnit } from '@/services/type-unit.service';
+import { getTypeUnits, getTypeUnitById, getTypeUnitDetail, createTypeUnit, updateTypeUnit, deleteTypeUnit, importTypeUnit } from '@/services/type-unit.service';
 import { TypeUnitPayload } from '@/@types/type-unit.types';
 
 const TYPE_UNIT_LIST_KEY = 'type-units';
@@ -23,6 +23,25 @@ export function useTypeUnit(id: string | number, options?: { companyId?: number 
     queryKey: [TYPE_UNIT_ITEM_KEY, id, options?.companyId ?? ''],
     queryFn: () => getTypeUnitById(id, options),
     enabled: !!id,
+  });
+}
+
+export function useTypeUnitDetail(id: string | number, params?: {
+  company_id?: number | string;
+  in_stock?: boolean | string;
+  color?: string;
+  machine_number?: string;
+  chassis_number?: string;
+  sort_by?: string;
+  sort_dir?: string;
+  per_page?: number | string;
+  page?: number | string;
+}) {
+  return useQuery({
+    queryKey: ['type-unit-detail', id, params],
+    queryFn: () => getTypeUnitDetail(id, params),
+    enabled: !!id,
+    placeholderData: keepPreviousData,
   });
 }
 

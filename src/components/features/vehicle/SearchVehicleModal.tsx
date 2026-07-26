@@ -185,7 +185,7 @@ export default function SearchVehicleModal({ open, onOpenChange, type }: Props) 
                 ) : results.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="h-48 text-center text-slate-400 text-sm">
-                      Silakan masukkan kata kunci dan cariz
+                      Silakan masukkan kata kunci dan cari
                     </TableCell>
                   </TableRow>
                 ) : (
