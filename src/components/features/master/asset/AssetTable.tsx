@@ -95,7 +95,7 @@ export function AssetTable({
                 ),
             },
         ],
-        [page, perPage, onEdit, onDelete, canEdit, canDelete],
+        [onEdit, onDelete, canEdit, canDelete],
     );
 
     return (

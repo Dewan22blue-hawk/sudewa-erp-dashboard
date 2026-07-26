@@ -125,7 +125,7 @@ export default function TypeUnitDetailPage() {
       alignment: 'center',
       cell: (item) => renderStatus(item.status),
     },
-  ], [typeUnit]);
+  ], [typeUnit, router.basePath, slug]);
 
   if (isLoading) {
     return (

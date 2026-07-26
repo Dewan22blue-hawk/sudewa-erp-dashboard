@@ -149,7 +149,7 @@ export function TypeUnitTable({
         ),
       },
     ],
-    [canEdit, canDelete, onEdit, onDelete, slugStr]
+    [canEdit, canDelete, onEdit, onDelete, slugStr, router]
   );
 
   return (

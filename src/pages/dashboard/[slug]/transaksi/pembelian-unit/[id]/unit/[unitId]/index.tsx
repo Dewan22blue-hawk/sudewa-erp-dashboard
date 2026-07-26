@@ -147,7 +147,7 @@ export default function UnitPurchaseDetailPage() {
         ),
       },
     ],
-    [],
+    [canDelete, canEdit, isPaid],
   );
 
   const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
