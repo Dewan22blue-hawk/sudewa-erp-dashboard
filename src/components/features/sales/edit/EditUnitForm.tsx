@@ -19,6 +19,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from '@/lib/utils';
 import { useUnitFormula } from '@/hooks/useUnitFormula';
 import { useTaxes, useTaxDefault } from '@/hooks/useTax';
+import { useTypeUnits } from '@/hooks/useTypeUnit';
 import type { Tax } from '@/@types/tax.types';
 
 interface EditUnitFormProps {
@@ -63,6 +64,14 @@ export function EditUnitForm({
   const { data: taxesData } = useTaxes();
   const { data: defaultDppTax } = useTaxDefault('dpp');
   const { data: defaultPpnTax } = useTaxDefault('ppn');
+  const { data: typeUnitData } = useTypeUnits();
+
+  const typeUnitList = useMemo(() => {
+    const list = typeUnitData?.data;
+    if (Array.isArray(list)) return list;
+    if (list && Array.isArray((list as any).data)) return (list as any).data;
+    return [];
+  }, [typeUnitData]);
 
   const taxOptions = useMemo<Tax[]>(() => {
     const list = (taxesData as any)?.data;
@@ -151,7 +160,7 @@ export function EditUnitForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         {/* Section Header */}
         <div>
           <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Penjualan</h2>
@@ -216,6 +225,11 @@ export function EditUnitForm({
                                   {unitOptions?.map((option) => (
                                     <CommandItem key={option.value} value={option.label} onSelect={() => {
                                       field.onChange(option.value);
+                                      const matched = typeUnitList.find((item) => String(item.id) === String(option.value));
+                                      const sellPriceVal = matched?.sellPrice ?? matched?.sell_price;
+                                      if (sellPriceVal !== undefined && sellPriceVal !== null) {
+                                        form.setValue('harga', Number(sellPriceVal));
+                                      }
                                       setOpenTypeSelect(false);
                                     }}>
                                       <Check className={cn('mr-2 h-4 w-4', field.value === option.value ? 'opacity-100' : 'opacity-0')} />
@@ -228,7 +242,14 @@ export function EditUnitForm({
                           </PopoverContent>
                         </Popover>
                       ) : (
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
+                        <Select onValueChange={(val) => {
+                          field.onChange(val);
+                          const matched = typeUnitList.find((item) => String(item.id) === String(val));
+                          const sellPriceVal = matched?.sellPrice ?? matched?.sell_price;
+                          if (sellPriceVal !== undefined && sellPriceVal !== null) {
+                            form.setValue('harga', Number(sellPriceVal));
+                          }
+                        }} defaultValue={field.value} disabled={readOnly}>
                           <FormControl>
                             <SelectTrigger className="w-full bg-transparent">
                               <SelectValue placeholder="Select an item" />

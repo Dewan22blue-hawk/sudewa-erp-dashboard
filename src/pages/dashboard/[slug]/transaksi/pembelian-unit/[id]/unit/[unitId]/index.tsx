@@ -2,12 +2,20 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload } from 'lucide-react';
+import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload, Trash } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
-import { useCreateUnitItemDetail, useDeleteUnitItemDetail, useImportUnitItemDetails, useUnitItemDetails, useUnitTransactionItemById, useUpdateUnitItemDetail } from '@/hooks/useUnitItemDetail';
+import {
+  useCreateUnitItemDetail,
+  useDeleteUnitItemDetail,
+  useImportUnitItemDetails,
+  useUnitItemDetails,
+  useUnitTransactionItemById,
+  useUpdateUnitItemDetail,
+  useBulkDeleteUnitItemDetails,
+} from '@/hooks/useUnitItemDetail';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -94,11 +102,14 @@ export default function UnitPurchaseDetailPage() {
   const updateMutation = useUpdateUnitItemDetail();
   const deleteMutation = useDeleteUnitItemDetail();
   const importMutation = useImportUnitItemDetails();
+  const bulkDeleteMutation = useBulkDeleteUnitItemDetails();
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [openForm, setOpenForm] = useState(false);
   const [openImport, setOpenImport] = useState(false);
   const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [formValues, setFormValues] = useState({
     color: '',
     machine_number: '',
@@ -281,6 +292,26 @@ export default function UnitPurchaseDetailPage() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.size} detail unit terpilih?`)) {
+      try {
+        setIsBulkDeleting(true);
+        await bulkDeleteMutation.mutateAsync({
+          unitItemId,
+          ids: Array.from(selectedIds),
+        });
+        toast.success('Beberapa detail unit berhasil dihapus');
+        setSelectedIds(new Set());
+      } catch (err: any) {
+        toast.error(parseApiError(err));
+      } finally {
+        setIsBulkDeleting(false);
+      }
+    }
+  };
+
   if (purchaseLoading || unitItemLoading) {
     return (
       <DashboardLayout>
@@ -437,14 +468,28 @@ export default function UnitPurchaseDetailPage() {
                 columns={columns}
                 headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
                 defaultSort={{ key: 'payment_date', direction: 'desc' }}
+                showCheckbox
+                selectedIds={selectedIds}
+                onSelectedIdsChange={setSelectedIds}
                 headerActions=
                 {(
                   <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
                     <div>
-                      <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Detail Unit</h2>
+                      <h2 className="text-base font-semibold text-slate-800">Data Pembelian Detail Unit Tipe</h2>
                       <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
                     </div>
                     <div className="flex items-center gap-2">
+                      {selectedIds.size > 0 && canDelete && !isPaid && (
+                        <Button
+                          onClick={handleBulkDelete}
+                          disabled={isBulkDeleting}
+                          variant="destructive"
+                          className="w-full sm:w-auto bg-[#EF4444] hover:bg-[#DC2626] text-white"
+                        >
+                          <Trash className="h-4 w-4 mr-2" />
+                          Hapus ({selectedIds.size})
+                        </Button>
+                      )}
                       {canCreate && !isPaid && (
                         <>
                           <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">

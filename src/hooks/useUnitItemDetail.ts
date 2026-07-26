@@ -77,3 +77,16 @@ export const useImportUnitItemDetails = () => {
     },
   });
 };
+
+export const useBulkDeleteUnitItemDetails = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ unitItemId, ids }: { unitItemId: string | number; ids: Array<string | number> }) =>
+      unitItemDetailService.bulkDeleteDetails(unitItemId, ids).then(() => ({ unitItemId })),
+    onSuccess: ({ unitItemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details', String(unitItemId)] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction-item', String(unitItemId)] });
+      queryClient.invalidateQueries({ queryKey: ['unit-item-details-by-transaction'] });
+    },
+  });
+};

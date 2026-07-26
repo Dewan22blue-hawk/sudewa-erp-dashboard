@@ -22,6 +22,8 @@ import { useUnitFormula } from '@/hooks/useUnitFormula';
 import { useTaxes, useTaxDefault } from '@/hooks/useTax';
 import type { Tax } from '@/@types/tax.types';
 import RequiredMark from '@/components/ui/required-mark';
+import { PageHeader } from '@/components/ui/page-header';
+import { useRouter } from 'next/router';
 
 interface Props {
   onSubmit: (data: CreatePurchaseUnitFormValues) => void;
@@ -36,6 +38,7 @@ interface Props {
 
 export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, loading, onCancel, companyId, excludedTypeUnitIds = [], prependFields }: Props) {
   void companyId;
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data: typeUnitData, isLoading: typeUnitLoading, isError: typeUnitError, refetch: refetchTypeUnits } = useTypeUnits();
   const { data: brandsData } = useBrands();
@@ -54,6 +57,9 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const { data: taxesData } = useTaxes();
   const { data: defaultDppTax } = useTaxDefault('dpp');
   const { data: defaultPpnTax } = useTaxDefault('ppn');
+
+  const slugQuery = router.query.slug;
+  const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
 
   const taxOptions = useMemo<Tax[]>(() => {
     const list = (taxesData as any)?.data;
@@ -201,7 +207,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Pembelian</h2>
             <p className="text-sm text-gray-500 mt-1">Kelola detail informasi pembelian unit dan biaya-biaya terkait</p>
@@ -260,6 +266,9 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                                   onSelect={() => {
                                     if (excludedTypeUnitIds.includes(String(option.id))) return;
                                     field.onChange(String(option.id));
+                                    if (option?.buyPrice !== undefined && option?.buyPrice !== null) {
+                                      form.setValue('price', Number(option.buyPrice));
+                                    }
                                     setOpenTypeSelect(false);
                                   }}
                                 >

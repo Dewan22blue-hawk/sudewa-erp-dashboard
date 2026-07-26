@@ -329,6 +329,15 @@ export const unitItemDetailService = {
     );
   },
 
+  async bulkDeleteDetails(unitTransactionItemId: number | string, ids: Array<number | string>): Promise<void> {
+    await apiClient.delete('/wapi/transaction/unit-transaction/unit-transaction-item-detail/bulk-delete', {
+      data: {
+        unit_transaction_item_id: Number(unitTransactionItemId),
+        unit_transaction_item_details_id: ids.map(id => Number(id)),
+      }
+    });
+  },
+
   async importDetails(unitTransactionItemId: string, file: File): Promise<void> {
     const form = new FormData();
     form.append('file', file);
