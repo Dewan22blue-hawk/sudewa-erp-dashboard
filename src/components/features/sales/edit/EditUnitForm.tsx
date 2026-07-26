@@ -225,7 +225,7 @@ export function EditUnitForm({
                                   {unitOptions?.map((option) => (
                                     <CommandItem key={option.value} value={option.label} onSelect={() => {
                                       field.onChange(option.value);
-                                      const matched = typeUnitList.find((item) => String(item.id) === String(option.value));
+                                      const matched = typeUnitList.find((item: any) => String(item.id) === String(option.value));
                                       const sellPriceVal = matched?.sellPrice ?? matched?.sell_price;
                                       if (sellPriceVal !== undefined && sellPriceVal !== null) {
                                         form.setValue('harga', Number(sellPriceVal));
@@ -244,7 +244,7 @@ export function EditUnitForm({
                       ) : (
                         <Select onValueChange={(val) => {
                           field.onChange(val);
-                          const matched = typeUnitList.find((item) => String(item.id) === String(val));
+                          const matched = typeUnitList.find((item: any) => String(item.id) === String(val));
                           const sellPriceVal = matched?.sellPrice ?? matched?.sell_price;
                           if (sellPriceVal !== undefined && sellPriceVal !== null) {
                             form.setValue('harga', Number(sellPriceVal));
