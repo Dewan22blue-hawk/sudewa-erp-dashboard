@@ -9,6 +9,8 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { formatDateUI } from '@/lib/utils/date';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: PPNPenjualan[];
@@ -47,15 +49,17 @@ export default function PPNPenjualanTable({
   sortDirection,
   hasNextPage,
   isTotalExact,
-  isLoading,
-  isFetching,
-  isError,
+  isLoading = false,
+  isFetching = false,
+  isError = false,
   errorMessage,
   onRetry,
   onEdit,
   onSortChange,
   onPageChange,
 }: Props) {
+  const router = useRouter();
+  const { slug } = router.query;
 
   const columns = useMemo<ColumnDef<PPNPenjualan>[]>(
     () => [
@@ -64,48 +68,76 @@ export default function PPNPenjualanTable({
         accessorKey: 'code',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <span className="font-medium text-blue-600 whitespace-nowrap">{item.code}</span>
+        cell: (item) => <CopyBox text={item?.code ?? '-'} />
       },
       {
         header: 'Tanggal Jual',
-        accessorKey: 'sales_date',
+        accessorKey: 'buy_date',
         sortable: true,
         alignment: 'center',
-        cell: (item) => <span className="text-slate-500 whitespace-nowrap">{formatDate(item.sales_date)}</span>,
+        cell: (item) => formatDate(item.buy_date),
+      },
+      {
+        header: 'Tipe Unit',
+        accessorKey: 'unit_type.name',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => (
+          <div>
+            <div className="font-medium text-slate-900">
+              <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item?.unit_type?.name}`}>
+                {item.unit_type.name}
+              </ReferenceLink>
+            </div>
+            <div className="text-xs text-slate-500">{item.unit_type.code}</div>
+          </div>
+        ),
       },
       {
         header: 'Customer',
-        accessorKey: 'customer',
+        accessorKey: 'supplier',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <span className="text-slate-700">{item.customer}</span>
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${item?.supplier}`}>
+            {item?.supplier}
+          </ReferenceLink>
+        )
       },
       {
         header: 'Tanggal FPM',
-        accessorKey: 'fpm_date',
+        accessorKey: 'fp_date',
         sortable: true,
         alignment: 'center',
         cell: (item) => {
-          const hasFpm = Boolean(item.fpm_date);
+          const hasFpm = Boolean(item.fp_date);
           return (
             <div className="space-y-1">
-              <div>{formatDate(item.fpm_date)}</div>
-              {renderStatusBadge(hasFpm, 'FPM Terisi', 'Belum FPM')}
+              {item.fp_date ? (
+                <>
+                  <div>{formatDate(item.fp_date)}</div>
+                  {renderStatusBadge(hasFpm, 'FPM Terisi', 'Belum FPM')}
+                </>
+              ) : renderStatusBadge(false, 'FPM Terisi', 'Belum FPM')}
             </div>
           );
         },
       },
       {
-        header: 'MASA NSFPM',
-        accessorKey: 'nsfpm_age',
+        header: 'Masa NSFPM',
+        accessorKey: 'nsfp_age',
         sortable: true,
         alignment: 'center',
         cell: (item) => {
-          const hasNsfpmAge = Boolean(item.nsfpm_age);
+          const hasNsfpmAge = Boolean(item.nsfp_age);
           return (
             <div className="space-y-1">
-              <div>{formatDate(item.nsfpm_age)}</div>
-              {renderStatusBadge(hasNsfpmAge, 'NSFPM Terisi', 'Belum NSFPM')}
+              {item.nsfp_age ? (
+                <>
+                  <div>{formatDate(item.nsfp_age)}</div>
+                  {renderStatusBadge(hasNsfpmAge, 'NSFPM Terisi', 'Belum NSFPM')}
+                </>
+              ) : renderStatusBadge(false, 'NSFPM Terisi', 'Belum NSFPM')}
             </div>
           );
         },
@@ -117,43 +149,23 @@ export default function PPNPenjualanTable({
           const hasNsfpNumber = Boolean(item.nsfp_number && item.nsfp_number.trim() !== '');
           return (
             <div className="space-y-1 flex flex-col items-center">
-              <div>{item.nsfp_number || '-'}</div>
-              {renderStatusBadge(hasNsfpNumber, 'Sudah Input', 'Belum Input')}
+              {hasNsfpNumber ? <CopyBox text={item.nsfp_number ?? '-'} /> : renderStatusBadge(false, 'Sudah Input', 'Belum Input')}
             </div>
           );
         },
       },
       {
-        header: 'QTY',
-        accessorKey: 'qty',
-        sortable: true,
-        alignment: 'center',
-        cell: (item) => <span className="text-slate-700">{item.qty}</span>,
-      },
-      {
-        header: 'Tipe Unit',
-        accessorKey: 'unit_type.name',
-        sortable: true,
-        alignment: 'left',
-        cell: (item) => (
-          <div>
-            <div className="font-medium text-slate-900">{item.unit_type.name}</div>
-            <div className="text-xs text-slate-500">{item.unit_type.code}</div>
-          </div>
-        ),
-      },
-      {
         header: 'No Mesin',
         alignment: 'left',
         cell: (item) => (
-          <span className="text-slate-700">{item.unit_transaction_item_detail?.machine_number ?? '-'}</span>
+          <CopyBox text={item.unit_transaction_item_detail?.machine_number ?? '-'} />
         ),
       },
       {
         header: 'No Rangka',
         alignment: 'left',
         cell: (item) => (
-          <span className="text-slate-700">{item.unit_transaction_item_detail?.chassis_number ?? '-'}</span>
+          <CopyBox text={item.unit_transaction_item_detail?.chassis_number ?? '-'} />
         ),
       },
       {
@@ -161,28 +173,35 @@ export default function PPNPenjualanTable({
         accessorKey: 'unit_price',
         sortable: true,
         alignment: 'center',
-        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.unit_price)}</span>,
+        cell: (item) => currenciesFormat('idr', item.unit_price),
+      },
+      {
+        header: 'Total Harga',
+        accessorKey: 'total_price',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => currenciesFormat('idr', item.total_price),
       },
       {
         header: 'DPP',
         accessorKey: 'dpp_amount',
         sortable: true,
         alignment: 'center',
-        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.dpp_amount)}</span>,
+        cell: (item) => currenciesFormat('idr', item.dpp_amount),
       },
       {
         header: 'PPN 11%',
         accessorKey: 'ppn_11',
         sortable: true,
         alignment: 'center',
-        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.ppn_11)}</span>,
+        cell: (item) => currenciesFormat('idr', item.ppn_11),
       },
       {
         header: 'Total Bayar',
         accessorKey: 'payment_amount',
         sortable: true,
         alignment: 'center',
-        cell: (item) => <span className="font-medium text-slate-900">{currenciesFormat('idr', item.payment_amount)}</span>,
+        cell: (item) => currenciesFormat('idr', item.payment_amount),
       },
       {
         header: 'Action',
@@ -204,7 +223,7 @@ export default function PPNPenjualanTable({
         ),
       },
     ],
-    [onEdit]
+    [onEdit, slug]
   );
 
   return (
