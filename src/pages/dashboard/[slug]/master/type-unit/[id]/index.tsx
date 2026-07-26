@@ -15,6 +15,16 @@ import { CopyBox } from '@/components/ui/copy-box';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { cn } from '@/lib/utils';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import {
+  useUnitTypePriceVersions,
+  useCreateUnitTypePriceVersion,
+  useUpdateUnitTypePriceVersion,
+  useDeleteUnitTypePriceVersion,
+} from '@/hooks/useUnitTypePriceVersion';
+import { UnitTypePriceVersionTable } from '@/components/features/type-unit/UnitTypePriceVersionTable';
+import { UnitTypePriceVersionForm } from '@/components/features/type-unit/UnitTypePriceVersionForm';
+import type { UnitTypePriceVersion, UnitTypePriceVersionFormValues } from '@/@types/unit-type-price-version.types';
+import { toast } from 'sonner';
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   normal: { label: 'Normal', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
@@ -78,6 +88,87 @@ export default function TypeUnitDetailPage() {
 
   const totalItems = typeUnit?.unit_item_details?.total ?? 0;
   const lastPage = typeUnit?.unit_item_details?.last_page ?? 1;
+
+  // Price Versioning States
+  const [pricePage, setPricePage] = useState(1);
+  const [pricePerPage, setPricePerPage] = useState(25);
+  const [priceSearch, setPriceSearch] = useState('');
+  const [debouncedPriceSearch, setDebouncedPriceSearch] = useState('');
+  const [isPriceFormOpen, setIsPriceFormOpen] = useState(false);
+  const [selectedPriceVersion, setSelectedPriceVersion] = useState<UnitTypePriceVersion | undefined>();
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedPriceSearch(priceSearch.trim());
+      setPricePage(1);
+    }, 400);
+    return () => window.clearTimeout(timeout);
+  }, [priceSearch]);
+
+  const { data: priceVersionsData, isLoading: isPriceLoading } = useUnitTypePriceVersions(id as string, {
+    page: pricePage,
+    per_page: pricePerPage,
+    search: debouncedPriceSearch || undefined,
+  });
+
+  const createPriceMutation = useCreateUnitTypePriceVersion();
+  const updatePriceMutation = useUpdateUnitTypePriceVersion();
+  const deletePriceMutation = useDeleteUnitTypePriceVersion(id as string);
+
+  const handleAddPrice = () => {
+    setSelectedPriceVersion(undefined);
+    setIsPriceFormOpen(true);
+  };
+
+  const handleEditPrice = (version: UnitTypePriceVersion) => {
+    setSelectedPriceVersion(version);
+    setIsPriceFormOpen(true);
+  };
+
+  const handleDeletePrice = (version: UnitTypePriceVersion) => {
+    if (confirm(`Apakah Anda yakin ingin menghapus versi harga "${version.name}"?`)) {
+      deletePriceMutation.mutate(version.id, {
+        onSuccess: () => {
+          toast.success('Berhasil menghapus versi harga');
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || 'Gagal menghapus versi harga');
+        }
+      });
+    }
+  };
+
+  const handlePriceSubmit = (values: UnitTypePriceVersionFormValues) => {
+    const payload = {
+      ...values,
+      unit_type_id: Number(id),
+    };
+
+    if (selectedPriceVersion) {
+      updatePriceMutation.mutate({
+        id: selectedPriceVersion.id,
+        data: payload
+      }, {
+        onSuccess: () => {
+          toast.success('Berhasil mengubah versi harga');
+          setIsPriceFormOpen(false);
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || 'Gagal mengubah versi harga');
+        }
+      });
+    } else {
+      createPriceMutation.mutate(payload, {
+        onSuccess: () => {
+          toast.success('Berhasil menambahkan versi harga baru');
+          setIsPriceFormOpen(false);
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || 'Gagal menambahkan versi harga');
+        }
+      });
+    }
+  };
 
   const handleBack = () => {
     router.push(`/dashboard/${slug}/master/type-unit`);
@@ -336,7 +427,43 @@ export default function TypeUnitDetailPage() {
             onPageChange={setPage}
           />
         </div>
+
+        {/* PRICE VERSIONING TABLE COMPONENT */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="border-b pb-4">
+            <h3 className="text-lg font-bold text-slate-900">Riwayat Versi Harga</h3>
+            <p className="text-sm text-slate-500 text-muted-foreground">Kelola riwayat harga beli & harga jual untuk tipe unit ini</p>
+          </div>
+
+          <UnitTypePriceVersionTable
+            data={priceVersionsData?.data || []}
+            meta={priceVersionsData ? {
+              currentPage: priceVersionsData.current_page,
+              lastPage: priceVersionsData.last_page,
+              perPage: priceVersionsData.per_page,
+              total: priceVersionsData.total,
+            } : undefined}
+            isLoading={isPriceLoading}
+            search={priceSearch}
+            page={pricePage}
+            perPage={pricePerPage}
+            onSearchChange={setPriceSearch}
+            onPageChange={setPricePage}
+            onPerPageChange={setPricePerPage}
+            onAdd={handleAddPrice}
+            onEdit={handleEditPrice}
+            onDelete={handleDeletePrice}
+          />
+        </div>
       </div>
+
+      <UnitTypePriceVersionForm
+        open={isPriceFormOpen}
+        onOpenChange={setIsPriceFormOpen}
+        initialData={selectedPriceVersion}
+        onSubmit={handlePriceSubmit}
+        isSubmitting={createPriceMutation.isPending || updatePriceMutation.isPending}
+      />
     </DashboardLayout>
   );
 }
