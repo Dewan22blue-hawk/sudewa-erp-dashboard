@@ -4,6 +4,8 @@ export type SalesCustomerOption = {
   label: string;
   value: string;
   keyword: string;
+  name: string;
+  code: string;
 };
 
 export type SalesCreateCustomerDetail = {
@@ -19,6 +21,8 @@ export const mapCustomerToSalesOption = (item: Customer): SalesCustomerOption =>
     label: `${code} - ${name}`,
     value: String(item.id),
     keyword: `${code} ${name}`.toLowerCase(),
+    name,
+    code,
   };
 };
 

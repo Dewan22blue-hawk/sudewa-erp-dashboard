@@ -340,21 +340,21 @@ export default function CreateSalesPage() {
                     <PopoverTrigger asChild>
                       <Button type="button" variant="outline" role="combobox" aria-expanded={isCustomerOpen} className="w-full justify-between bg-transparent font-normal">
                         <span className={cn('truncate', !selectedCustomer && 'text-muted-foreground')}>
-                          {selectedCustomer ? selectedCustomer.label : isLoadingCustomerList ? 'Memuat customer...' : 'Pilih customer'}
+                          {selectedCustomer ? selectedCustomer.name : isLoadingCustomerList ? 'Memuat customer...' : 'Pilih customer'}
                         </span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
-                        <CommandInput placeholder="Cari customer (kode/nama)..." />
+                        <CommandInput placeholder="Cari customer (nama)..." />
                         <CommandList>
                           <CommandEmpty>Customer tidak ditemukan.</CommandEmpty>
                           <CommandGroup>
                             {customerList.map((option) => (
-                              <CommandItem key={option.value} value={option.keyword} onSelect={() => handleSelectCustomer(option)}>
+                              <CommandItem key={option.value} value={option.name} onSelect={() => handleSelectCustomer(option)}>
                                 <Check className={cn('mr-2 h-4 w-4', form.customerId === option.value ? 'opacity-100' : 'opacity-0')} />
-                                {option.label}
+                                {option.name}
                               </CommandItem>
                             ))}
                           </CommandGroup>
