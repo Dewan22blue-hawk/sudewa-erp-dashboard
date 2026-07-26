@@ -71,6 +71,11 @@ const renderStatus = (status: string) => {
 };
 
 const parseApiError = (err: any): string => {
+  const message = err?.response?.data?.message || err?.message || '';
+  if (message.toLowerCase().includes('capacity reach maximum') || message.toLowerCase().includes('capacity limit')) {
+    return 'Jumlah unit yang diimport melebihi kapasitas quantity item pembelian ini.';
+  }
+
   const details = err?.details ?? err?.response?.data?.errors;
   if (typeof details === 'string') return details;
   if (details && typeof details === 'object') {
@@ -78,7 +83,7 @@ const parseApiError = (err: any): string => {
       .map(([field, value]) => `${field}: ${Array.isArray(value) ? value[0] : String(value)}`)
       .join(', ');
   }
-  return err?.message || 'Terjadi kesalahan pada server';
+  return message || 'Terjadi kesalahan pada server';
 };
 
 export default function UnitPurchaseDetailPage() {

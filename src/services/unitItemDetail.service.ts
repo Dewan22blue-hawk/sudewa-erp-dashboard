@@ -82,7 +82,7 @@ type UnitTransactionItemDetailApiModel = {
 
 const itemBasePath = '/wapi/transaction/unit-transaction-item';
 const itemLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item';
-const detailBasePath = '/wapi/transaction/unit-transaction-item-detail';
+const detailBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item-detail';
 const detailLegacyBasePath = '/wapi/transaction/unit-transaction/unit-transaction-item-detail';
 
 const shouldFallback = (error: any): boolean => {
@@ -342,9 +342,10 @@ export const unitItemDetailService = {
     const form = new FormData();
     form.append('file', file);
 
-    await withPathFallback(
+    const response = await withPathFallback(
       () => apiClient.post<LaravelApiResponse<any>>(`${detailLegacyBasePath}/${unitTransactionItemId}/import`, form),
       () => apiClient.post<LaravelApiResponse<any>>(`${detailBasePath}/${unitTransactionItemId}/import`, form),
     );
+    ensureSuccess(response.data);
   },
 };
