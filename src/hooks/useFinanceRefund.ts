@@ -84,3 +84,26 @@ export const useApproveFinanceRefund = (transactionType: RefundTransactionType) 
     },
   });
 };
+
+export const useDeleteFinanceRefund = (transactionType: RefundTransactionType) => {
+  const queryClient = useQueryClient();
+  const { companyId } = useCompany();
+
+  return useMutation({
+    mutationFn: async ({ refundId, deleteFinanceRefund }: { refundId: string; deleteFinanceRefund: boolean }) => {
+      return await financeRefundService.deleteRefund(refundId, deleteFinanceRefund);
+    },
+    onSuccess: () => {
+      if (companyId) {
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0] === 'company' &&
+            query.queryKey[1] === String(companyId),
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['finance-refunds', transactionType] });
+      }
+    },
+  });
+};

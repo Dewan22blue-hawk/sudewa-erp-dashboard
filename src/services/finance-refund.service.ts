@@ -106,4 +106,14 @@ export const financeRefundService = {
 
     return ensureSuccess(response.data);
   },
+
+  async deleteRefund(id: string, deleteFinanceRefund: boolean = true) {
+    const urlPath = `/wapi/transaction/unit-transaction/unit-transaction-refund/${id}`;
+    const response = await apiClient.delete<LaravelApiResponse<any>>(urlPath, {
+      params: {
+        'delete-finance-refund': deleteFinanceRefund,
+      },
+    });
+    return ensureSuccess(response.data);
+  },
 };
