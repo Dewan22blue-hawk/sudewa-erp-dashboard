@@ -69,6 +69,12 @@ export default function PurchaseDetailPage() {
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
   const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
 
+  useEffect(() => {
+    if (!isLoading && purchase && purchase?.type !== 'purchase') {
+      router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
+    }
+  }, [purchase, isLoading, router, slug]);
+
   const billingSummary = purchase?.billing_summary;
   const totalTagihan = Number(billingSummary?.grand_total ?? purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
   const totalPaid = Number(billingSummary?.total_paid ?? billings.reduce(
@@ -107,6 +113,12 @@ export default function PurchaseDetailPage() {
       }, 800);
     }
   }, [router.query.print, isLoading, purchase]);
+
+  // useEffect(() => {
+  //   if (!isLoading && detailData && detailData.activity_type !== 'receipt') {
+  //     router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
+  //   }
+  // }, [detailData, isLoading, router, slug]);
 
   const historyColumns = useMemo<ColumnDef<any>[]>(
     () => [

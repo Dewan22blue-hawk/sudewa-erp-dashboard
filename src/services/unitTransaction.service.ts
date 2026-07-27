@@ -19,6 +19,7 @@ type UnitTransactionApiModel = {
   transaction_other_fee?: string | number;
   expedition_fee_total?: string | number;
   has_returned_data?: boolean | string;
+  type?: string;
   person?: {
     id?: number | string;
     name?: string;
@@ -434,6 +435,7 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
       name: item.warehouse?.name ?? '-',
     },
     unit_type_name: item.unit_transaction_items?.[0]?.unit_type?.name ?? '-',
+    type: item?.type ?? '-',
     pivot: { unit_transaction_item_detail_id: 0 },
     unit_transaction_bruto_total: mainBruto,
     unit_transaction_item_total_hpp: itemHpp,

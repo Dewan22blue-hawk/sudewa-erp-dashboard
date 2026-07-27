@@ -170,26 +170,24 @@ export function EditUnitForm({
 
         {prependFields}
 
-        {!hideCustomerField && (
-          <FormField
-            control={form.control}
-            name="customer"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Customer</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="PT XX" className="bg-transparent max-w-sm" disabled={readOnly} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
         {!hideItemFields && (
           <>
             {/* ROW 1: Tipe Unit, Qty, Harga */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* <FormField
+                control={form.control}
+                name="customer"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Customer</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="PT XX" className="bg-transparent max-w-sm" disabled={readOnly} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              /> */}
+
               <FormField
                 control={form.control}
                 name="tipeUnit"

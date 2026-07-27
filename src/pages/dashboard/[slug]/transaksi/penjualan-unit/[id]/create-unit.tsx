@@ -11,13 +11,16 @@ import { useCreateUnitItem, useSalesUnitItems, useSalesItemsByWarehouse } from '
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCompany } from '@/contexts/CompanyContext';
+import { PageHeader } from '@/components/ui/page-header';
+import { LoadingState } from '@/components/ui/loading-state';
 
 /**
  * Tambah Unit Page - Nested under Sales Detail
  */
 export default function CreateUnitPage() {
   const router = useRouter();
-  const { id } = router.query;
+  const { slug: slugQuery, id } = router.query;
+  const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
   const { companyId } = useCompany();
   const queryClient = useQueryClient();
   const salesId = Array.isArray(id) ? id[0] : id;
@@ -127,7 +130,7 @@ export default function CreateUnitPage() {
   if (isLoadingDetail) {
     return (
       <DashboardLayout>
-        <div className="p-6">Loading data...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -135,20 +138,21 @@ export default function CreateUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">Tambah Unit</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Jual</span>
-              <span className="text-blue-600 font-medium">{invoiceCode}</span>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Detail Penjualan', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`) },
+            { label: 'Tambah Unit Penjualan' }
+          ]}
+          title="Tambah Unit Penjualan"
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}
+          subtitle={
+            <>
+              <span>Kode Penjualan:</span>
+              <span className="text-blue-600 font-semibold">{invoiceCode}</span>
+            </>
+          }
+        />
 
         <Card className="rounded-md">
           <CardContent className="p-6">

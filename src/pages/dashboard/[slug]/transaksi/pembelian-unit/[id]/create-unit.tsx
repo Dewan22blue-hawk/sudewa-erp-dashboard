@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
 import { useMemo } from 'react';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageHeader } from '@/components/ui/page-header';
 
 const parseApiError = (err: any): string => {
   const details = err?.details ?? err?.response?.data?.errors;
@@ -112,20 +113,22 @@ export default function CreatePurchaseUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+            { label: 'Detail Pembelian', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${id}`) },
+            { label: 'Tambah Unit Pembelian' }
+          ]}
+          title="Tambah Unit Pembelian"
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+          subtitle={
+            <>
+              <span>Kode Pembelian:</span>
+              <span className="text-blue-600 font-semibold">{purchase?.code ?? '-'}</span>
+            </>
+          }
+        />
 
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">Tambah Unit</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Pembelian</span>
-              <span className="text-blue-600 font-medium">{purchase?.code ?? '-'}</span>
-            </div>
-          </div>
-        </div>
 
         <Card className="rounded-md">
           <CardContent className="p-6">
