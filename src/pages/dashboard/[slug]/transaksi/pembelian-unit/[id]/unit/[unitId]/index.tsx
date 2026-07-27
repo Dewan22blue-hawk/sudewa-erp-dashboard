@@ -126,7 +126,7 @@ export default function UnitPurchaseDetailPage() {
     chassis_number: '',
   });
 
-  const details = detailResponse?.data ?? [];
+  const details = useMemo(() => detailResponse?.data ?? [], [detailResponse?.data]);
   const isPaid = purchase?.unit_transaction_billing?.is_paid;
 
   const filteredDetails = useMemo(() => {

@@ -114,12 +114,6 @@ export default function PenerimaanUnitTable({
                 <span className="text-gray-400">Detail</span>
               )}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setDeleteId(item.id)}
-              className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-            >
-              Hapus
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
