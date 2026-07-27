@@ -192,20 +192,20 @@ export default function PurchaseForm({
                 </div>
 
                 {!readOnly && (
-                    <div className="flex justify-end gap-3 pt-8">
+                    <div className="flex justify-center items-center gap-6 pt-10">
                         <Button
                             type="button"
                             variant="ghost"
                             onClick={onCancel || (() => router.back())}
                             disabled={loading}
-                            className="text-muted-foreground hover:text-foreground"
+                            className="text-muted-foreground font-medium hover:text-foreground"
                         >
                             Batal
                         </Button>
                         <Button
                             type="submit"
                             disabled={loading}
-                            className="bg-[#1e293b] hover:bg-[#0f172a] text-white min-w-[100px]"
+                            className="bg-[#1e293b] hover:bg-[#0f172a] text-white font-medium min-w-[120px] rounded-lg"
                         >
                             {loading ? (
                                 "Menyimpan..."

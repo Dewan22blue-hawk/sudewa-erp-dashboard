@@ -166,8 +166,12 @@ export const refundAdministrasiService = {
     return mapRefund(result);
   },
 
-  async deleteRefund(id: string): Promise<void> {
-    const response = await apiClient.delete<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`);
+  async deleteRefund(id: string, deleteFinanceRefund: boolean = true): Promise<void> {
+    const response = await apiClient.delete<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`, {
+      params: {
+        'delete-finance-refund': deleteFinanceRefund,
+      },
+    });
     ensureSuccess(response.data);
   },
 

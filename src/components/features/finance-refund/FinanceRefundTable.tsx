@@ -10,6 +10,74 @@ import { useRouter } from 'next/router';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Trash2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useDeleteFinanceRefund } from '@/hooks/useFinanceRefund';
+import { toast } from 'sonner';
+
+const DeleteFinanceRefundAction = ({ item, transactionType }: { item: FinanceRefundRecord, transactionType: RefundTransactionType }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
+  const deleteMutation = useDeleteFinanceRefund(transactionType);
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip open={isOpen} onOpenChange={setIsOpen}>
+        <TooltipTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50 ml-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(true);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top" align="center" className="max-w-xs bg-white text-slate-800 p-4 shadow-lg border border-slate-200" onPointerDownOutside={() => setIsOpen(false)}>
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Konfirmasi Hapus</p>
+            <p className="text-xs text-slate-500">Unit akan diperbarui stock status nya juga.</p>
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id={`checkbox-${item.id}`}
+                checked={isChecked}
+                onCheckedChange={(c) => setIsChecked(c as boolean)}
+                className="mt-0.5"
+              />
+              <label htmlFor={`checkbox-${item.id}`} className="text-xs font-medium cursor-pointer leading-tight">
+                Hapus Data Finance Refund {transactionType === 'sales' ? 'Jual' : 'Beli'}
+              </label>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button size="sm" variant="outline" onClick={() => setIsOpen(false)} className="h-7 text-xs px-2">Batal</Button>
+              <Button
+                size="sm"
+                className="h-7 text-xs bg-red-600 hover:bg-red-700 px-2 text-white"
+                disabled={deleteMutation.isPending}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    await deleteMutation.mutateAsync({ refundId: item.id, deleteFinanceRefund: isChecked });
+                    toast.success('Data berhasil dihapus');
+                    setIsOpen(false);
+                  } catch (err: any) {
+                    toast.error(err.message || 'Gagal menghapus data');
+                  }
+                }}
+              >
+                {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+              </Button>
+            </div>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 interface FinanceRefundTableProps {
   data: FinanceRefundRecord[];
@@ -115,17 +183,20 @@ export default function FinanceRefundTable({ data, meta, page, isLoading = false
         alignment: 'center',
         sticky: 'right',
         cell: (item) => (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 shadow-none transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedRefund(item);
-            }}
-          >
-            {item.status === 'approve' ? 'Sudah disetujui' : 'Setujui'}
-          </Button>
+          <div className="flex items-center justify-center">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 shadow-none transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedRefund(item);
+              }}
+            >
+              {item.status === 'approve' ? 'Sudah disetujui' : 'Setujui'}
+            </Button>
+            <DeleteFinanceRefundAction item={item} transactionType={transactionType} />
+          </div>
         ),
       }
     ],

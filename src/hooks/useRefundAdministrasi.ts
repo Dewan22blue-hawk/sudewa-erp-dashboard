@@ -75,7 +75,12 @@ export const useDeleteRefund = () => {
   const { companyId } = useCompany();
 
   return useMutation({
-    mutationFn: (id: string) => refundAdministrasiService.deleteRefund(id),
+    mutationFn: (payload: string | { id: string, deleteFinanceRefund?: boolean }) => {
+      if (typeof payload === 'string') {
+        return refundAdministrasiService.deleteRefund(payload);
+      }
+      return refundAdministrasiService.deleteRefund(payload.id, payload.deleteFinanceRefund);
+    },
     onSuccess: () => {
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });

@@ -294,8 +294,18 @@ export default function PurchaseTable({
               )}
               {canDelete && (
                 <DropdownMenuItem
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                  onClick={() => onDelete(item.id)}
+                  className={cn(
+                    "text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer",
+                    item.isPaid && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-red-600 focus:bg-transparent"
+                  )}
+                  disabled={item.isPaid}
+                  onClick={(e) => {
+                    if (item.isPaid) {
+                      e.preventDefault();
+                      return;
+                    }
+                    onDelete(item.id);
+                  }}
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> Hapus
                 </DropdownMenuItem>
