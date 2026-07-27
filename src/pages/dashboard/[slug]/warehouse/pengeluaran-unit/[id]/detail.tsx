@@ -41,9 +41,26 @@ export default function PengeluaranUnitDetailPage() {
         detailIds: ids,
       });
       toast.success('Dispatch stock berhasil diproses');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Gagal memproses dispatch stock';
-      toast.error(message);
+    } catch (error: unknown) {
+      const apiError = error as { message?: string; details?: unknown };
+      const detailsError = apiError?.details;
+
+      if (Array.isArray(detailsError)) {
+        toast.error(apiError?.message || 'Sebagian data detail tidak valid untuk proses release/issue stock');
+        return;
+      }
+
+      if (detailsError && typeof detailsError === 'object') {
+        const detailText = Object.entries(detailsError as Record<string, unknown>)
+          .map(([key, value]) => `${key}: ${Array.isArray(value) ? String(value[0]) : String(value)}`)
+          .join(', ')
+          .trim();
+
+        toast.error(detailText || apiError?.message || 'Gagal memproses release/issue stock');
+        return;
+      }
+
+      toast.error(apiError?.message || 'Gagal memproses release/issue stock');
     }
   };
 

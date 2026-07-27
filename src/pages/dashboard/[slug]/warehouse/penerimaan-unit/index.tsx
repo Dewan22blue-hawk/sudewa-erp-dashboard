@@ -88,14 +88,14 @@ export default function PenerimaanUnitPage() {
                 setCurrentPage(1);
               }}
               onPageChange={setCurrentPage}
-              headerActions={
-                canCreate && (
-                  <Button onClick={() => setOpenForm(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Tambah Data Penerimaan Unit
-                  </Button>
-                )
-              }
+            // headerActions={
+            //   canCreate && (
+            //     <Button onClick={() => setOpenForm(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+            //       <Plus className="h-4 w-4 mr-2" />
+            //       Tambah Data Penerimaan Unit
+            //     </Button>
+            //   )
+            // }
             />
           )}
         </div>

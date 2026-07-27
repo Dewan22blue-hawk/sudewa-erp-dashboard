@@ -137,13 +137,13 @@ export default function PenerimaanUnitTable({
         headerActions={headerActions}
       />
 
-      {deleteId && (
+      {/* {deleteId && (
         <DeletePenerimaanUnitDialog
           id={deleteId}
           open={!!deleteId}
           onClose={() => setDeleteId(null)}
         />
-      )}
+      )} */}
     </>
   );
 }
