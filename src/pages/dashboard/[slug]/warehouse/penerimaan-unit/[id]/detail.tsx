@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { ChevronRight, ArrowLeft, FileText, Package } from 'lucide-react';
@@ -15,6 +16,12 @@ export default function PenerimaanUnitDetailPage() {
   const { id, slug } = router.query as { id?: string; slug?: string };
 
   const { data: detailData, isLoading } = useWarehouseActivityDetail(id);
+
+  useEffect(() => {
+    if (!isLoading && detailData && detailData.activity_type !== 'receipt') {
+      router.push(`/dashboard/${slug}/warehouse/penerimaan-unit`);
+    }
+  }, [detailData, isLoading, router, slug]);
 
   const header = detailData;
   const details = detailData?.unit_transaction_details ?? [];

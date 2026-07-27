@@ -27,7 +27,6 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
   const [receivedFilter, setReceivedFilter] = useState<'all' | 'received' | 'pending'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selected, setSelected] = useState<number[]>([]);
-  const [confirmDeleteIds, setConfirmDeleteIds] = useState<number[]>([]);
   const [receivedIds, setReceivedIds] = useState<number[]>([]);
 
   const rows = useMemo(() => {
@@ -74,7 +73,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
-  
+
   const paginatedRows = useMemo(() => {
     const start = (safePage - 1) * itemsPerPage;
     return filteredRows.slice(start, start + itemsPerPage);
@@ -117,13 +116,6 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
     setSelected([]);
   };
 
-  const handleDeleteSelected = async () => {
-    if (confirmDeleteIds.length === 0) return;
-    await onDelete(confirmDeleteIds);
-    setSelected((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
-    setReceivedIds((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
-    setConfirmDeleteIds([]);
-  };
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
@@ -286,32 +278,11 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
                 <Button size="sm" className="h-10 px-5 bg-[#1FBE78] hover:bg-[#19ac6c] font-medium rounded-lg gap-2 text-white" onClick={handleTerima} disabled={selected.length === 0}>
                   <ArrowDown size={16} /> Terima
                 </Button>
-
-                <Button size="sm" variant="outline" className="h-10 px-6 border-red-400 text-red-500 hover:bg-red-50 font-medium rounded-lg bg-white" onClick={() => setConfirmDeleteIds(selected)} disabled={selected.length === 0}>
-                  Hapus
-                </Button>
               </div>
             </div>
           </div>
         }
       />
-
-      <AlertDialog open={confirmDeleteIds.length > 0} onOpenChange={(open) => !open && setConfirmDeleteIds([])}>
-        <AlertDialogContent className="max-w-[420px] rounded-md p-6 gap-6">
-          <AlertDialogHeader className="text-left space-y-3">
-            <AlertDialogTitle className="text-xl font-bold text-gray-900">Hapus Data Ini?</AlertDialogTitle>
-            <AlertDialogDescription className="text-[15px] text-gray-500 font-normal">
-              Apa anda yakin ingin menghapus data ini?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row justify-end gap-3 sm:gap-3 sm:space-x-0">
-            <AlertDialogCancel className="mt-0 h-10 px-6 rounded-lg font-medium border-gray-200 text-gray-900 hover:bg-gray-50">Batal</AlertDialogCancel>
-            <AlertDialogAction className="h-10 px-6 rounded-lg font-medium bg-[#DC2626] text-white hover:bg-red-700" onClick={handleDeleteSelected}>
-              Hapus
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
