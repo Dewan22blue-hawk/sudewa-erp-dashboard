@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { PageHeader } from "@/components/ui/page-header"
 import DataPiutangTable from "@/components/features/data-piutang/DataPiutangTable"
 import { useDataPiutang } from "@/hooks/useDataPiutang"
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DataPiutangPage() {
     const { hasPermission } = usePermissionGuard();
@@ -38,20 +40,18 @@ export default function DataPiutangPage() {
         <DashboardLayout>
             <div className="space-y-6">
 
-                {/* Header */}
-                <div className="flex items-center justify-between gap-4 no-print">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-950">Data Piutang</h1>
-                        <p className="text-sm text-slate-500">Kelola data pembayaran piutang</p>
-                    </div>
-
-                    {query.isFetching ? (
-                        <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Memuat data...
-                        </span>
-                    ) : null}
-                </div>
+                <PageHeader
+                    title="Data Piutang"
+                    subtitle="Kelola data pembayaran piutang"
+                    actions={
+                        query.isFetching ? (
+                            <span className="inline-flex items-center gap-2 text-sm text-slate-500">
+                                <LoadingState variant="inline" text={null} />
+                                Memuat data...
+                            </span>
+                        ) : null
+                    }
+                />
 
                 {/* Table */}
                 <DataPiutangTable

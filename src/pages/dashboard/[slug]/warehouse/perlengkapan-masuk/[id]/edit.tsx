@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Pencil, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,7 @@ import type { GoodsTransactionDetailEquipment } from '@/@types/goods-receipt-equ
 import type { GoodsReceiptEquipmentFormValues, GoodsReceiptEquipmentItemFormValues } from '@/scheme/goods-receipt-equipment.schema';
 
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const getErrorMessage = (error: any): string => {
   return getApiErrorMessage(error);
@@ -169,9 +171,7 @@ export default function PerlengkapanMasukEditPage() {
   if (query.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
-          Memuat data edit penerimaan perlengkapan...
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -179,7 +179,7 @@ export default function PerlengkapanMasukEditPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
           Data penerimaan perlengkapan tidak ditemukan.
         </div>
       </DashboardLayout>
@@ -189,17 +189,17 @@ export default function PerlengkapanMasukEditPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 px-1">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/perlengkapan-masuk`}>
-              <ArrowLeft className="mr-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold text-slate-950">Data Penerimaan Perlengkapan</h1>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penerimaan Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/perlengkapan-masuk`) },
+            { label: 'Edit' }
+          ]}
+          title="Data Penerimaan Perlengkapan"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/perlengkapan-masuk`)}
+        />
 
         {/* Transaction Header Info Card */}
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none">
           <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
             <h2 className="text-[20px] font-semibold text-slate-950">Informasi Penerimaan</h2>
             <Button
@@ -236,7 +236,7 @@ export default function PerlengkapanMasukEditPage() {
         </Card>
 
         {/* Detail Items Listing Card */}
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none space-y-6">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none space-y-6">
           <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
             <h2 className="text-[20px] font-semibold text-slate-950">Detail Perlengkapan</h2>
             <div className="flex flex-wrap gap-2">
@@ -373,13 +373,13 @@ export default function PerlengkapanMasukEditPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4">
-            <AlertDialogCancel className="h-14 rounded-2xl border-slate-300 px-7 text-[18px]">
+            <AlertDialogCancel className="h-14 rounded-md border-slate-300 px-7 text-[18px]">
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteItemSubmit}
               disabled={deleteItemMutation.isPending}
-              className="h-14 rounded-2xl bg-red-600 px-7 text-[18px] hover:bg-red-700"
+              className="h-14 rounded-md bg-red-600 px-7 text-[18px] hover:bg-red-700"
             >
               {deleteItemMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>

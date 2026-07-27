@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { RegionTable } from '@/components/features/region/RegionTable';
 import { RegionFormModal, RegionFormData } from '@/components/features/region/RegionFormModal';
 import { EditRegionModal } from '@/components/features/region/EditRegionModal';
@@ -114,12 +115,10 @@ export default function RegionPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Wilayah</h1>
-            <p className="text-sm text-muted-foreground">Kelola data wilayah dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data Wilayah"
+          subtitle="Kelola data wilayah dengan mudah"
+        />
 
         {/* Content */}
         <RegionTable

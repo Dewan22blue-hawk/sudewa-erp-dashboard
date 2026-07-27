@@ -3,9 +3,10 @@
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { useCreatePurchase } from '@/hooks/usePurchase';
-import { ChevronLeft, Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronLeft, Check, ChevronsUpDown, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSuppliers } from '@/hooks/useSupplier';
 import { useEffect, useMemo, useState } from 'react';
@@ -145,10 +146,10 @@ export default function CreatePurchasePage() {
         console.debug('create purchase payload', payload);
       }
 
-      await mutation.mutateAsync(payload);
+      const response = await mutation.mutateAsync(payload);
 
-      toast.success('Pembelian berhasil dibuat');
-      router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
+      toast.success(`Pembelian berhasil dibuat dengan nomor Transaksi ${response?.code}`);
+      router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${response?.id}`);
     } catch (err: any) {
       const statusCode = err?.statusCode ?? err?.response?.status;
       const apiMessage = err?.message;
@@ -202,21 +203,20 @@ export default function CreatePurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => router.push(purchasePath)}
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-2xl font-semibold tracking-tight">Tambah Pembelian</h1>
-          </div>
-          <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
-            <span className="text-muted-foreground">Kode Beli</span>
-            <span className="text-blue-500 font-medium">{generatedCode}</span>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+            { label: 'Detail Pembelian' }
+          ]}
+          title="Tambah Data Pembelian"
+          subtitle={
+            <>
+              <span>Kode Beli:</span>
+              <span className="text-blue-600 font-semibold">{generatedCode}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+        />
 
         <div className="rounded-md border bg-white p-5 md:p-6 shadow-sm">
           <PurchaseUnitForm

@@ -86,7 +86,7 @@ export function BBNBillTable({
         </Button>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">s*<Table>
+      <div className="overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">s*<Table>
         <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
           <TableRow className="border-slate-200">
             <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NOMOR TAGIHAN</TableHead>

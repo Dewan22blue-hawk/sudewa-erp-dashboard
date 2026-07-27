@@ -3,8 +3,8 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { PageHeader } from '@/components/common/PageHeader';
+import { ArrowLeft, ChevronLeft, ChevronRight, CreditCard } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 import { toast } from 'sonner';
 import { useCreateSales } from '@/hooks/useSales';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -45,7 +45,12 @@ export default function CreateSalesPage() {
   const createSalesMutation = useCreateSales();
   const createItemMutation = useCreateUnitItem();
   const createTypeUnitMutation = useCreateTypeUnit();
-  const { data: unitTypeData, isLoading: isLoadingUnitTypes } = useTypeUnits();
+  const { data: unitTypeData, isLoading: isLoadingUnitTypes } = useTypeUnits({
+    sort_by: 'created_at',
+    sort_order: 'asc',
+    in_stock: 'true',
+    company_id: companyId || 1
+  });
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
   const slugQuery = router.query.slug;
   const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
@@ -221,10 +226,15 @@ export default function CreateSalesPage() {
       }
 
       // Create transaction and its unit item atomically
-      await createSalesMutation.mutateAsync(transactionPayload);
+      const createdSales = await createSalesMutation.mutateAsync(transactionPayload);
+      const createdId = createdSales?.id;
 
       toast.success('Penjualan unit berhasil ditambahkan');
-      router.push(salesPath);
+      if (createdId) {
+        router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${createdId}`);
+      } else {
+        router.push(salesPath);
+      }
     } catch (error) {
       const message = readErrorMessage(error);
       if (message.toLowerCase().includes('no stock available')) {
@@ -280,22 +290,20 @@ export default function CreateSalesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(salesPath)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">Tambah Penjualan</span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <PageHeader title="Tambah Penjualan Unit" description="" />
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Kode Jual</span>
-            <span className="text-blue-600 font-medium">{generatedCode}</span>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Tambah Data Penjualan' }
+          ]}
+          title="Data Penjualan"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="font-semibold text-blue-600">{generatedCode}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}
+        />
 
         <div className="rounded-md border bg-white p-5 md:p-6 shadow-sm">
           <EditUnitForm
@@ -316,7 +324,7 @@ export default function CreateSalesPage() {
             }}
             prependFields={
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">Tanggal</Label>
                   <Input
                     type="date"
@@ -326,27 +334,27 @@ export default function CreateSalesPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">Customer</Label>
                   <Popover open={isCustomerOpen} onOpenChange={setIsCustomerOpen}>
                     <PopoverTrigger asChild>
                       <Button type="button" variant="outline" role="combobox" aria-expanded={isCustomerOpen} className="w-full justify-between bg-transparent font-normal">
                         <span className={cn('truncate', !selectedCustomer && 'text-muted-foreground')}>
-                          {selectedCustomer ? selectedCustomer.label : isLoadingCustomerList ? 'Memuat customer...' : 'Pilih customer'}
+                          {selectedCustomer ? selectedCustomer.name : isLoadingCustomerList ? 'Memuat customer...' : 'Pilih customer'}
                         </span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
-                        <CommandInput placeholder="Cari customer (kode/nama)..." />
+                        <CommandInput placeholder="Cari customer (nama)..." />
                         <CommandList>
                           <CommandEmpty>Customer tidak ditemukan.</CommandEmpty>
                           <CommandGroup>
                             {customerList.map((option) => (
-                              <CommandItem key={option.value} value={option.keyword} onSelect={() => handleSelectCustomer(option)}>
+                              <CommandItem key={option.value} value={option.name} onSelect={() => handleSelectCustomer(option)}>
                                 <Check className={cn('mr-2 h-4 w-4', form.customerId === option.value ? 'opacity-100' : 'opacity-0')} />
-                                {option.label}
+                                {option.name}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -356,12 +364,12 @@ export default function CreateSalesPage() {
                   </Popover>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">Alamat</Label>
                   <Input value={form.alamat} readOnly disabled className="bg-transparent" placeholder="Alamat customer" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label className="text-sm font-medium">NPWP</Label>
                   <Input value={form.npwp} readOnly disabled className="bg-transparent" placeholder="NPWP customer" />
                 </div>

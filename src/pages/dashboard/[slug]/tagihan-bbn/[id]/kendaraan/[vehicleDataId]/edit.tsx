@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { BBNBillVehicleFeeForm } from '@/components/features/tagihan-bbn/BBNBillVehicleFeeForm';
 import { useBBNBillDetail, useUpdateBBNBillVehicleData } from '@/hooks/useBBNBill';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditBBNBillVehiclePage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function EditBBNBillVehiclePage() {
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat detail kendaraan...</div>
+        <LoadingState variant="page" />
       ) : detailQuery.isError || !vehicle ? (
         <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
           <p className="text-red-500">Detail kendaraan tidak ditemukan.</p>

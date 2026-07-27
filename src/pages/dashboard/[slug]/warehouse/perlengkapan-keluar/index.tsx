@@ -5,6 +5,7 @@ import { useQueries } from '@tanstack/react-query';
 import { MoreVertical, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { MaterialReceiptFormModal } from '@/components/features/material-receipt/MaterialReceiptFormModal';
 import { UploadInvoiceModal } from '@/components/features/material-receipt/UploadInvoiceModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -33,6 +34,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { id } from 'date-fns/locale';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -161,19 +163,18 @@ export default function MaterialReleaseListPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Pengeluaran Perlengkapan</h1>
-            <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock perlengkapan</p>
-          </div>
-
-          {canCreate && (
-            <Button onClick={() => { setEditingTransaction(null); setOpenForm(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Data Pengeluaran Perlengkapan"
+          subtitle="Kelola dan lacak semua data pengeluaran stock perlengkapan"
+          actions={
+            canCreate && (
+              <Button onClick={() => { setEditingTransaction(null); setOpenForm(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah
+              </Button>
+            )
+          }
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -216,7 +217,7 @@ export default function MaterialReleaseListPage() {
               <TableBody>
                 {transactionsQuery.isLoading || transactionsQuery.isFetching ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-28 text-center text-slate-500">Memuat data pengeluaran perlengkapan...</TableCell>
+                    <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat data pengeluaran perlengkapan..." /></TableCell>
                   </TableRow>
                 ) : (transactionsQuery.data?.data ?? []).length === 0 ? (
                   <TableRow>
@@ -352,8 +353,8 @@ export default function MaterialReleaseListPage() {
             <AlertDialogDescription className="text-[18px] text-slate-500">Apa anda yakin ingin menghapus data ini?</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4">
-            <AlertDialogCancel className="h-14 rounded-2xl border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending} className="h-14 rounded-2xl bg-red-600 px-7 text-[18px] hover:bg-red-700">
+            <AlertDialogCancel className="h-14 rounded-md border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={deleteMutation.isPending} className="h-14 rounded-md bg-red-600 px-7 text-[18px] hover:bg-red-700">
               {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Check, Trash, ArrowDown } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -83,24 +83,24 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
     setCurrentPage(1);
   }, [itemsPerPage, search, receivedFilter]);
 
-  const isSelectionDisabled = (item: any) => {
+  const isSelectionDisabled = useCallback((item: any) => {
     return receivedIds.includes(item.id) || item.status === 'refunded' || item.status === 'returned';
-  };
+  }, [receivedIds]);
 
-  const toggleSelect = (item: any) => {
+  const toggleSelect = useCallback((item: any) => {
     if (isSelectionDisabled(item)) return;
     const id = item.id;
     setSelected((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
-  };
+  }, [isSelectionDisabled]);
 
-  const toggleAll = () => {
+  const toggleAll = useCallback(() => {
     if (filteredRows.length === 0) return;
     const selectableRows = filteredRows.filter((d) => !isSelectionDisabled(d));
     const allIds = selectableRows.map((d) => d.id);
     if (allIds.length === 0) return;
     const isAllSelected = allIds.every((id) => selected.includes(id));
     setSelected((prev) => (isAllSelected ? prev.filter((id) => !allIds.includes(id)) : Array.from(new Set([...prev, ...allIds]))));
-  };
+  }, [filteredRows, isSelectionDisabled, selected]);
 
   const handleTerima = async () => {
     if (selected.length === 0) return;
@@ -183,35 +183,49 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
         sortable: true,
         cell: (item) => {
           let text = '-';
-          let background;
+          let background = 'border-slate-200 bg-slate-50 text-slate-700';
           switch (item?.status) {
             case 'returned':
               text = 'Return';
-              background = 'bg-red-500';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
               break;
             case 'refunded':
               text = 'Refund';
-              background = 'bg-red-500';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
               break;
             case 'normal':
               text = 'Normal';
-              background = 'bg-green-500';
+              background = 'border-emerald-200 bg-emerald-50 text-emerald-700';
               break;
             default:
               text = 'Belum Diterima';
-              background = 'bg-yellow-500';
+              background = 'border-amber-200 bg-amber-50 text-amber-700';
               break;
           }
 
           return (
-            <Badge variant='outline' className="font-semibold border-slate-200 bg-slate-50 text-slate-700">
+            <Badge variant='outline' className={`font-semibold ${background}`}>
               {text}
             </Badge>
           );
         },
+      },
+      {
+        header: 'STATUS STOCK',
+        accessorKey: 'in_stock',
+        sortable: true,
+        cell: (item) => {
+          if (item.in_stock === true) {
+            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+          }
+          if (item.in_stock === false) {
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
+          }
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+        }
       }
     ],
-    [filteredRows, selected, receivedIds, slug, currentPage, itemsPerPage]
+    [filteredRows, selected, receivedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]
   );
 
   return (
@@ -283,7 +297,7 @@ export default function PenerimaanUnitDetailTable({ data, personId, onTerima, on
       />
 
       <AlertDialog open={confirmDeleteIds.length > 0} onOpenChange={(open) => !open && setConfirmDeleteIds([])}>
-        <AlertDialogContent className="max-w-[420px] rounded-2xl p-6 gap-6">
+        <AlertDialogContent className="max-w-[420px] rounded-md p-6 gap-6">
           <AlertDialogHeader className="text-left space-y-3">
             <AlertDialogTitle className="text-xl font-bold text-gray-900">Hapus Data Ini?</AlertDialogTitle>
             <AlertDialogDescription className="text-[15px] text-gray-500 font-normal">

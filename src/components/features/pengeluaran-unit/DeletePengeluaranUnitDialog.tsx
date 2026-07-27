@@ -19,7 +19,7 @@ export default function DeletePengeluaranUnitDialog({
 }: Props) {
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="max-w-[420px] rounded-2xl p-6 gap-6">
+            <AlertDialogContent className="max-w-[420px] rounded-md p-6 gap-6">
                 <AlertDialogHeader className="text-left space-y-3">
                     <AlertDialogTitle className="text-xl font-bold text-gray-900">{title}</AlertDialogTitle>
                     <AlertDialogDescription className="text-[15px] text-gray-500 font-normal">

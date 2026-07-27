@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { Search } from 'lucide-react';
 import type { UJDriverItem } from '@/@types/uj-driver.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import UJDriverTable from '@/components/features/finance/uj-driver/UJDriverTable';
@@ -77,10 +78,10 @@ export default function UJDriverPage() {
       </Head>
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-950">Linimasa Driver</h1>
-          <p className="text-sm text-slate-500">Kelola uang jalan driver dan lain-lain</p>
-        </div>
+        <PageHeader
+          title="Linimasa Driver"
+          subtitle="Kelola uang jalan driver dan lain-lain"
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

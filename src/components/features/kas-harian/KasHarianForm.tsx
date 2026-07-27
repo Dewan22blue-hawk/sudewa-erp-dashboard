@@ -54,7 +54,7 @@ export default function KasHarianForm({
             <FormItem className="flex flex-col">
               <FormLabel className="text-base font-medium text-slate-900">Tanggal</FormLabel>
               <FormControl>
-                <div className="rounded-2xl border border-slate-200 bg-white">
+                <div className="rounded-md border border-slate-200 bg-white">
                   <DatePicker
                     value={field.value instanceof Date ? field.value : null}
                     onChange={(date) => {
@@ -65,7 +65,7 @@ export default function KasHarianForm({
                       });
                     }}
                     placeholder="Jan 20, 2025"
-                    className="h-12 rounded-2xl border-0 shadow-none"
+                    className="h-12 rounded-md border-0 shadow-none"
                   />
                 </div>
               </FormControl>
@@ -76,7 +76,7 @@ export default function KasHarianForm({
 
         <div className="space-y-2">
           <FormLabel className="text-base font-medium text-slate-900">Perusahaan</FormLabel>
-          <div className="flex min-h-12 items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700">
+          <div className="flex min-h-12 items-center rounded-md border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700">
             {selectedCompany?.name ?? 'Perusahaan belum dipilih'}
           </div>
         </div>
@@ -89,11 +89,11 @@ export default function KasHarianForm({
               <FormLabel className="text-base font-medium text-slate-900">Kategori Transaksi</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="h-12 w-full rounded-2xl border-slate-200 bg-white px-4">
+                  <SelectTrigger className="h-12 w-full rounded-md border-slate-200 bg-white px-4">
                     <SelectValue placeholder="Pilih kategori transaksi" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="rounded-2xl">
+                <SelectContent className="rounded-md">
                   <SelectItem value="general" className="rounded-md">Umum (General)</SelectItem>
                   <SelectItem value="operational" className="rounded-md">Operasional (Operational)</SelectItem>
                   <SelectItem value="director_receivable" className="rounded-md">Piutang Direktur (Director Receivable)</SelectItem>
@@ -116,7 +116,7 @@ export default function KasHarianForm({
               <FormControl>
                 <Textarea
                   placeholder="Tulis deskripsi di sini"
-                  className="min-h-28 resize-none rounded-2xl border-slate-200 px-4 py-3"
+                  className="min-h-28 resize-none rounded-md border-slate-200 px-4 py-3"
                   {...field}
                 />
               </FormControl>
@@ -142,7 +142,7 @@ export default function KasHarianForm({
                     }
                   }}
                   placeholder="Tambahkan nominal"
-                  className="h-12 rounded-2xl border-slate-200 px-4"
+                  className="h-12 rounded-md border-slate-200 px-4"
                   disabled={isDebetDisabled}
                 />
               </FormControl>
@@ -170,7 +170,7 @@ export default function KasHarianForm({
                     }
                   }}
                   placeholder="Tambahkan nominal"
-                  className="h-12 rounded-2xl border-slate-200 px-4"
+                  className="h-12 rounded-md border-slate-200 px-4"
                   disabled={isCreditDisabled}
                 />
               </FormControl>
@@ -189,7 +189,7 @@ export default function KasHarianForm({
             <FormItem>
               <FormLabel className="text-base font-medium text-slate-900">Bukti Pembayaran (opsional)</FormLabel>
               <FormControl>
-                <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center">
+                <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center">
                   <Upload className="mb-3 h-7 w-7 text-slate-500" />
                   <span className="text-sm font-medium text-slate-700">{paymentProof ? paymentProof.name : 'Klik untuk upload dokumen'}</span>
                   <span className="mt-1 text-xs text-slate-400">PNG, JPG, PDF maksimal 5MB</span>

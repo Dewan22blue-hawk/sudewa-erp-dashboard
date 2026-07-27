@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import PenerimaanPiutangTable from '@/components/features/penerimaan-piutang/PenerimaanPiutangTable';
 import { useDeletePenerimaanPiutang, usePenerimaanPiutang } from '@/hooks/usePenerimaanPiutang';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import type { PenerimaanPiutang } from '@/@types/penerimaan-piutang.types';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DataPenerimaanPiutangPage() {
     const { hasPermission } = usePermissionGuard();
@@ -53,19 +54,18 @@ export default function DataPenerimaanPiutangPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex items-center justify-between gap-4 no-print">
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-950">Data Penerimaan Piutang</h1>
-                        <p className="text-sm text-slate-500">Kelola data penerimaan piutang</p>
-                    </div>
-
-                    {query.isFetching ? (
-                        <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                            Memuat data...
-                        </span>
-                    ) : null}
-                </div>
+                <PageHeader
+                    title="Data Penerimaan Piutang"
+                    subtitle="Kelola data penerimaan piutang"
+                    actions={
+                        query.isFetching ? (
+                            <span className="inline-flex items-center gap-2 text-sm text-slate-500">
+                                <LoadingState variant="inline" text={null} />
+                                Memuat data...
+                            </span>
+                        ) : null
+                    }
+                />
 
                 <PenerimaanPiutangTable
                     data={query.data?.data ?? []}
@@ -97,7 +97,7 @@ export default function DataPenerimaanPiutangPage() {
                         <AlertDialogAction onClick={handleDelete} className="bg-orange-600 hover:bg-orange-700" disabled={deleteMutation.isPending}>
                             {deleteMutation.isPending ? (
                                 <span className="inline-flex items-center gap-2">
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <LoadingState variant="inline" text={null} />
                                     Menghapus
                                 </span>
                             ) : (

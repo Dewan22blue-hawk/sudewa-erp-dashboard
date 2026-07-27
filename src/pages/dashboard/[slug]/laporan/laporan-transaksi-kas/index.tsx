@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { LaporanKasTable } from '@/components/features/laporan-kas/LaporanKasTable';
-import { Loader2, Search, Printer } from 'lucide-react';
+import {  Search, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -15,6 +16,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { resolveCompanyId, getLetterheadByCompanyId } from '@/lib/print-letterhead';
 import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { formatDate } from '@/lib/utils/format';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function LaporanTransaksiKasPage() {
   const {
@@ -102,15 +104,17 @@ export default function LaporanTransaksiKasPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
-          <div>
-            <h1 className="text-2xl font-semibold">Laporan Transaksi Kas</h1>
-            <p className="text-sm text-muted-foreground">Pantau semua pemasukan dan pengeluaran</p>
-          </div>
-          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </Button>
+        <div className="no-print">
+          <PageHeader
+            title="Laporan Transaksi Kas"
+            subtitle="Pantau semua pemasukan dan pengeluaran"
+            actions={
+              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+                <Printer className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+            }
+          />
         </div>
 
         {/* Filters */}
@@ -163,7 +167,7 @@ export default function LaporanTransaksiKasPage() {
         <div className="pt-4">
           {isLoadingDisplay ? (
             <div className="flex justify-center items-center py-20 bg-white rounded-md border border-gray-200 shadow-sm">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              <LoadingState variant="page" />
             </div>
           ) : (
             <>

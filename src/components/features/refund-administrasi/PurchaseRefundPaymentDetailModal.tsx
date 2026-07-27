@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarDays, Loader2 } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import type { UnitTransactionRefund, UnitTransactionRefundPayment } from '@/@types/refund.type';
 import { useCreateRefundPayment, useUpdateRefundPayment } from '@/hooks/useRefundAdministrasi';
 import { createRefundPaymentSchema, type CreateRefundPaymentFormValues } from '@/schemas/refund.schema';
@@ -15,6 +15,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { refundInputClassName, refundLabelClassName, refundPrimaryButtonClassName, refundSecondaryButtonClassName } from './purchase-refund.styles';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKas } from '@/hooks/useKas';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface PurchaseRefundPaymentDetailModalProps {
   open: boolean;
@@ -173,7 +174,7 @@ export default function PurchaseRefundPaymentDetailModal({ open, onClose, refund
 
           <div className="space-y-3 pt-1">
             <Button type="submit" className={`w-full ${refundPrimaryButtonClassName}`} disabled={isPending}>
-              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {isPending ? <LoadingState variant="inline" text={null} /> : null}
               Simpan
             </Button>
             <Button type="button" variant="outline" className={`w-full ${refundSecondaryButtonClassName}`} onClick={onClose} disabled={isPending}>

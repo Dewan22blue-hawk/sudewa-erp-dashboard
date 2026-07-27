@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { FinanceAssetDetailForm } from '@/components/features/finance/asset/FinanceAssetDetailForm';
 import { useFinanceAssetDetail } from '@/hooks/useFinanceAsset';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,16 +34,15 @@ export default function FinanceAssetDetailPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center gap-4">
-                    <Button onClick={handleBack} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                        <ArrowLeft className="h-5 w-5 text-slate-700" />
-                    </Button>
-                    <div>
-                        <h1 className="text-2xl font-semibold text-slate-950">Detail Aset</h1>
-                        <p className="text-sm text-slate-500">Detail data aset inventaris</p>
-                    </div>
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Aset', onClick: handleBack },
+                        { label: 'Detail Aset' }
+                    ]}
+                    title="Detail Aset"
+                    subtitle="Detail data aset inventaris"
+                    onBack={handleBack}
+                />
 
                 {isLoading || !asset ? (
                     <div className="space-y-6">

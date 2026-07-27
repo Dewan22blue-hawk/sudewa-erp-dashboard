@@ -6,6 +6,7 @@ import { OrderListDetailView } from '@/components/features/order-list/OrderListD
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useOrderListDetail, useOrderLists, useOrderListTarifs, useOrderListTarifItems } from '@/hooks/useOrderList';
 import { composeOrderListWithTarifs } from '@/services/order-list.service';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function OrderListDetailPage() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function OrderListDetailPage() {
   if (!router.isReady || detailQuery.isLoading || tarifItemQuery.isLoading || tarifLoadItemQuery.isLoading || orderListLookupQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat detail order list...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

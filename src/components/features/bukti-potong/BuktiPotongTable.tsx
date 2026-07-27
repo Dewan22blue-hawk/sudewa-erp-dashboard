@@ -51,10 +51,11 @@ export default function WithholdingTaxTable({
   const columns = useMemo<ColumnDef<WithholdingTaxItem>[]>(
     () => [
       {
-        header: 'NO',
+        header: 'NO INVOICE',
+        accessorKey: 'do_invoice.code',
+        sortable: true,
         alignment: 'left',
-        className: 'w-16',
-        cell: (_, idx) => (page - 1) * perPage + idx + 1,
+        cell: (item) => <CopyBox text={item.no_invoice || item.do_invoice?.code || '-'} />,
       },
       {
         header: 'TANGGAL',
@@ -62,13 +63,6 @@ export default function WithholdingTaxTable({
         sortable: true,
         alignment: 'left',
         cell: (item) => formatDate(item.created_at),
-      },
-      {
-        header: 'NO INVOICE',
-        accessorKey: 'do_invoice.code',
-        sortable: true,
-        alignment: 'left',
-        cell: (item) => <CopyBox text={item.no_invoice || item.do_invoice?.code || '-'} />,
       },
       {
         header: 'NO BUKPOT',
@@ -127,7 +121,7 @@ export default function WithholdingTaxTable({
         cell: (item) => formatDate(item.payment_date),
       },
       {
-        header: 'ACTION',
+        header: 'aksi',
         alignment: 'left',
         sticky: 'right',
         cell: (item) => (
@@ -156,7 +150,7 @@ export default function WithholdingTaxTable({
         ),
       },
     ],
-    [page, perPage, onView, onEdit, onDelete]
+    [onView, onEdit, onDelete]
   );
 
   return (

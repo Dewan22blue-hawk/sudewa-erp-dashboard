@@ -1,12 +1,18 @@
 import { ReactNode, useMemo, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
 import { WarehouseStockUnit } from '@/@types/unit-transaction.types';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { TypeUnit } from '@/@types/type-unit.types';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface StockPickerTableProps {
   units: WarehouseStockUnit[];
   selectedIds: Set<number>;
+  unitType?: TypeUnit;
+  isPaid?: boolean;
   onToggleOne: (id: number, checked: boolean) => void;
   onToggleAllPage: (checked: boolean) => void;
   currentPage: number;
@@ -20,17 +26,55 @@ interface StockPickerTableProps {
   searchAction?: ReactNode;
 }
 
+const statusConfig: Record<string, { label: string; className: string }> = {
+  // Backend enum statuses
+  normal: { label: 'Normal', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  minor_damage: { label: 'Minor Damage', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+  major_damage: { label: 'Major Damage', className: 'border-red-200 bg-red-50 text-red-700 font-semibold' },
+  returned: { label: 'Returned', className: 'border-purple-200 bg-purple-50 text-purple-700 font-semibold' },
+  refunded: { label: 'Refunded', className: 'border-orange-200 bg-orange-50 text-orange-700 font-semibold' },
+  lost: { label: 'Lost', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+  in_repair: { label: 'In Repair', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+
+  // Fallback / legacy statuses
+  draft: { label: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-medium' },
+  cancel: { label: 'Cancel', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  rejected: { label: 'Rejected', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  prepare: { label: 'Prepare', className: 'border-amber-200 bg-amber-50 text-amber-700 font-medium' },
+  inbound_purcase_order: { label: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_incoming_goods: { label: 'In Transit', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_receipt: { label: 'Available', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  inbound_return: { label: 'Refund', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_reserved: { label: 'Reserved', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_in_transit: { label: 'In Transit', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-medium' },
+  outbound_delivered: { label: 'Delivered', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-medium' },
+  outbound_return: { label: 'Return', className: 'border-rose-200 bg-rose-50 text-rose-700 font-medium' },
+};
+
+const renderStatus = (status: string) => {
+  const config = statusConfig[status] ?? {
+    label: status ? status.replace(/_/g, ' ') : '-',
+    className: 'border-slate-200 bg-slate-50 text-slate-700 font-medium',
+  };
+
+  return (
+    <Badge variant="outline" className={cn('capitalize', config.className)}>
+      {config.label}
+    </Badge>
+  );
+};
+
 export function StockPickerTable({
   units,
   selectedIds,
+  unitType,
+  isPaid,
   onToggleOne,
-  onToggleAllPage,
   currentPage,
   perPage,
   onPageChange,
   onPerPageChange,
   isLoading,
-  isError,
   searchValue,
   onSearchChange,
   searchAction,
@@ -43,6 +87,9 @@ export function StockPickerTable({
       return [item.color, item.machine_number, item.chassis_number].some((field) => String(field ?? '').toLowerCase().includes(query));
     });
   }, [units, searchValue]);
+
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
   const totalPages = Math.max(1, Math.ceil(filteredUnits.length / perPage));
   const pagedRows = useMemo(() => {
@@ -71,10 +118,8 @@ export function StockPickerTable({
 
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
     {
-      header: 'No',
-      alignment: 'center',
-      className: 'w-[60px]',
-      cell: (_, index) => (currentPage - 1) * perPage + index + 1,
+      header: 'Nama Tipe Unit',
+      cell: () => unitType?.name ? <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitType?.name}`}>{unitType?.name}</ReferenceLink> : '-'
     },
     {
       header: 'Warna',
@@ -104,7 +149,14 @@ export function StockPickerTable({
         </span>
       ),
     },
-  ], [currentPage, perPage]);
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      sortable: true,
+      alignment: 'center',
+      cell: (item) => renderStatus(item?.status ?? ''),
+    },
+  ], [unitType, slug]);
 
   return (
     <div className="space-y-4">
@@ -121,7 +173,7 @@ export function StockPickerTable({
           onPerPageChange(val);
           onPageChange(1);
         }}
-        showCheckbox
+        showCheckbox={!isPaid}
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}

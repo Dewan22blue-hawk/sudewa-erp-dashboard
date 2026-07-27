@@ -1,10 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { getTaxDetail } from '@/services/tax.service';
+import { getTaxDetail, type TaxVersion } from '@/services/tax.service';
+import { getTaxVersions, createTaxVersion, updateTaxVersion, deleteTaxVersion } from '@/services/taxVersion.service';
+import { TaxVersionTable } from '@/components/features/settings/tax-version/TaxVersionTable';
+import { TaxVersionForm, TaxVersionFormValues } from '@/components/features/settings/tax-version/TaxVersionForm';
+import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import Head from 'next/head';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle2, Lock } from 'lucide-react';
+import { ArrowLeft, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,14 +19,100 @@ export default function TaxDetailPage() {
   const router = useRouter();
   const slug = router.query.slug as string;
   const taxId = Number(router.query.id);
+  const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+      setPage(1);
+    }, 400);
+    return () => window.clearTimeout(timeout);
+  }, [searchInput]);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState<TaxVersion | undefined>();
+
+  const { data: taxData, isLoading: isTaxLoading } = useQuery({
     queryKey: ['tax', taxId],
     queryFn: () => getTaxDetail(taxId),
     enabled: !!taxId,
   });
 
-  const tax = data?.data;
+  const { data: taxVersionsData, isLoading: isVersionsLoading } = useQuery({
+    queryKey: ['tax-versions', taxId, page, perPage, debouncedSearch],
+    queryFn: () => getTaxVersions(page, perPage, debouncedSearch, taxId),
+    enabled: !!taxId,
+  });
+
+  const tax = taxData?.data;
+
+  const createMutation = useMutation({
+    mutationFn: createTaxVersion,
+    onSuccess: () => {
+      toast.success('Berhasil menambahkan versi pajak baru');
+      setIsFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['tax-versions', taxId] });
+      queryClient.invalidateQueries({ queryKey: ['tax', taxId] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Gagal menambahkan versi pajak');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => updateTaxVersion(id, data),
+    onSuccess: () => {
+      toast.success('Berhasil mengubah data versi pajak');
+      setIsFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['tax-versions', taxId] });
+      queryClient.invalidateQueries({ queryKey: ['tax', taxId] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Gagal mengubah versi pajak');
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTaxVersion,
+    onSuccess: () => {
+      toast.success('Berhasil menghapus data versi pajak');
+      queryClient.invalidateQueries({ queryKey: ['tax-versions', taxId] });
+      queryClient.invalidateQueries({ queryKey: ['tax', taxId] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Gagal menghapus versi pajak');
+    },
+  });
+
+  const handleAdd = () => {
+    setSelectedVersion(undefined);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = (version: TaxVersion) => {
+    setSelectedVersion(version);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (version: TaxVersion) => {
+    if (confirm(`Apakah Anda yakin ingin menghapus versi pajak ${version.name}?`)) {
+      deleteMutation.mutate(version.id);
+    }
+  };
+
+  const handleSubmit = (values: TaxVersionFormValues) => {
+    const payload = { ...values, tax_id: taxId };
+    if (selectedVersion) {
+      updateMutation.mutate({ id: selectedVersion.id, data: payload });
+    } else {
+      createMutation.mutate(payload);
+    }
+  };
 
   return (
     <>
@@ -29,29 +121,22 @@ export default function TaxDetailPage() {
       </Head>
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.push(`/dashboard/${slug}/settings/tax`)}
-                className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"
-              >
-                <ArrowLeft className="h-5 w-5 text-slate-700" />
-              </Button>
-              <div>
-                <h1 className="text-2xl font-semibold">Detail Pajak</h1>
-                <p className="text-sm text-muted-foreground">Lihat detail informasi pajak dan riwayat versinya</p>
-              </div>
-            </div>
-          </div>
+          <PageHeader
+            breadcrumbs={[
+              { label: 'Data Pajak', onClick: () => router.push(`/dashboard/${slug}/settings/tax`) },
+              { label: 'Detail' }
+            ]}
+            title="Detail Pajak"
+            subtitle="Lihat detail informasi pajak dan riwayat versinya"
+            onBack={() => router.push(`/dashboard/${slug}/settings/tax`)}
+          />
 
           <Card className="border-0 shadow-sm rounded-xl">
             <CardHeader className="border-b px-6 py-4">
               <CardTitle className="text-base font-semibold">Informasi Pajak</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {isLoading || !tax ? (
+              {isTaxLoading || !tax ? (
                 <div className="space-y-4">
                   <Skeleton className="h-6 w-1/3" />
                   <Skeleton className="h-6 w-1/4" />
@@ -78,64 +163,51 @@ export default function TaxDetailPage() {
                       <span className="text-base text-slate-900">-</span>
                     )}
                   </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">Jumlah Versi Pajak</p>
+                    <p className="text-base text-slate-900">{tax?.tax_version_count ?? 0} Versi</p>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm rounded-xl overflow-hidden">
-            <CardHeader className="border-b px-6 py-4 bg-white">
-              <CardTitle className="text-base font-semibold">Riwayat Versi Pajak</CardTitle>
-            </CardHeader>
-            <div className="p-0 overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-[#f8f9fa] border-b border-slate-200 text-slate-600">
-                  <tr>
-                    <th className="px-6 py-4 font-semibold">NAMA VERSI</th>
-                    <th className="px-6 py-4 font-semibold">NILAI/RATE</th>
-                    <th className="px-6 py-4 font-semibold">BERLAKU DARI</th>
-                    <th className="px-6 py-4 font-semibold">BERLAKU SAMPAI</th>
-                    <th className="px-6 py-4 font-semibold text-center">DEFAULT</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                        Memuat data versi pajak...
-                      </td>
-                    </tr>
-                  ) : tax?.tax_versions && tax.tax_versions.length > 0 ? (
-                    tax.tax_versions.map((version) => (
-                      <tr key={version.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-slate-900">{version.name}</td>
-                        <td className="px-6 py-4 text-slate-700">{version.rate}%</td>
-                        <td className="px-6 py-4 text-slate-700">{version.effective_from || '-'}</td>
-                        <td className="px-6 py-4 text-slate-700">{version.effective_until || '-'}</td>
-                        <td className="px-6 py-4 text-center">
-                          {version.is_default === 1 || version.is_default === true ? (
-                            <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none gap-1">
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              Default
-                            </Badge>
-                          ) : (
-                            <span className="text-slate-300">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                        Belum ada versi pajak yang terdaftar.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+          <div className="mt-8">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold">Daftar Versi Pajak</h2>
+              <p className="text-sm text-muted-foreground">Kelola riwayat nilai/rate pajak untuk {tax?.name || 'pajak ini'}</p>
             </div>
-          </Card>
+
+            <TaxVersionTable
+              data={taxVersionsData?.data?.data || []}
+              meta={taxVersionsData?.data ? {
+                currentPage: taxVersionsData.data.current_page,
+                lastPage: taxVersionsData.data.last_page,
+                perPage: taxVersionsData.data.per_page,
+                total: taxVersionsData.data.total,
+              } : undefined}
+              isLoading={isVersionsLoading}
+              search={searchInput}
+              page={page}
+              perPage={perPage}
+              onSearchChange={setSearchInput}
+              onPageChange={setPage}
+              onPerPageChange={setPerPage}
+              onAdd={handleAdd}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
         </div>
+
+        <TaxVersionForm
+          open={isFormOpen}
+          onOpenChange={setIsFormOpen}
+          initialData={selectedVersion}
+          baseTaxId={taxId}
+          onSubmit={handleSubmit}
+          isSubmitting={createMutation.isPending || updateMutation.isPending}
+        />
       </DashboardLayout>
     </>
   );

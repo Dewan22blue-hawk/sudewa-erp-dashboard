@@ -83,102 +83,102 @@ export function PurchaseMaterialFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-hidden rounded-[28px] border border-slate-200 px-0 py-0 sm:max-w-2xl">
         <div className="overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
-        <DialogHeader className="space-y-0">
-          <DialogTitle className="text-[24px] font-semibold text-slate-900">
-            {initialData ? editTitle : addTitle}
-          </DialogTitle>
-        </DialogHeader>
+          <DialogHeader className="space-y-0">
+            <DialogTitle className="text-[24px] font-semibold text-slate-900">
+              {initialData ? editTitle : addTitle}
+            </DialogTitle>
+          </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-7 pt-4">
-          {initialData ? (
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-7 pt-4">
+            {initialData ? (
+              <div className="space-y-3">
+                <Label className="text-[18px] font-medium text-slate-900">{codeLabel}</Label>
+                <Input
+                  value={initialData.code}
+                  readOnly
+                  className="h-14 rounded-md border-slate-200 px-5 text-[18px] text-slate-500 shadow-sm"
+                />
+              </div>
+            ) : null}
+
             <div className="space-y-3">
-              <Label className="text-[18px] font-medium text-slate-900">{codeLabel}</Label>
+              <Label className="text-[18px] font-medium text-slate-900">{warehouseLabel}</Label>
+              <Controller
+                control={form.control}
+                name="warehouseId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value ? String(field.value) : ''}
+                    onChange={(value) => field.onChange(Number(value))}
+                    options={warehouses.map((warehouse) => ({ value: String(warehouse.id), label: warehouse.name }))}
+                    placeholder={isLoadingWarehouses ? 'Memuat warehouse...' : 'Pilih warehouse'}
+                    searchPlaceholder="Cari warehouse..."
+                    emptyText="Warehouse tidak ditemukan."
+                    loading={isLoadingWarehouses}
+                    className="h-14 rounded-md border-slate-200 px-5 text-[18px] shadow-sm"
+                  />
+                )}
+              />
+              {form.formState.errors.warehouseId ? <p className="text-sm text-red-600">{form.formState.errors.warehouseId.message}</p> : null}
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[18px] font-medium text-slate-900">{counterpartyLabel}</Label>
               <Input
-                value={initialData.code}
-                readOnly
-                className="h-14 rounded-2xl border-slate-200 px-5 text-[18px] text-slate-500 shadow-sm"
+                {...form.register('supplierName')}
+                placeholder={counterpartyPlaceholder}
+                className="h-14 rounded-md border-slate-200 px-5 text-[18px] shadow-sm"
+              />
+              {form.formState.errors.supplierName ? <p className="text-sm text-red-600">{form.formState.errors.supplierName.message}</p> : null}
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[18px] font-medium text-slate-900">{dateLabel}</Label>
+              <Controller
+                control={form.control}
+                name="transactionDate"
+                render={({ field }) => (
+                  <DatePicker
+                    value={toDateValue(field.value)}
+                    onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                    placeholder="Pick a date"
+                    className="h-14 rounded-md border-slate-200 px-5 text-[18px] shadow-sm"
+                  />
+                )}
+              />
+              {form.formState.errors.transactionDate ? <p className="text-sm text-red-600">{form.formState.errors.transactionDate.message}</p> : null}
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[18px] font-medium text-slate-900">{descriptionLabel}</Label>
+              <Textarea
+                {...form.register('description')}
+                placeholder={descriptionPlaceholder}
+                rows={4}
+                className="rounded-md border-slate-200 px-5 py-4 text-[16px] shadow-sm"
               />
             </div>
-          ) : null}
 
-          <div className="space-y-3">
-            <Label className="text-[18px] font-medium text-slate-900">{warehouseLabel}</Label>
-            <Controller
-              control={form.control}
-              name="warehouseId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value ? String(field.value) : ''}
-                  onChange={(value) => field.onChange(Number(value))}
-                  options={warehouses.map((warehouse) => ({ value: String(warehouse.id), label: warehouse.name }))}
-                  placeholder={isLoadingWarehouses ? 'Memuat warehouse...' : 'Pilih warehouse'}
-                  searchPlaceholder="Cari warehouse..."
-                  emptyText="Warehouse tidak ditemukan."
-                  loading={isLoadingWarehouses}
-                  className="h-14 rounded-2xl border-slate-200 px-5 text-[18px] shadow-sm"
+            {initialData ? (
+              <div className="space-y-3">
+                <Label className="text-[18px] font-medium text-slate-900">{totalPaidLabel}</Label>
+                <Input
+                  value={`Rp${(initialData.totalPaid || 0).toLocaleString('id-ID')}`}
+                  readOnly
+                  className="h-14 rounded-md border-slate-200 px-5 text-[18px] text-slate-500 shadow-sm"
                 />
-              )}
-            />
-            {form.formState.errors.warehouseId ? <p className="text-sm text-red-600">{form.formState.errors.warehouseId.message}</p> : null}
-          </div>
+              </div>
+            ) : null}
 
-          <div className="space-y-3">
-            <Label className="text-[18px] font-medium text-slate-900">{counterpartyLabel}</Label>
-            <Input
-              {...form.register('supplierName')}
-              placeholder={counterpartyPlaceholder}
-              className="h-14 rounded-2xl border-slate-200 px-5 text-[18px] shadow-sm"
-            />
-            {form.formState.errors.supplierName ? <p className="text-sm text-red-600">{form.formState.errors.supplierName.message}</p> : null}
-          </div>
-
-          <div className="space-y-3">
-            <Label className="text-[18px] font-medium text-slate-900">{dateLabel}</Label>
-            <Controller
-              control={form.control}
-              name="transactionDate"
-              render={({ field }) => (
-                <DatePicker
-                  value={toDateValue(field.value)}
-                  onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
-                  placeholder="Pick a date"
-                  className="h-14 rounded-2xl border-slate-200 px-5 text-[18px] shadow-sm"
-                />
-              )}
-            />
-            {form.formState.errors.transactionDate ? <p className="text-sm text-red-600">{form.formState.errors.transactionDate.message}</p> : null}
-          </div>
-
-          <div className="space-y-3">
-            <Label className="text-[18px] font-medium text-slate-900">{descriptionLabel}</Label>
-            <Textarea
-              {...form.register('description')}
-              placeholder={descriptionPlaceholder}
-              rows={4}
-              className="rounded-2xl border-slate-200 px-5 py-4 text-[16px] shadow-sm"
-            />
-          </div>
-
-          {initialData ? (
-            <div className="space-y-3">
-              <Label className="text-[18px] font-medium text-slate-900">{totalPaidLabel}</Label>
-              <Input
-                value={`Rp${(initialData.totalPaid || 0).toLocaleString('id-ID')}`}
-                readOnly
-                className="h-14 rounded-2xl border-slate-200 px-5 text-[18px] text-slate-500 shadow-sm"
-              />
+            <div className="flex flex-col gap-4 pt-2">
+              <Button type="submit" disabled={isSubmitting} className="h-14 rounded-md bg-[#1f4163] text-[18px] font-medium hover:bg-[#183552]">
+                {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-14 rounded-md border-slate-300 text-[18px] font-medium">
+                Batal
+              </Button>
             </div>
-          ) : null}
-
-          <div className="flex flex-col gap-4 pt-2">
-            <Button type="submit" disabled={isSubmitting} className="h-14 rounded-2xl bg-[#1f4163] text-[18px] font-medium hover:bg-[#183552]">
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-14 rounded-2xl border-slate-300 text-[18px] font-medium">
-              Batal
-            </Button>
-          </div>
-        </form>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

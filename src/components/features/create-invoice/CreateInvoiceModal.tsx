@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, Search } from 'lucide-react';
+import {  Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { getCustomers } from '@/services/customer.service';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { createInvoiceSchema, type CreateInvoiceSchema } from '@/schemas/create-invoice.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 type FormValues = CreateInvoiceSchema;
 
@@ -189,7 +190,7 @@ export function CreateInvoiceModal({ open, onOpenChange, onSubmit, isSubmitting 
                 <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-sm font-semibold hover:bg-[#183552]">
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <LoadingState variant="inline" text={null} />
                       Menyimpan...
                     </>
                   ) : (

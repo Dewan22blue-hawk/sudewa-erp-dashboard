@@ -1,12 +1,14 @@
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import PurchaseForm from '@/components/features/purchase/PurchaseForm';
 import { usePurchaseById, useUpdatePurchase } from '@/hooks/usePurchase';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { useCompany } from '@/contexts/CompanyContext';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditPurchasePage() {
   const router = useRouter();
@@ -44,9 +46,7 @@ export default function EditPurchasePage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -67,23 +67,20 @@ export default function EditPurchasePage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
-            Pembelian Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0" />
-          <span className="font-medium text-foreground">Edit Pembelian</span>
-        </div>
-
-        {/* Title */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-950">Edit Pembelian</h1>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Kode Beli</span>
-            <span className="text-blue-600 font-medium">{purchase.code}</span>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+            { label: 'Edit Pembelian' }
+          ]}
+          title="Edit Pembelian"
+          subtitle={
+            <>
+              <span>Kode Beli:</span>
+              <span className="text-blue-600 font-semibold">{purchase.code}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+        />
 
         <Card className="rounded-md border border-gray-200 shadow-none">
           <CardContent className="p-6">

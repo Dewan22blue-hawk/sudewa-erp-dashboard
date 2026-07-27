@@ -19,6 +19,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from '@/lib/utils';
 import { useUnitFormula } from '@/hooks/useUnitFormula';
 import { useTaxes, useTaxDefault } from '@/hooks/useTax';
+import { useTypeUnits } from '@/hooks/useTypeUnit';
 import type { Tax } from '@/@types/tax.types';
 
 interface EditUnitFormProps {
@@ -63,6 +64,14 @@ export function EditUnitForm({
   const { data: taxesData } = useTaxes();
   const { data: defaultDppTax } = useTaxDefault('dpp');
   const { data: defaultPpnTax } = useTaxDefault('ppn');
+  const { data: typeUnitData } = useTypeUnits();
+
+  const typeUnitList = useMemo(() => {
+    const list = typeUnitData?.data;
+    if (Array.isArray(list)) return list;
+    if (list && Array.isArray((list as any).data)) return (list as any).data;
+    return [];
+  }, [typeUnitData]);
 
   const taxOptions = useMemo<Tax[]>(() => {
     const list = (taxesData as any)?.data;
@@ -117,7 +126,7 @@ export function EditUnitForm({
   const biayaBbn = Number(form.watch('biayaBbn') ?? defaultValues?.biayaBbn ?? 0);
   const biayaEkspedisi = Number(form.watch('biayaEkspedisi') ?? defaultValues?.biayaEkspedisi ?? 0);
   const biayaLain = Number(form.watch('biayaLain') ?? defaultValues?.biayaLain ?? 0);
-  const unitOptions = productOptions ?? PRODUCT_OPTIONS;
+  const unitOptions = productOptions;
 
   const { formula } = useUnitFormula({
     qty_total: qty,
@@ -151,7 +160,7 @@ export function EditUnitForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         {/* Section Header */}
         <div>
           <h2 className="text-xl font-semibold text-foreground tracking-tight">Informasi Penjualan</h2>
@@ -201,7 +210,7 @@ export function EditUnitForm({
                                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 <span className={cn('truncate', !field.value && 'text-muted-foreground')}>
-                                  {unitOptions.find((option) => option.value === field.value)?.label ?? 'Select an item'}
+                                  {unitOptions?.find((option) => option.value === field.value)?.label ?? 'Select an item'}
                                 </span>
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </button>
@@ -213,9 +222,14 @@ export function EditUnitForm({
                               <CommandList>
                                 <CommandEmpty>Tipe Unit tidak ditemukan.</CommandEmpty>
                                 <CommandGroup>
-                                  {unitOptions.map((option) => (
+                                  {unitOptions?.map((option) => (
                                     <CommandItem key={option.value} value={option.label} onSelect={() => {
                                       field.onChange(option.value);
+                                      const matched = typeUnitList.find((item: any) => String(item.id) === String(option.value));
+                                      const sellPriceVal = matched?.sellPrice ?? matched?.sell_price;
+                                      if (sellPriceVal !== undefined && sellPriceVal !== null) {
+                                        form.setValue('harga', Number(sellPriceVal));
+                                      }
                                       setOpenTypeSelect(false);
                                     }}>
                                       <Check className={cn('mr-2 h-4 w-4', field.value === option.value ? 'opacity-100' : 'opacity-0')} />
@@ -228,14 +242,21 @@ export function EditUnitForm({
                           </PopoverContent>
                         </Popover>
                       ) : (
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
+                        <Select onValueChange={(val) => {
+                          field.onChange(val);
+                          const matched = typeUnitList.find((item: any) => String(item.id) === String(val));
+                          const sellPriceVal = matched?.sellPrice ?? matched?.sell_price;
+                          if (sellPriceVal !== undefined && sellPriceVal !== null) {
+                            form.setValue('harga', Number(sellPriceVal));
+                          }
+                        }} defaultValue={field.value} disabled={readOnly}>
                           <FormControl>
                             <SelectTrigger className="w-full bg-transparent">
                               <SelectValue placeholder="Select an item" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {unitOptions.map((option) => (
+                            {unitOptions?.map((option) => (
                               <SelectItem key={option.value} value={option.value}>
                                 {option.label}
                               </SelectItem>
@@ -547,6 +568,7 @@ export function EditUnitForm({
                         type="button"
                         role="combobox"
                         aria-expanded={openDppTaxSelect}
+                        aria-controls="dpp-tax-list"
                         disabled={readOnly}
                         className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
                       >
@@ -559,7 +581,7 @@ export function EditUnitForm({
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
                         <CommandInput placeholder="Cari pajak..." />
-                        <CommandList>
+                        <CommandList id="dpp-tax-list">
                           <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
                           <CommandGroup>
                             {taxOptions.map((tax) =>
@@ -602,6 +624,7 @@ export function EditUnitForm({
                         type="button"
                         role="combobox"
                         aria-expanded={openPpnTaxSelect}
+                        aria-controls="ppn-tax-list"
                         disabled={readOnly}
                         className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
                       >
@@ -614,7 +637,7 @@ export function EditUnitForm({
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
                         <CommandInput placeholder="Cari pajak..." />
-                        <CommandList>
+                        <CommandList id="ppn-tax-list">
                           <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
                           <CommandGroup>
                             {taxOptions.map((tax) =>

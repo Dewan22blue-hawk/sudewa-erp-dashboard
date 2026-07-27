@@ -172,7 +172,7 @@ export const getTransindoMenus = (slug: string): MenuItem[] => {
       ],
     },
     {
-      label: 'Settings',
+      label: 'Pengaturan',
       icon: Settings,
       children: [
         {

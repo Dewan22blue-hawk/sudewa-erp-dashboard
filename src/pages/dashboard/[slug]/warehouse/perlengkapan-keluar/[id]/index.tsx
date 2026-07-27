@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { UploadInvoiceModal } from '@/components/features/material-receipt/UploadInvoiceModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -14,6 +15,7 @@ import { useMaterialTransaction, useMaterialTransactionItems, useUploadMaterialT
 import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '';
@@ -74,7 +76,7 @@ export default function MaterialReleaseDetailPage() {
   if (transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat detail pengeluaran perlengkapan...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -82,7 +84,7 @@ export default function MaterialReleaseDetailPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
       </DashboardLayout>
     );
   }
@@ -90,17 +92,22 @@ export default function MaterialReleaseDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="space-y-1">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">Data Pengeluaran Material</h1>
-          <p className="text-[16px] text-slate-500">
-            No Pengeluaran <span className="font-medium text-blue-600">{transaction.code}</span>
-          </p>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/perlengkapan-keluar`) },
+            { label: 'Detail' }
+          ]}
+          title="Data Pengeluaran Perlengkapan"
+          subtitle={
+            <div className="flex items-center gap-2">
+              No Pengeluaran
+              {transaction?.code && (
+                <span className="font-medium text-[#1f4163]">{transaction.code}</span>
+              )}
+            </div>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/perlengkapan-keluar`)}
+        />
 
         <Card className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-none">
           <div className="space-y-6">
@@ -168,7 +175,7 @@ export default function MaterialReleaseDetailPage() {
             <TableBody>
               {itemsQuery.isLoading || itemsQuery.isFetching ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-slate-500">Memuat item material...</TableCell>
+                  <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat item material..." /></TableCell>
                 </TableRow>
               ) : items.length === 0 ? (
                 <TableRow>

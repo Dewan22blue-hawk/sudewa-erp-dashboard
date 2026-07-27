@@ -12,6 +12,7 @@ export interface Tax {
   code: string;
   name: string;
   is_lock: number | boolean;
+  tax_version_count: number;
   created_at?: string;
   tax_versions?: TaxVersion[];
 }

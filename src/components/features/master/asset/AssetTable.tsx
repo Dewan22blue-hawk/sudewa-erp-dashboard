@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Upload } from 'lucide-react';
 import type { Asset } from '@/@types/asset.types';
-import { formatDateUI } from '@/lib/utils/date';
 import { CopyBox } from '@/components/ui/copy-box';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 interface AssetTableProps {
     assets: Asset[];
@@ -60,12 +58,6 @@ export function AssetTable({
     const columns = useMemo<ColumnDef<Asset>[]>(
         () => [
             {
-                header: 'NO',
-                alignment: 'center',
-                className: 'w-12',
-                cell: (_item, index) => (page - 1) * perPage + index + 1,
-            },
-            {
                 header: 'KODE ASET',
                 accessorKey: 'code',
                 className: 'font-medium text-slate-900 uppercase',
@@ -77,28 +69,8 @@ export function AssetTable({
                 cell: (item) => formatAssetType(item.type),
             },
             {
-                header: 'SERIAL NUMBER',
-                accessorKey: 'serial_number',
-                className: 'uppercase',
-                cell: (item) => <CopyBox text={item.serial_number || '-'} />,
-            },
-            {
                 header: 'NAMA BARANG',
                 accessorKey: 'name',
-            },
-            {
-                header: 'TGL BELI',
-                accessorKey: 'purchase_date',
-                alignment: 'center',
-                className: 'whitespace-nowrap',
-                cell: (item) => formatDateUI(item.purchase_date),
-            },
-            {
-                header: 'HARGA BELI',
-                accessorKey: 'price',
-                alignment: 'center',
-                className: 'font-medium text-slate-900',
-                cell: (item) => currenciesFormat('idr', item.price),
             },
             {
                 header: 'Aksi',
@@ -111,7 +83,7 @@ export function AssetTable({
                                 <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" /></svg>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-md p-2">
                             <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="cursor-pointer rounded-md px-3 py-2.5 text-slate-700">
                                 Edit
                             </DropdownMenuItem>
@@ -123,7 +95,7 @@ export function AssetTable({
                 ),
             },
         ],
-        [page, perPage, onEdit, onDelete, canEdit, canDelete],
+        [onEdit, onDelete, canEdit, canDelete],
     );
 
     return (

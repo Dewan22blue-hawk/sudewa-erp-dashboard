@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { InvoicePreviewModal } from '@/components/features/goods-receipt/InvoicePreviewModal';
 import { useGoodsReceipt } from '@/hooks/useGoodsReceipt';
 import { formatCurrency, formatLongDate, getReceiptBilling } from '@/components/features/goods-receipt/goods-receipt.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function GoodsReceiptDetailPage() {
   const router = useRouter();
@@ -25,29 +27,26 @@ export default function GoodsReceiptDetailPage() {
   const payments = billing?.payments ?? [];
 
   if (query.isLoading) {
-    return <DashboardLayout><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat detail penerimaan material...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!receipt) {
-    return <DashboardLayout><div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail penerimaan material tidak ditemukan.</div></DashboardLayout>;
+    return <DashboardLayout><div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail penerimaan material tidak ditemukan.</div></DashboardLayout>;
   }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/penerimaan-material`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-[24px] font-semibold text-slate-900">Data Penerimaan Material</h1>
-            <p className="text-[13px] text-slate-400">Detail</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Penerimaan Material', onClick: () => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`) },
+            { label: 'Detail' }
+          ]}
+          title="Data Penerimaan Material"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`)}
+        />
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-6">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Penerimaan</h2>
@@ -82,7 +81,7 @@ export default function GoodsReceiptDetailPage() {
           </div>
         </Card>
 
-        <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white shadow-sm">
           <Table>
             <TableHeader className="bg-slate-100">
               <TableRow className="border-slate-200">
@@ -115,7 +114,7 @@ export default function GoodsReceiptDetailPage() {
           </Table>
         </Card>
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-5">
             <h2 className="text-[18px] font-semibold text-slate-900">Informasi Billing</h2>
             <div className="grid gap-4 md:grid-cols-2">

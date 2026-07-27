@@ -13,6 +13,7 @@ import { DeleteTransactionDialog } from '@/components/features/transaction/Delet
 import { Plus, Search } from 'lucide-react';
 import { Transaction } from '@/@types/transaction.types';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 // This page implements the List view
 export default function TransactionListPage() {
@@ -96,9 +97,7 @@ export default function TransactionListPage() {
 
                 {/* TABLE */}
                 {isListLoading ? (
-                    <div className="h-64 flex items-center justify-center border rounded-md bg-white">
-                        <span className="animate-pulse text-muted-foreground">Loading transactions...</span>
-                    </div>
+                    <LoadingState variant="page" />
                 ) : (
                     <TransactionTable data={data?.data || []} onEdit={handleEdit} onDelete={handleDelete} canEdit={canEdit} canDelete={canDelete} />
                 )}

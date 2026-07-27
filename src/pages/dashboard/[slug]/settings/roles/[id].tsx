@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,6 +10,7 @@ import { useUserOptions, useAssignRole, useRevokeRole } from '@/hooks/useUser';
 import { toast } from 'sonner';
 import { ChevronLeft, Shield, UserPlus, UserMinus } from 'lucide-react';
 import { ApiResponseError } from '@/lib/api/response';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function RoleDetailPage() {
   const router = useRouter();
@@ -67,22 +69,20 @@ export default function RoleDetailPage() {
     <DashboardLayout>
       <div className="max-w-5xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full h-10 w-10">
-            <ChevronLeft size={20} />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-950 tracking-tight">Detail Peran</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Lihat informasi peran, kelola penugasan pengguna, dan daftar izin akses.</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Hak Akses', onClick: () => router.push(`/dashboard/${slug}/settings/roles`) },
+            { label: 'Detail' }
+          ]}
+          title="Detail Peran"
+          subtitle="Lihat informasi peran, kelola penugasan pengguna, dan daftar izin akses."
+          onBack={handleBack}
+        />
 
         {isLoadingRole ? (
-          <div className="bg-white rounded-2xl border p-12 text-center text-gray-500 font-medium">
-            Memuat data peran...
-          </div>
+          <LoadingState variant="page" />
         ) : isErrorRole || !role ? (
-          <div className="bg-white rounded-2xl border p-12 text-center text-red-500 font-medium">
+          <div className="bg-white rounded-md border p-12 text-center text-red-500 font-medium">
             Gagal memuat detail peran atau peran tidak ditemukan.
           </div>
         ) : (
@@ -90,7 +90,7 @@ export default function RoleDetailPage() {
             {/* Left/Main Column - Users & Management */}
             <div className="lg:col-span-2 space-y-6">
               {/* Card: Role Info Header (Without technical stuff like guard_name) */}
-              <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
+              <div className="bg-white rounded-md border p-6 shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-md bg-indigo-50 flex items-center justify-center text-indigo-600">
                     <Shield size={20} />
@@ -103,7 +103,7 @@ export default function RoleDetailPage() {
               </div>
 
               {/* Card: Users List */}
-              <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-6">
+              <div className="bg-white rounded-md border p-6 shadow-sm space-y-6">
                 <div>
                   <h3 className="text-base font-semibold text-gray-900">Daftar Pengguna</h3>
                   <p className="text-xs text-gray-500 mt-0.5">Pengguna yang saat ini memiliki peran &quot;{role.name}&quot;.</p>
@@ -171,8 +171,8 @@ export default function RoleDetailPage() {
                             </td>
                             <td className="px-4 py-3.5">
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${user.is_active === 1
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                  : 'bg-slate-50 text-slate-700 border-slate-200'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : 'bg-slate-50 text-slate-700 border-slate-200'
                                 }`}>
                                 {user.is_active === 1 ? 'Aktif' : 'Non-aktif'}
                               </span>
@@ -200,7 +200,7 @@ export default function RoleDetailPage() {
             </div>
 
             {/* Right Column - Permissions List */}
-            <div className="bg-white rounded-2xl border p-6 shadow-sm space-y-6 h-fit max-h-[80vh] flex flex-col">
+            <div className="bg-white rounded-md border p-6 shadow-sm space-y-6 h-fit max-h-[80vh] flex flex-col">
               <div>
                 <h3 className="text-base font-semibold text-gray-900">Izin Akses (Permissions)</h3>
                 <p className="text-xs text-gray-500 mt-0.5">Daftar hak akses yang diaktifkan untuk peran ini.</p>
@@ -227,7 +227,7 @@ export default function RoleDetailPage() {
 
       {/* Revoke Role Confirmation Modal */}
       <Dialog open={!!userToRevoke} onOpenChange={(open) => !open && setUserToRevoke(null)}>
-        <DialogContent className="max-w-[420px] rounded-2xl">
+        <DialogContent className="max-w-[420px] rounded-md">
           <DialogHeader>
             <DialogTitle>Lepas Peran Dari Pengguna?</DialogTitle>
             <DialogDescription className="pt-2 text-sm text-gray-500 leading-normal">

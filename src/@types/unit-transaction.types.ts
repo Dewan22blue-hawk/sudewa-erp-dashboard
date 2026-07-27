@@ -75,6 +75,7 @@ export interface UnitTransaction {
   stock_state: string;
   unit_transaction_billing?: UnitTransactionBilling | null;
   isPaid: boolean;
+  isRefunded: boolean | string | null;
   paymentAt: string | null;
   remainingPayment: number;
 }
@@ -309,6 +310,7 @@ export interface WarehouseStockUnit {
   unit_type_id?: string;
   warehouse_id?: string;
   in_stock?: boolean;
+  status?: string | undefined;
 }
 
 export interface UnitTransactionItemSalesAssignment {

@@ -35,7 +35,7 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
                         <div className="space-y-2">
                             <Label className="text-sm font-semibold text-gray-900">Tanggal Beli</Label>
                             <Input
-                                value={asset.purchase_date}
+                                value={asset.purchase_date ? new Date(asset.purchase_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'}
                                 disabled
                                 className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
                             />
@@ -106,12 +106,21 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
                                 className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
                             />
                         </div>
+
+                        <div className="space-y-2 md:col-span-3">
+                            <Label className="text-sm font-semibold text-gray-900">Keterangan / Deskripsi</Label>
+                            <textarea
+                                value={asset.description || '-'}
+                                disabled
+                                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 shadow-sm cursor-not-allowed min-h-[100px] resize-none"
+                            />
+                        </div>
                     </div>
                 </div>
             </Card>
 
             <div className="flex items-center justify-center pt-4">
-                <Button type="button" onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Button type="button" onClick={onBack} className="px-8 bg-[#1e3a5f] hover:bg-[#152e4d] text-white flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" />
                     Kembali
                 </Button>

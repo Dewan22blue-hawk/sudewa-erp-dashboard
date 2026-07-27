@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from "next/router"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, Loader2 } from "lucide-react"
+import { ArrowLeft, ChevronRight } from "lucide-react"
 import { PaymentFormData, PurchasePaymentForm } from "@/components/features/purchase/PurchasePaymentForm"
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import {
@@ -19,6 +20,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { getHistoryTotalIdrEquivalent } from '@/utils/payment-helpers';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const readApiError = (error: any): string => {
     const stringifyDetail = (value: unknown): string => {
@@ -79,7 +81,7 @@ const readCheckRightAmountError = (error: any): string => {
         })
         .join('; ');
 
-    return `Pembayaran belum bisa diproses. Detail unit belum lengkap -> ${detailText}.`;
+    return `Pembayaran belum bisa diproses. Detail unit belum lengkap asd ${detailText}.`;
 };
 
 const getInvalidItemIds = (error: any): string[] => {
@@ -235,9 +237,7 @@ export default function PurchasePaymentPage() {
     if (purchaseLoading || billingLoading || historyLoading) {
         return (
             <DashboardLayout>
-                <div className="flex h-[50vh] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
+                <LoadingState variant="page" />
             </DashboardLayout>
         )
     }
@@ -258,21 +258,21 @@ export default function PurchasePaymentPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => router.back()}
-                            className="text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                            <ArrowLeft className="h-5 w-5" />
-                        </button>
-                        <h1 className="text-2xl font-semibold tracking-tight">Pembayaran Unit</h1>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1 ml-7 text-xs">
-                        <span className="text-muted-foreground">Kode Beli</span>
-                        <span className="text-blue-500 font-medium">{purchase.code}</span>
-                    </div>
-                </div>
+                <PageHeader
+                    breadcrumbs={[
+                        { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+                        { label: 'Detail Pembelian', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`) },
+                        { label: 'Billing Pembelian Unit' }
+                    ]}
+                    title="Billing Pembelian Unit"
+                    subtitle={
+                        <>
+                            <span>Kode Beli:</span>
+                            <span className="text-blue-600 font-semibold">{purchase.code}</span>
+                        </>
+                    }
+                    onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}
+                />
 
                 <Card className="rounded-md">
                     <CardContent className="p-6">

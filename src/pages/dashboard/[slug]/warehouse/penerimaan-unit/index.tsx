@@ -1,4 +1,5 @@
 'use client';
+import { LoadingState } from '@/components/ui/loading-state';
 
 import { useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
@@ -8,7 +9,7 @@ import PenerimaanUnitTable from '@/components/features/penerimaan-unit/Penerimaa
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function PenerimaanUnitPage() {
   const [search, setSearch] = useState('');
@@ -63,12 +64,12 @@ export default function PenerimaanUnitPage() {
       <div className="space-y-6">
         <PageHeader
           title="Penerimaan Unit"
-          description="Kelola dan lacak semua data penerimaan stock unit"
+          subtitle="Kelola dan lacak semua data penerimaan stock unit"
         />
 
         <div className="space-y-4">
           {isLoading ? (
-            <div className="bg-white rounded-md border p-8 text-center text-gray-500">Loading...</div>
+            <LoadingState variant="page" />
           ) : isError ? (
             <div className="bg-white rounded-md border p-8 text-center text-red-500">{apiErrorMessage}</div>
           ) : (
@@ -91,7 +92,7 @@ export default function PenerimaanUnitPage() {
                 canCreate && (
                   <Button onClick={() => setOpenForm(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah Penerimaan Unit
+                    Tambah Data Penerimaan Unit
                   </Button>
                 )
               }

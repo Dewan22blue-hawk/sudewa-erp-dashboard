@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DOEkspedisiDetailForm } from '@/components/features/do-ekspedisi/DOEkspedisiDetailForm';
 import { useDoEkspedisiCustomerLookup, useDoEkspedisiDetail, useDoEkspedisiItemDetail, useDoEkspedisiItemDestinations } from '@/hooks/useDoEkspedisi';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DetailDOEkspedisiItemPage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function DetailDOEkspedisiItemPage() {
   if (detailQuery.isLoading || destinationQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-64 items-center justify-center text-slate-500">Memuat detail item DO...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

@@ -1,0 +1,81 @@
+import * as React from 'react';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export interface LoadingStateProps {
+  /**
+   * Variasi tampilan loading state.
+   * - `page`: Memusatkan loading secara vertikal dan horizontal dengan tinggi minimal 50vh.
+   * - `section`: Loading dengan padding menengah (py-10). Cocok untuk di dalam card.
+   * - `inline`: Loading tanpa margin/padding (inline flex).
+   * - `fullscreen`: Menutupi seluruh layar dengan backdrop semi transparan.
+   * @default "page"
+   */
+  variant?: 'page' | 'section' | 'inline' | 'fullscreen';
+  /**
+   * Teks yang ditampilkan di bawah atau di samping spinner.
+   * Berikan nilai `null` untuk menyembunyikan teks.
+   * @default "Memuat data..." (untuk variant page, section, fullscreen)
+   */
+  text?: React.ReactNode | null;
+  /**
+   * Tambahan class untuk container (pembungkus) loading.
+   */
+  className?: string;
+  /**
+   * Tambahan class untuk ikon spinner (misal untuk merubah warna/ukuran).
+   */
+  iconClassName?: string;
+}
+
+export function LoadingState({
+  variant = 'page',
+  text,
+  className,
+  iconClassName,
+}: LoadingStateProps) {
+  const isInline = variant === 'inline';
+
+  // Set default text jika tidak secara eksplisit di-set null
+  const defaultText = text === undefined && !isInline ? 'Memuat data...' : text;
+
+  const getContainerClassName = () => {
+    switch (variant) {
+      case 'fullscreen':
+        return 'fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/80 backdrop-blur-sm';
+      case 'page':
+        return 'flex h-[50vh] min-h-[300px] flex-col items-center justify-center gap-4';
+      case 'section':
+        return 'flex flex-col items-center justify-center gap-3 py-10';
+      case 'inline':
+        return 'inline-flex items-center gap-2';
+      default:
+        return '';
+    }
+  };
+
+  const getIconClassName = () => {
+    switch (variant) {
+      case 'fullscreen':
+      case 'page':
+        return 'h-8 w-8 text-muted-foreground';
+      case 'section':
+        return 'h-6 w-6 text-muted-foreground';
+      case 'inline':
+        return 'h-4 w-4 text-muted-foreground';
+      default:
+        return 'h-5 w-5';
+    }
+  };
+
+  return (
+    <div className={cn(getContainerClassName(), className)}>
+      <Loader2 className={cn('animate-spin', getIconClassName(), iconClassName)} />
+      {defaultText !== null && (
+        <p className={cn('text-sm text-muted-foreground animate-pulse', isInline && 'text-xs')}>
+          {defaultText}
+        </p>
+      )}
+    </div>
+  );
+}

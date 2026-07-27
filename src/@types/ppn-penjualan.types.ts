@@ -20,14 +20,15 @@ export interface UnitTransactionItemDetail {
 export interface PPNPenjualan {
   id: number;
   code: string;
-  sales_date: string;
-  customer: string;
-  fpm_date: string | null;
-  nsfpm_age: string | null;
+  buy_date: string;
+  supplier: string;
+  fp_date: string | null;
+  nsfp_age: string | null;
   qty: number;
   unit_type: UnitType;
   unit_transaction_item_detail: UnitTransactionItemDetail;
   unit_price: number;
+  total_price: number;
   dpp_amount: number;
   ppn_11: number;
   payment_amount: number;
@@ -35,8 +36,8 @@ export interface PPNPenjualan {
 }
 
 export interface UpdatePPNPenjualanPayload {
-  fpm_date?: string;
-  nsfpm_age?: string;
+  fp_date?: string;
+  nsfp_age?: string;
   amount?: number;
   nsfp_number?: string;
 }
@@ -59,15 +60,15 @@ export interface PPNPenjualanUpdateResponse {
   errors: Record<string, string[]> | null;
   data: {
     id: number;
-    fpm_date: string | null;
-    nsfpm_age: string | null;
+    fp_date: string | null;
+    nsfp_age: string | null;
     amount: string;
   };
 }
 
 export const UpdatePPNPenjualanSchema = z.object({
-  fpm_date: z.date().optional().nullable(),
-  nsfpm_age: z.date().optional().nullable(),
+  fp_date: z.date().optional().nullable(),
+  nsfp_age: z.date().optional().nullable(),
   amount: z.number().optional().nullable(),
   nsfp_number: z.string().optional().nullable(),
 });

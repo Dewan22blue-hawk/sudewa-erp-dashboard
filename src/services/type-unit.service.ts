@@ -116,12 +116,18 @@ const normalizeList = (
   return walk(data);
 };
 
-export const getTypeUnits = async (params?: { in_stock?: boolean }): Promise<TypeUnitListResponse> => {
+export const getTypeUnits = async (params?: {
+  in_stock?: boolean | string;
+  company_id?: number | string;
+  sort_by?: string;
+  sort_order?: string;
+}): Promise<TypeUnitListResponse> => {
   const response = await apiClient.get<TypeUnitListApiResponse>(basePath, {
     params: {
-      sort_by: 'created_at',
-      sort_order: 'desc',
+      sort_by: params?.sort_by || 'created_at',
+      sort_order: params?.sort_order || 'desc',
       in_stock: params?.in_stock,
+      company_id: params?.company_id,
     },
   });
   const data = ensureSuccess(response.data);
@@ -146,6 +152,35 @@ export const getTypeUnitById = async (id: number | string, options?: { companyId
   });
   const data = ensureSuccess(response.data);
   return mapTypeUnit(data);
+};
+
+export type TypeUnitDetailParams = {
+  company_id?: number | string;
+  in_stock?: boolean | string;
+  color?: string;
+  machine_number?: string;
+  chassis_number?: string;
+  sort_by?: string;
+  sort_dir?: string;
+  per_page?: number | string;
+  page?: number | string;
+};
+
+export const getTypeUnitDetail = async (id: number | string, params?: TypeUnitDetailParams): Promise<any> => {
+  const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/${id}`, {
+    params: {
+      company_id: params?.company_id,
+      in_stock: params?.in_stock,
+      color: params?.color || undefined,
+      machine_number: params?.machine_number || undefined,
+      chassis_number: params?.chassis_number || undefined,
+      sort_by: params?.sort_by || 'created_at',
+      sort_dir: params?.sort_dir || 'asc',
+      per_page: params?.per_page || 5,
+      page: params?.page || 1,
+    },
+  });
+  return ensureSuccess(response.data);
 };
 
 const buildPayload = (payload: TypeUnitPayload, opts?: { asUpdate?: boolean }) => {

@@ -92,7 +92,7 @@ export const checkTokenValidity = async (): Promise<TokenValidityStatus> => {
     const data = await response.json();
     return data?.status === true ? 'valid' : 'invalid';
   } catch (error: any) {
-    console.error('[Token Validation] Error checking token validity:', error);
+    console.warn('[Token Validation] Error checking token validity:', error?.message || error);
     return 'unknown';
   }
 };

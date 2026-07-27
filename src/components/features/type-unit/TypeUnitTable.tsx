@@ -135,6 +135,9 @@ export function TypeUnitTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/${slugStr}/master/type-unit/${item.id}`)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                Detail
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                 Edit
               </DropdownMenuItem>
@@ -146,7 +149,7 @@ export function TypeUnitTable({
         ),
       },
     ],
-    [canEdit, canDelete, onEdit, onDelete, slugStr]
+    [canEdit, canDelete, onEdit, onDelete, slugStr, router]
   );
 
   return (

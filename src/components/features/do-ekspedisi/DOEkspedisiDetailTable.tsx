@@ -1,11 +1,12 @@
 import React from 'react';
-import { MoreVertical, Loader2, Search } from 'lucide-react';
+import { MoreVertical, Search } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DoEkspedisiItem } from '@/@types/do-ekspedisi.types';
 import { formatCurrency } from '@/lib/utils/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface DOEkspedisiDetailTableProps {
   data: DoEkspedisiItem[];
@@ -57,10 +58,7 @@ export function DOEkspedisiDetailTable({
         {isLoading ? (
           <tr>
             <td colSpan={100} className="px-4 py-16 text-center bg-white">
-              <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-              </div>
+              <LoadingState variant="section" text="Memuat data..." />
             </td>
           </tr>
         ) : data.length > 0 ? (

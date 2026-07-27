@@ -90,7 +90,7 @@ export function GoodsReceiptEquipmentDetailTable({
                         <MoreVertical className="h-4 w-4 text-slate-700" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
+                    <DropdownMenuContent align="end" className="w-36 rounded-md border-slate-200 p-2 shadow-lg">
                       <DropdownMenuItem
                         onClick={() => onEdit(item)}
                         className="cursor-pointer rounded-md px-3 py-2 text-[16px]"

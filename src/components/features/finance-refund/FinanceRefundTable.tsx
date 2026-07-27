@@ -1,18 +1,92 @@
 import { useMemo, useState } from 'react';
-import { ColumnDef, SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowUpDown, ArrowUp, ArrowDown, Loader2, Search } from 'lucide-react';
 import type { FinanceRefundRecord, RefundTransactionType } from '@/@types/finance-refund.types';
 import type { PaginationMeta } from '@/@types/pagination.types';
 import FinanceRefundApprovalModal from '@/components/features/finance-refund/FinanceRefundApprovalModal';
 import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadge';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency } from '@/lib/utils/currency';
-import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { TextTruncate } from '@/components/ui/text-truncate';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Trash2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useDeleteFinanceRefund } from '@/hooks/useFinanceRefund';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+const DeleteFinanceRefundAction = ({ item, transactionType }: { item: FinanceRefundRecord, transactionType: RefundTransactionType }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
+  const deleteMutation = useDeleteFinanceRefund(transactionType);
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip open={isOpen} onOpenChange={setIsOpen}>
+        <TooltipTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="flex h-8 w-8 p-0 items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(true);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent 
+          side="top" 
+          align="center" 
+          sideOffset={10}
+          collisionPadding={10}
+          className="w-[280px] sm:w-[320px] max-w-[calc(100vw-2rem)] bg-white text-slate-800 p-3 sm:p-4 shadow-2xl border border-slate-200 z-[9999] pointer-events-auto break-words whitespace-normal" 
+          onPointerDownOutside={() => setIsOpen(false)}
+          onMouseLeave={() => {}}
+        >
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Konfirmasi Hapus</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 whitespace-normal">Unit akan diperbarui stock status nya juga.</p>
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id={`checkbox-${item.id}`}
+                checked={isChecked}
+                onCheckedChange={(c) => setIsChecked(c as boolean)}
+                className="mt-0.5"
+              />
+              <label htmlFor={`checkbox-${item.id}`} className="text-[11px] sm:text-xs font-medium cursor-pointer leading-tight">
+                Hapus Data Finance Refund {transactionType === 'sales' ? 'Jual' : 'Beli'}
+              </label>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button size="sm" variant="outline" onClick={() => setIsOpen(false)} className="h-7 text-[11px] sm:text-xs px-2 sm:px-3">Batal</Button>
+              <Button
+                size="sm"
+                className="h-7 text-[11px] sm:text-xs bg-red-600 hover:bg-red-700 px-2 sm:px-3 text-white"
+                disabled={deleteMutation.isPending}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    await deleteMutation.mutateAsync({ refundId: item.id, deleteFinanceRefund: isChecked });
+                    toast.success('Data berhasil dihapus');
+                    setIsOpen(false);
+                  } catch (err: any) {
+                    toast.error(err.message || 'Gagal menghapus data');
+                  }
+                }}
+              >
+                {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+              </Button>
+            </div>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 interface FinanceRefundTableProps {
   data: FinanceRefundRecord[];
@@ -30,229 +104,137 @@ const formatDate = (value: string) => {
   return date.toLocaleDateString('id-ID');
 };
 
-const getColumnAlignment = (columnId: string): 'left' | 'center' => {
-  if (['refundDate', 'totalTransaction', 'refundAmount', 'status', 'actions'].includes(columnId)) {
-    return 'center';
-  }
-  return 'left';
-};
-
 export default function FinanceRefundTable({ data, meta, page, isLoading = false, transactionType, onPageChange }: FinanceRefundTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'refundDate', desc: true }]);
   const [selectedRefund, setSelectedRefund] = useState<FinanceRefundRecord | null>(null);
   const router = useRouter();
   const { slug } = router.query;
   const slugStr = typeof slug === 'string' ? slug : '';
 
   const columns = useMemo<ColumnDef<FinanceRefundRecord>[]>(
-    () => {
-      const baseColumns: ColumnDef<FinanceRefundRecord>[] = [
-        {
-          accessorKey: 'refundCode',
-          header: 'KODE REFUND',
-          cell: ({ row }) => <CopyBox text={row.original.refundCode} />
-        },
-        {
-          accessorKey: 'transactionCode',
-          header: transactionType === 'sales' ? 'NO PENJUALAN' : 'NO PEMBELIAN',
-          cell: ({ row }) => <CopyBox text={row.original.transactionCode} />,
-        },
-        {
-          accessorKey: 'refundDate',
-          header: 'TANGGAL',
-          cell: ({ row }) => <span className="text-slate-800 font-normal">{formatDate(row.original.refundDate)}</span>,
-        },
-        {
-          accessorKey: 'partnerName',
-          header: transactionType === 'sales' ? 'NAMA CUSTOMER' : 'NAMA SUPPLIER',
-          cell: ({ row }) => row?.original?.partnerName ? <ReferenceLink href={`/dashboard/${slugStr}/master/supplier/${row?.original?.partnerName}`}>{row?.original?.partnerName}</ReferenceLink> : '-'
-        },
-        {
-          accessorKey: 'totalTransaction',
-          header: transactionType === 'sales' ? 'TOTAL PENJUALAN' : 'TOTAL PEMBELIAN',
-          cell: ({ row }) => (
-            <span className="text-slate-800 font-normal">
-              {currenciesFormat('idr', row.original.totalTransaction ?? 0)}
-            </span>
-          ),
-        },
-        {
-          accessorKey: 'refundAmount',
-          header: 'TOTAL REFUND',
-          cell: ({ row }) => <span className="text-slate-800 font-normal">{currenciesFormat('idr', row.original.refundAmount)}</span>,
-        },
-        {
-          accessorKey: 'cashName',
-          header: transactionType === 'sales' ? 'KAS KELUAR' : 'KAS MASUK',
-          cell: ({ row }) => <span className="text-slate-800 font-normal">{row.original.cashName || '-'}</span>,
-        },
-        {
-          accessorKey: 'note',
-          header: 'KETERANGAN',
-          cell: ({ row }) => <span className="text-slate-500 font-normal text-xs line-clamp-2 max-w-xs">{row.original.note || '-'}</span>,
-        },
-      ];
-
-      baseColumns.push(
-        {
-          accessorKey: 'status',
-          header: 'STATUS',
-          cell: ({ row }) => <RefundStatusBadge status={row.original.status} />,
-        },
-        {
-          id: 'actions',
-          header: 'ACTION',
-          cell: ({ row }) => (
+    () => [
+      {
+        header: 'KODE REFUND',
+        accessorKey: 'refundCode',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.refundCode} />,
+      },
+      {
+        header: transactionType === 'sales' ? 'NO PENJUALAN' : 'NO PEMBELIAN',
+        accessorKey: 'transactionCode',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slugStr}/transaksi/${transactionType === 'sales' ? 'penjualan-unit' : 'pembelian-unit'}/${item.transactionId}`}>
+            {item.transactionCode}
+          </ReferenceLink>
+        )
+      },
+      {
+        header: transactionType === 'sales' ? 'NAMA CUSTOMER' : 'NAMA SUPPLIER',
+        accessorKey: 'partnerName',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <ReferenceLink href={`/dashboard/${slugStr}/master/${transactionType === 'sales' ? 'customer' : 'supplier'}?search=${item.partnerName}`}>{item.partnerName}</ReferenceLink>,
+      },
+      {
+        header: 'TANGGAL',
+        accessorKey: 'refundDate',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="text-slate-800 font-normal">{formatDate(item.refundDate)}</span>,
+      },
+      {
+        header: transactionType === 'sales' ? 'TOTAL PENJUALAN' : 'TOTAL PEMBELIAN',
+        accessorKey: 'totalTransaction',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => (
+          <span className="text-slate-800 font-normal">
+            {currenciesFormat('idr', item.totalTransaction ?? 0)}
+          </span>
+        ),
+      },
+      {
+        header: 'TOTAL REFUND',
+        accessorKey: 'refundAmount',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <span className="text-slate-800 font-normal">{currenciesFormat('idr', item.refundAmount)}</span>,
+      },
+      {
+        header: transactionType === 'sales' ? 'KAS KELUAR' : 'KAS MASUK',
+        accessorKey: 'cashName',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => item.cashName ? (
+          <ReferenceLink href={`/dashboard/${slugStr}/master/kas?search=${item.cashName}`}>
+            {item.cashName}
+          </ReferenceLink >
+        ) : <span>-</span>
+      },
+      {
+        header: 'KETERANGAN',
+        accessorKey: 'note',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <TextTruncate maxLength={20} text={item.note || '-'} />,
+      },
+      {
+        header: 'STATUS',
+        accessorKey: 'status',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => <RefundStatusBadge status={item.status} />,
+      },
+      {
+        header: 'AKSI',
+        alignment: 'center',
+        sticky: 'right',
+        className: 'w-[140px] min-w-[140px] max-w-[140px]',
+        headerClassName: 'w-[140px] min-w-[140px] max-w-[140px]',
+        cell: (item) => (
+          <div className="flex flex-col items-center justify-center gap-2 py-1 min-w-[120px]">
             <Button
               size="sm"
-              variant="outline"
-              className="h-8 text-xs font-semibold px-3 font-sans border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors"
+              variant={item.status === 'approve' ? 'outline' : 'default'}
+              className={cn(
+                "h-8 text-xs font-semibold w-full font-sans transition-colors shadow-none whitespace-nowrap",
+                item.status === 'approve' 
+                  ? "border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-800" 
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              )}
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedRefund(row.original);
+                setSelectedRefund(item);
               }}
             >
-              Approval
+              {item.status === 'approve' ? 'Sudah disetujui' : 'Setujui'}
             </Button>
-          ),
-        }
-      );
-
-      return baseColumns;
-    },
-    [transactionType],
+            <DeleteFinanceRefundAction item={item} transactionType={transactionType} />
+          </div>
+        ),
+      }
+    ],
+    [transactionType, slugStr],
   );
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
-
-  const total = meta?.total ?? data.length;
-  const perPage = meta?.perPage ?? (data.length || 10);
-  const start = total === 0 ? 0 : (page - 1) * perPage + 1;
-  const end = total === 0 ? 0 : Math.min(page * perPage, total);
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="text-sm overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-none">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="bg-[#f8f9fa] border-b border-gray-200">
-                  {headerGroup.headers.map((header) => {
-                    const align = getColumnAlignment(header.column.id);
-                    const isSortable = header.column.getCanSort();
-                    const isSorted = header.column.getIsSorted();
-                    const isSortedActive = !!isSorted;
-                    const justifyClass = align === 'center' ? 'justify-center w-full' : 'justify-start';
-                    const title = flexRender(header.column.columnDef.header, header.getContext());
-
-                    return (
-                      <TableHead key={header.id} className={`p-0 text-left bg-[#f8f9fa] border-b border-gray-200 ${header.column.id === 'actions' ? 'sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] text-center' : ''}`}>
-                        {header.isPlaceholder ? null : (
-                          <button
-                            type="button"
-                            className={`flex items-center gap-1 select-none w-full px-4 py-4 text-xs font-semibold uppercase ${isSortable ? 'cursor-pointer group' : 'cursor-default'
-                              } ${isSortedActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'} ${justifyClass}`}
-                            onClick={header.column.getToggleSortingHandler()}
-                            disabled={!isSortable}
-                          >
-                            <span>{title}</span>
-                            {isSortable ? (
-                              isSorted === 'asc' ? (
-                                <ArrowUp className="h-3 w-3 text-indigo-500 shrink-0" />
-                              ) : isSorted === 'desc' ? (
-                                <ArrowDown className="h-3 w-3 text-indigo-500 shrink-0" />
-                              ) : (
-                                <ArrowUpDown className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity duration-150 shrink-0 text-slate-400" />
-                              )
-                            ) : null}
-                          </button>
-                        )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow className="group">
-                  <TableCell colSpan={columns.length} className="py-16 h-40 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="group border-b hover:bg-gray-50/70 border-slate-100 transition-colors cursor-pointer"
-                    onClick={() => setSelectedRefund(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      const align = getColumnAlignment(cell.column.id);
-                      const alignClass = align === 'center' ? 'text-center' : 'text-left';
-                      return (
-                        <TableCell key={cell.id} className={`py-4 px-4 ${alignClass} ${cell.column.id === 'actions' ? 'sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]' : ''}`}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow className="group">
-                  <TableCell colSpan={100} className="py-16 h-40 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-50 p-4 mb-2">
-                        <Search className="h-8 w-8 text-slate-400" />
-                      </div>
-                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between py-2">
-          <div>
-            Showing {start}-{end} of {total} data
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="font-semibold text-slate-600">
-              Previous
-            </Button>
-            {getVisiblePageNumbers(meta?.lastPage ?? 1, page).map((pageNumber) => (
-              <Button
-                key={pageNumber}
-                variant={pageNumber === page ? 'outline' : 'ghost'}
-                size="sm"
-                className="w-9"
-                onClick={() => onPageChange(pageNumber)}
-              >
-                {pageNumber}
-              </Button>
-            ))}
-            <Button variant="ghost" size="sm" disabled={meta ? page >= meta.lastPage : true} onClick={() => onPageChange(page + 1)} className="font-semibold text-slate-600">
-              Next
-            </Button>
-          </div>
-        </div>
-      </div>
+      <BaseTable
+        data={data}
+        columns={columns}
+        loading={isLoading}
+        defaultSort={{ key: 'refundDate', direction: 'desc' }}
+        onRowClick={(item) => setSelectedRefund(item)}
+        meta={meta ? {
+          currentPage: page,
+          perPage: meta.perPage || 10,
+          lastPage: meta.lastPage || 1,
+          total: meta.total || data.length,
+        } : undefined}
+        onPageChange={onPageChange}
+      />
 
       {selectedRefund ? (
         <FinanceRefundApprovalModal

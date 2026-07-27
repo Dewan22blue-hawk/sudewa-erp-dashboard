@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { MoreVertical, Pencil, Plus, Trash, Lock, Play, Eye } from 'lucide-react';
 import type { Tax } from '@/services/tax.service';
 import type { PaginationMeta } from '@/@types/pagination.types';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface TaxTableProps {
   data: Tax[];
@@ -19,12 +20,11 @@ interface TaxTableProps {
   onEdit: (tax: Tax) => void;
   onDelete: (tax: Tax) => void;
   onViewDetail: (tax: Tax) => void;
-  onViewVersion: (tax: Tax) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
 }
 
-export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onViewDetail, onViewVersion, onPageChange, onPerPageChange }: TaxTableProps) => {
+export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false, onSearchChange, onAdd, onEdit, onDelete, onViewDetail, onPageChange, onPerPageChange }: TaxTableProps) => {
   const columns = useMemo<ColumnDef<Tax>[]>(
     () => [
       {
@@ -33,7 +33,7 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
         sortable: true,
         cell: (item) => (
           <div className="flex items-center gap-1.5">
-            <span className="font-semibold text-sm text-gray-900">{item.code}</span>
+            <CopyBox text={item.code} />
             {item.is_lock === 1 || item.is_lock === true ? (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -56,6 +56,12 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
         cell: (item) => <span className="text-sm text-gray-900">{item.name}</span>,
       },
       {
+        header: 'JUMLAH VERSI PAJAK',
+        accessorKey: 'tax_version_count',
+        sortable: true,
+        cell: (item) => <span className="text-sm text-gray-900">{item.tax_version_count || 0} Versi</span>,
+      },
+      {
         header: 'ACTION',
         alignment: 'center',
         sticky: 'right',
@@ -73,13 +79,6 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
               >
                 <Eye className="mr-2 h-4 w-4" />
                 Lihat Detail
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onViewVersion(item)}
-                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Daftar Versi Pajak
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onEdit(item)}
@@ -102,7 +101,7 @@ export const TaxTable = ({ data, meta, search, page, perPage, isLoading = false,
         ),
       },
     ],
-    [onEdit, onDelete, onViewDetail, onViewVersion],
+    [onEdit, onDelete, onViewDetail],
   );
 
   return (

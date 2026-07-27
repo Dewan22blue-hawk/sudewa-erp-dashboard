@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -16,11 +16,13 @@ interface Props {
   lineItems: SalesLineItem[];
   salesId: string;
   onAddUnit?: () => void;
+  canCreate?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  isPaid?: boolean;
 }
 
-export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDelete }: Props) {
+export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEdit, canDelete, isPaid }: Props) {
   const router = useRouter();
   const { data: unitItemsData, isLoading, isError } = useSalesUnitItems(salesId);
   const { data: typeUnits } = useTypeUnits();
@@ -59,10 +61,10 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
     return items.slice(start, start + perPage);
   }, [currentPage, perPage, items]);
 
-  const getUnitTypeName = (id?: string) => {
+  const getUnitTypeName = useCallback((id?: string) => {
     if (!id) return '-';
     return typeUnits?.data?.find((unitType) => String(unitType.id) === String(id))?.name ?? '-';
-  };
+  }, [typeUnits]);
 
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
@@ -94,12 +96,6 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
 
   const columns: ColumnDef<any>[] = useMemo(() => [
     {
-      header: 'No',
-      alignment: 'center',
-      className: 'w-[60px]',
-      cell: (_, idx) => (currentPage - 1) * perPage + idx + 1,
-    },
-    {
       header: 'Tipe Unit',
       cell: (item) => (
         <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${getUnitTypeName(item.unit_type_id)}`}>
@@ -111,7 +107,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
       header: 'QTY',
       alignment: 'center',
       className: 'w-[80px]',
-      cell: (item) => item.qty_total,
+      cell: (item) => item.qty_total + ' Unit',
     },
     {
       header: 'Harga Jual',
@@ -175,24 +171,27 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)} disabled={!canEdit}>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
+            {!isPaid && (
+              <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}/edit`)} disabled={!canEdit && isPaid}>
+                <Pencil className="mr-2 h-4 w-4" /> Edit
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => router.push(`${basePath}/${salesId}/unit/${item.id}`)}>
               <Eye className="mr-2 h-4 w-4" /> Detail
             </DropdownMenuItem>
-            <DropdownMenuItem
+            {!isPaid && (<DropdownMenuItem
               className="text-red-600 focus:bg-red-50 focus:text-red-600"
-              onClick={() => setDeleteId(item.id)}
-              disabled={!canDelete}
+              onClick={() => !isPaid && setDeleteId(item.id)}
+              disabled={!canDelete && isPaid}
             >
               <Trash2 className="mr-2 h-4 w-4" /> Hapus
             </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
     },
-  ], [currentPage, perPage, slug, typeUnits, canEdit, canDelete, basePath, salesId, router]);
+  ], [slug, canEdit, canDelete, basePath, salesId, router, getUnitTypeName, isPaid]);
 
   return (
     <div className="space-y-4">
@@ -207,7 +206,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
             data={pagedData}
             columns={columns}
             loading={isLoading || isError}
-            showCheckbox
+            showCheckbox={!isPaid}
             selectedIds={selectedIds}
             onSelectedIdsChange={setSelectedIds}
             showLimitChange
@@ -229,17 +228,20 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canEdit, canDele
                   <Button
                     size="sm"
                     variant="destructive"
-                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending}
-                    onClick={() => setIsBulkDeleteOpen(true)}
+                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending || isPaid}
+                    onClick={() => !isPaid ? setIsBulkDeleteOpen(true) : undefined}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Bulk Delete ({selectedIds.size})
                   </Button>
                 )}
-                {onAddUnit && canEdit && (
-                  <Button onClick={onAddUnit} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                {onAddUnit && canCreate && (
+                  <Button
+                    onClick={!isPaid ? onAddUnit : undefined}
+                    className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
+                    disabled={isPaid}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Unit
+                    Tambah Data Unit
                   </Button>
                 )}
               </div>

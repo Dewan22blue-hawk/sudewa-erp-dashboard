@@ -8,9 +8,8 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import TransactionForm from '@/components/features/transaction/TransactionForm';
 import { useCreateTransaction } from '@/hooks/useTransaction';
 import { useCompany } from '@/contexts/CompanyContext';
-import { ChevronRight } from 'lucide-react';
-
 import { TransactionFormValues } from '@/scheme/transaction.schema';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function CreateTransactionPage() {
   const router = useRouter();
@@ -46,19 +45,15 @@ export default function CreateTransactionPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(basePath)}>
-            Arus Transaksi
-          </span>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">Tambah Transaksi</span>
-        </div>
-
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Tambahkan Transaksi</h1>
-          <p className="text-sm text-muted-foreground">Masukkan detail transaksi operasional baru</p>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Arus Transaksi', onClick: () => router.push(basePath) },
+            { label: 'Tambah Transaksi' }
+          ]}
+          title="Tambahkan Transaksi"
+          subtitle="Masukkan detail transaksi operasional baru"
+          onBack={() => router.push(basePath)}
+        />
 
         <div className="rounded-md border bg-white p-6 md:p-8">
           <TransactionForm

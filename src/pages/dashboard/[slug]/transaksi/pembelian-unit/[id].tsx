@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
@@ -14,7 +15,7 @@ import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ArrowLeft, ChevronRight, CreditCard, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { TextTruncate } from '@/components/ui/text-truncate';
@@ -26,6 +27,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { formatDate } from '@/lib/utils/format';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -64,6 +67,7 @@ export default function PurchaseDetailPage() {
   const { data: typeUnits } = useTypeUnits();
 
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
+  const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
 
   const billingSummary = purchase?.billing_summary;
   const totalTagihan = Number(billingSummary?.grand_total ?? purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
@@ -107,21 +111,11 @@ export default function PurchaseDetailPage() {
   const historyColumns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'No',
-        alignment: 'center',
-        className: 'w-12',
-        cell: (_, index) => index + 1,
-      },
-      {
         header: 'Tanggal',
         alignment: 'left',
         cell: (history) =>
           history.payment_at
-            ? new Date(history.payment_at).toLocaleDateString('id-ID', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            })
+            ? formatDate(history?.payment_at)
             : '-',
       },
       {
@@ -184,14 +178,17 @@ export default function PurchaseDetailPage() {
 
       if (!warehouseId) {
         toast.error('warehouse_id belum tersedia pada transaksi ini.');
+        setIsReceiveDialogOpen(false);
         return;
       }
       if (!personId) {
         toast.error('person_id belum tersedia pada transaksi ini.');
+        setIsReceiveDialogOpen(false);
         return;
       }
       if (unitItems.length === 0) {
         toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -218,6 +215,7 @@ export default function PurchaseDetailPage() {
           `Detail unit belum lengkap:\n- ${incompleteItems.join('\n- ')}\n\nSilakan klik tombol Action > Detail / Kelola Unit pada tabel di bawah untuk melengkapi nomor rangka, nomor mesin, dan warna setiap unit.`,
           { duration: 8000 }
         );
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -228,6 +226,7 @@ export default function PurchaseDetailPage() {
 
       if (detailIds.length === 0) {
         toast.error('Detail unit transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -243,6 +242,7 @@ export default function PurchaseDetailPage() {
 
       if (stockStateForWarehouse !== PURCHASE_PREPARE_STOCK_STATE) {
         toast.error('State transaksi harus inbound_incoming_goods sebelum membuat warehouse activity.');
+        setIsReceiveDialogOpen(false);
         return;
       }
 
@@ -261,6 +261,7 @@ export default function PurchaseDetailPage() {
       });
 
       toast.success('Status pembelian diperbarui ke receipt dan stok warehouse berhasil diproses.');
+      setIsReceiveDialogOpen(false);
     } catch (error: any) {
       const message = readApiError(error);
 
@@ -272,15 +273,14 @@ export default function PurchaseDetailPage() {
           },
         },
       });
+      setIsReceiveDialogOpen(false);
     }
   };
 
   if (isLoading || unitItemsLoading || billingLoading || historyLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -299,74 +299,65 @@ export default function PurchaseDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}>
-            Pembelian Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="font-medium text-slate-800">Detail Pembelian</span>
-        </div>
-
-        {/* HEADLINE & ACTIONS */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <ArrowLeft className="h-5 w-5 text-slate-700" />
-            </Button>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-slate-900">Data Pembelian</h1>
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <span>Kode Beli:</span>
-                <span className="text-blue-600 font-semibold">{purchase.code}</span>
-                {isPaid ? (
-                  <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
-                    Lunas
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
-                    Belum Lunas
-                  </Badge>
-                )}
-                {isAlreadyReceived ? (
-                  <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                    Stok Diterima
-                  </Badge>
-                ) : null}
-                {isRefunded ? (
-                  <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
-                    Sudah Refund
-                  </Badge>
-                ) : null}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
-              <CreditCard className="mr-2 h-4 w-4" />
-              {isPaid ? 'Sudah Dibayar' : 'Bayar'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-              onClick={() => setIsMarkAsPaidDialogOpen(true)}
-            >
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-white hover:bg-gray-50 border-gray-200"
-              disabled={!canReceive || updateState.isPending}
-              onClick={handleReceipt}
-            >
-              {isAlreadyReceived ? 'Sudah Diterima' : updateState.isPending ? 'Memproses...' : 'Terima Barang'}
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+            { label: 'Detail Pembelian' }
+          ]}
+          title="Data Pembelian"
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)}
+          subtitle={
+            <>
+              <span>Kode Beli:</span>
+              <span className="text-blue-600 font-semibold">{purchase.code}</span>
+              {isPaid ? (
+                <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
+                  Lunas
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700 font-semibold">
+                  Belum Lunas
+                </Badge>
+              )}
+              {isAlreadyReceived ? (
+                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
+                  Stok Diterima
+                </Badge>
+              ) : null}
+              {isRefunded ? (
+                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
+                  Sudah Refund
+                </Badge>
+              ) : null}
+            </>
+          }
+          actions={
+            <>
+              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                {isPaid ? 'Sudah Dibayar' : 'Bayar'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
+                className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setIsMarkAsPaidDialogOpen(true)}
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-white hover:bg-gray-50 border-gray-200"
+                disabled={!canReceive || updateState.isPending}
+                onClick={() => setIsReceiveDialogOpen(true)}
+              >
+                {isAlreadyReceived ? 'Sudah Diterima' : updateState.isPending ? 'Memproses...' : 'Terima Barang'}
+              </Button>
+            </>
+          }
+        />
 
         {isRefunded ? (
           <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">
@@ -410,6 +401,16 @@ export default function PurchaseDetailPage() {
             <DialogDescription className="pt-2">
               Apakah Anda yakin ingin menandai transaksi ini sebagai <strong>Lunas</strong>?
             </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Proses ini akan menambah data baru pada <b>Administrasi Arus Transaksi</b> dan <b>Finance Transaksi Kas Harian</b>, dan data <b>Administrasi</b> yang sudah dibilling tidak bisa dirubah data didalamnya.
+                </span>
+              </div>
+            </div>
           </DialogHeader>
           <DialogFooter className="mt-4 flex justify-end gap-2">
             <Button
@@ -427,6 +428,46 @@ export default function PurchaseDetailPage() {
               disabled={updateBillingIsPaid.isPending}
             >
               {updateBillingIsPaid.isPending ? 'Memproses...' : 'Ya, Tandai Lunas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* CONFIRMATION DIALOG TERIMA BARANG */}
+      <Dialog open={isReceiveDialogOpen} onOpenChange={setIsReceiveDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Terima Barang</DialogTitle>
+            <DialogDescription className="pt-2">
+              Apakah Anda yakin ingin menerima barang ini?
+            </DialogDescription>
+            <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+              <div className="flex gap-2">
+                <span>
+                  <Info />
+                </span>
+                <span>
+                  Dengan klik terima barang maka akan <b>Masuk ke Warehouse</b>.
+                </span>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsReceiveDialogOpen(false)}
+              disabled={updateState.isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleReceipt}
+              disabled={updateState.isPending}
+            >
+              {updateState.isPending ? 'Memproses...' : 'Ya, Terima Barang'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -42,6 +42,46 @@ return (
 
 ---
 
+## 2.1 Standarisasi Header Halaman (PageHeader)
+
+**Aturan**: Untuk seluruh halaman **Detail, Create, Edit, dan Payment** (terutama di dalam modul Transaksi/Administrasi), **WAJIB** menggunakan komponen `PageHeader` (`src/components/ui/page-header.tsx`) menggantikan struktur HTML manual. Komponen ini sudah mengatur layout flex, spacing, dan styling responsif secara seragam.
+
+**Komponen `PageHeader` memiliki properti berikut:**
+- `breadcrumbs`: Array navigasi (opsional). Elemen terakhir akan dirender sebagai teks tebal.
+- `onBack`: Fungsi tombol kembali. Jika diisi, tombol `ArrowLeft` akan muncul otomatis.
+- `title`: Judul utama halaman (string atau ReactNode).
+- `subtitle`: Subjudul atau Metadata khusus (contoh: Kode Unik Transaksi, Badge Status).
+- `actions`: Kumpulan komponen tombol (seperti Bayar, Edit, Print) diletakkan di sisi kanan.
+
+**Contoh Penggunaan:**
+```tsx
+import { PageHeader } from '@/components/ui/page-header';
+
+<PageHeader
+  breadcrumbs={[
+    { label: 'Pembelian Unit', onClick: () => router.push('/...') },
+    { label: 'Detail Pembelian' }
+  ]}
+  onBack={() => router.push('/...')}
+  title="Data Pembelian"
+  subtitle={
+    <>
+      <span>Kode Beli:</span>
+      <span className="text-blue-600 font-semibold">PBL-001</span>
+      <Badge variant="outline">Lunas</Badge>
+    </>
+  }
+  actions={
+    <>
+      <Button variant="outline">Print</Button>
+      <Button>Terima Barang</Button>
+    </>
+  }
+/>
+```
+
+---
+
 ## 3. Tombol Kembali Halaman Detail (Back Button)
 
 **Aturan**: Gunakan komponen `<Button>` variant ghost, size icon, `rounded-md`, border `border-slate-200`, ikon `ArrowLeft` dari `lucide-react`.
@@ -250,10 +290,13 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
   </DropdownMenuTrigger>
   <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
     <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
-      Edit
+      <Eye className="mr-2 h-4 w-4" /> Detail
+    </DropdownMenuItem>
+    <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+      <Pencil className="mr-2 h-4 w-4" /> Edit
     </DropdownMenuItem>
     <DropdownMenuItem className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer">
-      Hapus
+      <Trash2 className="mr-2 h-4 w-4" /> Hapus
     </DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
@@ -673,7 +716,65 @@ import { CopyBox } from '@/components/ui/copy-box';
 
 ---
 
-## 18. Standar Frontend Logic & React Query (Data Fetching, Search, Sort, Export)
+## 18. Standarisasi Indikator Loading (Loading State)
+
+Untuk menyeragamkan tampilan UI/UX saat proses pengambilan data (fetching/loading), **wajib** menggunakan komponen `<LoadingState />` (`src/components/ui/loading-state.tsx`) di seluruh aplikasi (Halaman, Tabel, Form, Button).
+
+**Tujuan**:
+- Menghindari kode *boilerplate* merender `<Loader2>` secara manual berulang kali.
+- Menjaga konsistensi jarak (*padding*, *margin*, dan *alignment*) dan transisi *layout* di seluruh menu aplikasi Wajira.
+- Memberikan fleksibilitas pada berbagai konteks loading (Halaman Penuh, Bagian Kecil, atau Teks Searah).
+
+> 🚫 **PERINGATAN KERAS**: 
+> **DILARANG KERAS** menggunakan custom string loading secara manual seperti: 
+> `<div className="text-center">Loading...</div>` atau `<div className="p-10">Memuat data...</div>`. 
+> Segala bentuk aktivitas *loading state* (baik itu table, page, atau button) **WAJIB** menggunakan `<LoadingState />` yang telah disediakan, tanpa terkecuali, agar UI tidak terlihat "belang" dan tetap terstandarisasi.
+
+**Aturan Penggunaan Variant:**
+
+1. **`variant="page"` (Default)**
+   Digunakan sebagai pengganti loading saat memuat keseluruhan *page* (misalnya di halaman index atau halaman detail). Variant ini mengamankan tinggi minimum (`50vh`) agar footer/layout tidak lompat (*layout shift*).
+   ```tsx
+   import { LoadingState } from '@/components/ui/loading-state';
+
+   if (isLoading) {
+     return (
+       <DashboardLayout>
+         <LoadingState variant="page" />
+       </DashboardLayout>
+     );
+   }
+   ```
+
+2. **`variant="section"`**
+   Digunakan untuk memuat bagian tertentu dari halaman yang berukuran kecil atau menengah, misalnya saat memuat isi Card, daftar dropdown, atau modal. Variant ini memiliki padding vertikal moderat (`py-10`).
+   ```tsx
+   <Card>
+     <CardContent>
+       {isDataLoading ? <LoadingState variant="section" /> : <DataTampil />}
+     </CardContent>
+   </Card>
+   ```
+
+3. **`variant="inline"`**
+   Digunakan untuk loading berukuran kecil yang letaknya berdampingan dengan teks atau aksi (*inline flex*). Cocok untuk tombol aksi atau label indikator asinkron.
+   ```tsx
+   <Button disabled={isSubmitting}>
+     {isSubmitting ? <LoadingState variant="inline" text="Menyimpan..." iconClassName="text-white" /> : "Simpan"}
+   </Button>
+   ```
+
+4. **`variant="fullscreen"`**
+   Digunakan apabila terdapat aksi krusial berdurasi lama (misal: Submit Laporan Besar, Upload File) yang mewajibkan seluruh layar terkunci dengan *backdrop blur*.
+
+**Catatan Kustomisasi:**
+- Teks default adalah `"Memuat data..."`. Anda dapat menggantinya menggunakan props `text="Sedang sinkronisasi..."`.
+- Jika Anda tidak menginginkan teks sama sekali, cukup lewatkan prop `text={null}`.
+- Prop `iconClassName` berguna jika Anda ingin mengubah warna loading indicator pada background gelap (contoh: `text-white`).
+
+---
+
+## 19. Standar Frontend Logic & React Query (Data Fetching, Search, Sort, Export)
 
 Selain standar UI visual, wajib mematuhi panduan implementasi fungsional berikut agar performa dan pengalaman pengguna *(User Experience)* seragam.
 
@@ -738,3 +839,206 @@ const handleExport = () => {
 };
 ```
 
+---
+
+## 19. Standarisasi Tabel Multi-Tab dengan BaseTable (Dynamic Columns)
+
+**Aturan**: Ketika sebuah halaman laporan atau modul memiliki beberapa tab yang menampilkan jenis data serupa tetapi dengan beberapa kolom spesifik yang berbeda (misal: Tab BPKB, STNK, TNKB), **JANGAN** membuat elemen `<Table>` (atau `BaseTable`) terpisah secara manual untuk setiap tab, karena hal ini menghasilkan kode markup yang sangat berlebihan (bloat) dan rentan terhadap inkonsistensi layout (khususnya padding, sorting, dan aksi).
+
+Sebagai gantinya, gunakan **Satu instance `BaseTable`** dengan pola **Dynamic Columns** di mana kita memanfaatkan *spread operator* `...` dan `conditional statement` berdasarkan `activeTab` di dalam array konfigurasi kolom.
+
+### Contoh Pola Dynamic Columns:
+
+```tsx
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+
+// State Tab yang Sedang Aktif
+const [activeTab, setActiveTab] = useState<'bpkb' | 'stnk'>('bpkb');
+
+// Konfigurasi Kolom Dinamis (Merespon perubahan activeTab)
+const columns: ColumnDef<any>[] = [
+  {
+    header: 'NO',
+    id: 'no',
+    alignment: 'center',
+    cell: (_, idx) => <span className="font-medium text-slate-500">{idx + 1 + (page - 1) * perPage}</span>,
+  },
+  {
+    header: `NAMA ${activeTab.toUpperCase()}`,
+    accessorKey: 'nama',
+    sortable: true,
+    cell: (item) => <span className="font-semibold text-gray-900 whitespace-nowrap">{item.nama || '-'}</span>,
+  },
+  // Kolom hanya muncul saat Tab BPKB
+  ...(activeTab === 'bpkb' ? [{
+    header: 'NOMOR BPKB',
+    accessorKey: 'bpkb_number',
+    sortable: true,
+    cell: (item: any) => <span className="font-medium text-gray-900 whitespace-nowrap">{item.bpkb_number || '-'}</span>,
+  }] : []),
+  // Kolom hanya muncul saat Tab STNK
+  ...(activeTab === 'stnk' ? [{
+    header: 'NOMOR STNK',
+    accessorKey: 'stnk_number',
+    sortable: true,
+    cell: (item: any) => <span className="font-medium text-gray-900 whitespace-nowrap">{item.stnk_number || '-'}</span>,
+  }] : []),
+  {
+    header: 'WILAYAH',
+    accessorKey: 'region',
+    sortable: true,
+    cell: (item) => <span className="text-slate-600 whitespace-nowrap">{item.region || '-'}</span>,
+  },
+];
+
+// Implementasi Render
+return (
+  <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val)}>
+    {/* Tab Triggers ... */}
+    
+    <div className="mt-4">
+      <BaseTable
+        data={data}
+        columns={columns}
+        loading={isLoading}
+        meta={{
+          currentPage: page,
+          perPage: perPage,
+          lastPage: pagination.lastPage,
+          total: pagination.total
+        }}
+        onPageChange={setPage}
+        sortBy={sortBy}
+        sortDirection={sortOrder}
+        onSortChange={(key, dir) => {
+          setSortBy(key);
+          setSortOrder(dir);
+          setPage(1); // Reset page saat merubah sort
+        }}
+      />
+    </div>
+  </Tabs>
+);
+```
+
+**Kelebihan pola ini**:
+1. Menghilangkan redundansi >500 baris kode jika dibandingkan dengan menyusun `<Table>` satu persatu.
+2. Semua fitur (No Data *empty state*, UI Loading Spinner berkedip, UI Server Error, Paginasi seragam) otomatis di-handle secara konsisten oleh satu pembungkus `BaseTable`.
+3. Sorting logic terintegrasi dengan mulus pada property `onSortChange`.
+
+---
+
+## 20. Standarisasi Validasi Maksimal Checkbox (Data Selection)
+
+**Aturan**: Ketika sebuah tabel atau *list* menyediakan fungsionalitas pemilihan baris via Checkbox (misal: Alokasi Unit, Penagihan Parsial) yang memiliki **kuantitas maksimal yang diizinkan (`requiredQty`)**, *frontend* **wajib** melakukan validasi ketat langsung pada UI sebelum memperbarui *state*.
+
+**Larangan Keras**:
+- **Dilarang** membiarkan *user* men-ceklis item melebihi kuota lalu baru memunculkan error pada saat tombol "Submit/Simpan" diklik.
+- **Dilarang** mengandalkan logika validasi *backend* saja. Jika *user* melakukan *bypass* pada *disabled state* dari tombol Submit, *frontend* harus tetap menggagalkan pengiriman jika kuota terlampaui.
+
+**Standar Implementasi `toggleOne` (Single Checkbox)**:
+Jika *user* mencoba men-ceklis baris baru saat kuota sudah penuh, tolak perubahan *state* secara eksplisit dan munculkan pesan `toast.error`.
+
+```tsx
+const toggleOne = (stockId: number, checked: boolean) => {
+  if (checked && selectedIds.size >= requiredQty) {
+    toast.error(`Maksimal ${requiredQty} unit yang dapat dipilih`);
+    return;
+  }
+  setSelectedIds((prev) => {
+    const next = new Set(prev);
+    if (checked) next.add(stockId);
+    else next.delete(stockId);
+    return next;
+  });
+};
+```
+
+**Standar Implementasi `toggleAllPage` (Bulk Checkbox / Select All)**:
+Saat *user* menekan tombol "Pilih Semua", sistem harus berhitung sisa kuota (`requiredQty - selectedIds.size`). Sistem **hanya boleh** men-ceklis baris hingga sisa kuota tersebut habis, dan mengabaikan baris sisanya secara otomatis. Munculkan pesan sukses interaktif atau *error* penolakan yang komunikatif.
+
+```tsx
+const toggleAllPage = (checked: boolean) => {
+  if (checked && selectedIds.size >= requiredQty) {
+    toast.error(`Maksimal ${requiredQty} unit yang dapat dipilih`);
+    return;
+  }
+  setSelectedIds((prev) => {
+    const next = new Set(prev);
+    const pageRows = // ... data baris pada halaman saat ini ...
+
+    if (checked) {
+      let remaining = requiredQty - next.size;
+      pageRows.forEach((item) => {
+        if (!next.has(item.id) && remaining > 0) {
+          next.add(item.id);
+          remaining--;
+        }
+      });
+      // (Opsional) Beri notifikasi UI jika berhasil men-ceklis maksimal
+      if (remaining === 0 && pageRows.length > 0 && next.size === requiredQty) {
+        toast.success(`Berhasil memilih ${requiredQty} unit (maksimal)`);
+      }
+    } else {
+      pageRows.forEach((item) => next.delete(item.id));
+    }
+
+    return next;
+  });
+};
+```
+
+---
+
+## 21. Standarisasi Modal Konfirmasi Aksi Kritis
+
+**Aturan**: Setiap tombol aksi yang memicu perubahan status signifikan pada transaksi atau data kritis (misal: "Tandai Lunas", "Terima Barang", "Kirim Barang", "Unit Terjual") **wajib** menggunakan Modal Konfirmasi (`Dialog`) sebelum aksi tersebut dieksekusi, tidak boleh memanggil fungsi API secara langsung dari tombol.
+
+**Standar Komponen Modal Konfirmasi**:
+1. Gunakan komponen `Dialog` dari `@/components/ui/dialog`.
+2. Sertakan kotak informasi bergaya peringatan yang konsisten dengan ikon `Info` dari `lucide-react` di dalam `DialogHeader`.
+3. Modal harus tertutup otomatis (*state* diubah menjadi `false`) setelah proses API sukses, maupun saat gagal atau terhenti di validasi *frontend*.
+
+**Contoh Implementasi**:
+
+```tsx
+<Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+  <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>Konfirmasi Kirim Barang</DialogTitle>
+      <DialogDescription className="pt-2">
+        Apakah Anda yakin ingin mengirim barang ini?
+      </DialogDescription>
+      {/* Kotak Informasi Wajib */}
+      <div className="border border-slate-200 bg-slate-50 text-slate-700 text-sm rounded-md p-2 text-justify">
+        <div className="flex gap-2">
+          <span>
+            <Info />
+          </span>
+          <span>
+            Dengan klik kirim barang maka akan mengurangi stock <b>Warehouse</b> dan barang akan dikirim ke pembeli.
+          </span>
+        </div>
+      </div>
+    </DialogHeader>
+    <DialogFooter className="mt-4 flex justify-end gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => setIsConfirmDialogOpen(false)}
+        disabled={isPending}
+      >
+        Batal
+      </Button>
+      <Button
+        type="button"
+        className="bg-blue-600 hover:bg-blue-700 text-white" // Sesuaikan warna, misal: emerald-600 untuk aksi positif
+        onClick={handleExecuteAction}
+        disabled={isPending}
+      >
+        {isPending ? 'Memproses...' : 'Ya, Kirim Barang'}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```

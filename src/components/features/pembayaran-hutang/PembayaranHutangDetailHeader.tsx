@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import { Progress } from '@/components/ui/progress';
 import { formatCurrency } from '@/lib/utils/currency';
 import { ArrowLeft, Building2, CalendarDays, CheckCircle2, ListChecks, ReceiptText } from 'lucide-react';
 import type { LiabilityDetail } from '@/types/pembayaran-hutang.types';
+import { CopyBox } from '@/components/ui/copy-box';
 
 interface Props {
   data: LiabilityDetail;
@@ -24,46 +26,42 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-            <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <Link href={resolvedBackHref}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali
-              </Link>
-            </Button>
+      <PageHeader
+        breadcrumbs={[
+          { label: resolvedBackHref.includes('data-hutang') && !resolvedBackHref.includes('pembayaran') ? 'Data Hutang' : 'Data Pembayaran Hutang', onClick: () => router.push(resolvedBackHref) },
+          { label: 'Detail Hutang Pembelian' }
+        ]}
+        title="Detail Hutang Pembelian"
+        subtitle={
+          <>
+            <span>Invoice <span className="font-medium text-gray-900">{data.code}</span> milik <span className="font-medium text-gray-900">{data.person.name}</span></span>
             <Badge variant={summary.is_paid ? 'default' : 'outline'} className={summary.is_paid ? 'bg-emerald-600 text-white' : 'text-gray-600'}>
               {summary.is_paid ? 'Lunas' : 'Belum Lunas'}
             </Badge>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Detail Hutang Pembelian</h1>
-            <p className="text-sm text-gray-500">
-              Invoice <span className="font-medium text-gray-900">{data.code}</span> milik <span className="font-medium text-gray-900">{data.person.name}</span>
-            </p>
-          </div>
-        </div>
-
-        <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-          Tambah Pembayaran
-        </Button>
-      </div>
+          </>
+        }
+        onBack={() => router.push(resolvedBackHref)}
+        actions={
+          <Button onClick={onAddPayment} disabled={addPaymentDisabled} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+            Tambah Pembayaran
+          </Button>
+        }
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Total Hutang</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">{formatCurrency(summary.grand_total)}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Total Dibayar</p>
           <p className="mt-2 text-2xl font-semibold text-emerald-600">{formatCurrency(summary.total_paid)}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Sisa Hutang</p>
           <p className="mt-2 text-2xl font-semibold text-rose-600">{formatCurrency(summary.remaining_payment)}</p>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="rounded-md border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Persentase</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">{percentage.toFixed(0)}%</p>
           <div className="mt-3">
@@ -73,7 +71,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="rounded-md bg-sky-50 p-2 text-sky-600">
               <ReceiptText className="h-5 w-5" />
@@ -84,7 +82,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <p className="text-sm text-gray-500">Nomor Transaksi</p>
-              <p className="mt-1 font-medium text-gray-900">{data.code}</p>
+              <CopyBox text={data.code} />
             </div>
             <div>
               <p className="text-sm text-gray-500">Billing ID</p>
@@ -110,7 +108,7 @@ export default function PembayaranHutangDetailHeader({ data, onAddPayment, addPa
           </div>
         </div>
 
-        <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="rounded-md bg-violet-50 p-2 text-violet-600">
               <ListChecks className="h-5 w-5" />

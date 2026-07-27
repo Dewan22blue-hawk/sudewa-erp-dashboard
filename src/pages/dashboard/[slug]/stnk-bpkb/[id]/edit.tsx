@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { VehicleDocumentDetailTable } from '@/components/features/vehicle-document/VehicleDocumentDetailTable';
 import { useVehicleDocumentDetail } from '@/hooks/useVehicleDocument';
 import type { VehicleDocumentItem } from '@/@types/vehicle-document.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -93,7 +94,7 @@ export default function EditVehicleDocumentPage() {
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
-        <div className="flex h-[360px] items-center justify-center text-slate-500">Memuat data penerimaan...</div>
+        <LoadingState variant="page" />
       ) : detailQuery.isError || !detailQuery.data ? (
         <div className="flex h-[360px] flex-col items-center justify-center gap-3 text-center">
           <p className="text-red-500">Data penerimaan tidak ditemukan.</p>

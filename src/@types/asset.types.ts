@@ -7,11 +7,8 @@ export interface Asset {
     uuid: string;
     company_id: number;
     code?: string;
-    purchase_date: string;
     name: string;
     type: AssetType;
-    price: number;
-    serial_number?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -20,9 +17,9 @@ export interface AssetPayload {
     company_id: number;
     name: string;
     code?: string;
-    purchase_date: string;
     type: AssetType;
-    price: number | string;
+    purchase_date?: string;
+    price?: number;
     serial_number?: string;
 }
 

@@ -29,6 +29,7 @@ import type { MaterialTransactionDetailItem } from '@/@types/material-transactio
 import { PurchaseMaterialDetailItemModal } from '@/components/features/material-purchase/PurchaseMaterialDetailItemModal';
 import { PurchaseMaterialPaymentModal } from '@/components/features/material-purchase/PurchaseMaterialPaymentModal';
 import type { MaterialTransactionBillingFormValues, MaterialTransactionItemFormValues } from '@/scheme/material-transaction.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '';
@@ -179,7 +180,7 @@ export default function PurchaseMaterialDetailPage() {
   if (transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat detail pembelian material...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -187,7 +188,7 @@ export default function PurchaseMaterialDetailPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail pembelian material tidak ditemukan.</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Detail pembelian material tidak ditemukan.</div>
       </DashboardLayout>
     );
   }
@@ -205,7 +206,7 @@ export default function PurchaseMaterialDetailPage() {
           <h1 className="text-[24px] font-semibold text-slate-900">Detail Pembelian</h1>
         </div>
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-6">
             <div className="space-y-3">
               <label className="text-[16px] font-medium text-slate-900">Nomor Pembelian</label>
@@ -234,15 +235,15 @@ export default function PurchaseMaterialDetailPage() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-5 py-4">
                 <p className="text-sm text-slate-500">Total Tagihan</p>
                 <p className="mt-1 text-xl font-semibold text-slate-900">{formatCurrency(transaction.totalAmount)}</p>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-5 py-4">
                 <p className="text-sm text-slate-500">Total Bayar</p>
                 <p className="mt-1 text-xl font-semibold text-emerald-600">{formatCurrency(Math.max(transaction.totalPaid, totalPaidFromBillings))}</p>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-5 py-4">
                 <p className="text-sm text-slate-500">Sisa Tagihan</p>
                 <p className="mt-1 text-xl font-semibold text-rose-600">{formatCurrency(transaction.totalUnpaid)}</p>
               </div>
@@ -278,7 +279,7 @@ export default function PurchaseMaterialDetailPage() {
           </Button>
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
           <Table>
             <TableHeader className="bg-slate-100">
               <TableRow className="border-slate-200">
@@ -293,7 +294,7 @@ export default function PurchaseMaterialDetailPage() {
             <TableBody>
               {transactionQuery.isFetching && filteredItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-28 text-center text-slate-500">Memuat detail item...</TableCell>
+                  <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat detail item..." /></TableCell>
                 </TableRow>
               ) : paginatedItems.length === 0 ? (
                 <TableRow>
@@ -314,7 +315,7 @@ export default function PurchaseMaterialDetailPage() {
                             <MoreVertical className="h-4 w-4 text-slate-700" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40 rounded-2xl border-slate-200 p-2 shadow-lg">
+                        <DropdownMenuContent align="end" className="w-40 rounded-md border-slate-200 p-2 shadow-lg">
                           <DropdownMenuItem
                             onClick={() => {
                               setEditingItem(item);

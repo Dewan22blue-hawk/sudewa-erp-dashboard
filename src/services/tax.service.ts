@@ -9,6 +9,7 @@ export interface TaxVersion {
   effective_until: string | null;
   is_default: number | boolean;
   is_lock?: number | boolean;
+  tax_version_count?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -18,6 +19,7 @@ export interface Tax {
   code: string;
   name: string;
   is_lock: number | boolean;
+  tax_version_count: number;
   created_at: string;
   updated_at?: string;
   tax_versions?: TaxVersion[];

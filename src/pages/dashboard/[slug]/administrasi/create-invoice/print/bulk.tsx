@@ -17,6 +17,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { getLetterheadByCompanyId, resolveCompanyId } from '@/lib/print-letterhead';
 import { getDoInvoiceById } from '@/services/do-invoice.service';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const parseIds = (value: string | string[] | undefined) => {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -87,7 +88,7 @@ export default function BulkCreateInvoicePrintPage() {
   if (!router.isReady || isLoading) {
     return (
       <DashboardLayout>
-        <div className="py-20 text-center text-sm text-slate-500">Memuat data invoice...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

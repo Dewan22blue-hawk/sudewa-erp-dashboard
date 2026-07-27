@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -8,6 +9,7 @@ import { usePermissions } from '@/hooks/usePermission';
 import { useCreateRole } from '@/hooks/useRole';
 import { toast } from 'sonner';
 import { ChevronLeft, Shield } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function CreateRolePage() {
   const router = useRouter();
@@ -76,20 +78,20 @@ export default function CreateRolePage() {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full h-10 w-10">
-            <ChevronLeft size={20} />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-950 tracking-tight">Tambah Peran Baru</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Definisikan peran baru beserta hak aksesnya.</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Hak Akses', onClick: () => router.push(`/dashboard/${slug}/settings/roles`) },
+            { label: 'Tambah Baru' }
+          ]}
+          title="Tambah Peran Baru"
+          subtitle="Definisikan peran baru beserta hak aksesnya."
+          onBack={handleBack}
+        />
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Card: Role Name */}
-          <div className="bg-white rounded-2xl border p-6 space-y-4 shadow-sm">
+          <div className="bg-white rounded-md border p-6 space-y-4 shadow-sm">
             <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
               <Shield className="text-indigo-600 h-4 w-4" />
               Informasi Utama Peran
@@ -109,7 +111,7 @@ export default function CreateRolePage() {
           </div>
 
           {/* Card: Permissions Selection */}
-          <div className="bg-white rounded-2xl border p-6 space-y-6 shadow-sm">
+          <div className="bg-white rounded-md border p-6 space-y-6 shadow-sm">
             <div className="flex items-center justify-between border-b pb-4">
               <div>
                 <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
@@ -143,7 +145,7 @@ export default function CreateRolePage() {
             </div>
 
             {isLoadingPerms ? (
-              <div className="py-8 text-center text-sm text-gray-500 font-medium">Memuat daftar permissions...</div>
+              <LoadingState variant="page" />
             ) : Object.keys(groupedPermissions).length === 0 ? (
               <div className="py-8 text-center text-sm text-gray-500 font-medium">Tidak ada permissions tersedia.</div>
             ) : (

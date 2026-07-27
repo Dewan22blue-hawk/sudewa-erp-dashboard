@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SalesPaymentForm, PaymentFormData } from '@/components/features/sales/SalesPaymentForm';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useSalesDetail } from '@/hooks/useSales';
@@ -17,6 +18,7 @@ import {
 } from '@/hooks/useUnitBilling';
 import { salesService } from '@/services/sales.service';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
+import { Button } from '@/components/ui/button';
 
 const readApiError = (error: any): string => {
   const stringifyDetail = (value: unknown): string => {
@@ -79,7 +81,7 @@ const readCheckRightAmountError = (error: any): string => {
     })
     .join('; ');
 
-  return `Pembayaran belum bisa diproses. Detail unit belum lengkap -> ${detailText}.`;
+  return `Pembayaran belum bisa diproses. Detail unit belum lengkap ${detailText}.`;
 };
 
 const getInvalidItemIds = (error: any): string[] => {
@@ -130,7 +132,7 @@ const hasCompleteSalesAssignmentsFromLatestSnapshot = async (salesId: string, fa
 
   try {
     const latest = await salesService.getSalesDetail(salesId);
-    return hasCompleteSalesAssignmentsForInvalidItems(latest?.raw, invalidItemIds);
+    return hasCompleteSalesAssignmentsForInvalidItems(latest, invalidItemIds);
   } catch {
     return false;
   }
@@ -340,19 +342,21 @@ export default function PaymentPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button onClick={() => router.back()} className="mb-2 inline-flex text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">Pembayaran Unit</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Jual</span>
-              <span className="text-blue-600 font-medium">{salesData.kodeJual}</span>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`) },
+            { label: 'Detail Penjualan', onClick: () => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`) },
+            { label: 'Billing Penjualan Unit' }
+          ]}
+          title="Billing Penjualan Unit"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="text-blue-600 font-semibold">{salesData.kodeJual}</span>
+            </>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${salesId}`)}
+        />
 
         <Card className="rounded-md">
           <CardContent className="p-6">

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ const formatLongDate = (value?: string) => {
 };
 
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const getErrorMessage = (error: any): string => {
   return getApiErrorMessage(error);
@@ -177,9 +179,7 @@ export default function PengeluaranPerlengkapanEditPage() {
   if (query.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
-          Memuat data edit pengeluaran perlengkapan...
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -187,7 +187,7 @@ export default function PengeluaranPerlengkapanEditPage() {
   if (!transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600 font-semibold">
           Data pengeluaran perlengkapan tidak ditemukan.
         </div>
       </DashboardLayout>
@@ -197,17 +197,17 @@ export default function PengeluaranPerlengkapanEditPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 px-1">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`}>
-              <ArrowLeft className="mr-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold text-slate-950">Data Pengeluaran Perlengkapan</h1>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`) },
+            { label: 'Edit' }
+          ]}
+          title="Data Pengeluaran Perlengkapan"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`)}
+        />
 
         {/* Transaction Header Info Card */}
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none">
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-5">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
@@ -300,7 +300,7 @@ export default function PengeluaranPerlengkapanEditPage() {
         </div>
 
         {/* Detail Items Table Card */}
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+        <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-none">
           <div className="overflow-x-auto">
             <GoodsIssueEquipmentDetailTable
               data={pageItems}

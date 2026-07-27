@@ -11,6 +11,7 @@ import type {
 } from '@/@types/ppn-penjualan.types';
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, mapLaravelPaginationMeta, type LaravelApiResponse } from '@/lib/api/response';
+import { updatePPNPembelian } from './ppn-pembelian';
 
 const BASE_PATH = '/wapi/finance/ppn';
 const DEFAULT_PAGE = 1;
@@ -44,14 +45,15 @@ const normalizeUnitDetail = (value: Partial<UnitTransactionItemDetail> | null | 
 const normalizePPNPenjualan = (value: Partial<PPNPenjualan>): PPNPenjualan => ({
   id: toNumber(value.id),
   code: value.code ?? '-',
-  sales_date: value.sales_date ?? '',
-  customer: value.customer ?? '-',
-  fpm_date: value.fpm_date ?? null,
-  nsfpm_age: value.nsfpm_age ?? null,
+  buy_date: value.buy_date ?? '',
+  supplier: value.supplier ?? '-',
+  fp_date: value.fp_date ?? null,
+  nsfp_age: value.nsfp_age ?? null,
   qty: toNumber(value.qty),
   unit_type: normalizeUnitType(value.unit_type),
   unit_transaction_item_detail: normalizeUnitDetail(value.unit_transaction_item_detail),
   unit_price: toNumber(value.unit_price),
+  total_price: toNumber(value.total_price),
   dpp_amount: toNumber(value.dpp_amount),
   ppn_11: toNumber(value.ppn_11),
   payment_amount: toNumber(value.payment_amount),
@@ -63,12 +65,14 @@ const toSuccessPayload = <T>(payload: { status: boolean; message: string; errors
     ...payload,
     errors: payload.errors ?? undefined,
   }) as unknown as LaravelApiResponse<T>;
+
 const isMethodNotAllowed = (error: unknown) => {
   if (!error || typeof error !== 'object') return false;
 
   const apiError = error as ApiError;
   return apiError.statusCode === 405;
 };
+
 export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {}): Promise<PPNPenjualanListResult> {
   const page = params.page ?? DEFAULT_PAGE;
   const perPage = params.per_page ?? DEFAULT_PER_PAGE;
@@ -81,7 +85,7 @@ export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {})
       search: params.search || undefined,
       start_date: params.start_date || undefined,
       end_date: params.end_date || undefined,
-      sort_by: params.sort_by ?? 'sales_date',
+      sort_by: params.sort_by ?? 'buy_date',
       sort_direction: params.sort_direction ?? 'desc',
     },
   });
@@ -97,24 +101,5 @@ export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {})
 }
 
 export async function updatePPNPenjualan({ id, payload }: UpdatePPNPenjualanMutationPayload) {
-  const requestBody = {
-    fpm_date: payload.fpm_date || undefined,
-    nsfpm_age: payload.nsfpm_age || undefined,
-    amount: payload.amount ?? undefined,
-    nsfp_number: payload.nsfp_number || undefined,
-  };
-
-  try {
-    const response = await apiClient.put<PPNPenjualanUpdateResponse>(`${BASE_PATH}/${id}`, requestBody);
-    return ensureSuccess(toSuccessPayload(response.data));
-  } catch (error) {
-    if (!isMethodNotAllowed(error)) throw error;
-
-    const response = await apiClient.post<PPNPenjualanUpdateResponse>(`${BASE_PATH}/${id}`, {
-      ...requestBody,
-      _method: 'PUT',
-    });
-
-    return ensureSuccess(toSuccessPayload(response.data));
-  }
+  return updatePPNPembelian({ id, payload: payload as any }) as any;
 }

@@ -75,7 +75,12 @@ export const useDeleteRefund = () => {
   const { companyId } = useCompany();
 
   return useMutation({
-    mutationFn: (id: string) => refundAdministrasiService.deleteRefund(id),
+    mutationFn: (payload: string | { id: string, deleteFinanceRefund?: boolean }) => {
+      if (typeof payload === 'string') {
+        return refundAdministrasiService.deleteRefund(payload);
+      }
+      return refundAdministrasiService.deleteRefund(payload.id, payload.deleteFinanceRefund);
+    },
     onSuccess: () => {
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
@@ -177,32 +182,49 @@ export const useRefundSelectableItems = (transactionId?: string) => {
 
   const transactionItems = useMemo(
     () =>
-      ((transactionQuery.data?.unit_transaction_items ?? []) as Array<{
+    ((transactionQuery.data?.unit_transaction_items ?? []) as Array<{
+      id?: string | number;
+      price?: string | number;
+      unit_type?: { name?: string; unit_model?: string };
+      unit_transaction_item_details?: Array<{
         id?: string | number;
+        unit_transaction_item_id?: string | number;
+        unit_type_name?: string;
+        tipeUnit?: string;
+        color?: string;
+        machine_number?: string;
+        chassis_number?: string;
         price?: string | number;
-        unit_type?: { name?: string; unit_model?: string };
-        unit_transaction_item_details?: Array<{
-          id?: string | number;
-          unit_transaction_item_id?: string | number;
-          color?: string;
-          machine_number?: string;
-          chassis_number?: string;
-          price?: string | number;
-          status?: string;
-          in_stock?: boolean | number | string;
-          is_forecast?: boolean | number | string;
-          created_at?: string;
-        }>;
-      }>),
+        status?: string;
+        in_stock?: boolean | number | string;
+        is_forecast?: boolean | number | string;
+        created_at?: string;
+      }>;
+      unit_type_sold_details?: Array<{
+        id?: string | number;
+        unit_transaction_item_id?: string | number;
+        unit_type_name?: string;
+        tipeUnit?: string;
+        color?: string;
+        machine_number?: string;
+        chassis_number?: string;
+        price?: string | number;
+        status?: string;
+        in_stock?: boolean | number | string;
+        is_forecast?: boolean | number | string;
+        created_at?: string;
+      }>;
+    }>),
     [transactionQuery.data?.unit_transaction_items],
   );
 
   const items = useMemo(() => {
-    const nestedItems = transactionItems.flatMap((item) =>
-      (item.unit_transaction_item_details ?? []).map((detail) => ({
+    const nestedItems = transactionItems.flatMap((item) => {
+      const details = item.unit_type_sold_details ?? item.unit_transaction_item_details ?? [];
+      return details.map((detail) => ({
         id: String(detail.id ?? ''),
         unit_transaction_item_id: String(detail.unit_transaction_item_id ?? item.id ?? ''),
-        unit_type_name: item.unit_type?.unit_model ?? item.unit_type?.name ?? '-',
+        unit_type_name: detail.unit_type_name ?? detail.tipeUnit ?? item.unit_type?.unit_model ?? item.unit_type?.name ?? '-',
         price: detail.price !== undefined ? Number(detail.price) : Number(item.price ?? 0),
         color: detail.color ?? '-',
         machine_number: detail.machine_number ?? '-',
@@ -211,8 +233,8 @@ export const useRefundSelectableItems = (transactionId?: string) => {
         in_stock: detail.in_stock === true || detail.in_stock === 1 || detail.in_stock === '1',
         is_forecast: detail.is_forecast === true || detail.is_forecast === 1 || detail.is_forecast === '1',
         created_at: detail.created_at ?? '',
-      })),
-    );
+      }));
+    });
 
     const fallbackItems = ((itemDetailsQuery.data?.data ?? []) as UnitTransactionItemDetail[]).filter((item) =>
       transactionItems.some((entry) => String(entry.id ?? '') === String(item.unit_transaction_item_id ?? '')),

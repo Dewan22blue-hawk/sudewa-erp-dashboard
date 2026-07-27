@@ -6,6 +6,7 @@ import { TaxTable } from '@/components/features/settings/tax/TaxTable';
 import { TaxForm } from '@/components/features/settings/tax/TaxForm';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import Head from 'next/head';
 
 export default function TaxPage() {
@@ -90,9 +91,6 @@ export default function TaxPage() {
     router.push(`/dashboard/${slug}/settings/tax/${tax.id}/detail`);
   };
 
-  const handleViewVersion = (tax: Tax) => {
-    router.push(`/dashboard/${slug}/settings/tax/${tax.id}`);
-  };
 
   const handleSubmit = (values: { code: string; name: string }) => {
     if (selectedTax) {
@@ -109,12 +107,10 @@ export default function TaxPage() {
       </Head>
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Data Pajak</h1>
-              <p className="text-sm text-muted-foreground">Kelola master data pajak dan versinya</p>
-            </div>
-          </div>
+          <PageHeader
+            title="Data Pajak"
+            subtitle="Kelola master data pajak dan versinya"
+          />
 
           <TaxTable
             data={data?.data?.data || []}
@@ -135,7 +131,6 @@ export default function TaxPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewDetail={handleViewDetail}
-            onViewVersion={handleViewVersion}
           />
         </div>
 

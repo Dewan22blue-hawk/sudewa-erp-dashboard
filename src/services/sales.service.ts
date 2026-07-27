@@ -2,6 +2,8 @@ import { LaravelPagination } from '@/@types/pagination.types';
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, LaravelApiResponse } from '@/lib/api/response';
 import { SalesApiModel, mapSalesDetailToUI, mapSalesToTableItem, mapSalesToUI } from '@/services/sales.mapper';
+import { unitTransactionService } from '@/services/unitTransaction.service';
+import { UnitTransactionDetail } from '@/@types/unit-transaction.types';
 
 const basePath = '/wapi/transaction/unit-transaction/unit-transaction';
 const fallbackBasePath = '/wapi/transaction/unit-transaction';
@@ -170,27 +172,8 @@ export const salesService = {
     };
   },
 
-  async getSalesDetail(id: string, companyId?: string | number) {
-    let detail: SalesApiModel | null = null;
-
-    try {
-      const response = await apiClient.get<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${basePath}/${id}`, {
-        params: companyId ? { company_id: companyId } : undefined,
-      });
-      const payload = ensureSuccess(response.data);
-      detail = unwrapDetail(payload);
-    } catch {
-      const fallbackResponse = await apiClient.get<LaravelApiResponse<SalesApiModel | { data?: SalesApiModel }>>(`${fallbackBasePath}/${id}`, {
-        params: companyId ? { company_id: companyId } : undefined,
-      });
-      const fallbackPayload = ensureSuccess(fallbackResponse.data);
-      detail = unwrapDetail(fallbackPayload);
-    }
-
-    return {
-      raw: detail,
-      ui: mapSalesDetailToUI(detail),
-    };
+  async getSalesDetail(id: string, companyId?: string | number): Promise<UnitTransactionDetail> {
+    return unitTransactionService.getUnitTransactionDetail(id, companyId);
   },
 
   async createSales(payload: SalesPayload) {

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, MoreVertical, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -34,6 +35,7 @@ import { useSuppliers } from '@/hooks/useSupplier';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { goodsReceiptSchema, type GoodsReceiptFormValues, type GoodsReceiptItemFormValues } from '@/scheme/goods-receipt.schema';
 import { formatCurrency } from '@/components/features/goods-receipt/goods-receipt.utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const toDateValue = (value?: string) => {
   if (!value) return undefined;
@@ -193,29 +195,26 @@ export default function GoodsReceiptEditPage() {
   };
 
   if (query.isLoading) {
-    return <DashboardLayout><div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat data edit penerimaan material...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!receipt) {
-    return <DashboardLayout><div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data penerimaan material tidak ditemukan.</div></DashboardLayout>;
+    return <DashboardLayout><div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Data penerimaan material tidak ditemukan.</div></DashboardLayout>;
   }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/penerimaan-material`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-[24px] font-semibold text-slate-900">Data Penerimaan Material</h1>
-            <p className="text-[13px] text-slate-400">Edit</p>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Penerimaan Material', onClick: () => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`) },
+            { label: 'Edit' }
+          ]}
+          title="Data Penerimaan Material"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/penerimaan-material`)}
+        />
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
           <form onSubmit={form.handleSubmit(handleUpdateHeader)} className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-6">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Penerimaan</h2>
@@ -331,7 +330,7 @@ export default function GoodsReceiptEditPage() {
           </Button>
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
           <Table>
             <TableHeader className="bg-slate-100">
               <TableRow className="border-slate-200">
@@ -381,7 +380,7 @@ export default function GoodsReceiptEditPage() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
+                      <DropdownMenuContent align="end" className="w-36 rounded-md border-slate-200 p-2 shadow-lg">
                         <DropdownMenuItem onClick={() => { setEditingItem(item); setItemOpen(true); }} className="cursor-pointer rounded-md px-3 py-2 text-[16px]">Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setDeleteTarget(item)} className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
                       </DropdownMenuContent>

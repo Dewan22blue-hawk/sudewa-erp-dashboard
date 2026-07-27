@@ -105,9 +105,9 @@ export const useAuthCheck = (router: NextRouter) => {
       } else {
         console.warn('[useAuthCheck] Token validation could not be completed, keeping current session');
       }
-    } catch (error) {
+    } catch (error: any) {
       // Log the error but don't interrupt the app flow
-      console.error('[useAuthCheck] Error during token validation:', error);
+      console.warn('[useAuthCheck] Error during token validation:', error?.message || error);
     }
   }, [router]);
 

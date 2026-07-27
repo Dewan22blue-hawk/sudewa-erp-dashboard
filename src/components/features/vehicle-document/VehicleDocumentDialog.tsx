@@ -110,7 +110,7 @@ export function VehicleDocumentDialog({
                     placeholder="Pilih kode proses Ditlantas"
                     searchPlaceholder="Cari proses Ditlantas..."
                     emptyText="Proses Ditlantas tidak ditemukan."
-                    className="h-14 rounded-2xl border-slate-200 text-lg"
+                    className="h-14 rounded-md border-slate-200 text-lg"
                   />
                 )}
               />
@@ -123,7 +123,7 @@ export function VehicleDocumentDialog({
                 name="receiptDate"
                 control={control}
                 rules={{ required: 'Tanggal terima wajib diisi' }}
-                render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-14 rounded-2xl border-slate-200 text-lg" />}
+                render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-14 rounded-md border-slate-200 text-lg" />}
               />
               {errors.receiptDate ? <p className="text-xs text-red-500">{errors.receiptDate.message as string}</p> : null}
             </div>
@@ -133,7 +133,7 @@ export function VehicleDocumentDialog({
               <Textarea
                 rows={5}
                 placeholder="Type your message here."
-                className="rounded-2xl border-slate-200 px-5 py-4 text-lg"
+                className="rounded-md border-slate-200 px-5 py-4 text-lg"
                 {...register('description', { required: 'Keterangan wajib diisi' })}
               />
               {errors.description ? <p className="text-xs text-red-500">{errors.description.message}</p> : null}

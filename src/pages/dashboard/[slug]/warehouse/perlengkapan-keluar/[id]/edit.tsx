@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { MaterialReceiptItemModal } from '@/components/features/material-receipt/MaterialReceiptItemModal';
 import { UploadInvoiceModal } from '@/components/features/material-receipt/UploadInvoiceModal';
 import { SearchableSelect } from '@/components/features/vehicle-data/SearchableSelect';
@@ -37,6 +38,7 @@ import { useQueryParamsTable } from '@/hooks/useQueryParamsTable';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 import { materialTransactionSchema, type MaterialTransactionFormValues, type MaterialTransactionItemFormValues } from '@/scheme/material-transaction.schema';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const toDateValue = (value?: string) => {
   if (!value) return undefined;
@@ -210,7 +212,7 @@ export default function MaterialReleaseEditPage() {
   if (transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">Memuat data pengeluaran perlengkapan...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -218,7 +220,7 @@ export default function MaterialReleaseEditPage() {
   if (!transactionQuery.data) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center text-red-600">Data pengeluaran perlengkapan tidak ditemukan.</div>
       </DashboardLayout>
     );
   }
@@ -226,17 +228,22 @@ export default function MaterialReleaseEditPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="space-y-1">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-slate-950">Data Pengeluaran Material</h1>
-          <p className="text-[16px] text-slate-500">
-            No Pengeluaran <span className="font-medium text-blue-600">{transactionQuery.data.code}</span>
-          </p>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/perlengkapan-keluar`) },
+            { label: 'Edit' }
+          ]}
+          title="Data Pengeluaran Perlengkapan"
+          subtitle={
+            <div className="flex items-center gap-2">
+              No Pengeluaran
+              {transactionQuery.data?.code && (
+                <span className="font-medium text-[#1f4163]">{transactionQuery.data.code}</span>
+              )}
+            </div>
+          }
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/perlengkapan-keluar`)}
+        />
 
         <Card className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-none">
           <div className="space-y-6">
@@ -375,7 +382,7 @@ export default function MaterialReleaseEditPage() {
             <TableBody>
               {itemsQuery.isLoading || itemsQuery.isFetching ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-slate-500">Memuat item material...</TableCell>
+                  <TableCell colSpan={100} className="h-28 text-center"><LoadingState variant="section" text="Memuat item material..." /></TableCell>
                 </TableRow>
               ) : items.length === 0 ? (
                 <TableRow>
@@ -479,8 +486,8 @@ export default function MaterialReleaseEditPage() {
             <AlertDialogDescription className="text-[18px] text-slate-500">Apa anda yakin ingin menghapus data ini?</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-4">
-            <AlertDialogCancel className="h-14 rounded-2xl border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteItems} disabled={deleteItemMutation.isPending} className="h-14 rounded-2xl bg-red-600 px-7 text-[18px] hover:bg-red-700">
+            <AlertDialogCancel className="h-14 rounded-md border-slate-300 px-7 text-[18px]">Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteItems} disabled={deleteItemMutation.isPending} className="h-14 rounded-md bg-red-600 px-7 text-[18px] hover:bg-red-700">
               {deleteItemMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>

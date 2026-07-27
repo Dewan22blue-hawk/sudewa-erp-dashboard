@@ -1,2 +1,0 @@
-src/components/layout/DashboardLayout.tsx
-src/hooks/use-company-menu.ts

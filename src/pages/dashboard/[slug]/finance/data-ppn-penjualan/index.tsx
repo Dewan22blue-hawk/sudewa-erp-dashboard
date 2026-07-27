@@ -6,6 +6,7 @@ import type { PPNPenjualan } from '@/@types/ppn-penjualan.types';
 import PPNPenjualanFormDialog from '@/components/features/ppn-penjualan/PPNPenjualanFormDialog';
 import PPNPenjualanTable from '@/components/features/ppn-penjualan/PPNPenjualanTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,7 +25,7 @@ export default function DataPPNPenjualanPage() {
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState(25);
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState('sales_date');
+  const [sortBy, setSortBy] = useState('buy_date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [selected, setSelected] = useState<PPNPenjualan | null>(null);
   const [openForm, setOpenForm] = useState(false);
@@ -89,12 +90,10 @@ export default function DataPPNPenjualanPage() {
       </Head>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Data PPN Penjualan</h1>
-            <p className="text-sm text-slate-500">Kelola dan lacak semua data PPN penjualan unit langsung dari report backend.</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Data PPN Penjualan"
+          subtitle="Kelola dan lacak semua data PPN penjualan unit langsung dari report backend."
+        />
 
         <div className="space-y-4">
           <div className="flex items-center gap-2 flex-wrap no-print">

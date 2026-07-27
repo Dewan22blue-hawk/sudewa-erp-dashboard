@@ -152,7 +152,7 @@ export function CreateInvoiceTable({
       </div>
 
       {selectedIds.length > 0 ? (
-        <div className="flex items-center justify-between rounded-2xl border border-emerald-100 bg-emerald-50/40 px-5 py-3 shadow-sm transition-all">
+        <div className="flex items-center justify-between rounded-md border border-emerald-100 bg-emerald-50/40 px-5 py-3 shadow-sm transition-all">
           <div className="flex items-center gap-3">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-sm">
               <Check className="h-4 w-4" strokeWidth={3} />

@@ -3,12 +3,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useTypeUnit, useUpdateTypeUnit } from '@/hooks/useTypeUnit';
 import { typeUnitSchema, type TypeUnitFormValues } from '@/scheme/type-unit.schema';
 import { TypeUnitForm } from '@/components/features/type-unit/TypeUnitForm';
 import { ChevronRight } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditTypeUnitPage() {
   const router = useRouter();
@@ -88,7 +90,7 @@ export default function EditTypeUnitPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="text-center text-muted-foreground p-10">Loading...</div>
+          <LoadingState variant="page" />
         </div>
       </DashboardLayout>
     );
@@ -107,23 +109,16 @@ export default function EditTypeUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={handleCancel}>
-            Tipe Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0" />
-          <span className="font-medium text-foreground">Edit Tipe Unit</span>
-        </div>
-
-        {/* Title */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-955">Edit Tipe Unit</h1>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-500">Kode</span>
-            <span className="text-blue-600 font-medium">{typeUnit.code}</span>
-          </div>
-        </div>
+        {/* HEADER */}
+        <PageHeader
+          title="Edit Tipe Unit"
+          subtitle={`Kode: ${typeUnit.code}`}
+          breadcrumbs={[
+            { label: 'Tipe Unit', onClick: handleCancel },
+            { label: 'Edit Tipe Unit' }
+          ]}
+          onBack={handleCancel}
+        />
 
         {/* FORM CARD */}
         <Card className="rounded-md p-6">

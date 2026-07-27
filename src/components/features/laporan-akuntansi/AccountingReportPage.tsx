@@ -13,6 +13,7 @@ import {
   YearlyVatReport,
 } from '@/@types/accounting-report.types';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   downloadAccountingReport,
   getAccountingBalanceSheetReport,
@@ -223,12 +224,10 @@ export default function AccountingReportPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="no-print">
-          <h1 className="text-2xl font-semibold">
-            Laporan Akuntansi
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Pantau semua pemasukan dan pengeluaran
-          </p>
+          <PageHeader
+            title="Laporan Akuntansi"
+            subtitle="Pantau semua pemasukan dan pengeluaran"
+          />
         </div>
 
         <div className="space-y-4">

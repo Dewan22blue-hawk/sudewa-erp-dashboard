@@ -2,13 +2,15 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
 import { EditUnitFormData } from '@/components/features/sales/edit/edit-unit.schema';
 import { toast } from 'sonner';
 import { useSalesUnitItems, useUpdateUnitItem } from '@/hooks/useUnitTransactionItem';
 import { useSalesDetail } from '@/hooks/useSales';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
+import { useCompany } from '@/contexts/CompanyContext';
+import { LoadingState } from '@/components/ui/loading-state';
 
 /**
  * Edit Unit Page - Nested under Sales Detail
@@ -20,9 +22,15 @@ export default function EditNestedUnitPage() {
     const selectedUnitId = Array.isArray(unitId) ? unitId[0] : unitId;
     const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
 
+    const { companyId } = useCompany();
     const { data: salesDetail, isLoading: salesLoading } = useSalesDetail(salesId);
     const { data: itemResponse, isLoading: itemLoading } = useSalesUnitItems(salesId);
-    const { data: unitTypes, isLoading: typeUnitLoading } = useTypeUnits();
+    const { data: unitTypes, isLoading: typeUnitLoading } = useTypeUnits({
+        sort_by: 'created_at',
+        sort_order: 'asc',
+        in_stock: 'true',
+        company_id: companyId || (salesDetail?.raw as any)?.company_id || 1
+    });
     const updateMutation = useUpdateUnitItem();
 
     const item = (itemResponse?.data ?? []).find((row) => String(row.id) === String(selectedUnitId ?? ''));
@@ -112,9 +120,7 @@ export default function EditNestedUnitPage() {
     if (salesLoading || itemLoading || typeUnitLoading) {
         return (
             <DashboardLayout>
-                <div className="flex h-[50vh] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
+                <LoadingState variant="page" />
             </DashboardLayout>
         );
     }

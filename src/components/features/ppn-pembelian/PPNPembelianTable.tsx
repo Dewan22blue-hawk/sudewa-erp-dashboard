@@ -64,18 +64,18 @@ export default function PPNPembelianTable({
   const columns = useMemo<ColumnDef<PPNPembelian>[]>(
     () => [
       {
-        header: 'Tanggal Beli',
-        accessorKey: 'buy_date',
-        sortable: true,
-        alignment: 'center',
-        cell: (item) => formatDate(item.buy_date),
-      },
-      {
         header: 'Kode Pembelian',
         accessorKey: 'code',
         sortable: true,
         alignment: 'left',
         cell: (item) => <CopyBox text={item?.code ?? '-'} />
+      },
+      {
+        header: 'Tanggal Beli',
+        accessorKey: 'buy_date',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => formatDate(item.buy_date),
       },
       {
         header: 'Tipe Unit',
@@ -113,8 +113,12 @@ export default function PPNPembelianTable({
           const hasFp = Boolean(item.fp_date);
           return (
             <div className="space-y-1">
-              <div>{formatDate(item.fp_date)}</div>
-              {renderStatusBadge(hasFp, 'FP Terisi', 'Belum FP')}
+              {item.fp_date ? (
+                <>
+                  <div>{formatDate(item.fp_date)}</div>
+                  {renderStatusBadge(hasFp, 'FP Terisi', 'Belum FP')}
+                </>
+              ) : renderStatusBadge(false, 'FP Terisi', 'Belum FP')}
             </div>
           );
         },
@@ -128,8 +132,12 @@ export default function PPNPembelianTable({
           const hasNsfpAge = Boolean(item.nsfp_age);
           return (
             <div className="space-y-1">
-              <div>{formatDate(item.nsfp_age)}</div>
-              {renderStatusBadge(hasNsfpAge, 'NSFPM Terisi', 'Belum NSFPM')}
+              {item.nsfp_age ? (
+                <>
+                  <div>{formatDate(item.nsfp_age)}</div>
+                  {renderStatusBadge(hasNsfpAge, 'NSFPM Terisi', 'Belum NSFPM')}
+                </>
+              ) : renderStatusBadge(false, 'NSFPM Terisi', 'Belum NSFPM')}
             </div>
           );
         },
@@ -206,7 +214,7 @@ export default function PPNPembelianTable({
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
+            <DropdownMenuContent align="end" className="min-w-[100px] rounded-md p-2">
               <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-md px-3 py-2.5">
                 Edit
               </DropdownMenuItem>
@@ -215,7 +223,7 @@ export default function PPNPembelianTable({
         ),
       },
     ],
-    [onEdit]
+    [onEdit, slug]
   );
 
   return (

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { Search } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -148,10 +149,10 @@ export default function StockPerlengkapanPage() {
       </Head>
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Data Stock Material</h1>
-          <p className="text-sm text-muted-foreground">Kelola dan lacak semua stock material</p>
-        </div>
+        <PageHeader
+          title="Data Stock Material"
+          subtitle="Kelola dan lacak semua stock material"
+        />
 
         <div className="space-y-4">
           {/* Filters, Search, and Tabs */}
@@ -185,7 +186,7 @@ export default function StockPerlengkapanPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
               <span className="text-sm font-medium text-slate-900">Status Perlengkapan:</span>
-              <div className="inline-flex w-fit items-center rounded-2xl bg-[#f3f3f3] p-1">
+              <div className="inline-flex w-fit items-center rounded-md bg-[#f3f3f3] p-1">
                 {tabOptions.map((tab) => {
                   const isActive = tab.value === activeTab;
                   return (

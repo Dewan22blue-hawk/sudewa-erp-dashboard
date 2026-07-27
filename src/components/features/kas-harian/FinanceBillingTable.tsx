@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { Loader2, Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, MoreVertical } from 'lucide-react';
+import {  Plus, Pencil, Trash2, MoreHorizontal, Check, ChevronsUpDown, Info, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -21,6 +21,7 @@ import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import type { FinanceBilling, FinanceBillingPayload } from '@/@types/finance-billing.types';
 import type { KasHarian } from '@/@types/kas-harian.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -317,24 +318,18 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
     }
   };
 
-  const getKasLabel = (cashId: number) => {
+  const getKasLabel = useCallback((cashId: number) => {
     const kas = kasOptions.find((k) => Number(k.id) === cashId);
     return kas ? (kas.cash_name || `${kas.code} - ${kas.description}`) : '-';
-  };
+  }, [kasOptions]);
 
-  const getAccountLabel = (cashId: number) => {
+  const getAccountLabel = useCallback((cashId: number) => {
     const akun = akunOptions.find((a) => Number(a.id) === cashId);
     return akun ? (akun.name || `${akun.code} - ${akun.description}`) : '-';
-  };
+  }, [akunOptions]);
 
   const columns = useMemo<ColumnDef<FinanceBilling>[]>(
     () => [
-      {
-        header: 'No',
-        alignment: 'center',
-        className: 'w-12',
-        cell: (_, index) => index + 1,
-      },
       {
         header: 'Tanggal Bayar',
         alignment: 'left',
@@ -398,7 +393,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           ) : null,
       },
     ],
-    [disabled, cashFlowDetail?.is_paid, slugStr, kasOptions, akunOptions]
+    [disabled, cashFlowDetail?.is_paid, slugStr, getAccountLabel, getKasLabel]
   );
 
   return (
@@ -428,7 +423,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
           <p className="text-sm text-slate-500 mt-1">Daftar finance billing yang terkait dengan transaksi ini</p>
         </div>
         {!disabled && (
-          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={Boolean(cashFlowDetail?.is_paid)}>
+          <Button type="button" onClick={openAddForm} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={Boolean(cashFlowDetail?.is_paid) || (remainingPayment <= 0)}>
             <Plus className="mr-1.5 h-4 w-4" />
             Tambah Pembayaran
           </Button>
@@ -557,7 +552,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                   Menyimpan...
                 </>
               ) : (
@@ -588,7 +583,7 @@ export default function FinanceBillingTable({ financeBillings, cashFlowDetail, c
             >
               {deleteMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                   Menghapus...
                 </>
               ) : (

@@ -49,7 +49,7 @@ export function MaintenanceDetailModal({
           {/* Main Info Blocks */}
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Maintenance Info */}
-            <Card className="rounded-2xl border border-slate-100 p-5 shadow-none bg-slate-50/50 space-y-4">
+            <Card className="rounded-md border border-slate-100 p-5 shadow-none bg-slate-50/50 space-y-4">
               <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-200 pb-2">Informasi Transaksi</h3>
               <div className="grid grid-cols-2 gap-y-3 text-sm">
                 <div>
@@ -76,7 +76,7 @@ export function MaintenanceDetailModal({
             </Card>
 
             {/* Driver Info */}
-            <Card className="rounded-2xl border border-slate-100 p-5 shadow-none bg-slate-50/50 space-y-4">
+            <Card className="rounded-md border border-slate-100 p-5 shadow-none bg-slate-50/50 space-y-4">
               <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-200 pb-2">Informasi Driver</h3>
               <div className="grid grid-cols-2 gap-y-3 text-sm">
                 <div>
@@ -96,7 +96,7 @@ export function MaintenanceDetailModal({
           </div>
 
           {/* Vehicle Fleet Info */}
-          <Card className="rounded-2xl border border-slate-100 p-5 shadow-none bg-slate-50/50 space-y-4">
+          <Card className="rounded-md border border-slate-100 p-5 shadow-none bg-slate-50/50 space-y-4">
             <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-200 pb-2">Informasi Kendaraan / Armada</h3>
             <div className="grid gap-4 sm:grid-cols-3 text-sm">
               <div>

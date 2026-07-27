@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { AccountTable } from '@/components/features/account/AccountTable';
 import { AccountImportModal } from '@/components/features/account/AccountImportModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -289,12 +290,10 @@ export const AccountListPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Akun</h1>
-            <p className="text-sm text-muted-foreground">Kelola akun finance dengan mudah</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Akun"
+          subtitle="Kelola akun finance dengan mudah"
+        />
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -343,7 +342,7 @@ export const AccountListPage = () => {
                   </Button>
                   <Button onClick={handleAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah
+                    Tambah Data
                   </Button>
                 </>
               )}
@@ -404,10 +403,10 @@ export const AccountListPage = () => {
             </AlertDialogHeader>
 
             <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
-              <AlertDialogAction className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleDelete} disabled={deleteMutation.isPending}>
+              <AlertDialogAction className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleDelete} disabled={deleteMutation.isPending}>
                 {deleteMutation.isPending ? 'Menghapus...' : 'Ya'}
               </AlertDialogAction>
-              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
+              <AlertDialogCancel className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50">
                 Tidak
               </AlertDialogCancel>
             </AlertDialogFooter>
@@ -444,14 +443,14 @@ export const AccountListPage = () => {
                   onSearchChange={handleGroupSearch}
                   onLoadMore={handleLoadMoreGroups}
                   hasMore={hasMoreGroups}
-                  className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300 bg-white"
+                  className="h-14 rounded-md border-slate-200 px-4 text-base shadow-none focus:ring-slate-300 bg-white"
                 />
               </div>
 
               <div className="space-y-2.5">
                 <label className="block text-base font-semibold text-slate-900">Kategori Laporan</label>
                 <Select value={bulkForm.category} onValueChange={(value) => setBulkForm((previous) => ({ ...previous, category: value }))}>
-                  <SelectTrigger className="h-14 rounded-2xl border-slate-200 px-4 text-base shadow-none focus:ring-slate-300">
+                  <SelectTrigger className="h-14 rounded-md border-slate-200 px-4 text-base shadow-none focus:ring-slate-300">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
@@ -466,10 +465,10 @@ export const AccountListPage = () => {
             </div>
 
             <div className="mt-8 flex flex-col gap-3">
-              <Button className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateRequest}>
+              <Button className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateRequest}>
                 Simpan
               </Button>
-              <Button variant="outline" className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" onClick={() => setOpenBulkUpdate(false)}>
+              <Button variant="outline" className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" onClick={() => setOpenBulkUpdate(false)}>
                 Batal
               </Button>
             </div>
@@ -494,10 +493,10 @@ export const AccountListPage = () => {
             </AlertDialogHeader>
 
             <AlertDialogFooter className="mt-8 flex-col gap-3 sm:flex-col">
-              <AlertDialogAction className="h-14 rounded-2xl bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateConfirm} disabled={bulkSubmitting}>
+              <AlertDialogAction className="h-14 rounded-md bg-[#1F3B5B] text-lg font-semibold text-white hover:bg-[#1B3450]" onClick={handleBulkUpdateConfirm} disabled={bulkSubmitting}>
                 {bulkSubmitting ? 'Menyimpan...' : 'Ya'}
               </AlertDialogAction>
-              <AlertDialogCancel className="h-14 rounded-2xl border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" disabled={bulkSubmitting}>
+              <AlertDialogCancel className="h-14 rounded-md border-slate-200 text-lg font-semibold text-slate-950 shadow-none hover:bg-slate-50" disabled={bulkSubmitting}>
                 Tidak
               </AlertDialogCancel>
             </AlertDialogFooter>

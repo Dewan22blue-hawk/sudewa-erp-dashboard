@@ -1,14 +1,16 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, CreditCard, Loader2, Search, User } from 'lucide-react';
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, CreditCard, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import PembayaranHutangPaymentDialog from '@/components/features/pembayaran-hutang/PembayaranHutangPaymentDialog';
 import { usePenerimaanPiutangDetail } from '@/hooks/usePenerimaanPiutangDetail';
 import { formatCurrency } from '@/lib/utils/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 
 type PaymentRow = {
   id: number;
@@ -108,43 +110,37 @@ export default function DetailPenerimaanPiutangPage() {
   return (
     <DashboardLayout>
       {isLoading ? (
-        <div className="flex min-h-[50vh] items-center justify-center rounded-2xl border bg-white">
-          <div className="flex items-center gap-3 text-gray-500">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Memuat detail penerimaan...
-          </div>
-        </div>
+        <LoadingState variant="page" text="Memuat detail penerimaan..." />
       ) : errorMessage || !detail ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-red-700">
+        <div className="rounded-md border border-red-200 bg-red-50 px-6 py-5 text-red-700">
           <p className="font-medium">{errorMessage ?? 'Data tidak ditemukan'}</p>
           <p className="mt-1 text-sm text-red-600">Pastikan parameter ID pada URL valid.</p>
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-2">
-                <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-                  <Link href={slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard'}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Kembali
-                  </Link>
+          <div className="space-y-6 rounded-md border bg-white p-6 shadow-sm">
+            <PageHeader
+              breadcrumbs={[
+                { label: 'Data Penerimaan Piutang', onClick: () => router.push(slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard') },
+                { label: 'Detail' }
+              ]}
+              title="Data Penerimaan Piutang"
+              subtitle={
+                <>
+                  <span>No Penjualan:</span>
+                  <span className="font-medium text-sky-600">{detail.code}</span>
+                </>
+              }
+              onBack={() => router.push(slug ? `/dashboard/${slug}/finance/data-penerimaan-piutang` : '/dashboard')}
+              actions={
+                <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                  Tambah Penerimaan
                 </Button>
-                <div>
-                  <h1 className="text-2xl font-semibold text-gray-900">Data Penerimaan Piutang</h1>
-                  <p className="text-sm text-gray-500">
-                    No Penjualan <span className="font-medium text-sky-600">{detail.code}</span>
-                  </p>
-                </div>
-              </div>
-
-              <Button onClick={() => setPaymentDialogOpen(true)} disabled={detail.billing_summary.is_paid || detail.billing_summary.remaining_payment <= 0 || detail.unit_transaction_billing.id <= 0} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                Tambah Penerimaan
-              </Button>
-            </div>
+              }
+            />
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
                 <div className="mb-5 flex items-center gap-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                     <CreditCard className="h-4 w-4" />
@@ -170,7 +166,7 @@ export default function DetailPenerimaanPiutangPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
                 <div className="mb-5 flex items-center gap-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-rose-500">
                     <CreditCard className="h-4 w-4" />
@@ -207,7 +203,7 @@ export default function DetailPenerimaanPiutangPage() {
             </div>
           </div>
 
-          <div className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+          <div className="space-y-4 rounded-md border bg-white p-6 shadow-sm">
             <div className="space-y-1">
               <h2 className="text-base font-semibold text-gray-900">Data Penerimaan Piutang</h2>
               <p className="text-sm text-gray-500">Kolom: No, KODE TERIMA, TANGGAL, KAS MASUK, JUMLAH TERIMA.</p>

@@ -15,6 +15,7 @@ import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { formatDate } from '@/lib/utils/format';
 
 export interface PurchaseTableProps {
   data: UnitTransaction[];
@@ -175,7 +176,7 @@ export default function PurchaseTable({
         header: 'Tanggal',
         accessorKey: 'created_at',
         sortable: true,
-        cell: (item) => (item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy HH:mm') : '-'),
+        cell: (item) => formatDate(item?.created_at) || '-',
       },
       {
         header: 'Supplier',
@@ -241,7 +242,9 @@ export default function PurchaseTable({
         alignment: 'center',
         accessorKey: 'remainingPayment',
         sortable: true,
-        cell: (item) => currenciesFormat('idr', getRemainingPayment(item)),
+        cell: (item) => <span className={cn(getRemainingPayment(item) !== 0 && 'text-red-600 font-semibold')}>
+          {currenciesFormat('idr', getRemainingPayment(item))}
+        </span>
       },
       {
         header: 'Status Billing',
@@ -291,8 +294,18 @@ export default function PurchaseTable({
               )}
               {canDelete && (
                 <DropdownMenuItem
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                  onClick={() => onDelete(item.id)}
+                  className={cn(
+                    "text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer",
+                    item.isPaid && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-red-600 focus:bg-transparent"
+                  )}
+                  disabled={item.isPaid}
+                  onClick={(e) => {
+                    if (item.isPaid) {
+                      e.preventDefault();
+                      return;
+                    }
+                    onDelete(item.id);
+                  }}
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> Hapus
                 </DropdownMenuItem>
@@ -302,62 +315,61 @@ export default function PurchaseTable({
         ),
       },
     ],
-    [currentPage, itemsPerPage, slug, canEdit, canDelete, onDelete, getBillingLabel, router]
+    [slug, canEdit, canDelete, onDelete, getBillingLabel, router]
+  );
+
+  const headerActions = (
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        {/* Search */}
+        <div className="relative w-full sm:w-[240px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+          <Input
+            type="text"
+            placeholder="Search No. Rangka / No. Mesin..."
+            className="pl-8 bg-white h-9 border-slate-300"
+            value={localSearch}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-md shadow-none px-4 whitespace-nowrap"
+          onClick={() => setIsVehicleSearchOpen(true)}
+        >
+          Cari Data Kendaraan
+        </Button>
+
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <span className="text-sm font-medium text-slate-700">Show</span>
+          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+            <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
+              <SelectValue placeholder="25" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+            </SelectContent>
+          </Select>
+          <span className="text-sm font-medium text-slate-700">Page</span>
+        </div>
+      </div>
+
+      {/* RIGHT CONTROLS */}
+      {onAdd && (
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Plus className="mr-2 h-4 w-4" />
+          Tambah Data
+        </Button>
+      )}
+    </div>
   );
 
   return (
     <div className="space-y-4">
-      {/* Controls Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* LEFT CONTROLS */}
-        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          {/* Search */}
-          <div className="relative w-full sm:w-[240px]">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input
-              type="text"
-              placeholder="Search No. Rangka / No. Mesin..."
-              className="pl-8 bg-white h-9 border-slate-300"
-              value={localSearch}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-9 font-medium rounded-md shadow-none px-4 whitespace-nowrap"
-            onClick={() => setIsVehicleSearchOpen(true)}
-          >
-            Cari Data Kendaraan
-          </Button>
-
-          {/* Show + Page limit */}
-          <div className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-sm font-medium text-slate-700">Show</span>
-            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-[70px] bg-white h-9 border-slate-300">
-                <SelectValue placeholder="25" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span className="text-sm font-medium text-slate-700">Page</span>
-          </div>
-        </div>
-
-        {/* RIGHT CONTROLS */}
-        {onAdd && (
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Data
-          </Button>
-        )}
-      </div>
-
       <BaseTable
         data={pagedData}
         columns={columns}
@@ -377,16 +389,7 @@ export default function PurchaseTable({
           total: totalEntries,
         }}
         onPageChange={handlePageChange}
-        headerActions={
-          selectedIds.size > 0 && canDelete ? (
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Hapus Terpilih ({selectedIds.size})
-              </Button>
-            </div>
-          ) : null
-        }
+        headerActions={headerActions}
       />
 
       {/* Vehicle Search Modal */}

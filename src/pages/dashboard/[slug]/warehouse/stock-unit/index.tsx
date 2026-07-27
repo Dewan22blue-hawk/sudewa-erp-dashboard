@@ -1,5 +1,7 @@
+import { LoadingState } from '@/components/ui/loading-state';
 import { useState, useMemo, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import StockUnitTable from '@/components/features/stock-unit/StockUnitTable';
 import StockUnitFilterDropdown from '@/components/features/stock-unit/StockUnitFilterTabs';
 import { useStockUnits } from '@/hooks/useStockUnit';
@@ -46,25 +48,12 @@ export default function StockUnitPage() {
     }
   }, [data]);
 
-  const PanelName = function () {
-    return (
-      <div className="flex items-center justify-between" >
-        <div>
-          <h1 className="text-2xl font-semibold">Data Unit Stok</h1>
-          <p className="text-sm text-muted-foreground">Kelola dan lacak semua unit stok</p>
-        </div>
-      </div >
-    )
-  }
-
   if (isLoading) {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <PanelName />
-          <Card className="rounded-md p-6">
-            <div className="text-center text-muted-foreground">Memuat data...</div>
-          </Card>
+          <PageHeader title="Data Unit Stok" subtitle="Kelola dan lacak semua unit stok" />
+          <LoadingState variant="page" />
         </div>
       </DashboardLayout>
     );
@@ -74,7 +63,7 @@ export default function StockUnitPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <PanelName />
+          <PageHeader title="Data Unit Stok" subtitle="Kelola dan lacak semua unit stok" />
           <Card className="rounded-md p-6">
             <div className="text-center text-destructive">Gagal memuat data</div>
           </Card>
@@ -86,7 +75,7 @@ export default function StockUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <PanelName />
+        <PageHeader title="Data Unit Stok" subtitle="Kelola dan lacak semua unit stok" />
         <StockUnitTable
           data={data?.data || []}
           isLoading={isLoading}

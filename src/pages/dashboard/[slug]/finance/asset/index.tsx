@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { FinanceAssetTable } from '@/components/features/finance/asset/FinanceAssetTable';
 import { useFinanceAssets, useDeleteFinanceAsset, useExportFinanceAsset } from '@/hooks/useFinanceAsset';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -55,6 +56,10 @@ export default function FinanceAssetPage() {
         router.push(`/dashboard/${slug}/finance/asset/${asset.id}/edit`);
     };
 
+    const handleAdd = () => {
+        router.push(`/dashboard/${slug}/finance/asset/create`);
+    };
+
     const handleDetail = (asset: FinanceAsset) => {
         router.push(`/dashboard/${slug}/finance/asset/${asset.id}`);
     };
@@ -87,10 +92,10 @@ export default function FinanceAssetPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-semibold text-slate-950">Aset</h1>
-                    <p className="text-sm text-slate-500">Kelola seluruh aset dengan mudah</p>
-                </div>
+                <PageHeader
+                    title="Aset"
+                    subtitle="Kelola seluruh aset dengan mudah"
+                />
 
                 <FinanceAssetTable
                     assets={filteredAssets}
@@ -109,6 +114,7 @@ export default function FinanceAssetPage() {
                     }}
                     onExport={handleExport}
                     isExporting={exportMutation.isPending}
+                    onAdd={canCreate ? handleAdd : undefined}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onDetail={handleDetail}

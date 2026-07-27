@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MoreVertical, Printer, Edit, FileText, Trash2, Loader2 } from 'lucide-react';
+import { Search, MoreVertical, Printer, Edit, FileText, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DoEkspedisi } from '@/@types/do-ekspedisi.types';
 import { cn } from '@/lib/utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface DOEkspedisiTableProps {
   data: DoEkspedisi[];
@@ -124,10 +125,7 @@ export const DOEkspedisiTable = React.memo(function DOEkspedisiTable({
             {isLoading ? (
               <tr>
                 <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
+                  <LoadingState variant="section" text="Memuat data..." />
                 </td>
               </tr>
             ) : data.length > 0 ? (

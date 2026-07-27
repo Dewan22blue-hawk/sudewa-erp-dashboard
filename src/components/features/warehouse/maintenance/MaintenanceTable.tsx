@@ -1,9 +1,10 @@
-import { Search, Loader2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { MaintenanceItem } from '@/@types/maintenance.types';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface MaintenanceTableProps {
   data: MaintenanceItem[];
@@ -42,10 +43,7 @@ export function MaintenanceTable({
         {isLoading ? (
           <TableRow className="group">
             <TableCell colSpan={7} className="py-16 h-28 text-center text-slate-500 text-sm">
-              <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-              </div>
+              <LoadingState variant="section" text="Memuat data..." />
             </TableCell>
           </TableRow>
         ) : data.length === 0 ? (

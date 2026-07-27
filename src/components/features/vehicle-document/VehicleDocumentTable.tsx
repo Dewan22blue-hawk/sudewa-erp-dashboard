@@ -1,4 +1,4 @@
-import { Download, MoreVertical, Plus, Search, Upload, Loader2 } from 'lucide-react';
+import { Download, MoreVertical, Plus, Search, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import type { VehicleDocumentSummary } from '@/@types/vehicle-document.types';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface Props {
   items: VehicleDocumentSummary[];
@@ -114,10 +115,7 @@ export function VehicleDocumentTable({
           {isLoading ? (
             <tr>
               <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                  <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                  <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                </div>
+                <LoadingState variant="section" text="Memuat data..." />
               </td>
             </tr>
           ) : items.length ? (

@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardList, Archive, Warehouse, Landmark, ListChecks, Shield } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Archive, Warehouse, Landmark, ListChecks, Shield, Settings } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getGeneralMenus = (slug: string): MenuItem[] => {
@@ -178,10 +178,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Laporan Transaksi Kas',
           href: base('/laporan/laporan-transaksi-kas'),
         },
-        {
-          label: 'Laporan Akuntansi',
-          href: base('/laporan/laporan-akuntansi'),
-        },
+        // {
+        //   label: 'Laporan Akuntansi',
+        //   href: base('/laporan/laporan-akuntansi'),
+        // },
         {
           label: 'Laporan Pembelian',
           href: base('/laporan/laporan-pembelian'),
@@ -213,8 +213,8 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
       ],
     },
     {
-      label: 'Settings',
-      icon: Shield, // re-using Shield or another icon
+      label: 'Pengaturan',
+      icon: Settings,
       children: [
         {
           label: 'Pajak',

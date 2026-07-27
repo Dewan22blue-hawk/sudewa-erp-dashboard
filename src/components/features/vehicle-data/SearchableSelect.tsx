@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export interface SearchableSelectOption {
   value: string;
@@ -138,7 +139,7 @@ export function SearchableSelect({
               ))}
             </CommandGroup>
             {loading && hasMore && (
-              <div className="py-2 text-center text-xs text-muted-foreground">Memuat data tambahan...</div>
+              <LoadingState variant="page" />
             )}
           </CommandList>
         </Command>

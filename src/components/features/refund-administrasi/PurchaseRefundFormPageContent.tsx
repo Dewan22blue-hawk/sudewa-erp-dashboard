@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Loader2, Search, Plus, Save } from 'lucide-react';
+import { ArrowLeft, Search, Plus, Save, ChevronRight } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,13 +12,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { MoneyInput } from '@/components/ui/money-input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useCompany } from '@/contexts/CompanyContext';
 import { usePurchases, usePurchaseById, useUnitTransactionItemDetailsData } from '@/hooks/usePurchase';
 import { useCreateRefund, useUpdateRefund, useRefundDetail } from '@/hooks/useRefundAdministrasi';
@@ -27,6 +20,8 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { toast } from 'sonner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const refundFormSchema = z.object({
   unit_transaction_id: z.string().min(1, 'Transaksi harus dipilih'),
@@ -52,15 +47,10 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
   const [filterColor, setFilterColor] = useState('');
   const [filterMachineNumber, setFilterMachineNumber] = useState('');
   const [filterChassisNumber, setFilterChassisNumber] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
 
   const debouncedColor = useDebouncedValue(filterColor, 300);
   const debouncedMachine = useDebouncedValue(filterMachineNumber, 300);
   const debouncedChassis = useDebouncedValue(filterChassisNumber, 300);
-
-  // Queries & Mutations
-  const { data: purchasesResponse } = usePurchases(companyId, { page: 1, perPage: 100 });
-  const purchaseList = purchasesResponse?.data ?? [];
 
   const createMutation = useCreateRefund();
   const updateMutation = useUpdateRefund();
@@ -141,28 +131,29 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
       .reduce((sum, item) => sum + Number(item.price || 0), 0);
   }, [mappedItems, selectedIds]);
 
-  const toggleItem = (id: number, checked: boolean) => {
+  const toggleItem = useCallback((id: number, checked: boolean) => {
     if (checked) {
       form.setValue('unit_transaction_item_detail_ids', [...selectedIds, id]);
     } else {
       form.setValue('unit_transaction_item_detail_ids', selectedIds.filter((item) => item !== id));
     }
-  };
+  }, [selectedIds, form]);
 
   const allSelected = mappedItems.length > 0 && mappedItems.every((item) => selectedIds.includes(Number(item.id)));
 
-  const toggleAllItems = (checked: boolean) => {
+  const toggleAllItems = useCallback((checked: boolean) => {
     if (checked) {
       form.setValue('unit_transaction_item_detail_ids', mappedItems.map((item) => Number(item.id)));
     } else {
       form.setValue('unit_transaction_item_detail_ids', []);
     }
-  };
+  }, [mappedItems, form]);
 
   const onSubmit = async (values: RefundFormValues) => {
+    let newRefundId = null;
     try {
       if (mode === 'create') {
-        await createMutation.mutateAsync({
+        const response = await createMutation.mutateAsync({
           unit_transaction_id: values.unit_transaction_id,
           refund_date: values.refund_date,
           refund_amount: values.refund_amount,
@@ -170,6 +161,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
           unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids,
         });
         toast.success('Data refund berhasil dibuat');
+        newRefundId = response.id;
       } else {
         if (!refundId) return;
         await updateMutation.mutateAsync({
@@ -183,8 +175,10 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
           },
         });
         toast.success('Data refund berhasil diperbarui');
+        newRefundId = refundId;
       }
-      router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${values.unit_transaction_id}`);
+
+      router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${values.unit_transaction_id}/refund/${newRefundId}`);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menyimpan data refund');
     }
@@ -206,6 +200,12 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
             onCheckedChange={(checked) => toggleItem(Number(item.id), Boolean(checked))}
           />
         ),
+      },
+      {
+        header: 'NAMA TIPE UNIT',
+        accessorKey: 'unit_type_name',
+        sortable: true,
+        cell: (item) => item?.unit_type_name ? <ReferenceLink href={`/dashboard/${slug}/master/tipe-unit?search=${item?.unit_type_name}`}>{item?.unit_type_name}</ReferenceLink> : '-'
       },
       {
         header: 'WARNA',
@@ -241,24 +241,37 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
         cell: (item) => currenciesFormat('idr', Number(item.price || 0)),
       },
     ],
-    [selectedIds, allSelected, mappedItems]
+    [slug, selectedIds, allSelected, toggleAllItems, toggleItem]
   );
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 pb-12">
-        {/* Header Section */}
-        <div>
-          <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
+      <div className="space-y-6">
+        {/* BREADCRUMB HEADER */}
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi//${parentPurchase?.id}`)}>
+            Penjualan Unit
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="hover:text-slate-800 cursor-pointer" onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${parentPurchase?.id}`)}>
+            Data Refund Pembelian
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="font-medium text-slate-800">DetailData Refund Pembelian</span>
+        </div>
 
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">{mode === 'create' ? 'Tambah Data Refund' : 'Edit Data Refund'}</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Kode Pembelian</span>
-              <span className="text-blue-600 font-medium">{parentPurchase?.code ?? '-'}</span>
+        {/* HEADLINE & ACTIONS */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/refund-beli?unit_transaction_id=${parentPurchase?.id}`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <ArrowLeft className="h-5 w-5 text-slate-700" />
+            </Button>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-900">Tambah Data Refund Pembelian</h1>
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{parentPurchase?.code}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -267,7 +280,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Form Fields Card */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-5">
               <h2 className="text-lg font-semibold text-slate-900 border-b pb-2">Informasi Refund</h2>
 
               {/* Unit Transaction ID Select */}
@@ -348,7 +361,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
                 className="w-full bg-[#1e3a5f] hover:bg-[#152e4d] gap-2 py-6 rounded-md"
               >
                 {createMutation.isPending || updateMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <LoadingState variant="inline" text={null} />
                 ) : (
                   <Save className="h-4 w-4" />
                 )}
@@ -359,7 +372,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
 
           {/* Unit Details Checkbox Table */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+            <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 gap-2">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">Unit Transaksi Pembelian</h2>
@@ -417,7 +430,7 @@ export default function PurchaseRefundFormPageContent({ mode, refundId }: Purcha
                   loading={isLoadingItems || isLoadingParent}
                 />
               ) : (
-                <div className="h-48 flex flex-col items-center justify-center border border-dashed rounded-2xl text-slate-400 text-sm">
+                <div className="h-48 flex flex-col items-center justify-center border border-dashed rounded-md text-slate-400 text-sm">
                   Silakan pilih transaksi pembelian terlebih dahulu untuk melihat daftar unit
                 </div>
               )}

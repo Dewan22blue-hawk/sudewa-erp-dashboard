@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Save, Loader2, Search } from 'lucide-react';
+import { Plus, Save, Search } from 'lucide-react';
 import { UnitTransactionDetail, UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 import { Kas } from '@/@types/kas.types';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -306,7 +307,7 @@ export function PurchaseRefundForm({
                     <TableRow>
                       <TableCell colSpan={6} className="py-10 text-center">
                         <div className="flex items-center justify-center gap-2 text-slate-400">
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <LoadingState variant="inline" text={null} />
                           <span className="text-sm">Memuat data unit...</span>
                         </div>
                       </TableCell>

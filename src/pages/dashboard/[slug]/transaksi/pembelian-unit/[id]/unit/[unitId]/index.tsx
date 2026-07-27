@@ -2,11 +2,20 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, DollarSignIcon, FileText, Info, ListTodoIcon, Loader2, MoreVertical, Plus, Upload } from 'lucide-react';
+import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload, Trash } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
-import { useCreateUnitItemDetail, useDeleteUnitItemDetail, useImportUnitItemDetails, useUnitItemDetails, useUnitTransactionItemById, useUpdateUnitItemDetail } from '@/hooks/useUnitItemDetail';
+import {
+  useCreateUnitItemDetail,
+  useDeleteUnitItemDetail,
+  useImportUnitItemDetails,
+  useUnitItemDetails,
+  useUnitTransactionItemById,
+  useUpdateUnitItemDetail,
+  useBulkDeleteUnitItemDetails,
+} from '@/hooks/useUnitItemDetail';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,9 +27,55 @@ import { CopyBox } from '@/components/ui/copy-box';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { ReferenceLink } from '@/components/ui/reference-link';
-import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import BaseTable from '@/components/ui/base-table';
+import { LoadingState } from '@/components/ui/loading-state';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+const statusConfig: Record<string, { label: string; className: string }> = {
+  // Backend enum statuses
+  normal: { label: 'Normal', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  minor_damage: { label: 'Minor Damage', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+  major_damage: { label: 'Major Damage', className: 'border-red-200 bg-red-50 text-red-700 font-semibold' },
+  returned: { label: 'Returned', className: 'border-purple-200 bg-purple-50 text-purple-700 font-semibold' },
+  refunded: { label: 'Refunded', className: 'border-orange-200 bg-orange-50 text-orange-700 font-semibold' },
+  lost: { label: 'Lost', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+  in_repair: { label: 'In Repair', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+
+  // Fallback / legacy statuses
+  draft: { label: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-medium' },
+  cancel: { label: 'Cancel', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  rejected: { label: 'Rejected', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  prepare: { label: 'Prepare', className: 'border-amber-200 bg-amber-50 text-amber-700 font-medium' },
+  inbound_purcase_order: { label: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_incoming_goods: { label: 'In Transit', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_receipt: { label: 'Available', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  inbound_return: { label: 'Refund', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_reserved: { label: 'Reserved', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_in_transit: { label: 'In Transit', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-medium' },
+  outbound_delivered: { label: 'Delivered', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-medium' },
+  outbound_return: { label: 'Return', className: 'border-rose-200 bg-rose-50 text-rose-700 font-medium' },
+};
+
+const renderStatus = (status: string) => {
+  const config = statusConfig[status] ?? {
+    label: status ? status.replace(/_/g, ' ') : '-',
+    className: 'border-slate-200 bg-slate-50 text-slate-700 font-medium',
+  };
+
+  return (
+    <Badge variant="outline" className={cn('capitalize', config.className)}>
+      {config.label}
+    </Badge>
+  );
+};
 
 const parseApiError = (err: any): string => {
+  const message = err?.response?.data?.message || err?.message || '';
+  if (message.toLowerCase().includes('capacity reach maximum') || message.toLowerCase().includes('capacity limit')) {
+    return 'Jumlah unit yang diimport melebihi kapasitas quantity item pembelian ini.';
+  }
+
   const details = err?.details ?? err?.response?.data?.errors;
   if (typeof details === 'string') return details;
   if (details && typeof details === 'object') {
@@ -28,7 +83,7 @@ const parseApiError = (err: any): string => {
       .map(([field, value]) => `${field}: ${Array.isArray(value) ? value[0] : String(value)}`)
       .join(', ');
   }
-  return err?.message || 'Terjadi kesalahan pada server';
+  return message || 'Terjadi kesalahan pada server';
 };
 
 export default function UnitPurchaseDetailPage() {
@@ -43,13 +98,34 @@ export default function UnitPurchaseDetailPage() {
   const purchaseId = String(id ?? '');
   const unitItemId = String(unitId ?? '');
 
+  const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
+  const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
+  const { data: detailResponse } = useUnitItemDetails(unitItemId);
+  const { data: typeUnits } = useTypeUnits();
+
+  const createMutation = useCreateUnitItemDetail();
+  const updateMutation = useUpdateUnitItemDetail();
+  const deleteMutation = useDeleteUnitItemDetail();
+  const importMutation = useImportUnitItemDetails();
+  const bulkDeleteMutation = useBulkDeleteUnitItemDetails();
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [openForm, setOpenForm] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
+  const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [formValues, setFormValues] = useState({
+    color: '',
+    machine_number: '',
+    chassis_number: '',
+  });
+
+  const details = detailResponse?.data ?? [];
+  const isPaid = purchase?.unit_transaction_billing?.is_paid;
+
   const columns = useMemo(
     () => [
-      {
-        header: 'NO',
-        alignment: 'left' as const,
-        cell: (_: any, index: number) => index + 1,
-      },
       {
         header: 'Nomor Mesin',
         accessorKey: 'machine_number',
@@ -74,7 +150,21 @@ export default function UnitPurchaseDetailPage() {
         cell: (details: any) => details.color,
       },
       {
-        header: 'ACTION',
+        header: 'Status Stok',
+        accessorKey: 'in_stock',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (details: any) => details.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
+      },
+      {
+        header: 'Kondisi Stok',
+        accessorKey: 'status',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (details: any) => renderStatus(details.status),
+      },
+      {
+        header: 'aksi',
         alignment: 'left' as const,
         sticky: 'right' as const,
         cell: (details: any) => (
@@ -85,41 +175,19 @@ export default function UnitPurchaseDetailPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[162px] rounded-[14px] border border-[#E5E7EB] p-2 shadow-[0_12px_35px_rgba(15,23,42,0.14)]">
-              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(details)}>
+              {canEdit && <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#111827]" onClick={() => openEditForm(details)}>
                 Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(details)}>
+              </DropdownMenuItem>}
+              {canDelete && !isPaid && <DropdownMenuItem className="rounded-[10px] px-4 py-3 text-sm text-[#EF4444]" onClick={() => setDeleteTarget(details)}>
                 Hapus
-              </DropdownMenuItem>
+              </DropdownMenuItem>}
             </DropdownMenuContent>
           </DropdownMenu>
         ),
       },
     ],
-    [],
+    [canDelete, canEdit, isPaid],
   );
-
-  const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
-  const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
-  const { data: detailResponse } = useUnitItemDetails(unitItemId);
-  const { data: typeUnits } = useTypeUnits();
-
-  const createMutation = useCreateUnitItemDetail();
-  const updateMutation = useUpdateUnitItemDetail();
-  const deleteMutation = useDeleteUnitItemDetail();
-  const importMutation = useImportUnitItemDetails();
-
-  const [openForm, setOpenForm] = useState(false);
-  const [openImport, setOpenImport] = useState(false);
-  const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
-  const [formValues, setFormValues] = useState({
-    color: '',
-    machine_number: '',
-    chassis_number: '',
-  });
-
-  const details = detailResponse?.data ?? [];
 
   const unitTypeName = useMemo(() => {
     if (!unitItem?.unit_type_id) return '-';
@@ -229,12 +297,30 @@ export default function UnitPurchaseDetailPage() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.size} detail unit terpilih?`)) {
+      try {
+        setIsBulkDeleting(true);
+        await bulkDeleteMutation.mutateAsync({
+          unitItemId,
+          ids: Array.from(selectedIds),
+        });
+        toast.success('Beberapa detail unit berhasil dihapus');
+        setSelectedIds(new Set());
+      } catch (err: any) {
+        toast.error(parseApiError(err));
+      } finally {
+        setIsBulkDeleting(false);
+      }
+    }
+  };
+
   if (purchaseLoading || unitItemLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -253,162 +339,181 @@ export default function UnitPurchaseDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 pb-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="space-y-1">
-            <button onClick={() => router.back()} className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </button>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Detail Pembelian Unit</h1>
-            <p className="text-sm text-muted-foreground">
-              Invoice <span className="text-blue-600 font-medium">{purchase.code}</span>
-            </p>
+        <div className="space-y-6">
+          <PageHeader
+            breadcrumbs={[
+              { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+              { label: 'Detail Pembelian', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`) },
+              { label: 'Detail Pembelian Unit' }
+            ]}
+            title="Detail Data Pembelian"
+            subtitle={
+              <>
+                <span>Kode Beli:</span>
+                <span className="text-blue-600 font-semibold">{purchase.code}</span>
+              </>
+            }
+            onBack={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}`)}
+          />
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-2">
+
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-blue-50">
+                    <FileText className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-700">Informasi Invoice</h3>
+                </div>
+                <div className="text-sm text-slate-600">
+                  <p>Nomor Pembelian</p>
+                  <p className="font-semibold text-slate-900">
+                    <CopyBox text={purchase.code} />
+                  </p>
+                </div>
+                <div className="text-sm text-slate-600">
+                  <p>Tipe Unit</p>
+                  <p className="font-semibold text-slate-900">
+                    <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitTypeName}`}>{unitTypeName}</ReferenceLink>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-green-50">
+                    <DollarSignIcon className="h-5 w-5 text-green-500" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-700">Detail Pembelian</h3>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>Harga Unit</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', price)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>BBN</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>Quantity</span>
+                  <span className="font-semibold text-slate-900">{qty}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>Total HPP</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalHpp)}</span>
+                </div>
+                {unitItem?.price_usd ? (
+                  <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100 mt-2">
+                    <span className="font-medium">Total Harga (USD)</span>
+                    <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_usd))}</span>
+                  </div>
+                ) : null}
+                {unitItem?.price_per_unit_usd ? (
+                  <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100">
+                    <span className="font-medium">Harga Satuan (USD)</span>
+                    <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_per_unit_usd))}</span>
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-yellow-50">
+                    <ListTodoIcon className="h-5 w-5 text-yellow-500" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-700">Rincian Biaya</h3>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>DPP</span>
+                  <span className="font-semibold text-slate-900">
+                    {currenciesFormat('idr', dppPerUnit)}
+                    <span className="ml-2 font-light opacity-70">
+                      ({(Number(unitItem?.dpp_tax_rate) / 100).toFixed(2)}%)
+                      {unitItem?.dpp_tax?.tax?.name && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex cursor-help p-0.5">
+                              <Info className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {unitItem?.dpp_tax?.tax?.name}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </span>
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-slate-600">
+                  <span>PPN</span>
+                  <span className="font-semibold text-slate-900">
+                    {currenciesFormat('idr', ppnPerUnit)}
+                    <span className="ml-2 font-light opacity-70">
+                      ({(Number(unitItem?.ppn_tax_rate) / 100).toFixed(2)}%)
+                    </span>
+                  </span>
+                </div>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+                  <span className="font-medium text-slate-700">Total Pembelian</span>
+                  <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Card className="border-slate-200">
-            <CardContent className="p-5 space-y-2">
-
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-md bg-blue-50">
-                  <FileText className="h-5 w-5 text-blue-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-700">Informasi Invoice</h3>
-              </div>
-              <div className="text-sm text-slate-600">
-                <p>Nomor Pembelian</p>
-                <p className="font-semibold text-slate-900">
-                  <CopyBox text={purchase.code} />
-                </p>
-              </div>
-              <div className="text-sm text-slate-600">
-                <p>Tipe Unit</p>
-                <p className="font-semibold text-slate-900">
-                  <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitTypeName}`}>{unitTypeName}</ReferenceLink>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-200">
-            <CardContent className="p-5 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-md bg-green-50">
-                  <DollarSignIcon className="h-5 w-5 text-green-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-700">Detail Pembelian</h3>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Harga Unit</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', price)}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>BBN</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', bbnPrice)}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Quantity</span>
-                <span className="font-semibold text-slate-900">{qty}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Total HPP</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalHpp)}</span>
-              </div>
-              {unitItem?.price_usd ? (
-                <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100 mt-2">
-                  <span className="font-medium">Total Harga (USD)</span>
-                  <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_usd))}</span>
-                </div>
-              ) : null}
-              {unitItem?.price_per_unit_usd ? (
-                <div className="flex items-center justify-between text-sm text-amber-800 bg-amber-50/50 px-2.5 py-1.5 rounded-lg border border-amber-100">
-                  <span className="font-medium">Harga Satuan (USD)</span>
-                  <span className="font-bold">{currenciesFormat('usd', Number(unitItem.price_per_unit_usd))}</span>
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-200">
-            <CardContent className="p-5 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-md bg-yellow-50">
-                  <ListTodoIcon className="h-5 w-5 text-yellow-500" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-700">Rincian Biaya</h3>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>DPP</span>
-                <span className="font-semibold text-slate-900">
-                  {currenciesFormat('idr', dppPerUnit)}
-                  <span className="ml-2 font-light opacity-70">
-                    ({(Number(unitItem?.dpp_tax_rate) / 100).toFixed(2)}%)
-                    {unitItem?.dpp_tax?.tax?.name && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="inline-flex cursor-help p-0.5">
-                            <Info className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {unitItem?.dpp_tax?.tax?.name}
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                  </span>
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>PPN</span>
-                <span className="font-semibold text-slate-900">
-                  {currenciesFormat('idr', ppnPerUnit)}
-                  <span className="ml-2 font-light opacity-70">
-                    ({(Number(unitItem?.ppn_tax_rate) / 100).toFixed(2)}%)
-                  </span>
-                </span>
-              </div>
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
-                <span className="font-medium text-slate-700">Total Pembelian</span>
-                <span className="font-semibold text-slate-900">{currenciesFormat('idr', totalPembelian)}</span>
-              </div>
+          <Card className="border border-slate-200 shadow-sm">
+            <CardContent className="p-4 space-y-4">
+              <BaseTable
+                data={details ?? []}
+                columns={columns}
+                headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
+                defaultSort={{ key: 'payment_date', direction: 'desc' }}
+                showCheckbox
+                selectedIds={selectedIds}
+                onSelectedIdsChange={setSelectedIds}
+                headerActions=
+                {(
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
+                    <div>
+                      <h2 className="text-base font-semibold text-slate-800">Data Pembelian Detail Unit Tipe</h2>
+                      <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {selectedIds.size > 0 && canDelete && !isPaid && (
+                        <Button
+                          onClick={handleBulkDelete}
+                          disabled={isBulkDeleting}
+                          variant="destructive"
+                          className="w-full sm:w-auto bg-[#EF4444] hover:bg-[#DC2626] text-white"
+                        >
+                          <Trash className="h-4 w-4 mr-2" />
+                          Hapus ({selectedIds.size})
+                        </Button>
+                      )}
+                      {canCreate && !isPaid && (
+                        <>
+                          <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Import
+                          </Button>
+                          <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Tambah Detail Unit
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              />
             </CardContent>
           </Card>
         </div>
-
-        <Card className="border border-slate-200 shadow-sm">
-          <CardContent className="p-4 space-y-4">
-            <BaseTable
-              data={details ?? []}
-              columns={columns}
-              headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
-              defaultSort={{ key: 'payment_date', direction: 'desc' }}
-              headerActions=
-              {(
-                <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
-                  <div>
-                    <h2 className="text-base font-semibold text-slate-800">Detail Pembelian Detail Unit</h2>
-                    <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {canCreate && (
-                      <>
-                        <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
-                          <Upload className="h-4 w-4 mr-2" />
-                          Import
-                        </Button>
-                        <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Tambah Detail Unit
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            />
-          </CardContent>
-        </Card>
       </div>
 
       <Dialog open={openForm} onOpenChange={setOpenForm}>

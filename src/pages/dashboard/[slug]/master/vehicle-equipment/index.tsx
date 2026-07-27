@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { VehicleEquipmentTable } from '@/components/features/vehicle-equipment/VehicleEquipmentTable';
 import { VehicleEquipmentFormModal } from '@/components/features/vehicle-equipment/VehicleEquipmentFormModal';
 import { DeleteVehicleEquipmentModal } from '@/components/features/vehicle-equipment/DeleteVehicleEquipmentModal';
@@ -91,12 +92,10 @@ export default function VehicleEquipmentPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 {/* Header Title */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Perlengkapan</h1>
-                        <p className="text-sm text-muted-foreground">Kelola data perlengkapan dengan mudah</p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Perlengkapan"
+                    subtitle="Kelola data perlengkapan dengan mudah"
+                />
 
                 {/* Loading / Error States */}
                 {isLoading ? (

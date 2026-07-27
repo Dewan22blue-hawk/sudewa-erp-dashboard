@@ -347,7 +347,7 @@ export function OrderListForm({
 
       <div className="space-y-5">
         {/* Card 1 — Customer */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none">
+        <section className="rounded-md border border-slate-200 bg-white p-5 shadow-none">
           <div className="space-y-2">
             <Label className="text-[14px] font-semibold text-slate-900">Nama Customer</Label>
             <div className="w-full max-w-[420px]">
@@ -383,7 +383,7 @@ export function OrderListForm({
           const tarif = getTarifById(item?.tarifId ?? '');
 
           return (
-            <section key={field.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
+            <section key={field.id} className="rounded-md border border-slate-200 bg-white p-5 shadow-none space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <Label className="text-[15px] font-bold text-slate-900">Rute #{index + 1}</Label>
                 {fields.length > 1 ? (
@@ -587,7 +587,7 @@ export function OrderListForm({
 
 
         {/* Card 4 — UJ Driver, Invoice, PPN */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-none space-y-4">
+        <section className="rounded-md border border-slate-200 bg-white p-5 shadow-none space-y-4">
           <div className="space-y-2">
             <Label className="text-[14px] font-semibold text-slate-900">UJ Driver</Label>
             <Controller

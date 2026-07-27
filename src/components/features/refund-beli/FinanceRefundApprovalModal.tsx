@@ -8,7 +8,7 @@ import { financeRefundService } from '@/services/finance-refund.service';
 import { useKas } from '@/hooks/useKas';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface FinanceRefundApprovalModalProps {
   open: boolean;
@@ -23,7 +23,7 @@ export default function FinanceRefundApprovalModal({ open, onClose, refundId, on
   const [selectedKas, setSelectedKas] = useState<string>('');
 
   const approveMutation = useMutation({
-    mutationFn: (data: { status: 'approve' | 'reject'; cash_id?: string }) => 
+    mutationFn: (data: { status: 'approve' | 'reject'; cash_id?: string }) =>
       financeRefundService.approveRefund(String(refundId), data),
     onSuccess: () => {
       // Callback to parent to refetch data since some hooks use custom state instead of react-query
@@ -73,22 +73,22 @@ export default function FinanceRefundApprovalModal({ open, onClose, refundId, on
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={handleReject} 
-              disabled={approveMutation.isPending} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleReject}
+              disabled={approveMutation.isPending}
               className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
             >
               Reject
             </Button>
-            <Button 
-              type="button" 
-              onClick={handleApprove} 
-              disabled={approveMutation.isPending || !selectedKas} 
+            <Button
+              type="button"
+              onClick={handleApprove}
+              disabled={approveMutation.isPending || !selectedKas}
               className="bg-[#1f304f] hover:bg-[#1a2842] text-white"
             >
-              {approveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {approveMutation.isPending ? <LoadingState variant="inline" text={null} /> : null}
               Approve
             </Button>
           </div>

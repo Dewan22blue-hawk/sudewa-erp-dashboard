@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 import { cn } from '@/lib/utils';
 
 export interface ColumnDef<T> {
@@ -29,6 +30,7 @@ export interface BaseTableProps<T> {
   search?: string;
   onSearchChange?: (value: string) => void;
   headerActions?: React.ReactNode;
+  headerGroups?: React.ReactNode; // Optional extra grouped header rows
 
   // Show / Limit page props
   showLimitChange?: boolean;
@@ -80,6 +82,7 @@ export default function BaseTable<T>({
   defaultSort,
   meta,
   onPageChange,
+  headerGroups,
   headerRowClassName = 'bg-[#f8f9fa]',
   containerClassName,
   showCheckbox = false,
@@ -140,9 +143,13 @@ export default function BaseTable<T>({
     return () => clearTimeout(timer);
   }, [localSearch, onSearchChange, search]);
 
-  const activeSort = onSortChange
-    ? { key: sortBy || '', direction: sortDirection || 'asc' }
-    : internalSort;
+  const activeSort = useMemo(
+    () =>
+      onSortChange
+        ? { key: sortBy || '', direction: sortDirection || 'asc' }
+        : internalSort,
+    [onSortChange, sortBy, sortDirection, internalSort]
+  );
 
   const handleSort = (key: string) => {
     const nextDirection =
@@ -289,6 +296,7 @@ export default function BaseTable<T>({
       <div className={cn('relative overflow-hidden rounded-md border border-slate-200 bg-white shadow-none', containerClassName)}>
         <Table className="w-max min-w-full">
           <TableHeader className={cn('border-b border-gray-200', headerRowClassName)}>
+            {headerGroups && headerGroups}
             <TableRow className="hover:bg-transparent border-none">
               {showCheckbox && (
                 <TableHead className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
@@ -346,10 +354,7 @@ export default function BaseTable<T>({
                 <TableCell colSpan={columns.length + (showCheckbox ? 1 : 0)} className="text-center px-4 py-16 bg-white border-none">
                   <div className="flex flex-col items-center justify-center gap-2">
                     {loading ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <p className="text-sm text-muted-foreground">Memuat data...</p>
-                      </>
+                      <LoadingState variant="section" text="Memuat data..." />
                     ) : (
                       <>
                         <div className="rounded-full bg-slate-50 p-4 mb-2">

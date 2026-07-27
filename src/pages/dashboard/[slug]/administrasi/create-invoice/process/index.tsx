@@ -20,6 +20,7 @@ const parseIds = (value: string | string[] | undefined) => {
 const isDefined = <T,>(value: T | undefined | null): value is T => value != null;
 
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function ProcessCreateInvoicePage() {
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function ProcessCreateInvoicePage() {
   };
 
   if (!router.isReady || isLoading) {
-    return <DashboardLayout><div className="py-20 text-center text-sm text-slate-500">Memuat data invoice...</div></DashboardLayout>;
+    return <DashboardLayout><LoadingState variant="page" /></DashboardLayout>;
   }
 
   if (!invoices.length) {

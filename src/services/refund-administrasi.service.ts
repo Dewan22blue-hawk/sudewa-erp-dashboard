@@ -29,7 +29,7 @@ const mapItemDetail = (item: any): UnitTransactionItemDetail => ({
   ...item,
   id: toString(item.id),
   unit_transaction_item_id: toString(item.unit_transaction_item_id),
-  unit_type_name: item.unit_type_name ?? item.unit_type?.name ?? '-',
+  unit_type_name: item?.tipeUnit ?? '-',
   price: item.price !== undefined ? toNumber(item.price) : undefined,
   color: item.color ?? '-',
   machine_number: item.machine_number ?? '-',
@@ -76,16 +76,16 @@ const mapRefund = (item: any): UnitTransactionRefund => ({
       : [],
   transaction: item.transaction ?? item.unit_transaction
     ? {
-        id: (item.transaction ?? item.unit_transaction).id ? toString((item.transaction ?? item.unit_transaction).id) : undefined,
-        code: (item.transaction ?? item.unit_transaction).code || undefined,
-        type: (item.transaction ?? item.unit_transaction).type || undefined,
-        person: (item.transaction ?? item.unit_transaction).person
-          ? {
-              id: (item.transaction ?? item.unit_transaction).person.id ? toString((item.transaction ?? item.unit_transaction).person.id) : undefined,
-              name: (item.transaction ?? item.unit_transaction).person.name || '-',
-            }
-          : null,
-      }
+      id: (item.transaction ?? item.unit_transaction).id ? toString((item.transaction ?? item.unit_transaction).id) : undefined,
+      code: (item.transaction ?? item.unit_transaction).code || undefined,
+      type: (item.transaction ?? item.unit_transaction).type || undefined,
+      person: (item.transaction ?? item.unit_transaction).person
+        ? {
+          id: (item.transaction ?? item.unit_transaction).person.id ? toString((item.transaction ?? item.unit_transaction).person.id) : undefined,
+          name: (item.transaction ?? item.unit_transaction).person.name || '-',
+        }
+        : null,
+    }
     : null,
 });
 
@@ -103,7 +103,7 @@ export const refundAdministrasiService = {
       }
     });
     const payload = ensureSuccess(response.data);
-    
+
     // Mapping from Laravel paginated format to our expected format
     const data = (payload?.data || []).map(mapRefund);
 
@@ -141,7 +141,7 @@ export const refundAdministrasiService = {
         'Content-Type': 'multipart/form-data',
       }
     });
-    
+
     const result = ensureSuccess(response.data);
     return mapRefund(result);
   },
@@ -166,8 +166,12 @@ export const refundAdministrasiService = {
     return mapRefund(result);
   },
 
-  async deleteRefund(id: string): Promise<void> {
-    const response = await apiClient.delete<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`);
+  async deleteRefund(id: string, deleteFinanceRefund: boolean = true): Promise<void> {
+    const response = await apiClient.delete<LaravelApiResponse<any>>(`${BASE_PATH}/${id}`, {
+      params: {
+        'delete-finance-refund': deleteFinanceRefund,
+      },
+    });
     ensureSuccess(response.data);
   },
 
@@ -191,7 +195,7 @@ export const refundAdministrasiService = {
         'Content-Type': 'application/x-www-form-urlencoded',
       }
     });
-    
+
     ensureSuccess(response.data);
   },
 
@@ -228,7 +232,7 @@ export const refundAdministrasiService = {
         search: params.search || undefined,
       }
     });
-    
+
     const payload = ensureSuccess(response.data);
 
     return {

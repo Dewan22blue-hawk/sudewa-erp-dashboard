@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
 import type { UnitTransactionRefund } from '@/@types/refund.type';
 import { createRefundPaymentSchema, type CreateRefundPaymentFormValues } from '@/schemas/refund.schema';
 import { useCreateRefundPayment } from '@/hooks/useRefundAdministrasi';
@@ -13,6 +12,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from 'sonner';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKas } from '@/hooks/useKas';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface RefundPaymentModalProps {
   open: boolean;
@@ -120,7 +120,7 @@ export default function RefundPaymentModal({ open, onClose, refund }: RefundPaym
               Batal
             </Button>
             <Button type="submit" disabled={createPaymentMutation.isPending || remainingAmount <= 0}>
-              {createPaymentMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {createPaymentMutation.isPending ? <LoadingState variant="inline" text={null} /> : null}
               Simpan Pembayaran
             </Button>
           </DialogFooter>

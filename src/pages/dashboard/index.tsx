@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies } from '@/services/company.service';
-import { Loader2 } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function DashboardIndex() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function DashboardIndex() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <LoadingState variant="page" className="h-screen" />
     </div>
   );
 }

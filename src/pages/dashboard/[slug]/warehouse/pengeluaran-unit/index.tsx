@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Plus } from 'lucide-react';
 import PengeluaranUnitTable from '@/components/features/pengeluaran-unit/PengeluaranUnitTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { usePengeluaranUnits } from '@/hooks/usePengeluaranUnit';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
@@ -62,19 +63,18 @@ export default function PengeluaranUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Data Pengeluaran Unit</h1>
-            <p className="text-sm text-muted-foreground">Kelola dan lacak semua data pengeluaran stock unit</p>
-          </div>
-
-          {canCreate && (
-            <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Data Pengeluaran Unit"
+          subtitle="Kelola dan lacak semua data pengeluaran stock unit"
+          actions={
+            canCreate && (
+              <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah
+              </Button>
+            )
+          }
+        />
 
         <PengeluaranUnitTable
           data={data?.data ?? []}

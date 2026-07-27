@@ -88,7 +88,7 @@ function SummaryStrip({
   value?: number | null;
 }) {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_140px] gap-4 rounded-2xl border border-[#e5e7eb] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#111827]">
+    <div className="grid grid-cols-[minmax(0,1fr)_140px] gap-4 rounded-md border border-[#e5e7eb] bg-[#f8fbff] px-4 py-3 text-sm font-semibold text-[#111827]">
       <span>{label}</span>
       <span className="text-right">{formatAccountingNumber(value)}</span>
     </div>

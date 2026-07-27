@@ -9,9 +9,9 @@ import { useUpdateTransaction } from '@/hooks/useTransaction';
 import { getTransactionById } from '@/services/transaction.service';
 import { Transaction } from '@/@types/transaction.types';
 import { useCompany } from '@/contexts/CompanyContext';
-import { ChevronRight } from 'lucide-react';
-
 import { TransactionFormValues } from '@/scheme/transaction.schema';
+import { PageHeader } from '@/components/ui/page-header';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function EditTransactionPage() {
   const router = useRouter();
@@ -79,9 +79,7 @@ export default function EditTransactionPage() {
   if (isFetching) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-[50vh]">
-          <span className="animate-pulse text-muted-foreground">Loading data...</span>
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -91,25 +89,20 @@ export default function EditTransactionPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(basePath)}>
-            Arus Transaksi
-          </span>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">Edit Transaksi</span>
-        </div>
-
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Edit Transaksi</h1>
-          <p className="text-sm text-muted-foreground">Ubah detail transaksi yang sudah ada</p>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Arus Transaksi', onClick: () => router.push(basePath) },
+            { label: 'Edit Transaksi' }
+          ]}
+          title="Edit Transaksi"
+          subtitle="Ubah detail transaksi yang sudah ada"
+          onBack={() => router.push(basePath)}
+        />
 
         <div className="rounded-md border bg-white p-6 md:p-8">
           <TransactionForm
             defaultValues={{
               ...transaction,
-              // Ensure date format needs
             }}
             onSubmit={handleSubmit}
             onCancel={() => router.push(basePath)}

@@ -33,7 +33,7 @@ function AccountCard({ account }: { account: AccountOverview }) {
   const color = palette[paletteKey];
 
   return (
-    <Card className="flex h-full flex-col space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <Card className="flex h-full flex-col space-y-6 rounded-md border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-start gap-4">
         <div className={`flex h-10 w-10 items-center justify-center rounded-md ${color.bg}`}>
           <Icon className={`h-5 w-5 ${color.text}`} />
@@ -59,7 +59,7 @@ function AccountCard({ account }: { account: AccountOverview }) {
 }
 
 function SkeletonCard() {
-  return <Skeleton className="h-[210px] rounded-2xl" />;
+  return <Skeleton className="h-[210px] rounded-md" />;
 }
 
 export function FinanceOverview({ accounts, isLoading, isError }: FinanceOverviewProps) {
@@ -75,7 +75,7 @@ export function FinanceOverview({ accounts, isLoading, isError }: FinanceOvervie
 
   if (isError) {
     return (
-      <Card className="rounded-2xl border border-red-200 bg-red-50 p-6 flex flex-col items-center justify-center min-h-[210px]">
+      <Card className="rounded-md border border-red-200 bg-red-50 p-6 flex flex-col items-center justify-center min-h-[210px]">
         <p className="text-red-600 font-medium text-center">Gagal memuat overview keuangan</p>
         <p className="text-red-500 text-sm mt-1 text-center">Silakan refresh halaman untuk mencoba lagi</p>
       </Card>
@@ -86,7 +86,7 @@ export function FinanceOverview({ accounts, isLoading, isError }: FinanceOvervie
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(3)].map((_, idx) => (
-          <Card key={idx} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col items-center justify-center min-h-[210px] text-slate-500">
+          <Card key={idx} className="rounded-md border border-slate-200 bg-white p-6 shadow-sm flex flex-col items-center justify-center min-h-[210px] text-slate-500">
             <p className="font-medium">Data Belum Tersedia</p>
           </Card>
         ))}

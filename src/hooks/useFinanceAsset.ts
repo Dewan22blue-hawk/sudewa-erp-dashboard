@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getFinanceAssets, getFinanceAssetById, updateFinanceAsset, deleteFinanceAsset, exportFinanceAsset } from '@/services/finance-asset.service';
+import { getFinanceAssets, getFinanceAssetById, updateFinanceAsset, deleteFinanceAsset, exportFinanceAsset, createFinanceAsset } from '@/services/finance-asset.service';
 import type { PaginationParams } from '@/@types/pagination.types';
 import type { FinanceAssetPayload } from '@/@types/finance-asset.types';
 
@@ -19,6 +19,16 @@ export function useFinanceAssetDetail(id: string | number | null) {
         queryKey: ['finance-assets', id],
         queryFn: () => getFinanceAssetById(id as string | number),
         enabled: !!id,
+    });
+}
+
+export function useCreateFinanceAsset() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: FinanceAssetPayload) => createFinanceAsset(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['finance-assets'] });
+        },
     });
 }
 

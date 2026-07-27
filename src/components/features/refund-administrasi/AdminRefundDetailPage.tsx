@@ -9,6 +9,7 @@ import { RefundStatusBadge } from '@/components/features/refund/RefundStatusBadg
 import RefundPaymentModal from '@/components/features/refund-administrasi/RefundPaymentModal';
 import { useRefundDetail, useRefundTransactionDetail } from '@/hooks/useRefundAdministrasi';
 import { formatCurrency } from '@/lib/utils/currency';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface AdminRefundDetailPageProps {
   title: string;
@@ -34,7 +35,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
   if (refundQuery.isLoading || transactionQuery.isLoading) {
     return (
       <DashboardLayout>
-        <div className="p-8 text-center text-slate-500">Memuat detail refund...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -61,19 +62,19 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
         </div>
 
         <div className="grid gap-4 xl:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Kode Refund</p>
             <p className="mt-2 text-lg font-semibold text-slate-900">{refund.code}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Tanggal Refund</p>
             <p className="mt-2 text-lg font-semibold text-slate-900">{formatDate(refund.refund_date)}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Nominal Refund</p>
             <p className="mt-2 text-lg font-semibold text-slate-900">{formatCurrency(refund.refund_amount)}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</p>
             <div className="mt-2">
               <RefundStatusBadge status={refund.status === 'approve' || refund.status === 'reject' ? refund.status : 'waiting'} />
@@ -82,12 +83,12 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <h2 className="text-base font-semibold text-slate-900">Catatan Refund</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">{refund.note || 'Tidak ada catatan refund.'}</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-md border border-slate-200 bg-white p-5">
             <h2 className="text-base font-semibold text-slate-900">Ringkasan Pembayaran</h2>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex items-center justify-between">
@@ -107,7 +108,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
             <div className="border-b border-slate-200 px-5 py-4">
               <h2 className="text-base font-semibold text-slate-900">Histori Pembayaran Refund</h2>
             </div>
@@ -143,7 +144,7 @@ export function AdminRefundDetailPage({ title, refundId, transactionId, backHref
             </Table>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
             <div className="border-b border-slate-200 px-5 py-4">
               <h2 className="text-base font-semibold text-slate-900">Unit yang Direfund</h2>
             </div>

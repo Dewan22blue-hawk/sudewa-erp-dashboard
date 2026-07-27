@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, Check, ChevronsUpDown } from 'lucide-react';
 import { EditUnitForm } from '@/components/features/sales/edit/EditUnitForm';
@@ -89,7 +90,7 @@ export default function EditUnitPage() {
   // Initialize form state when details are loaded
   useEffect(() => {
     if (data?.raw) {
-      const initialCustomerId = String(data.raw.person_id ?? data.raw.person?.id ?? '');
+      const initialCustomerId = String((data.raw as any).person_id ?? data.raw.person?.id ?? '');
       setForm((prev) => ({
         ...prev,
         customerId: initialCustomerId,
@@ -161,7 +162,7 @@ export default function EditUnitPage() {
       }
 
       const customerId = Number(form.customerId);
-      const companyIdNumber = Number(companyId || data.raw.company_id || 0);
+      const companyIdNumber = Number(companyId || (data.raw as any).company_id || 0);
 
       if (!customerId) {
         toast.error('Customer wajib dipilih');
@@ -171,7 +172,7 @@ export default function EditUnitPage() {
       const payload = {
         company_id: companyIdNumber,
         person_id: customerId,
-        warehouse_id: Number(data.raw.warehouse?.id ?? data.raw.warehouse_id ?? 1),
+        warehouse_id: Number(data.raw.warehouse?.id ?? (data.raw as any).warehouse_id ?? 1),
         code: data.raw.code ?? invoiceCode,
         type: 'sales' as const,
         max_capacity: Number(data.raw.max_capacity ?? 1),
@@ -205,23 +206,20 @@ export default function EditUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* BREADCRUMB HEADER */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="hover:text-foreground cursor-pointer" onClick={() => router.push(basePath)}>
-            Penjualan Unit
-          </span>
-          <ChevronRight className="h-4 w-4 shrink-0" />
-          <span className="font-medium text-foreground">Edit Penjualan</span>
-        </div>
-
-        {/* Title */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-950">Edit Penjualan</h1>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Kode Jual</span>
-            <span className="text-blue-600 font-medium">{invoiceCode}</span>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Penjualan Unit', onClick: () => router.push(basePath) },
+            { label: 'Edit Penjualan' }
+          ]}
+          title="Edit Penjualan"
+          subtitle={
+            <>
+              <span>Kode Jual:</span>
+              <span className="text-blue-600 font-medium">{invoiceCode}</span>
+            </>
+          }
+          onBack={() => router.push(basePath)}
+        />
 
         {/* Form Card - Border 1px, Radius 12px, Padding 24px */}
         <Card className="rounded-md border border-gray-200 shadow-none">
@@ -230,7 +228,7 @@ export default function EditUnitPage() {
               defaultValues={formData}
               prependFields={
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-col">
                     <Label className="text-sm font-medium">Tanggal</Label>
                     <Input
                       type="date"
@@ -240,7 +238,7 @@ export default function EditUnitPage() {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-col">
                     <Label className="text-sm font-medium">Customer</Label>
                     <Popover open={isCustomerOpen} onOpenChange={setIsCustomerOpen}>
                       <PopoverTrigger asChild>
@@ -270,12 +268,12 @@ export default function EditUnitPage() {
                     </Popover>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-col">
                     <Label className="text-sm font-medium">Alamat</Label>
                     <Input value={form.alamat} readOnly disabled className="bg-transparent" placeholder="Alamat customer" />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-col">
                     <Label className="text-sm font-medium">NPWP</Label>
                     <Input value={form.npwp} readOnly disabled className="bg-transparent" placeholder="NPWP customer" />
                   </div>

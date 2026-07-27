@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowLeft, FileText, Download } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useGoodsIssueEquipmentDetail } from '@/hooks/warehouse/useGoodsIssueEquipment';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const formatLongDate = (value?: string) => {
   if (!value) return '-';
@@ -35,9 +37,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
-          Memuat data detail pengeluaran perlengkapan...
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -45,7 +45,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
   if (isError || !transaction) {
     return (
       <DashboardLayout>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-10 text-center">
+        <div className="rounded-md border border-red-200 bg-red-50 p-10 text-center">
           <p className="text-[16px] text-red-600 font-medium mb-4">
             Gagal memuat data detail pengeluaran perlengkapan atau data tidak ditemukan.
           </p>
@@ -62,16 +62,16 @@ export default function PengeluaranPerlengkapanDetailPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6 px-1">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <Link href={`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`}>
-              <ArrowLeft className="mr-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <h1 className="text-[24px] font-semibold text-slate-950">Detail Pengeluaran Perlengkapan</h1>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Data Pengeluaran Perlengkapan', onClick: () => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`) },
+            { label: 'Detail' }
+          ]}
+          title="Detail Pengeluaran Perlengkapan"
+          onBack={() => router.push(`/dashboard/${slug}/warehouse/pengeluaran-perlengkapan`)}
+        />
 
-        <Card className="rounded-2xl border border-slate-200 bg-white p-6 shadow-none">
+        <Card className="rounded-md border border-slate-200 bg-white p-6 shadow-none">
           <div className="space-y-6">
             <div className="border-b border-slate-200 pb-5">
               <h2 className="text-[18px] font-semibold text-slate-900">Informasi Pengeluaran</h2>
@@ -143,7 +143,7 @@ export default function PengeluaranPerlengkapanDetailPage() {
         {/* Detail Items Card */}
         <div className="space-y-3">
           <h3 className="text-[18px] font-semibold text-slate-900 px-1">Daftar Perlengkapan Keluar</h3>
-          <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-none">
+          <Card className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-none">
             <Table>
               <TableHeader className="bg-slate-100/90">
                 <TableRow className="border-slate-200 hover:bg-transparent">

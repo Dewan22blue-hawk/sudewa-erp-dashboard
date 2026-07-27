@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { usePermissions, usePermission } from '@/hooks/usePermission';
 import {
   Dialog,
@@ -117,10 +118,10 @@ export default function PermissionsPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* HEADER */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Izin Akses</h1>
-          <p className="text-sm text-muted-foreground">Daftar Izin Akses yang tersedia pada sistem</p>
-        </div>
+        <PageHeader
+          title="Izin Akses"
+          subtitle="Daftar Izin Akses yang tersedia pada sistem"
+        />
 
         <BaseTable
           data={currentData}

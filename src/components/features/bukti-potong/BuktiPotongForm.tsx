@@ -106,8 +106,8 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (source === 'internal' && !cashId) {
-      toast.error('Kas wajib dipilih untuk source internal.');
+    if (!cashId) {
+      toast.error('Kas wajib dipilih.');
       return;
     }
 
@@ -152,7 +152,7 @@ export default function BuktiPotongForm({ item, companyId, onSuccess: onFinish, 
       payload.pph_amount = rawPph;
     }
 
-    if (source === 'internal' && cashId) {
+    if (cashId) {
       payload.cash_id = Number(cashId);
     }
 

@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import PurchaseUnitForm from '@/components/features/purchase/PurchaseUnitForm';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
 import {
@@ -10,6 +11,8 @@ import {
 } from '@/hooks/useUnitTransactionItem';
 import { toast } from 'sonner';
 import { CreatePurchaseUnitFormValues } from '@/scheme/purchase.schema';
+import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/ui/loading-state';
 
 // ======================
 // ERROR PARSER
@@ -267,9 +270,7 @@ export default function EditNestedUnitPage() {
   if (isLoading || isUnitLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
@@ -294,30 +295,21 @@ export default function EditNestedUnitPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <button
-            onClick={() => router.back()}
-            className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Edit Unit
-            </h1>
-
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">
-                Kode Pembelian
-              </span>
-              <span className="font-medium text-blue-600">
-                {purchase.code}
-              </span>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Pembelian Unit', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`) },
+            { label: 'Detail Pembelian', onClick: () => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${parentTransactionId}`) },
+            { label: 'Edit Unit' }
+          ]}
+          title="Data Pembelian"
+          subtitle={
+            <>
+              <span>Kode Beli:</span>
+              <span className="text-blue-600 font-semibold">{purchase.code}</span>
+            </>
+          }
+          onBack={() => router.back()}
+        />
 
         <Card className="rounded-md">
           <CardContent className="p-6">

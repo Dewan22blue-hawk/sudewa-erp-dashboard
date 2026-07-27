@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { TarifTable } from '@/components/features/tarif/TarifTable';
 import { DeleteTarifModal } from '@/components/features/tarif/DeleteTarifModal';
 import { toast } from 'sonner';
@@ -76,12 +77,10 @@ export default function TarifPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Tarif</h1>
-                        <p className="text-sm text-muted-foreground">Kelola data tarif dengan mudah</p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Tarif"
+                    subtitle="Kelola data tarif dengan mudah"
+                />
 
                 {/* Content */}
                 <TarifTable

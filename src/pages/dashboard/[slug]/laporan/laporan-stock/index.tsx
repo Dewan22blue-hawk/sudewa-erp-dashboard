@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -171,8 +172,10 @@ export default function LaporanStockPage() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div className="no-print">
-                    <h1 className="text-2xl font-semibold">{activeMeta.title}</h1>
-                    <p className="text-sm text-muted-foreground">{activeMeta.subtitle}</p>
+                    <PageHeader
+                        title={activeMeta.title}
+                        subtitle={activeMeta.subtitle}
+                    />
                 </div>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="no-print flex w-full flex-col gap-4">

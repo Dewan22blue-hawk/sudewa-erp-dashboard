@@ -52,7 +52,7 @@ export function VehicleEquipmentFormModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[440px] rounded-2xl bg-white p-6 border border-gray-100 shadow-2xl">
+            <DialogContent className="sm:max-w-[440px] rounded-md bg-white p-6 border border-gray-100 shadow-2xl">
                 <DialogHeader className="space-y-1">
                     <DialogTitle className="text-[20px] font-bold text-gray-900 leading-none">
                         {isEdit ? 'Edit Data Material' : 'Tambah Data Material'}
