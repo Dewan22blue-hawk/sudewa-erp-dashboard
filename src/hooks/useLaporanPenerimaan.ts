@@ -6,6 +6,7 @@ export type ReportType = 'per-nota' | 'per-tipe' | 'per-supplier';
 
 interface UseLaporanPenerimaanReturn {
   data: PenerimaanItem[];
+  type: string | null,
   pagination: {
     currentPage: number;
     lastPage: number;
@@ -42,6 +43,7 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
   // Filter states
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPerPage, setCurrentPerPage] = useState(25);
+  const [type, setType] = useState<string | null>('purchase');
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<number | null>(null);
@@ -53,6 +55,7 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
     try {
       const params: PenerimaanParams = {
         page: currentPage,
+        type: type || 'purchase',
         per_page: currentPerPage,
       };
 
@@ -79,7 +82,7 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, currentPerPage, startDate, endDate, selectedSupplier, selectedUnitType]);
+  }, [currentPage, currentPerPage, startDate, endDate, selectedSupplier, selectedUnitType, type]);
 
   useEffect(() => {
     fetchData();
@@ -87,6 +90,7 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
 
   return {
     data,
+    type,
     pagination,
     isLoading,
     error,
