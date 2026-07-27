@@ -115,7 +115,7 @@ export default function UnitPurchaseDetailPage() {
   const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
-  
+
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
@@ -494,11 +494,11 @@ export default function UnitPurchaseDetailPage() {
                   <h2 className="text-base font-bold text-slate-800">Data Pembelian Detail Unit Tipe</h2>
                   <p className="text-xs text-slate-500 mt-1">Rincian lengkap detail unit yang dibeli</p>
                 </div>
-                
+
                 <div className={cn(
                   "flex items-center gap-4 px-4 py-2.5 rounded-xl border",
-                  details.length >= qty 
-                    ? "bg-emerald-50/50 border-emerald-100" 
+                  details.length >= qty
+                    ? "bg-emerald-50/50 border-emerald-100"
                     : "bg-blue-50/50 border-blue-100"
                 )}>
                   <div>
@@ -528,7 +528,7 @@ export default function UnitPurchaseDetailPage() {
                 columns={columns}
                 headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
                 defaultSort={{ key: 'payment_date', direction: 'desc' }}
-                showCheckbox
+                showCheckbox={!isPaid}
                 selectedIds={selectedIds}
                 onSelectedIdsChange={setSelectedIds}
                 search={search}
@@ -545,31 +545,31 @@ export default function UnitPurchaseDetailPage() {
                 }}
                 headerActions=
                 {(
-                    <div className="flex items-center gap-2">
-                      {selectedIds.size > 0 && canDelete && !isPaid && (
-                        <Button
-                          onClick={handleBulkDelete}
-                          disabled={isBulkDeleting}
-                          variant="destructive"
-                          className="w-full sm:w-auto bg-[#EF4444] hover:bg-[#DC2626] text-white"
-                        >
-                          <Trash className="h-4 w-4 mr-2" />
-                          Hapus ({selectedIds.size})
+                  <div className="flex items-center gap-2">
+                    {selectedIds.size > 0 && canDelete && !isPaid && (
+                      <Button
+                        onClick={handleBulkDelete}
+                        disabled={isBulkDeleting}
+                        variant="destructive"
+                        className="w-full sm:w-auto bg-[#EF4444] hover:bg-[#DC2626] text-white"
+                      >
+                        <Trash className="h-4 w-4 mr-2" />
+                        Hapus ({selectedIds.size})
+                      </Button>
+                    )}
+                    {canCreate && !isPaid && (
+                      <>
+                        <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto font-medium shadow-sm">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Import
                         </Button>
-                      )}
-                      {canCreate && !isPaid && (
-                        <>
-                          <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto font-medium shadow-sm">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import
-                          </Button>
-                          <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto font-medium bg-[#1e3a5f] hover:bg-[#152e4d] shadow-sm text-white">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Tambah Detail Unit
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                        <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto font-medium bg-[#1e3a5f] hover:bg-[#152e4d] shadow-sm text-white">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Tambah Detail Unit
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 )}
               />
             </CardContent>

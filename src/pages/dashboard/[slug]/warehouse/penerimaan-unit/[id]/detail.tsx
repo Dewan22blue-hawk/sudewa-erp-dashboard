@@ -161,7 +161,12 @@ export default function PenerimaanUnitDetailPage() {
         </div>
 
         <div className="bg-white rounded-md border sm:p-5 space-y-4">
-          <PenerimaanUnitDetailTable data={details} onTerima={handleTerima} onDelete={handleDelete} isLoading={isLoading} />
+          <PenerimaanUnitDetailTable
+            data={details}
+            onTerima={handleTerima}
+            onDelete={handleDelete}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </DashboardLayout>

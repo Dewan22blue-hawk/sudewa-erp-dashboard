@@ -48,6 +48,7 @@ type WarehouseActivityUnitDetailApiModel = {
   receipt_status?: boolean | number | string;
   in_stock?: boolean | number | string;
   stock_state?: string;
+  status?: string;
   unit_type?: ApiUnitType;
   unit_transaction?: {
     code?: string;
@@ -120,15 +121,15 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
     description: item.description,
     warehouse: item.warehouse
       ? {
-          id: toStringValue(item.warehouse.id),
-          name: item.warehouse.name ?? '-',
-        }
+        id: toStringValue(item.warehouse.id),
+        name: item.warehouse.name ?? '-',
+      }
       : null,
     person: item.person
       ? {
-          id: toStringValue(item.person.id),
-          name: item.person.name ?? '-',
-        }
+        id: toStringValue(item.person.id),
+        name: item.person.name ?? '-',
+      }
       : null,
     noPenerimaan,
     tanggal,
@@ -152,6 +153,8 @@ const mapDetail = (activityId: string, detail: WarehouseActivityUnitDetailApiMod
   const warna = detail.warna ?? detail.color ?? '-';
   const noMesin = detail.no_mesin ?? detail.machine_number ?? '-';
   const noRangka = detail.no_rangka ?? detail.chassis_number ?? '-';
+  const status = detail.status ?? '-';
+  const in_stock = toBoolValue(detail.in_stock);
   const diterima =
     toBoolValue(detail.is_received) ||
     toBoolValue(detail.is_receipt) ||
@@ -167,6 +170,8 @@ const mapDetail = (activityId: string, detail: WarehouseActivityUnitDetailApiMod
     tipeUnit,
     warna,
     noMesin,
+    in_stock,
+    status,
     noRangka,
     diterima,
   };
@@ -310,15 +315,18 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
       const detail = movement.unit_transaction_item_detail ?? {};
       const item = detail.unit_transaction_item ?? {};
       const type = item.unit_type ?? {};
-      
+
       const detailId = toNumberValue(detail.id) || toNumberValue(movement.unit_transaction_item_detail_id);
       const noPembelian = movement.unit_transaction?.code ?? item.unit_transaction?.code ?? detail.unit_transaction_code ?? '-';
       const tipeUnit = type.name ?? detail.unit_type_name ?? '-';
       const warna = detail.color ?? '-';
       const noMesin = detail.machine_number ?? '-';
       const noRangka = detail.chassis_number ?? '-';
+      const status = detail.status ?? '-';
+      const in_stock = toBoolValue(detail.in_stock);
+      const stockStatus = detail.in_stock ?? '-';
       const diterima = movement.status === 'in' || toBoolValue(detail.in_stock);
-      
+
       return {
         id: detailId,
         penerimaanId: mapped.id,
@@ -326,6 +334,9 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
         tipeUnit,
         warna,
         noMesin,
+        status,
+        in_stock,
+        stockStatus,
         noRangka,
         diterima,
       };

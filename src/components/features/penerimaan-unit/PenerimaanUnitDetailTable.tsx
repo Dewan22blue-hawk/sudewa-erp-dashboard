@@ -4,7 +4,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { WarehouseActivityUnitDetail } from '@/@types/warehouse.types';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/router';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
@@ -38,10 +37,11 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
       color: item.warna,
       machineNumber: item.noMesin,
       chassisNumber: item.noRangka,
-      status: item.diterima ? 'normal' : 'Belum Diterima',
+      status: item.status,
+      in_stock: item.in_stock,
+      stockStatus: item.in_stock,
       unitTransactionId: Number(item.penerimaanId || 0),
       received: item.diterima,
-      in_stock: item.diterima,
     }));
   }, [data]);
 
@@ -182,6 +182,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         accessorKey: 'status',
         sortable: true,
         cell: (item) => {
+          console.log(item);
           let text = '-';
           let background = 'border-slate-200 bg-slate-50 text-slate-700';
           switch (item?.status) {
@@ -219,7 +220,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
             return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
           if (item.in_stock === false) {
-            return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
           }
           return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
         }
