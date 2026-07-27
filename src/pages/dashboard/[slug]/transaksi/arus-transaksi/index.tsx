@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useTransactions, useTransactionSummary } from '@/hooks/useTransaction';
 import { useCompany } from '@/contexts/CompanyContext';
+import { BYPASS_TRANSACTION_PERMISSIONS } from '@/configs/skripsi-filter';
 import { TransactionTable } from '@/components/features/transaction/TransactionTable';
 import { TransactionSummaryCards } from '@/components/features/transaction/TransactionSummaryCards';
 import { DeleteTransactionDialog } from '@/components/features/transaction/DeleteTransactionDialog';
@@ -30,9 +31,9 @@ export default function TransactionListPage() {
   const [localSearch, setLocalSearch] = useState('');
 
   const { hasPermission } = usePermissionGuard();
-  const canCreate = true; // hasPermission('transaction:create');
-  const canEdit = true; // hasPermission('transaction:edit');
-  const canDelete = true; // hasPermission('transaction:delete');
+  const canCreate = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:create');
+  const canEdit = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:edit');
+  const canDelete = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:delete');
 
   // Query Hooks
   const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);

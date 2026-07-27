@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { BYPASS_TRANSACTION_PERMISSIONS } from '@/configs/skripsi-filter';
 
 export default function PurchasePage() {
   const router = useRouter();
@@ -21,9 +22,9 @@ export default function PurchasePage() {
   const { slug } = router.query;
 
   const { hasPermission } = usePermissionGuard();
-  const canCreate = true; // hasPermission('transaction:create');
-  const canEdit = true; // hasPermission('transaction:edit');
-  const canDelete = true; // hasPermission('transaction:delete');
+  const canCreate = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:create');
+  const canEdit = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:edit');
+  const canDelete = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:delete');
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);

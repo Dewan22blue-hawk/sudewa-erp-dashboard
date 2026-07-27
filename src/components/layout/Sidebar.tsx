@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useCompanyMenu } from '@/hooks/use-company-menu';
 import { MenuItem } from '@/types/menu.types';
 import { clearCompanyScopedQueries } from '@/lib/session/query-cache';
+import { ACTIVE_COMPANY_KEYWORD } from '@/configs/skripsi-filter';
 
 function CompanySelector({ companies, companyId, setCompanyId }: { companies: Company[], companyId: string | null, setCompanyId: (id: string) => void }) {
   return (
@@ -35,7 +36,7 @@ export function Sidebar() {
 
   useEffect(() => {
     fetchUserCompanies().then((data) => {
-      const filteredData = data.filter((c) => c.name.toLowerCase().includes('morindo'));
+      const filteredData = data.filter((c) => c.name.toLowerCase().includes(ACTIVE_COMPANY_KEYWORD.toLowerCase()));
       setCompanies(filteredData);
     });
   }, []);

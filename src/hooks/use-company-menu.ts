@@ -14,7 +14,7 @@ const MODULE_MAP: Record<string, string[]> = {
     'report': ['Laporan'],
 };
 
-const ALWAYS_ALLOWED = ['Dashboard', 'Settings', 'Pengaturan'];
+const ALWAYS_ALLOWED = ['Dashboard', 'Settings', 'Pengaturan', 'Manajemen Pengguna'];
 
 export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoading: boolean } {
     const router = useRouter();

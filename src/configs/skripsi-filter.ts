@@ -24,6 +24,7 @@ export const HIDDEN_MENU_LABELS = [
   'Pengeluaran Material',
   // 'Stok Material',
 
+  // 'Manajemen Pengguna'
   // Laporan
   // 'Laporan Pembelian',
   // 'Laporan Penjualan',
@@ -35,3 +36,5 @@ export const HIDDEN_MENU_LABELS = [
   // 'Roles',
   // 'Permissions',
 ];
+
+export const BYPASS_TRANSACTION_PERMISSIONS = true;
