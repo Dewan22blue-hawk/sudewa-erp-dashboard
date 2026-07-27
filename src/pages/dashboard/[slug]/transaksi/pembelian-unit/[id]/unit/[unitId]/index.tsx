@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload, Trash } from 'lucide-react';
+import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Upload, Trash, CheckCircle2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
@@ -115,6 +115,11 @@ export default function UnitPurchaseDetailPage() {
   const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [search, setSearch] = useState('');
+
   const [formValues, setFormValues] = useState({
     color: '',
     machine_number: '',
@@ -123,6 +128,22 @@ export default function UnitPurchaseDetailPage() {
 
   const details = detailResponse?.data ?? [];
   const isPaid = purchase?.unit_transaction_billing?.is_paid;
+
+  const filteredDetails = useMemo(() => {
+    return details.filter((d: any) => {
+      const s = search.toLowerCase();
+      return (
+        (d.machine_number?.toLowerCase().includes(s) ?? false) ||
+        (d.chassis_number?.toLowerCase().includes(s) ?? false) ||
+        (d.color?.toLowerCase().includes(s) ?? false)
+      );
+    });
+  }, [details, search]);
+
+  const pagedDetails = useMemo(() => {
+    const start = (page - 1) * perPage;
+    return filteredDetails.slice(start, start + perPage);
+  }, [filteredDetails, page, perPage]);
 
   const columns = useMemo(
     () => [
@@ -468,21 +489,62 @@ export default function UnitPurchaseDetailPage() {
 
           <Card className="border border-slate-200 shadow-sm">
             <CardContent className="p-4 space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-4 gap-4">
+                <div>
+                  <h2 className="text-base font-bold text-slate-800">Data Pembelian Detail Unit Tipe</h2>
+                  <p className="text-xs text-slate-500 mt-1">Rincian lengkap detail unit yang dibeli</p>
+                </div>
+                
+                <div className={cn(
+                  "flex items-center gap-4 px-4 py-2.5 rounded-xl border",
+                  details.length >= qty 
+                    ? "bg-emerald-50/50 border-emerald-100" 
+                    : "bg-blue-50/50 border-blue-100"
+                )}>
+                  <div>
+                    <p className={cn(
+                      "text-[11px] font-semibold uppercase tracking-wider mb-0.5",
+                      details.length >= qty ? "text-emerald-600" : "text-blue-600"
+                    )}>
+                      Status Pengisian Unit
+                    </p>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-xl font-bold text-slate-800 leading-none">{details.length}</span>
+                      <span className="text-sm font-medium text-slate-500">/ {qty}</span>
+                      <span className="text-xs text-slate-500 ml-0.5">Unit</span>
+                    </div>
+                  </div>
+                  <div className={cn(
+                    "flex items-center justify-center h-10 w-10 rounded-full",
+                    details.length >= qty ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600"
+                  )}>
+                    {details.length >= qty ? <CheckCircle2 className="h-5 w-5" /> : <ListTodoIcon className="h-5 w-5" />}
+                  </div>
+                </div>
+              </div>
+
               <BaseTable
-                data={details ?? []}
+                data={pagedDetails}
                 columns={columns}
                 headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
                 defaultSort={{ key: 'payment_date', direction: 'desc' }}
                 showCheckbox
                 selectedIds={selectedIds}
                 onSelectedIdsChange={setSelectedIds}
+                search={search}
+                onSearchChange={(val) => { setSearch(val); setPage(1); }}
+                onPageChange={setPage}
+                showLimitChange={true}
+                perPage={perPage}
+                onPerPageChange={(val) => { setPerPage(val); setPage(1); }}
+                meta={{
+                  currentPage: page,
+                  perPage: perPage,
+                  lastPage: Math.ceil(filteredDetails.length / perPage) || 1,
+                  total: filteredDetails.length,
+                }}
                 headerActions=
                 {(
-                  <div className="flex flex-col gap-2 md:flex-row md:items-center justify-between">
-                    <div>
-                      <h2 className="text-base font-semibold text-slate-800">Data Pembelian Detail Unit Tipe</h2>
-                      <p className="text-xs text-slate-500">Rincian lengkap detail unit yang dibeli</p>
-                    </div>
                     <div className="flex items-center gap-2">
                       {selectedIds.size > 0 && canDelete && !isPaid && (
                         <Button
@@ -497,18 +559,17 @@ export default function UnitPurchaseDetailPage() {
                       )}
                       {canCreate && !isPaid && (
                         <>
-                          <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto">
+                          <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto font-medium shadow-sm">
                             <Upload className="h-4 w-4 mr-2" />
                             Import
                           </Button>
-                          <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                          <Button onClick={openCreateForm} disabled={qty === details.length || !qty} className="w-full sm:w-auto font-medium bg-[#1e3a5f] hover:bg-[#152e4d] shadow-sm text-white">
                             <Plus className="h-4 w-4 mr-2" />
                             Tambah Detail Unit
                           </Button>
                         </>
                       )}
                     </div>
-                  </div>
                 )}
               />
             </CardContent>
