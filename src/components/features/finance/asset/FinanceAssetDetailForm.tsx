@@ -15,7 +15,7 @@ interface FinanceAssetDetailFormProps {
 export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailFormProps) {
     return (
         <div className="space-y-6">
-            <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+            <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-md">
                 <div className="space-y-6">
                     <div>
                         <h2 className="text-lg font-bold text-gray-900">Detail Informasi</h2>
@@ -70,7 +70,7 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
                             <Label className="text-sm font-semibold text-gray-900">Harga Beli</Label>
                             <MoneyInput
                                 value={asset.price}
-                                onChangeValue={() => {}}
+                                onChangeValue={() => { }}
                                 disabled
                                 className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
                             />
@@ -92,7 +92,7 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
                             <Label className="text-sm font-semibold text-gray-900">Penyusutan/Bulan</Label>
                             <MoneyInput
                                 value={asset.depreciation_per_month ?? asset.depreciation ?? 0}
-                                onChangeValue={() => {}}
+                                onChangeValue={() => { }}
                                 disabled
                                 className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
                             />
@@ -101,7 +101,7 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
                             <Label className="text-sm font-semibold text-gray-900">Nilai Akhir</Label>
                             <MoneyInput
                                 value={asset.final_value ?? 0}
-                                onChangeValue={() => {}}
+                                onChangeValue={() => { }}
                                 disabled
                                 className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed"
                             />
@@ -111,7 +111,7 @@ export function FinanceAssetDetailForm({ asset, onBack }: FinanceAssetDetailForm
             </Card>
 
             <div className="flex items-center justify-center pt-4">
-                <Button type="button" onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Button type="button" onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
                     <ArrowLeft className="h-4 w-4" />
                     Kembali
                 </Button>

@@ -56,7 +56,7 @@ export function CreateInvoiceProcessForm({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+        <Button onClick={onBack} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <ArrowLeft className="h-5 w-5 text-slate-700" />
         </Button>
         <div>
@@ -67,7 +67,7 @@ export function CreateInvoiceProcessForm({
         </div>
       </div>
 
-      <Card className="rounded-xl border border-gray-200 bg-white p-6 shadow-none md:p-8">
+      <Card className="rounded-md border border-gray-200 bg-white p-6 shadow-none md:p-8">
         <div className="space-y-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <h2 className="text-lg font-semibold text-slate-900">Informasi Ekspedisi</h2>
@@ -83,23 +83,23 @@ export function CreateInvoiceProcessForm({
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Kode Invoice</Label>
-              <Input value={values.invoiceCode} readOnly className="h-12 rounded-xl border-slate-200 bg-slate-50" />
+              <Input value={values.invoiceCode} readOnly className="h-12 rounded-md border-slate-200 bg-slate-50" />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Nama Customer</Label>
-              <Input value={values.customerName} onChange={(event) => onChange('customerName', event.target.value)} className="h-12 rounded-xl border-slate-200" />
+              <Input value={values.customerName} onChange={(event) => onChange('customerName', event.target.value)} className="h-12 rounded-md border-slate-200" />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Tanggal</Label>
-              <DatePicker value={values.date} onChange={(date) => onChange('date', date ? date.toISOString().slice(0, 10) : '')} placeholder="Pilih tanggal" className="h-12 rounded-xl border-slate-200 bg-white" />
+              <DatePicker value={values.date} onChange={(date) => onChange('date', date ? date.toISOString().slice(0, 10) : '')} placeholder="Pilih tanggal" className="h-12 rounded-md border-slate-200 bg-white" />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Perihal</Label>
-              <Input value={values.subject} onChange={(event) => onChange('subject', event.target.value)} placeholder="Contoh: Invoice Ekspedisi" className="h-12 rounded-xl border-slate-200" />
+              <Input value={values.subject} onChange={(event) => onChange('subject', event.target.value)} placeholder="Contoh: Invoice Ekspedisi" className="h-12 rounded-md border-slate-200" />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Lampiran</Label>
-              <Input value={values.attachmentLabel} onChange={(event) => onChange('attachmentLabel', event.target.value)} placeholder="Contoh: 1 lembar" className="h-12 rounded-xl border-slate-200" />
+              <Input value={values.attachmentLabel} onChange={(event) => onChange('attachmentLabel', event.target.value)} placeholder="Contoh: 1 lembar" className="h-12 rounded-md border-slate-200" />
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-900">Upload Attachment</Label>
@@ -107,19 +107,19 @@ export function CreateInvoiceProcessForm({
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg"
                 onChange={(event) => onChange('attachmentFile', event.target.files?.[0] ?? null)}
-                className="h-12 rounded-xl border-slate-200 pt-3"
+                className="h-12 rounded-md border-slate-200 pt-3"
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-900">Deskripsi</Label>
-            <Input value={values.description} onChange={(event) => onChange('description', event.target.value)} placeholder="Masukkan deskripsi invoice" className="h-12 rounded-xl border-slate-200" />
+            <Input value={values.description} onChange={(event) => onChange('description', event.target.value)} placeholder="Masukkan deskripsi invoice" className="h-12 rounded-md border-slate-200" />
           </div>
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-900">Isi Surat</Label>
-            <Textarea value={values.letterContent} onChange={(event) => onChange('letterContent', event.target.value)} placeholder="Masukkan isi surat invoice" className="min-h-[140px] rounded-xl border-slate-200" />
+            <Textarea value={values.letterContent} onChange={(event) => onChange('letterContent', event.target.value)} placeholder="Masukkan isi surat invoice" className="min-h-[140px] rounded-md border-slate-200" />
           </div>
 
           <div className="flex items-center space-x-2 py-1">
@@ -136,7 +136,7 @@ export function CreateInvoiceProcessForm({
           </div>
 
           {values.isUsd && (
-            <div className="grid gap-5 md:grid-cols-2 border border-amber-100 bg-amber-50/20 p-5 rounded-xl">
+            <div className="grid gap-5 md:grid-cols-2 border border-amber-100 bg-amber-50/20 p-5 rounded-md">
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-amber-900">Kurs USD (1 USD = Rp ...)</Label>
                 <Input
@@ -145,20 +145,20 @@ export function CreateInvoiceProcessForm({
                   value={values.rateUsd ?? 16000}
                   onChange={(event) => onChange('rateUsd', Number(event.target.value))}
                   placeholder="Masukkan kurs USD"
-                  className="h-12 rounded-xl border-amber-200 bg-white focus-visible:ring-amber-500 text-slate-800"
+                  className="h-12 rounded-md border-amber-200 bg-white focus-visible:ring-amber-500 text-slate-800"
                 />
               </div>
             </div>
           )}
 
           {values.isUsd && (
-            <div className="bg-amber-50/50 border border-amber-100 text-amber-900 rounded-xl p-4 text-xs font-semibold flex items-center justify-between">
+            <div className="bg-amber-50/50 border border-amber-100 text-amber-900 rounded-md p-4 text-xs font-semibold flex items-center justify-between">
               <span>MATA UANG INVOICE: USD (UNITED STATES DOLLAR)</span>
               <span>KURS: 1 USD = {formatInvoiceMoney(values.rateUsd ?? 16000, false)}</span>
             </div>
           )}
 
-          <div className="overflow-hidden rounded-xl border border-gray-200">
+          <div className="overflow-hidden rounded-md border border-gray-200">
             <div className="max-h-[460px] overflow-auto">
               <Table>
                 <TableHeader className="sticky top-0 z-10 bg-[#f8f9fa] border-b border-gray-200">

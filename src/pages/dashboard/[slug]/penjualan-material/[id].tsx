@@ -196,7 +196,7 @@ export default function SalesMaterialDetailPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="space-y-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/penjualan-material`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
@@ -210,19 +210,19 @@ export default function SalesMaterialDetailPage() {
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="space-y-3">
                 <label className="text-[16px] font-medium text-slate-900">Nomor Penjualan</label>
-                <Input value={transaction.code} readOnly className="h-12 rounded-xl border-slate-200 bg-white shadow-sm" />
+                <Input value={transaction.code} readOnly className="h-12 rounded-md border-slate-200 bg-white shadow-sm" />
               </div>
               <div className="space-y-3">
                 <label className="text-[16px] font-medium text-slate-900">Total Terima</label>
-                <Input value={formatCurrency(Math.max(transaction.totalPaid, totalPaidFromBillings))} readOnly className="h-12 rounded-xl border-slate-200 bg-white shadow-sm" />
+                <Input value={formatCurrency(Math.max(transaction.totalPaid, totalPaidFromBillings))} readOnly className="h-12 rounded-md border-slate-200 bg-white shadow-sm" />
               </div>
               <div className="space-y-3">
                 <label className="text-[16px] font-medium text-slate-900">Customer</label>
-                <Input value={transaction.supplierName} readOnly className="h-12 rounded-xl border-slate-200 bg-white shadow-sm" />
+                <Input value={transaction.supplierName} readOnly className="h-12 rounded-md border-slate-200 bg-white shadow-sm" />
               </div>
               <div className="space-y-3">
                 <label className="text-[16px] font-medium text-slate-900">Tanggal Terima</label>
-                <Input value={formatDate(transaction.transactionDate)} readOnly className="h-12 rounded-xl border-slate-200 bg-white shadow-sm" />
+                <Input value={formatDate(transaction.transactionDate)} readOnly className="h-12 rounded-md border-slate-200 bg-white shadow-sm" />
               </div>
             </div>
 
@@ -230,7 +230,7 @@ export default function SalesMaterialDetailPage() {
               <Button
                 onClick={() => setOpenPaymentModal(true)}
                 disabled={transaction.totalUnpaid <= 0}
-                className="h-11 rounded-xl bg-emerald-500 px-6 text-[18px] font-medium hover:bg-emerald-600"
+                className="h-11 rounded-md bg-emerald-500 px-6 text-[18px] font-medium hover:bg-emerald-600"
               >
                 <Wallet className="mr-2 h-4 w-4" />
                 Bayar
@@ -243,12 +243,12 @@ export default function SalesMaterialDetailPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[332px]">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm" />
+              <Input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Search here" className="h-11 rounded-md border-slate-200 bg-white pl-11 shadow-sm" />
             </div>
             <div className="flex items-center gap-3 text-[16px] text-slate-700">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white shadow-sm">
+                <SelectTrigger className="h-11 w-[68px] rounded-md border-slate-200 bg-white shadow-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -263,7 +263,7 @@ export default function SalesMaterialDetailPage() {
 
           <Button onClick={() => { setEditingItem(null); setOpenItemModal(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
 
@@ -309,11 +309,11 @@ export default function SalesMaterialDetailPage() {
                               setEditingItem(item);
                               setOpenItemModal(true);
                             }}
-                            className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
+                            className="cursor-pointer rounded-md px-3 py-2 text-[16px]"
                           >
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setDeleteItem(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
+                          <DropdownMenuItem onClick={() => setDeleteItem(item)} className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
                             Hapus
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -337,14 +337,14 @@ export default function SalesMaterialDetailPage() {
                 key={pageNumber}
                 variant={pageNumber === safePage ? 'outline' : 'ghost'}
                 onClick={() => setPage(pageNumber)}
-                className={pageNumber === safePage ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white' : 'h-10 min-w-10 rounded-xl text-slate-700'}
+                className={pageNumber === safePage ? 'h-10 min-w-10 rounded-md border-slate-200 bg-white' : 'h-10 min-w-10 rounded-md text-slate-700'}
               >
                 {pageNumber}
               </Button>
             ))}
             {totalPages > 5 && safePage < totalPages - 2 ? <span className="px-2 text-slate-500">...</span> : null}
             {totalPages > 5 && !pageNumbers.includes(totalPages) ? (
-              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-xl text-slate-700">
+              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-md text-slate-700">
                 {totalPages}
               </Button>
             ) : null}

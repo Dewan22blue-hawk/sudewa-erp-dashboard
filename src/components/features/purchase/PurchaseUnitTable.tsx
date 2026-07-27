@@ -112,7 +112,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
       header: 'QTY',
       alignment: 'center',
       className: 'w-[100px] font-semibold',
-      cell: (item) => item.qty_total,
+      cell: (item) => item.qty_total + " Unit",
     },
     {
       header: 'Harga',
@@ -210,7 +210,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid = false, ca
         </div>
       ) : null}
 
-      <div className="rounded-xl border bg-white overflow-hidden">
+      <div className="rounded-md border bg-white overflow-hidden">
         {/* Header */}
         <div className="border-b px-6 py-5">
           <h3 className="text-xl font-semibold">Detail Pembelian Unit</h3>

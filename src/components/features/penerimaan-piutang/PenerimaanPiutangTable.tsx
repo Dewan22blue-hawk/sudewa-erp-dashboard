@@ -140,7 +140,7 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
             </div>
 
             {error ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <p>{error}</p>
                         {onRetry ? (
@@ -152,7 +152,7 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                 </div>
             ) : null}
 
-            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-none">
+            <div className="overflow-x-auto rounded-md border border-slate-200 bg-white shadow-none">
                 <table className="w-full text-sm">
                     <thead className="bg-[#f8f9fa] border-b border-gray-200">
                         <tr>
@@ -171,11 +171,11 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                         {loading && data.length === 0 ? (
                             <tr>
                                 <td colSpan={showActions ? 9 : 8} className="px-4 py-12 text-center text-slate-500">
-    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-    </div>
-</td>
+                                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
+                                        <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                                        <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                                    </div>
+                                </td>
                             </tr>
                         ) : sortedData.length > 0 ? (
                             sortedData.map((item, index) => {
@@ -210,10 +210,10 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                                                        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2.5">
+                                                        <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5">
                                                             {slug ? <Link href={`/dashboard/${slug}/finance/data-penerimaan-piutang/${item.id}`}>Detail</Link> : <span className="cursor-not-allowed text-slate-400">Detail</span>}
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onSelect={() => onDelete?.(item)} className="cursor-pointer rounded-xl px-3 py-2.5 text-orange-600 focus:text-orange-700">
+                                                        <DropdownMenuItem onSelect={() => onDelete?.(item)} className="cursor-pointer rounded-md px-3 py-2.5 text-orange-600 focus:text-orange-700">
                                                             Hapus
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -226,14 +226,14 @@ export default function PenerimaanPiutangTable({ data, meta, loading, error, sea
                         ) : (
                             <tr>
                                 <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="rounded-full bg-slate-50 p-4 mb-2">
-                            <Search className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                </td>
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                            <Search className="h-8 w-8 text-slate-400" />
+                                        </div>
+                                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                    </div>
+                                </td>
                             </tr>
                         )}
                     </tbody>

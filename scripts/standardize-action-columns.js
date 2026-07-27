@@ -26,7 +26,7 @@ files.forEach(file => {
                 return `className="${classes.join(' ')}"`;
             });
         } else {
-             newAttrs += ` className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"`;
+            newAttrs += ` className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]"`;
         }
         return `<${tag}${newAttrs}>${inner}`;
     });
@@ -34,8 +34,5 @@ files.forEach(file => {
     if (content !== originalContent) {
         fs.writeFileSync(file, content);
         modifiedCount++;
-        console.log(`Modified: ${file}`);
     }
 });
-
-console.log(`Modified ${modifiedCount} files.`);

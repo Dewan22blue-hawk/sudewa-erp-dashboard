@@ -109,7 +109,7 @@ export default function TypeUnitPage() {
               <p className="text-sm text-muted-foreground">Kelola semua tipe unit</p>
             </div>
           </div>
-          <Card className="rounded-xl p-6">
+          <Card className="rounded-md p-6">
             <div className="text-center text-muted-foreground">Loading...</div>
           </Card>
         </div>
@@ -127,7 +127,7 @@ export default function TypeUnitPage() {
               <p className="text-sm text-muted-foreground">Kelola semua tipe unit</p>
             </div>
           </div>
-          <Card className="rounded-xl p-6">
+          <Card className="rounded-md p-6">
             <div className="text-center text-destructive">Gagal memuat data</div>
           </Card>
         </div>

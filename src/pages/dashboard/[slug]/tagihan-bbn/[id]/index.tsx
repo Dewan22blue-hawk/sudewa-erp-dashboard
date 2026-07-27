@@ -1,14 +1,14 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Pencil, Plus, Printer } from 'lucide-react';
+import { Pencil, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { getApiErrorMessage } from '@/utils/apiErrorHandler';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useKas } from '@/hooks/useKas';
 import {
@@ -29,7 +29,7 @@ function ReadonlyField({ label, value, danger = false }: { label: string; value:
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-slate-900">{label}</p>
-      <Input value={value} readOnly className={`h-11 rounded-xl border-slate-200 bg-white ${danger ? 'text-red-500' : 'text-slate-500'}`} />
+      <Input value={value} readOnly className={`h-11 rounded-md border-slate-200 bg-white ${danger ? 'text-red-500' : 'text-slate-500'}`} />
     </div>
   );
 }
@@ -144,6 +144,143 @@ export default function BBNBillDetailPage() {
     );
   }, [vehicles]);
 
+  const vehicleColumns = React.useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'NAMA DEALER',
+        alignment: 'center',
+        cell: () => <span className="uppercase text-slate-700">{detailQuery.data?.dealer?.name || '-'}</span>,
+      },
+      {
+        header: 'NAMA STNK',
+        alignment: 'center',
+        cell: (vehicle) => vehicle.stnkName || '-',
+      },
+      {
+        header: 'NOMOR POLISI',
+        alignment: 'center',
+        cell: (vehicle) => vehicle.vehicleRegistration?.tnkbNumber || '-',
+      },
+      {
+        header: 'NOMOR RANGKA',
+        alignment: 'center',
+        cell: (vehicle) => vehicle.chassisNumber || '-',
+      },
+      {
+        header: 'NOMOR MESIN',
+        alignment: 'center',
+        cell: (vehicle) => vehicle.machineNumber || '-',
+      },
+      {
+        header: 'DAFTAR BBN',
+        alignment: 'center',
+        cell: (vehicle) => formatCurrency(vehicle.vehicleRegistration?.bbnRegistrationFee || 0),
+      },
+      {
+        header: 'ACC GARWIL',
+        alignment: 'center',
+        cell: (vehicle) => formatCurrency(vehicle.vehicleRegistration?.garwilFee || 0),
+      },
+      {
+        header: 'ACC NIK',
+        alignment: 'center',
+        cell: (vehicle) => formatCurrency(vehicle.vehicleRegistration?.nikValidationFee || 0),
+      },
+      {
+        header: 'PERCEPATAN',
+        alignment: 'center',
+        cell: (vehicle) => formatCurrency(vehicle.vehicleRegistration?.accelerationFee || 0),
+      },
+      {
+        header: 'Aksi',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (vehicle) => (
+          <Link
+            href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data?.id}/kendaraan/${vehicle.id}/edit`}
+            className="text-sm font-medium text-[#1f4163] hover:underline"
+          >
+            Edit
+          </Link>
+        ),
+      },
+    ],
+    [detailQuery.data?.dealer?.name, detailQuery.data?.id, slug]
+  );
+
+  const paymentColumns = React.useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'Tanggal',
+        alignment: 'left',
+        cell: (item) => formatShortDate(item.paidDate),
+      },
+      {
+        header: 'Keterangan Bayar',
+        alignment: 'left',
+        cell: () => (
+          <span className="cursor-pointer text-sm font-medium text-blue-600 hover:underline">
+            Link
+          </span>
+        ),
+      },
+      {
+        header: 'Nominal Pembayaran Cash BCA',
+        alignment: 'left',
+        cell: (item) => {
+          const label = item.cashLabel || 'Cash';
+          return label === 'BCA IDR' ? formatCurrency(item.amount) : 'Rp';
+        },
+      },
+      {
+        header: 'Nominal Pembayaran USD BCA',
+        alignment: 'left',
+        cell: (item) => {
+          const label = item.cashLabel || 'Cash';
+          return label === 'BCA USD' ? formatCurrency(item.amount) : 'Rp';
+        },
+      },
+      {
+        header: 'Nominal Pembayaran Cash',
+        alignment: 'left',
+        cell: (item) => {
+          const label = item.cashLabel || 'Cash';
+          return label === 'CASH IDR' || label === 'Cash' ? formatCurrency(item.amount) : 'Rp';
+        },
+      },
+      {
+        header: 'Aksi',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (item) => (
+          <div className="flex items-center justify-center gap-3">
+            <Link
+              href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data?.id}/pembayaran?itemId=${item.id}`}
+              className="text-sm font-medium text-[#1f4163] hover:underline"
+            >
+              Edit
+            </Link>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await deleteBillingItemMutation.mutateAsync(item.id);
+                  toast.success('Item pembayaran berhasil dihapus');
+                } catch (error: any) {
+                  toast.error(getApiErrorMessage(error));
+                }
+              }}
+              className="text-sm font-medium text-red-600 hover:underline"
+            >
+              Hapus
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [deleteBillingItemMutation, detailQuery.data?.id, slug]
+  );
+
   return (
     <DashboardLayout>
       {detailQuery.isLoading ? (
@@ -162,7 +299,7 @@ export default function BBNBillDetailPage() {
             </div>
             <div className="flex gap-3">
               <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/edit`}>
-                <Button variant="outline" className="h-11 rounded-xl border-slate-200 bg-white">
+                <Button variant="outline" className="h-11 rounded-md border-slate-200 bg-white">
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -194,168 +331,45 @@ export default function BBNBillDetailPage() {
             </div>
           </Card>
 
+          {/* Tabel Detail Kendaraan */}
+          <BaseTable
+            data={pagedVehicles}
+            columns={vehicleColumns}
+            loading={detailQuery.isLoading}
+            searchPlaceholder="Search here"
+            search={searchInput}
+            onSearchChange={(val) => {
+              setSearchInput(val);
+            }}
+            showLimitChange
+            perPage={perPage}
+            onPerPageChange={(val) => {
+              setPerPage(val);
+              setPage(1);
+            }}
+            meta={{
+              currentPage: page,
+              perPage,
+              lastPage: Math.max(1, Math.ceil(filteredVehicles.length / perPage)),
+              total: filteredVehicles.length,
+            }}
+            onPageChange={setPage}
+            headerRowClassName="bg-[#edf2f7]"
+          />
+
+          {/* Tabel History Pembayaran */}
           <div className="space-y-4">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Input
-                  placeholder="Search here"
-                  value={searchInput}
-                  onChange={(event) => setSearchInput(event.target.value)}
-                  className="h-11 w-full rounded-xl border-slate-200 bg-white sm:w-[258px]"
-                />
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-700">Show</span>
-                  <select
-                    className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm"
-                    value={perPage}
-                    onChange={(event) => {
-                      setPerPage(Number(event.target.value));
-                      setPage(1);
-                    }}
-                  >
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                  <span className="text-sm text-slate-700">Page</span>
-                </div>
-              </div>
-
-              {/* <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran`}>
-                <Button className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Tambah Pembayaran
-                </Button>
-              </Link> */}
+            <div>
+              <h2 className="text-[32px] font-semibold tracking-[-0.03em] text-slate-950">History Pembayaran</h2>
+              <p className="mt-1 text-sm text-slate-500">Rincian lengkap unit yang dibeli</p>
             </div>
 
-            <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-[#edf2f7]">
-                    <TableRow className="border-slate-200">
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">NAMA DEALER</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">NAMA STNK</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">NOMOR POLISI</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">NOMOR RANGKA</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">NOMOR MESIN</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">DAFTAR BBN</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">ACC GARWIL</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">ACC NIK</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">PERCEPATAN</TableHead>
-                      <TableHead className="px-4 py-4 text-center text-sm font-semibold text-slate-900">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pagedVehicles.map((vehicle) => (
-                      <TableRow key={vehicle.id} className="border-slate-100">
-                        <TableCell className="px-4 py-3 text-center text-sm uppercase text-slate-700">{detailQuery.data?.dealer?.name || '-'}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{vehicle.stnkName || '-'}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{vehicle.vehicleRegistration?.tnkbNumber || '-'}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{vehicle.chassisNumber || '-'}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{vehicle.machineNumber || '-'}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{formatCurrency(vehicle.vehicleRegistration?.bbnRegistrationFee || 0)}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{formatCurrency(vehicle.vehicleRegistration?.garwilFee || 0)}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{formatCurrency(vehicle.vehicleRegistration?.nikValidationFee || 0)}</TableCell>
-                        <TableCell className="px-4 py-3 text-center text-sm text-slate-700">{formatCurrency(vehicle.vehicleRegistration?.accelerationFee || 0)}</TableCell>
-                        <TableCell className="px-4 py-3 text-center">
-                          <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/kendaraan/${vehicle.id}/edit`} className="text-sm font-medium text-[#1f4163] hover:underline">
-                            Edit
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {pagedVehicles.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={10} className="h-24 text-center text-sm text-slate-500">
-                          Tidak ada detail kendaraan pada tagihan ini.
-                        </TableCell>
-                      </TableRow>
-                    ) : null}
-                  </TableBody>
-                </Table>
-              </div>
-            </Card>
-
-            <div className="flex flex-col gap-3 px-2 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-slate-500">Showing {filteredVehicles.length === 0 ? 0 : (page - 1) * perPage + 1}-{Math.min(page * perPage, filteredVehicles.length)} of {filteredVehicles.length} data</p>
-              <div className="flex items-center gap-3 text-sm text-slate-600">
-                <button disabled={page <= 1} onClick={() => setPage((current) => Math.max(current - 1, 1))}>Previous</button>
-                <span>{page}</span>
-                <button disabled={page >= Math.max(1, Math.ceil(filteredVehicles.length / perPage))} onClick={() => setPage((current) => current + 1)}>Next</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-[32px] font-semibold tracking-[-0.03em] text-slate-950">History Pembayaran</h2>
-                <p className="mt-1 text-sm text-slate-500">Rincian lengkap unit yang dibeli</p>
-              </div>
-            </div>
-
-            <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-[#eef9ee]">
-                    <TableRow className="border-slate-200">
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Tanggal</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Bukti Pembayaran</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash BCA</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran USD BCA</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Nominal Pembayaran Cash</TableHead>
-                      <TableHead className="px-4 py-4 text-sm font-semibold text-slate-900">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paymentItems.map((item) => {
-                      const label = item.cashLabel || 'Cash';
-                      return (
-                        <TableRow key={item.id} className="border-slate-100">
-                          <TableCell className="px-4 py-3 text-sm text-slate-700">{formatShortDate(item.paidDate)}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-blue-600 font-medium">
-                            <span className="cursor-pointer hover:underline">Link</span>
-                          </TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA IDR' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'BCA USD' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
-                          <TableCell className="px-4 py-3 text-sm text-slate-700">{label === 'CASH IDR' || label === 'Cash' ? formatCurrency(item.amount) : 'Rp'}</TableCell>
-                          <TableCell className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <Link href={`/dashboard/${slug}/tagihan-bbn/${detailQuery.data.id}/pembayaran?itemId=${item.id}`} className="text-sm font-medium text-[#1f4163] hover:underline">
-                                Edit
-                              </Link>
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  try {
-                                    await deleteBillingItemMutation.mutateAsync(item.id);
-                                    toast.success('Item pembayaran berhasil dihapus');
-                                  } catch (error: any) {
-                                    toast.error(getApiErrorMessage(error));
-                                  }
-                                }}
-                                className="text-sm font-medium text-red-600"
-                              >
-                                Hapus
-                              </button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                    {paymentItems.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="h-20 text-center text-sm text-slate-500">
-                          Belum ada riwayat pembayaran untuk tagihan ini.
-                        </TableCell>
-                      </TableRow>
-                    ) : null}
-                  </TableBody>
-                </Table>
-              </div>
-            </Card>
+            <BaseTable
+              data={paymentItems}
+              columns={paymentColumns}
+              loading={billingItemsQuery.isLoading || billingsQuery.isLoading}
+              headerRowClassName="bg-[#eef9ee]"
+            />
           </div>
 
           <Card className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">

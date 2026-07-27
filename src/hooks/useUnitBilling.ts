@@ -3,6 +3,7 @@ import { CreateUnitBillingHistoryPayload, CreateUnitBillingPayloadV2, UpsertUnit
 import { unitBillingService } from '@/services/unitBilling.service';
 import { useCompany } from '@/contexts/CompanyContext';
 import { companyQueryKeys } from '@/lib/query/company-key';
+import { apiClient } from '@/lib/api/client';
 
 const unitBillingKeys = {
   list: (transactionId?: string) => ['unit-billings', transactionId] as const,
@@ -131,22 +132,30 @@ export const useDeleteBillingHistory = () => {
   });
 };
 
-export const useUpdateBilling = () => {
+export const useUpdateBillingIsPaid = () => {
   const queryClient = useQueryClient();
   const { companyId } = useCompany();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpsertUnitBillingPayload }) => unitBillingService.updateBilling(id, payload),
-    onSuccess: (data) => {
+    mutationFn: async ({ billingId, isPaid = 'true' }: { billingId: string | number; isPaid?: boolean | string }) => {
+      const response = await apiClient.put(
+        `/wapi/transaction/unit-transaction/unit-transaction-billing/${billingId}`,
+        { is_paid: isPaid }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: companyQueryKeys.companyScope(companyId) });
       }
-      queryClient.invalidateQueries({ queryKey: unitBillingKeys.list(data.unit_transaction_id) });
-      queryClient.invalidateQueries({ queryKey: unitBillingKeys.current(data.unit_transaction_id) });
-      queryClient.invalidateQueries({ queryKey: unitBillingKeys.history(undefined, data.unit_transaction_id) });
-      queryClient.invalidateQueries({ queryKey: ['purchase-by-id', data.unit_transaction_id] });
-      queryClient.invalidateQueries({ queryKey: ['unit-transaction', data.unit_transaction_id] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-current'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billings'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-billing-history'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-by-id'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transaction'] });
+      queryClient.invalidateQueries({ queryKey: ['unit-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['sales-transaction'] });
     },
   });
 };
+

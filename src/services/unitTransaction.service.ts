@@ -40,6 +40,7 @@ type UnitTransactionApiModel = {
     bbn_price?: number | string;
     expedition_fee?: number | string;
     other_fee?: number | string;
+    unit_type?: { name?: string };
   }>;
   unit_transaction_billing?: {
     id?: number | string;
@@ -85,6 +86,8 @@ type UnitTransactionItemListApiModel = {
   ppn_per_unit_price?: number | string;
   dpp_total_price?: number | string;
   ppn_total_price?: number | string;
+  dpp_tax_rate?: number | string;
+  ppn_tax_rate?: number | string;
   created_at?: string;
   unit_transaction?: {
     id?: number | string;
@@ -426,6 +429,8 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
       id: String(item.warehouse?.id ?? item.warehouse_id ?? ''),
       name: item.warehouse?.name ?? '-',
     },
+    unit_type_name: item.unit_transaction_items?.[0]?.unit_type?.name ?? '-',
+    pivot: { unit_transaction_item_detail_id: 0 },
     unit_transaction_bruto_total: mainBruto,
     unit_transaction_item_total_hpp: itemHpp,
     unit_transaction_item_total_dpp: itemDpp || toNumber(item.unit_transaction_item_total_dpp ?? item.transaction_dpp_total),

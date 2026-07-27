@@ -29,6 +29,10 @@ export const editUnitSchema = z.object({
   // USD section
   hargaUsd: z.number().min(0).optional(),
   hargaPerUnitUsd: z.number().min(0).optional(),
+
+  // Tax section
+  dppTaxVersionId: z.union([z.string(), z.number()]).optional(),
+  ppnTaxVersionId: z.union([z.string(), z.number()]).optional(),
 });
 
 export type EditUnitFormData = z.infer<typeof editUnitSchema>;

@@ -15,6 +15,8 @@ export interface SalesLineItem {
   hargaJual: number;
   biayaBbn: number;
   biayaEkspedisi: number;
+  dppTaxVersionId: string;
+  ppnTaxVersionId: string;
   biayaLain: number;
   hpp: number;
   dpp: number;
@@ -37,6 +39,8 @@ export interface SalesItem {
   qty: number;
   biayaBbn: number;
   biayaEkspedisi: number;
+  dppTaxVersionId: string;
+  ppnTaxVersionId: string;
   biayaLain: number;
   totalHpp: number;
   totalDpp: number;
@@ -105,6 +109,8 @@ export const SALES_DATA: SalesItem[] = Array.from({ length: 50 }, (_, i) => {
       biayaBbn: Math.floor(biayaBbn / qty),
       biayaEkspedisi: Math.floor(biayaEkspedisi / qty),
       biayaLain,
+      dppTaxVersionId: '1',
+      ppnTaxVersionId: '1',
       hpp: rowHpp,
       dpp: rowDpp,
       ppn: rowPpn,
@@ -112,18 +118,20 @@ export const SALES_DATA: SalesItem[] = Array.from({ length: 50 }, (_, i) => {
     };
   });
 
-  return {
-    id: String(i + 1),
-    kodeJual: generateInvoice(i + 1),
-    tanggal: generateDate((i % 28) + 1),
-    customer: CUSTOMERS[i % CUSTOMERS.length],
-    tipeUnit: 'Honda PCX 160 ABS',
-    hargaSatuan,
-    qty,
-    biayaBbn,
-    biayaEkspedisi,
-    biayaLain,
-    totalHpp,
+    return {
+      id: String(i + 1),
+      kodeJual: generateInvoice(i + 1),
+      tanggal: generateDate((i % 28) + 1),
+      customer: CUSTOMERS[i % CUSTOMERS.length],
+      tipeUnit: 'Honda PCX 160 ABS',
+      hargaSatuan,
+      qty,
+      biayaBbn,
+      biayaEkspedisi,
+      biayaLain,
+      dppTaxVersionId: '1',
+      ppnTaxVersionId: '1',
+      totalHpp,
     totalDpp,
     totalPpn,
     totalBiaya,

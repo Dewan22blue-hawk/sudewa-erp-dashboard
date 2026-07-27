@@ -13,7 +13,7 @@ export function KpiCard({ data }: KpiCardProps) {
     const TrendIcon = isUp ? ArrowUpRight : ArrowDownRight
 
     return (
-        <Card className="rounded-xl border shadow-sm transition-all hover:shadow-md">
+        <Card className="rounded-md border shadow-sm transition-all hover:shadow-md">
             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                     {data.title}

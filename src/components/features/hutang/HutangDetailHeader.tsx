@@ -19,7 +19,7 @@ export default function HutangDetailHeader({ data }: Props) {
     return (
         <div className="grid grid-cols-2 gap-6">
             {/* LEFT CARD - INFORMASI HUTANG */}
-            <Card className="p-6 rounded-xl border shadow-sm space-y-6">
+            <Card className="p-6 rounded-md border shadow-sm space-y-6">
                 <div className="flex items-start gap-4">
                     <div className="bg-blue-50 p-2.5 rounded-lg">
                         <FileText
@@ -68,7 +68,7 @@ export default function HutangDetailHeader({ data }: Props) {
             </Card>
 
             {/* RIGHT CARD - STATUS PEMBAYARAN */}
-            <Card className="p-6 rounded-xl border shadow-sm space-y-6">
+            <Card className="p-6 rounded-md border shadow-sm space-y-6">
                 <div className="flex items-start gap-4">
                     <div className="bg-red-50 p-2.5 rounded-lg">
                         <ListChecks

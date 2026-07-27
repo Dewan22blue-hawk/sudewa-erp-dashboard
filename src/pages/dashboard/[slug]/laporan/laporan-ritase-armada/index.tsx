@@ -144,7 +144,7 @@ export default function LaporanRitaseArmadaPage() {
         <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as 'ritase' | 'maintenance')} className="w-full">
           {/* Tabs Navigation & Filtering Block */}
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between no-print mb-6">
-            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-xl w-fit">
+            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-md w-fit">
               <TabsTrigger
                 value="ritase"
                 className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer whitespace-nowrap"
@@ -167,13 +167,13 @@ export default function LaporanRitaseArmadaPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search here"
-                    className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
+                    className="pl-9 bg-white rounded-md border-slate-200 shadow-sm"
                   />
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
                   <span>Show</span>
                   <Select value={perPage} onValueChange={setPerPage}>
-                    <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                    <SelectTrigger className="w-[80px] rounded-md border-slate-200 bg-white shadow-sm cursor-pointer">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -208,141 +208,141 @@ export default function LaporanRitaseArmadaPage() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto shadow-none w-full">
-                  <Table>
-                    <TableHeader className="bg-slate-50 border-b border-slate-200">
-                      {activeTab === 'ritase' && (
-                        <>
-                          {/* Group Headers */}
-                          <TableRow className="hover:bg-transparent border-b border-slate-200">
-                            <TableHead colSpan={5} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                              LAPORAN TARGET INCOME EKSPEDISI PT WAJIRA JAGRATARA MORINDO
-                            </TableHead>
-                            <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                              BIAYA DAN PENGELUARAN
-                            </TableHead>
-                            <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                              PENDAPATAN
-                            </TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                              KETERANGAN
-                            </TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-                              DATA TARGET
-                            </TableHead>
-                            <TableHead className="bg-slate-50"></TableHead>
-                          </TableRow>
-                          {/* Normal Headers */}
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TANGGAL</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO POLISI</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">DRIVER</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">INV EKSPEDISI</TableHead>
-
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">BIAYA TAMBAHAN</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UJ DRIVER</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">BIAYA LAINNYA</TableHead>
-
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">INV EKSPEDISI</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TAMBAHAN</TableHead>
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">PPN</TableHead>
-
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">LABA/RUGI</TableHead>
-
-                            <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">RITASE</TableHead>
-
-                            <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-bold text-slate-700 uppercase sticky right-0 bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">Aksi</TableHead>
-                          </TableRow>
-                        </>
-                      )}
-
-                      {activeTab === 'maintenance' && (
-                        <TableRow className="hover:bg-transparent">
-                          <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO</TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO POLISI</TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE</TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">DRIVER/PIC</TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">SPAREPART</TableHead>
-                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">QTY</TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">KETERANGAN</TableHead>
-                          <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TGL PERBAIKAN</TableHead>
+              <div className="rounded-md border border-slate-200 bg-white overflow-x-auto shadow-none w-full">
+                <Table>
+                  <TableHeader className="bg-slate-50 border-b border-slate-200">
+                    {activeTab === 'ritase' && (
+                      <>
+                        {/* Group Headers */}
+                        <TableRow className="hover:bg-transparent border-b border-slate-200">
+                          <TableHead colSpan={5} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+                            LAPORAN TARGET INCOME EKSPEDISI PT WAJIRA JAGRATARA MORINDO
+                          </TableHead>
+                          <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+                            BIAYA DAN PENGELUARAN
+                          </TableHead>
+                          <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+                            PENDAPATAN
+                          </TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+                            KETERANGAN
+                          </TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
+                            DATA TARGET
+                          </TableHead>
+                          <TableHead className="bg-slate-50"></TableHead>
                         </TableRow>
-                      )}
-                    </TableHeader>
-                    <TableBody>
-                      {activeTab === 'ritase' && (
-                        paginatedRitase.length > 0 ? paginatedRitase.map((item, idx) => (
-                          <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatDateString(item.tanggal)}</TableCell>
-                            <TableCell className="text-center font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap">{item.driver}</TableCell>
-                            <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{formatIDR(item.invEkspedisi)}</TableCell>
+                        {/* Normal Headers */}
+                        <TableRow className="hover:bg-transparent">
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TANGGAL</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO POLISI</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">DRIVER</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">INV EKSPEDISI</TableHead>
 
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.biayaTambahan)}</TableCell>
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.ujDriver)}</TableCell>
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap border-r border-slate-100">{formatIDR(item.biayaLainnya)}</TableCell>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">BIAYA TAMBAHAN</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UJ DRIVER</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">BIAYA LAINNYA</TableHead>
 
-                            <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap">{formatIDR(item.invEkspedisiPendapatan)}</TableCell>
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.tambahan)}</TableCell>
-                            <TableCell className="text-center text-slate-600 whitespace-nowrap border-r border-slate-100">{formatIDR(item.ppn)}</TableCell>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">INV EKSPEDISI</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TAMBAHAN</TableHead>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">PPN</TableHead>
 
-                            <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{formatIDR(item.labaRugi)}</TableCell>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">LABA/RUGI</TableHead>
 
-                            <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{item.ritase}</TableCell>
+                          <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200">RITASE</TableHead>
 
-                            <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-100 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">
-                              <div className="flex justify-center">
+                          <TableHead className="w-[80px] px-4 py-4 text-center text-xs font-bold text-slate-700 uppercase sticky right-0 bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">Aksi</TableHead>
+                        </TableRow>
+                      </>
+                    )}
+
+                    {activeTab === 'maintenance' && (
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NO POLISI</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">DRIVER/PIC</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">SPAREPART</TableHead>
+                        <TableHead className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap">QTY</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">KETERANGAN</TableHead>
+                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TGL PERBAIKAN</TableHead>
+                      </TableRow>
+                    )}
+                  </TableHeader>
+                  <TableBody>
+                    {activeTab === 'ritase' && (
+                      paginatedRitase.length > 0 ? paginatedRitase.map((item, idx) => (
+                        <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatDateString(item.tanggal)}</TableCell>
+                          <TableCell className="text-center font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{item.driver}</TableCell>
+                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{formatIDR(item.invEkspedisi)}</TableCell>
+
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.biayaTambahan)}</TableCell>
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.ujDriver)}</TableCell>
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap border-r border-slate-100">{formatIDR(item.biayaLainnya)}</TableCell>
+
+                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap">{formatIDR(item.invEkspedisiPendapatan)}</TableCell>
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap">{formatIDR(item.tambahan)}</TableCell>
+                          <TableCell className="text-center text-slate-600 whitespace-nowrap border-r border-slate-100">{formatIDR(item.ppn)}</TableCell>
+
+                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{formatIDR(item.labaRugi)}</TableCell>
+
+                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap border-r border-slate-100">{item.ritase}</TableCell>
+
+                          <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-100 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] no-print">
+                            <div className="flex justify-center">
                               <Button variant="ghost" size="icon" onClick={handleOpenEdit} className="h-8 w-8 text-slate-500 hover:text-slate-900 cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )) : (
+                        <TableRow className="group">
+                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                <Search className="h-8 w-8 text-slate-400" />
                               </div>
-                            </TableCell>
-                          </TableRow>
-                        )) : (
-                          <TableRow className="group">
-                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                                <div className="flex flex-col items-center justify-center gap-2">
-                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                        <Search className="h-8 w-8 text-slate-400" />
-                                    </div>
-                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                </div>
-                            </TableCell>
-                          </TableRow>
-                        )
-                      )}
+                              <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                              <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
 
-                      {activeTab === 'maintenance' && (
-                        paginatedMaintenance.length > 0 ? paginatedMaintenance.map((item, idx) => (
-                          <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
-                            <TableCell className="text-center font-medium text-slate-500 whitespace-nowrap">{item.id}</TableCell>
-                            <TableCell className="font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
-                            <TableCell className="text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
-                            <TableCell className="text-slate-600 whitespace-nowrap">{item.driverPic}</TableCell>
-                            <TableCell className="text-slate-600 whitespace-nowrap">{item.sparepart}</TableCell>
-                            <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap">{item.qty}</TableCell>
-                            <TableCell className="text-slate-600 whitespace-nowrap">{item.keterangan}</TableCell>
-                            <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.tglPerbaikan)}</TableCell>
-                          </TableRow>
-                        )) : (
-                          <TableRow className="group">
-                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                                <div className="flex flex-col items-center justify-center gap-2">
-                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                        <Search className="h-8 w-8 text-slate-400" />
-                                    </div>
-                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                </div>
-                            </TableCell>
-                          </TableRow>
-                        )
-                      )}
-                    </TableBody>
-                  </Table>
+                    {activeTab === 'maintenance' && (
+                      paginatedMaintenance.length > 0 ? paginatedMaintenance.map((item, idx) => (
+                        <TableRow key={item.id || idx} className="border-slate-100 hover:bg-slate-50/50">
+                          <TableCell className="text-center font-medium text-slate-500 whitespace-nowrap">{item.id}</TableCell>
+                          <TableCell className="font-mono text-[13px] text-slate-700 whitespace-nowrap">{item.noPolisi}</TableCell>
+                          <TableCell className="text-slate-600 whitespace-nowrap">{item.tipe}</TableCell>
+                          <TableCell className="text-slate-600 whitespace-nowrap">{item.driverPic}</TableCell>
+                          <TableCell className="text-slate-600 whitespace-nowrap">{item.sparepart}</TableCell>
+                          <TableCell className="text-center text-slate-800 font-medium whitespace-nowrap">{item.qty}</TableCell>
+                          <TableCell className="text-slate-600 whitespace-nowrap">{item.keterangan}</TableCell>
+                          <TableCell className="text-slate-600 whitespace-nowrap">{formatDateString(item.tglPerbaikan)}</TableCell>
+                        </TableRow>
+                      )) : (
+                        <TableRow className="group">
+                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                <Search className="h-8 w-8 text-slate-400" />
+                              </div>
+                              <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                              <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
+                  </TableBody>
+                </Table>
               </div>
             </div>
           </PrintLetterPage>
@@ -354,7 +354,7 @@ export default function LaporanRitaseArmadaPage() {
             </div>
             {totalRecords > 0 && (
               <div className="flex items-center gap-1 text-sm text-slate-700">
-                <Button variant="ghost" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1} className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer">Previous</Button>
+                <Button variant="ghost" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1} className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer">Previous</Button>
                 {visiblePages[0] > 1 && <span className="px-1.5 text-slate-400">...</span>}
                 {visiblePages.map((pageNumber) => (
                   <Button
@@ -363,7 +363,7 @@ export default function LaporanRitaseArmadaPage() {
                     size="sm"
                     onClick={() => setPage(pageNumber)}
                     className={cn(
-                      "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                      "h-9 min-w-9 rounded-md border-slate-200 text-[13px] font-semibold cursor-pointer",
                       pageNumber === page ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-slate-600 hover:bg-slate-100"
                     )}
                   >
@@ -371,7 +371,7 @@ export default function LaporanRitaseArmadaPage() {
                   </Button>
                 ))}
                 {visiblePages[visiblePages.length - 1] < lastPage && <span className="px-1.5 text-slate-400">...</span>}
-                <Button variant="ghost" size="sm" onClick={() => setPage(page + 1)} disabled={page >= lastPage} className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer">Next</Button>
+                <Button variant="ghost" size="sm" onClick={() => setPage(page + 1)} disabled={page >= lastPage} className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer">Next</Button>
               </div>
             )}
           </div>
@@ -396,14 +396,14 @@ export default function LaporanRitaseArmadaPage() {
               placeholder="Contoh: 12"
               value={editRitaseValue}
               onChange={(e) => setEditRitaseValue(e.target.value)}
-              className="rounded-xl border-slate-200 bg-white h-11"
+              className="rounded-md border-slate-200 bg-white h-11"
             />
           </div>
           <DialogFooter className="mt-6 flex flex-col sm:flex-col gap-3">
             <Button
               type="button"
               onClick={() => setIsEditModalOpen(false)}
-              className="w-full bg-[#1c3553] hover:bg-[#122438] text-white rounded-xl h-11 font-medium cursor-pointer"
+              className="w-full bg-[#1c3553] hover:bg-[#122438] text-white rounded-md h-11 font-medium cursor-pointer"
             >
               Simpan
             </Button>
@@ -411,7 +411,7 @@ export default function LaporanRitaseArmadaPage() {
               type="button"
               variant="outline"
               onClick={() => setIsEditModalOpen(false)}
-              className="w-full rounded-xl border-slate-200 h-11 font-medium cursor-pointer mt-0 sm:mt-0"
+              className="w-full rounded-md border-slate-200 h-11 font-medium cursor-pointer mt-0 sm:mt-0"
             >
               Batal
             </Button>

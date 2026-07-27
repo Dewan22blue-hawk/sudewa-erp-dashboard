@@ -23,8 +23,7 @@ const parseApiError = (err: any): string => {
     return Object.entries(details)
       .map(
         ([field, value]) =>
-          `${field}: ${
-            Array.isArray(value) ? value[0] : String(value)
+          `${field}: ${Array.isArray(value) ? value[0] : String(value)
           }`
       )
       .join(', ');
@@ -88,7 +87,7 @@ export default function EditNestedUnitPage() {
       // ======================
       const selectedTypeUnitId =
         data.typeUnitId !== undefined &&
-        data.typeUnitId !== null
+          data.typeUnitId !== null
           ? String(data.typeUnitId)
           : '';
 
@@ -220,6 +219,19 @@ export default function EditNestedUnitPage() {
         payload.price_per_unit_usd = pricePerUnitUsd;
       }
 
+      const currentDppTaxId = unit?.dpp_tax_id ? Number(unit.dpp_tax_id) : 0;
+      const currentPpnTaxId = unit?.ppn_tax_id ? Number(unit.ppn_tax_id) : 0;
+      const newDppTaxId = data.dppTaxVersionId ? Number(data.dppTaxVersionId) : 0;
+      const newPpnTaxId = data.ppnTaxVersionId ? Number(data.ppnTaxVersionId) : 0;
+
+      if (newDppTaxId !== currentDppTaxId) {
+        payload.dpp_tax_id = newDppTaxId || undefined;
+      }
+
+      if (newPpnTaxId !== currentPpnTaxId) {
+        payload.ppn_tax_id = newPpnTaxId || undefined;
+      }
+
       // ======================
       // CHECK CHANGES
       // ======================
@@ -307,7 +319,7 @@ export default function EditNestedUnitPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="p-6">
             <PurchaseUnitForm
               defaultValues={{
@@ -320,6 +332,8 @@ export default function EditNestedUnitPage() {
                 biayaLain: unit.other_fee,
                 priceUsd: unit.price_usd,
                 pricePerUnitUsd: unit.price_per_unit_usd,
+                dppTaxVersionId: unit.dpp_tax_id != null ? String(unit.dpp_tax_id) : undefined,
+                ppnTaxVersionId: unit.ppn_tax_id != null ? String(unit.ppn_tax_id) : undefined,
               }}
               onSubmit={handleSubmit}
               onCancel={() => router.back()}

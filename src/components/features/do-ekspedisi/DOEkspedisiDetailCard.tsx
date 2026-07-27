@@ -34,34 +34,18 @@ export function DOEkspedisiDetailCard({ data }: DOEkspedisiDetailCardProps) {
       order?.tarifs && order.tarifs.length > 0
         ? order.tarifs
         : [
-            {
-              id: 0,
-              loadingIn: order?.loadingIn || firstItem?.loadingIn || '-',
-              loadingOut: order?.loadingOut || firstItem?.loadingOut || '-',
-              deliveryDestination: order?.destination || firstItem?.destination || '-',
-              loadContent: order?.loadContent || '-',
-              qty: Number(order?.qty || 0),
-              tarifItems: [],
-            },
-          ],
+          {
+            id: 0,
+            loadingIn: order?.loadingIn || firstItem?.loadingIn || '-',
+            loadingOut: order?.loadingOut || firstItem?.loadingOut || '-',
+            deliveryDestination: order?.destination || firstItem?.destination || '-',
+            loadContent: order?.loadContent || '-',
+            qty: Number(order?.qty || 0),
+            tarifItems: [],
+          },
+        ],
     [firstItem?.destination, firstItem?.loadingIn, firstItem?.loadingOut, order?.destination, order?.loadContent, order?.loadingIn, order?.loadingOut, order?.qty, order?.tarifs],
   );
-
-  React.useEffect(() => {
-    console.log('[DOEkspedisiDetailCard] detail data', data);
-    console.log('[DOEkspedisiDetailCard] order list', order);
-    console.log('[DOEkspedisiDetailCard] order details', orderDetails);
-    console.log(
-      '[DOEkspedisiDetailCard] muatan summary',
-      orderDetails.map((item, index) => ({
-        index,
-        id: item.id,
-        loadContent: item.loadContent,
-        qty: item.qty,
-        tarifItems: item.tarifItems,
-      })),
-    );
-  }, [data, order, orderDetails]);
 
   return (
     <div className="space-y-6">

@@ -11,7 +11,7 @@ import { formatCurrency } from "@/lib/utils/currency"
 export function InvoicePaymentSummary({ data }: { data: InvoicePayment }) {
     return (
         <Card
-            className="rounded-xl"
+            className="rounded-md"
             style={{
                 border: '1px solid #E5E5E5',
                 padding: '24px'

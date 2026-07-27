@@ -29,15 +29,15 @@ export default function AssetReportFilters({
   return (
     <div className="flex flex-col md:flex-row items-start md:items-end justify-between w-full gap-4">
       <div className="flex flex-col md:flex-row items-start md:items-end gap-4 w-full md:w-auto">
-        
+
         {/* Periode Transaksi */}
         <div className="flex flex-col space-y-2 w-full md:w-auto">
           <label className="text-[13px] font-bold text-gray-900">Periode Transaksi</label>
           <div className="w-full md:w-[280px]">
-            <DatePickerWithRange 
-              date={dateRange} 
-              onChange={setDateRange} 
-              className="h-10 rounded-xl border-gray-200"
+            <DatePickerWithRange
+              date={dateRange}
+              onChange={setDateRange}
+              className="h-10 rounded-md border-gray-200"
             />
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function AssetReportFilters({
         <div className="flex flex-col space-y-2 w-full md:w-auto">
           <label className="text-[13px] font-bold text-gray-900">Per Halaman</label>
           <Select value={perPage} onValueChange={setPerPage}>
-            <SelectTrigger className="w-full md:w-[80px] h-10 rounded-xl border-gray-200 bg-white">
+            <SelectTrigger className="w-full md:w-[80px] h-10 rounded-md border-gray-200 bg-white">
               <SelectValue placeholder="25" />
             </SelectTrigger>
             <SelectContent>
@@ -61,15 +61,15 @@ export default function AssetReportFilters({
         <div className="flex flex-col space-y-2 w-full md:w-auto">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Search here" 
+            <Input
+              placeholder="Search here"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 rounded-xl border-gray-200 bg-white w-full md:w-[250px]"
+              className="pl-9 h-10 rounded-md border-gray-200 bg-white w-full md:w-[250px]"
             />
           </div>
         </div>
-        
+
       </div>
 
       {/* Action Buttons */}

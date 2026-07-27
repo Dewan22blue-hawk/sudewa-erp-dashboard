@@ -90,7 +90,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
                 <MoreVertical className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+            <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
               <DropdownMenuItem
                 onClick={() => onEdit(item)}
                 disabled={item.is_lock || !canEdit}
@@ -137,7 +137,7 @@ export const AccountTable = ({ data, meta, search, page, perPage, isLoading = fa
       headerActions={
         <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
-          Tambah
+          Tambah Data
         </Button>
       }
     />

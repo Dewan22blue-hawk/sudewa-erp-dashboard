@@ -100,7 +100,7 @@ export default function CreateRolePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="misal: finance-supervisor"
-                className="max-w-md bg-white rounded-xl h-11"
+                className="max-w-md bg-white rounded-md h-11"
                 disabled={isPending}
                 required
               />
@@ -173,7 +173,7 @@ export default function CreateRolePage() {
                           return (
                             <label
                               key={perm.id}
-                              className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${isSelected
+                              className={`flex items-start gap-3 p-3 rounded-md border transition-all cursor-pointer select-none ${isSelected
                                 ? 'border-indigo-600/30 bg-indigo-50/20'
                                 : 'border-gray-100 bg-gray-50/20 hover:bg-gray-50/60'
                                 }`}
@@ -211,14 +211,14 @@ export default function CreateRolePage() {
               variant="outline"
               onClick={handleBack}
               disabled={isPending}
-              className="h-11 px-6 rounded-xl text-slate-800 border-slate-200"
+              className="h-11 px-6 rounded-md text-slate-800 border-slate-200"
             >
               Batal
             </Button>
             <Button
               type="submit"
               disabled={isPending || !name.trim()}
-              className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition-all"
+              className="h-11 px-6 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition-all"
             >
               {isPending ? 'Menyimpan...' : 'Simpan Peran'}
             </Button>

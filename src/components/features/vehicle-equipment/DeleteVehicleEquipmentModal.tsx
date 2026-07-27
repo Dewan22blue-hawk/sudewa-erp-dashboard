@@ -9,11 +9,11 @@ interface DeleteVehicleEquipmentModalProps {
     isDeleting?: boolean;
 }
 
-export function DeleteVehicleEquipmentModal({ 
-    isOpen, 
-    onClose, 
-    onConfirm, 
-    isDeleting = false 
+export function DeleteVehicleEquipmentModal({
+    isOpen,
+    onClose,
+    onConfirm,
+    isDeleting = false
 }: DeleteVehicleEquipmentModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -27,20 +27,20 @@ export function DeleteVehicleEquipmentModal({
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="pt-6 flex sm:justify-end gap-3.5">
-                    <Button 
-                        type="button" 
-                        variant="outline" 
+                    <Button
+                        type="button"
+                        variant="outline"
                         onClick={onClose}
                         disabled={isDeleting}
-                        className="w-full sm:w-auto border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-xl text-sm"
+                        className="w-full sm:w-auto border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-md text-sm"
                     >
                         Batal
                     </Button>
-                    <Button 
-                        type="button" 
+                    <Button
+                        type="button"
                         disabled={isDeleting}
                         onClick={onConfirm}
-                        className="w-full sm:w-auto bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-semibold px-5 py-2.5 rounded-xl text-sm"
+                        className="w-full sm:w-auto bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-semibold px-5 py-2.5 rounded-md text-sm"
                     >
                         {isDeleting ? 'Menghapus...' : 'Hapus'}
                     </Button>

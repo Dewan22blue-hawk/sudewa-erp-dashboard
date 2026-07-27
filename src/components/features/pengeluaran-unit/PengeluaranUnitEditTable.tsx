@@ -152,8 +152,8 @@ export default function PengeluaranUnitEditTable({ data, onDelete, onCancel }: P
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
-        <Table className="w-full text-sm">
+            <div className="bg-white rounded-md border border-gray-200 overflow-x-auto">
+                <Table className="w-full text-sm">
                     <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                         <TableRow>
                             <TableHead className="px-4 py-4 text-center w-[48px]">

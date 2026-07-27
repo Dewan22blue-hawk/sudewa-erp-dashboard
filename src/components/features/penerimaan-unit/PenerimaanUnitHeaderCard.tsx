@@ -68,7 +68,7 @@ export default function PenerimaanUnitHeaderCard({ data, onChange, onBlur, disab
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 shadow-sm">
+    <div className="bg-white rounded-md border border-gray-200 p-6 space-y-6 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">Informasi Penerimaan</h2>
         {!disabled && !isCreate && <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Double-click fields to edit</span>}
@@ -81,7 +81,7 @@ export default function PenerimaanUnitHeaderCard({ data, onChange, onBlur, disab
           {isCreate ? (
             <Input value={data.noPenerimaan} disabled={true} readOnly className="bg-gray-50 text-gray-500 rounded-lg h-10 border-gray-200" />
           ) : (
-            <InlineEditField value={data.noPenerimaan} displayValue={<span className="font-semibold">{data.noPenerimaan}</span>} onSave={() => {}} disabled={true} renderInput={() => null} />
+            <InlineEditField value={data.noPenerimaan} displayValue={<span className="font-semibold">{data.noPenerimaan}</span>} onSave={() => { }} disabled={true} renderInput={() => null} />
           )}
         </div>
 

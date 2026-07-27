@@ -94,14 +94,23 @@ export interface UnitTransactionWarehouse {
   name: string;
 }
 
-export interface UnitTransactionDetail {
+export interface UnitTransactionItemDetail {
   id: string;
+  unit_transaction_item_id: string;
   code: string;
-  created_at: string;
+  created_at: string | undefined;
   stock_state: string;
   max_capacity?: number;
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;
+  price?: number;
+  status?: string;
+  unit_type_name: string | undefined;
+  in_stock?: string | boolean | number | undefined;
+  is_forecast?: string | boolean | undefined;
+  color?: string;
+  chassis_number?: string;
+  machine_number?: string;
   unit_transaction_bruto_total: number;
   unit_transaction_item_total_hpp: number;
   unit_transaction_item_total_dpp: number;
@@ -115,6 +124,40 @@ export interface UnitTransactionDetail {
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
   unit_transaction_items?: any[];
+}
+
+export interface UnitTransactionDetail {
+  id: string;
+  code: string;
+  created_at: string;
+  stock_state: string;
+  max_capacity?: number;
+  person: UnitTransactionPerson;
+  warehouse: UnitTransactionWarehouse;
+  price?: number;
+  in_stock?: string;
+  is_forecast?: string;
+  status?: string;
+  unit_type_name: string;
+  color?: string;
+  chassis_number?: string;
+  machine_number?: string;
+  unit_transaction_bruto_total: number;
+  unit_transaction_item_total_hpp: number;
+  unit_transaction_item_total_dpp: number;
+  unit_transaction_item_total_ppn: number;
+  unit_transaction_item_bruto_total: number;
+  transaction_bbn_total: number;
+  transaction_other_fee: number;
+  expedition_fee_total: number;
+  total_operational_fee?: number;
+  billing_summary?: UnitTransactionBillingSummary | null;
+  unit_transaction_billing?: UnitTransactionBilling | null;
+  unit_transaction_adjustments?: any[];
+  unit_transaction_items?: any[];
+  pivot: {
+    unit_transaction_item_detail_id: number;
+  };
 }
 
 export interface UnitTransactionItem {
@@ -132,6 +175,28 @@ export interface UnitTransactionItem {
   ppn_total_price: number;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax_id?: string | number;
+  ppn_tax_id?: string | number;
+  ppn_tax_rate?: number;
+  dpp_tax_rate?: number;
+  dpp_tax?: {
+    id?: number,
+    tax_id?: number
+    tax?: {
+      id?: number,
+      name?: string,
+      code?: string,
+    }
+  };
+  ppn_tax?: {
+    id?: number,
+    tax_id?: number
+    tax?: {
+      id?: number,
+      name?: string,
+      code?: string,
+    }
+  };
 }
 
 export interface UnitTransactionItemListResponse {
@@ -152,6 +217,8 @@ export interface CreateUnitTransactionItemPayload {
   type?: string;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax_id?: number | string;
+  ppn_tax_id?: number | string;
 }
 
 export interface UpdateUnitTransactionItemPayload {
@@ -165,6 +232,18 @@ export interface UpdateUnitTransactionItemPayload {
   other_fee?: number;
   price_usd?: number;
   price_per_unit_usd?: number;
+  dpp_tax_id?: number | string;
+  ppn_tax_id?: number | string;
+}
+
+export interface TaxInfo {
+  id?: string | number;
+  tax_id?: string | number;
+  tax?: {
+    id?: string | number;
+    name?: string;
+    code?: string;
+  } | null;
 }
 
 export interface UnitTransactionItemSummary {
@@ -176,33 +255,21 @@ export interface UnitTransactionItemSummary {
   price: number;
   bbn_price: number;
   expedition_fee: number;
+  price_usd?: number;
+  price_per_unit_usd?: number;
   other_fee: number;
   hpp_per_unit_price?: number;
   dpp_per_unit_price?: number;
   ppn_per_unit_price?: number;
+  dpp_tax_id?: string | number;
+  ppn_tax_id?: string | number;
+  dpp_tax_rate?: number;
+  ppn_tax_rate?: number;
   hpp_total_price?: number;
   dpp_total_price?: number;
   ppn_total_price?: number;
-  price_usd?: number;
-  price_per_unit_usd?: number;
-}
-
-export interface UnitTransactionItemDetail {
-  id: string;
-  unit_transaction_item_id: string;
-  unit_type_name?: string;
-  price?: number;
-  color: string;
-  machine_number: string;
-  chassis_number: string;
-  in_stock?: boolean;
-  is_forecast?: boolean;
-  status?: string;
-  created_at?: string;
-  pivot?: {
-    unit_transaction_refund_id?: string | number;
-    unit_transaction_item_detail_id?: string | number;
-  };
+  dpp_tax?: TaxInfo | null;
+  ppn_tax?: TaxInfo | null;
 }
 
 export interface TransactionAdjustment {

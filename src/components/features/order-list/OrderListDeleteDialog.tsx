@@ -34,8 +34,8 @@ export function OrderListDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} disabled={isDeleting} className="rounded-xl bg-red-600 hover:bg-red-700">
+          <AlertDialogCancel className="rounded-md">Batal</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} disabled={isDeleting} className="rounded-md bg-red-600 hover:bg-red-700">
             {isDeleting ? 'Menghapus...' : 'Hapus'}
           </AlertDialogAction>
         </AlertDialogFooter>

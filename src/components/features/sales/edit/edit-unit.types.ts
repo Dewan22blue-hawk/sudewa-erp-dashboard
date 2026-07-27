@@ -22,6 +22,14 @@ export interface EditUnitFormData {
     biayaBbn: number
     biayaEkspedisi: number
     biayaLain: number
+
+    // USD section
+    hargaUsd?: number
+    hargaPerUnitUsd?: number
+
+    // Tax section
+    dppTaxVersionId?: string | number
+    ppnTaxVersionId?: string | number
 }
 
 export interface ProductOption {

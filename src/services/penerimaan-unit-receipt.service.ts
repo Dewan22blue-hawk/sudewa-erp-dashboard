@@ -29,6 +29,7 @@ type UnitTransactionItemDetailApiModel = {
   id?: number | string;
   unit_transaction_item_id?: number | string;
   color?: string;
+  status?: string;
   machine_number?: string;
   chassis_number?: string;
   in_stock?: boolean | number | string;
@@ -241,7 +242,6 @@ export const getReceiptUnitTableRows = async (params: ReceiptTableQueryParams): 
     if (!purchase) return;
 
     const purchaseCode = purchase.code ?? '-';
-    const status = purchase.billing_summary?.is_paid ? 'Lunas' : 'Belum Lunas';
     const unitTypeName = unitTypeNameById.get(toNumber(item.unit_type_id)) ?? '-';
 
     const details = detailByItemId.get(itemId) ?? [];
@@ -255,7 +255,8 @@ export const getReceiptUnitTableRows = async (params: ReceiptTableQueryParams): 
         color: toStringValue(detail.color || '-'),
         machineNumber: toStringValue(detail.machine_number || '-'),
         chassisNumber: toStringValue(detail.chassis_number || '-'),
-        status,
+        status: toStringValue(detail?.status),
+        in_stock: toBoolValue(detail.in_stock),
         unitTransactionId,
         received,
       });
@@ -270,10 +271,10 @@ export const getReceiptUnitTableRows = async (params: ReceiptTableQueryParams): 
     normalizedSearch.length === 0
       ? transformedRows
       : transformedRows.filter((item) =>
-          [item.purchaseCode, item.unitTypeName, item.color, item.machineNumber, item.chassisNumber, item.status]
-            .map((value) => String(value ?? '').toLowerCase())
-            .some((value) => value.includes(normalizedSearch)),
-        );
+        [item.purchaseCode, item.unitTypeName, item.color, item.machineNumber, item.chassisNumber, item.status]
+          .map((value) => String(value ?? '').toLowerCase())
+          .some((value) => value.includes(normalizedSearch)),
+      );
 
   const page = Math.max(1, params.page);
   const perPage = Math.max(1, params.perPage);

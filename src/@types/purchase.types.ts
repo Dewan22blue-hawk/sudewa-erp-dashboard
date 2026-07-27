@@ -16,6 +16,9 @@ export interface PurchaseUnit {
   biayaEkspedisi: number;
   biayaLain: number;
 
+  dppTaxVersionId: string;
+  ppnTaxVersionId: string;
+
   hpp: number;
   dpp: number;
   ppn: number;
@@ -52,6 +55,8 @@ export interface Purchase {
   totalPpn: number;
   totalBiaya: number;
   totalPurchase: number;
+
+  unit_transaction_items: any[];
 
   totalPaid: number;
   remainingPayment: number;
@@ -112,6 +117,8 @@ export interface CreatePurchaseUnitRequest {
   price: number;
   biayaBBN: number;
   biayaEkspedisi: number;
+  dppTaxVersionId: string;
+  ppnTaxVersionId: string;
   biayaLain: number;
 }
 
@@ -132,6 +139,7 @@ export interface PurchasePaginatedResponse {
 
 export interface PurchaseUnitItemRow {
   id: string;
+  code: string;
   unitTransactionId: string;
   unitTransactionCode?: string;
   unitTypeId?: string;
@@ -149,6 +157,7 @@ export interface PurchaseUnitItemRow {
   totalDpp?: number;
   totalPpn?: number;
   totalPurchase?: number;
+  supplierName?: string;
   createdAt?: string;
 }
 

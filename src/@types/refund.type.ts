@@ -1,5 +1,5 @@
 import { PaginationMeta } from '@/@types/pagination.types';
-import { UnitTransactionItemDetail } from './unit-transaction.types';
+import { UnitTransactionDetail } from './unit-transaction.types';
 
 export interface RefundStatus {
   id: string;
@@ -20,7 +20,7 @@ export interface UnitTransactionRefund {
   total_qty?: number;
   total_payable?: number;
   remaining_payment?: number;
-  items?: UnitTransactionItemDetail[];
+  items?: UnitTransactionDetail[];
   payments?: UnitTransactionRefundPayment[];
   transaction?: {
     id?: string;

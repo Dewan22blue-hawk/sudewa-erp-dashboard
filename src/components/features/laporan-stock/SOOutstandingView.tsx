@@ -16,7 +16,7 @@ interface Props {
 
 export default function SOOutstandingView({ data }: Props) {
     return (
-        <div className="bg-white border rounded-xl p-12 max-w-5xl mx-auto shadow-sm">
+        <div className="bg-white border rounded-md p-12 max-w-5xl mx-auto shadow-sm">
 
             {/* Header Section */}
             <div className="flex flex-col items-center justify-center mb-10 relative">

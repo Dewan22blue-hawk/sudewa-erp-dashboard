@@ -97,7 +97,7 @@ export default function WithholdingTaxTable({
 
   return (
     <div className="space-y-5">
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[1500px] text-sm">
           <thead className="bg-[#f8f9fa] border-b border-gray-200">
             <tr>

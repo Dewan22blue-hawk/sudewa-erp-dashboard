@@ -24,8 +24,6 @@ export function PurchaseDetailCards({ data, billingHistories = [] }: Props) {
   const biayaLainnya = Number(data?.transaction_other_fee ?? 0);
   const totalBiaya = Number(data?.total_operational_fee ?? 0);
 
-  console.log(data);
-
   const totalPembelian = totalHpp + totalBiaya;
 
   const historyPaid = billingHistories.reduce((sum, item) => sum + getHistoryTotalIdrEquivalent(item), 0);

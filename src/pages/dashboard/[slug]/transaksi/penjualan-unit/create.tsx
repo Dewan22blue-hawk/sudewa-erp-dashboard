@@ -147,6 +147,8 @@ export default function CreateSalesPage() {
     const biayaBbn = toNumber(data.biayaBbn);
     const biayaEkspedisi = toNumber(data.biayaEkspedisi);
     const biayaLain = toNumber(data.biayaLain);
+    const dppTaxVersionId = data.dppTaxVersionId ? Number(data.dppTaxVersionId) : undefined;
+    const ppnTaxVersionId = data.ppnTaxVersionId ? Number(data.ppnTaxVersionId) : undefined;
 
     if (!customerId) {
       toast.error('Customer wajib dipilih');
@@ -177,6 +179,8 @@ export default function CreateSalesPage() {
       bbn_price: biayaBbn,
       expedition_fee: biayaEkspedisi,
       other_fee: biayaLain,
+      dpp_tax_id: dppTaxVersionId,
+      ppn_tax_id: ppnTaxVersionId,
     };
 
     if (!transactionPayload.code?.trim()) {
@@ -293,7 +297,7 @@ export default function CreateSalesPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
+        <div className="rounded-md border bg-white p-5 md:p-6 shadow-sm">
           <EditUnitForm
             defaultValues={{
               customer: selectedCustomer?.label ?? '',
@@ -354,12 +358,12 @@ export default function CreateSalesPage() {
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Alamat</Label>
-                  <Input value={form.alamat} readOnly disabled={isLoadingCustomerDetail} className="bg-transparent" placeholder="Alamat customer" />
+                  <Input value={form.alamat} readOnly disabled className="bg-transparent" placeholder="Alamat customer" />
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">NPWP</Label>
-                  <Input value={form.npwp} readOnly disabled={isLoadingCustomerDetail} className="bg-transparent" placeholder="NPWP customer" />
+                  <Input value={form.npwp} readOnly disabled className="bg-transparent" placeholder="NPWP customer" />
                 </div>
               </div>
             }

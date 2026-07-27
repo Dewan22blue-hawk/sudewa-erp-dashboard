@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Search, Printer, Loader2, ArrowUpDown } from 'lucide-react';
+import { Printer, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -19,6 +17,27 @@ import { PrintLetterPage } from '@/components/common/PrintLetterPage';
 import { getVisiblePageNumbers } from '@/lib/api/pagination';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils/format';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { Badge } from '@/components/ui/badge';
+
+const getAssetTypeBadge = (type?: string | null) => {
+  if (!type) return <Badge variant="outline">-</Badge>;
+  switch (type.toLowerCase()) {
+    case 'inventory':
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Inventaris</Badge>;
+    case 'vehicles':
+      return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Kendaraan</Badge>;
+    case 'buildings':
+      return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">Bangunan</Badge>;
+    case 'land':
+      return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Tanah</Badge>;
+    default:
+      return <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200">{type}</Badge>;
+  }
+};
 
 export default function LaporanAssetPage() {
   const router = useRouter();
@@ -72,15 +91,6 @@ export default function LaporanAssetPage() {
     return format(date, 'dd/MM/yyyy');
   };
 
-  const formatIDR = (value?: number | null) => {
-    if (value === null || value === undefined) return '-';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(value);
-  };
-
   // Sorting handler
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -97,6 +107,66 @@ export default function LaporanAssetPage() {
     window.print();
   };
 
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
+
+  const columns = useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'KODE ASET',
+        accessorKey: 'asset_code',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.asset?.code} />,
+      },
+      {
+        header: 'TGL BELI',
+        alignment: 'center',
+        cell: (item) => formatDateString(item.asset?.purchase_date),
+      },
+      {
+        header: 'NAMA BARANG',
+        accessorKey: 'asset_name',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => item.asset?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/asset?search=${item.asset?.name}`}>{item.asset?.name}</ReferenceLink> : '-'
+      },
+      {
+        header: 'TIPE ASET',
+        alignment: 'left',
+        cell: (item) => getAssetTypeBadge(item.asset?.type),
+      },
+      {
+        header: 'SERIAL NUMBER',
+        accessorKey: 'serial_number',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.asset?.serial_number || '-'} />
+      },
+      {
+        header: 'HARGA BELI',
+        alignment: 'left',
+        cell: (item) => currenciesFormat('idr', item.asset?.price),
+      },
+      {
+        header: 'UMUR EKONOMIS',
+        alignment: 'left',
+        cell: (item) => item.economic_age !== null && item.economic_age !== undefined ? `${item.economic_age} TAHUN` : '-',
+      },
+      {
+        header: 'PENYUSUTAN/BULAN',
+        alignment: 'left',
+        cell: (item) => currenciesFormat('idr', item.depreciation_per_month || 0),
+      },
+      {
+        header: 'NILAI AKHIR',
+        alignment: 'left',
+        cell: (item) => currenciesFormat('idr', item.final_value || 0),
+      },
+    ],
+    [page, perPage]
+  );
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -107,7 +177,7 @@ export default function LaporanAssetPage() {
             <p className="text-sm text-slate-500">Laporan data aset perusahaan</p>
           </div>
           <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-            <Printer className="h-4.5 w-4.5 text-slate-700" /> Print
+            <Printer className="h-4.5 w-4.5 text-slate-700 hover:text-slate-900 transition-colors" /> Print
           </Button>
         </div>
 
@@ -115,18 +185,17 @@ export default function LaporanAssetPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <div className="relative w-full sm:w-[300px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search here"
-                className="pl-9 bg-white rounded-xl border-slate-200 shadow-sm"
+                className="pl-9 bg-white rounded-md border-slate-200 shadow-sm"
               />
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                <SelectTrigger className="w-[80px] rounded-xl border-slate-200 bg-white shadow-sm cursor-pointer">
+                <SelectTrigger className="w-[80px] rounded-md border-slate-200 bg-white shadow-sm cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -162,85 +231,21 @@ export default function LaporanAssetPage() {
               </p>
             </div>
 
-            {/* Loader and Table Rendering */}
-            {isLoading ? (
-              <div className="flex justify-center items-center py-24 w-full bg-white rounded-xl border border-slate-200">
-                <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-              </div>
-            ) : isError ? (
-              <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-xl border border-red-100 text-center p-6">
+            {/* Table Rendering */}
+            {isError ? (
+              <div className="flex flex-col justify-center items-center py-20 w-full bg-white rounded-md border border-red-100 text-center p-6 no-print">
                 <p className="text-red-600 font-semibold mb-1">Gagal memuat data laporan</p>
                 <p className="text-sm text-slate-500">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
               </div>
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto shadow-none w-full">
-                  <Table>
-                    <TableHeader className="bg-slate-50 border-b border-slate-200">
-                      <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-12 text-center text-xs font-bold uppercase text-slate-700">NO</TableHead>
-                        <TableHead onClick={() => handleSort('asset_code')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                          KODE ASET <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                        </TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TGL BELI</TableHead>
-                        <TableHead onClick={() => handleSort('asset_name')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                          NAMA BARANG <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                        </TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">TIPE ASET</TableHead>
-                        <TableHead onClick={() => handleSort('serial_number')} className="cursor-pointer select-none text-xs font-bold uppercase text-slate-700 whitespace-nowrap">
-                          SERIAL NUMBER <ArrowUpDown className="inline-block h-3.5 w-3.5 ml-1 text-slate-400" />
-                        </TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">HARGA BELI</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">UMUR EKONOMIS</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">PENYUSUTAN/BULAN</TableHead>
-                        <TableHead className="text-xs font-bold uppercase text-slate-700 whitespace-nowrap">NILAI AKHIR</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {data.length > 0 ? (
-                        data.map((item, idx) => {
-                          const indexNumber = idx + 1 + (page - 1) * perPage;
-
-                          const code = item.asset?.code || '-';
-                          const serialNumber = item.asset?.serial_number || '-';
-                          const name = item.asset?.name || '-';
-                          const type = item.asset?.type || '-';
-                          const purchaseDate = formatDateString(item.asset?.purchase_date);
-                          const price = formatIDR(item.asset?.price);
-                          const economicAge = item.economic_age !== null && item.economic_age !== undefined ? `${item.economic_age} TAHUN` : '-';
-                          const depreciationPerMonth = formatIDR(item.depreciation_per_month);
-                          const finalValue = formatIDR(item.final_value);
-
-                          return (
-                            <TableRow key={item.uuid || idx} className="border-slate-100 hover:bg-slate-50/50">
-                              <TableCell className="text-center font-medium text-slate-500">{indexNumber}</TableCell>
-                              <TableCell className="font-mono text-[13px] text-slate-700 whitespace-nowrap">{code}</TableCell>
-                              <TableCell className="text-slate-600 whitespace-nowrap">{purchaseDate}</TableCell>
-                              <TableCell className="font-semibold text-slate-800 whitespace-nowrap">{name}</TableCell>
-                              <TableCell className="text-slate-600 whitespace-nowrap">{type}</TableCell>
-                              <TableCell className="font-mono text-[13px] text-slate-600 whitespace-nowrap">{serialNumber}</TableCell>
-                              <TableCell className="text-slate-800 font-semibold whitespace-nowrap">{price}</TableCell>
-                              <TableCell className="text-slate-600 whitespace-nowrap">{economicAge}</TableCell>
-                              <TableCell className="text-slate-600 whitespace-nowrap">{depreciationPerMonth}</TableCell>
-                              <TableCell className="text-slate-800 font-semibold whitespace-nowrap">{finalValue}</TableCell>
-                            </TableRow>
-                          );
-                        })
-                      ) : (
-                        <TableRow className="group">
-                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                              <div className="flex flex-col items-center justify-center gap-2">
-                                  <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                      <Search className="h-8 w-8 text-slate-400" />
-                                  </div>
-                                  <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                  <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                              </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-              </div>
+              <BaseTable
+                data={data || []}
+                columns={columns}
+                loading={isLoading}
+                sortBy={sortBy}
+                sortDirection={sortOrder}
+                onSortChange={(key) => handleSort(key)}
+              />
             )}
           </div>
         </PrintLetterPage>
@@ -257,7 +262,7 @@ export default function LaporanAssetPage() {
                 size="sm"
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}
-                className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
+                className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
               >
                 Previous
               </Button>
@@ -269,7 +274,7 @@ export default function LaporanAssetPage() {
                   size="sm"
                   onClick={() => setPage(pageNumber)}
                   className={cn(
-                    "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                    "h-9 min-w-9 rounded-md border-slate-200 text-[13px] font-semibold cursor-pointer",
                     pageNumber === page
                       ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
                       : "text-slate-600 hover:bg-slate-100"
@@ -284,7 +289,7 @@ export default function LaporanAssetPage() {
                 size="sm"
                 onClick={() => setPage(page + 1)}
                 disabled={page >= pagination.lastPage}
-                className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
+                className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
               >
                 Next
               </Button>

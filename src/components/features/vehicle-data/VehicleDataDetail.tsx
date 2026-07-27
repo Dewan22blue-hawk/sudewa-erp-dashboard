@@ -20,7 +20,7 @@ const formatDate = (value?: string | null) => {
 
 function DetailRow({ label, value }: { label: string; value?: string | number | null }) {
   return (
-    <div className="space-y-1 rounded-xl border border-slate-200 bg-white px-4 py-3">
+    <div className="space-y-1 rounded-md border border-slate-200 bg-white px-4 py-3">
       <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div>
       <div className="text-sm text-slate-800">{value || '-'}</div>
     </div>
@@ -43,7 +43,7 @@ export function VehicleDataDetail({ data, slug }: VehicleDataDetailProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button onClick={() => router.back()} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>

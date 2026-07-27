@@ -216,7 +216,7 @@ export function SupplierManagementPage() {
 
   if (isError) {
     return (
-      <Card className="rounded-xl border border-[#E4E4E7] p-6 shadow-none">
+      <Card className="rounded-md border border-[#E4E4E7] p-6 shadow-none">
         <div className="text-center text-[15px] text-[#DC2626]">Gagal memuat data supplier</div>
       </Card>
     );

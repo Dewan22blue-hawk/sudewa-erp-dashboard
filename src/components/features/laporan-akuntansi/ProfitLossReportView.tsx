@@ -66,7 +66,7 @@ function ReportBox({
           <div
             className={cn(
               'mt-3 border-t border-[#111827] pt-2',
-              totalTone === 'soft' && 'rounded-xl bg-[#f8fafc] px-2',
+              totalTone === 'soft' && 'rounded-md bg-[#f8fafc] px-2',
             )}
           >
             <div className="grid grid-cols-[minmax(0,1fr)_140px] gap-4 text-sm font-semibold text-[#111827]">

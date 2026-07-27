@@ -27,11 +27,11 @@ export function EditDealerModal({ isOpen, onClose, onSave, initialData }: EditDe
                         Perbarui detail data dealer ini
                     </DialogDescription>
                 </DialogHeader>
-                
-                <EditDealerInnerForm 
-                    initialData={initialData} 
-                    onClose={onClose} 
-                    onSave={onSave} 
+
+                <EditDealerInnerForm
+                    initialData={initialData}
+                    onClose={onClose}
+                    onSave={onSave}
                 />
             </DialogContent>
         </Dialog>
@@ -108,8 +108,8 @@ function EditDealerInnerForm({ initialData, onClose, onSave }: InnerProps) {
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t bg-gray-50">
-                <Button type="button" variant="outline" className="flex-1 h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={onClose}>Batal</Button>
-                <Button type="submit" className="flex-1 h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]">Simpan Perubahan</Button>
+                <Button type="button" variant="outline" className="flex-1 h-11 rounded-md border-[#D4D4D8] text-[15px] text-[#171717]" onClick={onClose}>Batal</Button>
+                <Button type="submit" className="flex-1 h-11 rounded-md bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]">Simpan Perubahan</Button>
             </div>
         </form>
     );

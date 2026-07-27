@@ -13,7 +13,7 @@ function findOpeningTagEnd(str, startIdx) {
   let inString = false;
   let stringChar = '';
   let bracesDepth = 0;
-  
+
   for (let i = startIdx; i < str.length; i++) {
     const char = str[i];
     if (inString) {
@@ -63,10 +63,10 @@ function processFile(filePath) {
     }
 
     const openingTag = content.substring(buttonStart, openingTagEnd + 1);
-    
+
     // Check if self closing
     const isSelfClosing = openingTag.endsWith('/>');
-    
+
     if (isSelfClosing) {
       // We don't standardize self-closing buttons for this logic because we rely on inner content to know the type
       pos = openingTagEnd + 1;
@@ -88,7 +88,7 @@ function processFile(filePath) {
     const hasAction = /Export|Import|Download|Print/i.test(innerContent) || /<(Upload|Download|Printer)/.test(innerContent);
 
     if (hasArrowLeft) {
-      newAttrs = ` variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer"`;
+      newAttrs = ` variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer"`;
     } else if (hasAdd) {
       newAttrs = ` className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"`;
     } else if (hasAction) {
@@ -101,7 +101,7 @@ function processFile(filePath) {
     // Strip out the first '<Button' and the last '>'
     let innerAttrs = openingTag.substring(7, openingTag.length - 1);
     let cleanedAttrs = cleanButtonProps(innerAttrs);
-    
+
     cleanedAttrs = cleanedAttrs.replace(/\s+/g, ' ').trim();
     const finalAttrs = cleanedAttrs ? ` ${cleanedAttrs}${newAttrs}` : `${newAttrs}`;
 
@@ -109,14 +109,13 @@ function processFile(filePath) {
     const newBlock = newOpeningTag + innerContent + '</Button>';
 
     content = content.substring(0, buttonStart) + newBlock + content.substring(closingTagIdx + 9);
-    
+
     // update pos
     pos = buttonStart + newBlock.length;
   }
 
   if (content !== originalContent) {
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Standarisasi Button pada: ${filePath}`);
   }
 }
 
@@ -126,5 +125,3 @@ DIRECTORIES.forEach((dir) => {
     processDirectory(fullPath);
   }
 });
-
-console.log('Proses standarisasi Button selesai!');

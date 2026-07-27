@@ -1,12 +1,10 @@
-const fs = require('fs');
-const cp = require('child_process');
+import fs from 'fs';
+import cp from child_process;
 
 const statusOutput = cp.execSync('git status --porcelain').toString();
 const unmergedFiles = statusOutput.split('\n')
   .filter(line => line.startsWith('UU '))
   .map(line => line.slice(3).trim());
-
-console.log(`Found ${unmergedFiles.length} unmerged files.`);
 
 let unknownConflicts = [];
 
@@ -14,12 +12,12 @@ for (const file of unmergedFiles) {
   const content = fs.readFileSync(file, 'utf8');
   const lines = content.split('\n');
   const newLines = [];
-  
+
   let inConflict = false;
   let headLines = [];
   let remoteLines = [];
   let currentSide = ''; // 'HEAD' or 'REMOTE'
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (line.startsWith('<<<<<<< HEAD')) {
@@ -35,16 +33,16 @@ for (const file of unmergedFiles) {
     }
     if (line.match(/^>>>>>>> [a-f0-9]+/)) {
       inConflict = false;
-      
+
       // Heuristic resolution
       const headText = headLines.join('\n');
       const remoteText = remoteLines.join('\n');
-      
+
       let resolvedText = null;
-      
+
       const headHasSticky = headText.includes('sticky right-0');
       const remoteHasSticky = remoteText.includes('sticky right-0');
-      
+
       if (headHasSticky && !remoteHasSticky) {
         resolvedText = headText;
       } else if (!headHasSticky && remoteHasSticky) {
@@ -56,7 +54,7 @@ for (const file of unmergedFiles) {
         // Neither has sticky? Maybe it's a different conflict.
         resolvedText = null;
       }
-      
+
       if (resolvedText !== null) {
         newLines.push(resolvedText);
       } else {
@@ -70,7 +68,7 @@ for (const file of unmergedFiles) {
       }
       continue;
     }
-    
+
     if (inConflict) {
       if (currentSide === 'HEAD') headLines.push(line);
       else remoteLines.push(line);
@@ -78,17 +76,6 @@ for (const file of unmergedFiles) {
       newLines.push(line);
     }
   }
-  
-  fs.writeFileSync(file, newLines.join('\n'));
-}
 
-if (unknownConflicts.length > 0) {
-  console.log(`There are ${unknownConflicts.length} unresolved conflicts:`);
-  unknownConflicts.forEach((uc, idx) => {
-    console.log(`\n--- Conflict ${idx+1} in ${uc.file} ---`);
-    console.log(`HEAD:\n${uc.headText}`);
-    console.log(`REMOTE:\n${uc.remoteText}`);
-  });
-} else {
-  console.log('All conflicts resolved successfully based on heuristics!');
+  fs.writeFileSync(file, newLines.join('\n'));
 }

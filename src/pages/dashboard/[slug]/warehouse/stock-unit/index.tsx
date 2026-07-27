@@ -7,14 +7,8 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { StockStatus } from '@/@types/stock-unit.types';
-import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function StockUnitPage() {
-  const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('warehouse:create');
-  const canEdit = hasPermission('warehouse:edit');
-  const canDelete = hasPermission('warehouse:delete');
-
   const { companyId } = useCompany();
 
   const [search, setSearch] = useState('');
@@ -68,7 +62,7 @@ export default function StockUnitPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <PanelName />
-          <Card className="rounded-xl p-6">
+          <Card className="rounded-md p-6">
             <div className="text-center text-muted-foreground">Memuat data...</div>
           </Card>
         </div>
@@ -81,7 +75,7 @@ export default function StockUnitPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <PanelName />
-          <Card className="rounded-xl p-6">
+          <Card className="rounded-md p-6">
             <div className="text-center text-destructive">Gagal memuat data</div>
           </Card>
         </div>
@@ -93,7 +87,6 @@ export default function StockUnitPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <PanelName />
-
         <StockUnitTable
           data={data?.data || []}
           isLoading={isLoading}

@@ -95,7 +95,7 @@ export function MaterialReceiptFormModal({
                     searchPlaceholder="Cari warehouse..."
                     emptyText="Warehouse tidak ditemukan."
                     loading={isLoadingWarehouses}
-                    className="h-12 rounded-xl border-slate-200 bg-white px-4 text-[15px]"
+                    className="h-12 rounded-md border-slate-200 bg-white px-4 text-[15px]"
                   />
                 )}
               />
@@ -104,7 +104,7 @@ export function MaterialReceiptFormModal({
 
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">Supplier</Label>
-              <Input {...form.register('supplierName')} placeholder="Masukkan nama supplier" className="h-12 rounded-xl border-slate-200 px-4 text-[15px]" />
+              <Input {...form.register('supplierName')} placeholder="Masukkan nama supplier" className="h-12 rounded-md border-slate-200 px-4 text-[15px]" />
               {form.formState.errors.supplierName ? <p className="text-xs text-red-600">{form.formState.errors.supplierName.message}</p> : null}
             </div>
 
@@ -118,7 +118,7 @@ export function MaterialReceiptFormModal({
                     value={toDateValue(field.value)}
                     onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                     placeholder="Pick a Date"
-                    className="h-12 rounded-xl border-slate-200 px-4 text-[15px]"
+                    className="h-12 rounded-md border-slate-200 px-4 text-[15px]"
                   />
                 )}
               />
@@ -127,14 +127,14 @@ export function MaterialReceiptFormModal({
 
             <div className="space-y-2">
               <Label className="text-[15px] font-medium text-slate-900">Keterangan</Label>
-              <Textarea {...form.register('description')} placeholder={descriptionPlaceholder} rows={4} className="rounded-xl border-slate-200 px-4 py-3 text-[15px]" />
+              <Textarea {...form.register('description')} placeholder={descriptionPlaceholder} rows={4} className="rounded-md border-slate-200 px-4 py-3 text-[15px]" />
             </div>
 
             <div className="space-y-3 pt-2">
-              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-[16px] font-medium hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-300 text-[16px] font-medium">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-md border-slate-300 text-[16px] font-medium">
                 Batal
               </Button>
             </div>

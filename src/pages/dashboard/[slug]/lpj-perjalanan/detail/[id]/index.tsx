@@ -70,7 +70,7 @@ export default function DetailLPJPerjalananPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl border border-gray-200 p-5">
+        <Card className="rounded-md border border-gray-200 p-5">
           <div className="grid grid-cols-1 gap-4 text-sm text-gray-700 md:grid-cols-3">
             <div>
               <p className="text-xs text-gray-500">Driver</p>
@@ -106,7 +106,7 @@ export default function DetailLPJPerjalananPage() {
           <LPJDetailTable items={detailRows} />
         </div>
 
-        <Card className="rounded-xl border border-gray-200 p-5">
+        <Card className="rounded-md border border-gray-200 p-5">
           <h3 className="text-base font-semibold text-gray-900">Ringkasan Biaya</h3>
           <div className="mt-3 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
             <div>

@@ -218,7 +218,7 @@ export default function CreatePurchasePage() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-white p-5 md:p-6 shadow-sm">
+        <div className="rounded-md border bg-white p-5 md:p-6 shadow-sm">
           <PurchaseUnitForm
             onSubmit={handleSubmit}
             loading={mutation.isPending}

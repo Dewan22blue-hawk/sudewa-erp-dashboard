@@ -76,8 +76,8 @@ export function BBNBillFormDialog({
       ditlantasProcessId: initialData?.ditlantasProcess?.id
         ? String(initialData.ditlantasProcess.id)
         : initialData?.dealerId
-        ? String(initialData.dealerId)
-        : '',
+          ? String(initialData.dealerId)
+          : '',
       billDate: toDateValue(initialData?.billDate),
       paidDate: toDateValue(initialData?.paidDate),
     });
@@ -118,7 +118,7 @@ export function BBNBillFormDialog({
                     placeholder="Masukkan Kode Ditlantas"
                     searchPlaceholder="Cari proses Ditlantas..."
                     emptyText="Proses Ditlantas tidak ditemukan."
-                    className="h-11 rounded-xl border-slate-200"
+                    className="h-11 rounded-md border-slate-200"
                   />
                 )}
               />
@@ -131,7 +131,7 @@ export function BBNBillFormDialog({
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200 w-full" />
+                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-md border-slate-200 w-full" />
                 )}
               />
             </div>
@@ -142,16 +142,16 @@ export function BBNBillFormDialog({
                 name="paidDate"
                 control={form.control}
                 render={({ field }) => (
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200 w-full" />
+                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-md border-slate-200 w-full" />
                 )}
               />
             </div>
 
             <div className="flex flex-col gap-3 pt-3">
-              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-sm font-medium text-white hover:bg-[#183552]">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-sm font-medium text-white hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-200 text-sm font-medium text-slate-700 bg-white">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-md border-slate-200 text-sm font-medium text-slate-700 bg-white">
                 Batal
               </Button>
             </div>
@@ -208,7 +208,7 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
           >
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-950">Nomor Tagihan</Label>
-              <Input value={bill ? (bill.code || formatBillCode(bill.id)) : ''} readOnly className="h-11 rounded-xl border-slate-200 bg-white text-slate-500" />
+              <Input value={bill ? (bill.code || formatBillCode(bill.id)) : ''} readOnly className="h-11 rounded-md border-slate-200 bg-white text-slate-500" />
             </div>
 
             <div className="space-y-2">
@@ -218,7 +218,7 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-xl border-slate-200" />
+                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick a date" className="h-11 rounded-md border-slate-200" />
                 )}
               />
             </div>
@@ -231,7 +231,7 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
                 rules={{ required: true }}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                    <SelectTrigger className="h-11 rounded-md border-slate-200">
                       <SelectValue placeholder="Select an item" />
                     </SelectTrigger>
                     <SelectContent>
@@ -253,21 +253,21 @@ export function BBNBillPaymentDialog({ open, onOpenChange, onSubmit, isSubmittin
                 control={form.control}
                 rules={{ required: true }}
                 render={({ field }) => (
-                  <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-11 rounded-xl border-slate-200" />
+                  <MoneyInput value={field.value} onChangeValue={field.onChange} placeholder="Rp" className="h-11 rounded-md border-slate-200" />
                 )}
               />
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-950">Kurang Bayar</Label>
-              <Input value={formatCurrency(outstanding)} readOnly className="h-11 rounded-xl border-slate-200 bg-white text-slate-500" />
+              <Input value={formatCurrency(outstanding)} readOnly className="h-11 rounded-md border-slate-200 bg-white text-slate-500" />
             </div>
 
             <div className="flex flex-col gap-3 pt-3">
-              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-xl bg-[#1f4163] text-sm font-medium text-white hover:bg-[#183552]">
+              <Button type="submit" disabled={isSubmitting} className="h-11 w-full rounded-md bg-[#1f4163] text-sm font-medium text-white hover:bg-[#183552]">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-xl border-slate-200 text-sm font-medium text-slate-700 bg-white">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 w-full rounded-md border-slate-200 text-sm font-medium text-slate-700 bg-white">
                 Batal
               </Button>
             </div>
@@ -289,10 +289,10 @@ export function DeleteBBNBillDialog({ open, onOpenChange, onConfirm, isDeleting 
           Apakah Anda yakin ingin menghapus tagihan <span className="font-semibold text-slate-900">{bill ? formatBillCode(bill.id) : '-'}</span>?
         </p>
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl border-slate-200">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-md border-slate-200">
             Batal
           </Button>
-          <Button type="button" variant="destructive" onClick={() => onConfirm()} disabled={isDeleting} className="rounded-xl">
+          <Button type="button" variant="destructive" onClick={() => onConfirm()} disabled={isDeleting} className="rounded-md">
             {isDeleting ? 'Menghapus...' : 'Hapus'}
           </Button>
         </div>

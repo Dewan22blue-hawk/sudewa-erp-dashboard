@@ -169,7 +169,7 @@ export default function LPJumlahDaftarPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tabs Navigation (Pills structure) */}
           <div className="flex mb-4 no-print">
-            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-xl">
+            <TabsList className="flex h-auto p-1 bg-slate-100 border border-slate-200/60 rounded-md">
               <TabsTrigger
                 value="bpkb"
                 className="rounded-lg px-5 py-2 text-[14px] font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm cursor-pointer"
@@ -221,613 +221,613 @@ export default function LPJumlahDaftarPage() {
               </div>
 
               {/* Table Rendering (static header, dynamic body) */}
-              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-none w-full">
+              <div className="rounded-md border border-gray-200 bg-white overflow-hidden shadow-none w-full">
                 <div className="overflow-x-auto">
                   <Table>
-                      <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                        {/* Tab BPKB Header */}
-                        {activeTab === 'bpkb' && (
-                          <TableRow className="hover:bg-[#f8f9fa]">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
-                            <TableHead
-                              onClick={() => handleSort('stnk_name')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NAMA BPKB</span>
-                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('bpkb_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'bpkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NOMOR BPKB</span>
-                                <SortIcon sortKey="bpkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('region')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>WILAYAH</span>
-                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('dealer')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>DEALER</span>
-                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vendor')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>VENDOR</span>
-                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('tnkb_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO POLISI</span>
-                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vehicle_type')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>JENIS</span>
-                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('chassis_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO RANGKA</span>
-                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('machine_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO MESIN</span>
-                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('registration_date')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>TGL DAFTAR</span>
-                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('bpkb_physical_status')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'bpkb_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>FISIK BPKB</span>
-                                <SortIcon sortKey="bpkb_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        )}
+                    <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                      {/* Tab BPKB Header */}
+                      {activeTab === 'bpkb' && (
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                          <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
+                          <TableHead
+                            onClick={() => handleSort('stnk_name')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NAMA BPKB</span>
+                              <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('bpkb_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'bpkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NOMOR BPKB</span>
+                              <SortIcon sortKey="bpkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('region')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>WILAYAH</span>
+                              <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('dealer')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>DEALER</span>
+                              <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vendor')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>VENDOR</span>
+                              <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('tnkb_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO POLISI</span>
+                              <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vehicle_type')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>JENIS</span>
+                              <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('chassis_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO RANGKA</span>
+                              <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('machine_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO MESIN</span>
+                              <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('registration_date')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>TGL DAFTAR</span>
+                              <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('bpkb_physical_status')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'bpkb_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>FISIK BPKB</span>
+                              <SortIcon sortKey="bpkb_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                        </TableRow>
+                      )}
 
-                        {/* Tab STNK Header */}
-                        {activeTab === 'stnk' && (
-                          <TableRow className="hover:bg-[#f8f9fa]">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
-                            <TableHead
-                              onClick={() => handleSort('stnk_name')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NAMA STNK</span>
-                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('stnk_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'stnk_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NOMOR STNK</span>
-                                <SortIcon sortKey="stnk_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('region')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>WILAYAH</span>
-                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('dealer')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>DEALER</span>
-                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vendor')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>VENDOR</span>
-                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('tnkb_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO POLISI</span>
-                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vehicle_type')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>JENIS</span>
-                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('chassis_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO RANGKA</span>
-                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('machine_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO MESIN</span>
-                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('registration_date')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>TGL DAFTAR</span>
-                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('stnk_physical_status')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'stnk_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>FISIK STNK</span>
-                                <SortIcon sortKey="stnk_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        )}
+                      {/* Tab STNK Header */}
+                      {activeTab === 'stnk' && (
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                          <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
+                          <TableHead
+                            onClick={() => handleSort('stnk_name')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NAMA STNK</span>
+                              <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('stnk_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'stnk_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NOMOR STNK</span>
+                              <SortIcon sortKey="stnk_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('region')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>WILAYAH</span>
+                              <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('dealer')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>DEALER</span>
+                              <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vendor')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>VENDOR</span>
+                              <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('tnkb_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO POLISI</span>
+                              <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vehicle_type')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>JENIS</span>
+                              <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('chassis_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO RANGKA</span>
+                              <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('machine_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO MESIN</span>
+                              <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('registration_date')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>TGL DAFTAR</span>
+                              <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('stnk_physical_status')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'stnk_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>FISIK STNK</span>
+                              <SortIcon sortKey="stnk_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                        </TableRow>
+                      )}
 
-                        {/* Tab SKPD Header */}
-                        {activeTab === 'skpd' && (
-                          <TableRow className="hover:bg-[#f8f9fa]">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
-                            <TableHead
-                              onClick={() => handleSort('stnk_name')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NAMA SKPD</span>
-                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('region')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>WILAYAH</span>
-                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('dealer')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>DEALER</span>
-                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vendor')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>VENDOR</span>
-                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('tnkb_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO POLISI</span>
-                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vehicle_type')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>JENIS</span>
-                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('chassis_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO RANGKA</span>
-                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('machine_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO MESIN</span>
-                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('registration_date')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>TGL DAFTAR</span>
-                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('skpd_physical_status')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'skpd_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>FISIK SKPD</span>
-                                <SortIcon sortKey="skpd_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        )}
+                      {/* Tab SKPD Header */}
+                      {activeTab === 'skpd' && (
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                          <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
+                          <TableHead
+                            onClick={() => handleSort('stnk_name')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NAMA SKPD</span>
+                              <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('region')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>WILAYAH</span>
+                              <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('dealer')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>DEALER</span>
+                              <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vendor')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>VENDOR</span>
+                              <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('tnkb_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO POLISI</span>
+                              <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vehicle_type')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>JENIS</span>
+                              <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('chassis_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO RANGKA</span>
+                              <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('machine_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO MESIN</span>
+                              <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('registration_date')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>TGL DAFTAR</span>
+                              <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('skpd_physical_status')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'skpd_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>FISIK SKPD</span>
+                              <SortIcon sortKey="skpd_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                        </TableRow>
+                      )}
 
-                        {/* Tab TNKB Header */}
-                        {activeTab === 'tnkb' && (
-                          <TableRow className="hover:bg-[#f8f9fa]">
-                            <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
-                            <TableHead
-                              onClick={() => handleSort('stnk_name')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NAMA TNKB</span>
-                                <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('region')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>WILAYAH</span>
-                                <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('dealer')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>DEALER</span>
-                                <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vendor')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>VENDOR</span>
-                                <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('tnkb_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO POLISI</span>
-                                <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('vehicle_type')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>JENIS</span>
-                                <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('chassis_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO RANGKA</span>
-                                <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('machine_number')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
-                                sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="flex items-center gap-1">
-                                <span>NO MESIN</span>
-                                <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('registration_date')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>TGL DAFTAR</span>
-                                <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              onClick={() => handleSort('tnkb_physical_status')}
-                              className={cn(
-                                "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
-                                sortBy === 'tnkb_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
-                              )}
-                            >
-                              <div className="inline-flex items-center justify-center">
-                                <span className="w-3.5 shrink-0" />
-                                <span>FISIK TNKB</span>
-                                <SortIcon sortKey="tnkb_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        )}
-                      </TableHeader>
-                      <TableBody>
-                        {isLoading ? (
-                          <TableRow>
-                            <TableCell colSpan={12} className="h-32 text-center">
-                              <div className="flex items-center justify-center gap-2 text-slate-400">
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                <span className="text-sm font-medium">Memuat data...</span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ) : isError ? (
-                          <TableRow>
-                            <TableCell colSpan={12} className="h-32 text-center text-red-600 font-semibold p-4">
-                              <p className="mb-0.5">Gagal memuat data laporan</p>
-                              <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
-                            </TableCell>
-                          </TableRow>
-                        ) : data.length > 0 ? (
-                          data.map((item, idx) => {
-                            const indexNumber = idx + 1 + (page - 1) * perPage;
-                            return (
-                               <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
-                                <TableCell className="px-4 py-4 text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
-                                <TableCell className="px-4 py-4 text-left font-semibold text-gray-900 whitespace-nowrap text-sm">{item.stnk_name || '-'}</TableCell>
-                                
-                                {activeTab === 'bpkb' && <TableCell className="px-4 py-4 text-left font-medium whitespace-nowrap text-sm">{(item as any).bpkb_number || '-'}</TableCell>}
-                                {activeTab === 'stnk' && <TableCell className="px-4 py-4 text-left font-medium whitespace-nowrap text-sm">{(item as any).stnk_number || '-'}</TableCell>}
+                      {/* Tab TNKB Header */}
+                      {activeTab === 'tnkb' && (
+                        <TableRow className="hover:bg-[#f8f9fa]">
+                          <TableHead className="w-12 text-center text-xs font-semibold uppercase text-slate-500 px-4 py-4 whitespace-nowrap">NO</TableHead>
+                          <TableHead
+                            onClick={() => handleSort('stnk_name')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'stnk_name' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NAMA TNKB</span>
+                              <SortIcon sortKey="stnk_name" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('region')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'region' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>WILAYAH</span>
+                              <SortIcon sortKey="region" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('dealer')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'dealer' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>DEALER</span>
+                              <SortIcon sortKey="dealer" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vendor')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vendor' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>VENDOR</span>
+                              <SortIcon sortKey="vendor" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('tnkb_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'tnkb_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO POLISI</span>
+                              <SortIcon sortKey="tnkb_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('vehicle_type')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'vehicle_type' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>JENIS</span>
+                              <SortIcon sortKey="vehicle_type" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('chassis_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'chassis_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO RANGKA</span>
+                              <SortIcon sortKey="chassis_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('machine_number')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-left",
+                              sortBy === 'machine_number' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="flex items-center gap-1">
+                              <span>NO MESIN</span>
+                              <SortIcon sortKey="machine_number" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('registration_date')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'registration_date' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>TGL DAFTAR</span>
+                              <SortIcon sortKey="registration_date" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            onClick={() => handleSort('tnkb_physical_status')}
+                            className={cn(
+                              "group px-4 py-4 cursor-pointer select-none text-xs font-semibold uppercase transition-colors whitespace-nowrap text-center",
+                              sortBy === 'tnkb_physical_status' ? 'text-gray-900' : 'text-slate-500 hover:text-slate-800'
+                            )}
+                          >
+                            <div className="inline-flex items-center justify-center">
+                              <span className="w-3.5 shrink-0" />
+                              <span>FISIK TNKB</span>
+                              <SortIcon sortKey="tnkb_physical_status" currentSortKey={sortBy} sortOrder={sortOrder} />
+                            </div>
+                          </TableHead>
+                        </TableRow>
+                      )}
+                    </TableHeader>
+                    <TableBody>
+                      {isLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={12} className="h-32 text-center">
+                            <div className="flex items-center justify-center gap-2 text-slate-400">
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                              <span className="text-sm font-medium">Memuat data...</span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : isError ? (
+                        <TableRow>
+                          <TableCell colSpan={12} className="h-32 text-center text-red-600 font-semibold p-4">
+                            <p className="mb-0.5">Gagal memuat data laporan</p>
+                            <p className="text-xs text-slate-500 font-normal">{(error as any)?.message || 'Terjadi kesalahan pada server backend'}</p>
+                          </TableCell>
+                        </TableRow>
+                      ) : data.length > 0 ? (
+                        data.map((item, idx) => {
+                          const indexNumber = idx + 1 + (page - 1) * perPage;
+                          return (
+                            <TableRow key={item.id} className="border-slate-200 hover:bg-gray-50 transition-colors">
+                              <TableCell className="px-4 py-4 text-center font-medium text-slate-500 text-sm">{indexNumber}</TableCell>
+                              <TableCell className="px-4 py-4 text-left font-semibold text-gray-900 whitespace-nowrap text-sm">{item.stnk_name || '-'}</TableCell>
 
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{item.region || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{item.dealer || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{item.vendor || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-left font-medium text-gray-900 whitespace-nowrap text-sm">{item.tnkb_number || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{formatVehicleType(item.vehicle_type)}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 font-mono text-sm whitespace-nowrap">{item.chassis_number || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-left text-slate-600 font-mono text-sm whitespace-nowrap">{item.machine_number || '-'}</TableCell>
-                                <TableCell className="px-4 py-4 text-center text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.registration_date)}</TableCell>
-                                
-                                <TableCell className="px-4 py-4 text-center whitespace-nowrap text-sm">
-                                  {activeTab === 'bpkb' && renderPhysicalStatus((item as any).bpkb_physical_status)}
-                                  {activeTab === 'stnk' && renderPhysicalStatus((item as any).stnk_physical_status)}
-                                  {activeTab === 'skpd' && renderPhysicalStatus((item as any).skpd_physical_status)}
-                                  {activeTab === 'tnkb' && renderPhysicalStatus((item as any).tnkb_physical_status)}
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })
-                        ) : (
-                          <TableRow className="group">
-                            <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
-                                <div className="flex flex-col items-center justify-center gap-2">
-                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                        <Search className="h-8 w-8 text-slate-400" />
-                                    </div>
-                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
+                              {activeTab === 'bpkb' && <TableCell className="px-4 py-4 text-left font-medium whitespace-nowrap text-sm">{(item as any).bpkb_number || '-'}</TableCell>}
+                              {activeTab === 'stnk' && <TableCell className="px-4 py-4 text-left font-medium whitespace-nowrap text-sm">{(item as any).stnk_number || '-'}</TableCell>}
+
+                              <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{item.region || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{item.dealer || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{item.vendor || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-left font-medium text-gray-900 whitespace-nowrap text-sm">{item.tnkb_number || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-left text-slate-600 whitespace-nowrap text-sm">{formatVehicleType(item.vehicle_type)}</TableCell>
+                              <TableCell className="px-4 py-4 text-left text-slate-600 font-mono text-sm whitespace-nowrap">{item.chassis_number || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-left text-slate-600 font-mono text-sm whitespace-nowrap">{item.machine_number || '-'}</TableCell>
+                              <TableCell className="px-4 py-4 text-center text-slate-600 whitespace-nowrap text-sm">{formatDateString(item.registration_date)}</TableCell>
+
+                              <TableCell className="px-4 py-4 text-center whitespace-nowrap text-sm">
+                                {activeTab === 'bpkb' && renderPhysicalStatus((item as any).bpkb_physical_status)}
+                                {activeTab === 'stnk' && renderPhysicalStatus((item as any).stnk_physical_status)}
+                                {activeTab === 'skpd' && renderPhysicalStatus((item as any).skpd_physical_status)}
+                                {activeTab === 'tnkb' && renderPhysicalStatus((item as any).tnkb_physical_status)}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow className="group">
+                          <TableCell colSpan={100} className="py-16 h-32 text-center text-sm text-slate-500">
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                <Search className="h-8 w-8 text-slate-400" />
+                              </div>
+                              <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                              <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
                 </div>
+              </div>
             </div>
           </PrintLetterPage>
 
@@ -841,7 +841,7 @@ export default function LPJumlahDaftarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                   disabled={page <= 1 || isLoading}
                   onClick={() => setPage(page - 1)}
                 >
@@ -853,7 +853,7 @@ export default function LPJumlahDaftarPage() {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                      'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                       pageNumber === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -870,7 +870,7 @@ export default function LPJumlahDaftarPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                      className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
                       disabled={isLoading}
                       onClick={() => setPage(pagination.lastPage)}
                     >
@@ -881,7 +881,7 @@ export default function LPJumlahDaftarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                  className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                   disabled={page >= pagination.lastPage || pagination.total === 0 || isLoading}
                   onClick={() => setPage(page + 1)}
                 >

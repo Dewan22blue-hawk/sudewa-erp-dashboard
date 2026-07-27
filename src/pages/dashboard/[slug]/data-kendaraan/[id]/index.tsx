@@ -67,8 +67,8 @@ export default function VehicleFleetDetailPage() {
     return (
       <DashboardLayout>
         <div className="space-y-6">
-          <Skeleton className="h-[250px] w-full rounded-xl" />
-          <Skeleton className="h-[300px] w-full rounded-xl" />
+          <Skeleton className="h-[250px] w-full rounded-md" />
+          <Skeleton className="h-[300px] w-full rounded-md" />
         </div>
       </DashboardLayout>
     );
@@ -112,7 +112,7 @@ export default function VehicleFleetDetailPage() {
         </div>
 
         {/* Section 1: Detail Informasi */}
-        <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl space-y-6">
+        <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-md space-y-6">
           <div>
             <h2 className="text-base font-bold text-gray-900">Detail Informasi</h2>
             <div className="h-px bg-gray-100 mt-4" />
@@ -162,7 +162,7 @@ export default function VehicleFleetDetailPage() {
         </Card>
 
         {/* Section 2: Perlengkapan Armada */}
-        <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl space-y-6">
+        <Card className="p-6 bg-white border border-gray-100 shadow-sm rounded-md space-y-6">
           <div>
             <h2 className="text-base font-bold text-gray-900">Perlengkapan Kendaraan</h2>
             <div className="h-px bg-gray-100 mt-4" />

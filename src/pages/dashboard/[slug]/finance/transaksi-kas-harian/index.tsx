@@ -176,13 +176,6 @@ export default function KasHarianPage() {
             <h1 className="text-2xl font-semibold">Arus Transaksi Kas Harian</h1>
             <p className="text-sm text-muted-foreground">Kelola arus transaksi kas harian</p>
           </div>
-
-          {canCreate && (
-          <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah
-          </Button>
-          )}
         </div>
 
         <div className="space-y-4">
@@ -219,6 +212,12 @@ export default function KasHarianPage() {
                 <span>Page</span>
               </div>
             </div>
+            {canCreate && (
+              <Button type="button" onClick={() => setIsAddOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                <Plus className="mr-2 h-4 w-4" />
+                Tambah Data
+              </Button>
+            )}
           </div>
 
           <KasHarianTable

@@ -182,7 +182,7 @@ export default function GoodsIssueEditPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
@@ -209,7 +209,7 @@ export default function GoodsIssueEditPage() {
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[15px] font-medium text-slate-900">Kode Pengeluaran</Label>
-                <Input value={issue.code} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500" />
+                <Input value={issue.code} readOnly className="h-11 rounded-md border-slate-200 text-[16px] text-slate-500" />
               </div>
 
               <div className="space-y-2">
@@ -222,7 +222,7 @@ export default function GoodsIssueEditPage() {
                       value={toDateValue(field.value)}
                       onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                       placeholder="Pick a Date"
-                      className="h-11 rounded-xl border-slate-200 px-3 text-[16px]"
+                      className="h-11 rounded-md border-slate-200 px-3 text-[16px]"
                     />
                   )}
                 />
@@ -246,7 +246,7 @@ export default function GoodsIssueEditPage() {
                       emptyText="Customer tidak ditemukan."
                       loading={customersQuery.isLoading}
                       onSearchChange={setCustomerSearch}
-                      className="h-11 rounded-xl border-slate-200 bg-white px-3 text-[16px]"
+                      className="h-11 rounded-md border-slate-200 bg-white px-3 text-[16px]"
                     />
                   )}
                 />
@@ -258,7 +258,7 @@ export default function GoodsIssueEditPage() {
 
               <div className="space-y-2">
                 <Label className="text-[15px] font-medium text-slate-900">Total Harga Penjualan</Label>
-                <Input value={formatCurrency(issue.totalBrutto)} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
+                <Input value={formatCurrency(issue.totalBrutto)} readOnly className="h-11 rounded-md border-slate-200 text-[16px]" />
               </div>
             </div>
 
@@ -268,7 +268,7 @@ export default function GoodsIssueEditPage() {
                 {...form.register('description')}
                 rows={4}
                 placeholder="Contoh: Barang sudah dikeluarkan"
-                className="rounded-xl border-slate-200 text-[16px]"
+                className="rounded-md border-slate-200 text-[16px]"
               />
             </div>
           </form>
@@ -278,12 +278,12 @@ export default function GoodsIssueEditPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[328px]">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Search here" className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm" />
+              <Input value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Search here" className="h-11 rounded-md border-slate-200 bg-white pl-11 shadow-sm" />
             </div>
             <div className="flex items-center gap-3 text-[16px] text-slate-700">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
-                <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white shadow-sm"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-11 w-[68px] rounded-md border-slate-200 bg-white shadow-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
@@ -295,7 +295,7 @@ export default function GoodsIssueEditPage() {
           </div>
           <Button onClick={() => { setEditingItem(null); setItemOpen(true); }} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
 
@@ -345,8 +345,8 @@ export default function GoodsIssueEditPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><Button variant="ghost" className="h-9 w-9 rounded-full p-0"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
-                        <DropdownMenuItem onClick={() => { setEditingItem(item); setItemOpen(true); }} className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setDeleteTarget(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => { setEditingItem(item); setItemOpen(true); }} className="cursor-pointer rounded-md px-3 py-2 text-[16px]">Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setDeleteTarget(item)} className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600">Hapus</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -360,7 +360,7 @@ export default function GoodsIssueEditPage() {
           <p className="text-[14px] text-slate-500">Showing {filteredItems.length === 0 ? 0 : (safePage - 1) * perPage + 1}-{Math.min(safePage * perPage, filteredItems.length)} of {filteredItems.length} data</p>
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={safePage <= 1}>Previous</Button>
-            <Button variant="outline" className="h-10 min-w-10 rounded-xl border-slate-200 bg-white">{safePage}</Button>
+            <Button variant="outline" className="h-10 min-w-10 rounded-md border-slate-200 bg-white">{safePage}</Button>
             <Button variant="ghost" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} disabled={safePage >= totalPages}>Next</Button>
           </div>
         </div>

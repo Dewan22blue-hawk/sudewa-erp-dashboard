@@ -27,7 +27,7 @@ const parseCurrencyIDR = (value: string): number => {
 };
 
 export default function WithholdingTaxFormModal({ isOpen, onClose, item, companyId }: Props) {
-  const [source, setSource] = useState<'internal' | 'client_supplier'>('internal');
+  const [source, setSource] = useState<'internal' | 'external'>('internal');
   const [cashId, setCashId] = useState<string>('');
   const [doInvoiceId, setDoInvoiceId] = useState<string>('');
   const [withholdingNumber, setWithholdingNumber] = useState('');
@@ -73,7 +73,7 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
       if (item) {
         // We set initial values from item, but wait for detailData to populate completely if needed
         const dataToUse = detailData || item;
-        setSource((dataToUse.source as 'internal' | 'client_supplier') || 'internal');
+        setSource((dataToUse.source as 'internal' | 'external') || 'internal');
         setCashId(dataToUse.cash_id ? String(dataToUse.cash_id) : '');
         setDoInvoiceId(dataToUse.do_invoice_id ? String(dataToUse.do_invoice_id) : '');
         setWithholdingNumber(dataToUse.withholding_number || '');
@@ -122,7 +122,7 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
       toast.error('Invoice wajib dipilih.');
       return;
     }
-    
+
     if (source === 'internal' && !cashId) {
       toast.error('Kas wajib dipilih untuk source internal.');
       return;
@@ -154,13 +154,13 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
     const payload: WithholdingTaxPayload = {
       company_id: companyId,
       source,
-      do_invoice_id: Number(doInvoiceId),
       withholding_number: withholdingNumber,
       withholding_age: Number(withholdingAge),
       pph_amount: rawPph,
       pph_description: pphDescription,
       payment_amount: rawPayment,
       payment_date: paymentDate,
+      no_invoice: '',
     };
 
     if (source === 'internal' && cashId) {
@@ -174,7 +174,7 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
 
     const onError = (error: unknown) => {
       let message = 'Terjadi kesalahan saat menyimpan data.';
-      
+
       // Handle ApiValidationError specifically
       if (error && typeof error === 'object' && 'fieldErrors' in error) {
         const fieldErrors = (error as any).fieldErrors;
@@ -187,7 +187,7 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
       } else if (error instanceof Error) {
         message = error.message;
       }
-      
+
       toast.error(message);
     };
 
@@ -216,12 +216,12 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-            
+
             <div className="space-y-3">
               <Label>Source</Label>
               <Select
                 value={source}
-                onValueChange={(val: string) => setSource(val as 'internal' | 'client_supplier')}
+                onValueChange={(val: string) => setSource(val as 'internal' | 'external')}
                 disabled={isPending}
               >
                 <SelectTrigger className="w-full">
@@ -229,7 +229,7 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="internal">Internal</SelectItem>
-                  <SelectItem value="client_supplier">Client / Supplier</SelectItem>
+                  <SelectItem value="external">Client / Supplier</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -245,7 +245,7 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
                   searchPlaceholder="Cari Kas..."
                   emptyText="Data tidak ditemukan"
                   loading={isLoadingKas}
-                  disabled={source === 'client_supplier' || isPending}
+                  disabled={source === 'external' || isPending}
                 />
               </div>
               <div className="space-y-2">
@@ -266,9 +266,9 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Nomor Bukti Potong <span className="text-red-500">*</span></Label>
-                <Input 
-                  placeholder="Contoh: BPTR921031913" 
-                  value={withholdingNumber} 
+                <Input
+                  placeholder="Contoh: BPTR921031913"
+                  value={withholdingNumber}
                   onChange={(e) => setWithholdingNumber(e.target.value)}
                   disabled={isPending}
                   required
@@ -276,10 +276,10 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
               </div>
               <div className="space-y-2">
                 <Label>Masa Bukti Potong <span className="text-red-500">*</span></Label>
-                <Input 
+                <Input
                   type="number"
-                  placeholder="Contoh: 1" 
-                  value={withholdingAge} 
+                  placeholder="Contoh: 1"
+                  value={withholdingAge}
                   onChange={(e) => setWithholdingAge(e.target.value)}
                   disabled={isPending}
                   required
@@ -290,9 +290,9 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Nominal PPH <span className="text-red-500">*</span></Label>
-                <Input 
-                  placeholder="Rp 0" 
-                  value={pphAmountStr} 
+                <Input
+                  placeholder="Rp 0"
+                  value={pphAmountStr}
                   onChange={handleCurrencyChange(setPphAmountStr)}
                   disabled={isPending}
                   required
@@ -300,9 +300,9 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
               </div>
               <div className="space-y-2">
                 <Label>Keterangan PPH</Label>
-                <Input 
-                  placeholder="Contoh: Dari Bukti Potong" 
-                  value={pphDescription} 
+                <Input
+                  placeholder="Contoh: Dari Bukti Potong"
+                  value={pphDescription}
                   onChange={(e) => setPphDescription(e.target.value)}
                   disabled={isPending}
                 />
@@ -312,9 +312,9 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Jumlah Pembayaran <span className="text-red-500">*</span></Label>
-                <Input 
-                  placeholder="Rp 0" 
-                  value={paymentAmountStr} 
+                <Input
+                  placeholder="Rp 0"
+                  value={paymentAmountStr}
                   onChange={handleCurrencyChange(setPaymentAmountStr)}
                   disabled={isPending}
                   required
@@ -322,9 +322,9 @@ export default function WithholdingTaxFormModal({ isOpen, onClose, item, company
               </div>
               <div className="space-y-2">
                 <Label>Tanggal Pembayaran <span className="text-red-500">*</span></Label>
-                <Input 
+                <Input
                   type="date"
-                  value={paymentDate} 
+                  value={paymentDate}
                   onChange={(e) => setPaymentDate(e.target.value)}
                   disabled={isPending}
                   required

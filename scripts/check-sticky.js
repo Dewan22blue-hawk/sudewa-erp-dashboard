@@ -17,5 +17,3 @@ files.forEach(file => {
         }
     }
 });
-
-console.log(missingSticky.join('\n'));

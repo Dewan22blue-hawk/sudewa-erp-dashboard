@@ -98,7 +98,7 @@ export default function HutangTable({ data }: Props) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+      <div className="bg-white rounded-md border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50/50 uppercase text-sm font-semibold text-gray-900 leading-normal">
             <tr className="border-b border-gray-200">

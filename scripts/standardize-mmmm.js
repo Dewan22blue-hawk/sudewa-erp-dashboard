@@ -23,12 +23,11 @@ function processFile(filePath) {
 
   // Replace 'dd MMM yyyy' and "dd MMM yyyy" with 'dd MMMM yyyy'
   if (content.includes('dd MMM yyyy')) {
-      content = content.replace(/dd MMM yyyy/g, 'dd MMMM yyyy');
+    content = content.replace(/dd MMM yyyy/g, 'dd MMMM yyyy');
   }
 
   if (content !== originalContent) {
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Updated MMMM: ${filePath}`);
   }
 }
 
@@ -38,5 +37,3 @@ DIRECTORIES.forEach(dir => {
     processDirectory(fullPath);
   }
 });
-
-console.log('Update MMMM Selesai!');

@@ -1,21 +1,31 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseDetailCards } from '@/components/features/purchase/PurchaseDetailCards';
 import PurchaseUnitTable from '@/components/features/purchase/PurchaseUnitTable';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { usePurchaseById, useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
-import { useUnitBillings, useCurrentBilling, useBillingHistory } from '@/hooks/useUnitBilling';
+import { useUnitBillings, useCurrentBilling, useBillingHistory, useUpdateBillingIsPaid } from '@/hooks/useUnitBilling';
 import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ArrowLeft, ChevronRight, CreditCard, Loader2, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { TextTruncate } from '@/components/ui/text-truncate';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
@@ -39,7 +49,6 @@ const readApiError = (error: any): string => {
 export default function PurchaseDetailPage() {
   const router = useRouter();
   const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('transaction:create');
   const canEdit = hasPermission('transaction:edit');
   const canDelete = hasPermission('transaction:delete');
 
@@ -51,7 +60,10 @@ export default function PurchaseDetailPage() {
   const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(purchase?.id ?? ''));
   const { data: unitItemsResponse, isLoading: unitItemsLoading } = usePurchaseUnitItems(purchase?.id);
   const updateState = useUpdateUnitTransactionState();
+  const updateBillingIsPaid = useUpdateBillingIsPaid();
   const { data: typeUnits } = useTypeUnits();
+
+  const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
 
   const billingSummary = purchase?.billing_summary;
   const totalTagihan = Number(billingSummary?.grand_total ?? purchase?.unit_transaction_bruto_total ?? purchase?.unit_transaction_item_bruto_total ?? 0);
@@ -91,6 +103,77 @@ export default function PurchaseDetailPage() {
       }, 800);
     }
   }, [router.query.print, isLoading, purchase]);
+
+  const historyColumns = useMemo<ColumnDef<any>[]>(
+    () => [
+      {
+        header: 'No',
+        alignment: 'center',
+        className: 'w-12',
+        cell: (_, index) => index + 1,
+      },
+      {
+        header: 'Tanggal',
+        alignment: 'left',
+        cell: (history) =>
+          history.payment_at
+            ? new Date(history.payment_at).toLocaleDateString('id-ID', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })
+            : '-',
+      },
+      {
+        header: 'Keterangan Bayar',
+        alignment: 'left',
+        cell: (history) => (
+          <TextTruncate text={history?.note ?? '-'} maxLength={20} className="break-all" />
+        ),
+      },
+      {
+        header: 'Nominal Pembayaran BCA USD',
+        alignment: 'right',
+        cell: (history) => {
+          const usdPayment = Number(history.bca_payment_usd_amount ?? 0);
+          return usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-';
+        },
+      },
+      {
+        header: 'Nominal Pembayaran BCA IDR',
+        alignment: 'right',
+        cell: (history) => {
+          const bcaPayment = Number(history.bca_payment_amount ?? 0);
+          return bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-';
+        },
+      },
+      {
+        header: 'Nominal Pembayaran CASH IDR',
+        alignment: 'right',
+        cell: (history) => {
+          const cashPayment = Number(history.cash_payment_amount ?? 0);
+          return cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-';
+        },
+      },
+    ],
+    []
+  );
+
+  const handleMarkAsPaid = async () => {
+    const targetBillingId = String(currentBilling?.id || purchase?.unit_transaction_billing?.id || billings[0]?.id || '');
+    if (!targetBillingId) {
+      toast.error('Data billing tidak ditemukan pada transaksi ini.');
+      return;
+    }
+
+    try {
+      await updateBillingIsPaid.mutateAsync({ billingId: targetBillingId, isPaid: 'true' });
+      toast.success('Transaksi berhasil ditandai sebagai Lunas.');
+      setIsMarkAsPaidDialogOpen(false);
+    } catch (error: any) {
+      toast.error(readApiError(error));
+    }
+  };
 
   const handleReceipt = async () => {
     if (!purchase?.id) return;
@@ -180,12 +263,6 @@ export default function PurchaseDetailPage() {
       toast.success('Status pembelian diperbarui ke receipt dan stok warehouse berhasil diproses.');
     } catch (error: any) {
       const message = readApiError(error);
-      console.error('[purchase.handleReceipt] failed', {
-        purchaseId: purchase.id,
-        stockState: currentStockState,
-        error: message,
-        raw: error,
-      });
 
       toast.error(message || 'Gagal update state ke receipt', {
         action: {
@@ -234,7 +311,7 @@ export default function PurchaseDetailPage() {
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
@@ -268,7 +345,17 @@ export default function PurchaseDetailPage() {
           <div className="flex gap-2">
             <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
               <CreditCard className="mr-2 h-4 w-4" />
-              Bayar
+              {isPaid ? 'Sudah Dibayar' : 'Bayar'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
+              className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => setIsMarkAsPaidDialogOpen(true)}
+            >
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              {isPaid ? 'Sudah Lunas' : 'Tandai Lunas'}
             </Button>
             <Button
               variant="outline"
@@ -306,67 +393,44 @@ export default function PurchaseDetailPage() {
             <p className="text-xs text-muted-foreground">Rincian lengkap unit yang dibeli</p>
           </div>
 
-          <div className="rounded-lg border border-slate-200 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-green-100 border-b border-slate-200">
-                <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700 w-12">No</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Tanggal</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Bukti Pembayaran</th>
-                  <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA USD</th>
-                  <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran BCA IDR</th>
-                  <th className="px-4 py-3 text-right font-semibold text-slate-700">Nominal Pembayaran CASH IDR</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resolvedBillingHistories.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
-                      <div className="flex flex-col items-center justify-center gap-1">
-                        <p className="font-medium text-slate-700">Belum ada riwayat pembayaran</p>
-                        <p className="text-xs">Data pembayaran akan muncul di sini setelah proses bayar dilakukan.</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  resolvedBillingHistories.map((history, index) => {
-                    const paymentDate = history.payment_at
-                      ? new Date(history.payment_at).toLocaleDateString('id-ID', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })
-                      : '-';
-
-                    const bcaPayment = Number(history.bca_payment_amount ?? 0);
-                    const usdPayment = Number(history.bca_payment_usd_amount ?? 0);
-                    const cashPayment = Number(history.cash_payment_amount ?? 0);
-
-                    return (
-                      <tr key={history.id || index} className="border-b border-slate-200 hover:bg-slate-50">
-                        <td className="px-4 py-3 text-slate-900">{index + 1}</td>
-                        <td className="px-4 py-3 text-slate-900">{paymentDate}</td>
-                        <td className="px-4 py-3 text-slate-900">
-                          {history.payment_proof ? (
-                            <a href={history.payment_proof} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs font-medium">
-                              Lihat Bukti
-                            </a>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right text-slate-900 font-medium">{usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-'}</td>
-                        <td className="px-4 py-3 text-right text-slate-900 font-medium">{bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-'}</td>
-                        <td className="px-4 py-3 text-right text-slate-900 font-medium">{cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-'}</td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+          <BaseTable
+            data={resolvedBillingHistories}
+            columns={historyColumns}
+            loading={historyLoading}
+            headerRowClassName="bg-green-100"
+          />
         </div>
       </div>
+
+      {/* CONFIRMATION DIALOG TANDAI LUNAS */}
+      <Dialog open={isMarkAsPaidDialogOpen} onOpenChange={setIsMarkAsPaidDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Tandai Lunas</DialogTitle>
+            <DialogDescription className="pt-2">
+              Apakah Anda yakin ingin menandai transaksi ini sebagai <strong>Lunas</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsMarkAsPaidDialogOpen(false)}
+              disabled={updateBillingIsPaid.isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={handleMarkAsPaid}
+              disabled={updateBillingIsPaid.isPending}
+            >
+              {updateBillingIsPaid.isPending ? 'Memproses...' : 'Ya, Tandai Lunas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

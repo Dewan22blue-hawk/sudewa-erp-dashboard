@@ -70,7 +70,6 @@ export function GoodsReceiptEquipmentDetailTable({
           </TableRow>
         ) : (
           data.map((item, index) => {
-            console.log('GoodsReceiptEquipmentDetailTable item:', item);
             return (
               <TableRow key={item.id} className="group border-slate-200 bg-white hover:bg-slate-50 transition-colors">
                 <TableCell className="px-4 py-4 text-center sticky right-0 bg-white group-hover:bg-gray-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
@@ -94,13 +93,13 @@ export function GoodsReceiptEquipmentDetailTable({
                     <DropdownMenuContent align="end" className="w-36 rounded-2xl border-slate-200 p-2 shadow-lg">
                       <DropdownMenuItem
                         onClick={() => onEdit(item)}
-                        className="cursor-pointer rounded-xl px-3 py-2 text-[16px]"
+                        className="cursor-pointer rounded-md px-3 py-2 text-[16px]"
                       >
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => onDelete(item)}
-                        className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
+                        className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600"
                       >
                         Hapus
                       </DropdownMenuItem>

@@ -18,7 +18,7 @@ export default function YearlyVatReportView({
   report,
 }: YearlyVatReportViewProps) {
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-none sm:p-6 print:rounded-none print:border print:shadow-none">
+    <section className="rounded-md border border-gray-200 bg-white p-4 shadow-none sm:p-6 print:rounded-none print:border print:shadow-none">
       <header className="space-y-2 pb-10 text-center">
         <h2 className="text-lg font-semibold text-slate-900">{report.reportTitle}</h2>
         <p className="text-base font-semibold text-slate-800">{report.companyName}</p>

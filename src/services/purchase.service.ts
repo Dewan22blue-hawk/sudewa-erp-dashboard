@@ -145,6 +145,8 @@ const mapUnits = (detail: UnitTransactionDetailApiModel): PurchaseUnit[] => {
       biayaBBN: 0,
       biayaEkspedisi: 0,
       biayaLain: 0,
+      dppTaxVersionId: '',
+      ppnTaxVersionId: '',
       hpp: total,
       dpp,
       ppn,
@@ -159,13 +161,13 @@ const mapDetailToPurchase = (detail: UnitTransactionDetailApiModel): Purchase =>
   const billing = detail.unit_transaction_billing;
   const billingTotals = billing
     ? {
-        totalDpp: Number(billing.total_dpp ?? fromItems.totalDpp ?? 0),
-        totalPpn: Number(billing.total_ppn ?? fromItems.totalPpn ?? 0),
-        totalBiaya: Number(billing.total_billing ?? fromItems.totalBiaya ?? 0),
-        totalPurchase: Number(billing.total_billing ?? fromItems.totalPurchase ?? 0),
-        totalPaid: Number(billing.total_paid ?? 0),
-        remainingPayment: Number(billing.remaining_payment ?? fromItems.totalPurchase - Number(billing.total_paid ?? 0)),
-      }
+      totalDpp: Number(billing.total_dpp ?? fromItems.totalDpp ?? 0),
+      totalPpn: Number(billing.total_ppn ?? fromItems.totalPpn ?? 0),
+      totalBiaya: Number(billing.total_billing ?? fromItems.totalBiaya ?? 0),
+      totalPurchase: Number(billing.total_billing ?? fromItems.totalPurchase ?? 0),
+      totalPaid: Number(billing.total_paid ?? 0),
+      remainingPayment: Number(billing.remaining_payment ?? fromItems.totalPurchase - Number(billing.total_paid ?? 0)),
+    }
     : fromItems;
 
   return {
@@ -183,6 +185,7 @@ const mapDetailToPurchase = (detail: UnitTransactionDetailApiModel): Purchase =>
     transaction_date: (detail as any).transaction_date ?? detail.created_at ?? '',
     ...billingTotals,
     units: mapUnits(detail),
+    unit_transaction_items: detail.unit_transaction_items ?? [],
     totalPaid: billingTotals.totalPaid ?? 0,
     createdAt: detail.created_at ?? '',
     updatedAt: detail.updated_at ?? '',
@@ -193,21 +196,21 @@ const mapListItemToPurchase = (item: UnitTransactionListApiModel): Purchase => {
   const billing = item.unit_transaction_billing;
   const billingTotals = billing
     ? {
-        totalDpp: Number(billing.total_dpp ?? 0),
-        totalPpn: Number(billing.total_ppn ?? 0),
-        totalBiaya: Number(billing.total_billing ?? 0),
-        totalPurchase: Number(billing.total_billing ?? 0),
-        totalPaid: Number(billing.total_paid ?? 0),
-        remainingPayment: Number(billing.remaining_payment ?? 0),
-      }
+      totalDpp: Number(billing.total_dpp ?? 0),
+      totalPpn: Number(billing.total_ppn ?? 0),
+      totalBiaya: Number(billing.total_billing ?? 0),
+      totalPurchase: Number(billing.total_billing ?? 0),
+      totalPaid: Number(billing.total_paid ?? 0),
+      remainingPayment: Number(billing.remaining_payment ?? 0),
+    }
     : {
-        totalDpp: 0,
-        totalPpn: 0,
-        totalBiaya: 0,
-        totalPurchase: 0,
-        totalPaid: 0,
-        remainingPayment: 0,
-      };
+      totalDpp: 0,
+      totalPpn: 0,
+      totalBiaya: 0,
+      totalPurchase: 0,
+      totalPaid: 0,
+      remainingPayment: 0,
+    };
 
   return {
     id: String(item.id),
@@ -222,6 +225,7 @@ const mapListItemToPurchase = (item: UnitTransactionListApiModel): Purchase => {
     transaction_date: (item as any).transaction_date ?? item.created_at ?? '',
     ...billingTotals,
     units: [],
+    unit_transaction_items: (item as any).unit_transaction_items ?? [],
     createdAt: item.created_at ?? '',
     updatedAt: item.updated_at ?? '',
   };
@@ -272,6 +276,7 @@ const mapUnitTransactionItemList = (item: UnitTransactionItemListApiModel): Purc
 
   return {
     id: String(item.id ?? ''),
+    code: item.unit_transaction?.code ?? '-',
     unitTransactionId: item.unit_transaction_id ? String(item.unit_transaction_id) : '',
     unitTransactionCode: item.unit_transaction?.code,
     unitTypeId: item.unit_type_id ? String(item.unit_type_id) : undefined,
@@ -313,32 +318,32 @@ export const purchaseService = {
     const payload = ensureSuccess(response.data);
     const mapped = (payload.data ?? []).map((item: UnitTransactionListApiModel) => mapListItemToPurchase(item));
 
-      // Optionally enrich totals with detail fetch when billing is empty
-      let purchasesWithTotals = mapped;
-      if (params.withTotals !== false) {
-        const needsTotals = mapped.filter((item: Purchase) => item.totalDpp === 0 && item.totalPpn === 0 && item.totalPurchase === 0);
+    // Optionally enrich totals with detail fetch when billing is empty
+    let purchasesWithTotals = mapped;
+    if (params.withTotals !== false) {
+      const needsTotals = mapped.filter((item: Purchase) => item.totalDpp === 0 && item.totalPpn === 0 && item.totalPurchase === 0);
 
-        if (needsTotals.length > 0) {
-          const enriched = await Promise.all(
-            needsTotals.map(async (item: Purchase) => {
-              const detail = await this.getPurchaseById(item.id);
-              if (!detail) return item;
-              return {
-                ...item,
-                totalDpp: detail.totalDpp,
-                totalPpn: detail.totalPpn,
-                totalBiaya: detail.totalBiaya,
-                totalPurchase: detail.totalPurchase,
-                remainingPayment: detail.remainingPayment,
-                totalPaid: detail.totalPaid,
-                units: detail.units,
-              };
-            }),
-          );
+      if (needsTotals.length > 0) {
+        const enriched = await Promise.all(
+          needsTotals.map(async (item: Purchase) => {
+            const detail = await this.getPurchaseById(item.id);
+            if (!detail) return item;
+            return {
+              ...item,
+              totalDpp: detail.totalDpp,
+              totalPpn: detail.totalPpn,
+              totalBiaya: detail.totalBiaya,
+              totalPurchase: detail.totalPurchase,
+              remainingPayment: detail.remainingPayment,
+              totalPaid: detail.totalPaid,
+              units: detail.units,
+            };
+          }),
+        );
 
-          purchasesWithTotals = mapped.map((item: Purchase) => enriched.find((enrichedItem) => enrichedItem.id === item.id) ?? item);
-        }
+        purchasesWithTotals = mapped.map((item: Purchase) => enriched.find((enrichedItem) => enrichedItem.id === item.id) ?? item);
       }
+    }
 
     return {
       data: purchasesWithTotals,
@@ -454,7 +459,6 @@ export const purchaseService = {
         acc[k] = v;
         return acc;
       }, {});
-      console.log('[createPurchase] form payload', preview);
     }
 
     const response = await apiClient.post<LaravelApiResponse<UnitTransactionDetailApiModel>>(basePath, form);
@@ -556,5 +560,18 @@ export const purchaseService = {
     purchases = purchases.map((p) => (p.id === purchaseId ? updatedPurchase : p));
 
     return updatedPurchase;
+  },
+
+  async getUnitTransactionItemDetailsData(id: string, params: { in_stock?: boolean; color?: string; machine_number?: string; chassis_number?: string; status?: string } = {}): Promise<any[]> {
+    const response = await apiClient.get<LaravelApiResponse<any[]>>(`${basePath}/${id}/get-item-details`, {
+      params: {
+        in_stock: params.in_stock !== undefined ? params.in_stock : true,
+        color: params.color || undefined,
+        machine_number: params.machine_number || undefined,
+        chassis_number: params.chassis_number || undefined,
+        status: params.status || undefined,
+      }
+    });
+    return ensureSuccess(response.data);
   },
 };

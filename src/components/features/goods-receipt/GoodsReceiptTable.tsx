@@ -84,12 +84,12 @@ export function GoodsReceiptTable({
 
           <Button onClick={() => onAdd?.()} disabled={!canAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-none">
-        <Table>
+        <div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none">
+          <Table>
             <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
               <TableRow className="hover:bg-[#f8f9fa]">
                 <TableHead className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500 whitespace-nowrap">KODE BELI</TableHead>
@@ -137,7 +137,7 @@ export function GoodsReceiptTable({
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                        <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
                           <DropdownMenuItem asChild className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                             <Link href={`/dashboard/${slug}/warehouse/penerimaan-material/${item.id}/edit`}>Edit</Link>
                           </DropdownMenuItem>
@@ -169,7 +169,7 @@ export function GoodsReceiptTable({
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
               disabled={page <= 1}
               onClick={() => onPageChange(page - 1)}
             >
@@ -181,7 +181,7 @@ export function GoodsReceiptTable({
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                  'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                   pageNumber === page
                     ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                     : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -196,7 +196,7 @@ export function GoodsReceiptTable({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 min-w-9 rounded-xl border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+                className="h-9 min-w-9 rounded-md border border-transparent bg-transparent px-3 text-sm font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
                 onClick={() => onPageChange(totalPages)}
               >
                 {totalPages}
@@ -205,7 +205,7 @@ export function GoodsReceiptTable({
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
               disabled={page >= totalPages}
               onClick={() => onPageChange(page + 1)}
             >

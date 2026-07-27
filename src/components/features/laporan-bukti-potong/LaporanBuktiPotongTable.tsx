@@ -1,236 +1,134 @@
 import React, { useMemo } from 'react';
-import { Loader2, MoreVertical, Search, Edit2, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
-import type { WithholdingTaxReport } from '@/@types/laporan-bukti-potong.types';
+import { formatDateUI } from '@/lib/utils/date';
+import type { WithholdingTaxItem } from '@/@types/withholding-tax.types';
+import { CopyBox } from '@/components/ui/copy-box';
+import { TextTruncate } from '@/components/ui/text-truncate';
 
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return '-';
-  const parts = dateStr.split('-');
-  if (parts.length === 3) {
-    const [y, m, d] = parts;
-    return `${parseInt(d, 10)}/${parseInt(m, 10)}/${y}`;
-  }
-  return dateStr;
-};
+interface LaporanBuktiPotongTableProps {
+  data: WithholdingTaxItem[];
+  onSort?: (key: string) => void;
+  sortKey?: string;
+  sortOrder?: 'asc' | 'desc';
+  isLoading?: boolean;
+  page?: number;
+  perPage?: number;
+  total?: number;
+  lastPage?: number;
+  onPageChange?: (page: number) => void;
+}
 
-type Props = {
-  data: WithholdingTaxReport[];
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    per_page: number;
-    to: number;
-    total: number;
-  } | null;
-  loading?: boolean;
-  search: string;
-  perPage: number;
-  currentPage: number;
-  onSearchChange: (value: string) => void;
-  onPerPageChange: (value: number) => void;
-  onPageChange: (value: number) => void;
-  onEdit: (item: WithholdingTaxReport) => void;
-  onDelete: (item: WithholdingTaxReport) => void;
-};
-
-export default function LaporanBuktiPotongTable({
+export function LaporanBuktiPotongTable({
   data,
-  meta,
-  loading,
-  search,
-  perPage,
-  currentPage,
-  onSearchChange,
-  onPerPageChange,
+  onSort,
+  sortKey,
+  sortOrder,
+  isLoading = false,
+  page = 1,
+  perPage = 25,
+  total,
+  lastPage,
   onPageChange,
-  onEdit,
-  onDelete,
-}: Props) {
-  const totalPages = meta?.last_page ?? 1;
-  const pages = useMemo(() => {
-    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, index) => index + 1);
+}: LaporanBuktiPotongTableProps) {
+  const columns = useMemo<ColumnDef<WithholdingTaxItem>[]>(
+    () => [
+      {
+        header: 'No',
+        alignment: 'left',
+        className: 'w-[60px]',
+        cell: (_, index) => (page - 1) * perPage + index + 1,
+      },
+      {
+        header: 'No Bukti Potong',
+        accessorKey: 'withholding_number',
+        alignment: 'left',
+        sortable: true,
+        cell: (item) => <CopyBox text={item.withholding_number || '-'} />,
+      },
+      {
+        header: 'No Invoice',
+        accessorKey: 'no_invoice',
+        alignment: 'left',
+        sortable: true,
+        cell: (item) => <CopyBox text={item.no_invoice || '-'} />,
+      },
+      {
+        header: 'Sumber',
+        alignment: 'left',
+        cell: (item) => (
+          <span className={`${item.source === 'internal' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'} rounded-md px-2 py-1 text-gray-700`}>
+            {item.source === 'internal' ? 'internal' : 'Client / Supplier'}
+          </span>
+        ),
+      },
+      {
+        header: 'Cash',
+        alignment: 'left',
+        cell: (item) =>
+          item.cash ? (
+            <div className="flex flex-col">
+              <span className="text-xs text-slate-500">{item.cash.cash_name || item.cash.description || '-'}</span>
+            </div>
+          ) : (
+            '-'
+          ),
+      },
+      {
+        header: 'Nilai PPh',
+        alignment: 'left',
+        accessorKey: 'pph_amount',
+        sortable: true,
+        className: 'font-semibold text-slate-900',
+        cell: (item) => (item.pph_amount != null ? currenciesFormat('idr', item.pph_amount) : '-'),
+      },
+      {
+        header: 'Nominal Bayar',
+        alignment: 'left',
+        cell: (item) => (item.payment_amount != null ? currenciesFormat('idr', item.payment_amount) : '-'),
+      },
+      {
+        header: 'Tgl Bayar',
+        alignment: 'left',
+        cell: (item) => (item.payment_date ? formatDateUI(item.payment_date) : '-'),
+      },
+      {
+        header: 'Keterangan',
+        alignment: 'left',
 
-    if (currentPage <= 3) {
-      return [1, 2, 3, 4, '...', totalPages];
-    }
-
-    if (currentPage >= totalPages - 2) {
-      return [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-    }
-
-    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
-  }, [currentPage, totalPages]);
-
-  const startIndex = meta?.from ?? 0;
-  const endIndex = meta?.to ?? 0;
-  const totalItems = meta?.total ?? 0;
+        cell: (item) => <TextTruncate text={item.pph_description || '-'} maxLength={10} />,
+      },
+      {
+        header: 'Umur BP (Masa)',
+        alignment: 'left',
+        cell: (item) => (item.withholding_age != null ? item.withholding_age + ' Bulan' : '-'),
+      },
+      {
+        header: 'Tanggal Dibuat',
+        accessorKey: 'created_at',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => (item.created_at ? formatDateUI(item.created_at) : '-'),
+      },
+    ],
+    [page, perPage]
+  );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-950">Laporan Bukti Potong</h1>
-        <p className="text-sm text-slate-500">Kelola bukti potong dengan mudah</p>
-      </div>
-
-      <div className="flex justify-start items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
-          <span>Show</span>
-          <Select
-            value={String(perPage)}
-            onValueChange={(value) => onPerPageChange(Number(value))}
-          >
-            <SelectTrigger className="w-[70px] bg-white cursor-pointer">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Page</span>
-        </div>
-
-        <div className="relative w-[300px]">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <Input
-            placeholder="Search here"
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="pl-9 bg-white"
-          />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm whitespace-nowrap">
-            <thead className="bg-[#f8f9fa] border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NO</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">TGL INVOICE</th>
-                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO INVOICE</th>
-                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NAMA CUSTOMER</th>
-                <th className="px-4 py-4 text-left text-xs font-semibold uppercase text-slate-500">NO BUKPOT</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">MASA BUKPOT</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">NOMINAL INVOICE</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">PPH</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500">UANG MUKA PPH</th>
-                <th className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && data.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : data.length > 0 ? (
-                data.map((item, index) => (
-                  <tr key={item.id} className="border-b hover:bg-gray-50/70 border-slate-100 transition-colors">
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{startIndex + index}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{formatDate(item.tgl_invoice)}</td>
-                    <td className="px-4 py-4 text-left text-sm font-medium text-slate-900">{item.no_invoice}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.nama_customer}</td>
-                    <td className="px-4 py-4 text-left text-sm text-slate-700">{item.no_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{item.masa_bukpot || '-'}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.nominal_invoice)}</td>
-                    <td className="px-4 py-4 text-center text-sm font-medium text-slate-900">{currenciesFormat('idr', item.pph)}</td>
-                    <td className="px-4 py-4 text-center text-sm text-slate-500">{item.uang_muka_pph || '-'}</td>
-                    <td className="px-4 py-4 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-500 hover:text-slate-900">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[100px] rounded-2xl p-2">
-                          <DropdownMenuItem
-                            onSelect={() => onEdit(item)}
-                            className="cursor-pointer rounded-xl px-3 py-2.5"
-                          >
-                            <Edit2 className="mr-2 h-4 w-4 text-slate-500" />
-                            <span className="text-sm font-medium">Edit Bukpot</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onSelect={() => onDelete(item)}
-                            className="cursor-pointer rounded-xl px-3 py-2.5 text-red-600 focus:text-red-600 focus:bg-red-50"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span className="text-sm font-medium">Hapus Data</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={100} className="px-4 py-16 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-50 p-4 mb-2">
-                        <Search className="h-8 w-8 text-slate-400" />
-                      </div>
-                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center text-sm text-slate-500 font-medium">
-        <div>
-          Showing {totalItems > 0 ? startIndex : 0}-{endIndex} of {totalItems} data
-        </div>
-        <div className="flex gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
-            className="text-slate-600 disabled:opacity-50"
-          >
-            Previous
-          </Button>
-
-          {pages.map((page, index) => (
-            <Button
-              key={index}
-              variant={page === currentPage ? 'outline' : 'ghost'}
-              size="sm"
-              className={`min-w-[32px] ${page === currentPage ? 'bg-white border-slate-200 text-slate-900' : 'text-slate-600'}`}
-              onClick={() => typeof page === 'number' && onPageChange(page)}
-              disabled={typeof page !== 'number'}
-            >
-              {page}
-            </Button>
-          ))}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={currentPage === totalPages || totalPages === 0}
-            onClick={() => onPageChange(currentPage + 1)}
-            className="text-slate-600 disabled:opacity-50"
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-    </div>
+    <BaseTable
+      data={data}
+      columns={columns}
+      loading={isLoading}
+      sortBy={sortKey}
+      sortDirection={sortOrder}
+      onSortChange={(key) => onSort?.(key)}
+      meta={{
+        currentPage: page,
+        perPage,
+        lastPage: lastPage ?? 1,
+        total: total ?? data.length,
+      }}
+      onPageChange={onPageChange}
+    />
   );
 }

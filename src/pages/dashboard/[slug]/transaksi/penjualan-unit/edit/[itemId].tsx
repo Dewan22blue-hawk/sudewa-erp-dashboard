@@ -224,7 +224,7 @@ export default function EditUnitPage() {
         </div>
 
         {/* Form Card - Border 1px, Radius 12px, Padding 24px */}
-        <Card className="rounded-xl border border-gray-200 shadow-none">
+        <Card className="rounded-md border border-gray-200 shadow-none">
           <CardContent className="p-6">
             <EditUnitForm
               defaultValues={formData}
@@ -272,12 +272,12 @@ export default function EditUnitPage() {
 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Alamat</Label>
-                    <Input value={form.alamat} readOnly disabled={isLoadingCustomerDetail} className="bg-transparent" placeholder="Alamat customer" />
+                    <Input value={form.alamat} readOnly disabled className="bg-transparent" placeholder="Alamat customer" />
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">NPWP</Label>
-                    <Input value={form.npwp} readOnly disabled={isLoadingCustomerDetail} className="bg-transparent" placeholder="NPWP customer" />
+                    <Input value={form.npwp} readOnly disabled className="bg-transparent" placeholder="NPWP customer" />
                   </div>
                 </div>
               }

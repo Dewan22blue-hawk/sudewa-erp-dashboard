@@ -463,7 +463,7 @@ export function SalesPaymentForm({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
+                        <AlertDialogCancel className="rounded-md">Batal</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => {
                                 if (deleteId && onDeleteHistory) {
@@ -471,7 +471,7 @@ export function SalesPaymentForm({
                                     setDeleteId(null);
                                 }
                             }}
-                            className="rounded-xl bg-red-600 hover:bg-red-700"
+                            className="rounded-md bg-red-600 hover:bg-red-700"
                         >
                             Hapus
                         </AlertDialogAction>

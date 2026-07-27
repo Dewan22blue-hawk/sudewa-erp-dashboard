@@ -97,13 +97,13 @@ export function PurchaseMaterialTable({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40 rounded-2xl border-slate-200 p-2 shadow-lg">
-        <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+        <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer rounded-md px-3 py-2 text-[16px]">
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem asChild className="cursor-pointer rounded-xl px-3 py-2 text-[16px]">
+        <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2 text-[16px]">
           <Link href={`/dashboard/${slug}/${routeBasePath}/${item.id}`}>Detail</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-xl px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
+        <DropdownMenuItem onClick={() => onDelete(item)} className="cursor-pointer rounded-md px-3 py-2 text-[16px] text-red-600 focus:text-red-600">
           Hapus
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -125,14 +125,14 @@ export function PurchaseMaterialTable({
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search here"
-              className="h-11 rounded-xl border-slate-200 bg-white pl-11 shadow-sm"
+              className="h-11 rounded-md border-slate-200 bg-white pl-11 shadow-sm"
             />
           </div>
 
           <div className="flex items-center gap-3 text-[16px] text-slate-700">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => onPerPageChange(Number(value))}>
-              <SelectTrigger className="h-11 w-[68px] rounded-xl border-slate-200 bg-white shadow-sm">
+              <SelectTrigger className="h-11 w-[68px] rounded-md border-slate-200 bg-white shadow-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -147,7 +147,7 @@ export function PurchaseMaterialTable({
 
         <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
-          Tambah
+          Tambah Data
         </Button>
       </div>
 
@@ -230,14 +230,14 @@ export function PurchaseMaterialTable({
               key={pageNumber}
               variant={pageNumber === page ? 'outline' : 'ghost'}
               onClick={() => onPageChange(pageNumber)}
-              className={pageNumber === page ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white' : 'h-10 min-w-10 rounded-xl text-slate-700'}
+              className={pageNumber === page ? 'h-10 min-w-10 rounded-md border-slate-200 bg-white' : 'h-10 min-w-10 rounded-md text-slate-700'}
             >
               {pageNumber}
             </Button>
           ))}
           {totalPages > 5 && page < totalPages - 2 ? <span className="px-2 text-slate-500">...</span> : null}
           {totalPages > 5 && !pageNumbers.includes(totalPages) ? (
-            <Button variant="ghost" onClick={() => onPageChange(totalPages)} className="h-10 min-w-10 rounded-xl text-slate-700">
+            <Button variant="ghost" onClick={() => onPageChange(totalPages)} className="h-10 min-w-10 rounded-md text-slate-700">
               {totalPages}
             </Button>
           ) : null}

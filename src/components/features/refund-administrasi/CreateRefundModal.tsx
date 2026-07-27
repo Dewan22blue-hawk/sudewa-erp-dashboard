@@ -225,13 +225,13 @@ export default function CreateRefundModal({ open, onClose, transactionId }: Crea
                           )}
                         />
                       </TableCell>
-                      <TableCell>{item.color || '-'}</TableCell>
-                      <TableCell>{item.machine_number || '-'}</TableCell>
-                      <TableCell>{item.chassis_number || '-'}</TableCell>
-                      <TableCell>{item.in_stock ? 'Tersedia' : 'Tidak tersedia'}</TableCell>
-                      <TableCell>{item.is_forecast ? 'Forecast' : 'Normal'}</TableCell>
-                      <TableCell>{item.status || '-'}</TableCell>
-                      <TableCell>{item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}</TableCell>
+                      <TableCell>{item?.color || '-'}</TableCell>
+                      <TableCell>{item?.machine_number || '-'}</TableCell>
+                      <TableCell>{item?.chassis_number || '-'}</TableCell>
+                      <TableCell>{item?.in_stock ? 'Tersedia' : 'Tidak tersedia'}</TableCell>
+                      <TableCell>{item?.is_forecast ? 'Forecast' : 'Normal'}</TableCell>
+                      <TableCell>{item?.status || '-'}</TableCell>
+                      <TableCell>{item?.created_at ? new Date(item?.created_at).toLocaleDateString('id-ID') : '-'}</TableCell>
                       <TableCell className="text-right font-medium text-slate-900">{formatCurrency(Number(item.price ?? 0))}</TableCell>
                     </TableRow>
                   ))

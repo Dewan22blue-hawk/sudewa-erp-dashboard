@@ -56,8 +56,8 @@ export function VehicleEquipmentTable({
                     onClick={() => onPageChange(p)}
                     className={
                         p === page
-                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
-                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                            : 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                     }
                 >
                     {p}
@@ -91,10 +91,10 @@ export function VehicleEquipmentTable({
                 onClick={() => typeof p === 'number' && onPageChange(p)}
                 className={
                     p === page
-                        ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
+                        ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-sm border-slate-200 bg-white text-slate-950'
                         : p === '...'
-                            ? 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
-                            : 'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
+                            ? 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-500 cursor-default hover:bg-transparent hover:border-transparent'
+                            : 'h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white'
                 }
             >
                 {p}
@@ -144,66 +144,66 @@ export function VehicleEquipmentTable({
             </div>
 
             {/* Table Card */}
-            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none">s*<Table>
-                        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-                            <TableRow>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
-                                <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">NAMA BARANG</TableHead>
-                                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+            <div className="rounded-md overflow-x-auto border border-gray-200 bg-white shadow-none">s*<Table>
+                <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+                    <TableRow>
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">KODE BARANG</TableHead>
+                        <TableHead className="text-xs font-semibold text-slate-500 uppercase px-4 py-4 text-center">NAMA BARANG</TableHead>
+                        <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {equipments.length > 0 ? (
+                        equipments.map((item) => (
+                            <TableRow key={item.uuid} className="group hover:bg-gray-50/50 border-b border-gray-100">
+                                <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                                    {item.code || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-800 text-center font-medium">
+                                    {item.name || '-'}
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-center">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full">
+                                                <MoreVertical className="h-4 w-4 text-gray-500" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-[140px] rounded-md border border-gray-100 bg-white shadow-lg p-1.5">
+                                            <DropdownMenuItem
+                                                onClick={() => onEdit(item)}
+                                                disabled={!canEdit}
+                                                className="cursor-pointer text-gray-700 font-medium rounded-lg hover:bg-gray-50 px-3 py-2 text-sm"
+                                            >
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => onDelete(item)}
+                                                disabled={!canDelete}
+                                                className="text-red-600 cursor-pointer font-medium rounded-lg hover:bg-red-50 focus:bg-red-50 focus:text-red-600 px-3 py-2 text-sm"
+                                            >
+                                                Hapus
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {equipments.length > 0 ? (
-                                equipments.map((item) => (
-                                    <TableRow key={item.uuid} className="group hover:bg-gray-50/50 border-b border-gray-100">
-                                        <TableCell className="text-center px-4 py-4 sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                                            {item.code || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-gray-800 text-center font-medium">
-                                            {item.name || '-'}
-                                        </TableCell>
-                                        <TableCell className="px-4 py-4 text-sm text-center">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full">
-                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-[140px] rounded-xl border border-gray-100 bg-white shadow-lg p-1.5">
-                                                    <DropdownMenuItem
-                                                        onClick={() => onEdit(item)}
-                                                        disabled={!canEdit}
-                                                        className="cursor-pointer text-gray-700 font-medium rounded-lg hover:bg-gray-50 px-3 py-2 text-sm"
-                                                    >
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => onDelete(item)}
-                                                        disabled={!canDelete}
-                                                        className="text-red-600 cursor-pointer font-medium rounded-lg hover:bg-red-50 focus:bg-red-50 focus:text-red-600 px-3 py-2 text-sm"
-                                                    >
-                                                        Hapus
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow className="group">
-                                    <TableCell colSpan={100} className="py-16 h-40 text-center text-gray-400 text-sm font-medium">
-                                        <div className="flex flex-col items-center justify-center gap-2">
-                                            <div className="rounded-full bg-slate-50 p-4 mb-2">
-                                                <Search className="h-8 w-8 text-slate-400" />
-                                            </div>
-                                            <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                                            <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                        ))
+                    ) : (
+                        <TableRow className="group">
+                            <TableCell colSpan={100} className="py-16 h-40 text-center text-gray-400 text-sm font-medium">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <div className="rounded-full bg-slate-50 p-4 mb-2">
+                                        <Search className="h-8 w-8 text-slate-400" />
+                                    </div>
+                                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
             </div>
 
             {/* Bottom Pagination */}
@@ -219,7 +219,7 @@ export function VehicleEquipmentTable({
                             size="sm"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Previous
                         </Button>
@@ -231,7 +231,7 @@ export function VehicleEquipmentTable({
                             size="sm"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300 text-gray-500"
                         >
                             Next
                         </Button>

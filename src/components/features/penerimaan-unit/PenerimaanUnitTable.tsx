@@ -31,6 +31,7 @@ interface Props {
   perPage?: number;
   onPerPageChange?: (value: number) => void;
   onPageChange?: (page: number) => void;
+  headerActions?: React.ReactNode;
 }
 
 export default function PenerimaanUnitTable({
@@ -42,6 +43,7 @@ export default function PenerimaanUnitTable({
   perPage = 25,
   onPerPageChange,
   onPageChange,
+  headerActions,
 }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
@@ -101,7 +103,7 @@ export default function PenerimaanUnitTable({
               <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+          <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
             <DropdownMenuItem
               asChild
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
@@ -138,6 +140,7 @@ export default function PenerimaanUnitTable({
         onPerPageChange={onPerPageChange}
         meta={meta}
         onPageChange={onPageChange}
+        headerActions={headerActions}
       />
 
       {deleteId && (

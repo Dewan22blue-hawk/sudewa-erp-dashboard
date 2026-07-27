@@ -127,7 +127,7 @@ function StatCard({
       <div className="absolute top-0 left-0 right-0 h-[8px]" style={{ backgroundColor: accentColor }} />
 
       <div className="flex items-center justify-start mb-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ backgroundColor: iconBg }}>
+        <div className="flex h-11 w-11 items-center justify-center rounded-md" style={{ backgroundColor: iconBg }}>
           <Icon className="h-5 w-5" color={accentColor} />
         </div>
       </div>

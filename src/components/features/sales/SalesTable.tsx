@@ -11,7 +11,7 @@ import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Badge } from '@/components/ui/badge';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
-import { format } from 'date-fns';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Plus } from 'lucide-react';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import { useCompany } from '@/contexts/CompanyContext';
 
@@ -177,7 +177,7 @@ export function SalesTable({ onAdd }: Props) {
               <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+          <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
             <DropdownMenuItem
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/edit/${item.id}` : `/transaksi/penjualan-unit/edit/${item.id}`)}
@@ -222,7 +222,7 @@ export function SalesTable({ onAdd }: Props) {
     <div className="flex items-center gap-3">
       <button
         type="button"
-        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-none hover:bg-slate-50 h-9"
+        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-none hover:bg-slate-50 h-9"
         onClick={() => setIsVehicleSearchOpen(true)}
       >
         Cari Data Kendaraan
@@ -230,9 +230,10 @@ export function SalesTable({ onAdd }: Props) {
       {canCreate && onAdd && (
         <button
           onClick={onAdd}
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white shadow-none hover:bg-[#152e4d] h-9"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white shadow-none hover:bg-[#152e4d] h-9"
         >
-          Tambah
+          <Plus className="mr-2 h-4 w-4" />
+          Tambah Data
         </button>
       )}
     </div>

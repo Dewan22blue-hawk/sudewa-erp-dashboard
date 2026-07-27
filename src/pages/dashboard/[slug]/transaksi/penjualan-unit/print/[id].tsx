@@ -19,14 +19,14 @@ export default function SalesPrintPage() {
   const id = router.isReady && typeof router.query.id === 'string' ? router.query.id : '';
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
-  
+
   const detailQuery = useSalesDetail(id);
 
   const detailsQuery = useQuery({
     queryKey: ['sales-print-details', id],
     queryFn: async () => {
       if (!id) return [];
-      
+
       const itemsRes = await apiClient.get<LaravelApiResponse<any>>(
         '/wapi/transaction/unit-transaction/unit-transaction-item',
         { params: { unit_transaction_id: id, type: 'sales', per_page: 200 } }
@@ -48,7 +48,7 @@ export default function SalesPrintPage() {
           const typeName = row.unit_type?.name || row.unit_type_name || '-';
           const price = Number(row.price ?? 0);
           if (!itemId) return [];
-          
+
           try {
             let res: any;
             try {
@@ -62,7 +62,7 @@ export default function SalesPrintPage() {
                 { params: { unit_transaction_item_id: itemId, per_page: 200 } }
               );
             }
-            
+
             const payload = ensureSuccess(res.data) as any;
             const dataRows: any[] = Array.isArray(payload)
               ? payload
@@ -142,7 +142,7 @@ export default function SalesPrintPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="no-print flex items-center justify-between rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-none">
+        <div className="no-print flex items-center justify-between rounded-md border border-gray-200 bg-white px-5 py-4 shadow-none">
           <div className="flex items-center gap-3">
             <button
               type="button"

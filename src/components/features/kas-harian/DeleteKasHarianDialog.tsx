@@ -41,7 +41,7 @@ export default function DeleteKasHarianDialog({ open, onOpenChange, data }: Prop
           <Button
             type="button"
             variant="outline"
-            className="rounded-xl border-slate-200"
+            className="rounded-md border-slate-200"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
@@ -50,7 +50,7 @@ export default function DeleteKasHarianDialog({ open, onOpenChange, data }: Prop
           <Button
             type="button"
             variant="destructive"
-            className="rounded-xl bg-[#ea2626] hover:bg-[#c81f1f] text-white"
+            className="rounded-md bg-[#ea2626] hover:bg-[#c81f1f] text-white"
             onClick={handleDelete}
             disabled={isPending}
           >

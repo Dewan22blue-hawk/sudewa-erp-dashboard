@@ -1,13 +1,15 @@
+import React, { useMemo, useState } from 'react';
 import type { RefundJual, RefundJualPagination } from '@/@types/refund-jual.types';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { SortableHeader } from '@/components/ui/sortable-header';
 import type { SortOrder } from '@/hooks/useTableSort';
-import { MoreVertical, Loader2, Search } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useState } from 'react';
 import FinanceRefundApprovalModal from '../refund-beli/FinanceRefundApprovalModal';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: RefundJual[];
@@ -28,141 +30,133 @@ const formatDate = (value: string) => {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('id-ID');
 };
 
-const SkeletonRow = () => (
-  <tr className="border-b border-gray-100">
-    {Array.from({ length: 7 }).map((_, index) => (
-      <td key={index} className="px-4 py-4">
-        <Skeleton className="h-4 w-full max-w-[140px]" />
-      </td>
-    ))}
-  </tr>
-);
-
-const getPaginationItems = (currentPage: number, lastPage: number): Array<number | 'ellipsis-left' | 'ellipsis-right'> => {
-  if (lastPage <= 5) {
-    return Array.from({ length: lastPage }, (_, index) => index + 1);
-  }
-
-  if (currentPage <= 3) {
-    return [1, 2, 3, 4, 'ellipsis-right', lastPage];
-  }
-
-  if (currentPage >= lastPage - 2) {
-    return [1, 'ellipsis-left', lastPage - 3, lastPage - 2, lastPage - 1, lastPage];
-  }
-
-  return [1, 'ellipsis-left', currentPage - 1, currentPage, currentPage + 1, 'ellipsis-right', lastPage];
-};
-
-export default function RefundJualTable({ data, pagination, sortKey, sortOrder, isLoading, isFetching, error, onRetry, onSort, onPageChange }: Props) {
+export default function RefundJualTable({
+  data,
+  pagination,
+  sortKey,
+  sortOrder,
+  isLoading,
+  isFetching,
+  error,
+  onRetry,
+  onSort,
+  onPageChange,
+}: Props) {
   const [selectedRefundId, setSelectedRefundId] = useState<number | null>(null);
-  const canGoPrevious = pagination.currentPage > 1;
-  const canGoNext = pagination.currentPage < pagination.lastPage;
-  const paginationItems = getPaginationItems(pagination.currentPage, pagination.lastPage);
+  const router = useRouter();
+  const { slug } = router.query;
+  const slugStr = typeof slug === 'string' ? slug : '';
+
+  const columns = useMemo<ColumnDef<RefundJual>[]>(
+    () => [
+      {
+        header: 'No Penjualan',
+        accessorKey: 'noPenjualan',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item?.noPenjualan ?? '-'} />
+      },
+      {
+        header: 'Tanggal',
+        accessorKey: 'tanggal',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => formatDate(item.tanggal),
+      },
+      {
+        header: 'Nama Customer',
+        accessorKey: 'namaCustomer',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => item?.namaCustomer ? <ReferenceLink href={`/dashboard/${slugStr}/master/customer?search=${item?.namaCustomer}`}>{item?.namaCustomer}</ReferenceLink> : '-'
+      },
+      {
+        header: 'Total Penjualan',
+        accessorKey: 'totalPenjualan',
+        sortable: true,
+        alignment: 'right',
+        cell: (item) => currenciesFormat('idr', item.totalPenjualan),
+      },
+      {
+        header: 'Total Refund',
+        accessorKey: 'totalRefund',
+        sortable: true,
+        alignment: 'right',
+        cell: (item) => (
+          <span className="font-medium text-red-600">
+            {currenciesFormat('idr', item.totalRefund)}
+          </span>
+        ),
+      },
+      {
+        header: 'Kas Keluar',
+        accessorKey: 'kasKeluar',
+        sortable: true,
+        alignment: 'left',
+      },
+      {
+        header: 'Keterangan',
+        accessorKey: 'keterangan',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => (
+          <span className="text-gray-500">{item.keterangan || '-'}</span>
+        ),
+      },
+      {
+        header: 'Aksi',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (item) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[120px] rounded-md border-slate-200 p-1.5 shadow-lg">
+              <DropdownMenuItem
+                onClick={() => setSelectedRefundId(item.id)}
+                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+              >
+                Approval
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <div className="space-y-4">
-      <div className="relative overflow-x-auto rounded-xl border border-gray-200 bg-white">
-        {isFetching && !isLoading ? (
-          <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-center bg-white/70 py-2 text-xs text-slate-700 backdrop-blur-sm">
-            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
-            Memperbarui data...
-          </div>
-        ) : null}
+      {error ? (
+        <div className="bg-red-50 border border-red-200 rounded-md p-6 text-center">
+          <p className="text-sm text-red-600">{error}</p>
+          {onRetry ? (
+            <Button type="button" variant="outline" size="sm" onClick={onRetry} className="mt-3">
+              Retry
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
 
-        <table className="min-w-[1100px] w-full text-sm">
-          <thead className="bg-gray-100 uppercase text-sm font-semibold text-gray-900">
-            <tr className="border-b border-gray-200">
-              <th className="py-2 text-left">
-                <SortableHeader title="No Penjualan" sortKey="noPenjualan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="Tanggal" sortKey="tanggal" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="Nama Customer" sortKey="namaCustomer" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-right">
-                <SortableHeader title="Total Penjualan" sortKey="totalPenjualan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-end w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-right">
-                <SortableHeader title="Total Refund" sortKey="totalRefund" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-end w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="Kas Keluar" sortKey="kasKeluar" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-left">
-                <SortableHeader title="Keterangan" sortKey="keterangan" currentSortKey={sortKey} sortOrder={sortOrder} onSort={onSort} className="justify-start w-full px-4 text-gray-900" />
-              </th>
-              <th className="py-2 text-center px-4 sticky right-0 bg-gray-100 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">ACTION</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center bg-white">
-                  <div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                    <span className="text-sm font-medium text-slate-500">Memuat data...</span>
-                  </div>
-                </td>
-              </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-10 text-center">
-                  <div className="space-y-3">
-                    <p className="text-sm text-red-600">{error}</p>
-                    {onRetry ? (
-                      <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-                        Retry
-                      </Button>
-                    ) : null}
-                  </div>
-                </td>
-              </tr>
-            ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={100} className="px-4 py-16 text-center text-gray-500">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              data.map((item) => (
-                <tr key={item.id} className="border-b border-gray-100 transition-colors hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{item.noPenjualan}</td>
-                  <td className="px-4 py-3">{formatDate(item.tanggal)}</td>
-                  <td className="px-4 py-3">{item.namaCustomer}</td>
-                  <td className="px-4 py-3 text-right">{currenciesFormat('idr', item.totalPenjualan)}</td>
-                  <td className="px-4 py-3 text-right font-medium text-red-600">{currenciesFormat('idr', item.totalRefund)}</td>
-                  <td className="px-4 py-3">{item.kasKeluar}</td>
-                  <td className="px-4 py-3 text-gray-500">{item.keterangan}</td>
-                  <td className="px-4 py-3 text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem onClick={() => setSelectedRefundId(item.id)}>
-                          Approval
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <BaseTable
+        data={data}
+        columns={columns}
+        loading={isLoading}
+        sortBy={sortKey}
+        sortDirection={sortOrder === 'asc' ? 'asc' : 'desc'}
+        onSortChange={onSort ? (key) => onSort(key as keyof RefundJual) : undefined}
+        meta={{
+          currentPage: pagination.currentPage,
+          perPage: pagination.perPage,
+          lastPage: pagination.lastPage,
+          total: pagination.total,
+        }}
+        onPageChange={onPageChange}
+      />
 
       {selectedRefundId !== null && (
         <FinanceRefundApprovalModal
@@ -175,40 +169,6 @@ export default function RefundJualTable({ data, pagination, sortKey, sortOrder, 
           }}
         />
       )}
-
-      <div className="flex flex-col gap-3 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
-        <div>
-          Showing {pagination.from || 0}-{pagination.to || 0} of {pagination.total} data
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(pagination.currentPage - 1)} disabled={!canGoPrevious}>
-            Previous
-          </Button>
-          {paginationItems.map((item, index) =>
-            typeof item === 'number' ? (
-              <Button
-                key={item}
-                type="button"
-                variant="outline"
-                size="sm"
-                className={item === pagination.currentPage ? 'bg-gray-100' : ''}
-                onClick={() => onPageChange(item)}
-                disabled={item === pagination.currentPage}
-              >
-                {item}
-              </Button>
-            ) : (
-              <span key={`${item}-${index}`} className="px-1 text-gray-400">
-                ...
-              </span>
-            ),
-          )}
-          <Button type="button" variant="outline" size="sm" onClick={() => onPageChange(pagination.currentPage + 1)} disabled={!canGoNext}>
-            Next
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

@@ -7,8 +7,8 @@ import { CreateRefundPayload, CreateRefundPaymentPayload, UpdateRefundPayload, U
 import type { UnitTransactionItemDetail } from '@/@types/unit-transaction.types';
 
 const refundAdministrasiKeys = {
-  list: (companyId: string | number, options: { page?: number; perPage?: number; search?: string }) =>
-    companyQueryKeys.list(companyId, 'administrasi-refund-list', { page: options.page, perPage: options.perPage, search: options.search }),
+  list: (companyId: string | number, options: { page?: number; perPage?: number; search?: string; unit_transaction_id?: string }) =>
+    companyQueryKeys.list(companyId, 'administrasi-refund-list', { page: options.page, perPage: options.perPage, search: options.search, unit_transaction_id: options.unit_transaction_id }),
   detail: (companyId: string | number, refundId: string) =>
     companyQueryKeys.detail(companyId, 'administrasi-refund-detail', refundId),
   itemDetails: (companyId: string | number, options: { page?: number; perPage?: number; search?: string }) =>
@@ -17,14 +17,14 @@ const refundAdministrasiKeys = {
     companyQueryKeys.detail(companyId, 'refund-transaction-detail', transactionId),
 };
 
-export const useRefundList = (options: { page?: number; perPage?: number; search?: string } = {}) => {
+export const useRefundList = (options: { page?: number; perPage?: number; search?: string; unit_transaction_id?: string } = {}) => {
   const { companyId } = useCompany();
 
   return useQuery({
     queryKey: companyId
       ? refundAdministrasiKeys.list(companyId, options)
       : ['administrasi-refund-list', 'unscoped', options],
-    queryFn: () => refundAdministrasiService.getRefundList({ page: options.page, per_page: options.perPage, search: options.search }),
+    queryFn: () => refundAdministrasiService.getRefundList({ page: options.page, per_page: options.perPage, search: options.search, unit_transaction_id: options.unit_transaction_id }),
     placeholderData: (previousData) => previousData,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,

@@ -13,7 +13,7 @@ interface Props {
 
 export default function LaporanPembelianPerNotaView({ data }: Props) {
     return (
-        <div className="bg-white border rounded-xl p-12 max-w-4xl mx-auto shadow-sm">
+        <div className="bg-white border rounded-md p-12 max-w-4xl mx-auto shadow-sm">
 
             {/* Header Section */}
             <div className="flex flex-col items-center justify-center mb-10 relative">

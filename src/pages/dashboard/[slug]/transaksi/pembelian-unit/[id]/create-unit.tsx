@@ -81,15 +81,17 @@ export default function CreatePurchaseUnitPage() {
 
       await addUnitMutation.mutateAsync({
         unit_transaction_id: id as string,
-        unit_type_id: data.typeUnitId,
-        sparepart_id: data.sparepartId,
+        unit_type_id: data?.typeUnitId,
+        sparepart_id: data?.sparepartId,
         qty_total: qty,
         price,
         bbn_price: bbn,
         expedition_fee: expedition,
         other_fee: other,
-        price_usd: data.priceUsd ? Number(data.priceUsd) : undefined,
-        price_per_unit_usd: data.pricePerUnitUsd ? Number(data.pricePerUnitUsd) : undefined,
+        price_usd: data?.priceUsd ? Number(data?.priceUsd) : undefined,
+        price_per_unit_usd: data?.pricePerUnitUsd ? Number(data?.pricePerUnitUsd) : undefined,
+        dpp_tax_id: data?.dppTaxVersionId ? Number(data?.dppTaxVersionId) : undefined,
+        ppn_tax_id: data?.ppnTaxVersionId ? Number(data?.ppnTaxVersionId) : undefined,
       });
       toast.success('Unit berhasil ditambahkan');
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${id}`);
@@ -126,7 +128,7 @@ export default function CreatePurchaseUnitPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="p-6">
             <PurchaseUnitForm
               onSubmit={handleSubmit}

@@ -58,75 +58,75 @@ export function LPJTable({ data, search, onSearchChange, page, perPage, totalDat
         </Button>
       </div>
 
-      <div className="rounded-xl overflow-x-auto border border-gray-200">s*<Table className="min-w-275">
-            <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
-              <TableRow>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">KODE LPJ</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">DRIVER</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">NO POLISI</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TGL BERANGKAT</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TGL KEMBALI</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">RUTE</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">MUATAN</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TOTAL KM</TableHead>
-                <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+      <div className="rounded-md overflow-x-auto border border-gray-200">s*<Table className="min-w-275">
+        <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
+          <TableRow>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">KODE LPJ</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">DRIVER</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">NO POLISI</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TGL BERANGKAT</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TGL KEMBALI</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">RUTE</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">MUATAN</TableHead>
+            <TableHead className="text-xs font-semibold text-gray-600 uppercase text-center py-3">TOTAL KM</TableHead>
+            <TableHead className="px-4 py-4 text-center text-xs font-semibold uppercase text-slate-500 whitespace-nowrap sticky right-0 bg-[#f8f9fa] z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.length > 0 ? (
+            data.map((item) => (
+              <TableRow key={item.id} className="group hover:bg-gray-50/50">
+                <TableCell className="text-center px-4 py-4">{item.kodeLPJ}</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.driver}</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.noPolisi}</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{format(new Date(item.tglBerangkat), 'dd/MM/yyyy')}</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.tglKembali ? format(new Date(item.tglKembali), 'dd/MM/yyyy') : '-'}</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center">
+                  <span className="inline-flex flex-col items-center gap-1">
+                    <span>{item.ruteAsal}</span>
+                    <span>{item.ruteTujuan}</span>
+                  </span>
+                </TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.muatan}</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.totalKM} km</TableCell>
+                <TableCell className="px-4 py-3 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4 text-gray-500" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">
+                        Detail
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600 cursor-pointer focus:text-red-600">
+                        Hapus
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.length > 0 ? (
-                data.map((item) => (
-                  <TableRow key={item.id} className="group hover:bg-gray-50/50">
-                    <TableCell className="text-center px-4 py-4">{item.kodeLPJ}</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.driver}</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.noPolisi}</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{format(new Date(item.tglBerangkat), 'dd/MM/yyyy')}</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.tglKembali ? format(new Date(item.tglKembali), 'dd/MM/yyyy') : '-'}</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center">
-                      <span className="inline-flex flex-col items-center gap-1">
-                        <span>{item.ruteAsal}</span>
-                        <span>{item.ruteTujuan}</span>
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.muatan}</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-gray-700 text-center whitespace-nowrap">{item.totalKM} km</TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-center sticky right-0 bg-white z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)]">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4 text-gray-500" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDetail(item)} className="cursor-pointer">
-                            Detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600 cursor-pointer focus:text-red-600">
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow className="group">
-                  <TableCell colSpan={100} className="py-16 h-32 text-center text-gray-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="rounded-full bg-slate-50 p-4 mb-2">
-                        <Search className="h-8 w-8 text-slate-400" />
-                      </div>
-                      <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                      <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-            </div>
+            ))
+          ) : (
+            <TableRow className="group">
+              <TableCell colSpan={100} className="py-16 h-32 text-center text-gray-500">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="rounded-full bg-slate-50 p-4 mb-2">
+                    <Search className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                  <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      </div>
 
       {totalPages > 0 && (
         <div className="flex items-center justify-between px-2 pt-2">

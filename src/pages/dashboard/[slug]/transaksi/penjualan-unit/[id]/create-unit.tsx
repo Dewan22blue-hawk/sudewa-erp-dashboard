@@ -88,6 +88,8 @@ export default function CreateUnitPage() {
         other_fee: Number(data.biayaLain ?? 0),
         company_id: companyId ?? undefined,
         type: 'sales',
+        dpp_tax_id: data.dppTaxVersionId ? Number(data.dppTaxVersionId) : undefined,
+        ppn_tax_id: data.ppnTaxVersionId ? Number(data.ppnTaxVersionId) : undefined,
       });
 
       await Promise.all([
@@ -143,7 +145,7 @@ export default function CreateUnitPage() {
           </div>
         </div>
 
-        <Card className="rounded-xl">
+        <Card className="rounded-md">
           <CardContent className="p-6">
             <EditUnitForm
               defaultValues={{

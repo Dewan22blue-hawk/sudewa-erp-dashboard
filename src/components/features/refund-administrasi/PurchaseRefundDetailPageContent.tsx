@@ -16,6 +16,7 @@ import { getRefundPaymentProgressStatus } from '@/components/features/refund/ref
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { Badge } from '@/components/ui/badge';
 import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 
 const formatDate = (value?: string) => {
   if (!value) return '-';
@@ -49,7 +50,11 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
       {
         header: 'TIPE UNIT',
         alignment: 'left',
-        cell: (item) => item.unit_type_name || '-',
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item?.unit_transaction_item?.unit_type?.name}`}>
+            {item?.unit_transaction_item?.unit_type?.name || '-'}
+          </ReferenceLink>
+        )
       },
       {
         header: 'WARNA',
@@ -80,11 +85,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         alignment: 'left',
         cell: (item) => formatDate(item.created_at),
       },
-      {
-        header: 'NILAI',
-        alignment: 'right',
-        cell: (item) => currenciesFormat('idr', Number(item.price ?? 0)),
-      },
     ],
     [],
   );
@@ -105,7 +105,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         cell: (payment) => <CopyBox text={payment.code || '-'} />,
       },
       {
-        header: 'TANGGAL REFUND',
+        header: 'TANGGAL BAYAR REFUND',
         accessorKey: 'payment_date',
         sortable: true,
         alignment: 'left',
@@ -123,7 +123,11 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         accessorKey: 'note',
         sortable: true,
         alignment: 'left',
-        cell: (payment) => payment.note || 'Terbayar',
+        cell: (payment) => (
+          <Badge variant="outline" className={`${payment.note ? 'border-gray-200 bg-gray-50 text-gray-700' : 'border-gray-200 bg-gray-50 text-gray-700'} font-semibold`}>
+            {payment.note || 'Terbayar'}
+          </Badge>
+        )
       },
       {
         header: 'ACTION',
@@ -148,7 +152,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         ),
       },
     ],
-    [router, slug, transactionId],
+    [],
   );
 
   const handleDeletePayment = async () => {
@@ -194,7 +198,7 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
         {/* HEADLINE & ACTIONS */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit`)} variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
               <ArrowLeft className="h-5 w-5 text-slate-700" />
             </Button>
             <div className="space-y-1">
@@ -261,12 +265,6 @@ export default function PurchaseRefundDetailPageContent({ transactionId, refundI
                 <h3 className="text-sm font-semibold text-slate-700">Informasi Unit</h3>
               </div>
               <div className="text-sm text-slate-600 mt-3 space-y-2">
-                <div>
-                  <p className="text-xs text-slate-400">Tipe Unit</p>
-                  <p className="font-semibold text-slate-900 truncate" title={refund.items?.[0]?.unit_type_name || refund.note || '-'}>
-                    {refund.items?.[0]?.unit_type_name || refund.note || '-'}
-                  </p>
-                </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">Quantity</span>
                   <span className="font-semibold text-slate-900">{qty}</span>

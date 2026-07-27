@@ -60,7 +60,7 @@ export function MaterialTable({
                     size="sm"
                     onClick={() => onPageChange(p)}
                     className={cn(
-                        'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                        'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                         p === page
                             ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                             : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -96,7 +96,7 @@ export function MaterialTable({
                 disabled={p === '...'}
                 onClick={() => typeof p === 'number' && onPageChange(p)}
                 className={cn(
-                    'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+                    'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
                     p === page
                         ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
                         : p === '...'
@@ -172,7 +172,7 @@ export function MaterialTable({
                 </div>
             </div>
 
-            <div className="rounded-xl overflow-x-auto border border-gray-200 bg-white shadow-none"><Table>
+            <div className="rounded-md overflow-x-auto border border-gray-200 bg-white shadow-none"><Table>
                 <TableHeader className="bg-[#f8f9fa] border-b border-gray-200">
                     <TableRow className="hover:bg-[#f8f9fa]">
                         <TableHead className="text-xs font-semibold text-slate-500 w-[20%] uppercase px-4 py-4 text-left">KODE MATERIAL</TableHead>
@@ -206,7 +206,7 @@ export function MaterialTable({
                                                     <MoreVertical className="h-4 w-4 text-gray-500" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+                                            <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
                                                 <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                                                     Edit
                                                 </DropdownMenuItem>
@@ -246,7 +246,7 @@ export function MaterialTable({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                             onClick={() => onPageChange(page - 1)}
                             disabled={page === 1}
                         >
@@ -258,7 +258,7 @@ export function MaterialTable({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                            className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                             onClick={() => onPageChange(page + 1)}
                             disabled={page === totalPages}
                         >

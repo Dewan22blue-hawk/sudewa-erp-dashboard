@@ -79,17 +79,14 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
 
     // Action handlers
     const handleEdit = (item: InvoiceItem) => {
-        console.log('Edit item:', item)
         alert(`Edit: ${item.unitType}`)
     }
 
     const handleDetail = (item: InvoiceItem) => {
-        console.log('Detail item:', item)
         alert(`Detail: ${item.unitType}`)
     }
 
     const handleDelete = (item: InvoiceItem) => {
-        console.log('Delete item:', item)
         if (confirm(`Hapus ${item.unitType}?`)) {
             alert('Item deleted!')
         }
@@ -121,7 +118,7 @@ export function InvoiceItemTable({ items }: { items: InvoiceItem[] }) {
     };
 
     return (
-        <Card className="rounded-xl" style={{ border: '1px solid #E5E5E5' }}>
+        <Card className="rounded-md" style={{ border: '1px solid #E5E5E5' }}>
             {/* Card Header */}
             <CardHeader className="border-b" style={{ borderColor: '#E5E5E5' }}>
                 <div>

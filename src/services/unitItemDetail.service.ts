@@ -21,12 +21,34 @@ type UnitTransactionItemApiModel = {
   hpp_per_unit_price?: string | number;
   dpp_per_unit_price?: string | number;
   ppn_per_unit_price?: string | number;
+  dpp_tax_id?: string | number;
+  ppn_tax_id?: string | number;
+  dpp_tax_rate?: string | number;
+  ppn_tax_rate?: string | number;
   hpp_total_price?: string | number;
   dpp_total_price?: string | number;
   ppn_total_price?: string | number;
   unit_transaction?: {
     id?: string | number;
     code?: string;
+  };
+  dpp_tax?: {
+    id?: string | number,
+    tax_id?: string | number
+    tax?: {
+      id?: string | number,
+      name?: string,
+      code?: string,
+    }
+  };
+  ppn_tax?: {
+    id?: string | number,
+    tax_id?: string | number
+    tax?: {
+      id?: string | number,
+      name?: string,
+      code?: string,
+    }
   };
 };
 
@@ -104,19 +126,54 @@ const mapUnitTransactionItem = (item: UnitTransactionItemApiModel): UnitTransact
   hpp_total_price: toNumber(item.hpp_total_price),
   dpp_total_price: toNumber(item.dpp_total_price),
   ppn_total_price: toNumber(item.ppn_total_price),
+  dpp_tax_id: item.dpp_tax_id !== undefined ? String(item.dpp_tax_id) : undefined,
+  ppn_tax_id: item.ppn_tax_id !== undefined ? String(item.ppn_tax_id) : undefined,
+  dpp_tax_rate: toNumber(item.dpp_tax_rate),
+  ppn_tax_rate: toNumber(item.ppn_tax_rate),
+  dpp_tax: item.dpp_tax ? {
+    id: item?.dpp_tax?.id,
+    tax_id: item?.dpp_tax?.tax_id,
+    tax: item?.dpp_tax?.tax ? {
+      id: item?.dpp_tax?.tax?.id,
+      name: item?.dpp_tax?.tax?.name,
+      code: item?.dpp_tax?.tax?.code,
+    } : null,
+  } : null,
+  ppn_tax: item.ppn_tax ? {
+    id: item?.ppn_tax?.id,
+    tax_id: item?.ppn_tax?.tax_id,
+    tax: item?.ppn_tax?.tax ? {
+      id: item?.ppn_tax?.tax?.id,
+      name: item?.ppn_tax?.tax?.name,
+      code: item?.ppn_tax?.tax?.code,
+    } : null,
+  } : null,
 });
 
 const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransactionItemDetail => ({
   id: String(item.id ?? ''),
   unit_transaction_item_id: String(item.unit_transaction_item_id ?? ''),
+  code: item.unit_transaction_item?.unit_transaction?.code ?? '',
+  created_at: item.created_at ?? '',
+  stock_state: item.unit_transaction_item?.unit_transaction?.stock_state ?? '',
   unit_type_name: item.unit_transaction_item?.unit_type?.name ?? undefined,
   price: item.unit_transaction_item?.price !== undefined ? toNumber(item.unit_transaction_item.price) : undefined,
   color: item.color ?? '-',
   machine_number: item.machine_number ?? '-',
   chassis_number: item.chassis_number ?? '-',
   in_stock: toBool(item.in_stock),
+  is_forecast: toBool(item.is_forecast),
   status: item.status,
-  created_at: item.created_at,
+  person: { id: undefined, name: '-' },
+  warehouse: { id: undefined, name: '-' },
+  unit_transaction_bruto_total: 0,
+  unit_transaction_item_total_hpp: 0,
+  unit_transaction_item_total_dpp: 0,
+  unit_transaction_item_total_ppn: 0,
+  unit_transaction_item_bruto_total: 0,
+  transaction_bbn_total: 0,
+  transaction_other_fee: 0,
+  expedition_fee_total: 0,
 });
 
 export const unitItemDetailService = {

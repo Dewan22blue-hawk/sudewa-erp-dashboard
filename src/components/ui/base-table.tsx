@@ -59,6 +59,8 @@ export interface BaseTableProps<T> {
   selectedIds?: Set<string>;
   onSelectedIdsChange?: (ids: Set<string>) => void;
   getRowId?: (item: T) => string;
+  footer?: React.ReactNode;
+  onRowClick?: (item: T) => void;
 }
 
 export default function BaseTable<T>({
@@ -84,6 +86,8 @@ export default function BaseTable<T>({
   selectedIds,
   onSelectedIdsChange,
   getRowId,
+  footer,
+  onRowClick,
 }: BaseTableProps<T>) {
   const [localSearch, setLocalSearch] = useState(search || '');
   const [internalSort, setInternalSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(
@@ -219,7 +223,7 @@ export default function BaseTable<T>({
         variant="ghost"
         size="sm"
         className={cn(
-          'h-9 min-w-9 rounded-xl border px-3 text-sm font-medium shadow-none',
+          'h-9 min-w-9 rounded-md border px-3 text-sm font-medium shadow-none',
           pageNumber === currentPage
             ? 'border-slate-200 bg-white text-slate-950 shadow-sm'
             : 'border-transparent bg-transparent text-slate-700 hover:border-slate-200 hover:bg-white',
@@ -238,7 +242,7 @@ export default function BaseTable<T>({
     <div className="space-y-4">
       {hasControls && (
         showDefaultControls ? (
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 no-print">
             <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
               {onSearchChange && (
                 <div className="relative w-full sm:w-[240px]">
@@ -278,11 +282,11 @@ export default function BaseTable<T>({
             )}
           </div>
         ) : (
-          headerActions
+          <div className="no-print">{headerActions}</div>
         )
       )}
 
-      <div className={cn('relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none', containerClassName)}>
+      <div className={cn('relative overflow-hidden rounded-md border border-slate-200 bg-white shadow-none', containerClassName)}>
         <Table className="w-max min-w-full">
           <TableHeader className={cn('border-b border-gray-200', headerRowClassName)}>
             <TableRow className="hover:bg-transparent border-none">
@@ -341,17 +345,33 @@ export default function BaseTable<T>({
               <TableRow className="hover:bg-transparent border-none">
                 <TableCell colSpan={columns.length + (showCheckbox ? 1 : 0)} className="text-center px-4 py-16 bg-white border-none">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="rounded-full bg-slate-50 p-4 mb-2">
-                      <Search className="h-8 w-8 text-slate-400" />
-                    </div>
-                    <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
-                    <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <p className="text-sm text-muted-foreground">Memuat data...</p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="rounded-full bg-slate-50 p-4 mb-2">
+                          <Search className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-900">Tidak ada data ditemukan</p>
+                        <p className="text-sm text-slate-500">Belum ada data atau coba gunakan kata kunci pencarian lain.</p>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
               sortedData.map((item, rowIdx) => (
-                <TableRow key={rowIdx} className="group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors">
+                <TableRow
+                  key={rowIdx}
+                  className={cn(
+                    "group border-b bg-white hover:bg-slate-50 border-slate-100 transition-colors",
+                    onRowClick && "cursor-pointer"
+                  )}
+                  onClick={() => onRowClick?.(item)}
+                >
                   {showCheckbox && (
                     <TableCell className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
                       <Checkbox
@@ -388,24 +408,19 @@ export default function BaseTable<T>({
               ))
             )}
           </TableBody>
+          {footer}
         </Table>
-        {loading && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center text-sm text-muted-foreground gap-2">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Memuat data...</span>
-          </div>
-        )}
       </div>
 
       {/* Pagination */}
       {onPageChange && sortedData.length > 0 && (
-        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2">
+        <div className="flex flex-col gap-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between py-2 no-print">
           <p>Showing {startIndex}-{endIndex} of {totalEntries} data</p>
           <div className="flex flex-wrap items-center justify-end gap-1 text-slate-800">
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
               disabled={currentPage <= 1}
               onClick={() => handlePageChange(currentPage - 1)}
             >
@@ -416,7 +431,7 @@ export default function BaseTable<T>({
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+              className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
               disabled={currentPage >= totalPages}
               onClick={() => handlePageChange(currentPage + 1)}
             >

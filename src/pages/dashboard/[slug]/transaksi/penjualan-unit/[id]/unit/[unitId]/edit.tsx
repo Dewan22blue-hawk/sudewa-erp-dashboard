@@ -57,6 +57,8 @@ export default function EditNestedUnitPage() {
             totalPpn: Number(item.ppn_total_price ?? 0),
             hargaUsd: item.price_usd ? Number(item.price_usd) : undefined,
             hargaPerUnitUsd: item.price_per_unit_usd ? Number(item.price_per_unit_usd) : undefined,
+            dppTaxVersionId: item.dpp_tax_id ?? undefined,
+            ppnTaxVersionId: item.ppn_tax_id ?? undefined,
         };
     }, [item, salesDetail?.ui?.customer]);
 
@@ -73,7 +75,7 @@ export default function EditNestedUnitPage() {
             await updateMutation.mutateAsync({
                 id: String(selectedUnitId),
                 payload: {
-                    unit_transaction_id: undefined, // Selalu abaikan karena tidak mungkin pindah transaksi
+                    unit_transaction_id: undefined,
                     unit_type_id: isUnitTypeChanged && String(values.tipeUnit) !== 'null' ? String(values.tipeUnit) : undefined,
                     sparepart_id: item?.sparepart_id && String(item.sparepart_id) !== 'null' ? String(item.sparepart_id) : undefined,
                     qty_total: Number(values.qty ?? 0),
@@ -83,6 +85,8 @@ export default function EditNestedUnitPage() {
                     other_fee: Number(values.biayaLain ?? 0),
                     price_usd: values.hargaUsd ? Number(values.hargaUsd) : undefined,
                     price_per_unit_usd: values.hargaPerUnitUsd ? Number(values.hargaPerUnitUsd) : undefined,
+                    dpp_tax_id: values.dppTaxVersionId ? Number(values.dppTaxVersionId) : undefined,
+                    ppn_tax_id: values.ppnTaxVersionId ? Number(values.ppnTaxVersionId) : undefined,
                 },
             });
 
@@ -93,7 +97,7 @@ export default function EditNestedUnitPage() {
             const responseData = error?.response?.data;
             const errorMsg = responseData?.message || error?.message || 'Gagal memperbarui unit.';
             const validationErrors = responseData?.errors;
-            
+
             if (validationErrors && typeof validationErrors === 'object') {
                 const firstErrorKey = Object.keys(validationErrors)[0];
                 const firstErrorArray = validationErrors[firstErrorKey];
@@ -141,7 +145,7 @@ export default function EditNestedUnitPage() {
                     </div>
                 </div>
 
-                <Card className="rounded-xl">
+                <Card className="rounded-md">
                     <CardContent className="p-6">
                         <EditUnitForm
                             defaultValues={formData}

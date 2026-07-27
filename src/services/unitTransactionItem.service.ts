@@ -27,6 +27,8 @@ type UnitTransactionItemApiModel = {
   ppn_per_unit_price?: number | string;
   hpp_total_price?: number | string;
   dpp_total_price?: number | string;
+  dpp_tax_rate?: number | string;
+  ppn_tax_rate?: number | string;
   ppn_total_price?: number | string;
   price_usd?: number | string;
   price_per_unit_usd?: number | string;
@@ -38,6 +40,8 @@ export type UnitFormulaInput = {
   bbn_price?: number | string;
   expedition_fee?: number | string;
   other_fee?: number | string;
+  dpp_tax_id?: number | string | null;
+  ppn_tax_id?: number | string | null;
 };
 
 export type UnitFormulaResult = {
@@ -133,13 +137,20 @@ const mapFormula = (payload: any): UnitFormulaResult => ({
 
 export const unitTransactionItemService = {
   async getFormula(payload: UnitFormulaInput): Promise<UnitFormulaResult> {
-    const requestParams = {
+    const requestParams: Record<string, string | number | undefined> = {
       qty_total: toIntegerString(payload.qty_total),
       price: toDecimalString(payload.price),
       bbn_price: toDecimalString(payload.bbn_price),
       expedition_fee: toDecimalString(payload.expedition_fee),
       other_fee: toDecimalString(payload.other_fee),
     };
+
+    if (payload.dpp_tax_id != null && payload.dpp_tax_id !== '') {
+      requestParams.dpp_tax_id = Number(payload.dpp_tax_id);
+    }
+    if (payload.ppn_tax_id != null && payload.ppn_tax_id !== '') {
+      requestParams.ppn_tax_id = Number(payload.ppn_tax_id);
+    }
 
     const response = await apiClient.get<LaravelApiResponse<any>>(`${basePath}/get-formula`, {
       params: requestParams,
@@ -303,6 +314,19 @@ export const unitTransactionItemService = {
       toDecimalString
     );
 
+    appendIfDefined(
+      form,
+      'dpp_tax_id',
+      payload.dpp_tax_id,
+      toIntegerString
+    );
+    appendIfDefined(
+      form,
+      'ppn_tax_id',
+      payload.ppn_tax_id,
+      toIntegerString
+    );
+
     const response = await apiClient.post<
       LaravelApiResponse<UnitTransactionItemApiModel>
     >(basePath, form);
@@ -313,69 +337,77 @@ export const unitTransactionItemService = {
   // ======================
   // UPDATE ITEM (FIXED)
   // ======================
-async updateItem(
-  id: string,
-  payload: UpdateUnitTransactionItemPayload
-): Promise<UnitTransactionItem> {
-  const params = new URLSearchParams();
+  async updateItem(
+    id: string,
+    payload: UpdateUnitTransactionItemPayload
+  ): Promise<UnitTransactionItem> {
+    const params = new URLSearchParams();
 
-  if (payload.unit_transaction_id !== undefined && String(payload.unit_transaction_id) !== 'null') {
-    params.append('unit_transaction_id', String(payload.unit_transaction_id));
-  }
-
-  if (payload.unit_type_id !== undefined && String(payload.unit_type_id) !== 'null') {
-    params.append('unit_type_id', String(payload.unit_type_id));
-  }
-
-  if (
-    payload.sparepart_id !== undefined &&
-    payload.sparepart_id !== null &&
-    String(payload.sparepart_id) !== 'null' &&
-    String(payload.sparepart_id).trim().length > 0
-  ) {
-    params.append('sparepart_id', String(payload.sparepart_id));
-  }
-
-  if (payload.qty_total !== undefined) {
-    params.append('qty_total', String(payload.qty_total));
-  }
-
-  if (payload.price !== undefined) {
-    params.append('price', Number(payload.price).toFixed(2));
-  }
-
-  if (payload.bbn_price !== undefined) {
-    params.append('bbn_price', Number(payload.bbn_price).toFixed(2));
-  }
-
-  if (payload.expedition_fee !== undefined) {
-    params.append('expedition_fee', Number(payload.expedition_fee).toFixed(2));
-  }
-
-  if (payload.other_fee !== undefined) {
-    params.append('other_fee', Number(payload.other_fee).toFixed(2));
-  }
-
-  if (payload.price_usd !== undefined) {
-    params.append('price_usd', Number(payload.price_usd).toFixed(2));
-  }
-
-  if (payload.price_per_unit_usd !== undefined) {
-    params.append('price_per_unit_usd', Number(payload.price_per_unit_usd).toFixed(2));
-  }
-
-  const response = await apiClient.put(
-    `${basePath}/${id}`,
-    params,
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    if (payload.unit_transaction_id !== undefined && String(payload.unit_transaction_id) !== 'null') {
+      params.append('unit_transaction_id', String(payload.unit_transaction_id));
     }
-  );
 
-  return mapItem(ensureSuccess(response.data));
-},
+    if (payload.unit_type_id !== undefined && String(payload.unit_type_id) !== 'null') {
+      params.append('unit_type_id', String(payload.unit_type_id));
+    }
+
+    if (
+      payload.sparepart_id !== undefined &&
+      payload.sparepart_id !== null &&
+      String(payload.sparepart_id) !== 'null' &&
+      String(payload.sparepart_id).trim().length > 0
+    ) {
+      params.append('sparepart_id', String(payload.sparepart_id));
+    }
+
+    if (payload.qty_total !== undefined) {
+      params.append('qty_total', String(payload.qty_total));
+    }
+
+    if (payload.price !== undefined) {
+      params.append('price', Number(payload.price).toFixed(2));
+    }
+
+    if (payload.bbn_price !== undefined) {
+      params.append('bbn_price', Number(payload.bbn_price).toFixed(2));
+    }
+
+    if (payload.expedition_fee !== undefined) {
+      params.append('expedition_fee', Number(payload.expedition_fee).toFixed(2));
+    }
+
+    if (payload.other_fee !== undefined) {
+      params.append('other_fee', Number(payload.other_fee).toFixed(2));
+    }
+
+    if (payload.price_usd !== undefined) {
+      params.append('price_usd', Number(payload.price_usd).toFixed(2));
+    }
+
+    if (payload.price_per_unit_usd !== undefined) {
+      params.append('price_per_unit_usd', Number(payload.price_per_unit_usd).toFixed(2));
+    }
+
+    if (payload.dpp_tax_id !== undefined && payload.dpp_tax_id !== null && String(payload.dpp_tax_id) !== '') {
+      params.append('dpp_tax_id', String(Math.trunc(Number(payload.dpp_tax_id))));
+    }
+
+    if (payload.ppn_tax_id !== undefined && payload.ppn_tax_id !== null && String(payload.ppn_tax_id) !== '') {
+      params.append('ppn_tax_id', String(Math.trunc(Number(payload.ppn_tax_id))));
+    }
+
+    const response = await apiClient.put(
+      `${basePath}/${id}`,
+      params,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+
+    return mapItem(ensureSuccess(response.data));
+  },
 
   // ======================
   // DELETE

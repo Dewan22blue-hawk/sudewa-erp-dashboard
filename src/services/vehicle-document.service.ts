@@ -108,18 +108,18 @@ const mapVehicleDocumentSummary = (item: any): VehicleDocumentSummary => {
     ditlantasProcessId: Number(item.ditlantas_process_id ?? ditlantasProcess?.id ?? 0),
     ditlantasProcess: ditlantasProcess
       ? {
-          id: Number(ditlantasProcess.id),
-          code: text(ditlantasProcess.code),
-          vendorId: Number(ditlantasProcess.vendor_id),
-          processDate: text(ditlantasProcess.process_date),
-          vendor: vendor
-            ? {
-                id: Number(vendor.id),
-                name: text(vendor.name),
-                code: text(vendor.code),
-              }
-            : undefined,
-        }
+        id: Number(ditlantasProcess.id),
+        code: text(ditlantasProcess.code),
+        vendorId: Number(ditlantasProcess.vendor_id),
+        processDate: text(ditlantasProcess.process_date),
+        vendor: vendor
+          ? {
+            id: Number(vendor.id),
+            name: text(vendor.name),
+            code: text(vendor.code),
+          }
+          : undefined,
+      }
       : undefined,
   };
 };
@@ -371,27 +371,27 @@ export const getVehicleDocumentDetail = async (id: string | number): Promise<Veh
     ...mapVehicleDocumentSummary(data),
     vendorDetail: parentVendor
       ? {
-          id: Number(parentVendor.id),
-          uuid: text(parentVendor.uuid),
-          code: text(parentVendor.code),
-          type: text(parentVendor.type),
-          name: text(parentVendor.name),
-          address: text(parentVendor.address),
-          npwp: text(parentVendor.npwp),
-          phone: text(parentVendor.phone),
-          picName: text(parentVendor.pic_name),
-          identityNumber: parentVendor.identity_number,
-          driveLicenseIdentityNumber: parentVendor.drive_license_identity_number,
-          image: parentVendor.image,
-          mapLink: parentVendor.map_link,
-          socialMedia1Link: parentVendor.social_media_1_link,
-          socialMedia2Link: parentVendor.social_media_2_link,
-          socialMedia3Link: parentVendor.social_media_3_link,
-          socialMedia4Link: parentVendor.social_media_4_link,
-          websiteLink: parentVendor.website_link,
-          createdAt: parentVendor.created_at,
-          updatedAt: parentVendor.updated_at,
-        }
+        id: Number(parentVendor.id),
+        uuid: text(parentVendor.uuid),
+        code: text(parentVendor.code),
+        type: text(parentVendor.type),
+        name: text(parentVendor.name),
+        address: text(parentVendor.address),
+        npwp: text(parentVendor.npwp),
+        phone: text(parentVendor.phone),
+        picName: text(parentVendor.pic_name),
+        identityNumber: parentVendor.identity_number,
+        driveLicenseIdentityNumber: parentVendor.drive_license_identity_number,
+        image: parentVendor.image,
+        mapLink: parentVendor.map_link,
+        socialMedia1Link: parentVendor.social_media_1_link,
+        socialMedia2Link: parentVendor.social_media_2_link,
+        socialMedia3Link: parentVendor.social_media_3_link,
+        socialMedia4Link: parentVendor.social_media_4_link,
+        websiteLink: parentVendor.website_link,
+        createdAt: parentVendor.created_at,
+        updatedAt: parentVendor.updated_at,
+      }
       : undefined,
     vehicleDocumentItems: mergeDocumentTableItems(data),
     vehicleRegistrations: mappedRegistrations,
@@ -516,8 +516,6 @@ export const updateVehicleRegistration = async (id: string | number, payload: Pa
 
     if (typeof window !== 'undefined') {
       console.group('[VehicleRegistration][PUT]');
-      console.log('endpoint', `${registrationBasePath}/${id}`);
-      console.log('payload', requestPayload);
       console.groupEnd();
     }
 
@@ -529,16 +527,12 @@ export const updateVehicleRegistration = async (id: string | number, payload: Pa
     }
     if (typeof window !== 'undefined') {
       console.group('[VehicleRegistration][PUT][Response]');
-      console.log('endpoint', `${registrationBasePath}/${id}`);
-      console.log('response', response.data);
       console.groupEnd();
     }
     return mapVehicleRegistrationDetail(ensureSuccess(response.data));
   } catch (error) {
     if (typeof window !== 'undefined') {
       console.group('[VehicleRegistration][PUT][Error]');
-      console.log('endpoint', `${registrationBasePath}/${id}`);
-      console.log('payload', buildVehicleRegistrationPayload(payload));
       console.error('error', error);
       console.groupEnd();
     }

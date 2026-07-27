@@ -12,6 +12,7 @@ import {
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me';
 import { AuthService } from '@/features/auth/services/auth.service';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const getAvatarUrl = (path?: string | null) => {
     if (!path) return null;
@@ -134,9 +135,11 @@ export default function ProfilePage() {
                             <div className="flex flex-col items-center">
                                 {(avatarPreview || user?.avatar) ? (
                                     <div className="mb-5 flex justify-center">
-                                        <img
-                                            src={avatarPreview || getAvatarUrl(user?.avatar) || undefined}
+                                        <Image
+                                            src={avatarPreview || getAvatarUrl(user?.avatar)!}
                                             alt="Avatar"
+                                            width={100}
+                                            height={100}
                                             className="h-28 w-28 rounded-full object-cover border-4 border-slate-200 shadow-sm"
                                         />
                                     </div>
@@ -199,7 +202,7 @@ export default function ProfilePage() {
                                         value={formData.firstname}
                                         onChange={(e) => setFormData({ ...formData, firstname: e.target.value })}
                                         disabled={isSubmitting}
-                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
+                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-md"
                                     />
                                 </div>
 
@@ -213,7 +216,7 @@ export default function ProfilePage() {
                                         value={formData.lastname}
                                         onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
                                         disabled={isSubmitting}
-                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
+                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-md"
                                     />
                                 </div>
 
@@ -227,7 +230,7 @@ export default function ProfilePage() {
                                         value={formData.username}
                                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                         disabled={isSubmitting}
-                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-xl"
+                                        className="bg-white border-slate-200 text-sm shadow-sm h-11 focus-visible:ring-slate-400 rounded-md"
                                     />
                                 </div>
                             </div>
@@ -250,7 +253,7 @@ export default function ProfilePage() {
                                             id="email"
                                             value={user?.email || '-'}
                                             disabled
-                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-xl"
+                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-md"
                                         />
                                         <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     </div>
@@ -265,7 +268,7 @@ export default function ProfilePage() {
                                             id="role"
                                             value={roleName}
                                             disabled
-                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-xl"
+                                            className="bg-slate-50 border-slate-200 text-slate-500 text-sm shadow-sm h-11 cursor-not-allowed pl-10 rounded-md"
                                         />
                                         <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     </div>
@@ -278,7 +281,7 @@ export default function ProfilePage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white min-w-[140px] h-11 shadow-sm px-6 rounded-xl cursor-pointer font-medium"
+                                className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white min-w-[140px] h-11 shadow-sm px-6 rounded-md cursor-pointer font-medium"
                             >
                                 {isSubmitting ? (
                                     <>

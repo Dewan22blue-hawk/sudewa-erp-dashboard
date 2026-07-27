@@ -91,7 +91,7 @@ export default function MaterialReleaseDetailPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="space-y-1">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
@@ -106,7 +106,7 @@ export default function MaterialReleaseDetailPage() {
           <div className="space-y-6">
             <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 lg:flex-row lg:items-center lg:justify-between">
               <h2 className="text-[20px] font-semibold text-slate-950">Informasi Pengeluaran</h2>
-              <Button onClick={() => setOpenInvoiceModal(true)} className="h-11 rounded-xl bg-[#1f4163] px-6 text-[18px] hover:bg-[#183552]">
+              <Button onClick={() => setOpenInvoiceModal(true)} className="h-11 rounded-md bg-[#1f4163] px-6 text-[18px] hover:bg-[#183552]">
                 Lihat Invoice
               </Button>
             </div>
@@ -114,21 +114,21 @@ export default function MaterialReleaseDetailPage() {
             <div className="grid gap-4 lg:grid-cols-3">
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">No Pengeluaran</label>
-                <Input value={transaction.code} readOnly className="h-12 rounded-xl border-slate-200 bg-white text-[15px]" />
+                <Input value={transaction.code} readOnly className="h-12 rounded-md border-slate-200 bg-white text-[15px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Tanggal Keluar</label>
-                <Input value={formatDate(transaction.transactionDate)} readOnly className="h-12 rounded-xl border-slate-200 bg-white text-[15px]" />
+                <Input value={formatDate(transaction.transactionDate)} readOnly className="h-12 rounded-md border-slate-200 bg-white text-[15px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Tujuan / Supplier</label>
-                <Input value={transaction.supplierName} readOnly className="h-12 rounded-xl border-slate-200 bg-white text-[15px]" />
+                <Input value={transaction.supplierName} readOnly className="h-12 rounded-md border-slate-200 bg-white text-[15px]" />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-[15px] font-medium text-slate-900">Keterangan</label>
-              <textarea value={transaction.description ?? ''} readOnly className="min-h-[74px] w-full rounded-xl border border-slate-200 px-4 py-3 text-[15px] outline-none" />
+              <textarea value={transaction.description ?? ''} readOnly className="min-h-[74px] w-full rounded-md border border-slate-200 px-4 py-3 text-[15px] outline-none" />
             </div>
           </div>
         </Card>
@@ -136,12 +136,12 @@ export default function MaterialReleaseDetailPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative w-full sm:w-[304px]">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="h-[42px] rounded-xl border-slate-200 pl-11 shadow-sm" />
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="h-[42px] rounded-md border-slate-200 pl-11 shadow-sm" />
           </div>
           <div className="flex items-center gap-3 text-[16px] text-slate-800">
             <span>Show</span>
             <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-              <SelectTrigger className="h-[42px] w-[60px] rounded-xl border-slate-200 shadow-sm">
+              <SelectTrigger className="h-[42px] w-[60px] rounded-md border-slate-200 shadow-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -194,13 +194,13 @@ export default function MaterialReleaseDetailPage() {
           <div className="flex items-center gap-1 text-[16px]">
             <Button variant="ghost" onClick={() => setPage(page - 1)} disabled={page <= 1}>Previous</Button>
             {pageNumbers.map((pageNumber) => (
-              <Button key={pageNumber} variant={pageNumber === page ? 'outline' : 'ghost'} onClick={() => setPage(pageNumber)} className={pageNumber === page ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white' : 'h-10 min-w-10 rounded-xl'}>
+              <Button key={pageNumber} variant={pageNumber === page ? 'outline' : 'ghost'} onClick={() => setPage(pageNumber)} className={pageNumber === page ? 'h-10 min-w-10 rounded-md border-slate-200 bg-white' : 'h-10 min-w-10 rounded-md'}>
                 {pageNumber}
               </Button>
             ))}
             {totalPages > 5 && !pageNumbers.includes(totalPages) ? <span className="px-2 text-slate-500">...</span> : null}
             {totalPages > 5 && !pageNumbers.includes(totalPages) ? (
-              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-xl">{totalPages}</Button>
+              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-md">{totalPages}</Button>
             ) : null}
             <Button variant="ghost" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>Next</Button>
           </div>

@@ -94,12 +94,12 @@ export default function KasHarianForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="rounded-2xl">
-                  <SelectItem value="general" className="rounded-xl">Umum (General)</SelectItem>
-                  <SelectItem value="operational" className="rounded-xl">Operasional (Operational)</SelectItem>
-                  <SelectItem value="director_receivable" className="rounded-xl">Piutang Direktur (Director Receivable)</SelectItem>
-                  <SelectItem value="shareholder_receivable" className="rounded-xl">Piutang Pemegang Saham (Shareholder Receivable)</SelectItem>
-                  <SelectItem value="receivable" className="rounded-xl">Piutang Usaha (Receivable)</SelectItem>
-                  <SelectItem value="inventory" className="rounded-xl">Persediaan (Inventory)</SelectItem>
+                  <SelectItem value="general" className="rounded-md">Umum (General)</SelectItem>
+                  <SelectItem value="operational" className="rounded-md">Operasional (Operational)</SelectItem>
+                  <SelectItem value="director_receivable" className="rounded-md">Piutang Direktur (Director Receivable)</SelectItem>
+                  <SelectItem value="shareholder_receivable" className="rounded-md">Piutang Pemegang Saham (Shareholder Receivable)</SelectItem>
+                  <SelectItem value="receivable" className="rounded-md">Piutang Usaha (Receivable)</SelectItem>
+                  <SelectItem value="inventory" className="rounded-md">Persediaan (Inventory)</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

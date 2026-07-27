@@ -126,7 +126,7 @@ export default function SelectCompanyPage() {
                   hover:bg-[#F3F4F6]
                   border
                   border-[#E5E7EB]
-                  rounded-xl
+                  rounded-md
                   px-4
                   py-4
                   transition-all

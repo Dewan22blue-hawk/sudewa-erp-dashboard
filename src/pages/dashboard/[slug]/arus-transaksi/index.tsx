@@ -89,14 +89,14 @@ export default function TransactionListPage() {
                     {canCreate && (
                         <Button onClick={() => router.push(`${basePath}/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
                             <Plus className="mr-2 h-4 w-4" />
-                            Tambah
+                            Tambah Data
                         </Button>
                     )}
                 </div>
 
                 {/* TABLE */}
                 {isListLoading ? (
-                    <div className="h-64 flex items-center justify-center border rounded-xl bg-white">
+                    <div className="h-64 flex items-center justify-center border rounded-md bg-white">
                         <span className="animate-pulse text-muted-foreground">Loading transactions...</span>
                     </div>
                 ) : (
@@ -113,7 +113,7 @@ export default function TransactionListPage() {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                                     onClick={() => setPage(page - 1)}
                                     disabled={page === 1}
                                 >
@@ -122,14 +122,14 @@ export default function TransactionListPage() {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-9 min-w-9 rounded-xl border px-3 text-sm font-medium border-slate-200 bg-white text-slate-950 shadow-sm"
+                                    className="h-9 min-w-9 rounded-md border px-3 text-sm font-medium border-slate-200 bg-white text-slate-950 shadow-sm"
                                 >
                                     {page}
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-9 rounded-xl px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
+                                    className="h-9 rounded-md px-2 text-sm font-medium hover:bg-transparent disabled:text-slate-300"
                                     onClick={() => setPage(page + 1)}
                                     disabled={page * limit >= data.total}
                                 >

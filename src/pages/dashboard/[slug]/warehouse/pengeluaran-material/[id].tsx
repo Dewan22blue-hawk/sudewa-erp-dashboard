@@ -31,7 +31,7 @@ export default function GoodsIssueDetailPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/pengeluaran-material`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
@@ -52,25 +52,25 @@ export default function GoodsIssueDetailPage() {
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Kode Pengeluaran</label>
-                <Input value={issue.code} readOnly className="h-11 rounded-xl border-slate-200 text-[16px] text-slate-500" />
+                <Input value={issue.code} readOnly className="h-11 rounded-md border-slate-200 text-[16px] text-slate-500" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Tanggal Pengeluaran</label>
-                <Input value={formatLongDate(issue.transactionDate)} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
+                <Input value={formatLongDate(issue.transactionDate)} readOnly className="h-11 rounded-md border-slate-200 text-[16px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Customer</label>
-                <Input value={issue.customer?.name ?? '-'} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
+                <Input value={issue.customer?.name ?? '-'} readOnly className="h-11 rounded-md border-slate-200 text-[16px]" />
               </div>
               <div className="space-y-2">
                 <label className="text-[15px] font-medium text-slate-900">Total Harga Penjualan</label>
-                <Input value={formatCurrency(billing?.grandTotal ?? issue.totalBrutto)} readOnly className="h-11 rounded-xl border-slate-200 text-[16px]" />
+                <Input value={formatCurrency(billing?.grandTotal ?? issue.totalBrutto)} readOnly className="h-11 rounded-md border-slate-200 text-[16px]" />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-[15px] font-medium text-slate-900">Keterangan</label>
-              <Textarea value={issue.description ?? ''} readOnly rows={4} className="rounded-xl border-slate-200 text-[16px]" />
+              <Textarea value={issue.description ?? ''} readOnly rows={4} className="rounded-md border-slate-200 text-[16px]" />
             </div>
           </div>
         </Card>
@@ -110,11 +110,11 @@ export default function GoodsIssueDetailPage() {
           <div className="space-y-5">
             <h2 className="text-[18px] font-semibold text-slate-900">Informasi Billing</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Grand Total</p>
                 <p className="mt-1 text-[20px] font-semibold text-slate-900">{formatCurrency(billing?.grandTotal ?? issue.totalBrutto)}</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">Status</p>
                 <p className="mt-1 text-[20px] font-semibold text-slate-900">{issue.isPaid ? 'Lunas' : 'Belum Lunas'}</p>
               </div>
@@ -123,9 +123,9 @@ export default function GoodsIssueDetailPage() {
               <h3 className="text-[16px] font-semibold text-slate-900">History Pembayaran</h3>
               <div className="space-y-3">
                 {payments.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">Belum ada history pembayaran.</div>
+                  <div className="rounded-md border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">Belum ada history pembayaran.</div>
                 ) : payments.map((payment) => (
-                  <div key={payment.id} className="rounded-xl border border-slate-200 px-4 py-4">
+                  <div key={payment.id} className="rounded-md border border-slate-200 px-4 py-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-[15px] font-medium text-slate-900">{payment.cash?.description ?? payment.cash?.code ?? 'Pembayaran'}</p>

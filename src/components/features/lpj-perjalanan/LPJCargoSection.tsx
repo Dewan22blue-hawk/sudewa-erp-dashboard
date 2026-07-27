@@ -13,7 +13,7 @@ interface LPJCargoSectionProps {
 
 export function LPJCargoSection({ values, errors, onValueChange }: LPJCargoSectionProps) {
   return (
-    <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-6">
+    <section className="space-y-4 rounded-md border border-gray-200 bg-white p-6">
       <h4 className="text-lg font-semibold text-gray-900">Data Angkut</h4>
 
       <div className="space-y-4">

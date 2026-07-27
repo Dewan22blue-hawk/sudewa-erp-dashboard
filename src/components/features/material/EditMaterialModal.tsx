@@ -28,11 +28,11 @@ export function EditMaterialModal({ isOpen, onClose, onSave, initialData }: Edit
                         Edit data material baru
                     </DialogDescription>
                 </DialogHeader>
-                
-                <EditMaterialInnerForm 
-                    initialData={initialData} 
-                    onClose={onClose} 
-                    onSave={onSave} 
+
+                <EditMaterialInnerForm
+                    initialData={initialData}
+                    onClose={onClose}
+                    onSave={onSave}
                 />
             </DialogContent>
         </Dialog>
@@ -109,8 +109,8 @@ function EditMaterialInnerForm({ initialData, onClose, onSave }: InnerProps) {
                         name="type"
                         rules={{ required: 'Satuan wajib diisi' }}
                         render={({ field }) => (
-                            <Select 
-                                onValueChange={field.onChange} 
+                            <Select
+                                onValueChange={field.onChange}
                                 value={field.value}
                             >
                                 <SelectTrigger id="edit-type" className={errors.type ? 'border-red-500' : ''}>
@@ -129,8 +129,8 @@ function EditMaterialInnerForm({ initialData, onClose, onSave }: InnerProps) {
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t bg-gray-50">
-                <Button type="button" variant="outline" className="flex-1 h-11 rounded-xl border-[#D4D4D8] text-[15px] text-[#171717]" onClick={onClose}>Batal</Button>
-                <Button type="submit" className="flex-1 h-11 rounded-xl bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]">Simpan</Button>
+                <Button type="button" variant="outline" className="flex-1 h-11 rounded-md border-[#D4D4D8] text-[15px] text-[#171717]" onClick={onClose}>Batal</Button>
+                <Button type="submit" className="flex-1 h-11 rounded-md bg-[#1F3B5B] text-[15px] font-medium text-white hover:bg-[#19314b]">Simpan</Button>
             </div>
         </form>
     );

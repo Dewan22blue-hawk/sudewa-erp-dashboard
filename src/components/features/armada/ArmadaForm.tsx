@@ -111,33 +111,33 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
   } = useForm<ArmadaFormData>({
     defaultValues: initialData
       ? {
-          registrationNumber: initialData.registrationNumber,
-          type: initialData.type,
-          machineNumber: initialData.machineNumber,
-          chassisNumber: initialData.chassisNumber,
-          stnkAge: toInputDate(initialData.stnkAge),
-          kirAge: toInputDate(initialData.kirAge),
-          stnkNumber: initialData.stnkNumber ?? '',
-          kirBook: initialData.kirBook ?? '',
-          radio_tape: toEquipmentInput(initialData.equipment.radio_tape),
-          jack: toEquipmentInput(initialData.equipment.jack),
-          spare_tire: toEquipmentInput(initialData.equipment.spare_tire),
-          toolkit: toEquipmentInput(initialData.equipment.toolkit),
-          jack_handle: toEquipmentInput(initialData.equipment.jack_handle),
-          pressure_pipe_1: toEquipmentInput(initialData.equipment.pressure_pipe_1),
-          first_aid_kit: toEquipmentInput(initialData.equipment.first_aid_kit),
-          cigarette_lighter: toEquipmentInput(initialData.equipment.cigarette_lighter),
-          pressure_pipe_2: toEquipmentInput(initialData.equipment.pressure_pipe_2),
-          seat_saddle: toEquipmentInput(initialData.equipment.seat_saddle),
-          handlebar_hose: toEquipmentInput(initialData.equipment.handlebar_hose),
-          fire_extinguisher: toEquipmentInput(initialData.equipment.fire_extinguisher),
-          large_tie_down_strap: toEquipmentInput(initialData.equipment.large_tie_down_strap),
-          rearview_mirror: toEquipmentInput(initialData.equipment.rearview_mirror),
-          ati_foam: toEquipmentInput(initialData.equipment.ati_foam),
-          small_tie_down_strap: toEquipmentInput(initialData.equipment.small_tie_down_strap),
-          toolbox_lock: toEquipmentInput(initialData.equipment.toolbox_lock),
-          service_book: toEquipmentInput(initialData.equipment.service_book),
-        }
+        registrationNumber: initialData.registrationNumber,
+        type: initialData.type,
+        machineNumber: initialData.machineNumber,
+        chassisNumber: initialData.chassisNumber,
+        stnkAge: toInputDate(initialData.stnkAge),
+        kirAge: toInputDate(initialData.kirAge),
+        stnkNumber: initialData.stnkNumber ?? '',
+        kirBook: initialData.kirBook ?? '',
+        radio_tape: toEquipmentInput(initialData.equipment.radio_tape),
+        jack: toEquipmentInput(initialData.equipment.jack),
+        spare_tire: toEquipmentInput(initialData.equipment.spare_tire),
+        toolkit: toEquipmentInput(initialData.equipment.toolkit),
+        jack_handle: toEquipmentInput(initialData.equipment.jack_handle),
+        pressure_pipe_1: toEquipmentInput(initialData.equipment.pressure_pipe_1),
+        first_aid_kit: toEquipmentInput(initialData.equipment.first_aid_kit),
+        cigarette_lighter: toEquipmentInput(initialData.equipment.cigarette_lighter),
+        pressure_pipe_2: toEquipmentInput(initialData.equipment.pressure_pipe_2),
+        seat_saddle: toEquipmentInput(initialData.equipment.seat_saddle),
+        handlebar_hose: toEquipmentInput(initialData.equipment.handlebar_hose),
+        fire_extinguisher: toEquipmentInput(initialData.equipment.fire_extinguisher),
+        large_tie_down_strap: toEquipmentInput(initialData.equipment.large_tie_down_strap),
+        rearview_mirror: toEquipmentInput(initialData.equipment.rearview_mirror),
+        ati_foam: toEquipmentInput(initialData.equipment.ati_foam),
+        small_tie_down_strap: toEquipmentInput(initialData.equipment.small_tie_down_strap),
+        toolbox_lock: toEquipmentInput(initialData.equipment.toolbox_lock),
+        service_book: toEquipmentInput(initialData.equipment.service_book),
+      }
       : defaultValues,
   });
 
@@ -163,7 +163,7 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
 
   return (
     <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
-      <div className="rounded-xl border border-gray-200 bg-white p-6">
+      <div className="rounded-md border border-gray-200 bg-white p-6">
         <h3 className="mb-6 border-b pb-4 text-lg font-semibold text-gray-900">{title}</h3>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -183,9 +183,8 @@ export function ArmadaForm({ initialData, title, onSubmit, isSubmitting = false 
             <select
               id="type"
               {...register('type', { required: 'Tipe wajib diisi' })}
-              className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${
-                errors.type ? 'border-red-500' : 'border-slate-200'
-              }`}
+              className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${errors.type ? 'border-red-500' : 'border-slate-200'
+                }`}
             >
               <option value="" disabled>Pilih tipe armada</option>
               <option value="towing">Towing</option>

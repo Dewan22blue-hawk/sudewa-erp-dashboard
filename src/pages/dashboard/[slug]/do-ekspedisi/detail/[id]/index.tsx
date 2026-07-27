@@ -49,29 +49,29 @@ export default function DetailDOEkspedisiPage() {
     const tarifItems = tarifItemQuery.data?.data ?? [];
     const mergedOrderList: DoEkspedisiOrderList | null = detailQuery.data.orderList
       ? {
-          ...detailQuery.data.orderList,
-          tarifs: (tarifHeaders.length ? tarifHeaders : detailQuery.data.orderList.tarifs ?? []).map((tarif) => {
-            const matchedItems = tarifItems.filter((item) => {
-              const left = Number(item.doOrderListTarifId ?? 0);
-              const rightA = Number(tarif.id ?? 0);
-              const rightB = Number((tarif as any).tarifId ?? 0);
-              return left === rightA || (rightB && left === rightB);
-            });
-            const mappedTarifItems: DoEkspedisiOrderTarifLoadItem[] = matchedItems.map((item) => ({
-              id: Number(item.id ?? 0),
-              uuid: item.uuid,
-              loadContent: item.loadContent,
-              qty: Number(item.qty ?? 0),
-            }));
+        ...detailQuery.data.orderList,
+        tarifs: (tarifHeaders.length ? tarifHeaders : detailQuery.data.orderList.tarifs ?? []).map((tarif) => {
+          const matchedItems = tarifItems.filter((item) => {
+            const left = Number(item.doOrderListTarifId ?? 0);
+            const rightA = Number(tarif.id ?? 0);
+            const rightB = Number((tarif as any).tarifId ?? 0);
+            return left === rightA || (rightB && left === rightB);
+          });
+          const mappedTarifItems: DoEkspedisiOrderTarifLoadItem[] = matchedItems.map((item) => ({
+            id: Number(item.id ?? 0),
+            uuid: item.uuid,
+            loadContent: item.loadContent,
+            qty: Number(item.qty ?? 0),
+          }));
 
-            return {
-              ...tarif,
-              loadContent: tarif.loadContent || mappedTarifItems[0]?.loadContent || '-',
-              qty: tarif.qty || mappedTarifItems[0]?.qty || 0,
-              tarifItems: mappedTarifItems.length ? mappedTarifItems : tarif.tarifItems,
-            } satisfies DoEkspedisiOrderTarifItem;
-          }),
-        }
+          return {
+            ...tarif,
+            loadContent: tarif.loadContent || mappedTarifItems[0]?.loadContent || '-',
+            qty: tarif.qty || mappedTarifItems[0]?.qty || 0,
+            tarifItems: mappedTarifItems.length ? mappedTarifItems : tarif.tarifItems,
+          } satisfies DoEkspedisiOrderTarifItem;
+        }),
+      }
       : null;
 
     return {
@@ -213,7 +213,7 @@ export default function DetailDOEkspedisiPage() {
                 toast.error(getApiErrorMessage(error));
               }
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#152e4d]"
+            className="inline-flex items-center gap-2 rounded-md bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#152e4d]"
           >
             <Printer className="h-4 w-4" />
             Print DO
@@ -230,7 +230,7 @@ export default function DetailDOEkspedisiPage() {
                 placeholder="Search here"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                className="h-12 rounded-xl border-[#E5E7EB] bg-white pl-11"
+                className="h-12 rounded-md border-[#E5E7EB] bg-white pl-11"
               />
             </div>
 
@@ -240,7 +240,7 @@ export default function DetailDOEkspedisiPage() {
                 setPerPage(Number(value));
                 setPage(1);
               }}>
-                <SelectTrigger className="h-12 w-[88px] rounded-xl border-[#E5E7EB] bg-white">
+                <SelectTrigger className="h-12 w-[88px] rounded-md border-[#E5E7EB] bg-white">
                   <SelectValue placeholder="25" />
                 </SelectTrigger>
                 <SelectContent>
@@ -255,7 +255,7 @@ export default function DetailDOEkspedisiPage() {
 
           <Button onClick={() => slug && id && router.push(`/dashboard/${slug}/do-ekspedisi/detail/${id}/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="mr-2 h-4 w-4" />
-            Tambah
+            Tambah Data
           </Button>
         </div> */}
 

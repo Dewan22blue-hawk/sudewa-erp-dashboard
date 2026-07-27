@@ -162,7 +162,7 @@ export default function LaporanTransaksiKasPage() {
         {/* Main Table Content */}
         <div className="pt-4">
           {isLoadingDisplay ? (
-            <div className="flex justify-center items-center py-20 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex justify-center items-center py-20 bg-white rounded-md border border-gray-200 shadow-sm">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
           ) : (
@@ -187,8 +187,8 @@ export default function LaporanTransaksiKasPage() {
                     </p>
                   </div>
 
-                  <LaporanKasTable 
-                    data={data} 
+                  <LaporanKasTable
+                    data={data}
                     totalPemasukan={totalPemasukan}
                     totalPengeluaran={totalPengeluaran}
                     onSort={(key) => setSort(key, sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc')}
@@ -197,7 +197,7 @@ export default function LaporanTransaksiKasPage() {
                   />
                 </div>
               </PrintLetterPage>
-              
+
               {/* Pagination */}
               {data.length > 0 && (
                 <div className="flex flex-col gap-4 px-1 py-4 md:flex-row md:items-center md:justify-between no-print">
@@ -210,11 +210,11 @@ export default function LaporanTransaksiKasPage() {
                       size="sm"
                       onClick={() => setPage(pagination.currentPage - 1)}
                       disabled={pagination.currentPage === 1}
-                      className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
+                      className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                     >
                       Previous
                     </Button>
-                    
+
                     {getPageNumbers().map((pageNumber, idx) => (
                       typeof pageNumber === 'number' ? (
                         <Button
@@ -223,7 +223,7 @@ export default function LaporanTransaksiKasPage() {
                           size="sm"
                           onClick={() => setPage(pageNumber)}
                           className={cn(
-                            "h-9 min-w-9 rounded-xl border-slate-200 text-[13px] font-semibold cursor-pointer",
+                            "h-9 min-w-9 rounded-md border-slate-200 text-[13px] font-semibold cursor-pointer",
                             pageNumber === pagination.currentPage
                               ? "bg-white text-slate-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)] border border-slate-200 hover:bg-slate-50"
                               : "text-slate-600 hover:bg-slate-100"
@@ -235,13 +235,13 @@ export default function LaporanTransaksiKasPage() {
                         <span key={idx} className="px-1.5 text-slate-400">...</span>
                       )
                     ))}
-                    
+
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setPage(pagination.currentPage + 1)}
                       disabled={pagination.currentPage === pagination.lastPage}
-                      className="rounded-xl px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
+                      className="rounded-md px-3 hover:bg-slate-100 font-semibold text-[13px] cursor-pointer"
                     >
                       Next
                     </Button>

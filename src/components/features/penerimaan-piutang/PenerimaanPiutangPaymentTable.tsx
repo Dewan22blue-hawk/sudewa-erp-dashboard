@@ -104,7 +104,7 @@ export default function PenerimaanPiutangPaymentTable({
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-none">
+            <div className="bg-white rounded-md border border-slate-200 overflow-hidden shadow-none">
                 <table className="w-full text-sm">
                     <thead className="bg-[#f8f9fa] border-b border-gray-200">
                         <tr>

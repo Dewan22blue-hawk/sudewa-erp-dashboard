@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertCircle } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -14,17 +13,19 @@ import { useTypeUnits, useCreateTypeUnit } from '@/hooks/useTypeUnit';
 import { useBrands } from '@/hooks/useBrand';
 import { TypeUnit } from '@/@types/type-unit.types';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { useUnitFormula } from '@/hooks/useUnitFormula';
+import { useTaxes, useTaxDefault } from '@/hooks/useTax';
+import type { Tax } from '@/@types/tax.types';
+import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
   onSubmit: (data: CreatePurchaseUnitFormValues) => void;
-  defaultValues?: Partial<CreatePurchaseUnitFormValues>;
+  defaultValues?: Partial<CreatePurchaseUnitFormValues> & { dppTaxVersionId?: string | number | null; ppnTaxVersionId?: string | number | null };
   readOnly?: boolean;
   loading?: boolean;
   onCancel?: () => void;
@@ -44,6 +45,48 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
   const [typeImage, setTypeImage] = useState<File | null>(null);
   const [openTypeSelect, setOpenTypeSelect] = useState(false);
   const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.priceUsd && Number(defaultValues.priceUsd) > 0));
+
+  const [openDppTaxSelect, setOpenDppTaxSelect] = useState(false);
+  const [openPpnTaxSelect, setOpenPpnTaxSelect] = useState(false);
+  const [selectedDppTaxVersionId, setSelectedDppTaxVersionId] = useState<string | number | null>(defaultValues?.dppTaxVersionId ?? null);
+  const [selectedPpnTaxVersionId, setSelectedPpnTaxVersionId] = useState<string | number | null>(defaultValues?.ppnTaxVersionId ?? null);
+
+  const { data: taxesData } = useTaxes();
+  const { data: defaultDppTax } = useTaxDefault('dpp');
+  const { data: defaultPpnTax } = useTaxDefault('ppn');
+
+  const taxOptions = useMemo<Tax[]>(() => {
+    const list = (taxesData as any)?.data;
+    return Array.isArray(list) ? list : [];
+  }, [taxesData]);
+
+  useEffect(() => {
+    if (defaultDppTax?.id && selectedDppTaxVersionId == null) {
+      setSelectedDppTaxVersionId(defaultDppTax.id);
+    }
+  }, [defaultDppTax, selectedDppTaxVersionId]);
+
+  useEffect(() => {
+    if (defaultPpnTax?.id && selectedPpnTaxVersionId == null) {
+      setSelectedPpnTaxVersionId(defaultPpnTax.id);
+    }
+  }, [defaultPpnTax, selectedPpnTaxVersionId]);
+
+  const dppTaxVersion = useMemo(() => {
+    for (const tax of taxOptions) {
+      const found = tax.tax_versions?.find((v) => v.id === selectedDppTaxVersionId);
+      if (found) return { tax, version: found };
+    }
+    return null;
+  }, [taxOptions, selectedDppTaxVersionId]);
+
+  const ppnTaxVersion = useMemo(() => {
+    for (const tax of taxOptions) {
+      const found = tax.tax_versions?.find((v) => v.id === selectedPpnTaxVersionId);
+      if (found) return { tax, version: found };
+    }
+    return null;
+  }, [taxOptions, selectedPpnTaxVersionId]);
 
   const form = useForm<CreatePurchaseUnitFormValues>({
     resolver: zodResolver(createPurchaseUnitSchema),
@@ -72,6 +115,8 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     bbn_price: biayaBBN,
     expedition_fee: biayaEkspedisi,
     other_fee: biayaLain,
+    dpp_tax_id: dppTaxVersion?.version.id,
+    ppn_tax_id: ppnTaxVersion?.version.id,
   });
 
   const hppSatuan = Number(formula?.hpp_per_unit_price ?? 0);
@@ -149,6 +194,8 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
       ...values,
       priceUsd: Number(values.priceUsd) || 0,
       pricePerUnitUsd: Number(values.pricePerUnitUsd) || 0,
+      dppTaxVersionId: selectedDppTaxVersionId ?? undefined,
+      ppnTaxVersionId: selectedPpnTaxVersionId ?? undefined,
     } as any);
   };
 
@@ -171,7 +218,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="typeUnitId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Tipe Unit (Opsional)</FormLabel>
+                  <FormLabel className="text-sm font-medium">Tipe Unit <RequiredMark /></FormLabel>
                   <div className="flex items-center gap-2">
                     <Popover open={openTypeSelect} onOpenChange={setOpenTypeSelect}>
                       <FormControl>
@@ -241,10 +288,11 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="qty"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">QTY</FormLabel>
+                  <FormLabel className="text-sm font-medium">QTY <RequiredMark /></FormLabel>
                   <FormControl>
                     <Input
                       type="number"
+                      placeholder="QTY"
                       min="1"
                       value={field.value ?? ''}
                       onChange={(e) => {
@@ -264,7 +312,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Harga</FormLabel>
+                  <FormLabel className="text-sm font-medium">Harga Satuan <RequiredMark /></FormLabel>
                   <FormControl>
                     <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
                   </FormControl>
@@ -297,7 +345,7 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
 
           {/* USD Inputs */}
           {isUsd && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-xl border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-md border border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-2 duration-200">
               <FormField
                 control={form.control}
                 name="priceUsd"
@@ -467,16 +515,102 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
 
             <FormItem>
               <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
+              <div className="flex gap-2">
+                <Popover open={openDppTaxSelect} onOpenChange={setOpenDppTaxSelect}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      role="combobox"
+                      aria-expanded={openDppTaxSelect}
+                      disabled={readOnly}
+                      className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
+                    >
+                      <span className={cn('truncate', !dppTaxVersion && 'text-muted-foreground')}>
+                        {dppTaxVersion ? `${dppTaxVersion.tax.name}` : 'Pilih DPP'}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                    <Command>
+                      <CommandInput placeholder="Cari pajak..." />
+                      <CommandList>
+                        <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          {taxOptions.map((tax) =>
+                            tax.tax_versions?.map((ver) => (
+                              <CommandItem
+                                key={`${tax.id}-${ver.id}`}
+                                value={`${tax.name} ${ver.name}`}
+                                onSelect={() => {
+                                  setSelectedDppTaxVersionId(ver.id);
+                                  setOpenDppTaxSelect(false);
+                                }}
+                              >
+                                <Check className={cn('mr-2 h-4 w-4', selectedDppTaxVersionId === ver.id ? 'opacity-100' : 'opacity-0')} />
+                                <span className="truncate">{tax.name} - {ver.name}</span>
+                              </CommandItem>
+                            ))
+                          )}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <div className="flex-1">
+                  <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
+                </div>
+              </div>
             </FormItem>
 
             <FormItem>
               <FormLabel className="text-sm font-medium">PPN Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
+              <div className="flex gap-2">
+                <Popover open={openPpnTaxSelect} onOpenChange={setOpenPpnTaxSelect}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      role="combobox"
+                      aria-expanded={openPpnTaxSelect}
+                      disabled={readOnly}
+                      className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
+                    >
+                      <span className={cn('truncate', !ppnTaxVersion && 'text-muted-foreground')}>
+                        {ppnTaxVersion ? `${ppnTaxVersion.tax.name}` : 'Pilih PPN'}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                    <Command>
+                      <CommandInput placeholder="Cari pajak..." />
+                      <CommandList>
+                        <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
+                        <CommandGroup>
+                          {taxOptions.map((tax) =>
+                            tax.tax_versions?.map((ver) => (
+                              <CommandItem
+                                key={`${tax.id}-${ver.id}`}
+                                value={`${tax.name} ${ver.name}`}
+                                onSelect={() => {
+                                  setSelectedPpnTaxVersionId(ver.id);
+                                  setOpenPpnTaxSelect(false);
+                                }}
+                              >
+                                <Check className={cn('mr-2 h-4 w-4', selectedPpnTaxVersionId === ver.id ? 'opacity-100' : 'opacity-0')} />
+                                <span className="truncate">{tax.name} - {ver.name}</span>
+                              </CommandItem>
+                            ))
+                          )}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <div className="flex-1">
+                  <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
+                </div>
+              </div>
             </FormItem>
           </div>
 

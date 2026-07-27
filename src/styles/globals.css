@@ -461,13 +461,13 @@ body {
       color: #0f172a !important;
     }
 
-    .laporan-pembelian-print-area .rounded-xl,
+    .laporan-pembelian-print-area .rounded-md,
     .laporan-pembelian-print-area .shadow-sm,
     .laporan-pembelian-print-area .border,
-    .laporan-penjualan-print-area .rounded-xl,
+    .laporan-penjualan-print-area .rounded-md,
     .laporan-penjualan-print-area .shadow-sm,
     .laporan-penjualan-print-area .border,
-    .laporan-penerimaan-print-area .rounded-xl,
+    .laporan-penerimaan-print-area .rounded-md,
     .laporan-penerimaan-print-area .shadow-sm,
     .laporan-penerimaan-print-area .border {
       border-radius: 0 !important;
@@ -654,7 +654,7 @@ body {
     }
 
     /* Hapus border-radius & shadow */
-    .laporan-stock-print-area .rounded-xl,
+    .laporan-stock-print-area .rounded-md,
     .laporan-stock-print-area .shadow-sm,
     .laporan-stock-print-area .border {
       border-radius: 0 !important;

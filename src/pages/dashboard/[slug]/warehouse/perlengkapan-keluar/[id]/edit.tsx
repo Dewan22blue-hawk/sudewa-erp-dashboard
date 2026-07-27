@@ -227,7 +227,7 @@ export default function MaterialReleaseEditPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="space-y-1">
-          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <Button asChild variant="ghost" size="icon" className="h-10 w-10 rounded-md border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <Link href={`/dashboard/${slug}/warehouse/perlengkapan-keluar`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
             </Link>
@@ -248,7 +248,7 @@ export default function MaterialReleaseEditPage() {
               <div className="grid gap-4 lg:grid-cols-3">
                 <div className="space-y-2">
                   <Label className="text-[15px] font-medium text-slate-900">No Pengeluaran</Label>
-                  <Input value={transactionQuery.data.code} readOnly className="h-12 rounded-xl border-slate-200 bg-white text-[15px]" />
+                  <Input value={transactionQuery.data.code} readOnly className="h-12 rounded-md border-slate-200 bg-white text-[15px]" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[15px] font-medium text-slate-900">Tanggal Keluar</Label>
@@ -260,14 +260,14 @@ export default function MaterialReleaseEditPage() {
                         value={toDateValue(field.value)}
                         onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                         placeholder="Pilih tanggal"
-                        className="h-12 rounded-xl border-slate-200 px-4 text-[15px]"
+                        className="h-12 rounded-md border-slate-200 px-4 text-[15px]"
                       />
                     )}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[15px] font-medium text-slate-900">Tujuan / Supplier</Label>
-                  <Input {...form.register('supplierName')} className="h-12 rounded-xl border-slate-200 text-[15px]" />
+                  <Input {...form.register('supplierName')} className="h-12 rounded-md border-slate-200 text-[15px]" />
                 </div>
               </div>
 
@@ -286,16 +286,16 @@ export default function MaterialReleaseEditPage() {
                         searchPlaceholder="Cari warehouse..."
                         emptyText="Warehouse tidak ditemukan."
                         loading={warehousesQuery.isLoading}
-                        className="h-12 rounded-xl border-slate-200 px-4 text-[15px]"
+                        className="h-12 rounded-md border-slate-200 px-4 text-[15px]"
                       />
                     )}
                   />
                 </div>
                 <div className="flex gap-3">
-                  <Button type="button" onClick={() => setOpenInvoiceModal(true)} className="h-11 rounded-xl bg-[#1f4163] px-5 text-[16px] hover:bg-[#183552]">
+                  <Button type="button" onClick={() => setOpenInvoiceModal(true)} className="h-11 rounded-md bg-[#1f4163] px-5 text-[16px] hover:bg-[#183552]">
                     Upload Invoice
                   </Button>
-                  <Button type="submit" disabled={updateTransactionMutation.isPending} className="h-11 rounded-xl bg-emerald-500 px-5 text-[16px] hover:bg-emerald-600">
+                  <Button type="submit" disabled={updateTransactionMutation.isPending} className="h-11 rounded-md bg-emerald-500 px-5 text-[16px] hover:bg-emerald-600">
                     {updateTransactionMutation.isPending ? 'Menyimpan...' : 'Simpan'}
                   </Button>
                 </div>
@@ -303,7 +303,7 @@ export default function MaterialReleaseEditPage() {
 
               <div className="space-y-2">
                 <Label className="text-[15px] font-medium text-slate-900">Keterangan</Label>
-                <Textarea {...form.register('description')} rows={4} className="rounded-xl border-slate-200 px-4 py-3 text-[15px]" />
+                <Textarea {...form.register('description')} rows={4} className="rounded-md border-slate-200 px-4 py-3 text-[15px]" />
               </div>
             </form>
           </div>
@@ -313,12 +313,12 @@ export default function MaterialReleaseEditPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[304px]">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="h-[42px] rounded-xl border-slate-200 pl-11 shadow-sm" />
+              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search here" className="h-[42px] rounded-md border-slate-200 pl-11 shadow-sm" />
             </div>
             <div className="flex items-center gap-3 text-[16px] text-slate-800">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => setPerPage(Number(value))}>
-                <SelectTrigger className="h-[42px] w-[60px] rounded-xl border-slate-200 shadow-sm">
+                <SelectTrigger className="h-[42px] w-[60px] rounded-md border-slate-200 shadow-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -340,7 +340,7 @@ export default function MaterialReleaseEditPage() {
               variant="outline"
               disabled={selectedIds.length === 0}
               onClick={() => setDeleteTargets(items.filter((item) => selectedIds.includes(item.id)))}
-              className="h-11 rounded-xl border-red-300 px-6 text-[18px] text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="h-11 rounded-md border-red-300 px-6 text-[18px] text-red-600 hover:bg-red-50 hover:text-red-700"
             >
               Hapus
             </Button>
@@ -427,13 +427,13 @@ export default function MaterialReleaseEditPage() {
           <div className="flex items-center gap-1 text-[16px]">
             <Button variant="ghost" onClick={() => setPage(page - 1)} disabled={page <= 1}>Previous</Button>
             {pageNumbers.map((pageNumber) => (
-              <Button key={pageNumber} variant={pageNumber === page ? 'outline' : 'ghost'} onClick={() => setPage(pageNumber)} className={pageNumber === page ? 'h-10 min-w-10 rounded-xl border-slate-200 bg-white' : 'h-10 min-w-10 rounded-xl'}>
+              <Button key={pageNumber} variant={pageNumber === page ? 'outline' : 'ghost'} onClick={() => setPage(pageNumber)} className={pageNumber === page ? 'h-10 min-w-10 rounded-md border-slate-200 bg-white' : 'h-10 min-w-10 rounded-md'}>
                 {pageNumber}
               </Button>
             ))}
             {totalPages > 5 && !pageNumbers.includes(totalPages) ? <span className="px-2 text-slate-500">...</span> : null}
             {totalPages > 5 && !pageNumbers.includes(totalPages) ? (
-              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-xl">{totalPages}</Button>
+              <Button variant="ghost" onClick={() => setPage(totalPages)} className="h-10 min-w-10 rounded-md">{totalPages}</Button>
             ) : null}
             <Button variant="ghost" onClick={() => setPage(page + 1)} disabled={page >= totalPages}>Next</Button>
           </div>
