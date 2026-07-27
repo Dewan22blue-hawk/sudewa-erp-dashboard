@@ -304,15 +304,44 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
   const activity = extractActivityObject(payload);
   const mapped = mapActivity(activity);
 
-  const details = Array.isArray(activity.unit_transaction_details)
-    ? activity.unit_transaction_details
-    : Array.isArray(activity.details)
-      ? activity.details
-      : [];
+  let mappedDetails: WarehouseActivityUnitDetail[] = [];
+  if (activity && Array.isArray((activity as any).warehouse_movements)) {
+    mappedDetails = (activity as any).warehouse_movements.map((movement: any) => {
+      const detail = movement.unit_transaction_item_detail ?? {};
+      const item = detail.unit_transaction_item ?? {};
+      const type = item.unit_type ?? {};
+      
+      const detailId = toNumberValue(detail.id) || toNumberValue(movement.unit_transaction_item_detail_id);
+      const noPembelian = movement.unit_transaction?.code ?? item.unit_transaction?.code ?? detail.unit_transaction_code ?? '-';
+      const tipeUnit = type.name ?? detail.unit_type_name ?? '-';
+      const warna = detail.color ?? '-';
+      const noMesin = detail.machine_number ?? '-';
+      const noRangka = detail.chassis_number ?? '-';
+      const diterima = movement.status === 'in' || toBoolValue(detail.in_stock);
+      
+      return {
+        id: detailId,
+        penerimaanId: mapped.id,
+        noPembelian,
+        tipeUnit,
+        warna,
+        noMesin,
+        noRangka,
+        diterima,
+      };
+    });
+  } else {
+    const details = Array.isArray(activity.unit_transaction_details)
+      ? activity.unit_transaction_details
+      : Array.isArray(activity.details)
+        ? activity.details
+        : [];
+    mappedDetails = details.map((item) => mapDetail(mapped.id, item));
+  }
 
   return {
     ...mapped,
-    unit_transaction_details: details.map((item) => mapDetail(mapped.id, item)),
+    unit_transaction_details: mappedDetails,
   };
 };
 

@@ -108,7 +108,7 @@ export default function CreatePengeluaranUnitPage() {
     try {
       const created = await createMutation.mutateAsync(toSavePayload(payload));
       toast.success('Data pengeluaran unit berhasil disimpan');
-      await router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/${created.id}/edit`);
+      await router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/${created.id}/detail`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Gagal menyimpan data pengeluaran unit';
       toast.error(message);
@@ -133,7 +133,7 @@ export default function CreatePengeluaranUnitPage() {
       toast.success('Dispatch stock berhasil diproses');
       setSelectedIds([]);
       await dispatchTableQuery.refetch();
-      await router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/${ensuredActivityId}/edit`);
+      await router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/${ensuredActivityId}/detail`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Gagal memproses dispatch stock';
       toast.error(message);
