@@ -67,12 +67,7 @@ export default function PengeluaranUnitTable({
 
   const navigateToDetail = (id: number): void => {
     const base = resolveBasePath();
-    void router.push(`${base}/${id}`);
-  };
-
-  const navigateToEdit = (id: number): void => {
-    const base = resolveBasePath();
-    void router.push(`${base}/${id}/edit`);
+    void router.push(`${base}/${id}/detail`);
   };
 
   const columns: ColumnDef<PengeluaranUnit>[] = [
@@ -126,10 +121,10 @@ export default function PengeluaranUnitTable({
               Detail
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigateToEdit(item.id)}
-              className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+              onClick={() => setDeleteId(String(item.id))}
+              className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
             >
-              Edit
+              Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

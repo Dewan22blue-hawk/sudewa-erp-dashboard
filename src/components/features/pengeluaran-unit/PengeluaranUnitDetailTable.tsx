@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, ArrowDown } from 'lucide-react';
+import { Check, SendHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -13,42 +13,39 @@ import { CopyBox } from '@/components/ui/copy-box';
 
 interface Props {
   data?: WarehouseActivityUnitDetail[];
-  personId?: string;
-  onTerima: (ids: number[]) => Promise<void>;
+  onKirim: (ids: number[]) => Promise<void>;
   onDelete: (ids: number[]) => Promise<void>;
   isLoading?: boolean;
 }
 
-export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, isLoading = false }: Props) {
+export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, isLoading = false }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(25);
-  const [receivedFilter, setReceivedFilter] = useState<'all' | 'received' | 'pending'>('all');
+  const [dispatchFilter, setDispatchFilter] = useState<'all' | 'issued' | 'pending'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selected, setSelected] = useState<number[]>([]);
   const [confirmDeleteIds, setConfirmDeleteIds] = useState<number[]>([]);
-  const [receivedIds, setReceivedIds] = useState<number[]>([]);
+  const [dispatchedIds, setDispatchedIds] = useState<number[]>([]);
 
   const rows = useMemo(() => {
     const source = data ?? [];
     return source.map((item) => ({
       id: item.id,
-      purchaseCode: item.noPembelian,
+      salesCode: item.noPembelian,
       unitTypeName: item.tipeUnit,
       color: item.warna,
       machineNumber: item.noMesin,
       chassisNumber: item.noRangka,
-      status: item.diterima ? 'normal' : 'Belum Diterima',
-      unitTransactionId: Number(item.penerimaanId || 0),
-      received: item.diterima,
-      in_stock: item.diterima,
+      isDispatched: item.diterima,
+      inStock: !item.diterima,
     }));
   }, [data]);
 
   useEffect(() => {
-    const serverReceivedIds = rows.filter((item) => item.received).map((item) => item.id);
-    setReceivedIds((prev) => Array.from(new Set([...prev, ...serverReceivedIds])));
+    const serverDispatchedIds = rows.filter((item) => item.isDispatched).map((item) => item.id);
+    setDispatchedIds((prev) => Array.from(new Set([...prev, ...serverDispatchedIds])));
   }, [rows]);
 
   const filteredRows = useMemo(() => {
@@ -57,20 +54,20 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
 
     if (term) {
       result = result.filter((row) =>
-        [row.purchaseCode, row.unitTypeName, row.color, row.machineNumber, row.chassisNumber]
+        [row.salesCode, row.unitTypeName, row.color, row.machineNumber, row.chassisNumber]
           .map((val) => String(val ?? '').toLowerCase())
           .some((val) => val.includes(term))
       );
     }
 
-    if (receivedFilter === 'received') {
-      result = result.filter((item) => item.received);
-    } else if (receivedFilter === 'pending') {
-      result = result.filter((item) => !item.received);
+    if (dispatchFilter === 'issued') {
+      result = result.filter((item) => item.isDispatched);
+    } else if (dispatchFilter === 'pending') {
+      result = result.filter((item) => !item.isDispatched);
     }
 
     return result;
-  }, [rows, search, receivedFilter]);
+  }, [rows, search, dispatchFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / itemsPerPage));
   const safePage = Math.min(currentPage, totalPages);
@@ -84,16 +81,16 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
     setSelected([]);
   }, [filteredRows]);
 
-  const receivedCount = useMemo(() => rows.filter((item) => receivedIds.includes(item.id)).length, [rows, receivedIds]);
-  const pendingCount = useMemo(() => rows.filter((item) => !receivedIds.includes(item.id)).length, [rows, receivedIds]);
+  const issuedCount = useMemo(() => rows.filter((item) => dispatchedIds.includes(item.id)).length, [rows, dispatchedIds]);
+  const pendingCount = useMemo(() => rows.filter((item) => !dispatchedIds.includes(item.id)).length, [rows, dispatchedIds]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [itemsPerPage, search, receivedFilter]);
+  }, [itemsPerPage, search, dispatchFilter]);
 
   const isSelectionDisabled = useCallback((item: any) => {
-    return receivedIds.includes(item.id);
-  }, [receivedIds]);
+    return dispatchedIds.includes(item.id);
+  }, [dispatchedIds]);
 
   const toggleSelect = useCallback((item: any) => {
     if (isSelectionDisabled(item)) return;
@@ -110,10 +107,10 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
     setSelected((prev) => (isAllSelected ? prev.filter((id) => !allIds.includes(id)) : Array.from(new Set([...prev, ...allIds]))));
   }, [paginatedRows, isSelectionDisabled, selected]);
 
-  const handleTerima = async () => {
+  const handleKirim = async () => {
     if (selected.length === 0) return;
-    await onTerima(selected);
-    setReceivedIds((prev) => Array.from(new Set([...prev, ...selected])));
+    await onKirim(selected);
+    setDispatchedIds((prev) => Array.from(new Set([...prev, ...selected])));
     setSelected([]);
   };
 
@@ -121,7 +118,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
     if (confirmDeleteIds.length === 0) return;
     await onDelete(confirmDeleteIds);
     setSelected((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
-    setReceivedIds((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
+    setDispatchedIds((prev) => prev.filter((id) => !confirmDeleteIds.includes(id)));
     setConfirmDeleteIds([]);
   };
 
@@ -140,18 +137,18 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         alignment: 'center',
         cell: (item) => (
           <Checkbox
-            checked={selected.includes(item.id) || receivedIds.includes(item.id)}
+            checked={selected.includes(item.id) || dispatchedIds.includes(item.id)}
             onCheckedChange={() => toggleSelect(item)}
             disabled={isSelectionDisabled(item)}
           />
         ),
       },
       {
-        header: 'NO PEMBELIAN',
-        accessorKey: 'purchaseCode',
+        header: 'KODE JUAL',
+        accessorKey: 'salesCode',
         sortable: true,
         cell: (item) => (
-          <CopyBox text={item.purchaseCode || ""} />
+          <CopyBox text={item.salesCode || ""} />
         )
       },
       {
@@ -186,54 +183,29 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         )
       },
       {
-        header: 'STATUS',
-        accessorKey: 'status',
+        header: 'STATUS PENGELUARAN',
+        accessorKey: 'isDispatched',
         sortable: true,
         cell: (item) => {
-          let text = '-';
-          let background = 'border-slate-200 bg-slate-50 text-slate-700';
-          switch (item?.status) {
-            case 'returned':
-              text = 'Return';
-              background = 'border-rose-200 bg-rose-50 text-rose-700';
-              break;
-            case 'refunded':
-              text = 'Refund';
-              background = 'border-rose-200 bg-rose-50 text-rose-700';
-              break;
-            case 'normal':
-              text = 'Normal';
-              background = 'border-emerald-200 bg-emerald-50 text-emerald-700';
-              break;
-            default:
-              text = 'Belum Diterima';
-              background = 'border-amber-200 bg-amber-50 text-amber-700';
-              break;
+          if (item.isDispatched) {
+            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Dikeluarkan</Badge>;
           }
-
-          return (
-            <Badge variant='outline' className={`font-semibold ${background}`}>
-              {text}
-            </Badge>
-          );
+          return <Badge variant="outline" className="border-amber-200 text-amber-700">Belum Dikeluarkan</Badge>;
         },
       },
       {
         header: 'STATUS STOCK',
-        accessorKey: 'in_stock',
+        accessorKey: 'inStock',
         sortable: true,
         cell: (item) => {
-          if (item.in_stock === true) {
+          if (item.inStock) {
             return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
-          if (item.in_stock === false) {
-            return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
-          }
-          return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+          return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
         }
       }
     ],
-    [paginatedRows, selected, receivedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]
+    [paginatedRows, selected, dispatchedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]
   );
 
   return (
@@ -259,21 +231,21 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span>Filter Status</span>
-                <Select value={receivedFilter} onValueChange={(val) => setReceivedFilter(val as 'all' | 'received' | 'pending')}>
-                  <SelectTrigger className="h-10 w-[180px] border-gray-200 rounded-lg">
+                <Select value={dispatchFilter} onValueChange={(val) => setDispatchFilter(val as 'all' | 'issued' | 'pending')}>
+                  <SelectTrigger className="h-10 w-[190px] border-gray-200 rounded-lg">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Semua Data</SelectItem>
-                    <SelectItem value="pending">Belum Diterima</SelectItem>
-                    <SelectItem value="received">Sudah Diterima</SelectItem>
+                    <SelectItem value="pending">Belum Dikeluarkan</SelectItem>
+                    <SelectItem value="issued">Sudah Dikeluarkan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Diterima ke stock: {receivedCount}</span>
-                <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">Belum diterima: {pendingCount}</span>
+                <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">Dikeluarkan: {issuedCount}</span>
+                <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">Belum Dikeluarkan: {pendingCount}</span>
               </div>
             </div>
 
@@ -283,8 +255,8 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
               </div>
 
               <div className="flex items-center gap-2">
-                <Button size="sm" className="h-10 px-5 bg-[#1FBE78] hover:bg-[#19ac6c] font-medium rounded-lg gap-2 text-white" onClick={handleTerima} disabled={selected.length === 0}>
-                  <ArrowDown size={16} /> Terima
+                <Button size="sm" className="h-10 px-5 bg-[#1FBE78] hover:bg-[#19ac6c] font-medium rounded-lg gap-2 text-white" onClick={handleKirim} disabled={selected.length === 0}>
+                  <SendHorizontal size={16} /> Kirim
                 </Button>
 
                 <Button size="sm" variant="outline" className="h-10 px-6 border-red-400 text-red-500 hover:bg-red-50 font-medium rounded-lg bg-white" onClick={() => setConfirmDeleteIds(selected)} disabled={selected.length === 0}>
