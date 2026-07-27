@@ -326,8 +326,18 @@ export function SalesTable({
               )}
               {canDelete && (
                 <DropdownMenuItem
-                  onClick={() => onDelete(item.id)}
-                  className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                  onClick={(e) => {
+                    if (item.isPaid) {
+                      e.preventDefault();
+                      return;
+                    }
+                    onDelete(item.id);
+                  }}
+                  disabled={item.isPaid}
+                  className={cn(
+                    "rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer",
+                    item.isPaid && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-red-600 focus:bg-transparent"
+                  )}
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> Hapus
                 </DropdownMenuItem>
