@@ -171,10 +171,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Laporan Transaksi Kas',
           href: base('/laporan/laporan-transaksi-kas'),
         },
-        {
-          label: 'Laporan Akuntansi',
-          href: base('/laporan/laporan-akuntansi'),
-        },
+        // {
+        //   label: 'Laporan Akuntansi',
+        //   href: base('/laporan/laporan-akuntansi'),
+        // },
         {
           label: 'Laporan Pembelian',
           href: base('/laporan/laporan-pembelian'),
