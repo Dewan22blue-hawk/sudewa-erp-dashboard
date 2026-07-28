@@ -66,14 +66,14 @@ export default function PengeluaranUnitPage() {
         <PageHeader
           title="Data Pengeluaran Unit"
           subtitle="Kelola dan lacak semua data pengeluaran stock unit"
-          actions={
-            canCreate && (
-              <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                <Plus className="mr-2 h-4 w-4" />
-                Tambah
-              </Button>
-            )
-          }
+        // actions={
+        //   canCreate && (
+        //     <Button onClick={() => router.push(`/dashboard/${router.query.slug}/warehouse/pengeluaran-unit/create`)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+        //       <Plus className="mr-2 h-4 w-4" />
+        //       Tambah
+        //     </Button>
+        //   )
+        // }
         />
 
         <PengeluaranUnitTable

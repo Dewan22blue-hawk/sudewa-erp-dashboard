@@ -3,6 +3,9 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { PenerimaanItem } from '@/services/laporan-penerimaan.service';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: PenerimaanItem[];
@@ -22,17 +25,14 @@ export default function LaporanPenerimaanTable({
   isLoading,
   onPageChange,
 }: Props) {
+  const router = useRouter();
+  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
+
   const columns: ColumnDef<PenerimaanItem>[] = useMemo(() => [
-    {
-      header: 'NO',
-      id: 'no',
-      alignment: 'center',
-      cell: (_, idx) => <span className="font-medium text-slate-500">{idx + 1 + (pagination.currentPage - 1) * pagination.perPage}</span>,
-    },
     {
       header: 'NO PENERIMAAN',
       accessorKey: 'transaction_code',
-      cell: (item) => <span className="font-medium text-slate-900">{item.transaction_code}</span>,
+      cell: (item) => <CopyBox text={item.transaction_code} />,
     },
     {
       header: 'TGL TERIMA',
@@ -43,12 +43,12 @@ export default function LaporanPenerimaanTable({
     {
       header: 'NAMA SUPPLIER',
       accessorKey: 'person',
-      cell: (item) => <span className="text-gray-600">{item.person}</span>,
+      cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${item?.person}`}>{item?.person}</ReferenceLink>,
     },
     {
       header: 'TIPE UNIT',
       id: 'tipe_unit',
-      cell: (item) => <span className="text-gray-600">{item.unit_type.name}</span>,
+      cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${item?.unit_type.name}`}>{item?.unit_type?.name}</ReferenceLink>,
     },
     {
       header: 'WARNA',
@@ -58,12 +58,12 @@ export default function LaporanPenerimaanTable({
     {
       header: 'NO MESIN',
       accessorKey: 'machine_number',
-      cell: (item) => <span className="text-gray-600">{item.machine_number}</span>,
+      cell: (item) => <CopyBox text={item.machine_number} />,
     },
     {
       header: 'NO RANGKA',
       accessorKey: 'chassis_number',
-      cell: (item) => <span className="text-gray-600">{item.chassis_number}</span>,
+      cell: (item) => <CopyBox text={item.chassis_number} />,
     },
   ], [pagination.currentPage, pagination.perPage]);
 

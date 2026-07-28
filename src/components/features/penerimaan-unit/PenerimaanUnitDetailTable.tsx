@@ -119,25 +119,25 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
-      {
-        header: (
-          <Checkbox
-            checked={
-              paginatedRows.filter((d) => !isSelectionDisabled(d)).length > 0 &&
-              paginatedRows.filter((d) => !isSelectionDisabled(d)).every((d) => selected.includes(d.id))
-            }
-            onCheckedChange={() => toggleAll()}
-          />
-        ),
-        alignment: 'center',
-        cell: (item) => (
-          <Checkbox
-            checked={selected.includes(item.id) || receivedIds.includes(item.id)}
-            onCheckedChange={() => toggleSelect(item)}
-            disabled={isSelectionDisabled(item)}
-          />
-        ),
-      },
+      // {
+      //   header: (
+      //     <Checkbox
+      //       checked={
+      //         paginatedRows.filter((d) => !isSelectionDisabled(d)).length > 0 &&
+      //         paginatedRows.filter((d) => !isSelectionDisabled(d)).every((d) => selected.includes(d.id))
+      //       }
+      //       onCheckedChange={() => toggleAll()}
+      //     />
+      //   ),
+      //   alignment: 'center',
+      //   cell: (item) => (
+      //     <Checkbox
+      //       checked={selected.includes(item.id) || receivedIds.includes(item.id)}
+      //       onCheckedChange={() => toggleSelect(item)}
+      //       disabled={isSelectionDisabled(item)}
+      //     />
+      //   ),
+      // },
       {
         header: 'NO PEMBELIAN',
         accessorKey: 'purchaseCode',
@@ -270,7 +270,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
               </div>
             </div>
 
-            <div className="flex items-center justify-between min-h-[40px] pt-3 border-t">
+            {/* <div className="flex items-center justify-between min-h-[40px] pt-3 border-t">
               <div className="flex items-center gap-2 text-[15px] text-gray-500">
                 <span>{selected.length} data terpilih</span>
               </div>
@@ -280,7 +280,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
                   <ArrowDown size={16} /> Terima
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
         }
       />

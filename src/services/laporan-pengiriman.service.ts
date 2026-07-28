@@ -2,13 +2,13 @@ import { apiClient } from '@/lib/api/client';
 
 export interface PengirimanParams {
   page?: number;
+  type?: string;
   per_page?: number;
   start_date?: string;
   end_date?: string;
   person_id?: number;
   unit_type_id?: number;
   sort_dir?: 'asc' | 'desc';
-  type?: string;
 }
 
 export interface PengirimanItem {

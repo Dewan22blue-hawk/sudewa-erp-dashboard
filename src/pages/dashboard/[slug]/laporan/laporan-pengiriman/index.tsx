@@ -23,6 +23,7 @@ export default function LaporanPengirimanPage() {
   const router = useRouter();
   const { companyId } = useCompany();
   const {
+    type,
     data,
     pagination,
     isLoading,

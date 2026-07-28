@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, SendHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,9 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
       machineNumber: item.noMesin,
       chassisNumber: item.noRangka,
       isDispatched: item.diterima,
-      inStock: !item.diterima,
+      inStock: item.in_stock,
+      in_stock: item.in_stock,
+      status: item.status,
     }));
   }, [data]);
 
@@ -115,25 +116,25 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
-      {
-        header: (
-          <Checkbox
-            checked={
-              paginatedRows.filter((d) => !isSelectionDisabled(d)).length > 0 &&
-              paginatedRows.filter((d) => !isSelectionDisabled(d)).every((d) => selected.includes(d.id))
-            }
-            onCheckedChange={() => toggleAll()}
-          />
-        ),
-        alignment: 'center',
-        cell: (item) => (
-          <Checkbox
-            checked={selected.includes(item.id) || dispatchedIds.includes(item.id)}
-            onCheckedChange={() => toggleSelect(item)}
-            disabled={isSelectionDisabled(item)}
-          />
-        ),
-      },
+      // {
+      //   header: (
+      //     <Checkbox
+      //       checked={
+      //         paginatedRows.filter((d) => !isSelectionDisabled(d)).length > 0 &&
+      //         paginatedRows.filter((d) => !isSelectionDisabled(d)).every((d) => selected.includes(d.id))
+      //       }
+      //       onCheckedChange={() => toggleAll()}
+      //     />
+      //   ),
+      //   alignment: 'center',
+      //   cell: (item) => (
+      //     <Checkbox
+      //       checked={selected.includes(item.id) || dispatchedIds.includes(item.id)}
+      //       onCheckedChange={() => toggleSelect(item)}
+      //       disabled={isSelectionDisabled(item)}
+      //     />
+      //   ),
+      // },
       {
         header: 'KODE JUAL',
         accessorKey: 'salesCode',
@@ -174,25 +175,50 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         )
       },
       {
-        header: 'STATUS PENGELUARAN',
-        accessorKey: 'isDispatched',
+        header: 'STATUS',
+        accessorKey: 'status',
         sortable: true,
         cell: (item) => {
-          if (item.isDispatched) {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Dikeluarkan</Badge>;
+          let text = '-';
+          let background = 'border-slate-200 bg-slate-50 text-slate-700';
+          switch (item?.status) {
+            case 'returned':
+              text = 'Return';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
+              break;
+            case 'refunded':
+              text = 'Refund';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
+              break;
+            case 'normal':
+              text = 'Normal';
+              background = 'border-emerald-200 bg-emerald-50 text-emerald-700';
+              break;
+            default:
+              text = 'Belum Dikeluarkan';
+              background = 'border-amber-200 bg-amber-50 text-amber-700';
+              break;
           }
-          return <Badge variant="outline" className="border-amber-200 text-amber-700">Belum Dikeluarkan</Badge>;
+
+          return (
+            <Badge variant='outline' className={`font-semibold ${background}`}>
+              {text}
+            </Badge>
+          );
         },
       },
       {
         header: 'STATUS STOCK',
-        accessorKey: 'inStock',
+        accessorKey: 'in_stock',
         sortable: true,
         cell: (item) => {
-          if (item.inStock) {
+          if (item.in_stock === true) {
             return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
-          return <Badge variant="outline" className="border-amber-200 text-amber-700">Terjual</Badge>;
+          if (item.in_stock === false) {
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
+          }
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
         }
       }
     ],
@@ -240,7 +266,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
               </div>
             </div>
 
-            <div className="flex items-center justify-between min-h-[40px] pt-3 border-t">
+            {/* <div className="flex items-center justify-between min-h-[40px] pt-3 border-t">
               <div className="flex items-center gap-2 text-[15px] text-gray-500">
                 <span>{selected.length} data terpilih</span>
               </div>
@@ -250,7 +276,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
                   <SendHorizontal size={16} /> Kirim
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
         }
       />

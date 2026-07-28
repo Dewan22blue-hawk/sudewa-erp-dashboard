@@ -6,6 +6,7 @@ export type ReportType = 'per-nota' | 'per-tipe' | 'per-customer';
 
 interface UseLaporanPengirimanReturn {
   data: PengirimanItem[];
+  type: string | null,
   pagination: {
     currentPage: number;
     lastPage: number;
@@ -41,6 +42,7 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPerPage, setCurrentPerPage] = useState(25);
+  const [type, setType] = useState<string | null>('sales');
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
@@ -51,6 +53,7 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
     setError(null);
     try {
       const params: PengirimanParams = {
+        type: type || 'sales',
         page: currentPage,
         per_page: currentPerPage,
       };
@@ -78,7 +81,7 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, currentPerPage, startDate, endDate, selectedCustomer, selectedUnitType]);
+  }, [currentPage, currentPerPage, startDate, endDate, selectedCustomer, selectedUnitType, type]);
 
   useEffect(() => {
     fetchData();
@@ -86,6 +89,7 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
 
   return {
     data,
+    type,
     pagination,
     isLoading,
     error,

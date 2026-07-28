@@ -12,6 +12,7 @@ export interface PenerimaanParams {
 
 export interface PenerimaanItem {
   id: number;
+  type?: string;
   transaction_code: string;
   receipt_date: string;
   person: string;
