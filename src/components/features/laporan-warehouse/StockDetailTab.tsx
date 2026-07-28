@@ -54,14 +54,39 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
     warehouse_id: 1,
     page,
     per_page: perPage,
-    machine_number: debouncedMachineNumber || undefined,
-    chassis_number: debouncedChassisNumber || undefined,
-    color: debouncedColor || undefined,
-    stock_state: stockState === 'all' ? undefined : stockState || undefined,
-    in_stock: inStock === 'all' ? undefined : inStock,
   });
 
-  const rows = useMemo(() => response?.data || [], [response?.data]);
+  const rawRows = useMemo(() => response?.data || [], [response?.data]);
+  
+  const rows = useMemo(() => {
+    let result = [...rawRows];
+
+    if (debouncedMachineNumber) {
+      const q = debouncedMachineNumber.toLowerCase();
+      result = result.filter(r => r.machine_number?.toLowerCase().includes(q));
+    }
+    if (debouncedChassisNumber) {
+      const q = debouncedChassisNumber.toLowerCase();
+      result = result.filter(r => r.chassis_number?.toLowerCase().includes(q));
+    }
+    if (debouncedColor) {
+      const q = debouncedColor.toLowerCase();
+      result = result.filter(r => r.color?.toLowerCase().includes(q));
+    }
+    if (stockState && stockState !== 'all') {
+      result = result.filter(r => r.stock_status === stockState || r.status === stockState);
+    }
+    if (inStock && inStock !== 'all') {
+      const isInStockStr = String(inStock).toLowerCase();
+      if (isInStockStr === 'true') {
+        result = result.filter(r => r.stock_available > 0);
+      } else if (isInStockStr === 'false') {
+        result = result.filter(r => r.stock_available <= 0);
+      }
+    }
+
+    return result;
+  }, [rawRows, debouncedMachineNumber, debouncedChassisNumber, debouncedColor, stockState, inStock]);
   const pagination = response || {
     current_page: 1,
     data: [],
@@ -87,24 +112,28 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
       return;
     }
 
-    const header = ['NO', 'SUPPLIER', 'TIPE UNIT', 'WARNA', 'NO MESIN', 'NO RANGKA', 'HARGA BELI'];
+    const header = ['NO', 'KODE UNIT', 'SUPPLIER', 'TIPE UNIT', 'WARNA', 'NO MESIN', 'NO RANGKA', 'HARGA BELI', 'TERSEDIA', 'STOCK STATUS', 'STATUS'];
     const lines = [toCsvLine(header)];
 
     rows.forEach((item, index) => {
       lines.push(
         toCsvLine([
           (pagination.from > 0 ? pagination.from - 1 : 0) + index + 1,
+          item.unit_type?.code || '-',
           item.person || '-',
           item.unit_type?.name || '-',
           item.color || '-',
           item.machine_number || '-',
           item.chassis_number || '-',
           item.purchase_price,
+          item.stock_available || 0,
+          item.stock_status || '-',
+          item.status || '-',
         ]),
       );
     });
 
-    lines.push(toCsvLine(['', '', '', '', '', 'GRAND TOTAL', grandTotalPurchase]));
+    lines.push(toCsvLine(['', '', '', '', '', '', '', 'GRAND TOTAL', grandTotalPurchase, '', '', '']));
 
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -129,6 +158,13 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
+      {
+        header: 'KODE UNIT',
+        accessorKey: 'unit_type.code',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.unit_type?.code || '-'} />
+      },
       {
         header: 'SUPPLIER',
         accessorKey: 'person',
@@ -172,8 +208,29 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         header: 'HARGA BELI',
         accessorKey: 'purchase_price',
         sortable: true,
-        alignment: 'center',
+        alignment: 'right',
         cell: (item) => formatCurrency(item.purchase_price),
+      },
+      {
+        header: 'TERSEDIA',
+        accessorKey: 'stock_available',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => (item.stock_available || 0).toLocaleString('id-ID'),
+      },
+      {
+        header: 'STOCK STATUS',
+        accessorKey: 'stock_status',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => item.stock_status || '-',
+      },
+      {
+        header: 'STATUS',
+        accessorKey: 'status',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => item.status || '-',
       },
     ],
     [slugStr]
@@ -181,11 +238,12 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
 
   const footerRow = useMemo(
     () => (
-      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
-        <TableCell colSpan={6} className="px-4 py-4 text-center text-slate-900">
+      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold print:text-[10px]">
+        <TableCell colSpan={7} className="px-4 py-4 pr-10 text-right text-slate-900">
           GRAND TOTAL
         </TableCell>
-        <TableCell className="px-4 py-4 text-center text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
+        <TableCell className="px-4 py-4 text-right text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
+        <TableCell colSpan={3}></TableCell>
       </TableRow>
     ),
     [grandTotalPurchase]
@@ -258,7 +316,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
             currentPage: pagination.current_page,
             perPage: pagination.per_page,
             lastPage: pagination.last_page,
-            total: pagination.total,
+            total: rows.length > 0 ? rows.length : pagination.total,
           }}
           onPageChange={setPage}
         />
