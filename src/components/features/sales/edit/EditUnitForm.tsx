@@ -143,12 +143,14 @@ export function EditUnitForm({
     return Number.isFinite(normalized) ? normalized : 0;
   };
 
-  const hppSatuanVal = Number(formula?.hpp_per_unit_price ?? defaultValues?.hppSatuan ?? 0);
-  const dppSatuanVal = Number(formula?.dpp_per_unit_price ?? defaultValues?.dppSatuan ?? 0);
-  const ppnSatuanVal = Number(formula?.ppn_per_unit_price ?? defaultValues?.ppnSatuan ?? 0);
-  const totalHppVal = Number(formula?.hpp_total_price ?? defaultValues?.totalHpp ?? 0);
-  const totalDppVal = Number(formula?.dpp_total_price ?? defaultValues?.totalDpp ?? 0);
-  const totalPpnVal = Number(formula?.ppn_total_price ?? defaultValues?.totalPpn ?? 0);
+  useEffect(() => {
+    form.setValue('hppSatuan', Number(formula?.hpp_per_unit_price ?? defaultValues?.hppSatuan ?? 0));
+    form.setValue('dppSatuan', Number(formula?.dpp_per_unit_price ?? defaultValues?.dppSatuan ?? 0));
+    form.setValue('ppnSatuan', Number(formula?.ppn_per_unit_price ?? defaultValues?.ppnSatuan ?? 0));
+    form.setValue('totalHpp', Number(formula?.hpp_total_price ?? defaultValues?.totalHpp ?? 0));
+    form.setValue('totalDpp', Number(formula?.dpp_total_price ?? defaultValues?.totalDpp ?? 0));
+    form.setValue('totalPpn', Number(formula?.ppn_total_price ?? defaultValues?.totalPpn ?? 0));
+  }, [formula, defaultValues, form]);
 
   const handleFormSubmit = (values: EditUnitFormData) => {
     onSubmit({
@@ -506,56 +508,60 @@ export function EditUnitForm({
 
             {/* ROW 3: HPP Satuan, DPP Satuan, PPN Satuan */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FormItem>
-                <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-                <FormControl>
-                  <Input
-                    value={formatMoneyInput(String(Math.round(hppSatuanVal)))}
-                    className="bg-transparent"
-                    disabled
-                    readOnly
-                  />
-                </FormControl>
-              </FormItem>
+              <FormField
+                control={form.control}
+                name="hppSatuan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+                    <FormControl>
+                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-              <FormItem>
-                <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-                <FormControl>
-                  <Input
-                    value={formatMoneyInput(String(Math.round(dppSatuanVal)))}
-                    className="bg-transparent"
-                    disabled
-                    readOnly
-                  />
-                </FormControl>
-              </FormItem>
+              <FormField
+                control={form.control}
+                name="dppSatuan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+                    <FormControl>
+                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-              <FormItem>
-                <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-                <FormControl>
-                  <Input
-                    value={formatMoneyInput(String(Math.round(ppnSatuanVal)))}
-                    className="bg-transparent"
-                    disabled
-                    readOnly
-                  />
-                </FormControl>
-              </FormItem>
+              <FormField
+                control={form.control}
+                name="ppnSatuan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+                    <FormControl>
+                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* ROW 4: Total HPP, Total DPP + Tax Selector, Total PPN + Tax Selector */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FormItem>
-                <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
-                <FormControl>
-                  <Input
-                    value={formatMoneyInput(String(Math.round(totalHppVal)))}
-                    className="bg-transparent"
-                    disabled
-                    readOnly
-                  />
-                </FormControl>
-              </FormItem>
+              <FormField
+                control={form.control}
+                name="totalHpp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
+                    <FormControl>
+                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               <FormItem>
                 <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
@@ -603,11 +609,14 @@ export function EditUnitForm({
                     </PopoverContent>
                   </Popover>
                   <div className="flex-1">
-                    <Input
-                      value={formatMoneyInput(String(Math.round(totalDppVal)))}
-                      className="bg-transparent"
-                      disabled
-                      readOnly
+                    <FormField
+                      control={form.control}
+                      name="totalDpp"
+                      render={({ field }) => (
+                        <FormControl>
+                          <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                        </FormControl>
+                      )}
                     />
                   </div>
                 </div>
@@ -659,11 +668,14 @@ export function EditUnitForm({
                     </PopoverContent>
                   </Popover>
                   <div className="flex-1">
-                    <Input
-                      value={formatMoneyInput(String(Math.round(totalPpnVal)))}
-                      className="bg-transparent"
-                      disabled
-                      readOnly
+                    <FormField
+                      control={form.control}
+                      name="totalPpn"
+                      render={({ field }) => (
+                        <FormControl>
+                          <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                        </FormControl>
+                      )}
                     />
                   </div>
                 </div>

@@ -33,6 +33,12 @@ export const createPurchaseUnitSchema = z.object({
   pricePerUnitUsd: z.number().optional(),
   dppTaxVersionId: z.string().optional(),
   ppnTaxVersionId: z.string().optional(),
+  hppSatuan: z.number().optional(),
+  dppSatuan: z.number().optional(),
+  ppnSatuan: z.number().optional(),
+  hppTotal: z.number().optional(),
+  dppTotal: z.number().optional(),
+  ppnTotal: z.number().optional(),
 });
 
 export type CreatePurchaseFormValues = z.infer<typeof createPurchaseSchema>;
