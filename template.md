@@ -699,7 +699,7 @@ Ketentuan:
 
 ## 17. Standar Copy to Clipboard pada Tabel (Kode / Nomor Transaksi)
 
-Semua nomor unik (contoh: KODE BELI, NO INVOICE, NO BUKTI POTONG, dsb) yang panjang dan sering disalin oleh *user* **wajib** menggunakan komponen `<CopyBox>` agar menyediakan fitur penyalinan otomatis ketika di-klik.
+Semua nomor unik (contoh: KODE BELI, NO INVOICE, NO BUKTI POTONG, NOTA REFF, dsb) yang panjang dan sering disalin oleh *user* **wajib** menggunakan komponen `<CopyBox>` agar menyediakan fitur penyalinanotomatis (*Copy to Clipboard*) ketika di-klik.
 
 Ketentuan:
 - Gunakan komponen `@/components/ui/copy-box`.
