@@ -65,7 +65,7 @@ export default function LaporanPenerimaanTable({
       accessorKey: 'chassis_number',
       cell: (item) => <CopyBox text={item.chassis_number} />,
     },
-  ], [pagination.currentPage, pagination.perPage]);
+  ], [pagination.currentPage, pagination.perPage, slug]);
 
   return (
     <div className="space-y-4">

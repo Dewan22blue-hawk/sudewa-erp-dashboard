@@ -222,7 +222,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         }
       }
     ],
-    [paginatedRows, selected, dispatchedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]
+    [slug]
   );
 
   return (
