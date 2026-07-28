@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,11 +99,11 @@ export default function BaseTable<T>({
     defaultSort || null
   );
 
-  const getRowIdInternal = (item: T) => {
+  const getRowIdInternal = useCallback((item: T) => {
     if (getRowId) return getRowId(item);
     const anyItem = item as any;
     return String(anyItem.id || anyItem.uuid || '');
-  };
+  }, [getRowId]);
 
   const handleToggleAll = (checked: boolean) => {
     if (!onSelectedIdsChange) return;
@@ -208,7 +208,7 @@ export default function BaseTable<T>({
       const isChecked = selectedIds.has(getRowIdInternal(item));
       return !isChecked && isCheckboxDisabled(item);
     });
-  }, [sortedData, selectedIds, isCheckboxDisabled]);
+  }, [sortedData, selectedIds, isCheckboxDisabled, getRowIdInternal]);
 
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? perPage;
