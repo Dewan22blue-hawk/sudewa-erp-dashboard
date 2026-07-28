@@ -66,7 +66,7 @@ export default function LaporanBuktiPotongPage() {
   const { data: queryResult, isLoading: isInitialLoading, isFetching } = useWithholdingTaxes(queryParams);
   const isLoading = isInitialLoading || isFetching;
 
-  const rawData = queryResult?.data || [];
+  const rawData = React.useMemo(() => queryResult?.data || [], [queryResult?.data]);
   
   // Safe Client-Side Array Filter
   const filteredData = React.useMemo(() => {
