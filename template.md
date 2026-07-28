@@ -482,8 +482,9 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
 1. **Gunakan Class `.print-letter-page`**: Tempelkan class `.print-letter-page` pada div halaman A4 utama agar terintegrasi dengan visibilitas global dan pemotongan halaman (`overflow: hidden`).
 2. **Kop Surat (Background Image)**: Render background image kop surat menggunakan tag `<img>` absolut tanpa class `.print-letterhead` agar kop surat tetap terlihat baik di layar web (screen preview) maupun saat dicetak (print layout).
 3. **Konfigurasi Ref**: Pastikan `printRef` dipasang langsung di elemen kertas utama (lebar `210mm` dan tinggi minimal `297mm`), bukan di wrapper luarnya.
-4. **Perataan Sel Tabel (Cell Alignment)**:
+4. **Perataan Sel Tabel (Cell Alignment) dan Tata Letak (Layouting)**:
    - Kolom Nominal/Uang (Harga, DPP, PPN, Total): wajib Rata Tengah (`text-center` / `align: 'center'`).
+   - Tabel responsif (e.g. `BaseTable`) cenderung memiliki lebar `w-max` yang dapat merusak batasan kertas saat dicetak. Wajib menempelkan `print:w-full print:table-fixed` pada elemen `<Table>`.
 5. **Navigasi Tombol Aksi Print**: Tombol aksi print pada baris tabel (Action Dropdown) wajib membuka halaman print khusus di tab baru menggunakan `window.open` ke path `/dashboard/[slug]/[modul]/print/[id]`.
 
 ### Contoh Dropdown Action Print:
@@ -698,12 +699,13 @@ Ketentuan:
 
 ## 17. Standar Copy to Clipboard pada Tabel (Kode / Nomor Transaksi)
 
-Semua nomor unik (contoh: KODE BELI, NO INVOICE, NO BUKTI POTONG, dsb) yang panjang dan sering disalin oleh *user* **wajib** menggunakan komponen `<CopyBox>` agar menyediakan fitur penyalinan otomatis ketika di-klik.
+Semua nomor unik (contoh: KODE BELI, NO INVOICE, NO BUKTI POTONG, NOTA REFF, dsb) yang panjang dan sering disalin oleh *user* **wajib** menggunakan komponen `<CopyBox>` agar menyediakan fitur penyalinanotomatis (*Copy to Clipboard*) ketika di-klik.
 
 Ketentuan:
 - Gunakan komponen `@/components/ui/copy-box`.
 - Komponen ini tidak perlu dibungkus warna atau background yang mencolok; ia sudah memiliki *styling* transparan yang memukau (tersedia ikon copy & animasinya pada hover).
 - Apabila data tidak ada (`null` atau empty string), berikan *fallback* misal `'-'`.
+- **Mode Cetak (Print View)**: Karena teks kode/invoice sangat panjang dan tidak berspasi, komponen ini wajib dikonfigurasi dengan kelas agresif (`print:block print:w-full print:whitespace-normal` pada kontainer, dan `print:break-all print:whitespace-pre-wrap print:p-0 print:border-none print:bg-transparent` pada isi teks, serta `print:hidden` pada tombol copy). Ini memastikan teks terlipat rapi dan tidak tumpang tindih ke kolom lain ketika halaman dicetak di ukuran A4.
 
 ```tsx
 import { CopyBox } from '@/components/ui/copy-box';
@@ -1041,4 +1043,83 @@ const toggleAllPage = (checked: boolean) => {
     </DialogFooter>
   </DialogContent>
 </Dialog>
+```
+
+---
+
+## 22. Standarisasi Tautan ke Data Master (ReferenceLink)
+
+Ketika menata **Tabel Data** (terutama laporan atau transaksi) yang memiliki referensi ke entitas master (contoh: Nama Supplier, Tipe Unit, Customer), pastikan nama entitas tersebut dirupakan ke dalam tautan (link) agar interaktif dan mudah dinavigasi oleh pengguna untuk melihat detail rekaman utamanya.
+
+**Aturan Penggunaan Komponen `<ReferenceLink>`**:
+1. Gunakan komponen `@/components/ui/reference-link`. Komponen ini diformat agar terlihat eksklusif dengan warna biru (`text-blue-600`), ketebalan bold, *hover effect*, dan dibekali ikon panah/external.
+2. Karena tabel biasanya berada di dalam konteks bisnis dengan variabel `slug`, URL `href` wajib merujuk ke Master Data yang bersesuaian, seringkali dengan menambahkan *query params* pelencong (misalkan `?search=`).
+
+**Contoh Implementasi Standar pada Definisi Kolom Tabel (ColumnDef)**:
+
+```tsx
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
+
+// Di dalam fungsi komponen utama
+const router = useRouter();
+const slug = router.query.slug as string;
+
+// ...
+{
+  header: 'SUPPLIER',
+  accessorKey: 'person_name',
+  sortable: true,
+  alignment: 'left',
+  cell: (item) => (
+    <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${encodeURIComponent(item.person_name || '')}`}>
+      {item.person_name || '-'}
+    </ReferenceLink>
+  ),
+},
+```
+
+---
+
+## 23. Standarisasi Filter (Pencarian & Tanggal) pada Modul Laporan
+
+**Aturan**: Ketika membangun modul atau halaman **Laporan** (seperti Laporan Penjualan, Laporan Pembelian, Laporan Penerimaan) yang menggunakan _backend custom query/flattened response_ (contoh endpoint: `/wapi/report/...`), fitur penyaringan (Filter) **wajib** menggunakan strategi *Client-Side Text Matching* dan *Client-Side Date Matching* daripada mengirim ID relasional ke backend. Hal ini untuk mencegah kemungkinan Error 500 dari backend, serta menghindari masalah inkonsistensi skema bila API laporan tidak mengembalikan ID referensi (seperti `person_id` atau `unit_type_id`) melainkan mengembalikan string langsung (seperti `person_name` dan `unit_name`).
+
+**Standar Evaluasi Filter di tingkat Hook (mis. `useLaporanPenjualan.ts`)**:
+1. Komponen antarmuka pencarian (seperti Combobox) **tidak boleh** melempar ID referensi (misalnya melempar `supplierId = 22`). Balikkan nilai teks murni sesuai hasil ketikan pengguna (melempar `search = 'Customer 22'`).
+2. Tangkap seluruh hasil `data` dari backend, lalu eksekusi filter secara lokal di *frontend* dengan membandingkan teks murni atau memecah tanggal.
+
+**Contoh Implementasi pada Custom Hook**:
+
+```ts
+// 1. Eksekusi API secara normal TANPA membawa parameter spesifik yang rentan rusak:
+// (Catatan: Anda tetap dapat menyertakan parameter Pagination dasar)
+const result = await getLaporan(params);
+let filteredData = Array.isArray(result.data) ? result.data : [];
+
+// 2. Client-Side Date Matching (Contoh: receipt_date / transaction_date)
+if (startDate && endDate) {
+  filteredData = filteredData.filter(item => {
+    if (!item?.transaction_date) return true;
+    try {
+      const dateOnly = String(item.transaction_date).split(/[T ]/)[0];
+      return dateOnly >= startDate && dateOnly <= endDate;
+    } catch {
+      return true;
+    }
+  });
+}
+
+// 3. Client-Side Text Matching (Contoh: combobox unit_name atau person_name)
+if (currentSearch) {
+  const q = String(currentSearch).toLowerCase();
+  filteredData = filteredData.filter(item => {
+    const uName = String(item.unit_name || '').toLowerCase();
+    const pName = String(item.person_name || '').toLowerCase();
+    // Cukup gunakan includes untuk memastikan pencarian toleran terhadap variasi penulisan.
+    return uName.includes(q) || pName.includes(q); 
+  });
+}
+
+setData(filteredData);
 ```

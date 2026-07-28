@@ -125,12 +125,16 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
     ppn_tax_id: ppnTaxVersion?.version.id,
   });
 
-  const hppSatuan = Number(formula?.hpp_per_unit_price ?? 0);
-  const dppSatuan = Number(formula?.dpp_per_unit_price ?? 0);
-  const ppnSatuan = Number(formula?.ppn_per_unit_price ?? 0);
-  const totalHpp = Number(formula?.hpp_total_price ?? 0);
-  const totalDpp = Number(formula?.dpp_total_price ?? 0);
-  const totalPpn = Number(formula?.ppn_total_price ?? 0);
+  useEffect(() => {
+    form.setValue('hppSatuan', Number(formula?.hpp_per_unit_price ?? 0));
+    form.setValue('dppSatuan', Number(formula?.dpp_per_unit_price ?? 0));
+    form.setValue('ppnSatuan', Number(formula?.ppn_per_unit_price ?? 0));
+    form.setValue('hppTotal', Number(formula?.hpp_total_price ?? 0));
+    form.setValue('dppTotal', Number(formula?.dpp_total_price ?? 0));
+    form.setValue('ppnTotal', Number(formula?.ppn_total_price ?? 0));
+  }, [formula, form]);
+
+
 
   const typeUnitOptions = useMemo<TypeUnit[]>(() => {
     const maybeList = (typeUnitData as any)?.data;
@@ -491,35 +495,59 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormItem>
-              <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(hppSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+            <FormField
+              control={form.control}
+              name="hppSatuan"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+                  <FormControl>
+                    <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-            <FormItem>
-              <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(dppSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+            <FormField
+              control={form.control}
+              name="dppSatuan"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+                  <FormControl>
+                    <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-            <FormItem>
-              <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(ppnSatuan)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+            <FormField
+              control={form.control}
+              name="ppnSatuan"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+                  <FormControl>
+                    <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormItem>
-              <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
-              <FormControl>
-                <Input value={formatCurrency(totalHpp)} className="bg-muted/50" disabled readOnly />
-              </FormControl>
-            </FormItem>
+            <FormField
+              control={form.control}
+              name="hppTotal"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">HPP Total</FormLabel>
+                  <FormControl>
+                    <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <FormItem>
               <FormLabel className="text-sm font-medium">DPP Total</FormLabel>
@@ -567,7 +595,15 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                   </PopoverContent>
                 </Popover>
                 <div className="flex-1">
-                  <Input value={formatCurrency(totalDpp)} className="bg-muted/50" disabled readOnly />
+                  <FormField
+                    control={form.control}
+                    name="dppTotal"
+                    render={({ field }) => (
+                      <FormControl>
+                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                      </FormControl>
+                    )}
+                  />
                 </div>
               </div>
             </FormItem>
@@ -618,7 +654,15 @@ export default function PurchaseUnitForm({ onSubmit, defaultValues, readOnly, lo
                   </PopoverContent>
                 </Popover>
                 <div className="flex-1">
-                  <Input value={formatCurrency(totalPpn)} className="bg-muted/50" disabled readOnly />
+                  <FormField
+                    control={form.control}
+                    name="ppnTotal"
+                    render={({ field }) => (
+                      <FormControl>
+                        <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
+                      </FormControl>
+                    )}
+                  />
                 </div>
               </div>
             </FormItem>

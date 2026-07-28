@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { useRouter } from 'next/router';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { SalesTransactionItem } from '@/services/laporan-penjualan.service';
 
 interface Props {
@@ -11,33 +14,17 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
-const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')}`;
+const formatCurrency = (val: number) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 const formatDate = (date: string) => {
   const parsed = new Date(date);
   return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMMM yyyy', { locale: id });
 };
 
 export default function LaporanPenjualanPerNota({ data, pagination, isLoading, onPageChange }: Props) {
-  // Flatten data: setiap item bisa memiliki multiple unit_transaction_items
-  const flattenedData = useMemo(() => data.flatMap((item) =>
-    (item.unit_transaction_items || []).map((unit, idx) => ({
-      id: `${item.id}-${idx}`,
-      noPenjualan: item.code,
-      tanggal: item.created_at,
-      tipeUnit: unit.unit_type.name,
-      qty: unit.qty_total,
-      hargaJual: unit.price,
-      biayaBbn: unit.bbn_price,
-      biayaEkspedisi: unit.expedition_fee,
-      biayaLainnya: unit.other_fee,
-      hpp: unit.hpp_total_price,
-      dpp: unit.dpp_total_price,
-      ppn: unit.ppn_total_price,
-      jumlah: item.transaction_bruto_total,
-    }))
-  ), [data]);
+  const router = useRouter();
+  const slug = router.query.slug as string;
 
-  const columns: ColumnDef<any>[] = useMemo(() => [
+  const columns: ColumnDef<SalesTransactionItem>[] = useMemo(() => [
     {
       header: 'NO',
       id: 'no',
@@ -46,81 +33,99 @@ export default function LaporanPenjualanPerNota({ data, pagination, isLoading, o
     },
     {
       header: 'NO PENJUALAN',
-      accessorKey: 'noPenjualan',
-      cell: (item) => <span className="font-medium text-slate-900 whitespace-nowrap">{item.noPenjualan}</span>,
+      accessorKey: 'transaction_code',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => <CopyBox text={item.transaction_code} />,
     },
     {
       header: 'TGL JUAL',
-      id: 'tgl_jual',
+      accessorKey: 'transaction_date',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatDate(item.tanggal)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatDate(item.transaction_date)}</span>,
     },
     {
       header: 'TIPE UNIT',
-      accessorKey: 'tipeUnit',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{item.tipeUnit}</span>,
+      accessorKey: 'unit_name',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => (
+        <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${encodeURIComponent(item.unit_name || '')}`}>
+          {item.unit_name || '-'}
+        </ReferenceLink>
+      ),
     },
     {
       header: 'QTY',
       accessorKey: 'qty',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600">{item.qty}</span>,
+      cell: (item) => <span className="text-gray-600">{item.qty || 0}</span>,
     },
     {
       header: 'HARGA JUAL',
-      id: 'harga_jual',
+      accessorKey: 'price',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.hargaJual)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.price)}</span>,
     },
     {
       header: 'BIAYA BBN',
-      id: 'biaya_bbn',
+      accessorKey: 'bbn',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.biayaBbn)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.bbn)}</span>,
     },
     {
       header: 'BIAYA EKSPEDISI',
-      id: 'biaya_ekspedisi',
+      accessorKey: 'expedition_fee',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.biayaEkspedisi)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.expedition_fee)}</span>,
     },
     {
       header: 'BIAYA LAINNYA',
-      id: 'biaya_lainnya',
+      accessorKey: 'other_fee',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.biayaLainnya)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.other_fee)}</span>,
     },
     {
       header: 'HPP',
-      id: 'hpp',
+      accessorKey: 'hpp_fee',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.hpp)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.hpp_fee)}</span>,
     },
     {
       header: 'DPP',
-      id: 'dpp',
+      accessorKey: 'dpp',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.dpp)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.dpp)}</span>,
     },
     {
       header: 'PPN',
-      id: 'ppn',
+      accessorKey: 'ppn',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="text-gray-600 whitespace-nowrap">{formatCurrency(item.ppn)}</span>,
+      cell: (item) => <span className="text-gray-600">{formatCurrency(item.ppn)}</span>,
     },
     {
       header: 'JUMLAH',
-      id: 'jumlah',
+      accessorKey: 'total',
+      sortable: true,
       alignment: 'center',
-      cell: (item) => <span className="font-semibold text-slate-900 whitespace-nowrap">{formatCurrency(item.jumlah)}</span>,
+      cell: (item) => <span className="font-semibold text-slate-900">{formatCurrency(item.total)}</span>,
     }
-  ], [pagination.currentPage, pagination.perPage]);
+  ], [pagination.currentPage, pagination.perPage, slug]);
 
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-gray-200 bg-white overflow-x-auto shadow-none w-full">
         <BaseTable
-          data={flattenedData}
+          data={data}
           columns={columns}
           loading={isLoading}
           meta={{

@@ -31,8 +31,7 @@ export default function LaporanPenerimaanPage() {
     setPage,
     setPerPage,
     setDateRange,
-    setSupplier,
-    setUnitType,
+    setSearch,
   } = useLaporanPenerimaan();
 
   const slugParam = router.query.slug;
@@ -41,20 +40,17 @@ export default function LaporanPenerimaanPage() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as TabType);
-    setSupplier(null);
-    setUnitType(null);
+    setSearch('');
   };
 
   const handleApplyFilters = (filters: {
     startDate: string | null;
     endDate: string | null;
-    supplierId: number | null;
-    unitTypeId: number | null;
+    search: string;
     perPage: number;
   }) => {
     setDateRange(filters.startDate, filters.endDate);
-    setSupplier(filters.supplierId);
-    setUnitType(filters.unitTypeId);
+    setSearch(filters.search);
     setPerPage(filters.perPage);
   };
 

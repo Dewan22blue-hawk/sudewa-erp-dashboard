@@ -30,7 +30,7 @@ export default function LoginPage() {
       try {
         const status = await checkTokenValidity();
         if (status === 'valid') {
-          router.replace('/dashboard');
+          router.back();
         } else {
           removeAccessToken();
           clearStoredCompanyId();
@@ -70,10 +70,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen font-sans">
-      {/* Left Side - Login Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center bg-white">
-        <div className="flex flex-col items-start bg-white rounded-lg border border-[#E5E5E5] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6 gap-6" style={{ width: '400px' }}>
+    <>
+      {/* Initialization Overlay */}
+      {isCheckingAuth && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-70">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-4 border-[#B0160D] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm font-medium text-slate-500">Memeriksa sesi Anda...</p>
+          </div>
+        </div>
+      )}
+
+      <div className={`flex min-h-screen font-sans ${isCheckingAuth ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+        {/* Left Side - Login Form */}
+        <div className="flex w-full lg:w-1/2 items-center justify-center bg-white">
+          <div className="flex flex-col items-start bg-white rounded-lg border border-[#E5E5E5] shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] p-6 gap-6" style={{ width: '400px' }}>
           {/* Header */}
           <div className="flex flex-col gap-2 w-full">
             <h1 className="text-[16px] font-semibold leading-6 text-[#0A0A0A]">Login to your account</h1>
@@ -156,6 +167,7 @@ export default function LoginPage() {
           <Image src="/wajira-logo.png" alt="Wajira Logo" fill className="object-contain drop-shadow-lg" priority />
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

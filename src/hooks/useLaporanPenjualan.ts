@@ -83,10 +83,10 @@ export const useLaporanPenjualan = (): UseLaporanPenjualanReturn => {
 
       if (startDate && endDate) {
         filteredData = filteredData.filter(item => {
-          if (!item?.created_at) return true;
+          if (!item?.transaction_date) return true;
           try {
             // Support both T and space separated dates
-            const dateOnly = String(item.created_at).split(/[T ]/)[0]; 
+            const dateOnly = String(item.transaction_date).split(/[T ]/)[0]; 
             return dateOnly >= startDate && dateOnly <= endDate;
           } catch {
             return true;
@@ -94,17 +94,19 @@ export const useLaporanPenjualan = (): UseLaporanPenjualanReturn => {
         });
       }
 
-      if (selectedCustomer) {
-        filteredData = filteredData.filter(item => item?.person?.id === selectedCustomer || (item as any)?.person_id === selectedCustomer);
-      }
-
       if (currentSearch) {
         const q = String(currentSearch).toLowerCase();
         filteredData = filteredData.filter(item => {
-          return (item?.unit_transaction_items || []).some(
-            u => u?.unit_type?.name?.toLowerCase().includes(q)
-          );
+          const uName = String(item.unit_name || '').toLowerCase();
+          const pName = String(item.person_name || '').toLowerCase();
+          return uName.includes(q) || pName.includes(q);
         });
+      }
+
+      // Keep this for interface compatibility, though we rely on currentSearch for Customer matching now
+      if (selectedCustomer) {
+        // If we still want to filter by exact ID, but API doesn't return person_id anymore
+        // We'll safely ignore this since currentSearch handles the string match
       }
 
       setData(filteredData);

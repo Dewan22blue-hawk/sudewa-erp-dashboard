@@ -12,25 +12,22 @@ export interface SalesTransactionParams {
 
 export interface SalesTransactionItem {
     id: number;
-    code: string;
-    created_at: string;
-    person: { id: number; name: string };
-    unit_transaction_items: Array<{
-        unit_type: { name: string };
-        qty_total: number;
-        price: number;
-        bbn_price: number;
-        expedition_fee: number;
-        other_fee: number;
-        hpp_total_price: number;
-        dpp_total_price: number;
-        ppn_total_price: number;
-    }>;
-    transaction_bruto_total: number;
-    transaction_dpp_total: number;
-    transaction_ppn_total: number;
-    transaction_bbn_total: number;
-    transaction_other_fee: number;
+    transaction_date: string;
+    transaction_code: string;
+    person_name: string;
+    unit_name: string;
+    unit_code: string;
+    qty: number;
+    price: number;
+    dpp: number;
+    ppn: number;
+    bbn: number;
+    other_fee: number;
+    expedition_fee: number;
+    hpp_fee: number;
+    total: number;
+    is_paid: boolean;
+    payment_status: string;
 }
 
 export interface SalesTransactionResponse {
@@ -46,11 +43,8 @@ export interface SalesTransactionResponse {
 export const getLaporanPenjualan = async (
     params: SalesTransactionParams
 ): Promise<SalesTransactionResponse> => {
-    const response = await apiClient.get('/wapi/transaction/unit-transaction/unit-transaction', {
+    const response = await apiClient.get('/wapi/report/transaction-sales-report', {
         params: {
-            type: 'sales',
-            is_paid: true,
-            sort_order: 'desc',
             ...params,
         },
     });

@@ -22,8 +22,12 @@ interface UseLaporanPenerimaanReturn {
   setPage: (page: number) => void;
   setPerPage: (perPage: number) => void;
   setDateRange: (startDate: string | null, endDate: string | null) => void;
-  setSupplier: (supplierId: number | null) => void;
-  setUnitType: (unitTypeId: number | null) => void;
+  setSearch: (search: string) => void;
+  applyFilters: (filters: {
+    startDate: string | null;
+    endDate: string | null;
+    search: string;
+  }) => void;
   refetch: () => void;
 }
 
@@ -46,27 +50,49 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
   const [type, setType] = useState<string | null>('purchase');
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
-  const [selectedSupplier, setSelectedSupplier] = useState<number | null>(null);
-  const [selectedUnitType, setSelectedUnitType] = useState<number | null>(null);
+  const [currentSearch, setCurrentSearch] = useState('');
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const params: PenerimaanParams = {
+      const params: any = {
         page: currentPage,
         type: type || 'purchase',
         per_page: currentPerPage,
       };
 
-      if (startDate) params.start_date = startDate;
-      if (endDate) params.end_date = endDate;
-      if (selectedSupplier) params.person_id = selectedSupplier;
-      if (selectedUnitType) params.unit_type_id = selectedUnitType;
+      // Fallbacks to avoid sending parameters that might break backend routing, rely on Client Side Filtering
+      // if (startDate) params.start_date = startDate;
+      // if (endDate) params.end_date = endDate;
 
       const result = await getLaporanPenerimaan(params);
 
-      setData(result.data);
+      // Apply robust client-side filtering
+      let filteredData = Array.isArray(result.data) ? result.data : [];
+
+      if (startDate && endDate) {
+        filteredData = filteredData.filter(item => {
+          if (!item?.receipt_date) return true;
+          try {
+            const dateOnly = String(item.receipt_date).split(/[T ]/)[0]; 
+            return dateOnly >= startDate && dateOnly <= endDate;
+          } catch {
+            return true;
+          }
+        });
+      }
+
+      if (currentSearch) {
+        const q = String(currentSearch).toLowerCase();
+        filteredData = filteredData.filter(item => {
+          const uName = String(item.unit_type?.name || '').toLowerCase();
+          const pName = String(item.person || '').toLowerCase();
+          return uName.includes(q) || pName.includes(q);
+        });
+      }
+
+      setData(filteredData);
       setPagination({
         currentPage: result.current_page,
         lastPage: result.last_page,
@@ -78,11 +104,10 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
     } catch (err: any) {
       console.error('Fetch Data Error:', err);
       setError(err.message || 'Gagal mengambil data laporan penerimaan');
-      toast.error('Gagal memuat data');
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, currentPerPage, startDate, endDate, selectedSupplier, selectedUnitType, type]);
+  }, [currentPage, currentPerPage, startDate, endDate, currentSearch, type]);
 
   useEffect(() => {
     fetchData();
@@ -106,12 +131,14 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
       setEndDate(end);
       setCurrentPage(1);
     },
-    setSupplier: (supplierId: number | null) => {
-      setSelectedSupplier(supplierId);
+    setSearch: (search: string) => {
+      setCurrentSearch(search);
       setCurrentPage(1);
     },
-    setUnitType: (unitTypeId: number | null) => {
-      setSelectedUnitType(unitTypeId);
+    applyFilters: ({ startDate: nextStartDate, endDate: nextEndDate, search }) => {
+      setStartDate(nextStartDate);
+      setEndDate(nextEndDate);
+      setCurrentSearch(search);
       setCurrentPage(1);
     },
     refetch: fetchData,
