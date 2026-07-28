@@ -105,12 +105,7 @@ export default function LaporanPenjualanFilter({
     let search = '';
 
     if (activeTab === 'per-customer') {
-      const matchedCustomer = currentOptions.find(s => s.name?.toLowerCase() === searchQuery.trim().toLowerCase());
-      if (matchedCustomer) {
-        customerId = matchedCustomer.id;
-      } else {
-        search = searchQuery.trim();
-      }
+      search = searchQuery.trim();
     } else if (activeTab === 'per-tipe') {
       search = searchQuery.trim();
     }
@@ -132,12 +127,7 @@ export default function LaporanPenjualanFilter({
     let search = '';
 
     if (activeTab === 'per-customer') {
-      const matchedCustomer = currentOptions.find(s => s.name?.toLowerCase() === searchQuery.trim().toLowerCase());
-      if (matchedCustomer) {
-        customerId = matchedCustomer.id;
-      } else {
-        search = searchQuery.trim();
-      }
+      search = searchQuery.trim();
     } else if (activeTab === 'per-tipe') {
       search = searchQuery.trim();
     }
