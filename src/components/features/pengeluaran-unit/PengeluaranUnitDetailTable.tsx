@@ -175,17 +175,6 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         )
       },
       {
-        header: 'STATUS PENGELUARAN',
-        accessorKey: 'isDispatched',
-        sortable: true,
-        cell: (item) => {
-          if (item.isDispatched) {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Dikeluarkan</Badge>;
-          }
-          return <Badge variant="outline" className="border-amber-200 text-amber-700">Belum Dikeluarkan</Badge>;
-        },
-      },
-      {
         header: 'STATUS',
         accessorKey: 'status',
         sortable: true,

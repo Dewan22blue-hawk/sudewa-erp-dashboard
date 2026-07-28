@@ -258,9 +258,12 @@ export default function PurchaseDetailPage() {
         return;
       }
 
+      const description = String(`Penerimaan Stok Transaksi beli ${purchase?.code} Sebanyak ${detailIds?.length} Unit`);
+
       const activityId = await warehouseActivityService.createReceiptActivity({
         unitTransactionId: String(purchase.id),
         warehouseId,
+        description,
         personId,
         unitTransactionItemId: String(unitItems[0]?.id ?? ''),
       });

@@ -19,6 +19,7 @@ import {
 import { salesService } from '@/services/sales.service';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const readApiError = (error: any): string => {
   const stringifyDetail = (value: unknown): string => {
@@ -334,7 +335,7 @@ export default function PaymentPage() {
   if (salesLoading || billingLoading || historyLoading || !salesData) {
     return (
       <DashboardLayout>
-        <div className="p-6">Loading data...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
