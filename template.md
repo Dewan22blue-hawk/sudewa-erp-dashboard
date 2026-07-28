@@ -482,8 +482,9 @@ Untuk memastikan tombol aksi selalu terlihat di berbagai ukuran layar (terutama 
 1. **Gunakan Class `.print-letter-page`**: Tempelkan class `.print-letter-page` pada div halaman A4 utama agar terintegrasi dengan visibilitas global dan pemotongan halaman (`overflow: hidden`).
 2. **Kop Surat (Background Image)**: Render background image kop surat menggunakan tag `<img>` absolut tanpa class `.print-letterhead` agar kop surat tetap terlihat baik di layar web (screen preview) maupun saat dicetak (print layout).
 3. **Konfigurasi Ref**: Pastikan `printRef` dipasang langsung di elemen kertas utama (lebar `210mm` dan tinggi minimal `297mm`), bukan di wrapper luarnya.
-4. **Perataan Sel Tabel (Cell Alignment)**:
+4. **Perataan Sel Tabel (Cell Alignment) dan Tata Letak (Layouting)**:
    - Kolom Nominal/Uang (Harga, DPP, PPN, Total): wajib Rata Tengah (`text-center` / `align: 'center'`).
+   - Tabel responsif (e.g. `BaseTable`) cenderung memiliki lebar `w-max` yang dapat merusak batasan kertas saat dicetak. Wajib menempelkan `print:w-full print:table-fixed` pada elemen `<Table>`.
 5. **Navigasi Tombol Aksi Print**: Tombol aksi print pada baris tabel (Action Dropdown) wajib membuka halaman print khusus di tab baru menggunakan `window.open` ke path `/dashboard/[slug]/[modul]/print/[id]`.
 
 ### Contoh Dropdown Action Print:
@@ -704,6 +705,7 @@ Ketentuan:
 - Gunakan komponen `@/components/ui/copy-box`.
 - Komponen ini tidak perlu dibungkus warna atau background yang mencolok; ia sudah memiliki *styling* transparan yang memukau (tersedia ikon copy & animasinya pada hover).
 - Apabila data tidak ada (`null` atau empty string), berikan *fallback* misal `'-'`.
+- **Mode Cetak (Print View)**: Karena teks kode/invoice sangat panjang dan tidak berspasi, komponen ini wajib dikonfigurasi dengan kelas agresif (`print:block print:w-full print:whitespace-normal` pada kontainer, dan `print:break-all print:whitespace-pre-wrap print:p-0 print:border-none print:bg-transparent` pada isi teks, serta `print:hidden` pada tombol copy). Ini memastikan teks terlipat rapi dan tidak tumpang tindih ke kolom lain ketika halaman dicetak di ukuran A4.
 
 ```tsx
 import { CopyBox } from '@/components/ui/copy-box';

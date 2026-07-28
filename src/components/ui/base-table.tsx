@@ -294,7 +294,7 @@ export default function BaseTable<T>({
       )}
 
       <div className={cn('relative overflow-hidden rounded-md border border-slate-200 bg-white shadow-none', containerClassName)}>
-        <Table className="w-max min-w-full">
+        <Table className="w-max min-w-full print:w-full print:table-fixed">
           <TableHeader className={cn('border-b border-gray-200', headerRowClassName)}>
             {headerGroups && headerGroups}
             <TableRow className="hover:bg-transparent border-none">
