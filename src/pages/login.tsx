@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -6,14 +6,45 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useLogin } from '@/features/auth/hooks/use-login';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { getAccessToken, checkTokenValidity, removeAccessToken } from '@/lib/auth/token';
+import { clearStoredCompanyId, clearStoredPermissions } from '@/lib/session/storage';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function LoginPage() {
   const router = useRouter();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const { login, isLoading, error } = useLogin();
+
+  useEffect(() => {
+    async function checkAuth() {
+      const token = getAccessToken();
+      if (!token) {
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      try {
+        const status = await checkTokenValidity();
+        if (status === 'valid') {
+          router.replace('/dashboard');
+        } else {
+          removeAccessToken();
+          clearStoredCompanyId();
+          clearStoredPermissions();
+          setIsCheckingAuth(false);
+        }
+      } catch (err) {
+        console.error('Auth Check Error:', err);
+        setIsCheckingAuth(false);
+      }
+    }
+
+    checkAuth();
+  }, [router]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -28,6 +59,14 @@ export default function LoginPage() {
       // Error is handled by useLogin and accessible via `error` state
       console.error('Login Error:', err);
     }
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-white">
+        <LoadingState variant="page" text="Memeriksa sesi..." />
+      </div>
+    );
   }
 
   return (
