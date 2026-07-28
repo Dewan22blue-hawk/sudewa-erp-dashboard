@@ -22,8 +22,12 @@ interface UseLaporanPengirimanReturn {
   setPage: (page: number) => void;
   setPerPage: (perPage: number) => void;
   setDateRange: (startDate: string | null, endDate: string | null) => void;
-  setCustomer: (customerId: number | null) => void;
-  setUnitType: (unitTypeId: number | null) => void;
+  setSearch: (search: string) => void;
+  applyFilters: (filters: {
+    startDate: string | null;
+    endDate: string | null;
+    search: string;
+  }) => void;
   refetch: () => void;
 }
 
@@ -45,27 +49,49 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
   const [type, setType] = useState<string | null>('sales');
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
-  const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
-  const [selectedUnitType, setSelectedUnitType] = useState<number | null>(null);
+  const [currentSearch, setCurrentSearch] = useState('');
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const params: PengirimanParams = {
-        type: type || 'sales',
         page: currentPage,
+        type: type || 'sales',
         per_page: currentPerPage,
       };
 
-      if (startDate) params.start_date = startDate;
-      if (endDate) params.end_date = endDate;
-      if (selectedCustomer) params.person_id = selectedCustomer;
-      if (selectedUnitType) params.unit_type_id = selectedUnitType;
+      // Disable backend date matching/person matching to apply frontend matching
+      // if (startDate) params.start_date = startDate;
+      // if (endDate) params.end_date = endDate;
 
       const result = await getLaporanPengiriman(params);
 
-      setData(result.data);
+      // Client-Side Robust Filtering
+      let filteredData = Array.isArray(result.data) ? result.data : [];
+
+      if (startDate && endDate) {
+        filteredData = filteredData.filter(item => {
+          if (!item?.receipt_date) return true;
+          try {
+            const dateOnly = String(item.receipt_date).split(/[T ]/)[0]; 
+            return dateOnly >= startDate && dateOnly <= endDate;
+          } catch {
+            return true;
+          }
+        });
+      }
+
+      if (currentSearch) {
+        const q = String(currentSearch).toLowerCase();
+        filteredData = filteredData.filter(item => {
+          const uName = String(item.unit_type?.name || '').toLowerCase();
+          const pName = String(item.person || '').toLowerCase();
+          return uName.includes(q) || pName.includes(q);
+        });
+      }
+
+      setData(filteredData);
       setPagination({
         currentPage: result.current_page,
         lastPage: result.last_page,
@@ -81,7 +107,7 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, currentPerPage, startDate, endDate, selectedCustomer, selectedUnitType, type]);
+  }, [currentPage, currentPerPage, startDate, endDate, currentSearch, type]);
 
   useEffect(() => {
     fetchData();
@@ -105,12 +131,14 @@ export const useLaporanPengiriman = (): UseLaporanPengirimanReturn => {
       setEndDate(end);
       setCurrentPage(1);
     },
-    setCustomer: (customerId: number | null) => {
-      setSelectedCustomer(customerId);
+    setSearch: (search: string) => {
+      setCurrentSearch(search);
       setCurrentPage(1);
     },
-    setUnitType: (unitTypeId: number | null) => {
-      setSelectedUnitType(unitTypeId);
+    applyFilters: ({ startDate: nextStartDate, endDate: nextEndDate, search }) => {
+      setStartDate(nextStartDate);
+      setEndDate(nextEndDate);
+      setCurrentSearch(search);
       setCurrentPage(1);
     },
     refetch: fetchData,
