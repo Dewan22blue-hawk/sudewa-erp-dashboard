@@ -61,6 +61,7 @@ export interface BaseTableProps<T> {
   selectedIds?: Set<string>;
   onSelectedIdsChange?: (ids: Set<string>) => void;
   getRowId?: (item: T) => string;
+  isCheckboxDisabled?: (item: T) => boolean;
   footer?: React.ReactNode;
   onRowClick?: (item: T) => void;
 }
@@ -89,6 +90,7 @@ export default function BaseTable<T>({
   selectedIds,
   onSelectedIdsChange,
   getRowId,
+  isCheckboxDisabled,
   footer,
   onRowClick,
 }: BaseTableProps<T>) {
@@ -197,6 +199,17 @@ export default function BaseTable<T>({
     });
   }, [data, activeSort, onSortChange]);
 
+  const isMasterCheckboxDisabled = useMemo(() => {
+    if (!selectedIds || !isCheckboxDisabled) return false;
+    const allChecked = sortedData.length > 0 && sortedData.every((item) => selectedIds.has(getRowIdInternal(item)));
+    if (allChecked) return false;
+    
+    return sortedData.some((item) => {
+      const isChecked = selectedIds.has(getRowIdInternal(item));
+      return !isChecked && isCheckboxDisabled(item);
+    });
+  }, [sortedData, selectedIds, isCheckboxDisabled]);
+
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? perPage;
   const totalPages = meta?.lastPage ?? 1;
@@ -303,6 +316,7 @@ export default function BaseTable<T>({
                   <Checkbox
                     checked={sortedData.length > 0 && sortedData.every((item) => selectedIds?.has(getRowIdInternal(item)))}
                     onCheckedChange={handleToggleAll}
+                    disabled={isMasterCheckboxDisabled}
                     aria-label="Pilih semua"
                   />
                 </TableHead>
@@ -382,6 +396,7 @@ export default function BaseTable<T>({
                       <Checkbox
                         checked={selectedIds?.has(getRowIdInternal(item)) ?? false}
                         onCheckedChange={(checked) => handleToggleOne(getRowIdInternal(item), Boolean(checked))}
+                        disabled={isCheckboxDisabled?.(item)}
                         aria-label="Pilih baris"
                       />
                     </TableCell>
