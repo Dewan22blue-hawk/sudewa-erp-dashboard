@@ -188,15 +188,8 @@ export default function SalesUnitDetailPage() {
       }
     });
 
-    const result = Array.from(merged.values());
-    result.sort((a, b) => {
-      const aSelected = selectedIds.has(a.id) ? 1 : 0;
-      const bSelected = selectedIds.has(b.id) ? 1 : 0;
-      return bSelected - aSelected;
-    });
-
-    return result;
-  }, [stockUnits, assignedDetailRows, selectedIds]);
+    return Array.from(merged.values());
+  }, [stockUnits, assignedDetailRows]);
 
   useEffect(() => {
     const next = new Set(assignedIds);
@@ -224,6 +217,11 @@ export default function SalesUnitDetailPage() {
   const selectedCount = selectedIds.size;
 
   const canAssignStock = requiredQty > 0 && selectedCount === requiredQty;
+
+  const isSelectionMatchingSaved = useMemo(() => {
+    if (selectedIds.size !== assignedIds.length) return false;
+    return Array.from(selectedIds).every((id) => assignedIds.includes(id));
+  }, [selectedIds, assignedIds]);
 
   const salesCode = salesData?.raw?.code ?? '-';
   const slugValue = Array.isArray(slug) ? slug[0] : slug || '';
@@ -413,6 +411,7 @@ export default function SalesUnitDetailPage() {
             <StockPickerTable
               units={pickerRows}
               selectedIds={selectedIds}
+              requiredQty={requiredQty}
               unitType={unitTypeData}
               isPaid={salesData?.raw?.unit_transaction_billing?.is_paid}
               onToggleOne={toggleOne}
@@ -428,7 +427,7 @@ export default function SalesUnitDetailPage() {
                 <Button
                   size="sm"
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={!canAssignStock || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending || !!salesData?.raw?.unit_transaction_billing?.is_paid}
+                  disabled={!canAssignStock || isSelectionMatchingSaved || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending || !!salesData?.raw?.unit_transaction_billing?.is_paid}
                   onClick={() => setIsAssignDialogOpen(true)}
                 >
                   {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}

@@ -339,6 +339,7 @@ export function PurchasePaymentForm({
                                                     type="text"
                                                     inputMode="decimal"
                                                     value={field.value}
+                                                    disabled={billingRemaining === 0}
                                                     onChange={(e) => {
                                                         let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
                                                         const parts = val.split('.');
@@ -364,6 +365,7 @@ export function PurchasePaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
+                                                    disabled={billingRemaining === 0}
                                                     onChangeValue={(val) => {
                                                         const capped = parseAndClampMoneyInput(val, maxBca2);
                                                         field.onChange(capped);
@@ -385,6 +387,7 @@ export function PurchasePaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
+                                                    disabled={billingRemaining === 0}
                                                     onChangeValue={(val) => {
                                                         const capped = parseAndClampMoneyInput(val, maxCash);
                                                         field.onChange(capped);
@@ -414,6 +417,7 @@ export function PurchasePaymentForm({
                                                 <Textarea
                                                     placeholder="Catatan pembayaran (opsional)"
                                                     {...field}
+                                                    disabled={billingRemaining === 0}
                                                     value={field.value ?? ''}
                                                 />
                                             </FormControl>
@@ -430,13 +434,13 @@ export function PurchasePaymentForm({
                                 type="button"
                                 variant="outline"
                                 onClick={onCancel}
-                                disabled={loading}
+                                disabled={loading || billingRemaining === 0}
                             >
                                 Batal
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={loading || !canSubmit}
+                                disabled={loading || !canSubmit || billingRemaining === 0}
                                 className="bg-green-600 hover:bg-green-700 text-white min-w-[120px]"
                             >
                                 {loading ? (

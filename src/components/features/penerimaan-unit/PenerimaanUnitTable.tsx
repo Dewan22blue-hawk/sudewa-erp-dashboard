@@ -82,7 +82,7 @@ export default function PenerimaanUnitTable({
             {item.supplier}
           </ReferenceLink>
         ) : (
-          item.supplier
+          '-'
         ),
     },
     {

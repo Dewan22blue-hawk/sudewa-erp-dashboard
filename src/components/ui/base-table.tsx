@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,6 +61,7 @@ export interface BaseTableProps<T> {
   selectedIds?: Set<string>;
   onSelectedIdsChange?: (ids: Set<string>) => void;
   getRowId?: (item: T) => string;
+  isCheckboxDisabled?: (item: T) => boolean;
   footer?: React.ReactNode;
   onRowClick?: (item: T) => void;
 }
@@ -89,6 +90,7 @@ export default function BaseTable<T>({
   selectedIds,
   onSelectedIdsChange,
   getRowId,
+  isCheckboxDisabled,
   footer,
   onRowClick,
 }: BaseTableProps<T>) {
@@ -97,11 +99,11 @@ export default function BaseTable<T>({
     defaultSort || null
   );
 
-  const getRowIdInternal = (item: T) => {
+  const getRowIdInternal = useCallback((item: T) => {
     if (getRowId) return getRowId(item);
     const anyItem = item as any;
     return String(anyItem.id || anyItem.uuid || '');
-  };
+  }, [getRowId]);
 
   const handleToggleAll = (checked: boolean) => {
     if (!onSelectedIdsChange) return;
@@ -196,6 +198,17 @@ export default function BaseTable<T>({
       return String(valA).localeCompare(String(valB)) * factor;
     });
   }, [data, activeSort, onSortChange]);
+
+  const isMasterCheckboxDisabled = useMemo(() => {
+    if (!selectedIds || !isCheckboxDisabled) return false;
+    const allChecked = sortedData.length > 0 && sortedData.every((item) => selectedIds.has(getRowIdInternal(item)));
+    if (allChecked) return false;
+    
+    return sortedData.some((item) => {
+      const isChecked = selectedIds.has(getRowIdInternal(item));
+      return !isChecked && isCheckboxDisabled(item);
+    });
+  }, [sortedData, selectedIds, isCheckboxDisabled, getRowIdInternal]);
 
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? perPage;
@@ -303,6 +316,7 @@ export default function BaseTable<T>({
                   <Checkbox
                     checked={sortedData.length > 0 && sortedData.every((item) => selectedIds?.has(getRowIdInternal(item)))}
                     onCheckedChange={handleToggleAll}
+                    disabled={isMasterCheckboxDisabled}
                     aria-label="Pilih semua"
                   />
                 </TableHead>
@@ -382,6 +396,7 @@ export default function BaseTable<T>({
                       <Checkbox
                         checked={selectedIds?.has(getRowIdInternal(item)) ?? false}
                         onCheckedChange={(checked) => handleToggleOne(getRowIdInternal(item), Boolean(checked))}
+                        disabled={isCheckboxDisabled?.(item)}
                         aria-label="Pilih baris"
                       />
                     </TableCell>

@@ -2,6 +2,7 @@ import { apiClient } from '@/lib/api/client';
 
 export interface PenerimaanParams {
   page?: number;
+  type?: string;
   per_page?: number;
   start_date?: string;
   end_date?: string;

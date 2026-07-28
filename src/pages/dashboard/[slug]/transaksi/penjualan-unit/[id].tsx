@@ -275,10 +275,13 @@ export default function SalesDetailPage() {
         return;
       }
 
+      const description = String(`Pengiriman Stok Transaksi beli ${data?.raw?.code} Sebanyak ${detailIds?.length} Unit`);
+
       const activityId = await warehouseActivityService.createIssueActivity({
         unitTransactionId: String(salesId),
         warehouseId,
         personId,
+        description,
         unitTransactionItemId: String(items[0]?.id ?? ''),
       });
 

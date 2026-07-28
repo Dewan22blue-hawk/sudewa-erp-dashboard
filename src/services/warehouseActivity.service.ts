@@ -99,10 +99,12 @@ export const warehouseActivityService = {
     personId?: string;
     unitTransactionItemId?: string;
     activityDate?: string;
+    description?: string;
   }): Promise<string> {
     const unitTransactionId = String(payload.unitTransactionId ?? '').trim();
     const warehouseId = String(payload.warehouseId ?? '').trim();
     const personId = String(payload.personId ?? '').trim();
+    const description = String(payload?.description ?? '-');
     const unitTransactionItemId = String(payload.unitTransactionItemId ?? '').trim();
 
     if (!unitTransactionId) {
@@ -121,6 +123,7 @@ export const warehouseActivityService = {
     const form = new FormData();
     form.append('warehouse_id', warehouseId);
     form.append('activity_type', 'issue');
+    form.append('description', description);
     form.append('unit_transaction_id', unitTransactionId);
     form.append('person_id', personId);
     form.append('unit_transaction_item_id', unitTransactionItemId);

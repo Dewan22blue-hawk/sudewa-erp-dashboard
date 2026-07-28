@@ -226,7 +226,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         }
       }
     ],
-    [paginatedRows, selected, receivedIds, slug, isSelectionDisabled, toggleAll, toggleSelect]
+    [slug]
   );
 
   return (
