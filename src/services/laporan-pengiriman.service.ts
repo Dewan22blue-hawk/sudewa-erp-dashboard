@@ -20,7 +20,12 @@ export interface PengirimanItem {
   machine_number: string;
   chassis_number: string;
   color: string;
-  warehouse_movement?: { serial_number: string };
+  type?: string;
+  stock_state?: string;
+  in_stock?: boolean;
+  is_forecast?: boolean;
+  status?: string;
+  warehouse_movement?: any;
 }
 
 export interface PengirimanResponse {
@@ -46,6 +51,11 @@ const normalizePengirimanItem = (item: any): PengirimanItem => ({
   chassis_number: item.chassis_number || '-',
   color: item.color || '-',
   warehouse_movement: item.warehouse_movement,
+  type: item.type,
+  stock_state: item.stock_state,
+  in_stock: item.in_stock,
+  is_forecast: item.is_forecast,
+  status: item.status,
 });
 
 export const getLaporanPengiriman = async (
@@ -54,6 +64,7 @@ export const getLaporanPengiriman = async (
   const response = await apiClient.get('/wapi/report/unit-type-detail-report', {
     params: {
       sort_dir: 'asc',
+      warehouse_id: 1,
       ...params,
     },
   });
