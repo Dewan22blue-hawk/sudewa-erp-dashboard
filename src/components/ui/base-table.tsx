@@ -321,7 +321,7 @@ export default function BaseTable<T>({
                     key={col.id || idx}
                     onClick={() => isSortable && handleSort(sortKey)}
                     className={cn(
-                      'px-4 py-4 text-xs font-semibold uppercase text-slate-500 whitespace-nowrap',
+                      'px-4 py-4 print:px-2 print:py-2 text-xs print:text-[10px] font-semibold uppercase text-slate-500 whitespace-nowrap print:whitespace-normal',
                       isSortable && 'cursor-pointer select-none group',
                       col.sticky === 'right' && cn('sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]', headerRowClassName),
                       col.sticky === 'left' && cn('sticky left-0 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]', headerRowClassName),
@@ -394,7 +394,7 @@ export default function BaseTable<T>({
                       <TableCell
                         key={col.id || colIdx}
                         className={cn(
-                          'px-4 py-4 text-sm text-slate-700 transition-colors',
+                          'px-4 py-4 print:px-2 print:py-2 text-sm print:text-[10px] text-slate-700 transition-colors',
                           col.sticky === 'right' && 'sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]',
                           col.sticky === 'left' && 'sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]',
                           textAlignment,

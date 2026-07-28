@@ -1044,3 +1044,37 @@ const toggleAllPage = (checked: boolean) => {
   </DialogContent>
 </Dialog>
 ```
+
+---
+
+## 22. Standarisasi Tautan ke Data Master (ReferenceLink)
+
+Ketika menata **Tabel Data** (terutama laporan atau transaksi) yang memiliki referensi ke entitas master (contoh: Nama Supplier, Tipe Unit, Customer), pastikan nama entitas tersebut dirupakan ke dalam tautan (link) agar interaktif dan mudah dinavigasi oleh pengguna untuk melihat detail rekaman utamanya.
+
+**Aturan Penggunaan Komponen `<ReferenceLink>`**:
+1. Gunakan komponen `@/components/ui/reference-link`. Komponen ini diformat agar terlihat eksklusif dengan warna biru (`text-blue-600`), ketebalan bold, *hover effect*, dan dibekali ikon panah/external.
+2. Karena tabel biasanya berada di dalam konteks bisnis dengan variabel `slug`, URL `href` wajib merujuk ke Master Data yang bersesuaian, seringkali dengan menambahkan *query params* pelencong (misalkan `?search=`).
+
+**Contoh Implementasi Standar pada Definisi Kolom Tabel (ColumnDef)**:
+
+```tsx
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
+
+// Di dalam fungsi komponen utama
+const router = useRouter();
+const slug = router.query.slug as string;
+
+// ...
+{
+  header: 'SUPPLIER',
+  accessorKey: 'person_name',
+  sortable: true,
+  alignment: 'left',
+  cell: (item) => (
+    <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${encodeURIComponent(item.person_name || '')}`}>
+      {item.person_name || '-'}
+    </ReferenceLink>
+  ),
+},
+```
