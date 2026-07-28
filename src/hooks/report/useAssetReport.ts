@@ -30,7 +30,6 @@ export function useAssetReport({
         per_page: perPage,
         sort_by: sortBy || 'created_at',
         sort_order: sortOrder || 'desc',
-        search: search || undefined,
       };
 
       return getAssetReport(params);
@@ -69,11 +68,11 @@ export function useAssetReport({
       currentPage: backendPagination?.current_page || page,
       lastPage: backendPagination?.last_page || 1,
       perPage: backendPagination?.per_page || perPage,
-      total: backendPagination?.total || 0,
+      total: search?.trim() ? filteredData.length : (backendPagination?.total || 0),
       from: backendPagination?.from || 0,
       to: backendPagination?.to || 0,
     };
-  }, [queryResult.data, page, perPage]);
+  }, [queryResult.data, page, perPage, search, filteredData.length]);
 
   return {
     data: filteredData,
