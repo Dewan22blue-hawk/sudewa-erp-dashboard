@@ -56,7 +56,7 @@ export const useLaporanPenerimaan = (): UseLaporanPenerimaanReturn => {
     setIsLoading(true);
     setError(null);
     try {
-      const params: PenerimaanParams = {
+      const params: any = {
         page: currentPage,
         type: type || 'purchase',
         per_page: currentPerPage,

@@ -101,7 +101,7 @@ export default function LaporanPenjualanFilter({
     const startDateVal = startDate;
     const endDateVal = endDate;
 
-    let customerId: number | null = null;
+    const customerId: number | null = null;
     let search = '';
 
     if (activeTab === 'per-customer') {
@@ -123,7 +123,7 @@ export default function LaporanPenjualanFilter({
     const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
-    let customerId: number | null = null;
+    const customerId: number | null = null;
     let search = '';
 
     if (activeTab === 'per-customer') {
