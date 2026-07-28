@@ -1078,3 +1078,48 @@ const slug = router.query.slug as string;
   ),
 },
 ```
+
+---
+
+## 23. Standarisasi Filter (Pencarian & Tanggal) pada Modul Laporan
+
+**Aturan**: Ketika membangun modul atau halaman **Laporan** (seperti Laporan Penjualan, Laporan Pembelian, Laporan Penerimaan) yang menggunakan _backend custom query/flattened response_ (contoh endpoint: `/wapi/report/...`), fitur penyaringan (Filter) **wajib** menggunakan strategi *Client-Side Text Matching* dan *Client-Side Date Matching* daripada mengirim ID relasional ke backend. Hal ini untuk mencegah kemungkinan Error 500 dari backend, serta menghindari masalah inkonsistensi skema bila API laporan tidak mengembalikan ID referensi (seperti `person_id` atau `unit_type_id`) melainkan mengembalikan string langsung (seperti `person_name` dan `unit_name`).
+
+**Standar Evaluasi Filter di tingkat Hook (mis. `useLaporanPenjualan.ts`)**:
+1. Komponen antarmuka pencarian (seperti Combobox) **tidak boleh** melempar ID referensi (misalnya melempar `supplierId = 22`). Balikkan nilai teks murni sesuai hasil ketikan pengguna (melempar `search = 'Customer 22'`).
+2. Tangkap seluruh hasil `data` dari backend, lalu eksekusi filter secara lokal di *frontend* dengan membandingkan teks murni atau memecah tanggal.
+
+**Contoh Implementasi pada Custom Hook**:
+
+```ts
+// 1. Eksekusi API secara normal TANPA membawa parameter spesifik yang rentan rusak:
+// (Catatan: Anda tetap dapat menyertakan parameter Pagination dasar)
+const result = await getLaporan(params);
+let filteredData = Array.isArray(result.data) ? result.data : [];
+
+// 2. Client-Side Date Matching (Contoh: receipt_date / transaction_date)
+if (startDate && endDate) {
+  filteredData = filteredData.filter(item => {
+    if (!item?.transaction_date) return true;
+    try {
+      const dateOnly = String(item.transaction_date).split(/[T ]/)[0];
+      return dateOnly >= startDate && dateOnly <= endDate;
+    } catch {
+      return true;
+    }
+  });
+}
+
+// 3. Client-Side Text Matching (Contoh: combobox unit_name atau person_name)
+if (currentSearch) {
+  const q = String(currentSearch).toLowerCase();
+  filteredData = filteredData.filter(item => {
+    const uName = String(item.unit_name || '').toLowerCase();
+    const pName = String(item.person_name || '').toLowerCase();
+    // Cukup gunakan includes untuk memastikan pencarian toleran terhadap variasi penulisan.
+    return uName.includes(q) || pName.includes(q); 
+  });
+}
+
+setData(filteredData);
+```

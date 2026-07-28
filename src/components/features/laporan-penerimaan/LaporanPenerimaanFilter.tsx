@@ -17,8 +17,7 @@ interface LaporanPenerimaanFilterProps {
   onApplyFilters: (filters: {
     startDate: string | null;
     endDate: string | null;
-    supplierId: number | null;
-    unitTypeId: number | null;
+    search: string;
     perPage: number;
   }) => void;
   onPrint: () => void;
@@ -110,28 +109,17 @@ export default function LaporanPenerimaanFilter({
     const appliedStartDate = startDate;
     const appliedEndDate = endDate;
 
-    let supplierId: number | null = null;
-    let unitTypeId: number | null = null;
-
+    let search = '';
     if (activeTab === 'per-supplier') {
-      const matchedSupplier = suppliers.find(
-        (supplier) => supplier.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      supplierId = matchedSupplier ? matchedSupplier.id : null;
-    }
-
-    if (activeTab === 'per-tipe') {
-      const matchedType = unitTypes.find(
-        (unitType) => unitType.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      unitTypeId = matchedType ? matchedType.id : null;
+      search = searchQuery.trim();
+    } else if (activeTab === 'per-tipe') {
+      search = searchQuery.trim();
     }
 
     onApplyFilters({
       startDate: appliedStartDate,
       endDate: appliedEndDate,
-      supplierId,
-      unitTypeId,
+      search,
       perPage: parseInt(perPage, 10),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,28 +129,17 @@ export default function LaporanPenerimaanFilter({
     const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
-    let supplierId: number | null = null;
-    let unitTypeId: number | null = null;
-
+    let search = '';
     if (activeTab === 'per-supplier') {
-      const matchedSupplier = suppliers.find(
-        (supplier) => supplier.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      supplierId = matchedSupplier ? matchedSupplier.id : null;
-    }
-
-    if (activeTab === 'per-tipe') {
-      const matchedType = unitTypes.find(
-        (unitType) => unitType.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      unitTypeId = matchedType ? matchedType.id : null;
+      search = searchQuery.trim();
+    } else if (activeTab === 'per-tipe') {
+      search = searchQuery.trim();
     }
 
     onApplyFilters({
       startDate: appliedStartDate,
       endDate: appliedEndDate,
-      supplierId,
-      unitTypeId,
+      search,
       perPage: parseInt(perPage, 10),
     });
   };
