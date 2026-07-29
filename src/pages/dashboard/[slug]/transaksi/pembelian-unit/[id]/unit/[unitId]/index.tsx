@@ -557,7 +557,7 @@ export default function UnitPurchaseDetailPage() {
                         Hapus ({selectedIds.size})
                       </Button>
                     )}
-                    {canCreate && !isPaid && (
+                    {canCreate && (
                       <>
                         <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto font-medium shadow-sm">
                           <Upload className="h-4 w-4 mr-2" />

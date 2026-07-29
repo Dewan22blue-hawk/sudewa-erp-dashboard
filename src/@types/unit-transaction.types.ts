@@ -1,4 +1,5 @@
 import { PaginationMeta } from '@/@types/pagination.types';
+import { WarehouseActivity } from './warehouse-activity.types';
 
 export interface UnitTransactionBillingHistoryCashPivot {
   unit_transaction_billing_history_id: string | number;
@@ -121,10 +122,9 @@ export interface UnitTransactionItemDetail {
   transaction_other_fee: number;
   expedition_fee_total: number;
   total_operational_fee?: number;
+  has_refund_transaction?: boolean;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
-  unit_transaction_adjustments?: any[];
-  unit_transaction_items?: any[];
 }
 
 export interface UnitTransactionDetail {
@@ -153,6 +153,8 @@ export interface UnitTransactionDetail {
   transaction_other_fee: number;
   expedition_fee_total: number;
   total_operational_fee?: number;
+  has_refund_transaction?: boolean;
+  warehouse_activity?: WarehouseActivity | null;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];

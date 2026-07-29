@@ -30,7 +30,6 @@ export interface WarehouseActivity {
   } | null;
   person?: WarehouseActivityPerson | null;
   noPenerimaan: string;
-  tanggal: string;
   supplier: string;
   keterangan: string;
 }
