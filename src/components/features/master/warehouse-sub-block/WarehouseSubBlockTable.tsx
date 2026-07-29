@@ -1,0 +1,152 @@
+import { useMemo } from 'react';
+import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { MoreVertical, Pencil, Plus, Trash, CheckCircle } from 'lucide-react';
+import { CopyBox } from '@/components/ui/copy-box';
+import type { WarehouseSubBlock } from '@/services/warehouseBlock.service';
+import type { PaginationMeta } from '@/@types/pagination.types';
+
+interface WarehouseSubBlockTableProps {
+  data: WarehouseSubBlock[];
+  meta?: PaginationMeta;
+  search: string;
+  page: number;
+  perPage: number;
+  isLoading?: boolean;
+  onSearchChange: (value: string) => void;
+  onAdd: () => void;
+  onEdit: (subBlock: WarehouseSubBlock) => void;
+  onDelete: (subBlock: WarehouseSubBlock) => void;
+  onMakeDefault: (subBlock: WarehouseSubBlock) => void;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
+}
+
+export const WarehouseSubBlockTable = ({
+  data,
+  meta,
+  search,
+  page,
+  perPage,
+  isLoading = false,
+  onSearchChange,
+  onAdd,
+  onEdit,
+  onDelete,
+  onMakeDefault,
+  onPageChange,
+  onPerPageChange,
+}: WarehouseSubBlockTableProps) => {
+  const columns = useMemo<ColumnDef<WarehouseSubBlock>[]>(
+    () => [
+      {
+        header: 'NAMA SUB BLOK',
+        accessorKey: 'name',
+        sortable: true,
+        cell: (item) => <CopyBox text={item.name} className="font-medium text-slate-900" />,
+      },
+      {
+        header: 'DESKRIPSI',
+        accessorKey: 'description',
+        sortable: false,
+        cell: (item) => <span className="text-sm text-slate-600">{item.description || '-'}</span>,
+      },
+      {
+        header: 'STATUS',
+        accessorKey: 'is_active',
+        sortable: true,
+        cell: (item) => (
+          <Badge
+            variant={item.is_active ? 'default' : 'secondary'}
+            className={item.is_active ? 'bg-green-100 text-green-700 hover:bg-green-100 border-none' : 'bg-slate-100 text-slate-700 hover:bg-slate-100 border-none'}
+          >
+            {item.is_active ? 'Aktif' : 'Tidak Aktif'}
+          </Badge>
+        ),
+      },
+      {
+        header: 'DEFAULT',
+        accessorKey: 'is_default',
+        sortable: true,
+        cell: (item) => (
+          item.is_default ? (
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              Default
+            </Badge>
+          ) : (
+            <span className="text-slate-400">-</span>
+          )
+        ),
+      },
+      {
+        header: 'ACTION',
+        alignment: 'center',
+        sticky: 'right',
+        cell: (item) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center justify-center h-8 w-8 p-0 rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
+              <DropdownMenuItem
+                onClick={() => onMakeDefault(item)}
+                disabled={item.is_default}
+                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Jadikan Default
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onEdit(item)}
+                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDelete(item)}
+                className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    [onEdit, onDelete, onMakeDefault],
+  );
+
+  return (
+    <BaseTable
+      data={data}
+      columns={columns}
+      loading={isLoading}
+      searchPlaceholder="Cari sub blok gudang..."
+      search={search}
+      onSearchChange={onSearchChange}
+      showLimitChange
+      perPage={perPage}
+      onPerPageChange={onPerPageChange}
+      defaultSort={{ key: 'id', direction: 'desc' }}
+      meta={{
+        currentPage: page,
+        perPage,
+        lastPage: meta?.lastPage ?? 1,
+        total: meta?.total ?? data.length,
+      }}
+      onPageChange={onPageChange}
+      headerActions={
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Plus className="mr-2 h-4 w-4" />
+          Tambah Data
+        </Button>
+      }
+    />
+  );
+};
