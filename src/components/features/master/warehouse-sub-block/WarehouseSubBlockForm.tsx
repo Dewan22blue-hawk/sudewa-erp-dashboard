@@ -53,8 +53,8 @@ export function WarehouseSubBlockForm({
         form.reset({
           name: initialData.name,
           description: initialData.description || '',
-          is_active: initialData.is_active,
-          is_default: initialData.is_default,
+          is_active: String(initialData.is_active) === '1' || String(initialData.is_active) === 'true' || initialData.is_active === true,
+          is_default: String(initialData.is_default) === '1' || String(initialData.is_default) === 'true' || initialData.is_default === true,
         });
       } else {
         form.reset({
@@ -140,7 +140,7 @@ export function WarehouseSubBlockForm({
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        disabled={isSubmitting || (initialData?.is_default === true)} // Disable if already default to avoid unchecking directly
+                        disabled={isSubmitting || (initialData && (String(initialData.is_default) === '1' || String(initialData.is_default) === 'true' || initialData.is_default === true))} 
                       />
                     </FormControl>
                   </FormItem>
