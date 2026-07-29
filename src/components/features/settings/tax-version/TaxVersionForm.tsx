@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import type { TaxVersion } from '@/services/tax.service';
 import { ClampedNumericInput } from '@/components/ui/clamped-numeric-input';
 import { LoadingState } from '@/components/ui/loading-state';
+import { Badge } from '@/components/ui/badge';
 
 const taxVersionSchema = z.object({
   name: z.string().min(1, 'Nama versi wajib diisi'),
@@ -63,12 +64,15 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
   };
 
   const isLocked = initialData?.is_lock === 1 || initialData?.is_lock === true;
+  const isDefault = initialData?.is_default === 1;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{initialData ? 'Edit Versi Pajak' : 'Tambah Versi Pajak'}</DialogTitle>
+          {isDefault && <Badge className='bg-green-500'>Default</Badge>}
+          {isLocked && <Badge className='bg-red-500'>Locked</Badge>}
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -108,7 +112,7 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                     </div>
                   </FormControl>
                   <FormDescription>
-                    Masukkan nilai berupa persentase (%) atau nominal uang. &quot;Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping).&quot; 
+                    Masukkan nilai berupa persentase (%) atau nominal uang. &quot;Sistem menjaga otomatis angka tidak melewati batas wajar (nominal clapping).&quot;
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -142,7 +146,7 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                 )}
               />
             </div>
-            
+
             <FormField
               control={form.control}
               name="is_default"
@@ -158,7 +162,7 @@ export function TaxVersionForm({ open, onOpenChange, initialData, baseTaxId, onS
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={isSubmitting || isLocked}
+                      disabled={isSubmitting || isLocked || isDefault}
                     />
                   </FormControl>
                 </FormItem>
