@@ -15,8 +15,10 @@ export const createWarehouseSubBlock = async (data: CreateUpdateWarehouseSubBloc
   formData.append('warehouse_block_id', String(data.warehouse_block_id));
   formData.append('name', data.name);
   formData.append('description', data.description);
-  formData.append('is_active', data.is_active ? '1' : '0');
-  formData.append('is_default', data.is_default ? '1' : '0');
+  const isActive = String(data.is_active) === '1' || String(data.is_active) === 'true' || data.is_active === true;
+  const isDefault = String(data.is_default) === '1' || String(data.is_default) === 'true' || data.is_default === true;
+  formData.append('is_active', isActive ? 'true' : 'false');
+  formData.append('is_default', isDefault ? 'true' : 'false');
   
   const response = await apiClient.post<ApiResponse<WarehouseSubBlock>>(`/wapi/master-data/warehouse-sub-block`, formData, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -29,8 +31,10 @@ export const updateWarehouseSubBlock = async (id: number, data: CreateUpdateWare
   formData.append('warehouse_block_id', String(data.warehouse_block_id));
   formData.append('name', data.name);
   formData.append('description', data.description);
-  formData.append('is_active', data.is_active ? '1' : '0');
-  formData.append('is_default', data.is_default ? '1' : '0');
+  const isActive = String(data.is_active) === '1' || String(data.is_active) === 'true' || data.is_active === true;
+  const isDefault = String(data.is_default) === '1' || String(data.is_default) === 'true' || data.is_default === true;
+  formData.append('is_active', isActive ? 'true' : 'false');
+  formData.append('is_default', isDefault ? 'true' : 'false');
   formData.append('_method', 'PUT');
   
   const response = await apiClient.post<ApiResponse<WarehouseSubBlock>>(`/wapi/master-data/warehouse-sub-block/${id}`, formData, {
@@ -44,8 +48,10 @@ export const makeDefaultWarehouseSubBlock = async (id: number, data: CreateUpdat
   formData.append('warehouse_block_id', String(data.warehouse_block_id));
   formData.append('name', data.name);
   formData.append('description', data.description);
-  formData.append('is_active', data.is_active ? '1' : '0');
-  formData.append('is_default', data.is_default ? '1' : '0');
+  const isActive = String(data.is_active) === '1' || String(data.is_active) === 'true' || data.is_active === true;
+  const isDefault = String(data.is_default) === '1' || String(data.is_default) === 'true' || data.is_default === true;
+  formData.append('is_active', isActive ? 'true' : 'false');
+  formData.append('is_default', isDefault ? 'true' : 'false');
   formData.append('_method', 'PUT');
   
   const response = await apiClient.post<ApiResponse<WarehouseSubBlock>>(`/wapi/master-data/warehouse-sub-block/${id}/make-default`, formData, {

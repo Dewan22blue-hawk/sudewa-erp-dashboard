@@ -3,7 +3,7 @@ import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreVertical, Pencil, Plus, Trash, CheckCircle } from 'lucide-react';
+import { MoreVertical, Pencil, Plus, Trash, CheckCircle, PowerOff, Power } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import type { WarehouseSubBlock } from '@/services/warehouseBlock.service';
 import type { PaginationMeta } from '@/@types/pagination.types';
@@ -20,6 +20,7 @@ interface WarehouseSubBlockTableProps {
   onEdit: (subBlock: WarehouseSubBlock) => void;
   onDelete: (subBlock: WarehouseSubBlock) => void;
   onMakeDefault: (subBlock: WarehouseSubBlock) => void;
+  onToggleActive: (subBlock: WarehouseSubBlock) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
 }
@@ -36,6 +37,7 @@ export const WarehouseSubBlockTable = ({
   onEdit,
   onDelete,
   onMakeDefault,
+  onToggleActive,
   onPageChange,
   onPerPageChange,
 }: WarehouseSubBlockTableProps) => {
@@ -57,28 +59,32 @@ export const WarehouseSubBlockTable = ({
         header: 'STATUS',
         accessorKey: 'is_active',
         sortable: true,
-        cell: (item) => (
-          <Badge
-            variant={item.is_active ? 'default' : 'secondary'}
-            className={item.is_active ? 'bg-green-100 text-green-700 hover:bg-green-100 border-none' : 'bg-slate-100 text-slate-700 hover:bg-slate-100 border-none'}
-          >
-            {item.is_active ? 'Aktif' : 'Tidak Aktif'}
-          </Badge>
-        ),
+        cell: (item) => {
+          const isActive = String(item.is_active) === '1' || String(item.is_active) === 'true' || item.is_active === true;
+          return (
+            <Badge
+              variant={isActive ? 'default' : 'secondary'}
+              className={isActive ? 'bg-green-100 text-green-700 hover:bg-green-100 border-none' : 'bg-slate-100 text-slate-700 hover:bg-slate-100 border-none'}
+            >
+              {isActive ? 'Aktif' : 'Tidak Aktif'}
+            </Badge>
+          );
+        },
       },
       {
         header: 'DEFAULT',
         accessorKey: 'is_default',
         sortable: true,
-        cell: (item) => (
-          item.is_default ? (
+        cell: (item) => {
+          const isDefault = String(item.is_default) === '1' || String(item.is_default) === 'true' || item.is_default === true;
+          return isDefault ? (
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
               Default
             </Badge>
           ) : (
             <span className="text-slate-400">-</span>
-          )
-        ),
+          );
+        },
       },
       {
         header: 'ACTION',
@@ -94,11 +100,27 @@ export const WarehouseSubBlockTable = ({
             <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
               <DropdownMenuItem
                 onClick={() => onMakeDefault(item)}
-                disabled={item.is_default}
+                disabled={String(item.is_default) === '1' || String(item.is_default) === 'true' || item.is_default === true}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Jadikan Default
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onToggleActive(item)}
+                className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
+              >
+                {String(item.is_active) === '1' || String(item.is_active) === 'true' || item.is_active === true ? (
+                  <>
+                    <PowerOff className="mr-2 h-4 w-4 text-orange-500" />
+                    Jadikan Tidak Aktif
+                  </>
+                ) : (
+                  <>
+                    <Power className="mr-2 h-4 w-4 text-green-500" />
+                    Jadikan Aktif
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onEdit(item)}
@@ -119,7 +141,7 @@ export const WarehouseSubBlockTable = ({
         ),
       },
     ],
-    [onEdit, onDelete, onMakeDefault],
+    [onEdit, onDelete, onMakeDefault, onToggleActive],
   );
 
   return (

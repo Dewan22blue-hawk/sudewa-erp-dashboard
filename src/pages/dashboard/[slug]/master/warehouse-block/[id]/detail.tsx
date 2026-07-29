@@ -47,6 +47,7 @@ export default function WarehouseBlockDetailPage() {
 
   const [confirmDelete, setConfirmDelete] = useState<WarehouseSubBlock | null>(null);
   const [confirmMakeDefault, setConfirmMakeDefault] = useState<WarehouseSubBlock | null>(null);
+  const [confirmToggleActive, setConfirmToggleActive] = useState<WarehouseSubBlock | null>(null);
 
   const makeDefaultMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => makeDefaultWarehouseSubBlock(id, data),
@@ -121,6 +122,10 @@ export default function WarehouseBlockDetailPage() {
 
   const handleMakeDefault = (subBlock: WarehouseSubBlock) => {
     setConfirmMakeDefault(subBlock);
+  };
+
+  const handleToggleActive = (subBlock: WarehouseSubBlock) => {
+    setConfirmToggleActive(subBlock);
   };
 
   const handleSubmit = (values: WarehouseSubBlockFormValues) => {
@@ -224,6 +229,7 @@ export default function WarehouseBlockDetailPage() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onMakeDefault={handleMakeDefault}
+              onToggleActive={handleToggleActive}
             />
           </div>
         </div>
@@ -291,6 +297,46 @@ export default function WarehouseBlockDetailPage() {
                 className="bg-[#1e3a5f] hover:bg-[#152e4d] text-white"
               >
                 {makeDefaultMutation.isPending ? 'Menyimpan...' : 'Jadikan Default'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={!!confirmToggleActive} onOpenChange={(open) => !open && setConfirmToggleActive(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {confirmToggleActive && (String(confirmToggleActive.is_active) === '1' || String(confirmToggleActive.is_active) === 'true' || confirmToggleActive.is_active === true) ? 'Jadikan Tidak Aktif' : 'Jadikan Aktif'}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Apakah Anda yakin ingin mengubah status sub blok <strong>{confirmToggleActive?.name}</strong> menjadi {confirmToggleActive && (String(confirmToggleActive.is_active) === '1' || String(confirmToggleActive.is_active) === 'true' || confirmToggleActive.is_active === true) ? 'Tidak Aktif' : 'Aktif'}?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={updateMutation.isPending}>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (confirmToggleActive) {
+                    const currentActive = String(confirmToggleActive.is_active) === '1' || String(confirmToggleActive.is_active) === 'true' || confirmToggleActive.is_active === true;
+                    updateMutation.mutate({
+                      id: confirmToggleActive.id,
+                      data: {
+                        warehouse_block_id: blockId,
+                        name: confirmToggleActive.name,
+                        description: confirmToggleActive.description || '',
+                        is_active: !currentActive,
+                        is_default: confirmToggleActive.is_default,
+                      }
+                    }, {
+                      onSuccess: () => setConfirmToggleActive(null)
+                    });
+                  }
+                }}
+                disabled={updateMutation.isPending}
+                className={confirmToggleActive && (String(confirmToggleActive.is_active) === '1' || String(confirmToggleActive.is_active) === 'true' || confirmToggleActive.is_active === true) ? "bg-orange-600 hover:bg-orange-700 text-white" : "bg-green-600 hover:bg-green-700 text-white"}
+              >
+                {updateMutation.isPending ? 'Menyimpan...' : 'Ubah Status'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
