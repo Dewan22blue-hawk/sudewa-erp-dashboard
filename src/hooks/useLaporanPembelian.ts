@@ -83,10 +83,11 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
 
       if (startDate && endDate) {
         filteredData = filteredData.filter(item => {
-          if (!item?.created_at) return true;
+          const createdAt = (item as any)?.created_at;
+          if (!createdAt) return true;
           try {
             // Support both T and space separated dates
-            const dateOnly = String(item.created_at).split(/[T ]/)[0]; 
+            const dateOnly = String(createdAt).split(/[T ]/)[0]; 
             return dateOnly >= startDate && dateOnly <= endDate;
           } catch {
             return true;
@@ -95,16 +96,16 @@ export const useLaporanPembelian = (): UseLaporanPembelianReturn => {
       }
 
       if (selectedSupplier) {
-        filteredData = filteredData.filter(item => item?.person?.id === selectedSupplier || (item as any)?.person_id === selectedSupplier);
+        filteredData = filteredData.filter((item: any) => item?.person?.id === selectedSupplier || item?.person_id === selectedSupplier);
       }
 
       if (currentSearch) {
         const q = String(currentSearch).toLowerCase();
-        filteredData = filteredData.filter(item => {
+        filteredData = filteredData.filter((item: any) => {
           const matchesCode = item?.code?.toLowerCase().includes(q);
           const matchesSupplier = item?.person?.name?.toLowerCase().includes(q);
           const matchesUnitType = (item?.unit_transaction_items || []).some(
-            u => u?.unit_type?.name?.toLowerCase().includes(q)
+            (u: any) => u?.unit_type?.name?.toLowerCase().includes(q)
           );
           return Boolean(matchesCode || matchesSupplier || matchesUnitType);
         });

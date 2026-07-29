@@ -75,17 +75,19 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
     return rows.slice(start, start + ROWS_PER_PAGE);
   }, [rows, safeTablePage]);
 
+  // The outstanding API responds with single rows directly mapped, no manual group summary needed.
+  // We compute grand totals from all rows across the page.
   const summary = useMemo(
     () =>
       rows.reduce(
         (accumulator, item) => {
-          accumulator.order += item.order_qty;
+          accumulator.order += item.qty_total || 0;
           if (type === 'purchase') {
-            accumulator.processed += item.received_qty ?? 0;
+            accumulator.processed += item.qty_received || 0;
           } else {
-            accumulator.processed += item.delivered_qty ?? 0;
+            accumulator.processed += item.qty_outstanding !== undefined ? item.qty_total - item.qty_outstanding : 0;
           }
-          accumulator.remaining += item.remaining_qty;
+          accumulator.remaining += item.qty_outstanding || 0;
           return accumulator;
         },
         { order: 0, processed: 0, remaining: 0 },
@@ -119,13 +121,13 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
       lines.push(
         toCsvLine([
           index + 1,
-          item.code,
-          formatDateLabel(item.date),
-          (type === 'purchase' ? item.supplier_name : item.customer_name) || '-',
-          item.unit_type || '-',
-          item.order_qty,
-          type === 'purchase' ? (item.received_qty ?? 0) : (item.delivered_qty ?? 0),
-          item.remaining_qty,
+          item.transaction_code || '-',
+          formatDateLabel(item.transaction_date),
+          item.person_name || '-',
+          item.unit_type_name || '-',
+          item.qty_total || 0,
+          type === 'purchase' ? (item.qty_received || 0) : ((item.qty_total || 0) - (item.qty_outstanding || 0)),
+          item.qty_outstanding || 0,
         ]),
       );
     });
@@ -157,50 +159,56 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
     () => [
       {
         header: type === 'purchase' ? 'KODE PEMBELIAN' : 'KODE PENJUALAN',
-        accessorKey: 'code',
+        accessorKey: 'transaction_code',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <CopyBox text={item?.code ?? '-'} />
+        cell: (item) => <CopyBox text={item?.transaction_code ?? '-'} />
       },
       {
         header: type === 'purchase' ? 'TGL PEMBELIAN' : 'TGL JUAL',
-        accessorKey: 'date',
+        accessorKey: 'transaction_date',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatDateLabel(item.date),
+        cell: (item) => formatDateLabel(item.transaction_date),
       },
       {
         header: type === 'purchase' ? 'SUPPLIER' : 'CUSTOMER',
-        accessorKey: type === 'purchase' ? 'supplier_name' : 'customer_name',
+        accessorKey: 'person_name',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <ReferenceLink href={`/dashboard/${slugStr}/master/supplier?search=${item?.supplier_name}`}>{item?.supplier_name}</ReferenceLink>,
+        cell: (item) => {
+          const val = item.person_name || '';
+          return <ReferenceLink href={`/dashboard/${slugStr}/master/${type === 'purchase' ? 'supplier' : 'customer'}?search=${val}`}>{val || '-'}</ReferenceLink>;
+        }
       },
       {
         header: 'TIPE UNIT',
-        accessorKey: 'unit_type',
+        accessorKey: 'unit_type_name',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <ReferenceLink href={`/dashboard/${slugStr}/master/unit-type?search=${item?.unit_type}`}>{item?.unit_type}</ReferenceLink>,
+        cell: (item) => {
+          const val = item?.unit_type_name || '';
+          return <ReferenceLink href={`/dashboard/${slugStr}/master/unit-type?search=${val}`}>{val || '-'}</ReferenceLink>;
+        }
       },
       {
         header: type === 'purchase' ? 'QTY BELI' : 'QTY JUAL',
-        accessorKey: 'order_qty',
+        accessorKey: 'qty_total',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatNumber(item.order_qty),
+        cell: (item) => formatNumber(item.qty_total || 0),
       },
       {
         header: type === 'purchase' ? 'QTY TERIMA' : 'QTY KIRIM',
         alignment: 'center',
-        cell: (item) => formatNumber(type === 'purchase' ? (item.received_qty ?? 0) : (item.delivered_qty ?? 0)),
+        cell: (item) => formatNumber(type === 'purchase' ? (item.qty_received || 0) : ((item.qty_total || 0) - (item.qty_outstanding || 0))),
       },
       {
         header: 'KURANG',
-        accessorKey: 'remaining_qty',
+        accessorKey: 'qty_outstanding',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatNumber(item.remaining_qty),
+        cell: (item) => formatNumber(item.qty_outstanding || 0),
       },
     ],
     [type, slugStr]

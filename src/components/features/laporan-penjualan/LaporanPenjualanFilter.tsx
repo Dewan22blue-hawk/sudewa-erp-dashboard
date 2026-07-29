@@ -101,16 +101,11 @@ export default function LaporanPenjualanFilter({
     const startDateVal = startDate;
     const endDateVal = endDate;
 
-    let customerId: number | null = null;
+    const customerId: number | null = null;
     let search = '';
 
     if (activeTab === 'per-customer') {
-      const matchedCustomer = currentOptions.find(s => s.name?.toLowerCase() === searchQuery.trim().toLowerCase());
-      if (matchedCustomer) {
-        customerId = matchedCustomer.id;
-      } else {
-        search = searchQuery.trim();
-      }
+      search = searchQuery.trim();
     } else if (activeTab === 'per-tipe') {
       search = searchQuery.trim();
     }
@@ -128,16 +123,11 @@ export default function LaporanPenjualanFilter({
     const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
-    let customerId: number | null = null;
+    const customerId: number | null = null;
     let search = '';
 
     if (activeTab === 'per-customer') {
-      const matchedCustomer = currentOptions.find(s => s.name?.toLowerCase() === searchQuery.trim().toLowerCase());
-      if (matchedCustomer) {
-        customerId = matchedCustomer.id;
-      } else {
-        search = searchQuery.trim();
-      }
+      search = searchQuery.trim();
     } else if (activeTab === 'per-tipe') {
       search = searchQuery.trim();
     }

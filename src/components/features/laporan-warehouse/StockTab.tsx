@@ -15,15 +15,8 @@ import {
 } from '@/components/ui/select';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { CopyBox } from '@/components/ui/copy-box';
 import { useRouter } from 'next/router';
-
-interface GroupedStockRow {
-  brand: string;
-  unit: string;
-  qty: number;
-}
-
-const formatNumber = (value: number): string => value.toLocaleString('id-ID');
 
 const toCsvLine = (cells: Array<string | number>): string =>
   cells
@@ -50,10 +43,19 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
     company_id: 1,
     page,
     per_page: perPage,
-    status,
   });
 
-  const rows = useMemo(() => response?.data || [], [response?.data]);
+  const rawRows = useMemo(() => response?.data || [], [response?.data]);
+  
+  const rows = useMemo(() => {
+    let result = [...rawRows];
+
+    if (status && status !== 'all') {
+      result = result.filter(r => r.status === status || r.stock_status === status);
+    }
+    
+    return result;
+  }, [rawRows, status]);
   const pagination = response || {
     current_page: 1,
     data: [],
@@ -64,50 +66,44 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
     to: 0,
   };
 
-  const groupedRows = useMemo(() => {
-    const grouped = rows.reduce<Record<string, GroupedStockRow>>((accumulator, item) => {
-      const brandName = item.unit_type.brand?.name || '-';
-      const unitName = item.unit_type.name || '-';
-      const key = `${brandName}|${unitName}`;
-
-      if (!accumulator[key]) {
-        accumulator[key] = {
-          brand: brandName,
-          unit: unitName,
-          qty: 0,
-        };
-      }
-
-      accumulator[key].qty += item.stock_available + item.stock_forecast;
-      return accumulator;
-    }, {});
-
-    return Object.values(grouped);
+  const totals = useMemo(() => {
+    return rows.reduce(
+      (acc, item) => {
+        acc.available += item.stock_available || 0;
+        acc.forecast += item.stock_forecast || 0;
+        return acc;
+      },
+      { available: 0, forecast: 0 }
+    );
   }, [rows]);
-
-  const grandTotal = useMemo(
-    () => groupedRows.reduce((total, item) => total + item.qty, 0),
-    [groupedRows],
-  );
 
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
 
   const handleDownload = useCallback(() => {
-    if (groupedRows.length === 0) {
+    if (rows.length === 0) {
       toast.error('Tidak ada data untuk diunduh');
       return;
     }
 
-    const header = ['NO', 'MERK UNIT', 'TIPE UNIT', 'QTY'];
+    const header = ['NO', 'KODE UNIT', 'MERK', 'TIPE UNIT', 'KATEGORI', 'HARGA BELI', 'TERSEDIA', 'FORECAST'];
     const lines = [toCsvLine(header)];
 
-    groupedRows.forEach((item, index) => {
-      lines.push(toCsvLine([index + 1, item.brand, item.unit, item.qty]));
+    rows.forEach((item, index) => {
+      lines.push(toCsvLine([
+        (pagination.from > 0 ? pagination.from - 1 : 0) + index + 1,
+        item.unit_type?.code || '-',
+        item.unit_type?.brand?.name || '-',
+        item.unit_type?.name || '-',
+        item.unit_type?.unit_type || '-',
+        item.unit_type?.buy_price || 0,
+        item.stock_available || 0,
+        item.stock_forecast || 0,
+      ]));
     });
 
-    lines.push(toCsvLine(['', 'GRAND TOTAL', '', grandTotal]));
+    lines.push(toCsvLine(['', '', '', '', '', 'GRAND TOTAL', totals.available, totals.forecast]));
 
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -120,7 +116,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
     URL.revokeObjectURL(url);
 
     toast.success('Data stock berhasil diunduh');
-  }, [groupedRows, grandTotal, page]);
+  }, [rows, page, pagination.from, totals]);
 
   useEffect(() => {
     onActionsChange?.({ print: handlePrint, download: handleDownload });
@@ -130,28 +126,56 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
   const { slug } = router.query;
   const slugStr = typeof slug === 'string' ? slug : '';
 
-  const columns = useMemo<ColumnDef<GroupedStockRow>[]>(
+  const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'MERK UNIT',
-        accessorKey: 'brand',
+        header: 'KODE UNIT',
+        accessorKey: 'unit_type.code',
+        sortable: true,
+        alignment: 'left',
+        cell: (item) => <CopyBox text={item.unit_type?.code || '-'} />
+      },
+      {
+        header: 'MERK',
+        accessorKey: 'unit_type.brand.name',
         sortable: true,
         alignment: 'center',
-        cell: (item) => item?.brand ? <ReferenceLink href={`/dashboard/${slugStr}/master/brand?search=${item?.brand}`}>{item?.brand}</ReferenceLink> : '-'
+        cell: (item) => item.unit_type?.brand?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/brand?search=${item.unit_type.brand.name}`}>{item.unit_type.brand.name}</ReferenceLink> : '-'
       },
       {
         header: 'TIPE UNIT',
-        accessorKey: 'unit',
+        accessorKey: 'unit_type.name',
         sortable: true,
         alignment: 'center',
-        cell: (item) => item?.unit ? <ReferenceLink href={`/dashboard/${slugStr}/master/type-unit?search=${item?.unit}`}>{item?.unit}</ReferenceLink> : '-'
+        cell: (item) => item.unit_type?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/type-unit?search=${item.unit_type.name}`}>{item.unit_type.name}</ReferenceLink> : '-'
       },
       {
-        header: 'QTY',
-        accessorKey: 'qty',
+        header: 'KATEGORI',
+        accessorKey: 'unit_type.unit_type',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatNumber(item.qty),
+        cell: (item) => item.unit_type?.unit_type || '-',
+      },
+      {
+        header: 'HARGA BELI',
+        accessorKey: 'unit_type.buy_price',
+        sortable: true,
+        alignment: 'right',
+        cell: (item) => (item.unit_type?.buy_price || 0).toLocaleString('id-ID'),
+      },
+      {
+        header: 'TERSEDIA',
+        accessorKey: 'stock_available',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => (item.stock_available || 0).toLocaleString('id-ID'),
+      },
+      {
+        header: 'FORECAST',
+        accessorKey: 'stock_forecast',
+        sortable: true,
+        alignment: 'center',
+        cell: (item) => (item.stock_forecast || 0).toLocaleString('id-ID'),
       },
     ],
     [slugStr]
@@ -160,13 +184,14 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
   const footerRow = useMemo(
     () => (
       <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
-        <TableCell colSpan={3} className="px-4 py-4 text-center text-slate-900">
+        <TableCell colSpan={5} className="px-4 py-4 text-center text-slate-900">
           GRAND TOTAL
         </TableCell>
-        <TableCell className="px-4 py-4 text-center text-slate-900">{formatNumber(grandTotal)}</TableCell>
+        <TableCell className="px-4 py-4 text-center text-slate-900">{totals.available.toLocaleString('id-ID')}</TableCell>
+        <TableCell className="px-4 py-4 text-center text-slate-900">{totals.forecast.toLocaleString('id-ID')}</TableCell>
       </TableRow>
     ),
-    [grandTotal]
+    [totals]
   );
 
   const selectFilter = useMemo(
@@ -202,7 +227,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
         </div>
       ) : (
         <BaseTable
-          data={groupedRows}
+          data={rows}
           columns={columns}
           loading={isLoading}
           footer={footerRow}
@@ -211,7 +236,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
             currentPage: pagination.current_page,
             perPage: pagination.per_page,
             lastPage: pagination.last_page,
-            total: pagination.total,
+            total: rows.length > 0 ? rows.length : pagination.total,
           }}
           onPageChange={setPage}
         />

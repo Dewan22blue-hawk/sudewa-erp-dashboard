@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Printer, Loader2 } from 'lucide-react';
+import { Printer, Loader2, DownloadIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -10,6 +10,10 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import { DateRange } from 'react-day-picker';
+import { isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { toast } from 'sonner';
 
 import { useAssetReport } from '@/hooks/report/useAssetReport';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -62,6 +66,7 @@ export default function LaporanAssetPage() {
   const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   // Debounce search query
   useEffect(() => {
@@ -82,6 +87,20 @@ export default function LaporanAssetPage() {
     sortBy,
     sortOrder,
   });
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (!dateRange?.from || !dateRange?.to) return data;
+
+    const fromDate = startOfDay(dateRange.from);
+    const toDate = endOfDay(dateRange.to);
+
+    return data.filter((item: any) => {
+      if (!item.asset?.purchase_date) return false;
+      const tglBeli = parseISO(item.asset.purchase_date);
+      return isWithinInterval(tglBeli, { start: fromDate, end: toDate });
+    });
+  }, [data, dateRange]);
 
   const visiblePages = getVisiblePageNumbers(pagination.lastPage, page, 5);
 
@@ -106,6 +125,42 @@ export default function LaporanAssetPage() {
   // Print triggering handler
   const handlePrint = () => {
     window.print();
+  };
+
+  const toCSV = (cells: any[]) => cells.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',');
+
+  const handleDownload = () => {
+    if (!filteredData || filteredData.length === 0) {
+      toast.error('Tidak ada data untuk diunduh');
+      return;
+    }
+
+    const header = ['NO', 'KODE ASET', 'TGL BELI', 'NAMA BARANG', 'TIPE ASET', 'SERIAL NUMBER', 'HARGA BELI', 'UMUR EKONOMIS (TAHUN)', 'PENYUSUTAN PER BULAN', 'NILAI AKHIR'];
+    const lines = [toCSV(header)];
+
+    filteredData.forEach((item: any, index: number) => {
+      lines.push(toCSV([
+        index + 1,
+        item.asset?.code || '-',
+        item.asset?.purchase_date ? format(new Date(item.asset.purchase_date), 'dd/MM/yyyy') : '-',
+        item.asset?.name || '-',
+        item.asset?.type || '-',
+        item.asset?.serial_number || '-',
+        item.asset?.price || 0,
+        item.economic_age || '-',
+        item.depreciation_per_month || 0,
+        item.final_value || 0
+      ]));
+    });
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `laporan-aset-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Laporan Aset berhasil diunduh');
   };
 
   const { slug } = router.query;
@@ -177,24 +232,40 @@ export default function LaporanAssetPage() {
             title="Laporan Aset"
             subtitle="Laporan data aset perusahaan"
             actions={
-              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
-                <Printer className="h-4.5 w-4.5 text-slate-700 hover:text-slate-900 transition-colors mr-2" /> Print
-              </Button>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button onClick={handleDownload} variant="outline" className="flex-1 sm:flex-none">
+                  <DownloadIcon className="h-4.5 w-4.5 text-slate-700 mr-2" /> Download
+                </Button>
+                <Button onClick={handlePrint} variant="outline" className="flex-1 sm:flex-none">
+                  <Printer className="h-4.5 w-4.5 text-slate-700 mr-2" /> Print
+                </Button>
+              </div>
             }
           />
         </div>
 
         {/* Filtering Block (Search and Show Page dropdown) */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print mb-5">
-          <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
             <div className="relative w-full sm:w-[300px]">
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search here"
+                placeholder="Search Kode Aset, Nama..."
                 className="pl-9 bg-white rounded-md border-slate-200 shadow-sm"
               />
             </div>
+            
+            <div className="flex flex-col space-y-1 w-full sm:w-auto">
+              <div className="w-full sm:w-[260px]">
+                <DatePickerWithRange
+                  date={dateRange}
+                  onChange={setDateRange}
+                  className="rounded-md border-gray-200"
+                />
+              </div>
+            </div>
+
             <div className="flex items-center gap-2 text-sm text-slate-500 whitespace-nowrap">
               <span>Show</span>
               <Select value={String(perPage)} onValueChange={(value) => { setPerPage(Number(value)); setPage(1); }}>
@@ -242,7 +313,7 @@ export default function LaporanAssetPage() {
               </div>
             ) : (
               <BaseTable
-                data={data || []}
+                data={filteredData || []}
                 columns={columns}
                 loading={isLoading}
                 sortBy={sortBy}

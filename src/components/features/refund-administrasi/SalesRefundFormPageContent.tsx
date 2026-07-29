@@ -132,15 +132,18 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
   }, [selectableFilteredItems, form]);
 
   const onSubmit = async (values: CreateRefundFormValues) => {
+    let newRefundId = null;
     try {
       if (mode === 'create') {
-        await createMutation.mutateAsync({
+        const response = await createMutation.mutateAsync({
           unit_transaction_id: values.unit_transaction_id,
           refund_date: values.refund_date,
           refund_amount: Number(values.refund_amount),
           note: values.note || '',
           unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids.map(Number),
         });
+
+        newRefundId = response.id;
         toast.success('Data refund penjualan berhasil dibuat');
       } else {
         if (!refundId) return;
@@ -154,9 +157,10 @@ export default function SalesRefundFormPageContent({ transactionId, mode, refund
             unit_transaction_item_detail_ids: values.unit_transaction_item_detail_ids.map(Number),
           },
         });
+        newRefundId = refundId;
         toast.success('Data refund penjualan berhasil diperbarui');
       }
-      router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/${mode === 'create' ? createMutation.data?.id : refundId}`);
+      router.push(`/dashboard/${slug}/transaksi/penjualan-unit/${transactionId}/refund/${newRefundId}`);
     } catch (error: any) {
       toast.error(error?.message || 'Gagal menyimpan data refund');
     }

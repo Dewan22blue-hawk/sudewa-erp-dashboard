@@ -63,91 +63,52 @@ export default function LaporanPembelianPage() {
     csvContent += `"${periodText}"\n\n`;
 
     if (activeTab === 'per-nota') {
-      csvContent += "NO,No Pembelian,TGL BELI,TIPE UNIT,QTY,HARGA BELI,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAINNYA,HPP,DPP,PPN,JUMLAH\n";
+      csvContent += "NO,NO PEMBELIAN,TGL BELI,TIPE UNIT,QTY,HARGA BELI,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAINNYA,HPP,DPP,PPN,JUMLAH\n";
 
-      let index = 1;
-      data.forEach((item) => {
-        const items = item.unit_transaction_items || [];
-
-        if (items.length === 0) {
-          csvContent += `${index},`;
-          csvContent += `"${item.code}",`;
-          csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
-          csvContent += `"-",`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `0,`;
-          csvContent += `${item.transaction_bruto_total}\n`;
-          index++;
-          return;
-        }
-
-        items.forEach((unit) => {
-          csvContent += `${index},`;
-          csvContent += `"${item.code}",`;
-          csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
-          csvContent += `"${unit.unit_type?.name || '-'}",`;
-          csvContent += `${unit.qty_total},`;
-          csvContent += `${unit.price},`;
-          csvContent += `${unit.bbn_price},`;
-          csvContent += `${unit.expedition_fee},`;
-          csvContent += `${unit.other_fee},`;
-          csvContent += `${unit.hpp_total_price},`;
-          csvContent += `${unit.dpp_total_price},`;
-          csvContent += `${unit.ppn_total_price},`;
-          csvContent += `${(unit.price * unit.qty_total) + (unit.bbn_price * unit.qty_total) + unit.expedition_fee + unit.other_fee}\n`;
-          index++;
-        });
+      data.forEach((item, idx) => {
+        csvContent += `${idx + 1},`;
+        csvContent += `"${item.transaction_code}",`;
+        csvContent += `"${new Date(item.transaction_date).toLocaleDateString('id-ID')}",`;
+        csvContent += `"${item.unit_name || '-'}",`;
+        csvContent += `${item.qty || 0},`;
+        csvContent += `${item.price || 0},`;
+        csvContent += `${item.bbn || 0},`;
+        csvContent += `${item.expedition_fee || 0},`;
+        csvContent += `${item.other_fee || 0},`;
+        csvContent += `${item.hpp_fee || 0},`;
+        csvContent += `${item.dpp || 0},`;
+        csvContent += `${item.ppn || 0},`;
+        csvContent += `${item.total || 0}\n`;
       });
     } else if (activeTab === 'per-tipe') {
       csvContent += "NO,NO PEMBELIAN,TGL BELI,TIPE UNIT,QTY,HARGA,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAIN,TOTAL BELI\n";
 
       data.forEach((item, idx) => {
-        const items = item.unit_transaction_items || [];
-        const unitTypes = Array.from(new Set(items.map(u => u.unit_type?.name).filter(Boolean))).join(', ');
-        const qty = items.reduce((acc, curr) => acc + curr.qty_total, 0);
-        const harga = items.reduce((acc, curr) => acc + (curr.price * curr.qty_total), 0);
-        const biayaBbn = items.reduce((acc, curr) => acc + (curr.bbn_price * curr.qty_total), 0);
-        const biayaEkspedisi = items.reduce((acc, curr) => acc + curr.expedition_fee, 0);
-        const biayaLain = items.reduce((acc, curr) => acc + curr.other_fee, 0);
-
         csvContent += `${idx + 1},`;
-        csvContent += `"${item.code}",`;
-        csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
-        csvContent += `"${unitTypes || '-'}",`;
-        csvContent += `${qty},`;
-        csvContent += `${harga},`;
-        csvContent += `${biayaBbn},`;
-        csvContent += `${biayaEkspedisi},`;
-        csvContent += `${biayaLain},`;
-        csvContent += `${item.transaction_bruto_total}\n`;
+        csvContent += `"${item.transaction_code}",`;
+        csvContent += `"${new Date(item.transaction_date).toLocaleDateString('id-ID')}",`;
+        csvContent += `"${item.unit_name || '-'}",`;
+        csvContent += `${item.qty || 0},`;
+        csvContent += `${item.price || 0},`;
+        csvContent += `${item.bbn || 0},`;
+        csvContent += `${item.expedition_fee || 0},`;
+        csvContent += `${item.other_fee || 0},`;
+        csvContent += `${item.total || 0}\n`;
       });
     } else {
       csvContent += "NO,NO PEMBELIAN,TGL BELI,NAMA SUPPLIER,QTY,HARGA,BIAYA BBN,BIAYA EKSPEDISI,BIAYA LAIN,TOTAL BELI\n";
 
       data.forEach((item, idx) => {
-        const items = item.unit_transaction_items || [];
-        const qty = items.reduce((acc, curr) => acc + curr.qty_total, 0);
-        const harga = items.reduce((acc, curr) => acc + (curr.price * curr.qty_total), 0);
-        const biayaBbn = items.reduce((acc, curr) => acc + (curr.bbn_price * curr.qty_total), 0);
-        const biayaEkspedisi = items.reduce((acc, curr) => acc + curr.expedition_fee, 0);
-        const biayaLain = items.reduce((acc, curr) => acc + curr.other_fee, 0);
-
         csvContent += `${idx + 1},`;
-        csvContent += `"${item.code}",`;
-        csvContent += `"${new Date(item.created_at).toLocaleDateString('id-ID')}",`;
-        csvContent += `"${item.person?.name || '-'}",`;
-        csvContent += `${qty},`;
-        csvContent += `${harga},`;
-        csvContent += `${biayaBbn},`;
-        csvContent += `${biayaEkspedisi},`;
-        csvContent += `${biayaLain},`;
-        csvContent += `${item.transaction_bruto_total}\n`;
+        csvContent += `"${item.transaction_code}",`;
+        csvContent += `"${new Date(item.transaction_date).toLocaleDateString('id-ID')}",`;
+        csvContent += `"${item.person_name || '-'}",`;
+        csvContent += `${item.qty || 0},`;
+        csvContent += `${item.price || 0},`;
+        csvContent += `${item.bbn || 0},`;
+        csvContent += `${item.expedition_fee || 0},`;
+        csvContent += `${item.other_fee || 0},`;
+        csvContent += `${item.total || 0}\n`;
       });
     }
 

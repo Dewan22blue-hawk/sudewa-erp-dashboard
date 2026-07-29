@@ -12,6 +12,8 @@ export interface WarehouseActivityUnitDetail {
   tipeUnit: string;
   warna: string;
   noMesin: string;
+  in_stock: boolean;
+  status: string;
   noRangka: string;
   diterima: boolean;
 }

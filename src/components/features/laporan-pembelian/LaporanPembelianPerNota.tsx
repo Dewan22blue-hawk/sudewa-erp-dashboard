@@ -3,6 +3,9 @@ import { PurchaseTransactionItem } from '@/services/laporan-pembelian.service';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: PurchaseTransactionItem[];
@@ -32,104 +35,47 @@ const toNumber = (val: unknown) => {
   return Number.isFinite(num) ? num : 0;
 };
 
-const formatCurrency = (val: number) => `Rp ${toNumber(val).toLocaleString('id-ID')}`;
+const formatCurrency = (val: number) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 const formatDate = (date: string) => {
   const parsed = new Date(date);
   return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMMM yyyy', { locale: id });
 };
 
 export default function LaporanPembelianPerNota({ data, pagination, isLoading, onPageChange }: Props) {
-  const flattenedData: PerNotaRow[] = useMemo(() => {
-    return data.flatMap((item) => {
-      const units = Array.isArray(item.unit_transaction_items) ? item.unit_transaction_items : [];
+  const router = useRouter();
+  const slug = router.query.slug as string;
 
-      if (units.length === 0) {
-        return [{
-          id: `${item.id}-fallback`,
-          noPembelian: item.code,
-          tanggal: item.created_at,
-          tipeUnit: '-',
-          qty: 0,
-          hargaBeli: 0,
-          biayaBbn: 0,
-          biayaEkspedisi: 0,
-          biayaLainnya: 0,
-          hpp: 0,
-          dpp: 0,
-          ppn: 0,
-          jumlah: toNumber(item.transaction_bruto_total),
-        }];
-      }
-
-      return units.map((unit, idx) => ({
-        id: `${item.id}-${idx}`,
-        noPembelian: item.code,
-        tanggal: item.created_at,
-        tipeUnit: unit.unit_type?.name || '-',
-        qty: toNumber(unit.qty_total),
-        hargaBeli: toNumber(unit.price),
-        biayaBbn: toNumber(unit.bbn_price),
-        biayaEkspedisi: toNumber(unit.expedition_fee),
-        biayaLainnya: toNumber(unit.other_fee),
-        hpp: toNumber(unit.hpp_total_price),
-        dpp: toNumber(unit.dpp_total_price),
-        ppn: toNumber(unit.ppn_total_price),
-        jumlah: toNumber(item.transaction_bruto_total),
-      }));
-    });
-  }, [data]);
-
-  const rowsPerPage = pagination.perPage || 50;
-  const [tablePage, setTablePage] = useState(1);
-
-  useEffect(() => {
-    setTablePage(1);
-  }, [data]);
-
-  const totalRows = flattenedData.length;
-  const lastTablePage = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-  const safePage = Math.min(tablePage, lastTablePage);
-
-  useEffect(() => {
-    if (tablePage > lastTablePage) {
-      setTablePage(lastTablePage);
-    }
-  }, [tablePage, lastTablePage]);
-
-  const pagedData = useMemo(() => {
-    const start = (safePage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return flattenedData.slice(start, end);
-  }, [flattenedData, safePage, rowsPerPage]);
-
-  // Keep prop consumed for compatibility with parent contract; pagination on this table is row-based.
-  void onPageChange;
-
-  const columns = useMemo<ColumnDef<PerNotaRow>[]>(
+  const columns = useMemo<ColumnDef<PurchaseTransactionItem>[]>(
     () => [
       {
         header: 'NO',
         alignment: 'center',
-        cell: (_, idx) => idx + 1 + (safePage - 1) * rowsPerPage,
+        cell: (_, idx) => idx + 1 + ((pagination.currentPage || 1) - 1) * (pagination.perPage || 10),
       },
       {
         header: 'NO PEMBELIAN',
-        accessorKey: 'noPembelian',
+        accessorKey: 'transaction_code',
         sortable: true,
         alignment: 'left',
+        cell: (item) => <CopyBox text={item.transaction_code} />
       },
       {
         header: 'TGL BELI',
-        accessorKey: 'tanggal',
+        accessorKey: 'transaction_date',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatDate(item.tanggal),
+        cell: (item) => formatDate(item.transaction_date),
       },
       {
         header: 'TIPE UNIT',
-        accessorKey: 'tipeUnit',
+        accessorKey: 'unit_name',
         sortable: true,
         alignment: 'left',
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${encodeURIComponent(item.unit_name || '')}`}>
+            {item.unit_name || '-'}
+          </ReferenceLink>
+        ),
       },
       {
         header: 'QTY',
@@ -139,38 +85,38 @@ export default function LaporanPembelianPerNota({ data, pagination, isLoading, o
       },
       {
         header: 'HARGA BELI',
-        accessorKey: 'hargaBeli',
+        accessorKey: 'price',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatCurrency(item.hargaBeli),
+        cell: (item) => formatCurrency(item.price),
       },
       {
         header: 'BIAYA BBN',
-        accessorKey: 'biayaBbn',
+        accessorKey: 'bbn',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatCurrency(item.biayaBbn),
+        cell: (item) => formatCurrency(item.bbn),
       },
       {
         header: 'BIAYA EKSPEDISI',
-        accessorKey: 'biayaEkspedisi',
+        accessorKey: 'expedition_fee',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatCurrency(item.biayaEkspedisi),
+        cell: (item) => formatCurrency(item.expedition_fee),
       },
       {
         header: 'BIAYA LAINNYA',
-        accessorKey: 'biayaLainnya',
+        accessorKey: 'other_fee',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatCurrency(item.biayaLainnya),
+        cell: (item) => formatCurrency(item.other_fee),
       },
       {
         header: 'HPP',
-        accessorKey: 'hpp',
+        accessorKey: 'hpp_fee',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatCurrency(item.hpp),
+        cell: (item) => formatCurrency(item.hpp_fee),
       },
       {
         header: 'DPP',
@@ -188,29 +134,29 @@ export default function LaporanPembelianPerNota({ data, pagination, isLoading, o
       },
       {
         header: 'JUMLAH',
-        accessorKey: 'jumlah',
+        accessorKey: 'total',
         sortable: true,
         alignment: 'center',
         cell: (item) => (
-          <span className="font-semibold text-slate-900">{formatCurrency(item.jumlah)}</span>
+          <span className="font-semibold text-slate-900">{formatCurrency(item.total)}</span>
         ),
       },
     ],
-    [safePage, rowsPerPage]
+    [pagination.currentPage, pagination.perPage]
   );
 
   return (
     <BaseTable
-      data={pagedData}
+      data={data}
       columns={columns}
       loading={isLoading}
       meta={{
-        currentPage: safePage,
-        perPage: rowsPerPage,
-        lastPage: lastTablePage,
-        total: totalRows,
+        currentPage: pagination.currentPage,
+        perPage: pagination.perPage,
+        lastPage: pagination.lastPage,
+        total: pagination.total,
       }}
-      onPageChange={setTablePage}
+      onPageChange={onPageChange}
     />
   );
 }

@@ -159,8 +159,8 @@ export default function PurchaseForm({
                                 <FormControl>
                                     <Input
                                         placeholder="Alamat Supplier"
-                                        readOnly={true}
                                         className="bg-transparent"
+                                        disabled={readOnly}
                                         {...field}
                                         value={field.value ?? ''}
                                     />
@@ -179,8 +179,8 @@ export default function PurchaseForm({
                                 <FormControl>
                                     <Input
                                         placeholder="NPWP Supplier"
-                                        readOnly={true}
                                         className="bg-transparent"
+                                        disabled={readOnly}
                                         {...field}
                                         value={field.value ?? ''}
                                     />

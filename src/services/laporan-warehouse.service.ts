@@ -4,6 +4,10 @@ export interface StockItem {
   id: number;
   unit_type: {
     id: number;
+    code: string;
+    unit_type: string;
+    buy_price: number;
+    sell_price: number;
     name: string;
     brand: { id: number; name: string };
   };
@@ -13,20 +17,20 @@ export interface StockItem {
   stock_available: number;
   stock_forecast: number;
   purchase_price: number;
+  stock_status?: string;
   status?: string | undefined;
   person?: string;
 }
 
 export interface OrderOutstandingItem {
-  code: string;
-  date: string;
-  supplier_name?: string;
-  customer_name?: string;
-  unit_type: string;
-  order_qty: number;
-  received_qty?: number;
-  delivered_qty?: number;
-  remaining_qty: number;
+  transaction_code: string;
+  transaction_date: string;
+  transaction_type: string;
+  person_name: string;
+  unit_type_name: string;
+  qty_total: number;
+  qty_received: number;
+  qty_outstanding: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -146,6 +150,10 @@ const mapStockItem = (item: unknown, brandMap?: Map<number, string>): StockItem 
     id: toNumber(source.id),
     unit_type: {
       id: toNumber(unitType.id),
+      code: toString(unitType.code),
+      unit_type: toString(unitType.unit_type),
+      buy_price: toNumber(unitType.buy_price),
+      sell_price: toNumber(unitType.sell_price),
       name: toString(unitType.name),
       brand: {
         id: brandId,
@@ -160,63 +168,22 @@ const mapStockItem = (item: unknown, brandMap?: Map<number, string>): StockItem 
     purchase_price: toNumber(source.purchase_price),
     person: personName,
     status: toString(source?.status),
+    stock_status: toString(source?.stock_status),
   };
 };
 
-const mapOrderItemToRows = (item: unknown, type: 'purchase' | 'sales'): OrderOutstandingItem[] => {
+const mapOrderItemToRows = (item: unknown): OrderOutstandingItem[] => {
   const source = (item ?? {}) as Record<string, unknown>;
-  const items = toArray(source.items) as Record<string, unknown>[];
-
-  const person = toString(source.person, '');
-  const supplier_name = toString(source.supplier_name, person);
-  const customer_name = toString(source.customer_name, person);
-  const code = toString(source.code);
-  const date = toString(source.date, '');
-
-  if (items.length > 0) {
-    return items.map((i) => {
-      const uType = (i.unit_type ?? {}) as Record<string, unknown>;
-      const unitTypeName = toString(uType.name);
-      const orderQty = toNumber(i.qty_input);
-      const actualQty = toNumber(i.qty_actual);
-      const diffQty = toNumber(i.qty_difference);
-
-      return {
-        code,
-        date,
-        supplier_name,
-        customer_name,
-        unit_type: unitTypeName,
-        order_qty: orderQty,
-        received_qty: type === 'purchase' ? actualQty : undefined,
-        delivered_qty: type === 'sales' ? actualQty : undefined,
-        remaining_qty: diffQty,
-      };
-    });
-  }
-
-  // Fallback: single row from flat fields
-  const unitType = source.unit_type;
-  const orderQty = toNumber(source.order_qty);
-  const receivedQty = toNumber(source.received_qty);
-  const deliveredQty = toNumber(source.delivered_qty);
-  const remainingQty =
-    type === 'purchase' ? orderQty - receivedQty : orderQty - deliveredQty;
-
   return [
     {
-      code,
-      date,
-      supplier_name,
-      customer_name,
-      unit_type:
-        typeof unitType === 'string'
-          ? unitType
-          : toString((unitType as Record<string, unknown> | undefined)?.name),
-      order_qty: orderQty,
-      received_qty: receivedQty,
-      delivered_qty: deliveredQty,
-      remaining_qty: remainingQty,
+      transaction_code: toString(source.transaction_code),
+      transaction_date: toString(source.transaction_date),
+      transaction_type: toString(source.transaction_type),
+      person_name: toString(source.person_name),
+      unit_type_name: toString(source.unit_type_name),
+      qty_total: toNumber(source.qty_total),
+      qty_received: toNumber(source.qty_received),
+      qty_outstanding: toNumber(source.qty_outstanding),
     },
   ];
 };
@@ -331,7 +298,7 @@ export const getOrderOutstanding = async (params: {
   });
 
   const { rows, metaSource } = resolvePaginatedPayload(response.data?.data ?? response.data);
-  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item, params.type));
+  const flatRows = rows.flatMap((item) => mapOrderItemToRows(item));
   const currentPage = toNumber(metaSource.current_page) || 1;
   const perPage = toNumber(metaSource.per_page) || (params.per_page ?? 50);
   const total = toNumber(metaSource.total) || rows.length;

@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { formatDate } from '@/lib/utils/format';
+import { LoadingState } from '@/components/ui/loading-state';
 
 /**
  * Detail Data Penjualan Unit - Image 4
@@ -34,14 +35,20 @@ export default function SalesDetailPage() {
   const router = useRouter();
   const { id } = router.query;
   const salesId = Array.isArray(id) ? id[0] : id;
+  const { slug } = router.query;
   const { data, isLoading } = useSalesDetail(salesId);
+
+  useEffect(() => {
+    if (!isLoading && data && data.raw?.type !== 'sales') {
+      router.push(`/dashboard/${slug}/transaksi/penjualan-unit`);
+    }
+  }, [data, isLoading, router, slug]);
 
   const { hasPermission } = usePermissionGuard();
   const canCreate = hasPermission('transaction:create');
   const canEdit = hasPermission('transaction:edit');
   const canDelete = hasPermission('transaction:delete');
 
-  const { slug } = router.query;
   const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
   const salesData = data?.ui ?? null;
   const rawData = data?.raw ?? null;
@@ -268,10 +275,13 @@ export default function SalesDetailPage() {
         return;
       }
 
+      const description = String(`Pengiriman Stok Transaksi beli ${data?.raw?.code} Sebanyak ${detailIds?.length} Unit`);
+
       const activityId = await warehouseActivityService.createIssueActivity({
         unitTransactionId: String(salesId),
         warehouseId,
         personId,
+        description,
         unitTransactionItemId: String(items[0]?.id ?? ''),
       });
 
@@ -298,7 +308,7 @@ export default function SalesDetailPage() {
   if (isLoading || billingLoading || historyLoading || !salesData) {
     return (
       <DashboardLayout>
-        <div className="p-6">Loading data...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }

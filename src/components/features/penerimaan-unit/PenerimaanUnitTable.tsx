@@ -82,7 +82,7 @@ export default function PenerimaanUnitTable({
             {item.supplier}
           </ReferenceLink>
         ) : (
-          item.supplier
+          '-'
         ),
     },
     {
@@ -109,16 +109,10 @@ export default function PenerimaanUnitTable({
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
             >
               {slug ? (
-                <a href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/edit`}>Detail</a>
+                <a href={`/dashboard/${slug}/warehouse/penerimaan-unit/${item.id}/detail`}>Detail</a>
               ) : (
                 <span className="text-gray-400">Detail</span>
               )}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setDeleteId(item.id)}
-              className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-            >
-              Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -143,13 +137,13 @@ export default function PenerimaanUnitTable({
         headerActions={headerActions}
       />
 
-      {deleteId && (
+      {/* {deleteId && (
         <DeletePenerimaanUnitDialog
           id={deleteId}
           open={!!deleteId}
           onClose={() => setDeleteId(null)}
         />
-      )}
+      )} */}
     </>
   );
 }

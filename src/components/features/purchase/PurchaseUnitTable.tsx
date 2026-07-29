@@ -248,7 +248,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid, canEdit, c
                   className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
                   disabled={isPaid}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Unit
+                  Tambah Data Unit
                 </Button>
               </div>
             }

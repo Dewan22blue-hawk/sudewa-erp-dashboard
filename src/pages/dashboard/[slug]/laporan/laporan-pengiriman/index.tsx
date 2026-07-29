@@ -23,6 +23,7 @@ export default function LaporanPengirimanPage() {
   const router = useRouter();
   const { companyId } = useCompany();
   const {
+    type,
     data,
     pagination,
     isLoading,
@@ -31,8 +32,7 @@ export default function LaporanPengirimanPage() {
     setPage,
     setPerPage,
     setDateRange,
-    setCustomer,
-    setUnitType,
+    setSearch,
   } = useLaporanPengiriman();
 
   const slugParam = router.query.slug;
@@ -41,20 +41,17 @@ export default function LaporanPengirimanPage() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as TabType);
-    setCustomer(null);
-    setUnitType(null);
+    setSearch('');
   };
 
   const handleApplyFilters = (filters: {
     startDate: string | null;
     endDate: string | null;
-    customerId: number | null;
-    unitTypeId: number | null;
+    search: string;
     perPage: number;
   }) => {
     setDateRange(filters.startDate, filters.endDate);
-    setCustomer(filters.customerId);
-    setUnitType(filters.unitTypeId);
+    setSearch(filters.search);
     setPerPage(filters.perPage);
   };
 

@@ -53,5 +53,5 @@ next-env.d.ts
 # ignored files
 pembahasan_skripsi_erp_wajira.md
 
-src/pages/index.tsx
 public/wajira-footer-design.png
+/docs-flow/

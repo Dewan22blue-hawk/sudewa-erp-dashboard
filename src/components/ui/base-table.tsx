@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,6 +61,7 @@ export interface BaseTableProps<T> {
   selectedIds?: Set<string>;
   onSelectedIdsChange?: (ids: Set<string>) => void;
   getRowId?: (item: T) => string;
+  isCheckboxDisabled?: (item: T) => boolean;
   footer?: React.ReactNode;
   onRowClick?: (item: T) => void;
 }
@@ -89,6 +90,7 @@ export default function BaseTable<T>({
   selectedIds,
   onSelectedIdsChange,
   getRowId,
+  isCheckboxDisabled,
   footer,
   onRowClick,
 }: BaseTableProps<T>) {
@@ -97,11 +99,11 @@ export default function BaseTable<T>({
     defaultSort || null
   );
 
-  const getRowIdInternal = (item: T) => {
+  const getRowIdInternal = useCallback((item: T) => {
     if (getRowId) return getRowId(item);
     const anyItem = item as any;
     return String(anyItem.id || anyItem.uuid || '');
-  };
+  }, [getRowId]);
 
   const handleToggleAll = (checked: boolean) => {
     if (!onSelectedIdsChange) return;
@@ -196,6 +198,17 @@ export default function BaseTable<T>({
       return String(valA).localeCompare(String(valB)) * factor;
     });
   }, [data, activeSort, onSortChange]);
+
+  const isMasterCheckboxDisabled = useMemo(() => {
+    if (!selectedIds || !isCheckboxDisabled) return false;
+    const allChecked = sortedData.length > 0 && sortedData.every((item) => selectedIds.has(getRowIdInternal(item)));
+    if (allChecked) return false;
+    
+    return sortedData.some((item) => {
+      const isChecked = selectedIds.has(getRowIdInternal(item));
+      return !isChecked && isCheckboxDisabled(item);
+    });
+  }, [sortedData, selectedIds, isCheckboxDisabled, getRowIdInternal]);
 
   const currentPage = meta?.currentPage ?? 1;
   const itemsPerPage = meta?.perPage ?? perPage;
@@ -294,7 +307,7 @@ export default function BaseTable<T>({
       )}
 
       <div className={cn('relative overflow-hidden rounded-md border border-slate-200 bg-white shadow-none', containerClassName)}>
-        <Table className="w-max min-w-full">
+        <Table className="w-max min-w-full print:w-full print:table-fixed">
           <TableHeader className={cn('border-b border-gray-200', headerRowClassName)}>
             {headerGroups && headerGroups}
             <TableRow className="hover:bg-transparent border-none">
@@ -303,6 +316,7 @@ export default function BaseTable<T>({
                   <Checkbox
                     checked={sortedData.length > 0 && sortedData.every((item) => selectedIds?.has(getRowIdInternal(item)))}
                     onCheckedChange={handleToggleAll}
+                    disabled={isMasterCheckboxDisabled}
                     aria-label="Pilih semua"
                   />
                 </TableHead>
@@ -321,7 +335,7 @@ export default function BaseTable<T>({
                     key={col.id || idx}
                     onClick={() => isSortable && handleSort(sortKey)}
                     className={cn(
-                      'px-4 py-4 text-xs font-semibold uppercase text-slate-500 whitespace-nowrap',
+                      'px-4 py-4 print:px-2 print:py-2 text-xs print:text-[10px] font-semibold uppercase text-slate-500 whitespace-nowrap print:whitespace-normal',
                       isSortable && 'cursor-pointer select-none group',
                       col.sticky === 'right' && cn('sticky right-0 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]', headerRowClassName),
                       col.sticky === 'left' && cn('sticky left-0 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]', headerRowClassName),
@@ -382,6 +396,7 @@ export default function BaseTable<T>({
                       <Checkbox
                         checked={selectedIds?.has(getRowIdInternal(item)) ?? false}
                         onCheckedChange={(checked) => handleToggleOne(getRowIdInternal(item), Boolean(checked))}
+                        disabled={isCheckboxDisabled?.(item)}
                         aria-label="Pilih baris"
                       />
                     </TableCell>
@@ -394,7 +409,7 @@ export default function BaseTable<T>({
                       <TableCell
                         key={col.id || colIdx}
                         className={cn(
-                          'px-4 py-4 text-sm text-slate-700 transition-colors',
+                          'px-4 py-4 print:px-2 print:py-2 text-sm print:text-[10px] text-slate-700 transition-colors',
                           col.sticky === 'right' && 'sticky right-0 bg-white group-hover:bg-slate-50 z-10 border-l border-slate-200 shadow-[-4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]',
                           col.sticky === 'left' && 'sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)] w-[80px] min-w-[80px] max-w-[80px]',
                           textAlignment,

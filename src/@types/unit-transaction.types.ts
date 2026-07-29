@@ -132,6 +132,7 @@ export interface UnitTransactionDetail {
   code: string;
   created_at: string;
   stock_state: string;
+  type?: string;
   max_capacity?: number;
   person: UnitTransactionPerson;
   warehouse: UnitTransactionWarehouse;

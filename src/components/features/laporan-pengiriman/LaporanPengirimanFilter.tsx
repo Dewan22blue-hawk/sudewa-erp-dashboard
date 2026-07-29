@@ -17,8 +17,7 @@ interface LaporanPengirimanFilterProps {
   onApplyFilters: (filters: {
     startDate: string | null;
     endDate: string | null;
-    customerId: number | null;
-    unitTypeId: number | null;
+    search: string;
     perPage: number;
   }) => void;
   onPrint: () => void;
@@ -106,28 +105,17 @@ export default function LaporanPengirimanFilter({
   );
 
   useEffect(() => {
-    let customerId: number | null = null;
-    let unitTypeId: number | null = null;
-
+    let search = '';
     if (activeTab === 'per-customer') {
-      const matchedCustomer = customers.find(
-        (customer) => customer.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      customerId = matchedCustomer ? matchedCustomer.id : null;
-    }
-
-    if (activeTab === 'per-tipe') {
-      const matchedType = unitTypes.find(
-        (unitType) => unitType.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      unitTypeId = matchedType ? matchedType.id : null;
+      search = searchQuery.trim();
+    } else if (activeTab === 'per-tipe') {
+      search = searchQuery.trim();
     }
 
     onApplyFilters({
       startDate,
       endDate,
-      customerId,
-      unitTypeId,
+      search,
       perPage: parseInt(perPage, 10),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,28 +125,17 @@ export default function LaporanPengirimanFilter({
     const appliedStartDate = newRange?.from ? format(newRange.from, 'yyyy-MM-dd') : null;
     const appliedEndDate = newRange?.to ? format(newRange.to, 'yyyy-MM-dd') : appliedStartDate;
 
-    let customerId: number | null = null;
-    let unitTypeId: number | null = null;
-
+    let search = '';
     if (activeTab === 'per-customer') {
-      const matchedCustomer = customers.find(
-        (customer) => customer.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      customerId = matchedCustomer ? matchedCustomer.id : null;
-    }
-
-    if (activeTab === 'per-tipe') {
-      const matchedType = unitTypes.find(
-        (unitType) => unitType.name?.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      unitTypeId = matchedType ? matchedType.id : null;
+      search = searchQuery.trim();
+    } else if (activeTab === 'per-tipe') {
+      search = searchQuery.trim();
     }
 
     onApplyFilters({
       startDate: appliedStartDate,
       endDate: appliedEndDate,
-      customerId,
-      unitTypeId,
+      search,
       perPage: parseInt(perPage, 10),
     });
   };

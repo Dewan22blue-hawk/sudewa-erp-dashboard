@@ -24,6 +24,7 @@ interface StockPickerTableProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchAction?: ReactNode;
+  requiredQty?: number;
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -78,6 +79,7 @@ export function StockPickerTable({
   searchValue,
   onSearchChange,
   searchAction,
+  requiredQty,
 }: StockPickerTableProps) {
   const filteredUnits = useMemo(() => {
     const query = searchValue.trim().toLowerCase();
@@ -100,6 +102,15 @@ export function StockPickerTable({
   const stringSelectedIds = useMemo(() => {
     return new Set<string>(Array.from(selectedIds).map(String));
   }, [selectedIds]);
+
+  const isLimitReached = requiredQty !== undefined && requiredQty > 0 && selectedIds.size >= requiredQty;
+
+  const isCheckboxDisabled = useCallback((item: WarehouseStockUnit) => {
+    if (isLimitReached && !selectedIds.has(item.id)) {
+      return true;
+    }
+    return false;
+  }, [isLimitReached, selectedIds]);
 
   const handleSelectedIdsChange = useCallback((ids: Set<string>) => {
     const numIds = new Set<number>(Array.from(ids).map(Number));
@@ -177,6 +188,7 @@ export function StockPickerTable({
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}
+        isCheckboxDisabled={isCheckboxDisabled}
         meta={{
           currentPage,
           perPage,

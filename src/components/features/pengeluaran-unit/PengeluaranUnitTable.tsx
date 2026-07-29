@@ -67,12 +67,7 @@ export default function PengeluaranUnitTable({
 
   const navigateToDetail = (id: number): void => {
     const base = resolveBasePath();
-    void router.push(`${base}/${id}`);
-  };
-
-  const navigateToEdit = (id: number): void => {
-    const base = resolveBasePath();
-    void router.push(`${base}/${id}/edit`);
+    void router.push(`${base}/${id}/detail`);
   };
 
   const columns: ColumnDef<PengeluaranUnit>[] = [
@@ -80,6 +75,7 @@ export default function PengeluaranUnitTable({
       header: 'NO PENGELUARAN',
       accessorKey: 'activityNumber',
       alignment: 'left',
+      sortable: true,
       cell: (item) => <CopyBox text={item.activityNumber} />,
     },
     {
@@ -91,20 +87,19 @@ export default function PengeluaranUnitTable({
     {
       header: 'CUSTOMER',
       alignment: 'left',
+      sortable: true,
       cell: (item) => (
-        <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${item.person?.name ?? '-'}`}>
-          {item.person?.name ?? '-'}
-        </ReferenceLink>
+        item?.person ? (
+          <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${item.person?.name ?? '-'}`}>
+            {item.person?.name ?? '-'}
+          </ReferenceLink>
+        ) : '-'
       ),
-    },
-    {
-      header: 'WAREHOUSE',
-      alignment: 'left',
-      cell: (item) => item.warehouse?.name ?? '-',
     },
     {
       header: 'KETERANGAN',
       alignment: 'left',
+      sortable: true,
       cell: (item) => <TextTruncate text={item.description || '-'} maxLength={20} />
     },
     {
@@ -124,12 +119,6 @@ export default function PengeluaranUnitTable({
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
             >
               Detail
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => navigateToEdit(item.id)}
-              className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
-            >
-              Edit
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

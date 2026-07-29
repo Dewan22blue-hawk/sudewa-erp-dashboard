@@ -3,6 +3,9 @@ import { PurchaseTransactionItem } from '@/services/laporan-pembelian.service';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: PurchaseTransactionItem[];
@@ -11,13 +14,16 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
-const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')}`;
+const formatCurrency = (val: number) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 const formatDate = (date: string) => {
   const parsed = new Date(date);
   return Number.isNaN(parsed.getTime()) ? '-' : format(parsed, 'dd MMMM yyyy', { locale: id });
 };
 
 export default function LaporanPembelianPerTipe({ data, pagination, isLoading, onPageChange }: Props) {
+  const router = useRouter();
+  const slug = router.query.slug as string;
+
   const columns = useMemo<ColumnDef<PurchaseTransactionItem>[]>(
     () => [
       {
@@ -27,82 +33,65 @@ export default function LaporanPembelianPerTipe({ data, pagination, isLoading, o
       },
       {
         header: 'NO PEMBELIAN',
-        accessorKey: 'code',
+        accessorKey: 'transaction_code',
         sortable: true,
         alignment: 'left',
+        cell: (item) => <CopyBox text={item.transaction_code} />
       },
       {
         header: 'TGL BELI',
-        accessorKey: 'created_at',
+        accessorKey: 'transaction_date',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatDate(item.created_at),
+        cell: (item) => formatDate(item.transaction_date),
       },
       {
         header: 'TIPE UNIT',
+        accessorKey: 'unit_name',
         alignment: 'left',
-        cell: (item) => {
-          const items = item.unit_transaction_items || [];
-          const unitTypes = Array.from(new Set(items.map(u => u.unit_type?.name).filter(Boolean))).join(', ');
-          return (
-            <span className="max-w-[200px] truncate block" title={unitTypes || '-'}>
-              {unitTypes || '-'}
-            </span>
-          );
-        },
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${encodeURIComponent(item.unit_name || '')}`}>
+            {item.unit_name || '-'}
+          </ReferenceLink>
+        ),
       },
       {
         header: 'QTY',
+        accessorKey: 'qty',
         alignment: 'center',
-        cell: (item) => {
-          const items = item.unit_transaction_items || [];
-          return items.reduce((acc, curr) => acc + curr.qty_total, 0);
-        },
       },
       {
         header: 'HARGA',
+        accessorKey: 'price',
         alignment: 'center',
-        cell: (item) => {
-          const items = item.unit_transaction_items || [];
-          const harga = items.reduce((acc, curr) => acc + (curr.price * curr.qty_total), 0);
-          return formatCurrency(harga);
-        },
+        cell: (item) => formatCurrency(item.price),
       },
       {
         header: 'BIAYA BBN',
+        accessorKey: 'bbn',
         alignment: 'center',
-        cell: (item) => {
-          const items = item.unit_transaction_items || [];
-          const biayaBbn = items.reduce((acc, curr) => acc + (curr.bbn_price * curr.qty_total), 0);
-          return formatCurrency(biayaBbn);
-        },
+        cell: (item) => formatCurrency(item.bbn),
       },
       {
         header: 'BIAYA EKSPEDISI',
+        accessorKey: 'expedition_fee',
         alignment: 'center',
-        cell: (item) => {
-          const items = item.unit_transaction_items || [];
-          const biayaEkspedisi = items.reduce((acc, curr) => acc + curr.expedition_fee, 0);
-          return formatCurrency(biayaEkspedisi);
-        },
+        cell: (item) => formatCurrency(item.expedition_fee),
       },
       {
         header: 'BIAYA LAIN',
+        accessorKey: 'other_fee',
         alignment: 'center',
-        cell: (item) => {
-          const items = item.unit_transaction_items || [];
-          const biayaLain = items.reduce((acc, curr) => acc + curr.other_fee, 0);
-          return formatCurrency(biayaLain);
-        },
+        cell: (item) => formatCurrency(item.other_fee),
       },
       {
         header: 'TOTAL BELI',
-        accessorKey: 'transaction_bruto_total',
+        accessorKey: 'total',
         sortable: true,
         alignment: 'center',
         cell: (item) => (
           <span className="font-semibold text-slate-900">
-            {formatCurrency(item.transaction_bruto_total)}
+            {formatCurrency(item.total)}
           </span>
         ),
       },

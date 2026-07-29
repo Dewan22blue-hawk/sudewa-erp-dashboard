@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import { LoadingState } from '@/components/ui/loading-state';
 
 /**
  * Edit Unit Page - Penjualan Unit
@@ -198,7 +199,7 @@ export default function EditUnitPage() {
   if (isLoading || !formData) {
     return (
       <DashboardLayout>
-        <div className="p-6">Loading data...</div>
+        <LoadingState variant="page" />
       </DashboardLayout>
     );
   }
