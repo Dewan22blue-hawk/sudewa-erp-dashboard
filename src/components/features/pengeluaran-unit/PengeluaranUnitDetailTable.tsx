@@ -40,6 +40,8 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
       inStock: item.in_stock,
       in_stock: item.in_stock,
       status: item.status,
+      state: item?.stockState,
+      warehouseSubBlock: item?.warehouseSubBlock,
     }));
   }, [data]);
 
@@ -175,7 +177,13 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         )
       },
       {
-        header: 'STATUS',
+        header: 'SUB BLOK',
+        accessorKey: 'warehouseSubBlock',
+        sortable: true,
+        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock || '-'} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
+      },
+      {
+        header: 'STATUS UNIT',
         accessorKey: 'status',
         sortable: true,
         cell: (item) => {
@@ -208,17 +216,31 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         },
       },
       {
-        header: 'STATUS STOCK',
+        header: 'STATUS STOK',
         accessorKey: 'in_stock',
         sortable: true,
         cell: (item) => {
           if (item.in_stock === true) {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+            return <Badge className="border-amber-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
           if (item.in_stock === false) {
             return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
           }
           return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+        }
+      },
+      {
+        header: 'STATUS PENGELUARAN',
+        accessorKey: 'state',
+        sortable: true,
+        cell: (item) => {
+          if (item.state === 'done') {
+            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Selesai</Badge>;
+          }
+          if (item.state === 'pending') {
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Pending</Badge>;
+          }
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">Draft</Badge>;
         }
       }
     ],

@@ -16,6 +16,8 @@ export interface WarehouseActivityUnitDetail {
   status: string;
   noRangka: string;
   diterima: boolean;
+  stockState: string;
+  warehouseSubBlock?: string;
 }
 
 export interface WarehouseActivity {
@@ -31,6 +33,8 @@ export interface WarehouseActivity {
   person?: WarehouseActivityPerson | null;
   noPenerimaan: string;
   supplier: string;
+  tanggal: string;
+  state: string;
   keterangan: string;
 }
 

@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { usePengeluaranUnits } from '@/hooks/usePengeluaranUnit';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function PengeluaranUnitPage() {
   const router = useRouter();
@@ -59,6 +60,14 @@ export default function PengeluaranUnitPage() {
     const message = (error as { message?: unknown }).message;
     return typeof message === 'string' && message.trim().length > 0 ? message : 'Gagal memuat data pengeluaran unit';
   }, [error]);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <LoadingState variant="page" />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

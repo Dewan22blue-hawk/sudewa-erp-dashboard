@@ -23,4 +23,8 @@ export interface StockUnit {
   status: Status;
   inStock: boolean;
   stockStatus: StockStatus;
+  warehouseSubBlock?: {
+    id: number;
+    name: string;
+  } | null;
 }

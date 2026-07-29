@@ -107,6 +107,13 @@ export default function StockUnitTable({
       cell: (item) => <CopyBox text={item.noRangka} />,
     },
     {
+      header: 'Sub Blok',
+      accessorKey: 'warehouseSubBlock',
+      alignment: 'center',
+      sortable: true,
+      cell: (item) => item.warehouseSubBlock?.name ?? '-',
+    },
+    {
       header: 'Status Stok',
       accessorKey: 'status',
       sortable: true,
@@ -119,6 +126,13 @@ export default function StockUnitTable({
       sortable: true,
       alignment: 'center',
       cell: (item) => renderStatus(item.status),
+    },
+    {
+      header: 'Posisi Stok',
+      accessorKey: 'stockStatus',
+      sortable: true,
+      alignment: 'center',
+      cell: (item) => renderStatus(item.stockStatus),
     },
   ];
 

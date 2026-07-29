@@ -92,10 +92,10 @@ export default function PurchaseDetailPage() {
 
   const receiveButtonText = useMemo(() => {
     if (updateState.isPending) return 'Memproses...';
-    if (isStockAlreadyProcessed) return 'Sudah Diterima';
+    if (isStockAlreadyProcessed) return 'Sudah Diproses';
     if (purchase?.warehouse_activity?.state === 'process') return 'Sedang Diproses';
     if (purchase?.warehouse_activity?.state === 'draft') return 'Proses Penerimaan';
-    return 'Terima Barang';
+    return 'Proses Unit';
   }, [updateState.isPending, isStockAlreadyProcessed, purchase?.warehouse_activity?.state]);
   const unitItems = unitItemsResponse?.data ?? [];
   const resolvedBillingHistories =

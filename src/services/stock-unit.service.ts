@@ -22,6 +22,10 @@ interface StockUnitApiModel {
   stock_status?: string; // Field from BE
   stock_available: boolean;
   type_unit_name?: string;
+  warehouse_sub_block?: {
+    id: number;
+    name: string;
+  } | null;
 }
 
 const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
@@ -32,7 +36,8 @@ const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
   noRangka: payload.chassis_number,
   status: (payload.status) as Status,
   inStock: (payload.stock_available),
-  stockStatus: payload.stock_status as StockStatus,
+  stockStatus: (payload.stock_state) as StockStatus,
+  warehouseSubBlock: payload.warehouse_sub_block,
 });
 
 type PaginatedStockUnitResponse = LaravelApiResponse<{

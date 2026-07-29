@@ -41,6 +41,8 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
       in_stock: item.in_stock,
       stockStatus: item.in_stock,
       unitTransactionId: Number(item.penerimaanId || 0),
+      state: item?.stockState,
+      warehouseSubBlock: item?.warehouseSubBlock,
       received: item.diterima,
     }));
   }, [data]);
@@ -119,25 +121,25 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
-      // {
-      //   header: (
-      //     <Checkbox
-      //       checked={
-      //         paginatedRows.filter((d) => !isSelectionDisabled(d)).length > 0 &&
-      //         paginatedRows.filter((d) => !isSelectionDisabled(d)).every((d) => selected.includes(d.id))
-      //       }
-      //       onCheckedChange={() => toggleAll()}
-      //     />
-      //   ),
-      //   alignment: 'center',
-      //   cell: (item) => (
-      //     <Checkbox
-      //       checked={selected.includes(item.id) || receivedIds.includes(item.id)}
-      //       onCheckedChange={() => toggleSelect(item)}
-      //       disabled={isSelectionDisabled(item)}
-      //     />
-      //   ),
-      // },
+      {
+        header: (
+          <Checkbox
+            checked={
+              paginatedRows.filter((d) => !isSelectionDisabled(d)).length > 0 &&
+              paginatedRows.filter((d) => !isSelectionDisabled(d)).every((d) => selected.includes(d.id))
+            }
+            onCheckedChange={() => toggleAll()}
+          />
+        ),
+        alignment: 'center',
+        cell: (item) => (
+          <Checkbox
+            checked={selected.includes(item.id) || receivedIds.includes(item.id)}
+            onCheckedChange={() => toggleSelect(item)}
+            disabled={isSelectionDisabled(item)}
+          />
+        ),
+      },
       {
         header: 'NO PEMBELIAN',
         accessorKey: 'purchaseCode',
@@ -178,11 +180,16 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         )
       },
       {
-        header: 'STATUS',
+        header: 'SUB BLOK',
+        accessorKey: 'warehouseSubBlock',
+        sortable: true,
+        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock || '-'} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
+      },
+      {
+        header: 'STATUS UNIT',
         accessorKey: 'status',
         sortable: true,
         cell: (item) => {
-          console.log(item);
           let text = '-';
           let background = 'border-slate-200 bg-slate-50 text-slate-700';
           switch (item?.status) {
@@ -212,17 +219,31 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         },
       },
       {
-        header: 'STATUS STOCK',
+        header: 'STATUS STOK',
         accessorKey: 'in_stock',
         sortable: true,
         cell: (item) => {
           if (item.in_stock === true) {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+            return <Badge className="border-amber-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
           if (item.in_stock === false) {
             return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
           }
           return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+        }
+      },
+      {
+        header: 'STATUS PENERIMAAN',
+        accessorKey: 'state',
+        sortable: true,
+        cell: (item) => {
+          if (item.state === 'done') {
+            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Selesai</Badge>;
+          }
+          if (item.state === 'pending') {
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Pending</Badge>;
+          }
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">Draft</Badge>;
         }
       }
     ],

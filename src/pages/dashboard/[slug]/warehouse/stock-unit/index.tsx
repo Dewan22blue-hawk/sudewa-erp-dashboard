@@ -14,7 +14,6 @@ export default function StockUnitPage() {
   const { companyId } = useCompany();
 
   const [search, setSearch] = useState('');
-  // State for the hook's parameters
   const [hookPage, setHookPage] = useState(1);
   const [hookPerPage, setHookPerPage] = useState(25);
   const [stockState, setStockState] = useState<StockStatus | undefined>(undefined);
@@ -35,6 +34,8 @@ export default function StockUnitPage() {
   }), [hookPage, hookPerPage, search, stockState, inStock, machineNumber, chassisNumber, color]);
 
   const { data, isLoading, isError } = useStockUnits(companyId, params);
+
+  console.log(data)
 
   // State for the table's pagination display, derived from hook data
   const [tablePage, setTablePage] = useState(1);

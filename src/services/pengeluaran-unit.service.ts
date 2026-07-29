@@ -325,6 +325,7 @@ const mapPengeluaranUnit = (raw: z.infer<typeof pengeluaranUnitSchema>): Pengelu
   createdAt: raw.created_at,
   warehouse: raw.warehouse ?? null,
   person: raw.person ?? null,
+  state: raw.state,
 });
 
 const getErrorMessage = (error: unknown): string => {

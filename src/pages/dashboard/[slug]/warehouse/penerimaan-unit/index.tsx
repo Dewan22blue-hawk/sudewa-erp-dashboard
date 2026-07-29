@@ -59,6 +59,14 @@ export default function PenerimaanUnitPage() {
     return err?.message || 'Gagal memuat data penerimaan unit';
   }, [error, isError]);
 
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <LoadingState variant="page" />
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
