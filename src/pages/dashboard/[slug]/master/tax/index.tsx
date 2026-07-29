@@ -88,7 +88,7 @@ export default function TaxPage() {
   };
 
   const handleViewDetail = (tax: Tax) => {
-    router.push(`/dashboard/${slug}/settings/tax/${tax.id}/detail`);
+    router.push(`/dashboard/${slug}/master/tax/${tax.id}/detail`);
   };
 
 
