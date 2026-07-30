@@ -10,9 +10,8 @@ import { MoneyInput } from '@/components/ui/money-input';
 import { formatMoneyInput } from '@/lib/utils/money-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Save, Check, ChevronsUpDown } from 'lucide-react';
+import { Save, Check, ChevronsUpDown } from 'lucide-react';
 import { editUnitSchema, EditUnitFormData } from './edit-unit.schema';
-import { PRODUCT_OPTIONS } from './edit-unit.data';
 import { ProductOption } from './edit-unit.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -42,10 +41,7 @@ export function EditUnitForm({
   onSubmit = () => { },
   onCancel,
   readOnly = false,
-  showAddUnitButton = false,
-  onAddUnitClick,
   prependFields,
-  hideCustomerField = false,
   submitDisabled = false,
   cancelDisabled = false,
   productOptions,
@@ -149,20 +145,6 @@ export function EditUnitForm({
           <>
             {/* ROW 1: Tipe Unit, Qty, Harga */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* <FormField
-                control={form.control}
-                name="customer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Customer</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="PT XX" className="bg-transparent max-w-sm" disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-
               <FormField
                 control={form.control}
                 name="tipeUnit"
@@ -236,12 +218,6 @@ export function EditUnitForm({
                             ))}
                           </SelectContent>
                         </Select>
-                      )}
-
-                      {showAddUnitButton && !readOnly && (
-                        <Button type="button" onClick={onAddUnitClick} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                          <Plus className="h-4 w-4" />
-                        </Button>
                       )}
                     </div>
                     <FormMessage />

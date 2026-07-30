@@ -1,6 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
-import { id as idLocale } from 'date-fns/locale/id';
 import { Wallet, Trash, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +7,6 @@ import { UnitBilling, UnitBillingHistory } from '@/@types/unit-billing.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoneyInput } from '@/components/ui/money-input';
-import { Separator } from '@/components/ui/separator';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -33,7 +30,6 @@ import {
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Textarea } from '@/components/ui/textarea';
 import { parseAndClampMoneyInput } from '@/lib/utils/money-input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils/format';
 
 const paymentSchema = z.object({
@@ -227,7 +223,7 @@ export function PurchasePaymentForm({
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setDeleteId(item.id)}
-                                disabled={loading}
+                                disabled={loading || billing && billing?.is_paid}
                                 type="button"
                             >
                                 <Trash className="w-4 h-4 text-red-500" />
@@ -240,6 +236,12 @@ export function PurchasePaymentForm({
         [loading, onDeleteHistory],
     );
 
+    const isPaidAndValid = billing ? billing?.is_paid : false;
+    // console.log(isPaidAndValid)
+
+    // console.log(billing)
+
+    console.log(billingRemaining)
     return (
         <div className="space-y-6">
             <div className="space-y-6">
@@ -325,6 +327,7 @@ export function PurchasePaymentForm({
                                     <Input
                                         type="date"
                                         value={form.watch('paymentDate')}
+                                        disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                         onChange={(e) => form.setValue('paymentDate', e.target.value)}
                                     />
                                 </div>
@@ -339,7 +342,7 @@ export function PurchasePaymentForm({
                                                     type="text"
                                                     inputMode="decimal"
                                                     value={field.value}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChange={(e) => {
                                                         let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
                                                         const parts = val.split('.');
@@ -365,7 +368,7 @@ export function PurchasePaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChangeValue={(val) => {
                                                         const capped = parseAndClampMoneyInput(val, maxBca2);
                                                         field.onChange(capped);
@@ -387,7 +390,7 @@ export function PurchasePaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChangeValue={(val) => {
                                                         const capped = parseAndClampMoneyInput(val, maxCash);
                                                         field.onChange(capped);
@@ -417,7 +420,7 @@ export function PurchasePaymentForm({
                                                 <Textarea
                                                     placeholder="Catatan pembayaran (opsional)"
                                                     {...field}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     value={field.value ?? ''}
                                                 />
                                             </FormControl>
@@ -431,16 +434,8 @@ export function PurchasePaymentForm({
                         {/* Footer Buttons */}
                         <div className="flex justify-end gap-3 pt-4">
                             <Button
-                                type="button"
-                                variant="outline"
-                                onClick={onCancel}
-                                disabled={loading || billingRemaining === 0}
-                            >
-                                Batal
-                            </Button>
-                            <Button
                                 type="submit"
-                                disabled={loading || !canSubmit || billingRemaining === 0}
+                                disabled={loading || !canSubmit || billing && billingRemaining === 0 || isPaidAndValid}
                                 className="bg-green-600 hover:bg-green-700 text-white min-w-[120px]"
                             >
                                 {loading ? (
@@ -489,6 +484,7 @@ export function PurchasePaymentForm({
                                     setDeleteId(null);
                                 }
                             }}
+                            disabled={billing && billing?.is_paid}
                             className="rounded-md bg-red-600 hover:bg-red-700"
                         >
                             Hapus

@@ -53,6 +53,9 @@ type WarehouseActivityUnitDetailApiModel = {
   unit_transaction?: {
     code?: string;
   };
+  warehouse_sub_block?: {
+    name?: string;
+  };
 };
 
 type WarehouseActivityApiModel = {
@@ -66,6 +69,7 @@ type WarehouseActivityApiModel = {
     name?: string;
   } | null;
   person?: ApiPerson | null;
+  state?: string;
   unit_transaction_details?: WarehouseActivityUnitDetailApiModel[];
   details?: WarehouseActivityUnitDetailApiModel[];
   data?: WarehouseActivityApiModel;
@@ -112,6 +116,7 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
   const tanggal = item.activity_date ?? '';
   const supplier = item.person?.name ?? '-';
   const keterangan = item.description ?? '';
+  const state = item?.state ?? '-';
 
   return {
     id,
@@ -132,6 +137,7 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
       }
       : null,
     noPenerimaan,
+    state,
     tanggal,
     supplier,
     keterangan,
@@ -162,6 +168,8 @@ const mapDetail = (activityId: string, detail: WarehouseActivityUnitDetailApiMod
     toBoolValue(detail.receipt_status) ||
     toBoolValue(detail.in_stock) ||
     isReceivedByState(detail.stock_state);
+  const stockState = detail.stock_state ?? '-';
+  const warehouseSubBlock = detail.warehouse_sub_block?.name;
 
   return {
     id: detailId,
@@ -172,7 +180,9 @@ const mapDetail = (activityId: string, detail: WarehouseActivityUnitDetailApiMod
     noMesin,
     in_stock,
     status,
+    stockState,
     noRangka,
+    warehouseSubBlock,
     diterima,
   };
 };
@@ -325,6 +335,8 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
       const status = detail.status ?? '-';
       const in_stock = toBoolValue(detail.in_stock);
       const stockStatus = detail.in_stock ?? '-';
+      const stockState = detail?.stock_state ?? detail?.state ?? '-';
+      const warehouseSubBlock = detail?.warehouse_sub_block?.name;
       const diterima = movement.status === 'in' || toBoolValue(detail.in_stock);
 
       return {
@@ -338,6 +350,8 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
         in_stock,
         stockStatus,
         noRangka,
+        stockState,
+        warehouseSubBlock,
         diterima,
       };
     });

@@ -9,6 +9,7 @@ import { ReferenceLink } from '@/components/ui/reference-link';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Badge } from '@/components/ui/badge';
 import { CopyBox } from '@/components/ui/copy-box';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data?: WarehouseActivityUnitDetail[];
@@ -40,6 +41,8 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
       inStock: item.in_stock,
       in_stock: item.in_stock,
       status: item.status,
+      state: item?.stockState,
+      warehouseSubBlock: item?.warehouseSubBlock,
     }));
   }, [data]);
 
@@ -127,6 +130,9 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
       //     />
       //   ),
       //   alignment: 'center',
+      //   sticky: 'left',
+      //   className: 'w-[50px] min-w-[50px] max-w-[50px]',
+      //   headerClassName: 'w-[50px] min-w-[50px] max-w-[50px]',
       //   cell: (item) => (
       //     <Checkbox
       //       checked={selected.includes(item.id) || dispatchedIds.includes(item.id)}
@@ -175,7 +181,13 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         )
       },
       {
-        header: 'STATUS',
+        header: 'SUB BLOK',
+        accessorKey: 'warehouseSubBlock',
+        sortable: true,
+        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock || '-'} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
+      },
+      {
+        header: 'STATUS UNIT',
         accessorKey: 'status',
         sortable: true,
         cell: (item) => {
@@ -208,17 +220,45 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         },
       },
       {
-        header: 'STATUS STOCK',
+        header: 'STATUS STOK',
         accessorKey: 'in_stock',
         sortable: true,
         cell: (item) => {
           if (item.in_stock === true) {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+            return <Badge className="border-amber-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
           if (item.in_stock === false) {
             return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
           }
           return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+        }
+      },
+      {
+        header: 'STATUS PENGELUARAN',
+        accessorKey: 'state',
+        sortable: true,
+        cell: (item) => {
+          const config: Record<string, { label: string; name: string; className: string }> = {
+            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+            receipt: { label: 'Receipt', name: 'Dikirim', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+          };
+
+          const stateVal = item?.state ?? 'draft';
+          const match = config[stateVal] ?? {
+            label: stateVal.replace(/_/g, ' '),
+            name: stateVal.replace(/_/g, ' '),
+            className: 'border-slate-200 bg-slate-50 text-slate-700',
+          };
+
+          return (
+            <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+              {match.name}
+            </Badge>
+          );
         }
       }
     ],

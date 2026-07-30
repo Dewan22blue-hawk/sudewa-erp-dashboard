@@ -2,10 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unitTransactionItemSalesService } from '@/services/unitTransactionItemSales.service';
 
 export const useStockUnits = (itemId?: string, options?: { companyId?: string; unitTypeIdFallback?: string }) => {
+  const isValidId = !!itemId && itemId !== 'unit' && itemId !== 'undefined' && itemId !== 'null' && itemId.trim() !== '';
   const unitItemQuery = useQuery({
     queryKey: ['unit-transaction-item', itemId ?? ''],
     queryFn: () => unitTransactionItemSalesService.getUnitItemById(itemId as string),
-    enabled: !!itemId,
+    enabled: isValidId,
     staleTime: 1000 * 60,
   });
 

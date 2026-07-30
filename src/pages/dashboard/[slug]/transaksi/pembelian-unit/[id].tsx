@@ -69,6 +69,8 @@ export default function PurchaseDetailPage() {
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
   const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
 
+  console.log(purchase)
+
   useEffect(() => {
     if (!isLoading && purchase && purchase?.type !== 'purchase') {
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
@@ -84,9 +86,17 @@ export default function PurchaseDetailPage() {
   const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
   const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
   const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
-  const isRefunded = currentStockState === 'inbound_return';
-  const isAlreadyReceived = PURCHASE_RECEIVED_STATE_SET.has(currentStockState);
-  const canReceive = isPaid && !isAlreadyReceived && !isRefunded;
+  const isRefunded = purchase?.has_refund_transaction;
+  const isStockAlreadyProcessed = purchase?.warehouse_activity?.state === 'process';
+  const canReceive = isPaid && !isStockAlreadyProcessed && !purchase?.warehouse_activity;
+
+  const receiveButtonText = useMemo(() => {
+    if (updateState.isPending) return 'Memproses...';
+    if (isStockAlreadyProcessed) return 'Sudah Diproses';
+    if (purchase?.warehouse_activity?.state === 'process') return 'Sedang Diproses';
+    if (purchase?.warehouse_activity?.state === 'draft') return 'Proses Penerimaan';
+    return 'Proses Unit';
+  }, [updateState.isPending, isStockAlreadyProcessed, purchase?.warehouse_activity?.state]);
   const unitItems = unitItemsResponse?.data ?? [];
   const resolvedBillingHistories =
     billingHistories.length > 0
@@ -113,12 +123,6 @@ export default function PurchaseDetailPage() {
       }, 800);
     }
   }, [router.query.print, isLoading, purchase]);
-
-  // useEffect(() => {
-  //   if (!isLoading && detailData && detailData.activity_type !== 'receipt') {
-  //     router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);
-  //   }
-  // }, [detailData, isLoading, router, slug]);
 
   const historyColumns = useMemo<ColumnDef<any>[]>(
     () => [
@@ -187,6 +191,7 @@ export default function PurchaseDetailPage() {
     try {
       const warehouseId = String(purchase.warehouse?.id ?? '').trim();
       const personId = String(purchase.person?.id ?? '').trim();
+      const purchaseId = String(purchase?.id);
 
       if (!warehouseId) {
         toast.error('warehouse_id belum tersedia pada transaksi ini.');
@@ -334,7 +339,7 @@ export default function PurchaseDetailPage() {
                   Belum Lunas
                 </Badge>
               )}
-              {isAlreadyReceived ? (
+              {isStockAlreadyProcessed ? (
                 <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
                   Stok Diterima
                 </Badge>
@@ -365,10 +370,10 @@ export default function PurchaseDetailPage() {
               <Button
                 variant="outline"
                 className="bg-white hover:bg-gray-50 border-gray-200"
-                disabled={!canReceive || updateState.isPending}
+                disabled={!canReceive}
                 onClick={() => setIsReceiveDialogOpen(true)}
               >
-                {isAlreadyReceived ? 'Sudah Diterima' : updateState.isPending ? 'Memproses...' : 'Terima Barang'}
+                {receiveButtonText}
               </Button>
             </>
           }
@@ -482,7 +487,7 @@ export default function PurchaseDetailPage() {
               onClick={handleReceipt}
               disabled={updateState.isPending}
             >
-              {updateState.isPending ? 'Memproses...' : 'Ya, Terima Barang'}
+              {updateState.isPending ? 'Memproses...' : 'Ya, Proses Barang'}
             </Button>
           </DialogFooter>
         </DialogContent>

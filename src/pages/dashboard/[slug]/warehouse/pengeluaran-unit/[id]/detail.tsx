@@ -11,12 +11,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CopyBox } from '@/components/ui/copy-box';
 import { formatDate } from '@/lib/utils/format';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { LoadingState } from '@/components/ui/loading-state';
+import { Badge } from '@/components/ui/badge';
 
 export default function PengeluaranUnitDetailPage() {
   const router = useRouter();
   const { id, slug } = router.query as { id?: string; slug?: string };
 
   const { data: detailData, isLoading } = useWarehouseActivityDetail(id);
+  const dispatchMutation = useDispatchPengeluaranStock();
 
   useEffect(() => {
     if (!isLoading && detailData && detailData.activity_type !== 'issue') {
@@ -24,9 +27,23 @@ export default function PengeluaranUnitDetailPage() {
     }
   }, [detailData, isLoading, router, slug]);
 
-  const header = detailData;
+  const stateInfo = (() => {
+    const s = detailData?.state?.toLowerCase();
+    if (s === 'draft') return { text: 'Draft', bg: 'border-slate-200 bg-slate-50 text-slate-700' };
+    if (s === 'process') return { text: 'Proses', bg: 'border-amber-200 bg-amber-50 text-amber-700' };
+    if (s === 'done') return { text: 'Selesai', bg: 'border-emerald-200 bg-emerald-50 text-emerald-700' };
+    return { text: detailData?.state || '-', bg: 'border-slate-200 bg-slate-50 text-slate-700' };
+  })();
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <LoadingState variant="page" />
+      </DashboardLayout>
+    );
+  }
+
   const details = detailData?.unit_transaction_details ?? [];
-  const dispatchMutation = useDispatchPengeluaranStock();
 
   const handleKirim = async (ids: number[]) => {
     if (!id) return;
@@ -91,7 +108,10 @@ export default function PengeluaranUnitDetailPage() {
               <h1 className="text-2xl font-semibold text-slate-900">Detail Pengeluaran Unit</h1>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <span>Kode Transaksi:</span>
-                <span className="text-blue-600 font-semibold">{header?.activity_number || header?.noPenerimaan || '-'}</span>
+                <span className="text-blue-600 font-semibold">{detailData?.activity_number || detailData?.noPenerimaan || '-'}</span>
+                <Badge variant="outline" className={`font-semibold ${stateInfo.bg}`}>
+                  {stateInfo.text}
+                </Badge>
               </div>
             </div>
           </div>
@@ -112,25 +132,35 @@ export default function PengeluaranUnitDetailPage() {
                   <div>
                     <p className="text-xs text-slate-400">No. Pengeluaran</p>
                     <p className="font-semibold text-slate-900">
-                      <CopyBox text={header?.activity_number || header?.noPenerimaan || '-'} />
+                      <CopyBox text={detailData?.activity_number || detailData?.noPenerimaan || '-'} />
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-slate-400">Tanggal Pengeluaran</p>
-                    <p className="font-semibold text-slate-900">{formatDate(header?.activity_date || header?.tanggal || '')}</p>
+                    <p className="font-semibold text-slate-900">{formatDate(detailData?.activity_date || detailData?.tanggal || '')}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
                   <span className="text-xs text-slate-400">Warehouse/Gudang</span>
-                  <span className="font-semibold text-slate-900">{header?.warehouse?.name || '-'}</span>
+                  <span className="font-semibold text-slate-900">{detailData?.warehouse?.name || '-'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">Customer</span>
                   <span className="font-semibold text-slate-900">
-                    {header?.person?.name ? (
-                      <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${header?.person?.name}`}>
-                        {header?.person?.name}
+                    {detailData?.person?.name ? (
+                      <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${detailData?.person?.name}`}>
+                        {detailData?.person?.name}
                       </ReferenceLink>
+                    ) : '-'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Status Pengeluaran</span>
+                  <span className="font-semibold text-slate-900">
+                    {detailData?.state ? (
+                      <Badge variant="outline" className={`font-semibold ${stateInfo.bg}`}>
+                        {stateInfo.text}
+                      </Badge>
                     ) : '-'}
                   </span>
                 </div>
@@ -155,7 +185,7 @@ export default function PengeluaranUnitDetailPage() {
                 <div className="flex flex-col gap-2">
                   <span className="text-xs text-slate-400">Catatan / Keterangan</span>
                   <p className="text-slate-900 p-2 rounded-md bg-slate-50 w-full min-h-[50px]">
-                    {header?.description || header?.keterangan || '-'}
+                    {detailData?.description || detailData?.keterangan || '-'}
                   </p>
                 </div>
               </div>
