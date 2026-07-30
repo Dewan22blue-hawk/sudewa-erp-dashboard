@@ -65,6 +65,28 @@ const renderStatus = (status: string) => {
   );
 };
 
+const stockStateConfig: Record<string, { name: string; className: string }> = {
+  draft: { name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+  cancel: { name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+  prepare: { name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+  purchase_order: { name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+  in_transit: { name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+  receipt: { name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+};
+
+const renderStockState = (state: string) => {
+  const s = state ? state.toLowerCase() : 'draft';
+  const match = stockStateConfig[s] ?? {
+    name: state ? state.replace(/_/g, ' ') : '-',
+    className: 'border-slate-200 bg-slate-50 text-slate-700',
+  };
+  return (
+    <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+      {match.name}
+    </Badge>
+  );
+};
+
 export function StockPickerTable({
   units,
   selectedIds,
@@ -152,20 +174,36 @@ export function StockPickerTable({
       )
     },
     {
-      header: 'Status Stock',
+      header: 'Sub Blok',
+      accessorKey: 'warehouse_sub_block',
+      cell: (item) => item.warehouse_sub_block?.name ? (
+        <CopyBox text={item.warehouse_sub_block.name} />
+      ) : (
+        <Badge variant='outline' className="font-semibold bg-white">Belum ditentukan</Badge>
+      )
+    },
+    {
+      header: 'Status Stok',
       alignment: 'center',
       cell: (item) => (
         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${item?.in_stock ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-          {item?.in_stock ? 'In Stock' : 'Out Stock'}
+          {item?.in_stock ? 'Tersedia' : 'Tidak Tersedia'}
         </span>
       ),
     },
     {
-      header: 'Status',
+      header: 'Kondisi Stok',
       accessorKey: 'status',
       sortable: true,
       alignment: 'center',
       cell: (item) => renderStatus(item?.status ?? ''),
+    },
+    {
+      header: 'Posisi Stok',
+      accessorKey: 'stock_state',
+      sortable: true,
+      alignment: 'center',
+      cell: (item) => renderStockState(item?.stock_state ?? ''),
     },
   ], [unitType, slug]);
 
@@ -184,7 +222,7 @@ export function StockPickerTable({
           onPerPageChange(val);
           onPageChange(1);
         }}
-        showCheckbox={!isPaid}
+        showCheckbox
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}

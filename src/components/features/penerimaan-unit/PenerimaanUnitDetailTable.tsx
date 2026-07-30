@@ -346,10 +346,10 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
             <DialogTitle className="text-xl font-bold text-slate-800">Proses Data Unit ({selected.length} Unit Terpilih)</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 my-4">
+          <div className="space-y-6 my-4 overflow-x-scroll">
             {/* Selected Vehicles Table */}
             <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-              <div className="max-h-60 overflow-y-auto">
+              <div className="max-h-60 overflow-y-auto overflow-x-scroll">
                 <table className="w-full text-sm text-left border-collapse">
                   <thead className="bg-[#f8f9fa] text-slate-600 uppercase text-xs font-semibold border-b border-slate-200 sticky top-0 z-10">
                     <tr>
@@ -358,16 +358,26 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
                       <th className="px-4 py-3">Warna</th>
                       <th className="px-4 py-3">No Mesin</th>
                       <th className="px-4 py-3">No Rangka</th>
+                      <th className="px-4 py-3">Sub Blok</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {rows.filter((row) => selected.includes(row.id)).map((row) => (
                       <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-slate-900">{row.purchaseCode || '-'}</td>
-                        <td className="px-4 py-3 text-slate-600">{row.unitTypeName || '-'}</td>
+                        <td className="px-4 py-3 font-medium text-slate-900">
+                          <CopyBox text={row.purchaseCode ?? "-"} />
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          <ReferenceLink href={`/dashboard/${slug}/master?search=${row?.unitTypeName}`}>
+                            {row.unitTypeName}
+                          </ReferenceLink>
+                        </td>
                         <td className="px-4 py-3 text-slate-600">{row.color || '-'}</td>
                         <td className="px-4 py-3 text-slate-500 font-mono text-xs"><CopyBox text={row.machineNumber || ''} /></td>
                         <td className="px-4 py-3 text-slate-500 font-mono text-xs"><CopyBox text={row.chassisNumber || ''} /></td>
+                        <td className="px-4 py-3 text-slate-500 font-mono text-xs">
+                          {row.warehouseSubBlock ? <CopyBox text={row.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -398,15 +408,17 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
                     <SelectValue placeholder={subBlocksLoading ? "Memuat sub blok..." : "Pilih sub blok gudang"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {subBlocksResponse?.data?.data?.map((sb: any) => (
-                      <SelectItem key={sb.id} value={String(sb.id)}>
-                        {sb.name}
-                      </SelectItem>
-                    )) || (
-                        <SelectItem value="none" disabled>
-                          Tidak ada sub blok aktif
+                    {subBlocksResponse?.data?.data && subBlocksResponse.data.data.length > 0 ? (
+                      subBlocksResponse.data.data.map((sb: any) => (
+                        <SelectItem key={sb.id} value={String(sb.id)}>
+                          {sb.name}
                         </SelectItem>
-                      )}
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>
+                        Tidak ada sub blok aktif
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

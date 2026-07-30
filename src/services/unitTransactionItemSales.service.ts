@@ -29,6 +29,11 @@ export const unitTransactionItemSalesService = {
       chassis_number: String(detail.chassis_number ?? '-'),
       in_stock: detail.in_stock === true || detail.in_stock === 1 || detail.in_stock === '1',
       status: String(detail.status ?? ''),
+      stock_state: detail.stock_state ?? null,
+      warehouse_sub_block: detail.warehouse_sub_block ? {
+        id: Number(detail.warehouse_sub_block.id ?? null),
+        name: detail.warehouse_sub_block.name ?? null,
+      } : null,
     }));
   },
 

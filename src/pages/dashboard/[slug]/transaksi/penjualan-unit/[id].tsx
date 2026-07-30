@@ -223,7 +223,7 @@ export default function SalesDetailPage() {
 
       const items = rawData?.unit_transaction_items ?? [];
       if (items.length === 0) {
-        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Kirim Barang.');
+        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Proses Unit.');
         setIsDeliveryDialogOpen(false);
         return;
       }
@@ -368,7 +368,7 @@ export default function SalesDetailPage() {
                 disabled={!canDeliver || updateState.isPending}
                 onClick={() => setIsDeliveryDialogOpen(true)}
               >
-                {isAlreadyDelivered ? 'Sudah Terkirim' : updateState.isPending ? 'Memproses...' : 'Kirim Barang'}
+                {isAlreadyDelivered ? 'Sudah Terkirim' : updateState.isPending ? 'Memproses...' : 'Proses Unit'}
               </Button>
             </>
           }
@@ -455,11 +455,11 @@ export default function SalesDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {/* CONFIRMATION DIALOG KIRIM BARANG */}
+      {/* CONFIRMATION DIALOG Proses Unit */}
       <Dialog open={isDeliveryDialogOpen} onOpenChange={setIsDeliveryDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Konfirmasi Kirim Barang</DialogTitle>
+            <DialogTitle>Konfirmasi Proses Unit</DialogTitle>
             <DialogDescription className="pt-2">
               Apakah Anda yakin ingin mengirim barang ini?
             </DialogDescription>
@@ -469,7 +469,7 @@ export default function SalesDetailPage() {
                   <Info />
                 </span>
                 <span>
-                  Dengan klik kirim barang maka akan mengurangi stock <b>Warehouse</b> dan barang akan dikirim ke pembeli.
+                  Dengan klik Proses Unit maka akan masuk ke dalam aktifitas gudang untuk selanjutnya barang akan diproses digudang.
                 </span>
               </div>
             </div>
@@ -489,7 +489,7 @@ export default function SalesDetailPage() {
               onClick={handleDelivery}
               disabled={updateState.isPending}
             >
-              {updateState.isPending ? 'Memproses...' : 'Ya, Kirim Barang'}
+              {updateState.isPending ? 'Memproses...' : 'Ya, Proses Unit'}
             </Button>
           </DialogFooter>
         </DialogContent>

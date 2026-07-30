@@ -325,6 +325,11 @@ export interface WarehouseStockUnit {
   warehouse_id?: string;
   in_stock?: boolean;
   status?: string | undefined;
+  stock_state?: string | null;
+  warehouse_sub_block?: {
+    id: number;
+    name: string;
+  } | null;
 }
 
 export interface UnitTransactionItemSalesAssignment {

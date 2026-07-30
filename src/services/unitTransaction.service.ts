@@ -514,6 +514,7 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
         state: item.warehouse_activity.state ?? '',
       }
       : null,
+    unit_transaction_items: item.unit_transaction_items,
   };
 };
 

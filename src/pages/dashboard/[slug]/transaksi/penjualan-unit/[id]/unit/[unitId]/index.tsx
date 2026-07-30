@@ -92,7 +92,10 @@ export default function SalesUnitDetailPage() {
         color: String(detail?.color ?? '-'),
         machine_number: String(detail?.machine_number ?? '-'),
         chassis_number: String(detail?.chassis_number ?? '-'),
-        in_stock: true,
+        in_stock: detail?.in_stock === true || detail?.in_stock === 1 || detail?.in_stock === '1',
+        status: detail?.status,
+        stock_state: detail?.stock_state,
+        warehouse_sub_block: detail?.warehouse_sub_block,
       })),
       unit_transaction_item_sales: (hit.unit_transaction_item_sales ?? []).map((item: any) => ({
         id: Number(item?.id ?? 0),
@@ -141,6 +144,9 @@ export default function SalesUnitDetailPage() {
       machine_number: String(detail?.machine_number ?? '-'),
       chassis_number: String(detail?.chassis_number ?? '-'),
       in_stock: detail?.in_stock,
+      status: detail?.status,
+      stock_state: detail?.stock_state,
+      warehouse_sub_block: detail?.warehouse_sub_block,
     }));
 
     const detailLookup = new Map<number, WarehouseStockUnit>();
