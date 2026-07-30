@@ -1123,3 +1123,71 @@ if (currentSearch) {
 
 setData(filteredData);
 ```
+
+---
+
+## 24. Standarisasi Pencarian & Paginasi Client-Side pada Master Data (Fallback)
+
+**Aturan**: Seringkali terdeteksi *bug* di mana Endpoint API Backend untuk Master Data mengabaikan parameter `search` atau tidak mendukung *pagination* dan *search* secara bersamaan (misal, backend hanya memfilter *search* di 10 data yang tampil di halaman 1).
+
+Untuk mengatasi isu pencarian tidak berfungsi akibat *unstable backend search parameters*, **wajib** mengubah format *request* dengan meminta ditarik semua data, lalu melimpahkan logika pencarian dan paginasi (pemotongan keseluruhan array) murni ke algoritma sisi klien (*client-side*).
+
+**Standar Solusi Implementasi pada *Service Layer***:
+1. Buang penggunaan parameter `buildLaravelPaginationQuery(params)` dari opsi `apiClient.get`.
+2. Khusus injeksikan payload limit tanpa batas: `per_page: 9999` (sebagai paksaan jika backend membatasi maksimal *limit array*).
+3. Setelah menerima keseluruhan respon dari *server*, lakukan filter `params.search` secara lokal menggunakan deret `.filter()`.
+4. Implementasikan `params.page` dan `params.perPage` dengan metode `.slice(start, start + perPage)`.
+5. Rakit kembali array yang sudah terpotong dengan metadata statis buatan melalui pembungkus `toPaginatedResult`.
+
+**Contoh Implementasi pada fungsi *service* (mis. `account-group.service.ts`)**:
+
+```typescript
+export const getMasterDataList = async (params: PaginationParams & { company_id?: string | number }) => {
+  // 1. Tarik semua data dari backend tanpa limit paginasi standar
+  const response = await apiClient.get<PaginatedResponse>(basePath, {
+    params: {
+      company_id: params.company_id,
+      per_page: 9999, // Fallback untuk memastikan backend selalu mereturn semua
+    },
+  });
+
+  const data = ensureSuccess(response.data);
+  const isDirectArray = Array.isArray(data);
+  const items: ApiModel[] = isDirectArray ? data : ((data as any).data ?? []);
+
+  // 2. Terapkan scope company jika diberlakukan
+  const scopedData = params.company_id
+    ? items.filter((item) => String(item.company_id) === String(params.company_id))
+    : items;
+
+  let filteredData = scopedData;
+
+  // 3. Client-Side Search Matching (Cari di semua field relevan)
+  if (params.search && params.search.trim() !== '') {
+    const keyword = params.search.toLowerCase().trim();
+    filteredData = filteredData.filter((item) => {
+      const code = (item.code ?? '').toLowerCase();
+      const name = (item.name ?? '').toLowerCase();
+      return code.includes(keyword) || name.includes(keyword);
+    });
+  }
+
+  // 4. Client-Side Pagination (Slicing Array)
+  const page = params.page ?? 1;
+  const perPage = params.perPage ?? 10;
+  const start = (page - 1) * perPage;
+  const paginatedData = filteredData.slice(start, start + perPage);
+
+  // 5. Kembalikan array terpotong beserta manipulasi meta pagination
+  return toPaginatedResult(
+    {
+      data: paginatedData,
+      current_page: page,
+      per_page: perPage,
+      total: filteredData.length,
+      last_page: Math.max(1, Math.ceil(filteredData.length / perPage)),
+    },
+    mapModel
+  );
+};
+```
