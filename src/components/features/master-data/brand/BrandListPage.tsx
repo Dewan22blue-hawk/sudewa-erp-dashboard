@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -20,6 +20,17 @@ import { ApiResponseError, ApiValidationError } from '@/lib/api/response';
 
 export const BrandListPage = () => {
     const { page, perPage, search, setPage, setPerPage, setSearch } = useQueryParamsTable({ defaultPerPage: 25 });
+    const [searchInput, setSearchInput] = useState(search);
+
+    useEffect(() => {
+        const timeout = window.setTimeout(() => {
+            if (search !== searchInput.trim()) {
+                setSearch(searchInput.trim());
+            }
+        }, 400);
+        return () => window.clearTimeout(timeout);
+    }, [searchInput, search, setSearch]);
+
     const { hasPermission } = usePermissionGuard();
     const canCreate = hasPermission('master-data:create');
     const canEdit = hasPermission('master-data:edit');
@@ -122,10 +133,9 @@ export const BrandListPage = () => {
                         <BrandTable
                             data={data?.data ?? []}
                             meta={data?.meta}
-                            search={search}
+                            search={searchInput}
                             onSearchChange={(v) => {
-                                setSearch(v);
-                                setPage(1);
+                                setSearchInput(v);
                             }}
                             page={page}
                             canEdit={canEdit}
