@@ -16,6 +16,8 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
+import { Badge } from '@/components/ui/badge';
+import { TextTruncate } from '@/components/ui/text-truncate';
 
 interface Props {
   data: PenerimaanUnit[];
@@ -69,7 +71,33 @@ export default function PenerimaanUnitTable({
       accessorKey: 'tanggal',
       sortable: true,
       alignment: 'left',
-      cell: (item) => formatDate(item.tanggal),
+      cell: (item) => formatDate(item.activity_date),
+    },
+    {
+      header: 'STATUS PENERIMAAN',
+      accessorKey: 'state',
+      sortable: true,
+      alignment: 'left',
+      cell: (item) => {
+        const s = item?.state?.toLowerCase();
+        let text = item?.state || '-';
+        let bg = 'border-slate-200 bg-slate-50 text-slate-700';
+        if (s === 'draft') {
+          text = 'Draft';
+          bg = 'border-slate-200 bg-slate-50 text-slate-700';
+        } else if (s === 'process') {
+          text = 'Proses';
+          bg = 'border-amber-200 bg-amber-50 text-amber-700';
+        } else if (s === 'done') {
+          text = 'Selesai';
+          bg = 'border-emerald-200 bg-emerald-50 text-emerald-700';
+        }
+        return (
+          <Badge variant="outline" className={`font-semibold ${bg}`}>
+            {text}
+          </Badge>
+        );
+      },
     },
     {
       header: 'SUPPLIER',
@@ -90,7 +118,7 @@ export default function PenerimaanUnitTable({
       accessorKey: 'keterangan',
       sortable: true,
       alignment: 'left',
-      cell: (item) => item.keterangan || '-',
+      cell: (item) => <TextTruncate text={item.keterangan || '-'} maxLength={20} />,
     },
     {
       header: 'Aksi',

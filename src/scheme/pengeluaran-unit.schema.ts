@@ -22,6 +22,7 @@ export const pengeluaranUnitSchema = z.object({
   activity_date: z.string(),
   description: z.string().nullable().optional(),
   created_at: z.string().optional().default(''),
+  state: z.string().optional().default(''),
   warehouse: warehouseOptionSchema.nullable().optional(),
   person: personOptionSchema.nullable().optional(),
 });

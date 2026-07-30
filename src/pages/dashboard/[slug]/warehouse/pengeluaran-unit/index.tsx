@@ -2,18 +2,16 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Plus } from 'lucide-react';
 import PengeluaranUnitTable from '@/components/features/pengeluaran-unit/PengeluaranUnitTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
-import { Button } from '@/components/ui/button';
 import { usePengeluaranUnits } from '@/hooks/usePengeluaranUnit';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function PengeluaranUnitPage() {
   const router = useRouter();
   const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('warehouse:create');
   const canEdit = hasPermission('warehouse:edit');
   const canDelete = hasPermission('warehouse:delete');
 
@@ -59,6 +57,14 @@ export default function PengeluaranUnitPage() {
     const message = (error as { message?: unknown }).message;
     return typeof message === 'string' && message.trim().length > 0 ? message : 'Gagal memuat data pengeluaran unit';
   }, [error]);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <LoadingState variant="page" />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

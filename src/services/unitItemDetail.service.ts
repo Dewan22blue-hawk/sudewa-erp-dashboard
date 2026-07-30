@@ -8,6 +8,7 @@ import {
 } from '@/@types/unit-transaction.types';
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, LaravelApiResponse, toPaginatedResult } from '@/lib/api/response';
+import { WarehouseSubBlock } from './warehouseBlock.service';
 
 type UnitTransactionItemApiModel = {
   id?: string | number;
@@ -50,6 +51,11 @@ type UnitTransactionItemApiModel = {
       code?: string,
     }
   };
+  unit_type?: {
+    id?: string | number,
+    name?: string,
+    code?: string,
+  };
 };
 
 type UnitTransactionItemDetailApiModel = {
@@ -61,6 +67,7 @@ type UnitTransactionItemDetailApiModel = {
   in_stock?: boolean | number | string;
   is_forecast?: boolean;
   status?: string;
+  stock_state?: string | null;
   created_at?: string;
   unit_transaction_item?: {
     id?: string | number;
@@ -77,6 +84,10 @@ type UnitTransactionItemDetailApiModel = {
       code?: string;
       stock_state?: string;
     } | null;
+  } | null;
+  warehouse_sub_block: {
+    id?: string | number,
+    name?: string
   } | null;
 };
 
@@ -148,6 +159,11 @@ const mapUnitTransactionItem = (item: UnitTransactionItemApiModel): UnitTransact
       code: item?.ppn_tax?.tax?.code,
     } : null,
   } : null,
+  unit_type: {
+    id: item?.unit_type?.id,
+    name: item?.unit_type?.name,
+    code: item?.unit_type?.code,
+  }
 });
 
 const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransactionItemDetail => ({
@@ -155,7 +171,6 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
   unit_transaction_item_id: String(item.unit_transaction_item_id ?? ''),
   code: item.unit_transaction_item?.unit_transaction?.code ?? '',
   created_at: item.created_at ?? '',
-  stock_state: item.unit_transaction_item?.unit_transaction?.stock_state ?? '',
   unit_type_name: item.unit_transaction_item?.unit_type?.name ?? undefined,
   price: item.unit_transaction_item?.price !== undefined ? toNumber(item.unit_transaction_item.price) : undefined,
   color: item.color ?? '-',
@@ -165,7 +180,10 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
   is_forecast: toBool(item.is_forecast),
   status: item.status,
   person: { id: undefined, name: '-' },
-  warehouse: { id: undefined, name: '-' },
+  warehouse_sub_block: {
+    id: Number(item.warehouse_sub_block?.id ?? null),
+    name: item.warehouse_sub_block?.name ?? null,
+  } as WarehouseSubBlock,
   unit_transaction_bruto_total: 0,
   unit_transaction_item_total_hpp: 0,
   unit_transaction_item_total_dpp: 0,
@@ -174,6 +192,7 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
   transaction_bbn_total: 0,
   transaction_other_fee: 0,
   expedition_fee_total: 0,
+  stock_state: item.stock_state ?? null,
 });
 
 export const unitItemDetailService = {
@@ -336,6 +355,18 @@ export const unitItemDetailService = {
         unit_transaction_item_details_id: ids.map(id => Number(id)),
       }
     });
+  },
+
+  async bulkUpdateState(payload: {
+    unit_transaction_item_details_ids: number[];
+    stock_state: string;
+    warehouse_sub_block_id?: number | null;
+  }): Promise<void> {
+    const response = await apiClient.put(
+      '/wapi/transaction/unit-transaction/unit-transaction-item-detail/update-state',
+      payload
+    );
+    ensureSuccess(response.data);
   },
 
   async importDetails(unitTransactionItemId: string, file: File): Promise<void> {

@@ -1,4 +1,6 @@
 import { PaginationMeta } from '@/@types/pagination.types';
+import { WarehouseActivity } from './warehouse-activity.types';
+import { WarehouseSubBlock } from '@/services/warehouseBlock.service';
 
 export interface UnitTransactionBillingHistoryCashPivot {
   unit_transaction_billing_history_id: string | number;
@@ -95,15 +97,19 @@ export interface UnitTransactionWarehouse {
   name: string;
 }
 
+export interface WarehouseSubBlock {
+  id?: string | undefined;
+  name?: string | undefined;
+}
+
 export interface UnitTransactionItemDetail {
   id: string;
   unit_transaction_item_id: string;
   code: string;
   created_at: string | undefined;
-  stock_state: string;
+  stock_state: string | null;
   max_capacity?: number;
   person: UnitTransactionPerson;
-  warehouse: UnitTransactionWarehouse;
   price?: number;
   status?: string;
   unit_type_name: string | undefined;
@@ -119,12 +125,12 @@ export interface UnitTransactionItemDetail {
   unit_transaction_item_bruto_total: number;
   transaction_bbn_total: number;
   transaction_other_fee: number;
+  warehouse_sub_block: WarehouseSubBlock;
   expedition_fee_total: number;
   total_operational_fee?: number;
+  has_refund_transaction?: boolean;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
-  unit_transaction_adjustments?: any[];
-  unit_transaction_items?: any[];
 }
 
 export interface UnitTransactionDetail {
@@ -153,6 +159,8 @@ export interface UnitTransactionDetail {
   transaction_other_fee: number;
   expedition_fee_total: number;
   total_operational_fee?: number;
+  has_refund_transaction?: boolean;
+  warehouse_activity?: WarehouseActivity | null;
   billing_summary?: UnitTransactionBillingSummary | null;
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
@@ -272,6 +280,11 @@ export interface UnitTransactionItemSummary {
   ppn_total_price?: number;
   dpp_tax?: TaxInfo | null;
   ppn_tax?: TaxInfo | null;
+  unit_type?: {
+    id?: string | number;
+    name?: string;
+    code?: string;
+  } | null;
 }
 
 export interface TransactionAdjustment {

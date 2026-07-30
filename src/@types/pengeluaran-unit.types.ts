@@ -26,6 +26,7 @@ export interface PengeluaranUnit {
   createdAt: string;
   warehouse: WarehouseOption | null;
   person: PersonOption | null;
+  state?: string;
 }
 
 export interface DispatchUnitTableRow {

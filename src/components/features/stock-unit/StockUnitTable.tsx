@@ -107,10 +107,19 @@ export default function StockUnitTable({
       cell: (item) => <CopyBox text={item.noRangka} />,
     },
     {
+      header: 'Sub Blok',
+      accessorKey: 'warehouseSubBlock',
+      alignment: 'center',
+      sortable: true,
+      tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
+      cell: (item) => item.warehouseSubBlock?.name ? item.warehouseSubBlock?.name : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>,
+    },
+    {
       header: 'Status Stok',
       accessorKey: 'status',
       sortable: true,
       alignment: 'center',
+      tooltip: 'Status ketersediaan unit fisik di gudang',
       cell: (item) => item?.inStock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
     },
     {
@@ -118,7 +127,37 @@ export default function StockUnitTable({
       accessorKey: 'status',
       sortable: true,
       alignment: 'center',
+      tooltip: 'Kondisi fisik unit saat ini',
       cell: (item) => renderStatus(item.status),
+    },
+    {
+      header: 'Posisi Stok',
+      accessorKey: 'stockStatus',
+      sortable: true,
+      alignment: 'center',
+      tooltip: 'Posisi logistik atau status alur stok unit',
+      // cell: (item) => renderStatus(item.stockStatus),
+      cell: (item) => {
+        const config: Record<string, { label: string; name: string; className: string }> = {
+          draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+          cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+          prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+          purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+          in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+          receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+        };
+        const stateVal = item?.stockStatus ?? 'draft';
+        const match = config[stateVal] ?? {
+          label: stateVal.replace(/_/g, ' '),
+          className: 'border-slate-200 bg-slate-50 text-slate-700',
+        };
+
+        return (
+          <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+            {match.name}
+          </Badge>
+        );
+      }
     },
   ];
 
