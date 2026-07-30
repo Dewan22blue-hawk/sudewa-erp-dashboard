@@ -9,6 +9,7 @@ import { ReferenceLink } from '@/components/ui/reference-link';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Badge } from '@/components/ui/badge';
 import { CopyBox } from '@/components/ui/copy-box';
+import { cn } from '@/lib/utils';
 
 interface Props {
   data?: WarehouseActivityUnitDetail[];
@@ -237,13 +238,27 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         accessorKey: 'state',
         sortable: true,
         cell: (item) => {
-          if (item.state === 'done') {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Selesai</Badge>;
-          }
-          if (item.state === 'pending') {
-            return <Badge variant="outline" className="border-amber-200 text-amber-700">Pending</Badge>;
-          }
-          return <Badge variant="outline" className="border-gray-200 text-gray-700">Draft</Badge>;
+          const config: Record<string, { label: string; name: string; className: string }> = {
+            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+            receipt: { label: 'Receipt', name: 'Dikirim', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+          };
+
+          const stateVal = item?.state ?? 'draft';
+          const match = config[stateVal] ?? {
+            label: stateVal.replace(/_/g, ' '),
+            name: stateVal.replace(/_/g, ' '),
+            className: 'border-slate-200 bg-slate-50 text-slate-700',
+          };
+
+          return (
+            <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+              {match.name}
+            </Badge>
+          );
         }
       }
     ],

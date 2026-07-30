@@ -75,3 +75,10 @@ export const deleteWarehouseSubBlock = async (id: number) => {
   const response = await apiClient.delete<ApiResponse<any>>(`/wapi/master-data/warehouse-sub-block/${id}`);
   return response.data;
 };
+
+export const getWarehouseSubBlocks = async (params: { is_active?: boolean; per_page?: number } = {}) => {
+  const response = await apiClient.get<ApiResponse<any>>(`/wapi/master-data/warehouse-sub-block`, {
+    params,
+  });
+  return response.data;
+};

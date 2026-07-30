@@ -357,6 +357,18 @@ export const unitItemDetailService = {
     });
   },
 
+  async bulkUpdateState(payload: {
+    unit_transaction_item_details_ids: number[];
+    stock_state: string;
+    warehouse_sub_block_id?: number | null;
+  }): Promise<void> {
+    const response = await apiClient.put(
+      '/wapi/transaction/unit-transaction/unit-transaction-item-detail/update-state',
+      payload
+    );
+    ensureSuccess(response.data);
+  },
+
   async importDetails(unitTransactionItemId: string, file: File): Promise<void> {
     const form = new FormData();
     form.append('file', file);

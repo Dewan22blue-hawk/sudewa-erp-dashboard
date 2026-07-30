@@ -2,11 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Plus } from 'lucide-react';
 import PengeluaranUnitTable from '@/components/features/pengeluaran-unit/PengeluaranUnitTable';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
-import { Button } from '@/components/ui/button';
 import { usePengeluaranUnits } from '@/hooks/usePengeluaranUnit';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -14,7 +12,6 @@ import { LoadingState } from '@/components/ui/loading-state';
 export default function PengeluaranUnitPage() {
   const router = useRouter();
   const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('warehouse:create');
   const canEdit = hasPermission('warehouse:edit');
   const canDelete = hasPermission('warehouse:delete');
 

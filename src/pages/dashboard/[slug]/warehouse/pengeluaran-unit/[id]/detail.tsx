@@ -19,6 +19,7 @@ export default function PengeluaranUnitDetailPage() {
   const { id, slug } = router.query as { id?: string; slug?: string };
 
   const { data: detailData, isLoading } = useWarehouseActivityDetail(id);
+  const dispatchMutation = useDispatchPengeluaranStock();
 
   useEffect(() => {
     if (!isLoading && detailData && detailData.activity_type !== 'issue') {
@@ -43,7 +44,6 @@ export default function PengeluaranUnitDetailPage() {
   }
 
   const details = detailData?.unit_transaction_details ?? [];
-  const dispatchMutation = useDispatchPengeluaranStock();
 
   const handleKirim = async (ids: number[]) => {
     if (!id) return;
