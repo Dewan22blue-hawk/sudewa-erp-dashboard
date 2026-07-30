@@ -57,6 +57,7 @@ export const getStockUnits = async (
     color?: string;
     search?: string; // Added search param for consistency
     in_stock?: boolean;
+    specified?: string;
   },
 ) => {
   const queryParams: Record<string, unknown> = {
@@ -68,6 +69,7 @@ export const getStockUnits = async (
     machine_number: params.machine_number,
     chassis_number: params.chassis_number,
     color: params.color,
+    specified: params.specified,
   };
 
   if (params.in_stock !== undefined) {

@@ -151,67 +151,99 @@ export function StockPickerTable({
 
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
     {
-      header: 'Nama Tipe Unit',
-      cell: () => unitType?.name ? <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitType?.name}`}>{unitType?.name}</ReferenceLink> : '-'
-    },
-    {
       header: 'Warna',
       accessorKey: 'color',
+      sortable: true,
+      alignment: 'left' as const,
+      cell: (item) => item?.color ?? '-',
     },
     {
       header: 'Nomor Mesin',
       accessorKey: 'machine_number',
-      className: 'font-medium',
+      sortable: true,
+      alignment: 'left' as const,
       cell: (item) => (
         <CopyBox text={item?.machine_number ?? '-'} />
-      )
+      ),
     },
     {
       header: 'Nomor Rangka',
       accessorKey: 'chassis_number',
+      sortable: true,
+      alignment: 'left' as const,
       cell: (item) => (
         <CopyBox text={item?.chassis_number ?? '-'} />
-      )
-    },
-    {
-      header: 'Sub Blok',
-      accessorKey: 'warehouse_sub_block',
-      cell: (item) => item.warehouse_sub_block?.name ? (
-        <CopyBox text={item.warehouse_sub_block.name} />
-      ) : (
-        <Badge variant='outline' className="font-semibold bg-white">Belum ditentukan</Badge>
-      )
-    },
-    {
-      header: 'Status Stok',
-      alignment: 'center',
-      cell: (item) => (
-        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${item?.in_stock ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-          {item?.in_stock ? 'Tersedia' : 'Tidak Tersedia'}
-        </span>
       ),
     },
     {
+      header: 'Sub Blok',
+      accessorKey: 'warehouseSubBlock',
+      alignment: 'center' as const,
+      sortable: true,
+      tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
+      cell: (item) => item?.warehouse_sub_block?.name ? item?.warehouse_sub_block?.name : <Badge variant='outline' className="font-semibold bg-white">Belum Ditambahkan</Badge>,
+    },
+    {
+      header: 'Status Stok',
+      accessorKey: 'in_stock',
+      sortable: true,
+      alignment: 'center' as const,
+      tooltip: 'Status ketersediaan unit fisik di gudang',
+      cell: (item) => item?.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
+    },
+    {
+      header: 'Kondisi Stok',
       header: 'Kondisi Stok',
       accessorKey: 'status',
       sortable: true,
-      alignment: 'center',
+      alignment: 'center' as const,
+      tooltip: 'Kondisi fisik unit saat ini',
       cell: (item) => renderStatus(item?.status ?? ''),
     },
     {
       header: 'Posisi Stok',
       accessorKey: 'stock_state',
       sortable: true,
-      alignment: 'center',
-      cell: (item) => renderStockState(item?.stock_state ?? ''),
+      alignment: 'center' as const,
+      tooltip: 'Posisi logistik atau status alur stok unit',
+      cell: (item) => {
+        const config: Record<string, { label: string; name: string; className: string }> = {
+          draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+          cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+          prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+          purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+          in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+          receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+        };
+        const stateVal = item?.stock_state ?? 'draft';
+        const match = config[stateVal] ?? {
+          label: stateVal.replace(/_/g, ' '),
+          className: 'border-slate-200 bg-slate-50 text-slate-700',
+        };
+
+        return (
+          <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+            {match.name ?? match.label}
+          </Badge>
+        );
+      }
     },
-  ], [unitType, slug]);
+  ], []);
+
+  const isPaidBool = useMemo(() => {
+    if (isPaid === undefined || isPaid === null) return false;
+    if (typeof isPaid === 'boolean') return isPaid;
+    if (typeof isPaid === 'number') return isPaid === 1;
+    if (typeof isPaid === 'string') return isPaid === 'true' || isPaid === '1';
+    return false;
+  }, [isPaid]);
 
   return (
     <div className="space-y-4">
       <BaseTable
         data={pagedRows}
         columns={columns}
+        headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
         loading={isLoading}
         searchPlaceholder="Cari warna/nomor mesin/nomor rangka"
         search={searchValue}
@@ -222,7 +254,7 @@ export function StockPickerTable({
           onPerPageChange(val);
           onPageChange(1);
         }}
-        showCheckbox
+        showCheckbox={!isPaidBool}
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}

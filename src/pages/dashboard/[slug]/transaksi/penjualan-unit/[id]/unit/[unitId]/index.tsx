@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, ChevronRight, Badge, Info } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Info, CheckCircle2, ListTodo as ListTodoIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -92,10 +94,10 @@ export default function SalesUnitDetailPage() {
         color: String(detail?.color ?? '-'),
         machine_number: String(detail?.machine_number ?? '-'),
         chassis_number: String(detail?.chassis_number ?? '-'),
-        in_stock: detail?.in_stock === true || detail?.in_stock === 1 || detail?.in_stock === '1',
-        status: detail?.status,
-        stock_state: detail?.stock_state,
+        in_stock: true,
+        status: String(detail?.status ?? ''),
         warehouse_sub_block: detail?.warehouse_sub_block,
+        stock_state: detail?.stock_state ?? null,
       })),
       unit_transaction_item_sales: (hit.unit_transaction_item_sales ?? []).map((item: any) => ({
         id: Number(item?.id ?? 0),
@@ -144,9 +146,9 @@ export default function SalesUnitDetailPage() {
       machine_number: String(detail?.machine_number ?? '-'),
       chassis_number: String(detail?.chassis_number ?? '-'),
       in_stock: detail?.in_stock,
-      status: detail?.status,
-      stock_state: detail?.stock_state,
+      status: String(detail?.status ?? ''),
       warehouse_sub_block: detail?.warehouse_sub_block,
+      stock_state: detail?.stock_state ?? null,
     }));
 
     const detailLookup = new Map<number, WarehouseStockUnit>();
@@ -167,6 +169,9 @@ export default function SalesUnitDetailPage() {
           machine_number: '-',
           chassis_number: '-',
           in_stock: false,
+          status: '',
+          warehouse_sub_block: undefined,
+          stock_state: null,
         },
       );
 
@@ -197,6 +202,8 @@ export default function SalesUnitDetailPage() {
     return Array.from(merged.values());
   }, [stockUnits, assignedDetailRows]);
 
+  console.log(pickerRows)
+
   useEffect(() => {
     const next = new Set(assignedIds);
     setSelectedIds((prev) => {
@@ -219,6 +226,20 @@ export default function SalesUnitDetailPage() {
     if (!isStockError) return;
     toast.error(readApiError(stockError));
   }, [isStockError, stockError]);
+
+  const isPaid = useMemo(() => {
+    const raw = salesData?.raw;
+    if (!raw) return false;
+    const billingSummary = raw.billing_summary;
+    const totalTagihan = Number(billingSummary?.grand_total ?? raw.unit_transaction_bruto_total ?? raw.unit_transaction_item_bruto_total ?? 0);
+    const totalPaid = Number(billingSummary?.total_paid ?? 0);
+    const isPaidVal = billingSummary?.is_paid ?? (totalPaid >= totalTagihan && totalTagihan > 0);
+
+    if (typeof isPaidVal === 'string') {
+      return isPaidVal === 'true' || isPaidVal === '1';
+    }
+    return Boolean(isPaidVal);
+  }, [salesData]);
 
   const selectedCount = selectedIds.size;
 
@@ -405,12 +426,39 @@ export default function SalesUnitDetailPage() {
 
         <SalesDetailCards data={salesData.ui} billingHistories={resolvedBillingHistories} unitType={unitTypeData} />
 
-        <Card className="rounded-md">
-          <CardContent className="space-y-4 p-6">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <Card className="border border-slate-200 shadow-sm">
+          <CardContent className="p-4 space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-4 gap-4">
               <div>
-                <h3 className="text-lg font-semibold">Detail Penjualan Unit</h3>
-                <p className="text-sm text-muted-foreground">Pilih stock unit yang tersedia untuk dijual</p>
+                <h2 className="text-base font-bold text-slate-800">Data Penjualan Detail Unit Tipe</h2>
+                <p className="text-xs text-slate-500 mt-1">Pilih stock unit yang tersedia untuk dijual</p>
+              </div>
+
+              <div className={cn(
+                "flex items-center gap-4 px-4 py-2.5 rounded-xl border",
+                selectedCount >= requiredQty
+                  ? "bg-emerald-50/50 border-emerald-100"
+                  : "bg-blue-50/50 border-blue-100"
+              )}>
+                <div>
+                  <p className={cn(
+                    "text-[11px] font-semibold uppercase tracking-wider mb-0.5",
+                    selectedCount >= requiredQty ? "text-emerald-600" : "text-blue-600"
+                  )}>
+                    Status Pemilihan Unit
+                  </p>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-bold text-slate-800 leading-none">{selectedCount}</span>
+                    <span className="text-sm font-medium text-slate-500">/ {requiredQty}</span>
+                    <span className="text-xs text-slate-500 ml-0.5">Unit</span>
+                  </div>
+                </div>
+                <div className={cn(
+                  "flex items-center justify-center h-10 w-10 rounded-full",
+                  selectedCount >= requiredQty ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600"
+                )}>
+                  {selectedCount >= requiredQty ? <CheckCircle2 className="h-5 w-5" /> : <ListTodoIcon className="h-5 w-5" />}
+                </div>
               </div>
             </div>
 
@@ -419,7 +467,7 @@ export default function SalesUnitDetailPage() {
               selectedIds={selectedIds}
               requiredQty={requiredQty}
               unitType={unitTypeData}
-              isPaid={salesData?.raw?.unit_transaction_billing?.is_paid}
+              isPaid={isPaid}
               onToggleOne={toggleOne}
               onToggleAllPage={toggleAllPage}
               currentPage={currentPage}
@@ -433,7 +481,7 @@ export default function SalesUnitDetailPage() {
                 <Button
                   size="sm"
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={!canAssignStock || isSelectionMatchingSaved || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending || !!salesData?.raw?.unit_transaction_billing?.is_paid}
+                  disabled={!canAssignStock || isSelectionMatchingSaved || assignMutation.isPending || dispatchMutation.isPending || updateStateMutation.isPending || isPaid}
                   onClick={() => setIsAssignDialogOpen(true)}
                 >
                   {assignMutation.isPending ? 'Menyimpan...' : `Unit Terjual (${selectedCount}/${requiredQty})`}

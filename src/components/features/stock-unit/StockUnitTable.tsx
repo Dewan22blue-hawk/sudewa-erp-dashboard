@@ -136,7 +136,6 @@ export default function StockUnitTable({
       sortable: true,
       alignment: 'center',
       tooltip: 'Posisi logistik atau status alur stok unit',
-      // cell: (item) => renderStatus(item.stockStatus),
       cell: (item) => {
         const config: Record<string, { label: string; name: string; className: string }> = {
           draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },

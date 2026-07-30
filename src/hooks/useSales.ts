@@ -44,6 +44,21 @@ export const useSalesDetail = (id?: string) => {
   });
 };
 
+export const useSalesById = (id?: string) => {
+  const { companyId } = useCompany();
+
+  return useQuery({
+    queryKey: companyId ? ['sales-by-id', companyId, id ?? ''] : ['sales-by-id', 'unscoped', id],
+    queryFn: () => salesService.getSalesDetail(id as string, companyId ?? undefined),
+    enabled: !!id && Boolean(companyId),
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: 'always',
+    refetchInterval: 30_000,
+    staleTime: 0,
+  });
+};
+
 export const useCreateSales = () => {
   const queryClient = useQueryClient();
 

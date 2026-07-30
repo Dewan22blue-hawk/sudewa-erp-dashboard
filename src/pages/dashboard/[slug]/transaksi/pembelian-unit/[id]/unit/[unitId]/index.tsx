@@ -173,16 +173,16 @@ export default function UnitPurchaseDetailPage() {
       {
         header: 'Sub Blok',
         accessorKey: 'warehouseSubBlock',
-        alignment: 'center',
+        alignment: 'center' as const,
         sortable: true,
         tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
-        cell: (details: any) => details.warehouse_sub_block?.name ?? <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Belum ditentukan</Badge>,
+        cell: (details: any) => details.warehouse_sub_block?.name ? details.warehouse_sub_block?.name : <Badge variant='outline' className="font-semibold bg-white">Belum Ditambahkan</Badge>,
       },
       {
         header: 'Status Stok',
         accessorKey: 'in_stock',
         sortable: true,
-        alignment: 'left' as const,
+        alignment: 'center' as const,
         tooltip: 'Status ketersediaan unit fisik di gudang',
         cell: (details: any) => details.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
       },
@@ -190,7 +190,7 @@ export default function UnitPurchaseDetailPage() {
         header: 'Kondisi Stok',
         accessorKey: 'status',
         sortable: true,
-        alignment: 'left' as const,
+        alignment: 'center' as const,
         tooltip: 'Kondisi fisik unit saat ini',
         cell: (details: any) => renderStatus(details.status),
       },
@@ -198,9 +198,29 @@ export default function UnitPurchaseDetailPage() {
         header: 'Posisi Stok',
         accessorKey: 'stock_state',
         sortable: true,
-        alignment: 'left' as const,
+        alignment: 'center' as const,
         tooltip: 'Posisi logistik atau status alur stok unit',
-        cell: (details: any) => renderStatus(details.stock_state),
+        cell: (details: any) => {
+          const config: Record<string, { label: string; name: string; className: string }> = {
+            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+            receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+          };
+          const stateVal = details?.stock_state ?? 'draft';
+          const match = config[stateVal] ?? {
+            label: stateVal.replace(/_/g, ' '),
+            className: 'border-slate-200 bg-slate-50 text-slate-700',
+          };
+
+          return (
+            <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+              {match.name ?? match.label}
+            </Badge>
+          );
+        }
       },
       {
         header: 'aksi',

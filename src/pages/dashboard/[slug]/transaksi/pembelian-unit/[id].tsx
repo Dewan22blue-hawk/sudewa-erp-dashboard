@@ -15,7 +15,7 @@ import { usePurchaseUnitItems } from '@/hooks/useUnitTransactionItem';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
 import { unitItemDetailService } from '@/services/unitItemDetail.service';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
-import { ArrowLeft, ChevronRight, CreditCard, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { CreditCard, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { TextTruncate } from '@/components/ui/text-truncate';
@@ -32,7 +32,6 @@ import { LoadingState } from '@/components/ui/loading-state';
 
 const PURCHASE_PREPARE_STOCK_STATE = 'inbound_incoming_goods';
 const PURCHASE_RECEIVED_STOCK_STATE = 'inbound_receipt';
-const PURCHASE_RECEIVED_STATE_SET = new Set(['receipt', 'inbound_receipt']);
 
 const readApiError = (error: any): string => {
   const details = error?.details ?? error?.response?.data?.errors;
@@ -95,7 +94,7 @@ export default function PurchaseDetailPage() {
     if (isStockAlreadyProcessed) return 'Sudah Diproses';
     if (purchase?.warehouse_activity?.state === 'process') return 'Sedang Diproses';
     if (purchase?.warehouse_activity?.state === 'draft') return 'Proses Penerimaan';
-    return 'Proses Unit';
+    return 'Proses Barang';
   }, [updateState.isPending, isStockAlreadyProcessed, purchase?.warehouse_activity?.state]);
   const unitItems = unitItemsResponse?.data ?? [];
   const resolvedBillingHistories =
@@ -204,7 +203,7 @@ export default function PurchaseDetailPage() {
         return;
       }
       if (unitItems.length === 0) {
-        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Proses Barang.');
         setIsReceiveDialogOpen(false);
         return;
       }
@@ -242,7 +241,7 @@ export default function PurchaseDetailPage() {
         .filter((value) => Number.isFinite(value) && value > 0);
 
       if (detailIds.length === 0) {
-        toast.error('Detail unit transaksi belum tersedia. Tidak dapat melakukan Terima Barang.');
+        toast.error('Detail unit transaksi belum tersedia. Tidak dapat melakukan Proses Barang.');
         setIsReceiveDialogOpen(false);
         return;
       }
@@ -385,7 +384,7 @@ export default function PurchaseDetailPage() {
             <div>
               <p className="font-semibold text-amber-900">Transaksi Sudah Direfund</p>
               <p className="text-xs mt-0.5 text-amber-700/95">
-                Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">inbound_return</span>. Proses terima barang dinonaktifkan.
+                Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">inbound_return</span>. Proses Proses Barang dinonaktifkan.
               </p>
             </div>
           </div>
@@ -453,11 +452,11 @@ export default function PurchaseDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {/* CONFIRMATION DIALOG TERIMA BARANG */}
+      {/* CONFIRMATION DIALOG Proses Barang */}
       <Dialog open={isReceiveDialogOpen} onOpenChange={setIsReceiveDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Konfirmasi Terima Barang</DialogTitle>
+            <DialogTitle>Konfirmasi Proses Barang</DialogTitle>
             <DialogDescription className="pt-2">
               Apakah Anda yakin ingin menerima barang ini?
             </DialogDescription>
@@ -467,7 +466,7 @@ export default function PurchaseDetailPage() {
                   <Info />
                 </span>
                 <span>
-                  Dengan klik terima barang maka akan <b>Masuk ke Warehouse</b>.
+                  Dengan klik Proses Barang maka akan <b>Masuk ke Warehouse</b>.
                 </span>
               </div>
             </div>
