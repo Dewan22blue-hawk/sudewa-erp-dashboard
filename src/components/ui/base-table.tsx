@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, Info } from 'lucide-react';
 import { LoadingState } from '@/components/ui/loading-state';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 export interface ColumnDef<T> {
   header: React.ReactNode;
@@ -18,6 +19,7 @@ export interface ColumnDef<T> {
   headerClassName?: string;
   cell?: (item: T, index: number) => React.ReactNode;
   sticky?: 'left' | 'right'; // If provided, column will float/sticky
+  tooltip?: React.ReactNode; // Optional tooltip for the column header
 }
 
 export interface BaseTableProps<T> {
@@ -312,7 +314,7 @@ export default function BaseTable<T>({
             {headerGroups && headerGroups}
             <TableRow className="hover:bg-transparent border-none">
               {showCheckbox && (
-                <TableHead className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
+                <TableHead className={cn("w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center sticky left-0 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)]", headerRowClassName)}>
                   <Checkbox
                     checked={sortedData.length > 0 && sortedData.every((item) => selectedIds?.has(getRowIdInternal(item)))}
                     onCheckedChange={handleToggleAll}
@@ -345,6 +347,23 @@ export default function BaseTable<T>({
                   >
                     <div className={cn('flex items-center gap-1', justifyClass)}>
                       <span>{col.header}</span>
+                      {col.tooltip && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span
+                                onClick={(e) => e.stopPropagation()}
+                                className="cursor-help inline-flex items-center"
+                              >
+                                <Info className="h-3.5 w-3.5 text-slate-400 shrink-0 hover:text-slate-600 transition-colors" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {col.tooltip}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                       {isSortable && (
                         isSorted ? (
                           activeSort.direction === 'asc' ? (
@@ -392,7 +411,7 @@ export default function BaseTable<T>({
                   onClick={() => onRowClick?.(item)}
                 >
                   {showCheckbox && (
-                    <TableCell className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center">
+                    <TableCell className="w-[50px] min-w-[50px] max-w-[50px] px-4 py-4 text-center sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-200 shadow-[4px_0_6px_-4px_rgba(0,0,0,0.05)]">
                       <Checkbox
                         checked={selectedIds?.has(getRowIdInternal(item)) ?? false}
                         onCheckedChange={(checked) => handleToggleOne(getRowIdInternal(item), Boolean(checked))}

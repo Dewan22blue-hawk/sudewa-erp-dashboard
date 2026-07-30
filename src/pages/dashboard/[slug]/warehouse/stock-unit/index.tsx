@@ -35,8 +35,6 @@ export default function StockUnitPage() {
 
   const { data, isLoading, isError } = useStockUnits(companyId, params);
 
-  console.log(data)
-
   // State for the table's pagination display, derived from hook data
   const [tablePage, setTablePage] = useState(1);
   const [tablePerPage, setTablePerPage] = useState(25);

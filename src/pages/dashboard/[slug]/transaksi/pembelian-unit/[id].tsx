@@ -487,7 +487,7 @@ export default function PurchaseDetailPage() {
               onClick={handleReceipt}
               disabled={updateState.isPending}
             >
-              {updateState.isPending ? 'Memproses...' : 'Ya, Terima Barang'}
+              {updateState.isPending ? 'Memproses...' : 'Ya, Proses Barang'}
             </Button>
           </DialogFooter>
         </DialogContent>

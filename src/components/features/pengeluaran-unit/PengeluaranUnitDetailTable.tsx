@@ -129,6 +129,9 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
       //     />
       //   ),
       //   alignment: 'center',
+      //   sticky: 'left',
+      //   className: 'w-[50px] min-w-[50px] max-w-[50px]',
+      //   headerClassName: 'w-[50px] min-w-[50px] max-w-[50px]',
       //   cell: (item) => (
       //     <Checkbox
       //       checked={selected.includes(item.id) || dispatchedIds.includes(item.id)}

@@ -132,6 +132,9 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
           />
         ),
         alignment: 'center',
+        sticky: 'left',
+        className: 'w-[50px] min-w-[50px] max-w-[50px]',
+        headerClassName: 'w-[50px] min-w-[50px] max-w-[50px]',
         cell: (item) => (
           <Checkbox
             checked={selected.includes(item.id) || receivedIds.includes(item.id)}
@@ -183,7 +186,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         header: 'SUB BLOK',
         accessorKey: 'warehouseSubBlock',
         sortable: true,
-        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock || '-'} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
+        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
       },
       {
         header: 'STATUS UNIT',
@@ -237,13 +240,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         accessorKey: 'state',
         sortable: true,
         cell: (item) => {
-          if (item.state === 'done') {
-            return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Selesai</Badge>;
-          }
-          if (item.state === 'pending') {
-            return <Badge variant="outline" className="border-amber-200 text-amber-700">Pending</Badge>;
-          }
-          return <Badge variant="outline" className="border-gray-200 text-gray-700">Draft</Badge>;
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">{item?.state}</Badge>;
         }
       }
     ],

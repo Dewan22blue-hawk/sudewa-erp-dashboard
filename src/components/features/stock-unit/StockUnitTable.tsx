@@ -111,13 +111,15 @@ export default function StockUnitTable({
       accessorKey: 'warehouseSubBlock',
       alignment: 'center',
       sortable: true,
-      cell: (item) => item.warehouseSubBlock?.name ?? '-',
+      tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
+      cell: (item) => item.warehouseSubBlock?.name ? item.warehouseSubBlock?.name : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>,
     },
     {
       header: 'Status Stok',
       accessorKey: 'status',
       sortable: true,
       alignment: 'center',
+      tooltip: 'Status ketersediaan unit fisik di gudang',
       cell: (item) => item?.inStock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
     },
     {
@@ -125,6 +127,7 @@ export default function StockUnitTable({
       accessorKey: 'status',
       sortable: true,
       alignment: 'center',
+      tooltip: 'Kondisi fisik unit saat ini',
       cell: (item) => renderStatus(item.status),
     },
     {
@@ -132,6 +135,7 @@ export default function StockUnitTable({
       accessorKey: 'stockStatus',
       sortable: true,
       alignment: 'center',
+      tooltip: 'Posisi logistik atau status alur stok unit',
       cell: (item) => renderStatus(item.stockStatus),
     },
   ];
