@@ -34,7 +34,6 @@ export default function PengeluaranUnitDetailPage() {
   const { id, slug } = router.query as { id?: string; slug?: string };
 
   const { data: detailData, isLoading } = useWarehouseActivityDetail(id);
-  const dispatchMutation = useDispatchPengeluaranStock();
 
   const [isUpdateStateDialogOpen, setIsUpdateStateDialogOpen] = useState(false);
   const [selectedState, setSelectedState] = useState<'draft' | 'process' | 'done'>('draft');
@@ -203,7 +202,7 @@ export default function PengeluaranUnitDetailPage() {
         </div>
 
         <div className="bg-white rounded-md border sm:p-5 space-y-4">
-          <PengeluaranUnitDetailTable data={details} activityState={detailData?.state} isLoading={isLoading} />
+          <PengeluaranUnitDetailTable data={details} isRefundActivity={detailData?.isRefundActivity} activityState={detailData?.state} isLoading={isLoading} />
         </div>
       </div>
 

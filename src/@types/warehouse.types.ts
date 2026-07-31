@@ -37,6 +37,7 @@ export interface WarehouseActivity {
   tanggal: string;
   state: string;
   keterangan: string;
+  isRefundActivity?: boolean;
 }
 
 export interface WarehouseActivityListResponse {

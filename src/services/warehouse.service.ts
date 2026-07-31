@@ -72,6 +72,8 @@ type WarehouseActivityApiModel = {
   } | null;
   person?: ApiPerson | null;
   state?: string;
+  is_refund_activity?: boolean | number | string;
+  isRefundActivity?: boolean | number | string;
   unit_transaction_details?: WarehouseActivityUnitDetailApiModel[];
   details?: WarehouseActivityUnitDetailApiModel[];
   data?: WarehouseActivityApiModel;
@@ -119,6 +121,7 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
   const supplier = item.person?.name ?? '-';
   const keterangan = item.description ?? '';
   const state = item?.state ?? '-';
+  const isRefundActivity = toBoolValue(item.is_refund_activity) || toBoolValue(item.isRefundActivity);
 
   return {
     id,
@@ -143,6 +146,7 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
     tanggal,
     supplier,
     keterangan,
+    isRefundActivity,
   };
 };
 

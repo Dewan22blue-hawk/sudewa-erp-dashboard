@@ -22,10 +22,11 @@ import { cn } from '@/lib/utils';
 interface Props {
   data?: WarehouseActivityUnitDetail[];
   activityState?: string;
+  isRefundActivity?: boolean;
   isLoading?: boolean;
 }
 
-export default function PengeluaranUnitDetailTable({ data, activityState, isLoading = false }: Props) {
+export default function PengeluaranUnitDetailTable({ data, activityState, isRefundActivity, isLoading = false }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
@@ -120,6 +121,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
         unit_transaction_item_details_ids: selected,
         stock_state: stockState,
         transaction_type: 'sales',
+        refund_activity: isRefundActivity,
         warehouse_sub_block_id: warehouseSubBlockId ? Number(warehouseSubBlockId) : null,
       });
       toast.success('Berhasil memproses status dan sub-blok unit');
