@@ -68,7 +68,7 @@ export default function PenerimaanUnitTable({
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
-  const [editingActivity, setEditingActivity] = useState<{ id: number; state: 'draft' | 'process' | 'done' } | null>(null);
+  const [editingActivity, setEditingActivity] = useState<{ id: string | number; state: 'draft' | 'process' | 'done' } | null>(null);
   const [selectedState, setSelectedState] = useState<'draft' | 'process' | 'done'>('draft');
 
   const updateStateMutation = useWarehouseActivityStateUpdate();
@@ -96,7 +96,7 @@ export default function PenerimaanUnitTable({
     }
   };
 
-  const handleOpenStateDialog = (activityId: number, state: string) => {
+  const handleOpenStateDialog = (activityId: string | number, state: string) => {
     const s = state?.toLowerCase();
     const cleanState = s === 'draft' || s === 'process' || s === 'done' ? (s as 'draft' | 'process' | 'done') : 'draft';
     setEditingActivity({ id: activityId, state: cleanState });

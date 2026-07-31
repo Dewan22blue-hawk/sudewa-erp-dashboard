@@ -194,7 +194,7 @@ export default function SalesUnitDetailPage() {
     }
 
     return assignedBySales;
-  }, [stockUnits, effectiveUnitItem?.unit_transaction_item_details, effectiveUnitItem?.unit_transaction_item_sales]);
+  }, [stockUnits, effectiveUnitItem?.unit_transaction_item_details, effectiveUnitItem?.unit_transaction_item_sales, isPaid]);
 
   const assignedIds = useMemo(() => {
     return assignedDetailRows.map((item: any) => item.id).filter((item: number) => item > 0);

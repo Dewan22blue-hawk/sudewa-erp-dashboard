@@ -65,6 +65,7 @@ type UnitTransactionItemDetailApiModel = {
   chassis_number?: string;
   in_stock?: boolean | number | string;
   is_forecast?: boolean;
+  is_sold_unit?: boolean | number | string;
   status?: string;
   stock_state?: string | null;
   created_at?: string;
@@ -177,6 +178,7 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
   chassis_number: item.chassis_number ?? '-',
   in_stock: toBool(item.in_stock),
   is_forecast: toBool(item.is_forecast),
+  is_sold_unit: toBool(item.is_sold_unit),
   status: item.status,
   person: { id: undefined, name: '-' },
   warehouse_sub_block: {
