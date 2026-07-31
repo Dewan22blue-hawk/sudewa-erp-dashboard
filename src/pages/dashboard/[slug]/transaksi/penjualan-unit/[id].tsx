@@ -71,20 +71,18 @@ export default function SalesDetailPage() {
   const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
   const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
   const currentStockState = String(sales?.stock_state ?? '').toLowerCase();
-  const isRefunded = sales?.has_refund_transaction ?? (currentStockState === 'outbound_return');
+  const isRefunded = sales?.has_refund_transaction;
 
   const SALES_DELIVERED_STOCK_STATE = 'outbound_delivered';
-  const SALES_DELIVERED_STATE_SET = new Set(['outbound_delivered', 'delivered']);
-  const isAlreadyDelivered = SALES_DELIVERED_STATE_SET.has(currentStockState);
-  const canDeliver = isPaid && !isAlreadyDelivered && !isRefunded;
+  const canDeliver = isPaid && (sales?.warehouse_activity ? sales?.warehouse_activity?.state === 'draft' : true);
 
   const deliveryButtonText = useMemo(() => {
     if (updateState.isPending) return 'Memproses...';
-    if (isAlreadyDelivered) return 'Sudah Terkirim';
+    if (sales?.warehouse_activity?.state === 'done') return 'Selesai Diproses';
     if (sales?.warehouse_activity?.state === 'process') return 'Sedang Diproses';
     if (sales?.warehouse_activity?.state === 'draft') return 'Proses Pengiriman';
     return 'Proses Barang';
-  }, [updateState.isPending, isAlreadyDelivered, sales?.warehouse_activity?.state]);
+  }, [updateState.isPending, sales?.warehouse_activity?.state]);
 
   const resolvedBillingHistories =
     billingHistories.length > 0
@@ -342,16 +340,6 @@ export default function SalesDetailPage() {
                   Belum Lunas
                 </Badge>
               )}
-              {isAlreadyDelivered ? (
-                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                  Stok Terkirim
-                </Badge>
-              ) : null}
-              {isRefunded ? (
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
-                  Sudah Refund
-                </Badge>
-              ) : null}
             </>
           }
           actions={

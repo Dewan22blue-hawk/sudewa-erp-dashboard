@@ -86,16 +86,15 @@ export default function PurchaseDetailPage() {
   const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
   const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
   const isRefunded = purchase?.has_refund_transaction;
-  const isStockAlreadyProcessed = purchase?.warehouse_activity?.state === 'process';
-  const canReceive = isPaid && !isStockAlreadyProcessed && !purchase?.warehouse_activity;
+  const canReceive = isPaid && (purchase?.warehouse_activity ? purchase?.warehouse_activity?.state === 'draft' : true);
 
   const receiveButtonText = useMemo(() => {
     if (updateState.isPending) return 'Memproses...';
-    if (isStockAlreadyProcessed) return 'Sudah Diproses';
+    if (purchase?.warehouse_activity?.state === 'done') return 'Selesai Diproses';
     if (purchase?.warehouse_activity?.state === 'process') return 'Sedang Diproses';
     if (purchase?.warehouse_activity?.state === 'draft') return 'Proses Penerimaan';
     return 'Proses Barang';
-  }, [updateState.isPending, isStockAlreadyProcessed, purchase?.warehouse_activity?.state]);
+  }, [updateState.isPending, purchase?.warehouse_activity?.state]);
   const unitItems = unitItemsResponse?.data ?? [];
   const resolvedBillingHistories =
     billingHistories.length > 0
@@ -338,16 +337,6 @@ export default function PurchaseDetailPage() {
                   Belum Lunas
                 </Badge>
               )}
-              {isStockAlreadyProcessed ? (
-                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                  Stok Diterima
-                </Badge>
-              ) : null}
-              {isRefunded ? (
-                <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700 font-semibold">
-                  Sudah Refund
-                </Badge>
-              ) : null}
             </>
           }
           actions={

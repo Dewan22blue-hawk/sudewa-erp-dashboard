@@ -90,7 +90,6 @@ const renderStockState = (state: string) => {
 export function StockPickerTable({
   units,
   selectedIds,
-  isPaid,
   onToggleOne,
   currentPage,
   perPage,
@@ -110,9 +109,6 @@ export function StockPickerTable({
       return [item.color, item.machine_number, item.chassis_number].some((field) => String(field ?? '').toLowerCase().includes(query));
     });
   }, [units, searchValue]);
-
-  const router = useRouter();
-  const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
   const totalPages = Math.max(1, Math.ceil(filteredUnits.length / perPage));
   const pagedRows = useMemo(() => {
@@ -236,14 +232,6 @@ export function StockPickerTable({
     },
   ], []);
 
-  const isPaidBool = useMemo(() => {
-    if (isPaid === undefined || isPaid === null) return false;
-    if (typeof isPaid === 'boolean') return isPaid;
-    if (typeof isPaid === 'number') return isPaid === 1;
-    if (typeof isPaid === 'string') return isPaid === 'true' || isPaid === '1';
-    return false;
-  }, [isPaid]);
-
   return (
     <div className="space-y-4">
       <BaseTable
@@ -260,7 +248,7 @@ export function StockPickerTable({
           onPerPageChange(val);
           onPageChange(1);
         }}
-        showCheckbox={!isPaidBool}
+        showCheckbox
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}

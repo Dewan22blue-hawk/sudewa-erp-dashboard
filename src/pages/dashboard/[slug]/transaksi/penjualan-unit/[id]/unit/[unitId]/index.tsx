@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowLeft, ChevronRight, Info, CheckCircle2, ListTodo as ListTodoIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Info, CheckCircle2, ListTodo as ListTodoIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -127,6 +126,20 @@ export default function SalesUnitDetailPage() {
     isLoading: unitTypeLoading,
   } = useTypeUnit(fallbackUnitTypeId);
 
+  const isPaid = useMemo(() => {
+    const raw = salesData?.raw;
+    if (!raw) return false;
+    const billingSummary = raw.billing_summary;
+    const totalTagihan = Number(billingSummary?.grand_total ?? raw.unit_transaction_bruto_total ?? raw.unit_transaction_item_bruto_total ?? 0);
+    const totalPaid = Number(billingSummary?.total_paid ?? 0);
+    const isPaidVal = billingSummary?.is_paid ?? (totalPaid >= totalTagihan && totalTagihan > 0);
+
+    if (typeof isPaidVal === 'string') {
+      return isPaidVal === 'true' || isPaidVal === '1';
+    }
+    return Boolean(isPaidVal);
+  }, [salesData]);
+
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
@@ -140,7 +153,8 @@ export default function SalesUnitDetailPage() {
   const requiredQty = Number(effectiveUnitItem?.qty_total ?? 0);
 
   const assignedDetailRows = useMemo<WarehouseStockUnit[]>(() => {
-    const mappedFromItemDetails = (effectiveUnitItem?.unit_transaction_item_details ?? []).map((detail: any) => ({
+    const salesItems = effectiveUnitItem?.unit_transaction_item_sales?.map((item: any) => item.unit_transaction_item_detail)
+    const mappedFromItemDetails = (isPaid ? salesItems : effectiveUnitItem?.unit_transaction_item_details ?? []).map((detail: any) => ({
       id: toNumberId(detail?.id),
       color: String(detail?.color ?? '-'),
       machine_number: String(detail?.machine_number ?? '-'),
@@ -202,8 +216,6 @@ export default function SalesUnitDetailPage() {
     return Array.from(merged.values());
   }, [stockUnits, assignedDetailRows]);
 
-  console.log(pickerRows)
-
   useEffect(() => {
     const next = new Set(assignedIds);
     setSelectedIds((prev) => {
@@ -226,20 +238,6 @@ export default function SalesUnitDetailPage() {
     if (!isStockError) return;
     toast.error(readApiError(stockError));
   }, [isStockError, stockError]);
-
-  const isPaid = useMemo(() => {
-    const raw = salesData?.raw;
-    if (!raw) return false;
-    const billingSummary = raw.billing_summary;
-    const totalTagihan = Number(billingSummary?.grand_total ?? raw.unit_transaction_bruto_total ?? raw.unit_transaction_item_bruto_total ?? 0);
-    const totalPaid = Number(billingSummary?.total_paid ?? 0);
-    const isPaidVal = billingSummary?.is_paid ?? (totalPaid >= totalTagihan && totalTagihan > 0);
-
-    if (typeof isPaidVal === 'string') {
-      return isPaidVal === 'true' || isPaidVal === '1';
-    }
-    return Boolean(isPaidVal);
-  }, [salesData]);
 
   const selectedCount = selectedIds.size;
 
