@@ -100,7 +100,6 @@ export default function UnitPurchaseDetailPage() {
   const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
   const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
   const { data: detailResponse } = useUnitItemDetails(unitItemId);
-  console.log(detailResponse?.data)
 
   const createMutation = useCreateUnitItemDetail();
   const updateMutation = useUpdateUnitItemDetail();

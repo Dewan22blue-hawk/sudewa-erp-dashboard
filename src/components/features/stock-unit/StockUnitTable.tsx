@@ -120,7 +120,7 @@ export default function StockUnitTable({
       sortable: true,
       alignment: 'center',
       tooltip: 'Status ketersediaan unit fisik di gudang',
-      cell: (item) => item?.inStock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
+      cell: (item) => item?.inStock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia {item?.isSoldUnit && '/ Terjual'}</Badge>
     },
     {
       header: 'Kondisi Stok',

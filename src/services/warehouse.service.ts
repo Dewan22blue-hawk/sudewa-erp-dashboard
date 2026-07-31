@@ -49,6 +49,8 @@ type WarehouseActivityUnitDetailApiModel = {
   in_stock?: boolean | number | string;
   stock_state?: string;
   status?: string;
+  is_sold_unit?: boolean | number | string;
+  isSoldUnit?: boolean | number | string;
   unit_type?: ApiUnitType;
   unit_transaction?: {
     code?: string;
@@ -170,6 +172,7 @@ const mapDetail = (activityId: string, detail: WarehouseActivityUnitDetailApiMod
     isReceivedByState(detail.stock_state);
   const stockState = detail.stock_state ?? '-';
   const warehouseSubBlock = detail.warehouse_sub_block?.name;
+  const isSoldUnit = toBoolValue(detail.is_sold_unit) || toBoolValue(detail.isSoldUnit);
 
   return {
     id: detailId,
@@ -184,6 +187,7 @@ const mapDetail = (activityId: string, detail: WarehouseActivityUnitDetailApiMod
     noRangka,
     warehouseSubBlock,
     diterima,
+    isSoldUnit,
   };
 };
 
@@ -335,6 +339,7 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
       const status = detail.status ?? '-';
       const in_stock = toBoolValue(detail.in_stock);
       const stockStatus = detail.in_stock ?? '-';
+      const isSoldUnit = detail.is_sold_unit ?? '-';
       const stockState = detail?.stock_state ?? detail?.state ?? '-';
       const warehouseSubBlock = detail?.warehouse_sub_block?.name;
       const diterima = movement.status === 'in' || toBoolValue(detail.in_stock);
@@ -352,6 +357,7 @@ export const getWarehouseActivityById = async (id: string): Promise<WarehouseAct
         noRangka,
         stockState,
         warehouseSubBlock,
+        isSoldUnit,
         diterima,
       };
     });
@@ -434,4 +440,15 @@ export const createWarehouseData = async (payload: CreateWarehouseDataPayload): 
 
 export const deleteWarehouseActivity = async (id: string): Promise<void> => {
   await apiClient.delete<LaravelApiResponse<unknown>>(`${basePath}/${id}`);
+};
+
+export const updateWarehouseActivityState = async (
+  activityId: string | number,
+  state: 'draft' | 'process' | 'done'
+): Promise<any> => {
+  const response = await apiClient.put<LaravelApiResponse<any>>(
+    `${basePath}/${activityId}/update-state`,
+    { state }
+  );
+  return ensureSuccess(response.data);
 };

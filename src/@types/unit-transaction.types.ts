@@ -126,6 +126,7 @@ export interface UnitTransactionItemDetail {
   transaction_bbn_total: number;
   transaction_other_fee: number;
   warehouse_sub_block: WarehouseSubBlock;
+  is_sold_unit: boolean | undefined;
   expedition_fee_total: number;
   total_operational_fee?: number;
   has_refund_transaction?: boolean;

@@ -68,8 +68,6 @@ export default function PurchaseDetailPage() {
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
   const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
 
-  console.log(purchase)
-
   useEffect(() => {
     if (!isLoading && purchase && purchase?.type !== 'purchase') {
       router.push(`/dashboard/${slug}/transaksi/pembelian-unit`);

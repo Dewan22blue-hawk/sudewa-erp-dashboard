@@ -18,6 +18,7 @@ export interface WarehouseActivityUnitDetail {
   diterima: boolean;
   stockState: string;
   warehouseSubBlock?: string;
+  isSoldUnit?: boolean;
 }
 
 export interface WarehouseActivity {

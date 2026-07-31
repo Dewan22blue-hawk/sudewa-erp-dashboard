@@ -237,11 +237,7 @@ export function PurchasePaymentForm({
     );
 
     const isPaidAndValid = billing ? billing?.is_paid : false;
-    // console.log(isPaidAndValid)
 
-    // console.log(billing)
-
-    console.log(billingRemaining)
     return (
         <div className="space-y-6">
             <div className="space-y-6">

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Settings } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { WarehouseActivityUnitDetail } from '@/@types/warehouse.types';
@@ -22,12 +21,11 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   data?: WarehouseActivityUnitDetail[];
-  onKirim: (ids: number[]) => Promise<void>;
-  onDelete: (ids: number[]) => Promise<void>;
+  activityState?: string;
   isLoading?: boolean;
 }
 
-export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, isLoading = false }: Props) {
+export default function PengeluaranUnitDetailTable({ data, activityState, isLoading = false }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
@@ -60,6 +58,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
       status: item.status,
       state: item?.stockState,
       warehouseSubBlock: item?.warehouseSubBlock,
+      isSoldUnit: item.isSoldUnit,
     }));
   }, [data]);
 
@@ -108,17 +107,11 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
     setCurrentPage(1);
   }, [itemsPerPage, search, dispatchFilter]);
 
-  const toggleSelect = useCallback((item: any) => {
-    const id = item.id;
-    setSelected((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
-  }, []);
+  const stringSelectedIds = useMemo(() => new Set(selected.map(String)), [selected]);
 
-  const toggleAll = useCallback(() => {
-    if (paginatedRows.length === 0) return;
-    const allIds = paginatedRows.map((d) => d.id);
-    const isAllSelected = allIds.every((id) => selected.includes(id));
-    setSelected((prev) => (isAllSelected ? prev.filter((id) => !allIds.includes(id)) : Array.from(new Set([...prev, ...allIds]))));
-  }, [paginatedRows, selected]);
+  const handleSelectedIdsChange = useCallback((ids: Set<string>) => {
+    setSelected(Array.from(ids).map(Number));
+  }, []);
 
   const handleSubmitProcess = async () => {
     if (selected.length === 0) return;
@@ -139,27 +132,6 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
-      {
-        header: (
-          <Checkbox
-            checked={
-              paginatedRows.length > 0 &&
-              paginatedRows.every((d) => selected.includes(d.id))
-            }
-            onCheckedChange={() => toggleAll()}
-          />
-        ),
-        alignment: 'center',
-        sticky: 'left',
-        className: 'w-[50px] min-w-[50px] max-w-[50px]',
-        headerClassName: 'w-[50px] min-w-[50px] max-w-[50px]',
-        cell: (item) => (
-          <Checkbox
-            checked={selected.includes(item.id)}
-            onCheckedChange={() => toggleSelect(item)}
-          />
-        ),
-      },
       {
         header: 'KODE JUAL',
         accessorKey: 'salesCode',
@@ -203,7 +175,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         header: 'SUB BLOK',
         accessorKey: 'warehouseSubBlock',
         sortable: true,
-        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Dikeluarkan / Belum Ditambahkan</Badge>
+        cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
       },
       {
         header: 'STATUS UNIT',
@@ -281,7 +253,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         }
       }
     ],
-    [slug, selected, paginatedRows, toggleAll, toggleSelect]
+    [slug]
   );
 
   return (
@@ -295,6 +267,11 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
         showLimitChange
         perPage={itemsPerPage}
         onPerPageChange={setItemsPerPage}
+        showCheckbox={activityState !== 'done'}
+        selectedIds={stringSelectedIds}
+        onSelectedIdsChange={handleSelectedIdsChange}
+        getRowId={(item) => String(item.id)}
+        isCheckboxDisabled={() => activityState?.toLowerCase() === 'done'}
         meta={{
           currentPage: safePage,
           perPage: itemsPerPage,
@@ -392,7 +369,7 @@ export default function PengeluaranUnitDetailTable({ data, onKirim, onDelete, is
                   <SelectContent>
                     <SelectItem value="purchase_order">Purchase Order (PO)</SelectItem>
                     <SelectItem value="in_transit">In Transit (Dalam Perjalanan)</SelectItem>
-                    <SelectItem value="receipt">Receipt (Telah Diterima)</SelectItem>
+                    <SelectItem value="receipt">Receipt (Diterima / Tersedia)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
