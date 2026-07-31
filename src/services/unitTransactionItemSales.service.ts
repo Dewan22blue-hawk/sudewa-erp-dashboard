@@ -15,7 +15,8 @@ export const unitTransactionItemSalesService = {
       {
         params: {
           company_id: companyId,
-          // in_stock: 'true',
+          in_stock: 'true',
+          stock_state: 'receipt'
         },
       }
     );

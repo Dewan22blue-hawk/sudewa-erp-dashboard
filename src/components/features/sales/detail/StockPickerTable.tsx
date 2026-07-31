@@ -90,7 +90,6 @@ const renderStockState = (state: string) => {
 export function StockPickerTable({
   units,
   selectedIds,
-  unitType,
   isPaid,
   onToggleOne,
   currentPage,
@@ -141,13 +140,21 @@ export function StockPickerTable({
     const added = Array.from(numIds).filter((id) => !selectedIds.has(id));
     const removed = Array.from(allPageIds).filter((id) => selectedIds.has(id) && !numIds.has(id));
 
-    if (added.length > 0) {
-      added.forEach((id) => onToggleOne(id, true));
-    }
     if (removed.length > 0) {
       removed.forEach((id) => onToggleOne(id, false));
     }
-  }, [pagedRows, selectedIds, onToggleOne]);
+
+    if (added.length > 0) {
+      let currentSelectedSize = selectedIds.size - removed.length;
+      for (const id of added) {
+        if (requiredQty !== undefined && requiredQty > 0 && currentSelectedSize >= requiredQty) {
+          break;
+        }
+        onToggleOne(id, true);
+        currentSelectedSize++;
+      }
+    }
+  }, [pagedRows, selectedIds, onToggleOne, requiredQty]);
 
   const columns = useMemo<ColumnDef<WarehouseStockUnit>[]>(() => [
     {
@@ -192,7 +199,6 @@ export function StockPickerTable({
       cell: (item) => item?.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
     },
     {
-      header: 'Kondisi Stok',
       header: 'Kondisi Stok',
       accessorKey: 'status',
       sortable: true,

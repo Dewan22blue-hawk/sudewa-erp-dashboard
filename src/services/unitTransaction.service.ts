@@ -220,23 +220,6 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
   isRefunded: item?.has_returned_data ?? null,
   remainingPayment: toNumber(item.billing_summary?.remaining_payment),
-  warehouse_activity: item.warehouse_activity
-    ? {
-      id: toNumber(item.warehouse_activity.id),
-      uuid: item.warehouse_activity.uuid ?? '',
-      person_id: toNumber(item.warehouse_activity.person_id),
-      cash_id: item.warehouse_activity.cash_id ? toNumber(item.warehouse_activity.cash_id) : null,
-      warehouse_id: toNumber(item.warehouse_activity.warehouse_id),
-      unit_transaction_id: item.warehouse_activity.unit_transaction_id ? toNumber(item.warehouse_activity.unit_transaction_id) : null,
-      activity_number: item.warehouse_activity.activity_number ?? '',
-      activity_type: item.warehouse_activity.activity_type ?? '',
-      activity_date: item.warehouse_activity.activity_date ?? '',
-      description: item.warehouse_activity.description ?? null,
-      state: item.warehouse_activity.state ?? '',
-      created_at: '',
-      updated_at: '',
-    }
-    : null,
 });
 
 const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): UnitTransaction[] => {

@@ -8,7 +8,6 @@ import {
 } from '@/@types/unit-transaction.types';
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, LaravelApiResponse, toPaginatedResult } from '@/lib/api/response';
-import { WarehouseSubBlock } from './warehouseBlock.service';
 
 type UnitTransactionItemApiModel = {
   id?: string | number;
@@ -181,9 +180,9 @@ const mapItemDetail = (item: UnitTransactionItemDetailApiModel): UnitTransaction
   status: item.status,
   person: { id: undefined, name: '-' },
   warehouse_sub_block: {
-    id: Number(item.warehouse_sub_block?.id ?? null),
-    name: item.warehouse_sub_block?.name ?? null,
-  } as WarehouseSubBlock,
+    id: item.warehouse_sub_block?.id !== undefined ? String(item.warehouse_sub_block.id) : undefined,
+    name: item.warehouse_sub_block?.name ?? undefined,
+  },
   unit_transaction_bruto_total: 0,
   unit_transaction_item_total_hpp: 0,
   unit_transaction_item_total_dpp: 0,

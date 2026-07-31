@@ -51,7 +51,7 @@ export default function PenerimaanUnitTable({
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const formatDate = (val: string) => {
+  const formatDate = (val?: string) => {
     if (!val) return '-';
     const date = new Date(val);
     if (Number.isNaN(date.getTime())) return val;

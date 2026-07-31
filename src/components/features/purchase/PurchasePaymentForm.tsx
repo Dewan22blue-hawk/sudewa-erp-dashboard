@@ -223,7 +223,7 @@ export function PurchasePaymentForm({
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setDeleteId(item.id)}
-                                disabled={loading || billing && billing?.is_paid}
+                                disabled={loading || !!billing?.is_paid}
                                 type="button"
                             >
                                 <Trash className="w-4 h-4 text-red-500" />
@@ -233,7 +233,7 @@ export function PurchasePaymentForm({
                 ]
                 : []),
         ],
-        [loading, onDeleteHistory],
+        [loading, onDeleteHistory, billing],
     );
 
     const isPaidAndValid = billing ? billing?.is_paid : false;
@@ -484,7 +484,7 @@ export function PurchasePaymentForm({
                                     setDeleteId(null);
                                 }
                             }}
-                            disabled={billing && billing?.is_paid}
+                            disabled={!!billing?.is_paid}
                             className="rounded-md bg-red-600 hover:bg-red-700"
                         >
                             Hapus

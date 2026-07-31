@@ -97,7 +97,7 @@ export default function LaporanPembelianPerSupplier({ data, pagination, isLoadin
         ),
       },
     ],
-    [pagination.currentPage, pagination.perPage]
+    [pagination.currentPage, pagination.perPage, slug]
   );
 
   return (
