@@ -150,7 +150,7 @@ export const WarehouseSubBlockTable = ({
         ),
       },
     ],
-    [onEdit, onDelete, onMakeDefault, onToggleActive, canCreate, canEdit, canDelete],
+    [onEdit, onDelete, onMakeDefault, onToggleActive, canEdit, canDelete],
   );
 
   return (
@@ -173,7 +173,7 @@ export const WarehouseSubBlockTable = ({
       }}
       onPageChange={onPageChange}
       headerActions={
-        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+        <Button onClick={canCreate ? onAdd : undefined} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={!canCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Tambah Data
         </Button>

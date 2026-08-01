@@ -259,7 +259,7 @@ export default function PengeluaranUnitDetailTable({ data, isRefundActivity, act
         }
       }
     ],
-    [slug]
+    [slug, isRefundActivity]
   );
 
   return (
