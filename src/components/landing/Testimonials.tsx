@@ -54,7 +54,7 @@ export default function Testimonials() {
               whileHover={{ scale: 1.05, y: -10 }}
               className={`w-[320px] sm:w-[400px] shrink-0 p-8 sm:p-10 rounded-[3rem] ${testi.color} shadow-clay-sm border-2 flex flex-col justify-between min-h-[300px] cursor-pointer`}
             >
-              <p className="text-lg sm:text-xl font-bold leading-relaxed mb-8 opacity-80">"{testi.story}"</p>
+              <p className="text-lg sm:text-xl font-bold leading-relaxed mb-8 opacity-80">&quot;{testi.story}&quot;</p>
               
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-inner flex items-center justify-center font-black text-xl sm:text-2xl opacity-60">

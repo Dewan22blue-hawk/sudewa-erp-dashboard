@@ -43,6 +43,20 @@ export default function HowItWorks() {
   // Calculate neon line height
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
+  // Calculate step specific animations
+  const step1Opacity = useTransform(scrollYProgress, [-0.2, 0], [0.3, 1]);
+  const step1Y = useTransform(scrollYProgress, [-0.2, 0], [40, 0]);
+  const step2Opacity = useTransform(scrollYProgress, [0.13, 0.33], [0.3, 1]);
+  const step2Y = useTransform(scrollYProgress, [0.13, 0.33], [40, 0]);
+  const step3Opacity = useTransform(scrollYProgress, [0.46, 0.66], [0.3, 1]);
+  const step3Y = useTransform(scrollYProgress, [0.46, 0.66], [40, 0]);
+
+  const stepAnimations = [
+    { opacity: step1Opacity, y: step1Y },
+    { opacity: step2Opacity, y: step2Y },
+    { opacity: step3Opacity, y: step3Y },
+  ];
+
   return (
     <section 
       ref={containerRef} 
@@ -84,17 +98,8 @@ export default function HowItWorks() {
           <div className="flex flex-col gap-24 sm:gap-40">
             {steps.map((step, index) => {
               const Icon = step.icon;
-              // Map scroll positions to individual steps for glowing effect trigger
-              const startPoint = index * 0.33; 
-              
-              const stepOpacity = useTransform(scrollYProgress, 
-                [startPoint - 0.2, startPoint], 
-                [0.3, 1]
-              );
-              const stepY = useTransform(scrollYProgress, 
-                [startPoint - 0.2, startPoint], 
-                [40, 0]
-              );
+              const stepOpacity = stepAnimations[index].opacity;
+              const stepY = stepAnimations[index].y;
 
               return (
                 <motion.div 
