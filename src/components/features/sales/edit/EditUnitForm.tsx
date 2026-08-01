@@ -303,35 +303,14 @@ export function EditUnitForm({
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-amber-900">Total Harga (USD)</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ''}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val === '') {
-                              field.onChange(undefined);
-                              return;
-                            }
-                            const num = Number(val);
-                            if (Number.isNaN(num)) {
-                              field.onChange(undefined);
-                              return;
-                            }
-                            if (/^0+[1-9]/.test(val)) {
-                              const stripped = val.replace(/^0+/, '');
-                              e.target.value = stripped;
-                              field.onChange(Number(stripped));
-                            } else if (/^0+0/.test(val)) {
-                              const stripped = '0';
-                              e.target.value = stripped;
-                              field.onChange(0);
-                            } else {
-                              field.onChange(num);
-                            }
-                          }}
+                        <MoneyInput
+                          currency="USD"
+                          placeholder="$ 0.00"
+                          name={field.name}
+                          value={field.value ?? 0}
+                          onChangeValue={(val) => field.onChange(val === 0 ? undefined : val)}
                           disabled={readOnly}
+                          onBlur={field.onBlur}
                           className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
                         />
                       </FormControl>
@@ -347,35 +326,14 @@ export function EditUnitForm({
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-amber-900">Harga Satuan (USD)</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ''}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val === '') {
-                              field.onChange(undefined);
-                              return;
-                            }
-                            const num = Number(val);
-                            if (Number.isNaN(num)) {
-                              field.onChange(undefined);
-                              return;
-                            }
-                            if (/^0+[1-9]/.test(val)) {
-                              const stripped = val.replace(/^0+/, '');
-                              e.target.value = stripped;
-                              field.onChange(Number(stripped));
-                            } else if (/^0+0/.test(val)) {
-                              const stripped = '0';
-                              e.target.value = stripped;
-                              field.onChange(0);
-                            } else {
-                              field.onChange(num);
-                            }
-                          }}
+                        <MoneyInput
+                          currency="USD"
+                          placeholder="$ 0.00"
+                          name={field.name}
+                          value={field.value ?? 0}
+                          onChangeValue={(val) => field.onChange(val === 0 ? undefined : val)}
                           disabled={readOnly}
+                          onBlur={field.onBlur}
                           className="border-amber-200 focus:border-amber-300 focus:ring-amber-200 bg-white"
                         />
                       </FormControl>

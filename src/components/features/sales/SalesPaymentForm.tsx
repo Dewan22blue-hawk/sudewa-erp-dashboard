@@ -336,17 +336,12 @@ export function SalesPaymentForm({
                                         <FormItem className="space-y-2">
                                             <FormLabel className="text-sm font-medium">BCA USD</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    inputMode="decimal"
-                                                    value={field.value}
+                                                <MoneyInput
+                                                    name={field.name}
+                                                    currency="USD"
+                                                    value={Number(field.value) || 0}
                                                     disabled={billing && billingRemaining === 0 || isPaidAndValid}
-                                                    onChange={(e) => {
-                                                        let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
-                                                        const parts = val.split('.');
-                                                        if (parts.length > 2) {
-                                                            val = parts[0] + '.' + parts.slice(1).join('');
-                                                        }
+                                                    onChangeValue={(val) => {
                                                         field.onChange(val);
                                                     }}
                                                     onBlur={field.onBlur}
